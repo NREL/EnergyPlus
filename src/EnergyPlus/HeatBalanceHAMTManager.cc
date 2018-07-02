@@ -715,22 +715,23 @@ namespace HeatBalanceHAMTManager {
 
             ims(item).imsid = item;
             ims(item).sid = UtilityRoutines::FindItemInList(AlphaArray(1), Surface);
+            ims(item).lid = NumArray(1);
  
             // FA HAMT2
-            ims(item).SourceType = (int)NumArray(2);
+            ims(item).SourceType = NumArray(2);
             ims(item).moistairflow_Input = NumArray(3);
             ims(item).StackHeight = NumArray(4);
             ims(item).ComponentAirPermeance = NumArray(5);
             ims(item).MechanicalVentilationOverpressure = NumArray(6);
 
-            // connect to airflow network
+            /* connect to airflow network
             for (ii = 1; ii <= AirflowNetworkNumOfSurfaces; ii++) {
                 //
                 if (Surface(ims(item).sid).Name.compare(MultizoneSurfaceData(ii).SurfName) == 0) {
                     ims(item).AirflowNetworkid = ii;
                     break;
                 }
-            }
+            } */
             // end FA
 
             if (ims(item).sid == 0) {
@@ -739,22 +740,22 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-
-            if (ims(item).SourceType == 1 && lNumericBlanks[3] == true) {
+            /* 
+            if (ims(item).SourceType == 1 && lNumericBlanks(3) == true) {
                 ShowSevereError(cHAMTObject8 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError("No user defined input for Air Flow throguh Component found. Internal Moisture Source Type 1 requires this input.");
                 ErrorsFound = true;
                 continue;
             }
 
-            if (ims(item).SourceType == 2 && lNumericBlanks[4] == true) {
+            if (ims(item).SourceType == 2 && lNumericBlanks(4) == true) {
                 ShowSevereError(cHAMTObject8 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError("No user defined input for Stack Height for Component found. Internal Moisture Source Type 2 requires this input.");
                 ErrorsFound = true;
                 continue;
             }
 
-            if (ims(item).SourceType == 2 && lNumericBlanks[5] == true ) {
+            if (ims(item).SourceType == 2 && lNumericBlanks(5) == true ) {
                 ShowSevereError(cHAMTObject8 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError("No user defined input for Component Air Permeance found. Internal Moisture Source Type 2 requires this input.");
                 ErrorsFound = true;
@@ -766,7 +767,7 @@ namespace HeatBalanceHAMTManager {
                 ShowContinueError("No Air Flow Network Id found for Internal Moisture Source Type 3.");
                 ErrorsFound = true;
                 continue;
-            }
+            } */
         }
 
         AlphaArray.deallocate();
