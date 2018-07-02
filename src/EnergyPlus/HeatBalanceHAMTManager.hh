@@ -163,9 +163,24 @@ namespace HeatBalanceHAMTManager {
         int sid;
         int lid;
 
+        int SourceType;   // (1 = air flow input; 2 = infiltration model (Kuenzel); 3 = multi zone air flow model)
+
+        // SourceType == 1: Air Flow input
+        Real64 moistairflow_Input;
+
+        // Source Type == 2: Air infiltration model
+        Real64 StackHeight;
+        Real64 ComponentAirPermeance;
+        Real64 MechanicalVentilationOverpressure;
+        Real64 DeltaPressure;
+
+        // Source Type == 3: Air flow network
+        int AirflowNetworkid;
+
         Real64 moistairflow;
 
-        s_ims() : imsid(-1), sid(-1), lid(-1), moistairflow(0.0)
+        s_ims() : imsid(-1), sid(-1), lid(-1), SourceType(0), moistairflow_Input(0.0), StackHeight(0.0), ComponentAirPermeance(0.0), 
+            MechanicalVentilationOverpressure(0.0), DeltaPressure(0.0), AirflowNetworkid(0), moistairflow(0.0)
         {
         }
     };

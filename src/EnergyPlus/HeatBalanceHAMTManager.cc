@@ -70,6 +70,9 @@
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
 
+// FA
+#include <DataAirflowNetwork.hh>
+
 namespace EnergyPlus {
 
 namespace HeatBalanceHAMTManager {
@@ -134,6 +137,9 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalFanSys::QHWBaseboardSurf;
     using DataHeatBalFanSys::QSteamBaseboardSurf;
 
+    // FA
+    using namespace DataAirflowNetwork;
+
     // Data
     // MODULE PARAMETER DEFINITIONS:
     int const ittermax(150); // Maximum Number of itterations
@@ -178,10 +184,10 @@ namespace HeatBalanceHAMTManager {
 
     int TotCellsMax(0); // Maximum number of cells per material
 
-    int TotImsMax(0);   // Maximumg number of internal moisture sources
+    int TotImsMax(0); // Maximumg number of internal moisture sources
 
-    bool latswitch(false); // latent heat switch,
-    bool rainswitch(false);    // rain switch,
+    bool latswitch(false);  // latent heat switch,
+    bool rainswitch(false); // rain switch,
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceHAMTManager:
 
@@ -709,11 +715,55 @@ namespace HeatBalanceHAMTManager {
 
             ims(item).imsid = item;
             ims(item).sid = UtilityRoutines::FindItemInList(AlphaArray(1), Surface);
-            ims(item).moistairflow = NumArray(2);
+ 
+            // FA HAMT2
+            ims(item).SourceType = (int)NumArray(2);
+            ims(item).moistairflow_Input = NumArray(3);
+            ims(item).StackHeight = NumArray(4);
+            ims(item).ComponentAirPermeance = NumArray(5);
+            ims(item).MechanicalVentilationOverpressure = NumArray(6);
+
+            // connect to airflow network
+            for (ii = 1; ii <= AirflowNetworkNumOfSurfaces; ii++) {
+                //
+                if (Surface(ims(item).sid).Name.compare(MultizoneSurfaceData(ii).SurfName) == 0) {
+                    ims(item).AirflowNetworkid = ii;
+                    break;
+                }
+            }
+            // end FA
 
             if (ims(item).sid == 0) {
                 ShowSevereError(cHAMTObject8 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError("The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
+                ErrorsFound = true;
+                continue;
+            }
+
+            if (ims(item).SourceType == 1 && lNumericBlanks[3] == true) {
+                ShowSevereError(cHAMTObject8 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowContinueError("No user defined input for Air Flow throguh Component found. Internal Moisture Source Type 1 requires this input.");
+                ErrorsFound = true;
+                continue;
+            }
+
+            if (ims(item).SourceType == 2 && lNumericBlanks[4] == true) {
+                ShowSevereError(cHAMTObject8 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowContinueError("No user defined input for Stack Height for Component found. Internal Moisture Source Type 2 requires this input.");
+                ErrorsFound = true;
+                continue;
+            }
+
+            if (ims(item).SourceType == 2 && lNumericBlanks[5] == true ) {
+                ShowSevereError(cHAMTObject8 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowContinueError("No user defined input for Component Air Permeance found. Internal Moisture Source Type 2 requires this input.");
+                ErrorsFound = true;
+                continue;
+            }
+
+            if (ims(item).SourceType == 3 && ims(item).AirflowNetworkid == 0) {
+                ShowSevereError(cHAMTObject8 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowContinueError("No Air Flow Network Id found for Internal Moisture Source Type 3.");
                 ErrorsFound = true;
                 continue;
             }
@@ -984,7 +1034,7 @@ namespace HeatBalanceHAMTManager {
                     cells(cid).volume = cells(cid).length(1) * Surface(sid).Area;
 
                     // connect internal moisture source with cell
-                    for (imsid = 1; imsid <= TotImsMax; imsid) {
+                    for (imsid = 1; imsid <= TotImsMax; ++imsid) {
                         if ((cells(cid).sid == ims(imsid).sid) && (cells(cid).lid == ims(imsid).lid)) {
                             cells(cid).imsid = imsid;
                         }
@@ -1348,13 +1398,30 @@ namespace HeatBalanceHAMTManager {
                 if (cells(cid).imsid > 0) {
                     matid = cells(cid).matid;
                     imsid = cells(cid).imsid;
-                    
-                    if (ims(imsid).moistairflow >= 0) {
-                        InternalMoistureSource =
-                            ims(imsid).moistairflow * (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp));
+
+                    // FA HAMT2
+
+                    if (ims(imsid).SourceType == 1) { // user defined input of the air flow
+                        ims(imsid).moistairflow = ims(imsid).moistairflow_Input;
+                    } else if (ims(imsid).SourceType == 2) { // infiltration model according to Kuenzel, extended with ventilation pressure
+                        ims(imsid).DeltaPressure =
+                            cells(Extcell(sid)).density * ((cells(Extcell(sid)).temp - cells(Intcell(sid)).temp) / cells(Intcell(sid)).temp) *
+                                GravityConstant * (ims(imsid).StackHeight / 2) - ims(imsid).MechanicalVentilationOverpressure;
+                            ims(imsid).moistairflow = std::abs(ims(imsid).DeltaPressure) * (ims(imsid).ComponentAirPermeance) / 3600;
+                    } else if (ims(imsid).SourceType == 3) {  // air flow through component from multizone airflow network
+                        ims(imsid).moistairflow = AirflowNetworkLinkSimu(ims(imsid).AirflowNetworkid).FLOW;
                     } else {
-                        InternalMoistureSource = 
-                            -ims(imsid).moistairflow * (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp));
+                        ims(imsid).moistairflow = 0.0;
+                    }
+
+                    // end FA
+
+                    if (ims(imsid).moistairflow >= 0) {
+                        InternalMoistureSource = ims(imsid).moistairflow *
+                                                 (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp));
+                    } else {
+                        InternalMoistureSource = -ims(imsid).moistairflow *
+                                                 (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp));
                     }
 
                     if (InternalMoistureSource > 0) {
