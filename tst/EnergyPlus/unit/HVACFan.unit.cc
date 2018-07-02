@@ -461,10 +461,10 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
     EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
 }
 
-TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc_noPowerFFlowCurve)
+TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_noPowerFFlowCurve)
 {
     // this unit test checks the power averaging when cycling between a hi and low speed
-    // this uses fan power curve instead of speed level power fractions
+    // this uses fan speed level power fractions
     // this unit test uses the optional two-mode arguments
 
     std::string const idf_objects = delimited_string({
@@ -508,7 +508,8 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc_noPowerFFlowCurve)
     Real64 runTimeFrac2 = 0.5;
     HVACFan::fanObjs[0]->simulate(_, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);
     Real64 locFanElecPower = HVACFan::fanObjs[0]->fanPower();
-    Real64 locExpectPower = (0.5 * 0.5 + 0.5 * 1.0) * HVACFan::fanObjs[0]->designElecPower;
+    // uses flow weighted power calculation. 50% of time at 50% flow and 50% of time at 100% flow
+    Real64 locExpectPower = (0.5 * 0.5 + 0.5 * 1.0) * HVACFan::fanObjs[0]->designElecPower; // expect 75% of power
     EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
 
     // 100% of the time at average flow 0.75, on for entire timestep
@@ -518,7 +519,8 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc_noPowerFFlowCurve)
     runTimeFrac2 = 1.0;
     HVACFan::fanObjs[0]->simulate(_, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);
     locFanElecPower = HVACFan::fanObjs[0]->fanPower();
-    locExpectPower = 0.75 * HVACFan::fanObjs[0]->designElecPower;
+    // uses flow weighted power calculation. 0% of time at 0% flow and 100% of time at 75% flow
+    locExpectPower = (0.0 * 0.0 + 1.0 * 0.75) * HVACFan::fanObjs[0]->designElecPower; // expect 75% of power
     EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
 
     // 100% of the time at full flow, on for the entire timestep
@@ -528,7 +530,8 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc_noPowerFFlowCurve)
     runTimeFrac2 = 1.0;
     HVACFan::fanObjs[0]->simulate(_, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);
     locFanElecPower = HVACFan::fanObjs[0]->fanPower();
-    locExpectPower = HVACFan::fanObjs[0]->designElecPower; // expect full power
+    // uses flow weighted power calculation. 0% of time at 0% flow and 100% of time at 100% flow
+    locExpectPower = (0.0 * 0.0 + 1.0 * 1.0) * HVACFan::fanObjs[0]->designElecPower; // expect full power
     EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
 
     // 85% of the time at full flow, on for the entire timestep
@@ -538,7 +541,8 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc_noPowerFFlowCurve)
     runTimeFrac2 = 0.85;
     HVACFan::fanObjs[0]->simulate(_, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);
     locFanElecPower = HVACFan::fanObjs[0]->fanPower();
-    locExpectPower = 0.85 * HVACFan::fanObjs[0]->designElecPower; // expect 85% of full power
+    // uses flow weighted power calculation. 0% of time at 0% flow and 85% of time at 100% flow
+    locExpectPower = (0.0 * 0.25 + 0.85 * 1.0) * HVACFan::fanObjs[0]->designElecPower; // expect 85% of full power
     EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
 }
 

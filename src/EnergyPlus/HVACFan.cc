@@ -539,8 +539,8 @@ namespace HVACFan {
             if (foundMissingPowerFraction) {
                 // field set input does not match number of speeds, throw warning
                 ShowSevereError(routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError("Fan with Discrete speed control does not have input for power fraction at one or more speed levels and does not "
-                                  "have a power curve.");
+                ShowContinueError(
+                    "Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
                 errorsFound = true;
             }
         }
