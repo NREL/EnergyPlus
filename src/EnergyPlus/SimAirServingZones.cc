@@ -7610,8 +7610,8 @@ namespace SimAirServingZones {
         }
 
         bool WaterCoilIsOnWaterCoilSystem = false;
-        std::string CoilSystemName = "";
-        int CoilSystemTypeNum = 0;
+        std::string CoilSystemName = CompName;
+        int CoilSystemTypeNum = CompTypeNum;
 
         if (HVACHXAssistedCoolingCoil::TotalNumHXAssistedCoils > 0) {
             // check if the water coil is placed on 'CoilSystem:Cooling:Water:HeatExchangerAssisted' object
