@@ -460,6 +460,7 @@ namespace Boilers {
 
         for (auto &boiler : Boiler) {
             std::string const fuelType(GetResourceTypeChar(boiler.FuelType));
+            std::string const fuelTypeCaps(UtilityRoutines::MakeUPPERCase(fuelType));
 
             SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, boiler.m_operatingLoad, "System", "Average", boiler.Name);
             SetupOutputVariable("Boiler Heating Energy", OutputProcessor::Unit::J, boiler.m_operatingHeatingEnergy, "System", "Sum",
@@ -472,7 +473,7 @@ namespace Boilers {
             }
 
             SetupOutputVariable("Boiler " + fuelType + " Energy", OutputProcessor::Unit::J, boiler.m_operatingFuelUse, "System", "Sum", boiler.Name, _,
-                                fuelType, "Heating", boiler.EndUseSubcategory, "Plant");
+                                fuelTypeCaps, "Heating", boiler.EndUseSubcategory, "Plant");
             SetupOutputVariable("Boiler Inlet Temperature", OutputProcessor::Unit::C, boiler.m_operatingInletTemperature, "System", "Average", boiler.Name);
             SetupOutputVariable("Boiler Outlet Temperature", OutputProcessor::Unit::C, boiler.m_operatingOutletTemperature, "System", "Average", boiler.Name);
             SetupOutputVariable("Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, boiler.m_operatingMassFlowRate, "System", "Average", boiler.Name);
