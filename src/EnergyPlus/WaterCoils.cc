@@ -191,9 +191,10 @@ namespace WaterCoils {
     Array1D_bool MyUAAndFlowCalcFlag;
     Array1D_bool MyCoilDesignFlag;
     Array1D_bool CoilWarningOnceFlag;
-    Array1D_int WaterTempCoolCoilErrs; // error counting for detailed coils
-    Array1D_int PartWetCoolCoilErrs;   // error counting for detailed coils
-    bool GetWaterCoilsInputFlag(true); // Flag set to make sure you get input once
+    Array1D_int WaterTempCoolCoilErrs;              // error counting for detailed coils
+    Array1D_int PartWetCoolCoilErrs;                // error counting for detailed coils
+    bool GetWaterCoilsInputFlag(true);              // Flag set to make sure you get input once
+    bool WaterCoilControllerCheckOneTimeFlag(true); // flg used to check water coil controller
     Array1D_bool CheckEquipName;
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -240,6 +241,7 @@ namespace WaterCoils {
         CheckEquipName.deallocate();
         WaterCoil.deallocate();
         WaterCoilNumericFields.deallocate();
+        WaterCoilControllerCheckOneTimeFlag = true;
     }
 
     void SimulateWaterCoilComponents(std::string const &CompName,
@@ -1121,6 +1123,13 @@ namespace WaterCoils {
             for (tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum) {
                 GetControllerNameAndIndex(
                     WaterCoil(tempCoilNum).WaterInletNodeNum, WaterCoil(tempCoilNum).ControllerName, WaterCoil(tempCoilNum).ControllerIndex, errFlag);
+            }
+        }
+
+        if (WaterCoilControllerCheckOneTimeFlag && (DataHVACGlobals::GetAirPathDataDone)) {
+            bool ErrorsFound = false;
+            bool WaterCoilOnAirLoop = true;
+            for (tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum) {
                 if (WaterCoil(tempCoilNum).ControllerIndex > 0) {
                     int CoilTypeNum;
                     std::string CompType;
@@ -1135,13 +1144,17 @@ namespace WaterCoils {
                         CoilTypeNum = SimAirServingZones::WaterCoil_SimpleHeat;
                         CompType = cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
                     }
-
-                    bool watercoilonBranch = CheckWaterCoilIsOnAirLoop(CoilTypeNum, CompType, CompName);
-                    if (!watercoilonBranch) {
-                        ShowFatalError("Controller:WaterCoil = " + WaterCoil(tempCoilNum).ControllerName +
-                                       ". Invalid water controller entry. Program terminated for previous condition.");
+                    WaterCoilOnAirLoop = true;
+                    CheckWaterCoilIsOnAirLoop(CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
+                    if (!WaterCoilOnAirLoop) {
+                        ShowContinueError("Controller:WaterCoil = " + WaterCoil(tempCoilNum).ControllerName + ". Invalid water controller entry.");
+                        ErrorsFound = true;
                     }
                 }
+            }
+            WaterCoilControllerCheckOneTimeFlag = false;
+            if (ErrorsFound) {
+                ShowFatalError("Program terminated for previous condition.");
             }
         }
 

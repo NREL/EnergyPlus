@@ -7391,7 +7391,7 @@ namespace SimAirServingZones {
         return ReheatCoilInHumRatForSizing;
     }
 
-    bool CheckWaterCoilIsOnAirLoop(int const &CompTypeNum, std::string const &CompType, std::string const &CompName)
+    void CheckWaterCoilIsOnAirLoop(int const CompTypeNum, std::string const CompType, std::string const CompName, bool &WaterCoilOnAirLoop)
     {
 
         // PURPOSE OF THIS FUNCTION:
@@ -7440,10 +7440,10 @@ namespace SimAirServingZones {
                               "'Controller:Water' object.");
         }
 
-        return CheckWaterCoilIsOnAirLoop;
+        WaterCoilOnAirLoop = CheckWaterCoilIsOnAirLoop;
     }
 
-    bool CheckWaterCoilOnPrimaryAirLoopBranch(int const &CompTypeNum, std::string const &CompName)
+    bool CheckWaterCoilOnPrimaryAirLoopBranch(int const CompTypeNum, std::string const CompName)
     {
 
         // PURPOSE OF THIS FUNCTION:
@@ -7502,7 +7502,7 @@ namespace SimAirServingZones {
         return CheckWaterCoilIsOnPrimaryAirLoopBranch;
     }
 
-    bool CheckWaterCoilOnOASystem(int const &CompTypeNum, std::string const &CompName)
+    bool CheckWaterCoilOnOASystem(int const CompTypeNum, std::string const CompName)
     {
 
         // PURPOSE OF THIS FUNCTION:
@@ -7547,11 +7547,11 @@ namespace SimAirServingZones {
         if (NumOASys > 0) {
             for (int OASysNum = 1; OASysNum <= NumOASys; ++OASysNum) {
                 for (int OACompNum = 1; OACompNum <= OutsideAirSys(OASysNum).NumComponents; ++OACompNum) {
-                    std::string CompType = OutsideAirSys(OASysNum).ComponentType(OACompNum);
-                    if ((UtilityRoutines::SameString(CompType, "Coil:Cooling:Water") ||
-                         UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry") ||
-                         UtilityRoutines::SameString(CompType, "CoilSystem:Cooling:Water:HeatExchangerAssisted") ||
-                         UtilityRoutines::SameString(CompType, "Coil:Heating:Water")) &&
+                    std::string WaterCoilType = OutsideAirSys(OASysNum).ComponentType(OACompNum);
+                    if ((UtilityRoutines::SameString(WaterCoilType, "Coil:Cooling:Water") ||
+                         UtilityRoutines::SameString(WaterCoilType, "Coil:Cooling:Water:DetailedGeometry") ||
+                         UtilityRoutines::SameString(WaterCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted") ||
+                         UtilityRoutines::SameString(WaterCoilType, "Coil:Heating:Water")) &&
                         (UtilityRoutines::SameString(CompName, OutsideAirSys(OASysNum).ComponentName(OACompNum)))) {
                         CheckWaterCoilIsOnOASystem = true;
                         goto OASystemLoop_exit;
@@ -7564,7 +7564,7 @@ namespace SimAirServingZones {
         return CheckWaterCoilIsOnOASystem;
     }
 
-    bool CheckWaterCoilSystemOnAirLoopOrOASystem(int const &CompTypeNum, std::string const &CompName)
+    bool CheckWaterCoilSystemOnAirLoopOrOASystem(int const CompTypeNum, std::string const CompName)
     {
 
         // PURPOSE OF THIS FUNCTION:
@@ -7602,7 +7602,6 @@ namespace SimAirServingZones {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // if (!CheckWaterCoilIsOnAirLoopBranch && (NumOASys > 0 || DataHVACGlobals::NumPrimaryAirSys > 0)) {
         if (GetCoilsInputFlag) {
             // Get the HXAssistedCoolingCoil input
             GetHXAssistedCoolingCoilInput();
