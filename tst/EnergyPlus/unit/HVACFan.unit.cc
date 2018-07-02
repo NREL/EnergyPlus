@@ -461,4 +461,85 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
     EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
 }
 
+TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc_noPowerFFlowCurve)
+{
+    // this unit test checks the power averaging when cycling between a hi and low speed
+    // this uses fan power curve instead of speed level power fractions
+    // this unit test uses the optional two-mode arguments
+
+    std::string const idf_objects = delimited_string({
+
+        "  Fan:SystemModel,",
+        "    Test Fan ,              !- Name",
+        "    ,                       !- Availability Schedule Name",
+        "    TestFanAirInletNode,    !- Air Inlet Node Name",
+        "    TestFanOutletNode,      !- Air Outlet Node Name",
+        "    1.0 ,                   !- Design Maximum Air Flow Rate",
+        "    Discrete,               !- Speed Control Method",
+        "    0.0,                    !- Electric Power Minimum Flow Rate Fraction",
+        "    100.0,                  !- Design Pressure Rise",
+        "    0.9 ,                   !- Motor Efficiency",
+        "    1.0 ,                   !- Motor In Air Stream Fraction",
+        "    100.0,                  !- Design Electric Power Consumption",
+        "    ,                       !- Design Power Sizing Method",
+        "    ,                       !- Electric Power Per Unit Flow Rate",
+        "    ,                       !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+        "    ,                       !- Fan Total Efficiency",
+        "    ;                       !- Electric Power Function of Flow Fraction Curve Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    std::string fanName = "TEST FAN";
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    DataSizing::CurZoneEqNum = 0;
+    DataSizing::CurSysNum = 0;
+    DataSizing::CurOASysNum = 0;
+    DataEnvironment::StdRhoAir = 1.2;
+    HVACFan::fanObjs[0]->simulate(_, _, _, _);
+    Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate;
+    EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);
+
+    // 50% of the time at speed 1 (0.5 flow) and 50% of the time at speed 2 (1.0 flow), average flow 0.75, on for entire timestep
+    Real64 designMassFlowRate = locFanSizeVdot * DataEnvironment::StdRhoAir;
+    Real64 massFlow1 = 0.5 * designMassFlowRate;
+    Real64 massFlow2 = designMassFlowRate;
+    Real64 runTimeFrac1 = 0.5;
+    Real64 runTimeFrac2 = 0.5;
+    HVACFan::fanObjs[0]->simulate(_, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);
+    Real64 locFanElecPower = HVACFan::fanObjs[0]->fanPower();
+    Real64 locExpectPower = (0.5 * 0.5 + 0.5 * 1.0) * HVACFan::fanObjs[0]->designElecPower;
+    EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
+
+    // 100% of the time at average flow 0.75, on for entire timestep
+    massFlow1 = 0.0;
+    massFlow2 = 0.75 * designMassFlowRate;
+    runTimeFrac1 = 0.0;
+    runTimeFrac2 = 1.0;
+    HVACFan::fanObjs[0]->simulate(_, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);
+    locFanElecPower = HVACFan::fanObjs[0]->fanPower();
+    locExpectPower = 0.75 * HVACFan::fanObjs[0]->designElecPower;
+    EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
+
+    // 100% of the time at full flow, on for the entire timestep
+    massFlow1 = 0.0;
+    massFlow2 = 1.0 * designMassFlowRate;
+    runTimeFrac1 = 0.0;
+    runTimeFrac2 = 1.0;
+    HVACFan::fanObjs[0]->simulate(_, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);
+    locFanElecPower = HVACFan::fanObjs[0]->fanPower();
+    locExpectPower = HVACFan::fanObjs[0]->designElecPower; // expect full power
+    EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
+
+    // 85% of the time at full flow, on for the entire timestep
+    massFlow1 = 0.0;
+    massFlow2 = 1.0 * designMassFlowRate;
+    runTimeFrac1 = 0.0;
+    runTimeFrac2 = 0.85;
+    HVACFan::fanObjs[0]->simulate(_, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);
+    locFanElecPower = HVACFan::fanObjs[0]->fanPower();
+    locExpectPower = 0.85 * HVACFan::fanObjs[0]->designElecPower; // expect 85% of full power
+    EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
+}
+
 } // namespace EnergyPlus

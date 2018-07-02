@@ -278,7 +278,7 @@ namespace HVACFan {
         // calculate total fan system efficiency at design
         m_fanTotalEff = designAirVolFlowRate * deltaPress / designElecPower;
 
-        if (m_numSpeeds > 1) { // set up values at speeds
+        if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) { // set up values at speeds
             m_massFlowAtSpeed.resize(m_numSpeeds, 0.0);
             m_totEfficAtSpeed.resize(m_numSpeeds, 0.0);
             for (auto loop = 0; loop < m_numSpeeds; ++loop) {
@@ -461,6 +461,7 @@ namespace HVACFan {
             if (speedControl == SpeedControlMethod::Continuous) {
                 ShowWarningError(routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError("Continuous speed control requires a fan power curve in " + alphaFieldNames(7) + " = " + alphaArgs(7));
+                errorsFound = true;
             }
         }
         m_nightVentPressureDelta = numericArgs(10);
@@ -538,8 +539,8 @@ namespace HVACFan {
             if (foundMissingPowerFraction) {
                 // field set input does not match number of speeds, throw warning
                 ShowSevereError(routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(
-                    "Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
+                ShowContinueError("Fan with Discrete speed control does not have input for power fraction at one or more speed levels and does not "
+                                  "have a power curve.");
                 errorsFound = true;
             }
         }
