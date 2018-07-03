@@ -66,7 +66,8 @@ namespace Boilers {
     // MODULE PARAMETER DEFINITIONS
 
     // Boiler normalized efficiency curve types
-    enum class EfficiencyCurveType {
+    enum class EfficiencyCurveType
+    {
         NotSet,
         Linear,
         BiLinear,
@@ -75,30 +76,32 @@ namespace Boilers {
         Cubic,
         QuadraticLinear,
         BiCubic,
-        Default=NotSet,
+        Default = NotSet,
     };
 
     // water temperature evaluation method
-    enum class TemperatureEvaluationModeType {
+    enum class TemperatureEvaluationModeType
+    {
         NotSet,
         Entering,
         Leaving,
-        Default=NotSet,
+        Default = NotSet,
     };
 
     // Boiler flow modes
-    enum class FlowModeType {
+    enum class FlowModeType
+    {
         NotSet,
         Constant,
         NotModulated,
         LeavingSetPointModulated,
-        Default=NotSet,
+        Default = NotSet,
     };
 
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumBoilers;            // Number of boilers
+    extern int NumBoilers; // Number of boilers
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
@@ -106,132 +109,136 @@ namespace Boilers {
     class BoilerObject : public PlantComponent
     {
         // Members
-        public:
-            virtual ~BoilerObject()
-            {
-            }
+    public:
+        virtual ~BoilerObject()
+        {
+        }
 
-            std::string Name;             // user identifier
-            
-            // Operational fault parameters
-            bool FaultyBoilerFoulingFlag;     // True if the boiler has fouling fault
-            int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
-            Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
+        std::string Name; // user identifier
 
-                                              // member functions
-            static PlantComponent *factory(std::string objectName);
+        // Operational fault parameters
+        bool FaultyBoilerFoulingFlag;     // True if the boiler has fouling fault
+        int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
+        Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
 
-            void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag, int const EquipFlowCtrl) override;
+        // member functions
+        static PlantComponent *factory(std::string objectName);
 
-            void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void simulate(const PlantLocation &calledFromLocation,
+                      bool const FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool const RunFlag,
+                      int const EquipFlowCtrl) override;
 
-            void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-            void getSizingFactor(Real64 &SizFac) override;
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-            void doSizing();
+        void getSizingFactor(Real64 &SizFac) override;
 
-            // public getters/setters
-            Real64 getDesignNominalCapacity();
-            Real64 getDesignVolumeFlowRate();
+        void doSizing();
 
-            void setDesignNominalCapacity(Real64 const capacity);
-            void setDesignVolumeFlowRate(Real64 const flowRate);
+        // public getters/setters
+        Real64 getDesignNominalCapacity();
+        Real64 getDesignVolumeFlowRate();
 
-            // set the sizing factor for the boiler, if sizingFactor <= 0.0, it is set to 1.0
-            void setDesignSizingFactor(Real64 const sizingFactor);
-            void setLoopNumber(int const loopNumber);
-            void setDesignOutletTemperature(Real64 const temperature);
+        void setDesignNominalCapacity(Real64 const capacity);
+        void setDesignVolumeFlowRate(Real64 const flowRate);
 
-            // set the outlet limit temperature, if temperature <= 0.0, set it to 99.9
-            void setDesignOutletTemperatureLimit(Real64 const temperature);
+        // set the sizing factor for the boiler, if sizingFactor <= 0.0, it is set to 1.0
+        void setDesignSizingFactor(Real64 const sizingFactor);
+        void setLoopNumber(int const loopNumber);
+        void setDesignOutletTemperature(Real64 const temperature);
 
-            // Default Constructor
-            BoilerObject()
-                : FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), FuelType(0), TypeNum(0), LoopNum(0),
-                  LoopSideNum(0), BranchNum(0), CompNum(0), m_designNominalCapacity(0.0), m_designNominalCapacityWasAutoSized(false),
-                  m_designEfficiency(0.0), m_designOutletTemperature(0.0), m_designFlowMode(FlowModeType::Default), ModulatedFlowSetToLoop(false),
-                  ModulatedFlowErrDone(false), m_designVolumeFlowRate(0.0), m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0),
-                  m_designSizingFactor(0.0), m_nodeHotWaterInletIndex(0), m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0),
-                  m_designMaxPartLoadRatio(0.0), m_designOptimalPartLoadRatio(0.0),
-                  m_efficiencyCurveTemperatureMode(TemperatureEvaluationModeType::Default), m_curveEfficiencyIndex(0),
-                  m_efficiencyCurveType(EfficiencyCurveType::Default), m_designOutletTemperatureLimit(0.0), m_designParasiticElectricalLoad(0.0),
-                  EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), m_doOneTimeInitialisation(true),
-                  m_doEnvironmentInitialisation(true), m_operatingLoad(0.0), m_operatingHeatingEnergy(0.0), m_operatingParasiticElectricalPower(0.0),
-                  m_operatingParasiticElectricalConsumption(0.0), m_operatingMassFlowRate(0.0), m_operatingInletTemperature(0.0),
-                  m_operatingPartLoadRatio(0.0), m_operatingFuelUseRate(0.0), m_operatingFuelUse(0.0)
-            {
-            }
+        // set the outlet limit temperature, if temperature <= 0.0, set it to 99.9
+        void setDesignOutletTemperatureLimit(Real64 const temperature);
 
-        private:
-            int FuelType;                                                       // resource type assignment
-            int TypeNum;                                                        // plant loop type identifier
-            int LoopNum;                                                        // plant loop connection
-            int LoopSideNum;                                                    // plant loop side connection
-            int BranchNum;                                                      // plant loop branch connection
-            int CompNum;                                                        // plant loop component connection
-            Real64 m_designNominalCapacity;                                      // W - design nominal capacity of Boiler
-            bool m_designNominalCapacityWasAutoSized;                            // true if previous was set to autosize input
-            Real64 m_designEfficiency;                                           // boiler efficiency at design conditions
-            Real64 m_designOutletTemperature;                                    // C - Boiler design outlet temperature
-            FlowModeType m_designFlowMode;                                       // one of 3 modes for componet flow during operation
-            bool ModulatedFlowSetToLoop;                                        // True if the setpoint is missing at the outlet node
-            bool ModulatedFlowErrDone;                                          // true if setpoint warning issued
-            Real64 m_designVolumeFlowRate;                                       // m3/s - Boiler water design volumetric flow rate
-            bool m_designVolumeFlowRateWasAutoSized;                             // true if previous was set to autosize input
-            Real64 m_designMassFlowRate;                                         // kg/s - Boiler water design mass flow rate
-            Real64 m_designSizingFactor;                                         // sizing factor
-            int m_nodeHotWaterInletIndex;                                        // Node number at the boiler inlet
-            int m_nodeHotWaterOutletIndex;                                       // Node number at the boiler outlet
-            Real64 m_designMinPartLoadRatio;                                     // Minimum allowed operating part load ratio
-            Real64 m_designMaxPartLoadRatio;                                     // Maximum allowed operating part load ratio
-            Real64 m_designOptimalPartLoadRatio;                                 // Optimal operating part load ratio
-            TemperatureEvaluationModeType m_efficiencyCurveTemperatureMode;      // water temp to use in curve, switch between entering and leaving
-            int m_curveEfficiencyIndex;                                          // Index to efficiency curve
-            EfficiencyCurveType m_efficiencyCurveType;                           // Type of efficiency curve
-            Real64 m_designOutletTemperatureLimit;                               // C - Boiler outlet maximum temperature limit
-            Real64 m_designParasiticElectricalLoad;                              // W - Parasitic electric power (e.g. forced draft fan)
-            int EffCurveOutputError;                                            // efficiency curve output <=0 recurring warning error counter
-            int EffCurveOutputIndex;                                            // efficiency curve output <=0 recurring warning error message index
-            int CalculatedEffError;                                             // calculated efficiency >1.1 recurring warning error counter
-            int CalculatedEffIndex;                                             // calculated efficiency >1.1 recurring warning error message index
-            std::string EndUseSubcategory;                                      // identifier use for the end use subcategory
-            bool m_doOneTimeInitialisation;                                      // do the one time initialisation, i.e. locate on plantloops etc.
-            bool m_doEnvironmentInitialisation;                                  // do the environment initialisation, i.e. get inlet conditions etc.
-            Real64 m_operatingLoad;                                              // W - Boiler Load
-            Real64 m_operatingHeatingEnergy;                                     // J - Boiler energy integrated over time
-            Real64 m_operatingParasiticElectricalPower;                          // W - Parasitic electrical power (e.g. forced draft fan)
-            Real64 m_operatingParasiticElectricalConsumption;                    // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-            Real64 m_operatingMassFlowRate;                                      // kg/s - Boiler mass flow rate
-            Real64 m_operatingInletTemperature;                                  // C - Boiler inlet temperature
-            Real64 m_operatingOutletTemperature;                                 // C - Boiler outlet temperature
-            Real64 m_operatingPartLoadRatio;                                     // Boiler operating part-load ratio
-            Real64 m_operatingFuelUseRate;                                       // W - Boiler fuel used
-            Real64 m_operatingFuelUse;                                           // J - Boiler Fuel consumed integrated over time
+        // Default Constructor
+        BoilerObject()
+            : FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), FuelType(0), TypeNum(0), LoopNum(0),
+              LoopSideNum(0), BranchNum(0), CompNum(0), m_designNominalCapacity(0.0), m_designNominalCapacityWasAutoSized(false),
+              m_designEfficiency(0.0), m_designOutletTemperature(0.0), m_designFlowMode(FlowModeType::Default), ModulatedFlowSetToLoop(false),
+              ModulatedFlowErrDone(false), m_designVolumeFlowRate(0.0), m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0),
+              m_designSizingFactor(0.0), m_nodeHotWaterInletIndex(0), m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0),
+              m_designMaxPartLoadRatio(0.0), m_designOptimalPartLoadRatio(0.0),
+              m_efficiencyCurveTemperatureMode(TemperatureEvaluationModeType::Default), m_curveEfficiencyIndex(0),
+              m_efficiencyCurveType(EfficiencyCurveType::Default), m_designOutletTemperatureLimit(0.0), m_designParasiticElectricalLoad(0.0),
+              EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), m_doOneTimeInitialisation(true),
+              m_doEnvironmentInitialisation(true), m_operatingLoad(0.0), m_operatingHeatingEnergy(0.0), m_operatingParasiticElectricalPower(0.0),
+              m_operatingParasiticElectricalConsumption(0.0), m_operatingMassFlowRate(0.0), m_operatingInletTemperature(0.0),
+              m_operatingPartLoadRatio(0.0), m_operatingFuelUseRate(0.0), m_operatingFuelUse(0.0)
+        {
+        }
 
-            // static member functions
-            static void GetBoilerInput();
+    private:
+        int FuelType;                                                   // resource type assignment
+        int TypeNum;                                                    // plant loop type identifier
+        int LoopNum;                                                    // plant loop connection
+        int LoopSideNum;                                                // plant loop side connection
+        int BranchNum;                                                  // plant loop branch connection
+        int CompNum;                                                    // plant loop component connection
+        Real64 m_designNominalCapacity;                                 // W - design nominal capacity of Boiler
+        bool m_designNominalCapacityWasAutoSized;                       // true if previous was set to autosize input
+        Real64 m_designEfficiency;                                      // boiler efficiency at design conditions
+        Real64 m_designOutletTemperature;                               // C - Boiler design outlet temperature
+        FlowModeType m_designFlowMode;                                  // one of 3 modes for componet flow during operation
+        bool ModulatedFlowSetToLoop;                                    // True if the setpoint is missing at the outlet node
+        bool ModulatedFlowErrDone;                                      // true if setpoint warning issued
+        Real64 m_designVolumeFlowRate;                                  // m3/s - Boiler water design volumetric flow rate
+        bool m_designVolumeFlowRateWasAutoSized;                        // true if previous was set to autosize input
+        Real64 m_designMassFlowRate;                                    // kg/s - Boiler water design mass flow rate
+        Real64 m_designSizingFactor;                                    // sizing factor
+        int m_nodeHotWaterInletIndex;                                   // Node number at the boiler inlet
+        int m_nodeHotWaterOutletIndex;                                  // Node number at the boiler outlet
+        Real64 m_designMinPartLoadRatio;                                // Minimum allowed operating part load ratio
+        Real64 m_designMaxPartLoadRatio;                                // Maximum allowed operating part load ratio
+        Real64 m_designOptimalPartLoadRatio;                            // Optimal operating part load ratio
+        TemperatureEvaluationModeType m_efficiencyCurveTemperatureMode; // water temp to use in curve, switch between entering and leaving
+        int m_curveEfficiencyIndex;                                     // Index to efficiency curve
+        EfficiencyCurveType m_efficiencyCurveType;                      // Type of efficiency curve
+        Real64 m_designOutletTemperatureLimit;                          // C - Boiler outlet maximum temperature limit
+        Real64 m_designParasiticElectricalLoad;                         // W - Parasitic electric power (e.g. forced draft fan)
+        int EffCurveOutputError;                                        // efficiency curve output <=0 recurring warning error counter
+        int EffCurveOutputIndex;                                        // efficiency curve output <=0 recurring warning error message index
+        int CalculatedEffError;                                         // calculated efficiency >1.1 recurring warning error counter
+        int CalculatedEffIndex;                                         // calculated efficiency >1.1 recurring warning error message index
+        std::string EndUseSubcategory;                                  // identifier use for the end use subcategory
+        bool m_doOneTimeInitialisation;                                 // do the one time initialisation, i.e. locate on plantloops etc.
+        bool m_doEnvironmentInitialisation;                             // do the environment initialisation, i.e. get inlet conditions etc.
+        Real64 m_operatingLoad;                                         // W - Boiler Load
+        Real64 m_operatingHeatingEnergy;                                // J - Boiler energy integrated over time
+        Real64 m_operatingParasiticElectricalPower;                     // W - Parasitic electrical power (e.g. forced draft fan)
+        Real64 m_operatingParasiticElectricalConsumption;               // J - Parasitic Electrical Consumption (e.g. forced draft fan)
+        Real64 m_operatingMassFlowRate;                                 // kg/s - Boiler mass flow rate
+        Real64 m_operatingInletTemperature;                             // C - Boiler inlet temperature
+        Real64 m_operatingOutletTemperature;                            // C - Boiler outlet temperature
+        Real64 m_operatingPartLoadRatio;                                // Boiler operating part-load ratio
+        Real64 m_operatingFuelUseRate;                                  // W - Boiler fuel used
+        Real64 m_operatingFuelUse;                                      // J - Boiler Fuel consumed integrated over time
 
-            void initialise(); // number of the current boiler being simulated
+        // static member functions
+        static void GetBoilerInput();
 
-            void calculate(Real64 const MyLoad,    // W - hot water demand to be met by boiler
-                           bool const RunFlag,     // TRUE if boiler operating
-                           int const EquipFlowCtrl // Flow control mode for the equipment
-            );
+        void initialise(); // number of the current boiler being simulated
 
-            bool hasTwoVariableEfficiencyCurve();
+        void calculate(Real64 const MyLoad,    // W - hot water demand to be met by boiler
+                       bool const RunFlag,     // TRUE if boiler operating
+                       int const EquipFlowCtrl // Flow control mode for the equipment
+        );
 
-            void clearOperatingVariables();
+        bool hasTwoVariableEfficiencyCurve();
 
-            // transfer data from the boiler to outlet nodes
-            void update();
+        void clearOperatingVariables();
 
-            // update all reporting variables
-            void report();
+        // transfer data from the boiler to outlet nodes
+        void update();
+
+        // update all reporting variables
+        void report();
     };
 
     // Object Data
-    extern Array1D<BoilerObject> Boiler;      // boiler data - dimension to number of machines
+    extern Array1D<BoilerObject> Boiler; // boiler data - dimension to number of machines
 
     void clear_state();
 
