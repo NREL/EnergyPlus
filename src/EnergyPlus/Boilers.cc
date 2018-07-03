@@ -1069,6 +1069,7 @@ namespace Boilers {
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
         m_operatingFuelUseRate = theoreticalFuelUse / efficiencyCurveOutput;
+        // TODO: add output variable for operating efficiency
         if (m_operatingLoad > 0.0) {
             m_operatingParasiticElectricalPower = m_designParasiticElectricalLoad * m_operatingPartLoadRatio;
         }
