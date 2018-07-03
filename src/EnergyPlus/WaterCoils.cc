@@ -1131,7 +1131,7 @@ namespace WaterCoils {
             bool WaterCoilOnAirLoop = true;
             for (tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum) {
                 if (WaterCoil(tempCoilNum).ControllerIndex > 0) {
-                    int CoilTypeNum;
+                    int CoilTypeNum(0);
                     std::string CompType;
                     std::string CompName = WaterCoil(tempCoilNum).Name;
                     if (WaterCoil(tempCoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_Cooling) {

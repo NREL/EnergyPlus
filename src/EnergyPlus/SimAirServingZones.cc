@@ -7437,7 +7437,7 @@ namespace SimAirServingZones {
         if (!CheckWaterCoilIsOnAirLoop) {
             ShowSevereError("CheckWaterCoilIsOnAirLoop: = " + CompType + " = " + CompName + ".");
             ShowContinueError("The water coil or coil system is neither on primary air branch nor on outdoor air system hence does not require "
-                              "'Controller:Water' object.");
+                              "'Controller:WaterCoil' object.");
         }
 
         WaterCoilOnAirLoop = CheckWaterCoilIsOnAirLoop;
@@ -7547,11 +7547,7 @@ namespace SimAirServingZones {
         if (NumOASys > 0) {
             for (int OASysNum = 1; OASysNum <= NumOASys; ++OASysNum) {
                 for (int OACompNum = 1; OACompNum <= OutsideAirSys(OASysNum).NumComponents; ++OACompNum) {
-                    std::string WaterCoilType = OutsideAirSys(OASysNum).ComponentType(OACompNum);
-                    if ((UtilityRoutines::SameString(WaterCoilType, "Coil:Cooling:Water") ||
-                         UtilityRoutines::SameString(WaterCoilType, "Coil:Cooling:Water:DetailedGeometry") ||
-                         UtilityRoutines::SameString(WaterCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted") ||
-                         UtilityRoutines::SameString(WaterCoilType, "Coil:Heating:Water")) &&
+                    if ((CompTypeNum == OutsideAirSys(OASysNum).ComponentType_Num(OACompNum)) &&
                         (UtilityRoutines::SameString(CompName, OutsideAirSys(OASysNum).ComponentName(OACompNum)))) {
                         CheckWaterCoilIsOnOASystem = true;
                         goto OASystemLoop_exit;
@@ -7631,7 +7627,6 @@ namespace SimAirServingZones {
         if (WaterCoilIsOnWaterCoilSystem) {
             CheckWaterCoilSystemIsOnAirLoopOASystem = CheckWaterCoilOnPrimaryAirLoopBranch(CoilSystemTypeNum, CoilSystemName);
             if (!CheckWaterCoilSystemIsOnAirLoopOASystem) {
-                // CoilSystemTypeNum = MixedAir::WaterCoil_CoolingHXAsst;
                 CheckWaterCoilSystemIsOnAirLoopOASystem = CheckWaterCoilOnOASystem(CoilSystemTypeNum, CoilSystemName);
             }
         }
