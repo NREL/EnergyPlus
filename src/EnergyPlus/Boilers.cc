@@ -700,10 +700,10 @@ namespace Boilers {
         static std::string const RoutineName("SizeBoiler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PltSizNum(0);        // Plant Sizing index corresponding to CurLoopNum
-        bool ErrorsFound(false); // If errors detected in input
-        Real64 rho;
-        Real64 Cp;
+        int PltSizNum(0);            // Plant Sizing index corresponding to CurLoopNum
+        bool ErrorsFound(false);     // If errors detected in input
+        Real64 rho;                  // water density at initialization temperature
+        Real64 Cp;                   // water specific heat capacity at design outlet temperature
         Real64 tmpNomCap;            // local nominal capacity cooling power
         Real64 tmpBoilerVolFlowRate; // local boiler design volume flow rate
         Real64 NomCapUser(0.0);      // Hardsized nominal capacity for reporting
