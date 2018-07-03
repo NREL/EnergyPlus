@@ -74,7 +74,13 @@ namespace EIRWaterToWaterHeatPumps {
 		// fixed configuration parameters
         std::string name = "";
         int plantTypeOfNum = -1;
-        
+
+        // reference data
+        Real64 referenceCapacity = 0.0;
+        Real64 referenceCOP = 0.0;
+        Real64 referenceLeavingLoadSideTemp = 0.0;
+        Real64 referenceEnteringSourceSideTemp = 0.0;
+
         // flow rate terms
         Real64 loadSideDesignVolFlowRate = 0.0;
         Real64 sourceSideDesignVolFlowRate = 0.0;
@@ -118,7 +124,9 @@ namespace EIRWaterToWaterHeatPumps {
 
         static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
 
-        static void processInputForEIRWWHP();
+        static void processInputForEIRWWHPHeating();
+
+        static void processInputForEIRWWHPCooling();
 
         static void clear_state();
     };

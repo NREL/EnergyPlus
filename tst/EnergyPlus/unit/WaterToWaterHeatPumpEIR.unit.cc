@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 
@@ -60,22 +61,44 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::EIRWaterToWaterHeatPumps;
 
 TEST_F(EnergyPlusFixture, TestAddFunction) {
-	EIRWaterToWaterHeatPump wwhp;
-	EXPECT_EQ(2, wwhp.add(1, 1));
+    EIRWaterToWaterHeatPump wwhp;
+    EXPECT_EQ(2, wwhp.add(1, 1));
 }
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPFactory) {
-	std::string const idf_objects =
-			delimited_string(
-					{"HeatPump:WaterToWater:EIR:Heating,", "  hp heating side,", "  node 1,", "  node 2,", "  node 3,",
-					 "  node 4,", "0.001,", "0.001;"});
-	ASSERT_TRUE(process_idf(idf_objects));
-	// call the factory with a valid name to trigger reading inputs
-	EIRWaterToWaterHeatPump::factory(96, "HP HEATING SIDE");
-	// verify the size of the vector and the processed name
-	EXPECT_EQ(1u, eir_wwhp.size());
-	EIRWaterToWaterHeatPump *thisWWHP = &eir_wwhp[0];
-	EXPECT_EQ("HP HEATING SIDE", thisWWHP->name);
-	// calling the factory with an invalid name should call ShowFatalError, which will trigger a runtime exception
-	EXPECT_THROW(EIRWaterToWaterHeatPump::factory(95, "hp fake name"), std::runtime_error);
+TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstruction) {
+    std::string const idf_objects =
+            delimited_string(
+                    {"HeatPump:WaterToWater:EIR:Heating,", "  hp heating side,", "  node 1,", "  node 2,", "  node 3,",
+                     "  node 4,", "0.001,", "0.001,", "1000,", "3.14,", "25.56,", "40.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+    // call the factory with a valid name to trigger reading inputs
+    EIRWaterToWaterHeatPump::factory(96, "HP HEATING SIDE");
+    // verify the size of the vector and the processed name
+    EXPECT_EQ(1u, eir_wwhp.size());
+    EIRWaterToWaterHeatPump *thisWWHP = &eir_wwhp[0];
+    EXPECT_EQ("HP HEATING SIDE", thisWWHP->name);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisWWHP->plantTypeOfNum);
+    // calling the factory with an invalid name should call ShowFatalError, which will trigger a runtime exception
+    EXPECT_THROW(EIRWaterToWaterHeatPump::factory(96, "hp fake name"), std::runtime_error);
+    // calling the factory with an invalid type of num should also call ShowFatalError, triggering an exception
+    EXPECT_THROW(EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
+}
+
+TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingConstruction) {
+    std::string const idf_objects =
+            delimited_string(
+                    {"HeatPump:WaterToWater:EIR:Cooling,", "  hp cooling side,", "  node 1,", "  node 2,", "  node 3,",
+                     "  node 4,", "0.001,", "0.001,", "1000,", "3.14,", "25.56,", "40.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+    // call the factory with a valid name to trigger reading inputs
+    EIRWaterToWaterHeatPump::factory(95, "HP COOLING SIDE");
+    // verify the size of the vector and the processed name
+    EXPECT_EQ(1u, eir_wwhp.size());
+    EIRWaterToWaterHeatPump *thisWWHP = &eir_wwhp[0];
+    EXPECT_EQ("HP COOLING SIDE", thisWWHP->name);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisWWHP->plantTypeOfNum);
+    // calling the factory with an invalid name should call ShowFatalError, which will trigger a runtime exception
+    EXPECT_THROW(EIRWaterToWaterHeatPump::factory(95, "hp fake name"), std::runtime_error);
+    // calling the factory with an invalid type of num should also call ShowFatalError, triggering an exception
+    EXPECT_THROW(EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }

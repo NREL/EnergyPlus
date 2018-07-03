@@ -243,7 +243,7 @@ namespace EIRWaterToWaterHeatPumps {
             SetupOutputVariable(
                 "EIR WWHP Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
             SetupOutputVariable("EIR WWHP Power Usage", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
-            // SetupOutputVariable("EIR WWHP Running", OutputProcessor::Unit::None, eir.running, "System", "Average", eir.name);
+            //SetupOutputVariable("EIR WWHP Running", OutputProcessor::Unit::None, this->running, "System", "Average", this->name);
 
             // find this component on the plant
             bool errFlag = false;
@@ -347,7 +347,8 @@ namespace EIRWaterToWaterHeatPumps {
     PlantComponent *EIRWaterToWaterHeatPump::factory(int plantTypeOfNum, std::string objectName)
     {
         if (getInputsWWHP) {
-            EIRWaterToWaterHeatPump::processInputForEIRWWHP();
+            EIRWaterToWaterHeatPump::processInputForEIRWWHPHeating();
+            EIRWaterToWaterHeatPump::processInputForEIRWWHPCooling();
             getInputsWWHP = false;
         }
 
@@ -361,7 +362,7 @@ namespace EIRWaterToWaterHeatPumps {
         return nullptr;
     }
 
-    void EIRWaterToWaterHeatPump::processInputForEIRWWHP()
+    void EIRWaterToWaterHeatPump::processInputForEIRWWHPHeating()
     {
         using namespace DataIPShortCuts;
 
@@ -386,8 +387,13 @@ namespace EIRWaterToWaterHeatPumps {
                 std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_outlet_node_name"));
                 std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name"));
                 std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name"));
-                thisWWHP.loadSideDesignVolFlowRate = fields.at("load_side_design_flow_rate");
-                thisWWHP.sourceSideDesignVolFlowRate = fields.at("source_side_design_flow_rate");
+                thisWWHP.loadSideDesignVolFlowRate = fields.at("load_side_reference_flow_rate");
+                thisWWHP.sourceSideDesignVolFlowRate = fields.at("source_side_reference_flow_rate");
+                thisWWHP.referenceCapacity = fields.at("reference_capacity");
+                thisWWHP.referenceCOP = fields.at("reference_cop");
+                thisWWHP.referenceLeavingLoadSideTemp = fields.at("reference_leaving_load_side_water_temperature");
+                thisWWHP.referenceEnteringSourceSideTemp = fields.at("reference_entering_source_side_fluid_temperature");
+
                 int const flowPath1 = 1, flowPath2 = 2;
                 thisWWHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(loadSideInletNodeName,
                                                                                    errorsFound,
@@ -425,6 +431,82 @@ namespace EIRWaterToWaterHeatPumps {
                     cCurrentModuleObject, thisWWHP.name, loadSideInletNodeName, loadSideOutletNodeName, "Hot Water Nodes");
                 BranchNodeConnections::TestCompSet(
                     cCurrentModuleObject, thisWWHP.name, sourceSideInletNodeName, sourceSideOutletNodeName, "Condenser Water Nodes");
+
+                eir_wwhp.push_back(thisWWHP);
+            }
+        }
+    }
+
+
+    void EIRWaterToWaterHeatPump::processInputForEIRWWHPCooling()
+    {
+        using namespace DataIPShortCuts;
+
+        bool errorsFound = false;
+
+        cCurrentModuleObject = "HeatPump:WaterToWater:EIR:Cooling";
+        int numWWHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (numWWHP > 0) {
+            auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
+            if (instances == inputProcessor->epJSON.end()) {
+                errorsFound = true;
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+
+                EIRWaterToWaterHeatPump thisWWHP;
+                thisWWHP.plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+                thisWWHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_inlet_node_name"));
+                std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_outlet_node_name"));
+                std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name"));
+                std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name"));
+                thisWWHP.loadSideDesignVolFlowRate = fields.at("load_side_reference_flow_rate");
+                thisWWHP.sourceSideDesignVolFlowRate = fields.at("source_side_reference_flow_rate");
+                thisWWHP.referenceCapacity = fields.at("reference_capacity");
+                thisWWHP.referenceCOP = fields.at("reference_cop");
+                thisWWHP.referenceLeavingLoadSideTemp = fields.at("reference_leaving_load_side_water_temperature");
+                thisWWHP.referenceEnteringSourceSideTemp = fields.at("reference_entering_source_side_fluid_temperature");
+
+                int const flowPath1 = 1, flowPath2 = 2;
+                thisWWHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(loadSideInletNodeName,
+                                                                                   errorsFound,
+                                                                                   cCurrentModuleObject,
+                                                                                   thisWWHP.name,
+                                                                                   DataLoopNode::NodeType_Water,
+                                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                                   flowPath1,
+                                                                                   DataLoopNode::ObjectIsNotParent);
+                thisWWHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(loadSideOutletNodeName,
+                                                                                    errorsFound,
+                                                                                    cCurrentModuleObject,
+                                                                                    thisWWHP.name,
+                                                                                    DataLoopNode::NodeType_Water,
+                                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                                    flowPath1,
+                                                                                    DataLoopNode::ObjectIsNotParent);
+                thisWWHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(sourceSideInletNodeName,
+                                                                                     errorsFound,
+                                                                                     cCurrentModuleObject,
+                                                                                     thisWWHP.name,
+                                                                                     DataLoopNode::NodeType_Water,
+                                                                                     DataLoopNode::NodeConnectionType_Inlet,
+                                                                                     flowPath2,
+                                                                                     DataLoopNode::ObjectIsNotParent);
+                thisWWHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(sourceSideOutletNodeName,
+                                                                                      errorsFound,
+                                                                                      cCurrentModuleObject,
+                                                                                      thisWWHP.name,
+                                                                                      DataLoopNode::NodeType_Water,
+                                                                                      DataLoopNode::NodeConnectionType_Outlet,
+                                                                                      flowPath2,
+                                                                                      DataLoopNode::ObjectIsNotParent);
+                BranchNodeConnections::TestCompSet(
+                        cCurrentModuleObject, thisWWHP.name, loadSideInletNodeName, loadSideOutletNodeName, "Hot Water Nodes");
+                BranchNodeConnections::TestCompSet(
+                        cCurrentModuleObject, thisWWHP.name, sourceSideInletNodeName, sourceSideOutletNodeName, "Condenser Water Nodes");
 
                 eir_wwhp.push_back(thisWWHP);
             }
