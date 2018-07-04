@@ -49,6 +49,11 @@
 
 extern "C"
 {
+	int EXPORTCALL CheckConnect()
+	{
+		return 42;
+	}
+
 	int EXPORTCALL HelloWorld(char * greeting_out, int greeting_out_buffer_count)
 	{
 		char standard_greeting[] = "Hello, World!";
@@ -62,9 +67,19 @@ extern "C"
 		strcpy(greeting_out, standard_greeting);
 		return 0;
 	}
-}
 
-int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved)
-{
-	return 1;
+	int EXPORTCALL RunEPlus(const char* path, int path_length)
+	{
+		std::string filepath;
+		if (path_length == 0)
+		{
+			filepath = std::string();
+		}
+		else
+		{
+			filepath = std::string(path, path_length);
+		}
+		EnergyPlusPgm(filepath);
+		return 0;
+	}
 }

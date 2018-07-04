@@ -54,9 +54,7 @@
 
 extern "C"
 {
+	int EXPORTCALL CheckConnect();
 	int EXPORTCALL HelloWorld(char * greeting_out, int greeting_out_buffer_count);
-	//void EXPORTCALL RunEPlus(const char* path);
+	int EXPORTCALL RunEPlus(const char* path, int path_length);
 }
-
-#pragma argsused
-int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved);
