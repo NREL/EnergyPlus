@@ -170,6 +170,12 @@ public:
 
     void reportOrphanRecordObjects();
 
+    const json getObjectInstances(std::string const &ObjType);
+
+    json epJSON;
+
+
+
 private:
     struct ObjectInfo
     {
@@ -241,7 +247,6 @@ private:
     std::unique_ptr<Validation> validation;
     std::unique_ptr<DataStorage> data;
     json schema;
-    json epJSON;
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
     UnorderedObjectCacheMap objectCacheMap;
     UnorderedUnusedObjectMap unusedInputs;

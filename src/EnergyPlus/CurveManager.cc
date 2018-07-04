@@ -133,6 +133,9 @@ namespace CurveManager {
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
 
+    using json = nlohmann::json;
+
+
     // Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
     int const Linear(1);
     int const BiLinear(2);
@@ -196,6 +199,7 @@ namespace CurveManager {
     int const CurveType_QuadLinear(21);
     int const CurveType_CubicLinear(22);
     int const CurveType_ChillerPartLoadWithLift(23);
+    int const CurveType_TableLookup(24);
 
     Array1D_string const cCurveTypes(NumAllCurveTypes,
                                      {"Curve:Linear",
@@ -222,6 +226,12 @@ namespace CurveManager {
                                       "Curve:CubicLinear",
                                       "Curve:ChillerPartLoadWithLift"});
 
+    std::map<std::string, Btwxt::Method>  BtwxtContainer::interpMethods =
+            {{"Linear", Btwxt::Method::LINEAR}, {"Cubic", Btwxt::Method::CUBIC}};
+
+    std::map<std::string, Btwxt::Method>  BtwxtContainer::extrapMethods =
+            {{"Linear", Btwxt::Method::LINEAR}, {"Constant", Btwxt::Method::CONSTANT}};
+
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
@@ -238,6 +248,7 @@ namespace CurveManager {
     Array1D<TableDataStruct> TempTableData;
     Array1D<TableDataStruct> Temp2TableData;
     Array1D<TableLookupData> TableLookup;
+    BtwxtContainer btwxtContainer;
     std::unordered_map<std::string, std::string> UniqueCurveNames;
 
     // Functions
@@ -505,6 +516,7 @@ namespace CurveManager {
         NumTriQuad = inputProcessor->getNumObjectsFound("Curve:Triquadratic");
         NumExponent = inputProcessor->getNumObjectsFound("Curve:Exponent");
         NumMultVarLookup = inputProcessor->getNumObjectsFound("Table:MultiVariableLookup");
+        int NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
         NumFanPressRise = inputProcessor->getNumObjectsFound("Curve:FanPressureRise");                    // cpw22Aug2010
         NumExpSkewNorm = inputProcessor->getNumObjectsFound("Curve:ExponentialSkewNormal");               // cpw22Aug2010
         NumSigmoid = inputProcessor->getNumObjectsFound("Curve:Sigmoid");                                 // cpw22Aug2010
@@ -519,12 +531,12 @@ namespace CurveManager {
         NumTwoVarTab = inputProcessor->getNumObjectsFound("Table:TwoIndependentVariables");
 
         NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
-                    NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
+                    NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
                     NumExpDecay + NumDoubleExpDecay + NumQLinear + NumChillerPartLoadWithLift + NumWPCValTab;
 
         // intermediate count for one and two variable performance tables
         NumTables = NumOneVarTab + NumTwoVarTab + NumWPCValTab;
-        // final count for all tables
+        // final count for all tables (except Table:Lookup (handled with Btwxt data structure))
         NumLookupTables = NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumWPCValTab;
         if (NumLookupTables > 0) TableLookup.allocate(NumLookupTables);
 
@@ -2921,6 +2933,109 @@ namespace CurveManager {
                 }
             }
         }
+
+        // Create GridSpaces from Independent Variable List first
+        auto const indVarListInstances = inputProcessor->getObjectInstances("Table:IndependentVariableList");
+        for (auto instance : indVarListInstances.items()) {
+
+            auto const &fields = instance.value();
+            auto const &thisObjectName = instance.key();
+
+            std::vector<Btwxt::GridAxis > gridAxes;
+
+
+            // Loop through independent variables in list and add them to the grid
+            for (auto indVar : fields.at("independent_variables")) {
+                std::string indVarName = indVar.at("independent_variable_name");
+                // Find independent variable input data
+                auto const indVarInstances = inputProcessor->getObjectInstances("Table:IndependentVariable");
+                if (indVarInstances.find(indVarName) != indVarInstances.end()) {
+                    // If found, read data
+                    auto indVarInstance = indVarInstances.at(indVarName);
+
+                    std::vector<double> axis;
+                    for (auto value : indVarInstance.at("values")) {
+                        axis.push_back(value.at("value"));
+                    }
+
+                    Btwxt::Method interpMethod = BtwxtContainer::interpMethods.at(indVarInstance.at("interpolation_method"));
+
+                    Btwxt::Method extrapMethod = BtwxtContainer::extrapMethods.at(indVarInstance.at("extrapolation_method"));
+
+
+                    double min_val, max_val;
+                    // TODO: Input processor needs a set default value function
+                    if (indVarInstance.find("minimum_value") != indVarInstance.end()) {
+                        min_val = indVarInstance.at("minimum_value");
+                    } else {
+                        min_val = *std::min_element(axis.begin(), axis.end());
+                    }
+
+                    if (indVarInstance.find("maximum_value") != indVarInstance.end()) {
+                        max_val = indVarInstance.at("maximum_value");
+                    } else {
+                        max_val = *std::max_element(axis.begin(), axis.end());
+                    }
+
+                    gridAxes.emplace_back(axis, extrapMethod, interpMethod, std::pair<double, double> {min_val, max_val});
+
+                } else {
+                    // Independent variable does not exist
+                    ShowSevereError("Table:IndependentVariableList: No Table:IndependentVariable found for " + indVarName + ".");
+                    ErrorsFound = true;
+                }
+
+                // Add grid to btwxtContainer
+                btwxtContainer.addGrid(thisObjectName, Btwxt::GriddedData(gridAxes));
+            }
+        }
+
+
+        auto const lookupInstances = inputProcessor->getObjectInstances("Table:Lookup");
+        for (auto instance : lookupInstances.items()) {
+
+            auto const &fields = instance.value();
+            auto const &thisObjectName = instance.key();
+            ++CurveNum;
+            PerfCurve(CurveNum).Name = thisObjectName;
+            PerfCurve(CurveNum).ObjectType = CurveType_TableLookup;
+
+            std::string indVarListName = fields.at("independent_variable_list_name");
+
+            int gridIndex = btwxtContainer.getGridIndex(indVarListName, ErrorsFound);
+            PerfCurve(CurveNum).TableIndex = gridIndex;
+            PerfCurve(CurveNum).TableVariables = btwxtContainer.getNumGridDims(gridIndex);
+            std::vector<double> lookupValues;
+
+            for (auto value : fields.at("values")) {
+                lookupValues.push_back(value.at("output_value"));
+            }
+
+            PerfCurve(CurveNum).GridValueIndex = btwxtContainer.addOutputValues(gridIndex, lookupValues);
+
+        }
+
+    }
+
+    int BtwxtContainer::getGridIndex(std::string indVarListName, bool &ErrorsFound) {
+        int gridIndex = -1;
+        if (gridMap.count(indVarListName)) {
+            gridIndex = gridMap.at(indVarListName);
+        } else {
+            // Independent variable list does not exist
+            ShowSevereError("Table:Lookup: No Table:IndependentVariableList found for " + indVarListName + ".");
+            ErrorsFound = true;
+        }
+        return gridIndex;
+    }
+
+    int BtwxtContainer::addOutputValues(int gridIndex, std::vector<double> values)
+    {
+        return (int)grids[gridIndex].add_value_table(values);
+    }
+
+    int BtwxtContainer::getNumGridDims(int gridIndex) {
+        return (int)grids[gridIndex].get_ndims();
     }
 
     void InitCurveReporting()

@@ -469,6 +469,11 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
     return output;
 }
 
+const json InputProcessor::getObjectInstances(std::string const &ObjType)
+{
+    return epJSON.find(ObjType).value();
+}
+
 void InputProcessor::getObjectItem(std::string const &Object,
                                    int const Number,
                                    Array1S_string Alphas,
