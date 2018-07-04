@@ -313,8 +313,17 @@ namespace Humidifiers {
         // loop over electric steam humidifiers and load the input data
         CurrentModuleObject = "Humidifier:Steam:Electric";
         for (HumidifierIndex = 1; HumidifierIndex <= NumElecSteamHums; ++HumidifierIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          HumidifierIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             HumNum = HumidifierIndex;
             GlobalNames::VerifyUniqueInterObjectName(HumidifierUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             Humidifier(HumNum).Name = Alphas(1);
@@ -335,18 +344,18 @@ namespace Humidifiers {
             Humidifier(HumNum).NomPower = Numbers(2);
             Humidifier(HumNum).FanPower = Numbers(3);
             Humidifier(HumNum).StandbyPower = Numbers(4);
-            Humidifier(HumNum).AirInNode = GetOnlySingleNode(Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                             NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Humidifier(HumNum).AirOutNode = GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                              NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            Humidifier(HumNum).AirInNode = GetOnlySingleNode(
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            Humidifier(HumNum).AirOutNode = GetOnlySingleNode(
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             //  A5; \field Name of Water Storage Tank
             if (lAlphaBlanks(5)) {
                 Humidifier(HumNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                SetupTankDemandComponent(Alphas(1), CurrentModuleObject, Alphas(5), ErrorsFound, Humidifier(HumNum).WaterTankID,
-                                         Humidifier(HumNum).WaterTankDemandARRID);
+                SetupTankDemandComponent(
+                    Alphas(1), CurrentModuleObject, Alphas(5), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).WaterTankDemandARRID);
                 Humidifier(HumNum).SuppliedByWaterSystem = true;
             }
         }
@@ -354,8 +363,17 @@ namespace Humidifiers {
         // loop over gas fired steam humidifiers and load the input data
         CurrentModuleObject = "Humidifier:Steam:Gas";
         for (HumidifierIndex = 1; HumidifierIndex <= NumGasSteamHums; ++HumidifierIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          HumidifierIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             HumNum = NumElecSteamHums + HumidifierIndex;
             GlobalNames::VerifyUniqueInterObjectName(HumidifierUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             Humidifier(HumNum).Name = Alphas(1);
@@ -376,10 +394,10 @@ namespace Humidifiers {
             Humidifier(HumNum).ThermalEffRated = Numbers(3);
             Humidifier(HumNum).FanPower = Numbers(4);
             Humidifier(HumNum).StandbyPower = Numbers(5);
-            Humidifier(HumNum).AirInNode = GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                             NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Humidifier(HumNum).AirOutNode = GetOnlySingleNode(Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                              NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            Humidifier(HumNum).AirInNode = GetOnlySingleNode(
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            Humidifier(HumNum).AirOutNode = GetOnlySingleNode(
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
 
             Humidifier(HumNum).EfficiencyCurvePtr = GetCurveIndex(Alphas(3));
@@ -410,10 +428,10 @@ namespace Humidifiers {
             if (lAlphaBlanks(6)) {
                 Humidifier(HumNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                SetupTankDemandComponent(Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID,
-                                         Humidifier(HumNum).WaterTankDemandARRID);
-                SetupTankSupplyComponent(Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID,
-                                         Humidifier(HumNum).TankSupplyID);
+                SetupTankDemandComponent(
+                    Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).WaterTankDemandARRID);
+                SetupTankSupplyComponent(
+                    Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).TankSupplyID);
                 Humidifier(HumNum).SuppliedByWaterSystem = true;
             }
 
@@ -434,45 +452,145 @@ namespace Humidifiers {
         for (HumNum = 1; HumNum <= NumHumidifiers; ++HumNum) {
             // Setup Report variables for the Humidifiers
             if (Humidifier(HumNum).SuppliedByWaterSystem) {
-                SetupOutputVariable("Humidifier Water Volume Flow Rate", OutputProcessor::Unit::m3_s, Humidifier(HumNum).WaterConsRate, "System",
-                                    "Average", Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Water Volume", OutputProcessor::Unit::m3, Humidifier(HumNum).WaterCons, "System", "Sum",
+                SetupOutputVariable("Humidifier Water Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    Humidifier(HumNum).WaterConsRate,
+                                    "System",
+                                    "Average",
                                     Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Storage Tank Water Volume Flow Rate", OutputProcessor::Unit::m3_s, Humidifier(HumNum).TankSupplyVdot,
-                                    "System", "Average", Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Storage Tank Water Volume", OutputProcessor::Unit::m3, Humidifier(HumNum).TankSupplyVol, "System",
-                                    "Sum", Humidifier(HumNum).Name, _, "Water", "HUMIDIFIER", _, "SYSTEM");
-                SetupOutputVariable("Humidifier Starved Storage Tank Water Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                    Humidifier(HumNum).StarvedSupplyVdot, "System", "Average", Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Starved Storage Tank Water Volume", OutputProcessor::Unit::m3, Humidifier(HumNum).StarvedSupplyVol,
-                                    "System", "Sum", Humidifier(HumNum).Name, _, "Water", "HUMIDIFIER", _, "SYSTEM");
-                SetupOutputVariable("Humidifier Mains Water Volume", OutputProcessor::Unit::m3, Humidifier(HumNum).StarvedSupplyVol, "System", "Sum",
-                                    Humidifier(HumNum).Name, _, "MainsWater", "HUMIDIFIER", _, "SYSTEM");
+                SetupOutputVariable(
+                    "Humidifier Water Volume", OutputProcessor::Unit::m3, Humidifier(HumNum).WaterCons, "System", "Sum", Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier Storage Tank Water Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    Humidifier(HumNum).TankSupplyVdot,
+                                    "System",
+                                    "Average",
+                                    Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier Storage Tank Water Volume",
+                                    OutputProcessor::Unit::m3,
+                                    Humidifier(HumNum).TankSupplyVol,
+                                    "System",
+                                    "Sum",
+                                    Humidifier(HumNum).Name,
+                                    _,
+                                    "Water",
+                                    "HUMIDIFIER",
+                                    _,
+                                    "SYSTEM");
+                SetupOutputVariable("Humidifier Starved Storage Tank Water Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    Humidifier(HumNum).StarvedSupplyVdot,
+                                    "System",
+                                    "Average",
+                                    Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier Starved Storage Tank Water Volume",
+                                    OutputProcessor::Unit::m3,
+                                    Humidifier(HumNum).StarvedSupplyVol,
+                                    "System",
+                                    "Sum",
+                                    Humidifier(HumNum).Name,
+                                    _,
+                                    "Water",
+                                    "HUMIDIFIER",
+                                    _,
+                                    "SYSTEM");
+                SetupOutputVariable("Humidifier Mains Water Volume",
+                                    OutputProcessor::Unit::m3,
+                                    Humidifier(HumNum).StarvedSupplyVol,
+                                    "System",
+                                    "Sum",
+                                    Humidifier(HumNum).Name,
+                                    _,
+                                    "MainsWater",
+                                    "HUMIDIFIER",
+                                    _,
+                                    "SYSTEM");
 
             } else {
-                SetupOutputVariable("Humidifier Water Volume Flow Rate", OutputProcessor::Unit::m3_s, Humidifier(HumNum).WaterConsRate, "System",
-                                    "Average", Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Water Volume", OutputProcessor::Unit::m3, Humidifier(HumNum).WaterCons, "System", "Sum",
-                                    Humidifier(HumNum).Name, _, "WATER", "HUMIDIFIER", _, "System");
-                SetupOutputVariable("Humidifier Mains Water Volume", OutputProcessor::Unit::m3, Humidifier(HumNum).WaterCons, "System", "Sum",
-                                    Humidifier(HumNum).Name, _, "MAINSWATER", "HUMIDIFIER", _, "System");
+                SetupOutputVariable("Humidifier Water Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    Humidifier(HumNum).WaterConsRate,
+                                    "System",
+                                    "Average",
+                                    Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier Water Volume",
+                                    OutputProcessor::Unit::m3,
+                                    Humidifier(HumNum).WaterCons,
+                                    "System",
+                                    "Sum",
+                                    Humidifier(HumNum).Name,
+                                    _,
+                                    "WATER",
+                                    "HUMIDIFIER",
+                                    _,
+                                    "System");
+                SetupOutputVariable("Humidifier Mains Water Volume",
+                                    OutputProcessor::Unit::m3,
+                                    Humidifier(HumNum).WaterCons,
+                                    "System",
+                                    "Sum",
+                                    Humidifier(HumNum).Name,
+                                    _,
+                                    "MAINSWATER",
+                                    "HUMIDIFIER",
+                                    _,
+                                    "System");
             }
             if (Humidifier(HumNum).HumType_Code == Humidifier_Steam_Electric) {
-                SetupOutputVariable("Humidifier Electric Power", OutputProcessor::Unit::W, Humidifier(HumNum).ElecUseRate, "System", "Average",
+                SetupOutputVariable("Humidifier Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    Humidifier(HumNum).ElecUseRate,
+                                    "System",
+                                    "Average",
                                     Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Electric Energy", OutputProcessor::Unit::J, Humidifier(HumNum).ElecUseEnergy, "System", "Sum",
-                                    Humidifier(HumNum).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System");
+                SetupOutputVariable("Humidifier Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    Humidifier(HumNum).ElecUseEnergy,
+                                    "System",
+                                    "Sum",
+                                    Humidifier(HumNum).Name,
+                                    _,
+                                    "ELECTRICITY",
+                                    "HUMIDIFIER",
+                                    _,
+                                    "System");
             } else if (Humidifier(HumNum).HumType_Code == Humidifier_Steam_Gas) {
-                SetupOutputVariable("Humidifier Gas Use Thermal Efficiency", OutputProcessor::Unit::None, Humidifier(HumNum).ThermalEff, "System",
-                                    "Average", Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Gas Use Rate", OutputProcessor::Unit::W, Humidifier(HumNum).GasUseRate, "System", "Average",
+                SetupOutputVariable("Humidifier Gas Use Thermal Efficiency",
+                                    OutputProcessor::Unit::None,
+                                    Humidifier(HumNum).ThermalEff,
+                                    "System",
+                                    "Average",
                                     Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Gas Use Energy", OutputProcessor::Unit::J, Humidifier(HumNum).GasUseEnergy, "System", "Sum",
-                                    Humidifier(HumNum).Name, _, "GAS", "HUMIDIFIER", _, "System");
-                SetupOutputVariable("Humidifier Auxiliary Electric Power", OutputProcessor::Unit::W, Humidifier(HumNum).AuxElecUseRate, "System",
-                                    "Average", Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Auxiliary Electric Energy", OutputProcessor::Unit::J, Humidifier(HumNum).AuxElecUseEnergy, "System",
-                                    "Sum", Humidifier(HumNum).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System");
+                SetupOutputVariable(
+                    "Humidifier Gas Use Rate", OutputProcessor::Unit::W, Humidifier(HumNum).GasUseRate, "System", "Average", Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier Gas Use Energy",
+                                    OutputProcessor::Unit::J,
+                                    Humidifier(HumNum).GasUseEnergy,
+                                    "System",
+                                    "Sum",
+                                    Humidifier(HumNum).Name,
+                                    _,
+                                    "GAS",
+                                    "HUMIDIFIER",
+                                    _,
+                                    "System");
+                SetupOutputVariable("Humidifier Auxiliary Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    Humidifier(HumNum).AuxElecUseRate,
+                                    "System",
+                                    "Average",
+                                    Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier Auxiliary Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    Humidifier(HumNum).AuxElecUseEnergy,
+                                    "System",
+                                    "Sum",
+                                    Humidifier(HumNum).Name,
+                                    _,
+                                    "ELECTRICITY",
+                                    "HUMIDIFIER",
+                                    _,
+                                    "System");
             }
         }
 
@@ -720,8 +838,8 @@ namespace Humidifiers {
                             } else {
                                 AirVolFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
                             }
-                            AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, FinalSysSizing(CurSysNum).MixTempAtCoolPeak,
-                                                           FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
+                            AirDensity = PsyRhoAirFnPbTdbW(
+                                OutBaroPress, FinalSysSizing(CurSysNum).MixTempAtCoolPeak, FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
                             MassFlowDes = AirVolFlow * AirDensity;
                             InletHumRatDes = min(FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, FinalSysSizing(CurSysNum).HeatMixHumRat);
                             OutletHumRatDes = max(FinalSysSizing(CurSysNum).CoolSupHumRat, FinalSysSizing(CurSysNum).HeatSupHumRat);
@@ -739,8 +857,8 @@ namespace Humidifiers {
                         } else {
                             AirVolFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
                         }
-                        AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, FinalSysSizing(CurSysNum).MixTempAtCoolPeak,
-                                                       FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
+                        AirDensity = PsyRhoAirFnPbTdbW(
+                            OutBaroPress, FinalSysSizing(CurSysNum).MixTempAtCoolPeak, FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
                         MassFlowDes = AirVolFlow * AirDensity;
                         InletHumRatDes = std::min(FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak, FinalSysSizing(CurSysNum).HeatMixHumRat);
                         OutletHumRatDes = std::max(FinalSysSizing(CurSysNum).CoolSupHumRat, FinalSysSizing(CurSysNum).HeatSupHumRat);
@@ -758,8 +876,12 @@ namespace Humidifiers {
                 } else {
                     if (NomCapVol > 0.0) {
                         NomCapVolUser = NomCapVol;
-                        ReportSizingOutput(HumidifierType(HumType_Code), Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes,
-                                           "User-Specified Nominal Capacity Volume [m3/s]", NomCapVolUser);
+                        ReportSizingOutput(HumidifierType(HumType_Code),
+                                           Name,
+                                           "Design Size Nominal Capacity Volume [m3/s]",
+                                           NomCapVolDes,
+                                           "User-Specified Nominal Capacity Volume [m3/s]",
+                                           NomCapVolUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(NomCapVolDes - NomCapVolUser) / NomCapVolUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(HumType_Code) + " = \"" +
@@ -824,8 +946,12 @@ namespace Humidifiers {
             } else {
                 if (NomPower >= 0.0 && NomCap > 0.0) {
                     NomPowerUser = NomPower;
-                    ReportSizingOutput(HumidifierType(HumType_Code), Name, "Design Size Rated Power [W]", NomPowerDes,
-                                       "User-Specified Rated Power [W]", NomPowerUser);
+                    ReportSizingOutput(HumidifierType(HumType_Code),
+                                       Name,
+                                       "Design Size Rated Power [W]",
+                                       NomPowerDes,
+                                       "User-Specified Rated Power [W]",
+                                       NomPowerUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(NomPowerDes - NomPowerUser) / NomPowerUser) > AutoVsHardSizingThreshold) {
                             ShowMessage("SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(HumType_Code) + " =\"" + Name +

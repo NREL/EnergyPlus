@@ -195,8 +195,17 @@ namespace PVWatts {
     {
         // Set up output variables
         SetupOutputVariable("Generator Produced DC Electric Power", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
-        SetupOutputVariable("Generator Produced DC Electric Energy", OutputProcessor::Unit::J, m_outputDCEnergy, "System", "Sum", m_name, _,
-                            "ElectricityProduced", "Photovoltaics", _, "Plant");
+        SetupOutputVariable("Generator Produced DC Electric Energy",
+                            OutputProcessor::Unit::J,
+                            m_outputDCEnergy,
+                            "System",
+                            "Sum",
+                            m_name,
+                            _,
+                            "ElectricityProduced",
+                            "Photovoltaics",
+                            _,
+                            "Plant");
         SetupOutputVariable("Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name);
         SetupOutputVariable("Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, "System", "Average", m_name);
     }
@@ -222,8 +231,17 @@ namespace PVWatts {
         int IOStat;
         bool errorsFound = false;
 
-        inputProcessor->getObjectItem("Generator:PVWatts", objNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                      lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+        inputProcessor->getObjectItem("Generator:PVWatts",
+                                      objNum,
+                                      cAlphaArgs,
+                                      NumAlphas,
+                                      rNumericArgs,
+                                      NumNums,
+                                      IOStat,
+                                      lNumericFieldBlanks,
+                                      lAlphaFieldBlanks,
+                                      cAlphaFieldNames,
+                                      cNumericFieldNames);
 
         const std::string name(cAlphaArgs(AlphaFields::NAME));
         const Real64 dcSystemCapacity(rNumericArgs(NumFields::DC_SYSTEM_CAPACITY));
@@ -281,8 +299,8 @@ namespace PVWatts {
         }
         const Real64 groundCoverageRatio(rNumericArgs(NumFields::GROUND_COVERAGE_RATIO));
 
-        PVWattsGenerator pvwattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum,
-                                          groundCoverageRatio);
+        PVWattsGenerator pvwattsGenerator(
+            name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
         return pvwattsGenerator;
     }
 
@@ -377,11 +395,18 @@ namespace PVWatts {
         }
 
         // process_irradiance
-        IrradianceOutput irr_st =
-            processIrradiance(DataEnvironment::Year, DataEnvironment::Month, DataEnvironment::DayOfMonth, HourOfDay - 1,
-                              (TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep, TimeStepZone, WeatherManager::WeatherFileLatitude,
-                              WeatherManager::WeatherFileLongitude, WeatherManager::WeatherFileTimeZone, DataEnvironment::BeamSolarRad,
-                              DataEnvironment::DifSolarRad, albedo);
+        IrradianceOutput irr_st = processIrradiance(DataEnvironment::Year,
+                                                    DataEnvironment::Month,
+                                                    DataEnvironment::DayOfMonth,
+                                                    HourOfDay - 1,
+                                                    (TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep,
+                                                    TimeStepZone,
+                                                    WeatherManager::WeatherFileLatitude,
+                                                    WeatherManager::WeatherFileLongitude,
+                                                    WeatherManager::WeatherFileTimeZone,
+                                                    DataEnvironment::BeamSolarRad,
+                                                    DataEnvironment::DifSolarRad,
+                                                    albedo);
 
         // powerout
         Real64 shad_beam = 1.0;
@@ -463,10 +488,20 @@ namespace PVWatts {
 
                     // calculate sky and gnd diffuse derate factors
                     // based on view factor reductions from self-shading
-                    diffuse_reduce(irr_st.solzen, irr_st.stilt, dni, irr_st.iskydiff + irr_st.ignddiff, gcr, phi0, alb, 1000,
+                    diffuse_reduce(irr_st.solzen,
+                                   irr_st.stilt,
+                                   dni,
+                                   irr_st.iskydiff + irr_st.ignddiff,
+                                   gcr,
+                                   phi0,
+                                   alb,
+                                   1000,
 
                                    // outputs (pass by reference)
-                                   reduced_skydiff, Fskydiff, reduced_gnddiff, Fgnddiff);
+                                   reduced_skydiff,
+                                   Fskydiff,
+                                   reduced_gnddiff,
+                                   Fgnddiff);
 
                     if (Fskydiff >= 0 && Fskydiff <= 1)
                         irr_st.iskydiff *= Fskydiff;

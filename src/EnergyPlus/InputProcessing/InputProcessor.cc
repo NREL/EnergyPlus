@@ -1262,9 +1262,17 @@ void InputProcessor::preProcessorCheck(bool &PreP_Fatal) // True if a preprocess
         getObjectDefMaxArgs(DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         DataIPShortCuts::cAlphaArgs({1, NumAlphas}) = BlankString;
         for (CountP = 1; CountP <= NumPrePM; ++CountP) {
-            getObjectItem(DataIPShortCuts::cCurrentModuleObject, CountP, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs,
-                          NumNumbers, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks,
-                          DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames);
+            getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                          CountP,
+                          DataIPShortCuts::cAlphaArgs,
+                          NumAlphas,
+                          DataIPShortCuts::rNumericArgs,
+                          NumNumbers,
+                          IOStat,
+                          DataIPShortCuts::lNumericFieldBlanks,
+                          DataIPShortCuts::lAlphaFieldBlanks,
+                          DataIPShortCuts::cAlphaFieldNames,
+                          DataIPShortCuts::cNumericFieldNames);
             if (DataIPShortCuts::cAlphaArgs(1).empty()) DataIPShortCuts::cAlphaArgs(1) = "Unknown";
             if (NumAlphas > 3) {
                 Multiples = "s";

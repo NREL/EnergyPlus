@@ -600,8 +600,12 @@ namespace DElightManagerF {
                                         << znDayl.FracZoneDaylit(refPt.indexToFracAndIllum)
                                         << znDayl.IllumSetPoint(refPt.indexToFracAndIllum) * LUX2FC << znDayl.LightControlType;
                                     // RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
-                                    SetupOutputVariable("Daylighting Reference Point Illuminance", OutputProcessor::Unit::lux,
-                                                        znDayl.DaylIllumAtRefPt(refPt.indexToFracAndIllum), "Zone", "Average", refPt.Name);
+                                    SetupOutputVariable("Daylighting Reference Point Illuminance",
+                                                        OutputProcessor::Unit::lux,
+                                                        znDayl.DaylIllumAtRefPt(refPt.indexToFracAndIllum),
+                                                        "Zone",
+                                                        "Average",
+                                                        refPt.Name);
                                 } else {
                                     gio::write(unit, Format_913)
                                         << cNameWOBlanks << RefPt_WCS_Coord(1) * M2FT << RefPt_WCS_Coord(2) * M2FT << RefPt_WCS_Coord(3) * M2FT << 0.0
@@ -677,8 +681,17 @@ namespace DElightManagerF {
         TotDElightCFS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         DElightComplexFene.allocate(TotDElightCFS);
         for (auto &cfs : DElightComplexFene) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, ++CFSNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          ++CFSNum,
+                                          cAlphaArgs,
+                                          NumAlpha,
+                                          rNumericArgs,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             cfs.Name = cAlphaArgs(1);
             cfs.ComplexFeneType = cAlphaArgs(2);
             cfs.surfName = cAlphaArgs(3);
@@ -740,8 +753,17 @@ namespace DElightManagerF {
         NewAspectRatio = 1.0;
 
         if (inputProcessor->getNumObjectsFound(CurrentModuleObject) == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          cAlphas,
+                                          NAlphas,
+                                          rNumerics,
+                                          NNum,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             OldAspectRatio = rNumerics(1);
             NewAspectRatio = rNumerics(2);
             if (cAlphas(1) != "XY") {
@@ -791,8 +813,8 @@ namespace DElightManagerF {
                             int piErrorFlag)
     {
         auto zoneNameArr(getCharArrayFromString(cZoneName));
-        delightelecltgctrl(iNameLength, &zoneNameArr[0], dBldgLat, dHISKF, dHISUNF, dCloudFraction, dSOLCOSX, dSOLCOSY, dSOLCOSZ, &pdPowerReducFac,
-                           &piErrorFlag);
+        delightelecltgctrl(
+            iNameLength, &zoneNameArr[0], dBldgLat, dHISKF, dHISUNF, dCloudFraction, dSOLCOSX, dSOLCOSY, dSOLCOSZ, &pdPowerReducFac, &piErrorFlag);
     }
 
     std::vector<char> getCharArrayFromString(std::string const &originalString)

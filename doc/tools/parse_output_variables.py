@@ -1,21 +1,23 @@
+#!/usr/bin/env python
 # python 2/3 compatibility imports
 from __future__ import absolute_import
-from __future__ import unicode_literals
 from __future__ import print_function
+from __future__ import unicode_literals
+
+import csv
+import glob
+import io
+import sys
+from os import path
+import re
 
 # generates a csv summary of the output variables in E+
-# assumption: function calls are single line -- **NOT** wrapped
+# assumption: doesn't check for commented lines
 # assumption: no /* */ style commenting
 # To Call: 3 ARGUMENTS:
 # the first is the source dir to find *.cc files
 # the second is the csv output file name
 # the third is the md output file name
-
-import sys
-from os import path
-import io
-import glob
-import csv
 
 # example arguments here
 # source_dir = "<repo_source_dir>\src\EnergyPlus"
@@ -28,7 +30,9 @@ if len(sys.argv) == 4:
     md_output_file = sys.argv[3]
 else:
     print("Bad usage, three command line arguments are required")
-    print("  The first is the source dir to find .cc files, and the second is the output csv file, and the third is the output md file")
+    print("  The first is the source dir to find .cc files,")
+    print("  the second is the output csv file,")
+    print("  and the third is the output md file")
     sys.exit(1)
 
 
@@ -55,8 +59,8 @@ def get_level_zero_comma_locations(line):
             current_parentheses_level += 1
         elif char == ')':
             current_parentheses_level -= 1
-        # print "Character: " + char + "; paren_level: " + str(current_parentheses_level)
-        # print (char + " : " + str(level_zero_comma_locations) )
+            # print "Character: " + char + "; paren_level: " + str(current_parentheses_level)
+            # print (char + " : " + str(level_zero_comma_locations) )
     return level_zero_comma_locations
 
 
@@ -73,7 +77,7 @@ def get_arguments_based_on_comma_locations(line, comma_locations):
                 arguments.append(line[comma_locations[i - 1] + 1:comma_locations[i]].strip())
         return arguments
     except:
-        print (line)
+        print(line)
         return None
 
 
@@ -92,10 +96,9 @@ def process_variable_name_and_units(argument):
 
 class OutputVariableCall:
     # constructor
-    def __init__(self, file_name, line_number, variable_name, units, variable_itself, index_type_key, variable_type_key,
+    def __init__(self, file_name, variable_name, units, variable_itself, index_type_key, variable_type_key,
                  keyed_value):
         self.file_name = file_name
-        self.line_number = line_number
         self.variable_name = variable_name
         self.units = units
         self.variable = variable_itself
@@ -107,18 +110,18 @@ class OutputVariableCall:
     @staticmethod
     def spew_header_to_csv(csv_file_object):
         csv_file_object.writerow(
-            ('Filename', 'Line number', 'Variable name', 'Units', 'Variable reference', 'Index type key',
+            ('Filename', 'Variable name', 'Units', 'Variable reference', 'Index type key',
              'Variable type key', 'Keyed value'))
 
     def spew_to_csv(self, csv_file_object):
         csv_file_object.writerow(
-            [self.file_name, self.line_number, self.variable_name, self.units, self.variable, self.index_type_key,
+            [self.file_name, self.variable_name, self.units, self.variable, self.index_type_key,
              self.variable_type_key, self.keyed_value])
 
     # markdown methods
     def spew_to_md(self, md_file_object):
         md_file_object.write("|")
-        md_file_object.write("|".join((str(x) for x in (self.line_number, self.variable_name, self.units, self.variable,
+        md_file_object.write("|".join((str(x) for x in (self.variable_name, self.units, self.variable,
                                                         self.index_type_key, self.variable_type_key,
                                                         self.keyed_value))))
         md_file_object.write("|")
@@ -128,9 +131,9 @@ class OutputVariableCall:
         md_file_object.write("\n")
         md_file_object.write("## %s\n" % self.file_name)
         md_file_object.write(
-            "|Line #|Variable name|Units|Variable reference|Index type key|Variable type key|Keyed value|\n")
+            "|Variable name|Units|Variable reference|Index type key|Variable type key|Keyed value|\n")
         md_file_object.write(
-            "|------|-------------|-----|------------------|--------------|-----------------|-----------|\n")
+            "|-------------|-----|------------------|--------------|-----------------|-----------|\n")
 
 
 def main():
@@ -148,56 +151,59 @@ def main():
 
         with io.open(this_file, 'r', encoding='latin-1') as f:
 
-            # initialize
-            line_number = 0
+            file_contents = f.read()
 
-            for line in f.readlines():
+            # first warn about commented lines
+            p = re.compile('//\s*SetupOutputVariable')
+            matches = p.findall(file_contents)
 
-                line_number += 1
+            if len(matches) > 0:
+                print("File %s contains commented SetupOutputVariable calls; output may be flawed" % file_name)
 
-                # create a copy of line to work on
-                working_line = line
+            p = re.compile('SetupOutputVariable\([^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^;]*;')
+            matches = p.findall(file_contents)
 
-                # trim off comments first
-                if "//" in working_line:
-                    working_line = working_line[0:working_line.index("//")]
+            for match in matches:
 
-                if 'SetupOutputVariable' in working_line:
-                    # trim off the leading/trailing stuff to just get args
-                    working_line = do_initial_line_trimming(working_line)
+                setup_call = match.replace('\n', '')
 
-                    # get all the zero parentheses level comma locations to parse actual arguments, even if the arguments have embedded commas
-                    comma_locations = get_level_zero_comma_locations(working_line)
+                # trim off the leading/trailing stuff to just get args
+                working_line = do_initial_line_trimming(setup_call)
 
-                    # get a list of the actual arguments
-                    arguments = get_arguments_based_on_comma_locations(working_line, comma_locations)
+                # get all the zero parentheses level comma locations to parse actual arguments,
+                #  even if the arguments have embedded commas
+                comma_locations = get_level_zero_comma_locations(working_line)
 
-                    # parse out data from the variable name first
-                    variable_name, variable_units = process_variable_name_and_units(arguments[0])
+                # get a list of the actual arguments
+                arguments = get_arguments_based_on_comma_locations(working_line, comma_locations)
 
-                    try:
+                # parse out data from the variable name first
+                variable_name, variable_units = process_variable_name_and_units(arguments[0])
 
-                        # the second can be taken as-is
-                        actual_variable = arguments[1]
+                try:
 
-                        # the third should be processed for quotes
-                        index_type_key = arguments[2]
+                    # the second can be taken as-is
+                    actual_variable = arguments[1]
 
-                        # same for the fourth
-                        variable_type_key = arguments[3]
+                    # the third should be processed for quotes
+                    index_type_key = arguments[2]
 
-                        # same for the fifth I guess
-                        keyed_value = arguments[4]
+                    # same for the fourth
+                    variable_type_key = arguments[3]
 
-                    except:
-                        
-                        print("Something went wrong processing this variable line:")
-                        print(working_line)
+                    # same for the fifth I guess
+                    keyed_value = arguments[4]
 
-                    # add to the array
-                    thisOV = OutputVariableCall(file_name, line_number, variable_name, variable_units, actual_variable,
-                                                index_type_key, variable_type_key, keyed_value)
-                    output_variables.append(thisOV)
+                except:
+
+                    print("Something went wrong processing this variable line:")
+                    print(working_line)
+                    continue
+
+                # add to the array
+                this_o_v = OutputVariableCall(file_name, variable_name, variable_units,
+                                              actual_variable, index_type_key, variable_type_key, keyed_value)
+                output_variables.append(this_o_v)
 
                 # print "Finished with file %s; %i calls processed so far" % (file_name, len(output_variables))
 
@@ -222,6 +228,7 @@ def main():
             call.spew_to_md(md_file)
 
     print(" +++ AutoDocs: Completed processing output variable audit: processed %i calls" % len(output_variables))
+
 
 # run main documentation code
 main()

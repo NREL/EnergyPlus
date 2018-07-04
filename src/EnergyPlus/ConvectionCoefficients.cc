@@ -285,8 +285,8 @@ namespace ConvectionCoefficients {
 
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
-        using DataHeatBalFanSys::MAT;
         using DataHeatBalance::Construct;
+        using DataHeatBalFanSys::MAT;
         using DataLoopNode::Node;
         using DataLoopNode::NumOfNodes;
         using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -326,7 +326,8 @@ namespace ConvectionCoefficients {
         }
 
         if (BeginEnvrnFlag && MyEnvirnFlag) {
-            if (std::any_of(Surface.begin(), Surface.end(),
+            if (std::any_of(Surface.begin(),
+                            Surface.end(),
                             [](DataSurfaces::SurfaceData const &e) { return e.IntConvCoeff == DataHeatBalance::AdaptiveConvectionAlgorithm; }) ||
                 std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) {
                     return e.InsideConvectionAlgo == DataHeatBalance::AdaptiveConvectionAlgorithm;
@@ -609,8 +610,13 @@ namespace ConvectionCoefficients {
 
                         if (Surface(BaseSurf).GrossArea != 0.0 && Surface(BaseSurf).Height != 0.0) {
                             rCalcPerimeter = 2.0 * (Surface(BaseSurf).GrossArea / Surface(BaseSurf).Height + Surface(BaseSurf).Height);
-                            Hf = CalcHfExteriorSparrow(SurfWindSpeed, Surface(BaseSurf).GrossArea, rCalcPerimeter, Surface(SurfNum).CosTilt,
-                                                       Surface(SurfNum).Azimuth, Roughness, SurfWindDir);
+                            Hf = CalcHfExteriorSparrow(SurfWindSpeed,
+                                                       Surface(BaseSurf).GrossArea,
+                                                       rCalcPerimeter,
+                                                       Surface(SurfNum).CosTilt,
+                                                       Surface(SurfNum).Azimuth,
+                                                       Roughness,
+                                                       SurfWindDir);
                         } else {
                             Hf = 0.0;
                         }
@@ -726,8 +732,13 @@ namespace ConvectionCoefficients {
 
                         if (Surface(BaseSurf).GrossArea != 0.0 && Surface(BaseSurf).Height != 0.0) {
                             rCalcPerimeter = 2.0 * (Surface(BaseSurf).GrossArea / Surface(BaseSurf).Height + Surface(BaseSurf).Height);
-                            Hf = CalcHfExteriorSparrow(SurfWindSpeed, Surface(BaseSurf).GrossArea, rCalcPerimeter, Surface(SurfNum).CosTilt,
-                                                       Surface(SurfNum).Azimuth, Roughness, SurfWindDir);
+                            Hf = CalcHfExteriorSparrow(SurfWindSpeed,
+                                                       Surface(BaseSurf).GrossArea,
+                                                       rCalcPerimeter,
+                                                       Surface(SurfNum).CosTilt,
+                                                       Surface(SurfNum).Azimuth,
+                                                       Roughness,
+                                                       SurfWindDir);
                         } else {
                             Hf = 0.0;
                         }
@@ -1152,146 +1163,198 @@ namespace ConvectionCoefficients {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetUserConvectionCoefficients");
         int const NumValidSurfaceTypes(11);
-        static Array1D_string const ValidSurfaceTypes(11, {"ALLEXTERIORSURFACES", "ALLEXTERIORWINDOWS", "ALLEXTERIORWALLS", "ALLEXTERIORROOFS",
-                                                           "ALLEXTERIORFLOORS", "ALLINTERIORSURFACES", "ALLINTERIORWINDOWS", "ALLINTERIORWALLS",
-                                                           "ALLINTERIORROOFS", "ALLINTERIORCEILINGS", "ALLINTERIORFLOORS"});
+        static Array1D_string const ValidSurfaceTypes(11,
+                                                      {"ALLEXTERIORSURFACES",
+                                                       "ALLEXTERIORWINDOWS",
+                                                       "ALLEXTERIORWALLS",
+                                                       "ALLEXTERIORROOFS",
+                                                       "ALLEXTERIORFLOORS",
+                                                       "ALLINTERIORSURFACES",
+                                                       "ALLINTERIORWINDOWS",
+                                                       "ALLINTERIORWALLS",
+                                                       "ALLINTERIORROOFS",
+                                                       "ALLINTERIORCEILINGS",
+                                                       "ALLINTERIORFLOORS"});
 
         int const NumValidExtConvectionValueTypes(22);
-        static Array1D_string const ValidExtConvectionValueTypes(22, {"VALUE",
-                                                                      "SCHEDULE",
-                                                                      "SIMPLECOMBINED",
-                                                                      "TARP",
-                                                                      "MOWITT",
-                                                                      "DOE-2",
-                                                                      "ADAPTIVECONVECTIONALGORITHM",
-                                                                      "USERCURVE",
-                                                                      "ASHRAEVERTICALWALL",
-                                                                      "WALTONUNSTABLEHORIZONTALORTILT",
-                                                                      "WALTONSTABLEHORIZONTALORTILT",
-                                                                      "NUSSELTJURGES",
-                                                                      "MCADAMS",
-                                                                      "MITCHELL",
-                                                                      "CLEARROOF",
-                                                                      "EMMELVERTICAL",
-                                                                      "EMMELROOF",
-                                                                      "ALAMDARIHAMMONDVERTICALWALL",
-                                                                      "FOHANNOPOLIDORIVERTICALWALL",
-                                                                      "ISO15099WINDOWS",
-                                                                      "ALAMDARIHAMMONDSTABLEHORIZONTAL",
-                                                                      "ALAMDARIHAMMONDUNSTABLEHORIZONTAL"});
+        static Array1D_string const ValidExtConvectionValueTypes(22,
+                                                                 {"VALUE",
+                                                                  "SCHEDULE",
+                                                                  "SIMPLECOMBINED",
+                                                                  "TARP",
+                                                                  "MOWITT",
+                                                                  "DOE-2",
+                                                                  "ADAPTIVECONVECTIONALGORITHM",
+                                                                  "USERCURVE",
+                                                                  "ASHRAEVERTICALWALL",
+                                                                  "WALTONUNSTABLEHORIZONTALORTILT",
+                                                                  "WALTONSTABLEHORIZONTALORTILT",
+                                                                  "NUSSELTJURGES",
+                                                                  "MCADAMS",
+                                                                  "MITCHELL",
+                                                                  "CLEARROOF",
+                                                                  "EMMELVERTICAL",
+                                                                  "EMMELROOF",
+                                                                  "ALAMDARIHAMMONDVERTICALWALL",
+                                                                  "FOHANNOPOLIDORIVERTICALWALL",
+                                                                  "ISO15099WINDOWS",
+                                                                  "ALAMDARIHAMMONDSTABLEHORIZONTAL",
+                                                                  "ALAMDARIHAMMONDUNSTABLEHORIZONTAL"});
 
-        static Array1D_int const ExtConvectionValue(22, {-999,
-                                                         -999,
-                                                         ASHRAESimple,
-                                                         TarpHcOutside,
-                                                         MoWiTTHcOutside,
-                                                         DOE2HcOutside,
-                                                         AdaptiveConvectionAlgorithm,
-                                                         HcExt_UserCurve,
-                                                         HcExt_NaturalASHRAEVerticalWall,
-                                                         HcExt_NaturalWaltonUnstableHorizontalOrTilt,
-                                                         HcExt_NaturalWaltonStableHorizontalOrTilt,
-                                                         HcExt_NusseltJurges,
-                                                         HcExt_McAdams,
-                                                         HcExt_Mitchell,
-                                                         HcExt_ClearRoof,
-                                                         HcExt_EmmelVertical,
-                                                         HcExt_EmmelRoof,
-                                                         HcExt_AlamdariHammondVerticalWall,
-                                                         HcExt_FohannoPolidoriVerticalWall,
-                                                         HcExt_ISO15099Windows,
-                                                         HcExt_AlamdariHammondStableHorizontal,
-                                                         HcExt_AlamdariHammondUnstableHorizontal});
+        static Array1D_int const ExtConvectionValue(22,
+                                                    {-999,
+                                                     -999,
+                                                     ASHRAESimple,
+                                                     TarpHcOutside,
+                                                     MoWiTTHcOutside,
+                                                     DOE2HcOutside,
+                                                     AdaptiveConvectionAlgorithm,
+                                                     HcExt_UserCurve,
+                                                     HcExt_NaturalASHRAEVerticalWall,
+                                                     HcExt_NaturalWaltonUnstableHorizontalOrTilt,
+                                                     HcExt_NaturalWaltonStableHorizontalOrTilt,
+                                                     HcExt_NusseltJurges,
+                                                     HcExt_McAdams,
+                                                     HcExt_Mitchell,
+                                                     HcExt_ClearRoof,
+                                                     HcExt_EmmelVertical,
+                                                     HcExt_EmmelRoof,
+                                                     HcExt_AlamdariHammondVerticalWall,
+                                                     HcExt_FohannoPolidoriVerticalWall,
+                                                     HcExt_ISO15099Windows,
+                                                     HcExt_AlamdariHammondStableHorizontal,
+                                                     HcExt_AlamdariHammondUnstableHorizontal});
 
         int const NumValidSpecificExtWindConvValueTypes(15);
-        static Array1D_string const ValidSpecificExtWindConvValueTypes(
-            15, {"SIMPLECOMBINED", "TARPWINDWARD", "TARPLEEWARD", "MOWITTWINDWARD", "MOWITTLEEWARD", "DOE2WINDWARD", "DOE2LEEWARD", "NUSSELTJURGES",
-                 "MCADAMS", "MITCHELL", "EMMELVERTICAL", "EMMELROOF", "BLOCKENWINDWARD", "CLEARROOF", "USERCURVE"});
-        static Array1D_int const MoreSpecificExtWindConvectionValue(
-            15, {HcExt_ASHRAESimpleCombined, HcExt_SparrowWindward, HcExt_SparrowLeeward, HcExt_MoWiTTWindward, HcExt_DOE2Windward,
-                 HcExt_MoWiTTLeeward, HcExt_DOE2Leeward, HcExt_NusseltJurges, HcExt_McAdams, HcExt_Mitchell, HcExt_EmmelVertical, HcExt_EmmelRoof,
-                 HcExt_BlockenWindward, HcExt_ClearRoof, HcExt_UserCurve});
+        static Array1D_string const ValidSpecificExtWindConvValueTypes(15,
+                                                                       {"SIMPLECOMBINED",
+                                                                        "TARPWINDWARD",
+                                                                        "TARPLEEWARD",
+                                                                        "MOWITTWINDWARD",
+                                                                        "MOWITTLEEWARD",
+                                                                        "DOE2WINDWARD",
+                                                                        "DOE2LEEWARD",
+                                                                        "NUSSELTJURGES",
+                                                                        "MCADAMS",
+                                                                        "MITCHELL",
+                                                                        "EMMELVERTICAL",
+                                                                        "EMMELROOF",
+                                                                        "BLOCKENWINDWARD",
+                                                                        "CLEARROOF",
+                                                                        "USERCURVE"});
+        static Array1D_int const MoreSpecificExtWindConvectionValue(15,
+                                                                    {HcExt_ASHRAESimpleCombined,
+                                                                     HcExt_SparrowWindward,
+                                                                     HcExt_SparrowLeeward,
+                                                                     HcExt_MoWiTTWindward,
+                                                                     HcExt_DOE2Windward,
+                                                                     HcExt_MoWiTTLeeward,
+                                                                     HcExt_DOE2Leeward,
+                                                                     HcExt_NusseltJurges,
+                                                                     HcExt_McAdams,
+                                                                     HcExt_Mitchell,
+                                                                     HcExt_EmmelVertical,
+                                                                     HcExt_EmmelRoof,
+                                                                     HcExt_BlockenWindward,
+                                                                     HcExt_ClearRoof,
+                                                                     HcExt_UserCurve});
 
         int const NumValidSpecificExtNatConvectValueTypes(10);
-        static Array1D_string const ValidSpecificExtNatConvectValueTypes(
-            10, {"ASHRAEVERTICALWALL", "ALAMDARIHAMMONDVERTICALWALL", "FOHANNOPOLIDORIVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT",
-                 "WALTONSTABLEHORIZONTALORTILT", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL", "ISO15099WINDOWS",
-                 "USERCURVE", "NONE"});
-        static Array1D_int const SpecificExtNatConvectionValue(
-            10, {HcExt_NaturalASHRAEVerticalWall, HcExt_AlamdariHammondVerticalWall, HcExt_FohannoPolidoriVerticalWall,
-                 HcExt_NaturalWaltonUnstableHorizontalOrTilt, HcExt_NaturalWaltonStableHorizontalOrTilt, HcExt_AlamdariHammondStableHorizontal,
-                 HcExt_AlamdariHammondUnstableHorizontal, HcExt_ISO15099Windows, HcExt_UserCurve, HcExt_None});
+        static Array1D_string const ValidSpecificExtNatConvectValueTypes(10,
+                                                                         {"ASHRAEVERTICALWALL",
+                                                                          "ALAMDARIHAMMONDVERTICALWALL",
+                                                                          "FOHANNOPOLIDORIVERTICALWALL",
+                                                                          "WALTONUNSTABLEHORIZONTALORTILT",
+                                                                          "WALTONSTABLEHORIZONTALORTILT",
+                                                                          "ALAMDARIHAMMONDSTABLEHORIZONTAL",
+                                                                          "ALAMDARIHAMMONDUNSTABLEHORIZONTAL",
+                                                                          "ISO15099WINDOWS",
+                                                                          "USERCURVE",
+                                                                          "NONE"});
+        static Array1D_int const SpecificExtNatConvectionValue(10,
+                                                               {HcExt_NaturalASHRAEVerticalWall,
+                                                                HcExt_AlamdariHammondVerticalWall,
+                                                                HcExt_FohannoPolidoriVerticalWall,
+                                                                HcExt_NaturalWaltonUnstableHorizontalOrTilt,
+                                                                HcExt_NaturalWaltonStableHorizontalOrTilt,
+                                                                HcExt_AlamdariHammondStableHorizontal,
+                                                                HcExt_AlamdariHammondUnstableHorizontal,
+                                                                HcExt_ISO15099Windows,
+                                                                HcExt_UserCurve,
+                                                                HcExt_None});
 
         // CeilingDiffuser and TrombeWall Interior types are only Zone Level settings.
         int const NumValidIntConvectionValueTypes(34);
-        static Array1D_string const ValidIntConvectionValueTypes(34, {"VALUE",
-                                                                      "SCHEDULE",
-                                                                      "SIMPLE",
-                                                                      "TARP",
-                                                                      "ADAPTIVECONVECTIONALGORITHM",
-                                                                      "USERCURVE",
-                                                                      "ASHRAEVERTICALWALL",
-                                                                      "WALTONUNSTABLEHORIZONTALORTILT",
-                                                                      "WALTONSTABLEHORIZONTALORTILT",
-                                                                      "FISHERPEDERSENCEILINGDIFFUSERWALLS",
-                                                                      "FISHERPEDERSENCEILINGDIFFUSERCEILING",
-                                                                      "FISHERPEDERSENCEILINGDIFFUSERFLOOR",
-                                                                      "ALAMDARIHAMMONDSTABLEHORIZONTAL",
-                                                                      "ALAMDARIHAMMONDUNSTABLEHORIZONTAL",
-                                                                      "ALAMDARIHAMMONDVERTICALWALL",
-                                                                      "KHALIFAEQ3WALLAWAYFROMHEAT",
-                                                                      "KHALIFAEQ4CEILINGAWAYFROMHEAT",
-                                                                      "KHALIFAEQ5WALLNEARHEAT",
-                                                                      "KHALIFAEQ6NONHEATEDWALLS",
-                                                                      "KHALIFAEQ7CEILING",
-                                                                      "AWBIHATTONHEATEDFLOOR",
-                                                                      "AWBIHATTONHEATEDWALL",
-                                                                      "BEAUSOLEILMORRISONMIXEDASSISTEDWALL",
-                                                                      "BEAUSOLEILMORRISONMIXEDOPPOSINGWALL",
-                                                                      "BEAUSOLEILMORRISONMIXEDSTABLEFLOOR",
-                                                                      "BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR",
-                                                                      "BEAUSOLEILMORRISONMIXEDSTABLECEILING",
-                                                                      "BEAUSOLEILMORRISONMIXEDUNSTABLECEILING",
-                                                                      "FOHANNOPOLIDORIVERTICALWALL",
-                                                                      "KARADAGCHILLEDCEILING",
-                                                                      "ISO15099WINDOWS",
-                                                                      "GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW",
-                                                                      "GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS",
-                                                                      "GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR"});
-        static Array1D_int const IntConvectionValue(34, {-999,
-                                                         -999,
-                                                         ASHRAESimple,
-                                                         ASHRAETARP,
-                                                         AdaptiveConvectionAlgorithm,
-                                                         HcInt_UserCurve,
-                                                         HcInt_ASHRAEVerticalWall,
-                                                         HcInt_WaltonUnstableHorizontalOrTilt,
-                                                         HcInt_WaltonStableHorizontalOrTilt,
-                                                         HcInt_FisherPedersenCeilDiffuserWalls,
-                                                         HcInt_FisherPedersenCeilDiffuserCeiling,
-                                                         HcInt_FisherPedersenCeilDiffuserFloor,
-                                                         HcInt_AlamdariHammondStableHorizontal,
-                                                         HcInt_AlamdariHammondUnstableHorizontal,
-                                                         HcInt_AlamdariHammondVerticalWall,
-                                                         HcInt_KhalifaEq3WallAwayFromHeat,
-                                                         HcInt_KhalifaEq4CeilingAwayFromHeat,
-                                                         HcInt_KhalifaEq5WallNearHeat,
-                                                         HcInt_KhalifaEq6NonHeatedWalls,
-                                                         HcInt_KhalifaEq7Ceiling,
-                                                         HcInt_AwbiHattonHeatedFloor,
-                                                         HcInt_AwbiHattonHeatedWall,
-                                                         HcInt_BeausoleilMorrisonMixedAssistingWall,
-                                                         HcInt_BeausoleilMorrisonMixedOppossingWall,
-                                                         HcInt_BeausoleilMorrisonMixedStableFloor,
-                                                         HcInt_BeausoleilMorrisonMixedUnstableFloor,
-                                                         HcInt_BeausoleilMorrisonMixedStableCeiling,
-                                                         HcInt_BeausoleilMorrisonMixedUnstableCeiling,
-                                                         HcInt_FohannoPolidoriVerticalWall,
-                                                         HcInt_KaradagChilledCeiling,
-                                                         HcInt_ISO15099Windows,
-                                                         HcInt_GoldsteinNovoselacCeilingDiffuserWindow,
-                                                         HcInt_GoldsteinNovoselacCeilingDiffuserWalls,
-                                                         HcInt_GoldsteinNovoselacCeilingDiffuserFloor});
+        static Array1D_string const ValidIntConvectionValueTypes(34,
+                                                                 {"VALUE",
+                                                                  "SCHEDULE",
+                                                                  "SIMPLE",
+                                                                  "TARP",
+                                                                  "ADAPTIVECONVECTIONALGORITHM",
+                                                                  "USERCURVE",
+                                                                  "ASHRAEVERTICALWALL",
+                                                                  "WALTONUNSTABLEHORIZONTALORTILT",
+                                                                  "WALTONSTABLEHORIZONTALORTILT",
+                                                                  "FISHERPEDERSENCEILINGDIFFUSERWALLS",
+                                                                  "FISHERPEDERSENCEILINGDIFFUSERCEILING",
+                                                                  "FISHERPEDERSENCEILINGDIFFUSERFLOOR",
+                                                                  "ALAMDARIHAMMONDSTABLEHORIZONTAL",
+                                                                  "ALAMDARIHAMMONDUNSTABLEHORIZONTAL",
+                                                                  "ALAMDARIHAMMONDVERTICALWALL",
+                                                                  "KHALIFAEQ3WALLAWAYFROMHEAT",
+                                                                  "KHALIFAEQ4CEILINGAWAYFROMHEAT",
+                                                                  "KHALIFAEQ5WALLNEARHEAT",
+                                                                  "KHALIFAEQ6NONHEATEDWALLS",
+                                                                  "KHALIFAEQ7CEILING",
+                                                                  "AWBIHATTONHEATEDFLOOR",
+                                                                  "AWBIHATTONHEATEDWALL",
+                                                                  "BEAUSOLEILMORRISONMIXEDASSISTEDWALL",
+                                                                  "BEAUSOLEILMORRISONMIXEDOPPOSINGWALL",
+                                                                  "BEAUSOLEILMORRISONMIXEDSTABLEFLOOR",
+                                                                  "BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR",
+                                                                  "BEAUSOLEILMORRISONMIXEDSTABLECEILING",
+                                                                  "BEAUSOLEILMORRISONMIXEDUNSTABLECEILING",
+                                                                  "FOHANNOPOLIDORIVERTICALWALL",
+                                                                  "KARADAGCHILLEDCEILING",
+                                                                  "ISO15099WINDOWS",
+                                                                  "GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW",
+                                                                  "GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS",
+                                                                  "GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR"});
+        static Array1D_int const IntConvectionValue(34,
+                                                    {-999,
+                                                     -999,
+                                                     ASHRAESimple,
+                                                     ASHRAETARP,
+                                                     AdaptiveConvectionAlgorithm,
+                                                     HcInt_UserCurve,
+                                                     HcInt_ASHRAEVerticalWall,
+                                                     HcInt_WaltonUnstableHorizontalOrTilt,
+                                                     HcInt_WaltonStableHorizontalOrTilt,
+                                                     HcInt_FisherPedersenCeilDiffuserWalls,
+                                                     HcInt_FisherPedersenCeilDiffuserCeiling,
+                                                     HcInt_FisherPedersenCeilDiffuserFloor,
+                                                     HcInt_AlamdariHammondStableHorizontal,
+                                                     HcInt_AlamdariHammondUnstableHorizontal,
+                                                     HcInt_AlamdariHammondVerticalWall,
+                                                     HcInt_KhalifaEq3WallAwayFromHeat,
+                                                     HcInt_KhalifaEq4CeilingAwayFromHeat,
+                                                     HcInt_KhalifaEq5WallNearHeat,
+                                                     HcInt_KhalifaEq6NonHeatedWalls,
+                                                     HcInt_KhalifaEq7Ceiling,
+                                                     HcInt_AwbiHattonHeatedFloor,
+                                                     HcInt_AwbiHattonHeatedWall,
+                                                     HcInt_BeausoleilMorrisonMixedAssistingWall,
+                                                     HcInt_BeausoleilMorrisonMixedOppossingWall,
+                                                     HcInt_BeausoleilMorrisonMixedStableFloor,
+                                                     HcInt_BeausoleilMorrisonMixedUnstableFloor,
+                                                     HcInt_BeausoleilMorrisonMixedStableCeiling,
+                                                     HcInt_BeausoleilMorrisonMixedUnstableCeiling,
+                                                     HcInt_FohannoPolidoriVerticalWall,
+                                                     HcInt_KaradagChilledCeiling,
+                                                     HcInt_ISO15099Windows,
+                                                     HcInt_GoldsteinNovoselacCeilingDiffuserWindow,
+                                                     HcInt_GoldsteinNovoselacCeilingDiffuserWalls,
+                                                     HcInt_GoldsteinNovoselacCeilingDiffuserFloor});
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1327,8 +1390,17 @@ namespace ConvectionCoefficients {
         TotInsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         HcInsideUserCurve.allocate(TotInsideHcUserCurves);
         for (Loop = 1; Loop <= TotInsideHcUserCurves; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             HcInsideUserCurve(Loop).Name = cAlphaArgs(1);
             {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
@@ -1451,8 +1523,17 @@ namespace ConvectionCoefficients {
         TotOutsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         HcOutsideUserCurve.allocate(TotOutsideHcUserCurves);
         for (Loop = 1; Loop <= TotOutsideHcUserCurves; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             HcOutsideUserCurve(Loop).Name = cAlphaArgs(1);
 
             {
@@ -1559,8 +1640,17 @@ namespace ConvectionCoefficients {
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         for (Loop = 1; Loop <= Count; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             if (Alphas(2) == "INSIDE") {
                 ++TotIntConvCoeff;
             }
@@ -1585,8 +1675,17 @@ namespace ConvectionCoefficients {
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         for (Loop = 1; Loop <= Count; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             if (Alphas(2) == "INSIDE") {
                 ++TotIntConvCoeff;
             }
@@ -1619,8 +1718,17 @@ namespace ConvectionCoefficients {
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         for (Loop = 1; Loop <= Count; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             Found = UtilityRoutines::FindItemInList(Alphas(1), Surface);
             if (Found == 0) {
                 ShowSevereError("GetUserConvectionCoefficients: " + CurrentModuleObject + ", illegal value for " + cAlphaFieldNames(1) + '=' +
@@ -1845,8 +1953,17 @@ namespace ConvectionCoefficients {
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         for (Loop = 1; Loop <= Count; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // Check Field 1 for validity
             IsValidType = false;
             for (Loop1 = 1; Loop1 <= NumValidSurfaceTypes; ++Loop1) {
@@ -2117,8 +2234,17 @@ namespace ConvectionCoefficients {
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         // IF (Count > 1) ! throw  error ... TODO or IP handles it
         if (Count == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             InsideFaceAdaptiveConvectionAlgo.Name = cAlphaArgs(1); // not used by E+, unique object
             InsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 
@@ -3205,8 +3331,17 @@ namespace ConvectionCoefficients {
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         // IF (Count > 1) ! throw  error ... TODO or IP handles it
         if (Count == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             OutsideFaceAdaptiveConvectionAlgo.Name = cAlphaArgs(1); // not used by E+, unique object
             OutsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 
@@ -4658,8 +4793,10 @@ namespace ConvectionCoefficients {
                 Surface(SurfNum).OutConvHfModelEq = HcExt_UserCurve; // reporting
                 Surface(SurfNum).OutConvHnModelEq = HcExt_None;      // reporting
             } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
-                EvaluateExtHcModels(SurfNum, UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
-                                    UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq, HExt);
+                EvaluateExtHcModels(SurfNum,
+                                    UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
+                                    UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
+                                    HExt);
                 Surface(SurfNum).OutConvHfModelEq = UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
                 Surface(SurfNum).OutConvHnModelEq = UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
             } else {
@@ -5981,8 +6118,12 @@ namespace ConvectionCoefficients {
                     AirChangeRate = 0.0;
                     SupplyAirTemp = Node(ZoneNode).Temp;
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedAssistedWall((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneWallHeight,
-                                                                TH(2, 1, SurfNum), SupplyAirTemp, AirChangeRate, ZoneNum);
+                tmpHc = CalcBeausoleilMorrisonMixedAssistedWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                Surface(SurfNum).IntConvZoneWallHeight,
+                                                                TH(2, 1, SurfNum),
+                                                                SupplyAirTemp,
+                                                                AirChangeRate,
+                                                                ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedOppossingWall) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -6016,8 +6157,12 @@ namespace ConvectionCoefficients {
                     SupplyAirTemp = Node(ZoneNode).Temp;
                 }
 
-                tmpHc = CalcBeausoleilMorrisonMixedOpposingWall((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneWallHeight,
-                                                                TH(2, 1, SurfNum), SupplyAirTemp, AirChangeRate, ZoneNum);
+                tmpHc = CalcBeausoleilMorrisonMixedOpposingWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                Surface(SurfNum).IntConvZoneWallHeight,
+                                                                TH(2, 1, SurfNum),
+                                                                SupplyAirTemp,
+                                                                AirChangeRate,
+                                                                ZoneNum);
 
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedStableCeiling) {
@@ -6051,8 +6196,12 @@ namespace ConvectionCoefficients {
                     AirChangeRate = 0.0;
                     SupplyAirTemp = Node(ZoneNode).Temp;
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedStableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                 TH(2, 1, SurfNum), SupplyAirTemp, AirChangeRate, ZoneNum);
+                tmpHc = CalcBeausoleilMorrisonMixedStableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                 Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                 TH(2, 1, SurfNum),
+                                                                 SupplyAirTemp,
+                                                                 AirChangeRate,
+                                                                 ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedUnstableCeiling) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -6085,8 +6234,12 @@ namespace ConvectionCoefficients {
                     AirChangeRate = 0.0;
                     SupplyAirTemp = Node(ZoneNode).Temp;
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedUnstableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                   TH(2, 1, SurfNum), SupplyAirTemp, AirChangeRate, ZoneNum);
+                tmpHc = CalcBeausoleilMorrisonMixedUnstableCeiling((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                   Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                   TH(2, 1, SurfNum),
+                                                                   SupplyAirTemp,
+                                                                   AirChangeRate,
+                                                                   ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedStableFloor) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -6119,8 +6272,12 @@ namespace ConvectionCoefficients {
                     AirChangeRate = 0.0;
                     SupplyAirTemp = Node(ZoneNode).Temp;
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedStableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                               TH(2, 1, SurfNum), SupplyAirTemp, AirChangeRate, ZoneNum);
+                tmpHc = CalcBeausoleilMorrisonMixedStableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                               Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                               TH(2, 1, SurfNum),
+                                                               SupplyAirTemp,
+                                                               AirChangeRate,
+                                                               ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_BeausoleilMorrisonMixedUnstableFloor) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -6153,13 +6310,20 @@ namespace ConvectionCoefficients {
                     AirChangeRate = 0.0;
                     SupplyAirTemp = Node(ZoneNode).Temp;
                 }
-                tmpHc = CalcBeausoleilMorrisonMixedUnstableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneHorizHydrDiam,
-                                                                 TH(2, 1, SurfNum), SupplyAirTemp, AirChangeRate, ZoneNum);
+                tmpHc = CalcBeausoleilMorrisonMixedUnstableFloor((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                                 Surface(SurfNum).IntConvZoneHorizHydrDiam,
+                                                                 TH(2, 1, SurfNum),
+                                                                 SupplyAirTemp,
+                                                                 AirChangeRate,
+                                                                 ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FohannoPolidoriVerticalWall) {
                 ZoneNum = Surface(SurfNum).Zone;
-                tmpHc = CalcFohannoPolidoriVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)), Surface(SurfNum).IntConvZoneWallHeight, TH(2, 1, SurfNum),
-                                                        -QdotConvInRepPerArea(SurfNum), SurfNum);
+                tmpHc = CalcFohannoPolidoriVerticalWall((TH(2, 1, SurfNum) - MAT(ZoneNum)),
+                                                        Surface(SurfNum).IntConvZoneWallHeight,
+                                                        TH(2, 1, SurfNum),
+                                                        -QdotConvInRepPerArea(SurfNum),
+                                                        SurfNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_KaradagChilledCeiling) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -6182,8 +6346,10 @@ namespace ConvectionCoefficients {
                     AirSystemVolFlowRate = 0.0;
                     Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
                 }
-                tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWindow(AirSystemVolFlowRate, Surface(SurfNum).IntConvZonePerimLength,
-                                                                    Surface(SurfNum).IntConvWindowWallRatio, Surface(SurfNum).IntConvWindowLocation,
+                tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWindow(AirSystemVolFlowRate,
+                                                                    Surface(SurfNum).IntConvZonePerimLength,
+                                                                    Surface(SurfNum).IntConvWindowWallRatio,
+                                                                    Surface(SurfNum).IntConvWindowLocation,
                                                                     ZoneNum);
 
             } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserWalls) {
@@ -6198,8 +6364,8 @@ namespace ConvectionCoefficients {
                     AirSystemVolFlowRate = 0.0;
                     Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
                 }
-                tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWall(AirSystemVolFlowRate, Surface(SurfNum).IntConvZonePerimLength,
-                                                                  Surface(SurfNum).IntConvWindowLocation, ZoneNum);
+                tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWall(
+                    AirSystemVolFlowRate, Surface(SurfNum).IntConvZonePerimLength, Surface(SurfNum).IntConvWindowLocation, ZoneNum);
 
             } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserFloor) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -6285,11 +6451,14 @@ namespace ConvectionCoefficients {
                                                       Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
             } else if (SELECT_CASE_var == HcExt_AlamdariHammondVerticalWall) {
 
-                Hn = CalcAlamdariHammondVerticalWall((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), Surface(SurfNum).OutConvFaceHeight,
-                                                     SurfNum);
+                Hn = CalcAlamdariHammondVerticalWall(
+                    (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), Surface(SurfNum).OutConvFaceHeight, SurfNum);
             } else if (SELECT_CASE_var == HcExt_FohannoPolidoriVerticalWall) {
-                Hn = CalcFohannoPolidoriVerticalWall((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), Surface(SurfNum).OutConvFaceHeight,
-                                                     TH(1, 1, SurfNum), -QdotConvOutRepPerArea(SurfNum), SurfNum);
+                Hn = CalcFohannoPolidoriVerticalWall((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
+                                                     Surface(SurfNum).OutConvFaceHeight,
+                                                     TH(1, 1, SurfNum),
+                                                     -QdotConvOutRepPerArea(SurfNum),
+                                                     SurfNum);
                 //  CASE (HcExt_ISO15099Windows)
 
             } else if (SELECT_CASE_var == HcExt_AlamdariHammondStableHorizontal) {
@@ -6325,8 +6494,11 @@ namespace ConvectionCoefficients {
                 } else {
                     SurfWindSpeed = Surface(SurfNum).WindSpeed;
                 }
-                Hf = CalcSparrowWindward(Material(Construct(ConstructNum).LayerPoint(1)).Roughness, Surface(SurfNum).OutConvFacePerimeter,
-                                         Surface(SurfNum).OutConvFaceArea, SurfWindSpeed, SurfNum);
+                Hf = CalcSparrowWindward(Material(Construct(ConstructNum).LayerPoint(1)).Roughness,
+                                         Surface(SurfNum).OutConvFacePerimeter,
+                                         Surface(SurfNum).OutConvFaceArea,
+                                         SurfWindSpeed,
+                                         SurfNum);
 
             } else if (SELECT_CASE_var == HcExt_SparrowLeeward) {
                 ConstructNum = Surface(SurfNum).Construction;
@@ -6337,8 +6509,11 @@ namespace ConvectionCoefficients {
                 } else {
                     SurfWindSpeed = Surface(SurfNum).WindSpeed;
                 }
-                Hf = CalcSparrowLeeward(Material(Construct(ConstructNum).LayerPoint(1)).Roughness, Surface(SurfNum).OutConvFacePerimeter,
-                                        Surface(SurfNum).OutConvFaceArea, SurfWindSpeed, SurfNum);
+                Hf = CalcSparrowLeeward(Material(Construct(ConstructNum).LayerPoint(1)).Roughness,
+                                        Surface(SurfNum).OutConvFacePerimeter,
+                                        Surface(SurfNum).OutConvFaceArea,
+                                        SurfWindSpeed,
+                                        SurfNum);
             } else if (SELECT_CASE_var == HcExt_MoWiTTWindward) {
                 if (!Surface(SurfNum).ExtWind) {
                     SurfWindSpeed = 0.0; // No wind exposure
@@ -6366,7 +6541,10 @@ namespace ConvectionCoefficients {
                 } else {
                     SurfWindSpeed = Surface(SurfNum).WindSpeed;
                 }
-                Hf = CalcDOE2Windward(TH(1, 1, SurfNum), Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).CosTilt, SurfWindSpeed,
+                Hf = CalcDOE2Windward(TH(1, 1, SurfNum),
+                                      Surface(SurfNum).OutDryBulbTemp,
+                                      Surface(SurfNum).CosTilt,
+                                      SurfWindSpeed,
                                       Material(Construct(ConstructNum).LayerPoint(1)).Roughness);
             } else if (SELECT_CASE_var == HcExt_DOE2Leeward) {
                 ConstructNum = Surface(SurfNum).Construction;
@@ -6377,7 +6555,10 @@ namespace ConvectionCoefficients {
                 } else {
                     SurfWindSpeed = Surface(SurfNum).WindSpeed;
                 }
-                Hf = CalcDOE2Leeward(TH(1, 1, SurfNum), Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).CosTilt, SurfWindSpeed,
+                Hf = CalcDOE2Leeward(TH(1, 1, SurfNum),
+                                     Surface(SurfNum).OutDryBulbTemp,
+                                     Surface(SurfNum).CosTilt,
+                                     SurfWindSpeed,
                                      Material(Construct(ConstructNum).LayerPoint(1)).Roughness);
             } else if (SELECT_CASE_var == HcExt_NusseltJurges) {
                 if (!Surface(SurfNum).ExtWind) {
@@ -6417,8 +6598,13 @@ namespace ConvectionCoefficients {
                     SurfWindSpeed = Surface(SurfNum).WindSpeed;
                 }
                 SurfWindDir = Surface(SurfNum).WindDir;
-                Hf = CalcClearRoof(SurfNum, TH(1, 1, SurfNum), Surface(SurfNum).OutDryBulbTemp, SurfWindSpeed, SurfWindDir,
-                                   Surface(SurfNum).OutConvFaceArea, Surface(SurfNum).OutConvFacePerimeter);
+                Hf = CalcClearRoof(SurfNum,
+                                   TH(1, 1, SurfNum),
+                                   Surface(SurfNum).OutDryBulbTemp,
+                                   SurfWindSpeed,
+                                   SurfWindDir,
+                                   Surface(SurfNum).OutConvFaceArea,
+                                   Surface(SurfNum).OutConvFacePerimeter);
             } else if (SELECT_CASE_var == HcExt_BlockenWindward) {
                 Hf = CalcBlockenWindward(WindSpeed, WindDir, Surface(SurfNum).Azimuth);
             } else if (SELECT_CASE_var == HcExt_EmmelVertical) {
