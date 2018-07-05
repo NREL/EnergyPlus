@@ -333,9 +333,17 @@ namespace HysteresisPhaseChange {
             int numNumbers;
 
             // get the input data and store it in the Shortcuts structures
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, hmNum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                          DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                          DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames);
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                          hmNum,
+                                          DataIPShortCuts::cAlphaArgs,
+                                          numAlphas,
+                                          DataIPShortCuts::rNumericArgs,
+                                          numNumbers,
+                                          ioStatus,
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
 
             // the input processor validates the numeric inputs based on the IDD definition
             // still validate the name to make sure there aren't any duplicates or blanks

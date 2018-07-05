@@ -1016,13 +1016,15 @@ namespace HVACUnitarySystem {
                     if (GetCurrentScheduleValue(UnitarySystem(UnitarySysNum).SysAvailSchedPtr) > 0.0) {
                         if (UnitarySystem(UnitarySysNum).LastMode == CoolingMode) {
                             if (MultiOrVarSpeedCoolCoil(UnitarySysNum)) {
-                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).CoolMassFlowRate(UnitarySystem(UnitarySysNum).NumOfSpeedCooling);
+                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate =
+                                    UnitarySystem(UnitarySysNum).CoolMassFlowRate(UnitarySystem(UnitarySysNum).NumOfSpeedCooling);
                             } else {
                                 Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).MaxCoolAirMassFlow;
                             }
-                        } else if (UnitarySystem(UnitarySysNum).LastMode == CoolingMode) {
-                            if (MultiOrVarSpeedCoolCoil(UnitarySysNum)) {
-                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).HeatMassFlowRate(UnitarySystem(UnitarySysNum).NumOfSpeedHeating);
+                        } else if (UnitarySystem(UnitarySysNum).LastMode == HeatingMode) {
+                            if (MultiOrVarSpeedHeatCoil(UnitarySysNum)) {
+                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate =
+                                    UnitarySystem(UnitarySysNum).HeatMassFlowRate(UnitarySystem(UnitarySysNum).NumOfSpeedHeating);
                             } else {
                                 Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).MaxHeatAirMassFlow;
                             }
@@ -1033,8 +1035,7 @@ namespace HVACUnitarySystem {
                                 Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).MaxNoCoolHeatAirMassFlow;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = 0.0;
                     }
                 }
@@ -3831,8 +3832,6 @@ namespace HVACUnitarySystem {
                         ZoneEquipmentFound = true;
                         //               Find the controlled zone number for the specified thermostat location
                         UnitarySystem(UnitarySysNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                        // TotalZonesOnAirLoop doesn't appear to be used anywhere
-                        //++TotalZonesOnAirLoop;
                         TotalFloorAreaOnAirLoop = Zone(ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                         UnitarySystem(UnitarySysNum).AirLoopEquipment = false;
                         UnitarySystem(UnitarySysNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
@@ -3879,13 +3878,6 @@ namespace HVACUnitarySystem {
                         ErrorsFound = true;
                     }
                 }
-                // Need to move this to the end - just comment out for now
-                // if ( ! ZoneEquipmentFound ) {
-                //	ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-                //	ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas(
-                // iAirInletNodeNameAlphaNum ) ); 	ShowContinueError( "Node name does not match any controlled zone exhaust node name. Check
-                // ZoneHVAC:EquipmentConnections object inputs." ); 	ErrorsFound = true;
-                //}
             }
 
             // check if the UnitarySystem is connected as zone equipment
@@ -3915,7 +3907,6 @@ namespace HVACUnitarySystem {
                                         ZoneEquipList(ZoneEquipConfig(ControlledZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                 }
                             }
- //                           UnitarySystem(UnitarySysNum).ControlZoneNum = ControlledZoneNum;
                             break;
                         }
                         if (ZoneEquipmentFound) {
@@ -3973,7 +3964,6 @@ namespace HVACUnitarySystem {
                                         ZoneEquipList(ZoneEquipConfig(ControlledZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                 }
                             }
- //                           UnitarySystem(UnitarySysNum).ControlZoneNum = ControlledZoneNum;
                             break;
                         }
                         if (ZoneEquipmentFound) {
@@ -7687,7 +7677,8 @@ namespace HVACUnitarySystem {
             if (UnitarySystem(UnitarySysNum).ATMixerType == ATMixer_InletSide) { // if there is an inlet side air terminal mixer
                                                                                  // set the primary air inlet mass flow rate
                 Node(UnitarySystem(UnitarySysNum).ATMixerPriNode).MassFlowRate =
-                    min(Node(UnitarySystem(UnitarySysNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate);
+                    min(Node(UnitarySystem(UnitarySysNum).ATMixerPriNode).MassFlowRateMaxAvail,
+                        Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
                 // the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
                 SingleDuct::SimATMixer(UnitarySystem(UnitarySysNum).ATMixerName, FirstHVACIteration, UnitarySystem(UnitarySysNum).ATMixerIndex);
@@ -7758,7 +7749,10 @@ namespace HVACUnitarySystem {
                 ControlHeatingSystemToSP(UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn);
                 PartLoadRatio = UnitarySystem(UnitarySysNum).HeatingPartLoadFrac;
                 CompOn = 0;
-                if (PartLoadRatio > 0.0) CompOn = 1;
+                if (PartLoadRatio > 0.0) {
+                    CompOn = 1;
+                    UnitarySystem(UnitarySysNum).LastMode = HeatingMode;
+                }
                 CalcUnitaryHeatingSystem(UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio);
             }
             if (UnitarySystem(UnitarySysNum).CoolCoilExists) {
@@ -7772,7 +7766,10 @@ namespace HVACUnitarySystem {
                 ControlCoolingSystemToSP(UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
                 PartLoadRatio = UnitarySystem(UnitarySysNum).CoolingPartLoadFrac;
                 CompOn = 0;
-                if (PartLoadRatio > 0.0) CompOn = 1;
+                if (PartLoadRatio > 0.0) {
+                    CompOn = 1;
+                    UnitarySystem(UnitarySysNum).LastMode = CoolingMode;
+                }
                 CalcUnitaryCoolingSystem(
                     UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
             }
@@ -9849,10 +9846,10 @@ namespace HVACUnitarySystem {
         Real64 CoilPLR;            // variable speed coils run at PLR = 1 when SpeedNum > 1
         Real64 OutdoorPressure;    // Outdoor barometric pressure at condenser (Pa)
         bool errFlag;              // returned flag from called routine
-        bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil
-                            // is wrapped by UnitarySystem.
-        bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil
-                            // is wrapped by UnitarySystem.
+        bool HeatingActive;        // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since
+                                   // coil is wrapped by UnitarySystem.
+        bool CoolingActive;        // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since
+                                   // coil is wrapped by UnitarySystem.
 
         // Simulate the coil component
         CompName = UnitarySystem(UnitarySysNum).CoolingCoilName;
@@ -10111,10 +10108,10 @@ namespace HVACUnitarySystem {
         Real64 dummy;           // used when sub argument is not needed
         Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
         bool errFlag;           // returned flag from called routine
-        bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil
-                            // is wrapped by UnitarySystem.
-        bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil
-                            // is wrapped by UnitarySystem.
+        bool HeatingActive;     // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since
+                                // coil is wrapped by UnitarySystem.
+        bool CoolingActive;     // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since
+                                // coil is wrapped by UnitarySystem.
 
         CompName = UnitarySystem(UnitarySysNum).HeatingCoilName;
         dummy = 0.0;
@@ -11013,7 +11010,8 @@ namespace HVACUnitarySystem {
 
                     } else if (CoilType_Num == CoilDX_PackagedThermalStorageCooling) {
 
-                        // TES coil simulated above with PLR=0. Operating mode is known here, no need to simulate again to determine operating mode.
+                        // TES coil simulated above with PLR=0. Operating mode is known here, no need to simulate again to determine operating
+                        // mode.
                         if (UnitarySystem(UnitarySysNum).TESOpMode == OffMode ||
                             UnitarySystem(UnitarySysNum).TESOpMode == ChargeOnlyMode) { // cannot cool
                             PartLoadFrac = 0.0;
@@ -11100,7 +11098,8 @@ namespace HVACUnitarySystem {
                                 }
                                 TempMinPLR = TempMaxPLR;
                                 while ((TempOutletTempDXCoil - DesOutTemp) < 0.0 && TempMinPLR >= 0.0) {
-                                    //                  pull upper limit of PLR DOwn to last valid limit (i.e. outlet temp still exceeds DesOutTemp)
+                                    //                  pull upper limit of PLR DOwn to last valid limit (i.e. outlet temp still exceeds
+                                    //                  DesOutTemp)
                                     TempMaxPLR = TempMinPLR;
                                     //                   find minimum limit of PLR
                                     TempMinPLR -= 0.01;
@@ -11115,8 +11114,8 @@ namespace HVACUnitarySystem {
                                                              EconomizerFlag);
                                     TempOutletTempDXCoil = HXAssistedCoilOutletTemp(UnitarySystem(UnitarySysNum).CoolingCoilIndex);
                                 }
-                                //                 Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary may
-                                //                 be very near the desired result)
+                                //                 Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary
+                                //                 may be very near the desired result)
                                 TempMinPLR = max(0.0, (TempMinPLR - 0.01));
                                 TempMaxPLR = min(1.0, (TempMaxPLR + 0.01));
                                 //                 tighter boundary of solution has been found, CALL RegulaFalsi a second time
@@ -11133,13 +11132,14 @@ namespace HVACUnitarySystem {
                                             ShowContinueErrorTimeStamp(
                                                 "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(
-                                            UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
-                                                "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR "
-                                                "statistics follow.",
-                                            UnitarySystem(UnitarySysNum).HXAssistedSensPLRIterIndex,
-                                            PartLoadFrac,
-                                            PartLoadFrac);
+                                        ShowRecurringWarningErrorAtEnd(UnitarySystem(UnitarySysNum).UnitType + " \"" +
+                                                                           UnitarySystem(UnitarySysNum).Name +
+                                                                           "\" - Iteration limit exceeded calculating sensible part-load ratio "
+                                                                           "error continues. Sensible PLR "
+                                                                           "statistics follow.",
+                                                                       UnitarySystem(UnitarySysNum).HXAssistedSensPLRIterIndex,
+                                                                       PartLoadFrac,
+                                                                       PartLoadFrac);
                                     }
                                 } else if (SolFla == -2) {
                                     PartLoadFrac = ReqOutput / FullOutput;
@@ -11154,13 +11154,14 @@ namespace HVACUnitarySystem {
                                             ShowContinueErrorTimeStamp(
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(
-                                            UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
-                                                "\" - DX unit sensible part-load ratio calculation unexpectedly failed error continues. Sensible PLR "
-                                                "statistics follow.",
-                                            UnitarySystem(UnitarySysNum).HXAssistedSensPLRFailIndex,
-                                            PartLoadFrac,
-                                            PartLoadFrac);
+                                        ShowRecurringWarningErrorAtEnd(UnitarySystem(UnitarySysNum).UnitType + " \"" +
+                                                                           UnitarySystem(UnitarySysNum).Name +
+                                                                           "\" - DX unit sensible part-load ratio calculation unexpectedly "
+                                                                           "failed error continues. Sensible PLR "
+                                                                           "statistics follow.",
+                                                                       UnitarySystem(UnitarySysNum).HXAssistedSensPLRFailIndex,
+                                                                       PartLoadFrac,
+                                                                       PartLoadFrac);
                                     }
                                 }
                             } else if (SolFla == -2) {
@@ -11168,10 +11169,10 @@ namespace HVACUnitarySystem {
                                 if (!WarmupFlag) {
                                     if (UnitarySystem(UnitarySysNum).HXAssistedSensPLRFail2 < 1) {
                                         ++UnitarySystem(UnitarySysNum).HXAssistedSensPLRFail2;
-                                        ShowWarningError(
-                                            UnitarySystem(UnitarySysNum).UnitType +
-                                            " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                            UnitarySystem(UnitarySysNum).Name);
+                                        ShowWarningError(UnitarySystem(UnitarySysNum).UnitType +
+                                                         " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
+                                                         "exceeded, for unit = " +
+                                                         UnitarySystem(UnitarySysNum).Name);
                                         ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
                                         ShowContinueErrorTimeStamp(
                                             "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
@@ -11394,14 +11395,15 @@ namespace HVACUnitarySystem {
                             // If sensible load and setpoint cannot be met, set PLR = 1. if no sensible load and
                             // latent load exists and setpoint cannot be met, set PLR = 1.
                             // why is our logic different? Did we figure something out that reduced the logic?
-                            //                  IF ((SensibleLoad .and. LatentLoad .AND. .NOT. UnitarySystem(UnitarySysNum)%RunOnLatentLoad .AND. &
+                            //                  IF ((SensibleLoad .and. LatentLoad .AND. .NOT. UnitarySystem(UnitarySysNum)%RunOnLatentLoad .AND.
+                            //                  &
                             //                       OutletHumRatDXCoil >= DesOutHumRat)) THEN
                             if ((OutletTempDXCoil > (DesOutTemp - (Acc * 2.0)) && SensibleLoad && UnitarySystem(UnitarySysNum).RunOnSensibleLoad) ||
                                 (OutletHumRatDXCoil > (DesOutHumRat - (HumRatAcc * 2.0)) && !SensibleLoad && LatentLoad &&
                                  UnitarySystem(UnitarySysNum).RunOnLatentLoad)) {
                                 PartLoadFrac = 1.0;
-                                //                  ELSEIF ((SensibleLoad .and. LatentLoad .AND. .NOT. UnitarySystem(UnitarySysNum)%RunOnLatentLoad
-                                //                  .AND. &
+                                //                  ELSEIF ((SensibleLoad .and. LatentLoad .AND. .NOT.
+                                //                  UnitarySystem(UnitarySysNum)%RunOnLatentLoad .AND. &
                                 //                       OutletHumRatDXCoil < DesOutHumRat)) THEN
                             } else if (!SensibleLoad &&
                                        (OutletHumRatDXCoil < DesOutHumRat && LatentLoad && UnitarySystem(UnitarySysNum).RunOnLatentLoad)) {
@@ -11460,7 +11462,8 @@ namespace HVACUnitarySystem {
                             //               IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
                             //               do not run the compressor
                             if ((NoLoadHumRatOut - DesOutHumRat) < HumRatAcc * 2.0) {
-                                // PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
+                                // PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented
+                                // out
                                 //                If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the
                                 //                DesOutHumRat, run the compressor at PartLoadFrac = 1.
                             } else if ((DesOutHumRat - FullLoadHumRatOut) < HumRatAcc * 2.0) {
@@ -11536,13 +11539,14 @@ namespace HVACUnitarySystem {
                                                 ShowContinueErrorTimeStamp("The calculated latent part-load ratio will be used and the simulation "
                                                                            "continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(
-                                                UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
-                                                    "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR "
-                                                    "statistics follow.",
-                                                UnitarySystem(UnitarySysNum).HXAssistedCRLatPLRIterIndex,
-                                                PartLoadFrac,
-                                                PartLoadFrac);
+                                            ShowRecurringWarningErrorAtEnd(UnitarySystem(UnitarySysNum).UnitType + " \"" +
+                                                                               UnitarySystem(UnitarySysNum).Name +
+                                                                               "\" - Iteration limit exceeded calculating latent part-load ratio "
+                                                                               "error continues. Latent PLR "
+                                                                               "statistics follow.",
+                                                                           UnitarySystem(UnitarySysNum).HXAssistedCRLatPLRIterIndex,
+                                                                           PartLoadFrac,
+                                                                           PartLoadFrac);
                                         }
 
                                     } else if (SolFla == -2) {
@@ -11559,13 +11563,14 @@ namespace HVACUnitarySystem {
                                                 ShowContinueErrorTimeStamp(
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(
-                                                UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
-                                                    "\" - DX unit latent part-load ratio calculation failed unexpectedly error continues. Latent PLR "
-                                                    "statistics follow.",
-                                                UnitarySystem(UnitarySysNum).HXAssistedCRLatPLRFailIndex,
-                                                PartLoadFrac,
-                                                PartLoadFrac);
+                                            ShowRecurringWarningErrorAtEnd(UnitarySystem(UnitarySysNum).UnitType + " \"" +
+                                                                               UnitarySystem(UnitarySysNum).Name +
+                                                                               "\" - DX unit latent part-load ratio calculation failed "
+                                                                               "unexpectedly error continues. Latent PLR "
+                                                                               "statistics follow.",
+                                                                           UnitarySystem(UnitarySysNum).HXAssistedCRLatPLRFailIndex,
+                                                                           PartLoadFrac,
+                                                                           PartLoadFrac);
                                         }
                                     }
                                 } else if (SolFla == -2) {
@@ -11573,10 +11578,10 @@ namespace HVACUnitarySystem {
                                     if (!WarmupFlag) {
                                         if (UnitarySystem(UnitarySysNum).HXAssistedCRLatPLRFail2 < 1) {
                                             ++UnitarySystem(UnitarySysNum).HXAssistedCRLatPLRFail2;
-                                            ShowWarningError(
-                                                UnitarySystem(UnitarySysNum).UnitType +
-                                                " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                                UnitarySystem(UnitarySysNum).Name);
+                                            ShowWarningError(UnitarySystem(UnitarySysNum).UnitType +
+                                                             " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
+                                                             "exceeded, for unit = " +
+                                                             UnitarySystem(UnitarySysNum).Name);
                                             ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
                                             ShowContinueErrorTimeStamp(
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
@@ -11964,11 +11969,11 @@ namespace HVACUnitarySystem {
         Real64 OutdoorPressure;           // local variable for OutBaroPress
         Real64 OutdoorWetBulb;            // local variable for OutWetBulbTemp
         Real64 OutletTemp;
-        bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil
-                            // is wrapped by UnitarySystem.
-        bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil
-                            // is wrapped by UnitarySystem.
-        Real64 mdot;        // water coil water flow rate [kg/s]
+        bool HeatingActive;     // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since
+                                // coil is wrapped by UnitarySystem.
+        bool CoolingActive;     // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since
+                                // coil is wrapped by UnitarySystem.
+        Real64 mdot;            // water coil water flow rate [kg/s]
         Real64 maxPartLoadFrac; // calculated maximum water side PLR for RegulaFalsi call (when plant limits flow max PLR != 1)
 
         // Set local variables
@@ -12510,12 +12515,12 @@ namespace HVACUnitarySystem {
                         ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
                         ShowContinueErrorTimeStamp("The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(
-                            UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
-                                "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.",
-                            UnitarySystem(UnitarySysNum).HeatCoilSensPLRIterIndex,
-                            PartLoadFrac,
-                            PartLoadFrac);
+                        ShowRecurringWarningErrorAtEnd(UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
+                                                           "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
+                                                           "Sensible PLR statistics follow.",
+                                                       UnitarySystem(UnitarySysNum).HeatCoilSensPLRIterIndex,
+                                                       PartLoadFrac,
+                                                       PartLoadFrac);
                     }
                 }
             } else if (SolFla == -2) {
@@ -12744,7 +12749,8 @@ namespace HVACUnitarySystem {
 
                         if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
 
-                            //                                  CompIndex=CompIndex, QCoilReq= UnitarySystem(UnitarySysNum)%DesignSuppHeatingCapacity,
+                            //                                  CompIndex=CompIndex, QCoilReq=
+                            //                                  UnitarySystem(UnitarySysNum)%DesignSuppHeatingCapacity,
                             //                                  &
                             SimulateHeatingCoilComponents(
                                 CompName, FirstHVACIteration, _, CompIndex, QCoilActual, SuppHeatingCoilFlag, FanOpMode, PartLoadFrac);
@@ -14068,8 +14074,8 @@ namespace HVACUnitarySystem {
                                               RoutineName);
 
             HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + HeatRecInletTemp;
-            // coil model should be handling max outlet water temp (via limit to heat transfer) since heat rejection needs to be accounted for by the
-            // coil
+            // coil model should be handling max outlet water temp (via limit to heat transfer) since heat rejection needs to be accounted for by
+            // the coil
             if (HeatRecOutletTemp > UnitarySystem(UnitarySysNum).MaxHROutletWaterTemp) {
                 HeatRecOutletTemp = max(HeatRecInletTemp, UnitarySystem(UnitarySysNum).MaxHROutletWaterTemp);
                 QHeatRec = HeatRecMassFlowRate * CpHeatRec * (HeatRecOutletTemp - HeatRecInletTemp);

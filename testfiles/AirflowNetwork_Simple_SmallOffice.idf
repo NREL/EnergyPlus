@@ -2012,7 +2012,19 @@
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
+    Zn002:Wall001,           !- Surface Name
+    ZoneLeak,                !- Leakage Component Name
+    ,                        !- External Node Name
+    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+  AirflowNetwork:MultiZone:Surface,
     Zn002:Wall002,           !- Surface Name
+    ZoneLeak,                !- Leakage Component Name
+    ,                        !- External Node Name
+    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+  AirflowNetwork:MultiZone:Surface,
+    Zn002:Wall003,           !- Surface Name
     ZoneLeak,                !- Leakage Component Name
     ,                        !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
@@ -2036,6 +2048,12 @@
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
+    Zn003:Wall002,           !- Surface Name
+    ZoneLeak,                !- Leakage Component Name
+    ,                        !- External Node Name
+    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+  AirflowNetwork:MultiZone:Surface,
     Zn003:Ceil001,           !- Surface Name
     AtticToZoneLeak,         !- Leakage Component Name
     ,                        !- External Node Name
@@ -2043,6 +2061,12 @@
 
   AirflowNetwork:MultiZone:Surface,
     Zn004:Wall001,           !- Surface Name
+    AtticLeak,               !- Leakage Component Name
+    ,                        !- External Node Name
+    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+  AirflowNetwork:MultiZone:Surface,
+    Zn004:Roof001,           !- Surface Name
     AtticLeak,               !- Leakage Component Name
     ,                        !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}

@@ -278,9 +278,9 @@ namespace EMSManager {
         using DataGlobals::emsCallFromSetupSimulation;
         using DataGlobals::emsCallFromUserDefinedComponentModel;
         using OutputProcessor::MeterType;
-        using OutputProcessor::RVariableTypes;
-        using OutputProcessor::RealVariableType;
         using OutputProcessor::RealVariables;
+        using OutputProcessor::RealVariableType;
+        using OutputProcessor::RVariableTypes;
         using RuntimeLanguageProcessor::BeginEnvrnInitializeRuntimeLanguage;
         using RuntimeLanguageProcessor::EvaluateStack;
 
@@ -400,10 +400,10 @@ namespace EMSManager {
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
         using DataGlobals::emsCallFromSystemSizing;
         using DataGlobals::emsCallFromUserDefinedComponentModel;
         using DataGlobals::emsCallFromZoneSizing;
+        using DataGlobals::KickOffSimulation;
         using DataZoneControls::GetZoneAirStatsInputFlag;
         using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
         using RuntimeLanguageProcessor::SetErlValueNumber;
@@ -677,8 +677,17 @@ namespace EMSManager {
             Sensor.allocate(NumSensors);
 
             for (SensorNum = 1; SensorNum <= NumSensors; ++SensorNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, SensorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SensorNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
@@ -744,19 +753,45 @@ namespace EMSManager {
                 // If we process the ExternalInterface actuators, all we need to do is to change the
                 // name of the module object, and shift the ActuatorNum in GetObjectItem
                 if (ActuatorNum <= numActuatorsUsed) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, ActuatorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                  lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  ActuatorNum,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                 } else if (ActuatorNum > numActuatorsUsed && ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed) {
                     cCurrentModuleObject = "ExternalInterface:Actuator";
-                    inputProcessor->getObjectItem(cCurrentModuleObject, ActuatorNum - numActuatorsUsed, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
-                                                  IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  ActuatorNum - numActuatorsUsed,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                 } else if (ActuatorNum > numActuatorsUsed + NumExternalInterfaceActuatorsUsed &&
                            ActuatorNum <=
                                (numActuatorsUsed + NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed)) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-                    inputProcessor->getObjectItem(cCurrentModuleObject, ActuatorNum - numActuatorsUsed - NumExternalInterfaceActuatorsUsed,
-                                                  cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                                  cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  ActuatorNum - numActuatorsUsed - NumExternalInterfaceActuatorsUsed,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                 } else if (ActuatorNum >
                                numActuatorsUsed + NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed &&
                            ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed +
@@ -766,8 +801,15 @@ namespace EMSManager {
                     inputProcessor->getObjectItem(cCurrentModuleObject,
                                                   ActuatorNum - numActuatorsUsed - NumExternalInterfaceActuatorsUsed -
                                                       NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed,
-                                                  cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                                  cAlphaFieldNames, cNumericFieldNames);
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                 }
 
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
@@ -829,8 +871,17 @@ namespace EMSManager {
             EMSInternalVarsUsed.allocate(NumInternalVariablesUsed);
 
             for (InternVarNum = 1; InternVarNum <= NumInternalVariablesUsed; ++InternVarNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, InternVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              InternVarNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
@@ -878,8 +929,17 @@ namespace EMSManager {
 
             for (CallManagerNum = 1; CallManagerNum <= NumProgramCallManagers; ++CallManagerNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, CallManagerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              CallManagerNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 EMSProgramCallManager(CallManagerNum).Name = cAlphaArgs(1);
@@ -1314,12 +1374,14 @@ namespace EMSManager {
             int FoundControlType;
             for (int ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop) {
                 if (ActuatorLoop + 1 <= numEMSActuatorsAvailable) {
-                    FoundTypeName = UtilityRoutines::FindItemInList(
-                        EMSActuatorAvailable(ActuatorLoop).ComponentTypeName, EMSActuatorAvailable({ActuatorLoop + 1, numEMSActuatorsAvailable}),
-                        &EMSActuatorAvailableType::ComponentTypeName, numEMSActuatorsAvailable - (ActuatorLoop + 1));
-                    FoundControlType = UtilityRoutines::FindItemInList(
-                        EMSActuatorAvailable(ActuatorLoop).ControlTypeName, EMSActuatorAvailable({ActuatorLoop + 1, numEMSActuatorsAvailable}),
-                        &EMSActuatorAvailableType::ControlTypeName, numEMSActuatorsAvailable - (ActuatorLoop + 1));
+                    FoundTypeName = UtilityRoutines::FindItemInList(EMSActuatorAvailable(ActuatorLoop).ComponentTypeName,
+                                                                    EMSActuatorAvailable({ActuatorLoop + 1, numEMSActuatorsAvailable}),
+                                                                    &EMSActuatorAvailableType::ComponentTypeName,
+                                                                    numEMSActuatorsAvailable - (ActuatorLoop + 1));
+                    FoundControlType = UtilityRoutines::FindItemInList(EMSActuatorAvailable(ActuatorLoop).ControlTypeName,
+                                                                       EMSActuatorAvailable({ActuatorLoop + 1, numEMSActuatorsAvailable}),
+                                                                       &EMSActuatorAvailableType::ControlTypeName,
+                                                                       numEMSActuatorsAvailable - (ActuatorLoop + 1));
                 } else {
                     FoundTypeName = 1;
                     FoundControlType = 1;
@@ -1438,21 +1500,37 @@ namespace EMSManager {
             for (LoopNode = 1; LoopNode <= NumOfNodes; ++LoopNode) {
                 // setup the setpoint for each type of variable that can be controlled
                 SetupEMSActuator("System Node Setpoint", NodeID(LoopNode), "Temperature Setpoint", "[C]", lDummy, Node(LoopNode).TempSetPoint);
-                SetupEMSActuator("System Node Setpoint", NodeID(LoopNode), "Temperature Minimum Setpoint", "[C]", lDummy,
-                                 Node(LoopNode).TempSetPointLo);
-                SetupEMSActuator("System Node Setpoint", NodeID(LoopNode), "Temperature Maximum Setpoint", "[C]", lDummy,
-                                 Node(LoopNode).TempSetPointHi);
-                SetupEMSActuator("System Node Setpoint", NodeID(LoopNode), "Humidity Ratio Setpoint", "[kgWater/kgDryAir]", lDummy,
-                                 Node(LoopNode).HumRatSetPoint);
-                SetupEMSActuator("System Node Setpoint", NodeID(LoopNode), "Humidity Ratio Maximum Setpoint", "[kgWater/kgDryAir]", lDummy,
+                SetupEMSActuator(
+                    "System Node Setpoint", NodeID(LoopNode), "Temperature Minimum Setpoint", "[C]", lDummy, Node(LoopNode).TempSetPointLo);
+                SetupEMSActuator(
+                    "System Node Setpoint", NodeID(LoopNode), "Temperature Maximum Setpoint", "[C]", lDummy, Node(LoopNode).TempSetPointHi);
+                SetupEMSActuator(
+                    "System Node Setpoint", NodeID(LoopNode), "Humidity Ratio Setpoint", "[kgWater/kgDryAir]", lDummy, Node(LoopNode).HumRatSetPoint);
+                SetupEMSActuator("System Node Setpoint",
+                                 NodeID(LoopNode),
+                                 "Humidity Ratio Maximum Setpoint",
+                                 "[kgWater/kgDryAir]",
+                                 lDummy,
                                  Node(LoopNode).HumRatMax);
-                SetupEMSActuator("System Node Setpoint", NodeID(LoopNode), "Humidity Ratio Minimum Setpoint", "[kgWater/kgDryAir]", lDummy,
+                SetupEMSActuator("System Node Setpoint",
+                                 NodeID(LoopNode),
+                                 "Humidity Ratio Minimum Setpoint",
+                                 "[kgWater/kgDryAir]",
+                                 lDummy,
                                  Node(LoopNode).HumRatMin);
-                SetupEMSActuator("System Node Setpoint", NodeID(LoopNode), "Mass Flow Rate Setpoint", "[kg/s]", lDummy,
-                                 Node(LoopNode).MassFlowRateSetPoint);
-                SetupEMSActuator("System Node Setpoint", NodeID(LoopNode), "Mass Flow Rate Maximum Available Setpoint", "[kg/s]", lDummy,
+                SetupEMSActuator(
+                    "System Node Setpoint", NodeID(LoopNode), "Mass Flow Rate Setpoint", "[kg/s]", lDummy, Node(LoopNode).MassFlowRateSetPoint);
+                SetupEMSActuator("System Node Setpoint",
+                                 NodeID(LoopNode),
+                                 "Mass Flow Rate Maximum Available Setpoint",
+                                 "[kg/s]",
+                                 lDummy,
                                  Node(LoopNode).MassFlowRateMaxAvail);
-                SetupEMSActuator("System Node Setpoint", NodeID(LoopNode), "Mass Flow Rate Minimum Available Setpoint", "[kg/s]", lDummy,
+                SetupEMSActuator("System Node Setpoint",
+                                 NodeID(LoopNode),
+                                 "Mass Flow Rate Minimum Available Setpoint",
+                                 "[kg/s]",
+                                 lDummy,
                                  Node(LoopNode).MassFlowRateMinAvail);
             }
 
@@ -1461,13 +1539,29 @@ namespace EMSManager {
         if (NumOutsideAirNodes > 0) {
             for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= NumOutsideAirNodes; ++OutsideAirNodeNum) {
                 NodeNum = OutsideAirNodeList(OutsideAirNodeNum);
-                SetupEMSActuator("Outdoor Air System Node", NodeID(NodeNum), "Drybulb Temperature", "[C]", Node(NodeNum).EMSOverrideOutAirDryBulb,
+                SetupEMSActuator("Outdoor Air System Node",
+                                 NodeID(NodeNum),
+                                 "Drybulb Temperature",
+                                 "[C]",
+                                 Node(NodeNum).EMSOverrideOutAirDryBulb,
                                  Node(NodeNum).EMSValueForOutAirDryBulb);
-                SetupEMSActuator("Outdoor Air System Node", NodeID(NodeNum), "Wetbulb Temperature", "[C]", Node(NodeNum).EMSOverrideOutAirWetBulb,
+                SetupEMSActuator("Outdoor Air System Node",
+                                 NodeID(NodeNum),
+                                 "Wetbulb Temperature",
+                                 "[C]",
+                                 Node(NodeNum).EMSOverrideOutAirWetBulb,
                                  Node(NodeNum).EMSValueForOutAirWetBulb);
-                SetupEMSActuator("Outdoor Air System Node", NodeID(NodeNum), "Wind Speed", "[m/s]", Node(NodeNum).EMSOverrideOutAirWindSpeed,
+                SetupEMSActuator("Outdoor Air System Node",
+                                 NodeID(NodeNum),
+                                 "Wind Speed",
+                                 "[m/s]",
+                                 Node(NodeNum).EMSOverrideOutAirWindSpeed,
                                  Node(NodeNum).EMSValueForOutAirWindSpeed);
-                SetupEMSActuator("Outdoor Air System Node", NodeID(NodeNum), "Wind Direction", "[degree]", Node(NodeNum).EMSOverrideOutAirWindDir,
+                SetupEMSActuator("Outdoor Air System Node",
+                                 NodeID(NodeNum),
+                                 "Wind Direction",
+                                 "[degree]",
+                                 Node(NodeNum).EMSOverrideOutAirWindDir,
                                  Node(NodeNum).EMSValueForOutAirWindDir);
             }
         }
@@ -1656,8 +1750,8 @@ namespace EMSManager {
         if (allocated(PriAirSysAvailMgr)) {
             numAirLoops = isize(PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
-                SetupEMSActuator("AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy,
-                                 PriAirSysAvailMgr(Loop).AvailStatus);
+                SetupEMSActuator(
+                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {
@@ -1689,8 +1783,8 @@ namespace EMSManager {
         using DataSurfaces::SurfaceClass_Window;
         using DataSurfaces::SurfaceWindow;
         using DataSurfaces::TotSurfaces;
-        using DataSurfaces::WSC_ST_SwitchableGlazing;
         using DataSurfaces::WindowShadingControl;
+        using DataSurfaces::WSC_ST_SwitchableGlazing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1715,11 +1809,19 @@ namespace EMSManager {
             if (Surface(loopSurfNum).WindowShadingControlPtr == 0) continue;
 
             if (SurfaceWindow(loopSurfNum).HasShadeOrBlindLayer) {
-                SetupEMSActuator("Window Shading Control", Surface(loopSurfNum).Name, "Control Status", "[ShadeStatus]",
-                                 SurfaceWindow(loopSurfNum).ShadingFlagEMSOn, SurfaceWindow(loopSurfNum).ShadingFlagEMSValue);
+                SetupEMSActuator("Window Shading Control",
+                                 Surface(loopSurfNum).Name,
+                                 "Control Status",
+                                 "[ShadeStatus]",
+                                 SurfaceWindow(loopSurfNum).ShadingFlagEMSOn,
+                                 SurfaceWindow(loopSurfNum).ShadingFlagEMSValue);
                 if (SurfaceWindow(loopSurfNum).MovableSlats) {
-                    SetupEMSActuator("Window Shading Control", Surface(loopSurfNum).Name, "Slat Angle", "[degrees]",
-                                     SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSon, SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSValue);
+                    SetupEMSActuator("Window Shading Control",
+                                     Surface(loopSurfNum).Name,
+                                     "Slat Angle",
+                                     "[degrees]",
+                                     SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSon,
+                                     SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSValue);
                 }
             } else {
                 if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType != WSC_ST_SwitchableGlazing) {
@@ -1772,24 +1874,48 @@ namespace EMSManager {
         static int Loop(0); // local do loop index
 
         for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
-            SetupEMSActuator("Zone Temperature Control", TempControlledZone(Loop).ZoneName, "Heating Setpoint", "[C]",
-                             TempControlledZone(Loop).EMSOverrideHeatingSetPointOn, TempControlledZone(Loop).EMSOverrideHeatingSetPointValue);
-            SetupEMSActuator("Zone Temperature Control", TempControlledZone(Loop).ZoneName, "Cooling Setpoint", "[C]",
-                             TempControlledZone(Loop).EMSOverrideCoolingSetPointOn, TempControlledZone(Loop).EMSOverrideCoolingSetPointValue);
+            SetupEMSActuator("Zone Temperature Control",
+                             TempControlledZone(Loop).ZoneName,
+                             "Heating Setpoint",
+                             "[C]",
+                             TempControlledZone(Loop).EMSOverrideHeatingSetPointOn,
+                             TempControlledZone(Loop).EMSOverrideHeatingSetPointValue);
+            SetupEMSActuator("Zone Temperature Control",
+                             TempControlledZone(Loop).ZoneName,
+                             "Cooling Setpoint",
+                             "[C]",
+                             TempControlledZone(Loop).EMSOverrideCoolingSetPointOn,
+                             TempControlledZone(Loop).EMSOverrideCoolingSetPointValue);
         }
 
         for (Loop = 1; Loop <= NumHumidityControlZones; ++Loop) {
-            SetupEMSActuator("Zone Humidity Control", HumidityControlZone(Loop).ZoneName, "Relative Humidity Humidifying Setpoint", "[%]",
-                             HumidityControlZone(Loop).EMSOverrideHumidifySetPointOn, HumidityControlZone(Loop).EMSOverrideHumidifySetPointValue);
-            SetupEMSActuator("Zone Humidity Control", HumidityControlZone(Loop).ZoneName, "Relative Humidity Dehumidifying Setpoint", "[%]",
-                             HumidityControlZone(Loop).EMSOverrideDehumidifySetPointOn, HumidityControlZone(Loop).EMSOverrideDehumidifySetPointValue);
+            SetupEMSActuator("Zone Humidity Control",
+                             HumidityControlZone(Loop).ZoneName,
+                             "Relative Humidity Humidifying Setpoint",
+                             "[%]",
+                             HumidityControlZone(Loop).EMSOverrideHumidifySetPointOn,
+                             HumidityControlZone(Loop).EMSOverrideHumidifySetPointValue);
+            SetupEMSActuator("Zone Humidity Control",
+                             HumidityControlZone(Loop).ZoneName,
+                             "Relative Humidity Dehumidifying Setpoint",
+                             "[%]",
+                             HumidityControlZone(Loop).EMSOverrideDehumidifySetPointOn,
+                             HumidityControlZone(Loop).EMSOverrideDehumidifySetPointValue);
         }
 
         for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
-            SetupEMSActuator("Zone Comfort Control", ComfortControlledZone(Loop).ZoneName, "Heating Setpoint", "[]",
-                             ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn, ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue);
-            SetupEMSActuator("Zone Comfort Control", ComfortControlledZone(Loop).ZoneName, "Cooling Setpoint", "[]",
-                             ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn, ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue);
+            SetupEMSActuator("Zone Comfort Control",
+                             ComfortControlledZone(Loop).ZoneName,
+                             "Heating Setpoint",
+                             "[]",
+                             ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn,
+                             ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue);
+            SetupEMSActuator("Zone Comfort Control",
+                             ComfortControlledZone(Loop).ZoneName,
+                             "Cooling Setpoint",
+                             "[]",
+                             ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn,
+                             ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue);
         }
     }
 
@@ -1832,10 +1958,18 @@ namespace EMSManager {
         int SurfNum; // local loop index.
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            SetupEMSActuator("Surface", Surface(SurfNum).Name, "Interior Surface Convection Heat Transfer Coefficient", "[W/m2-K]",
-                             Surface(SurfNum).EMSOverrideIntConvCoef, Surface(SurfNum).EMSValueForIntConvCoef);
-            SetupEMSActuator("Surface", Surface(SurfNum).Name, "Exterior Surface Convection Heat Transfer Coefficient", "[W/m2-K]",
-                             Surface(SurfNum).EMSOverrideExtConvCoef, Surface(SurfNum).EMSValueForExtConvCoef);
+            SetupEMSActuator("Surface",
+                             Surface(SurfNum).Name,
+                             "Interior Surface Convection Heat Transfer Coefficient",
+                             "[W/m2-K]",
+                             Surface(SurfNum).EMSOverrideIntConvCoef,
+                             Surface(SurfNum).EMSValueForIntConvCoef);
+            SetupEMSActuator("Surface",
+                             Surface(SurfNum).Name,
+                             "Exterior Surface Convection Heat Transfer Coefficient",
+                             "[W/m2-K]",
+                             Surface(SurfNum).EMSOverrideExtConvCoef,
+                             Surface(SurfNum).EMSValueForExtConvCoef);
         }
     }
 
@@ -1882,7 +2016,11 @@ namespace EMSManager {
 
             if (!Surface(SurfNum).HeatTransSurf) continue;
 
-            SetupEMSActuator("Surface", Surface(SurfNum).Name, "Construction State", "[ ]", Surface(SurfNum).EMSConstructionOverrideON,
+            SetupEMSActuator("Surface",
+                             Surface(SurfNum).Name,
+                             "Construction State",
+                             "[ ]",
+                             Surface(SurfNum).EMSConstructionOverrideON,
                              Surface(SurfNum).EMSConstructionOverrideValue);
         }
 
@@ -1939,15 +2077,31 @@ namespace EMSManager {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (!(Surface(SurfNum).ExtBoundCond == ExternalEnvironment)) continue;
 
-            SetupEMSActuator("Surface", Surface(SurfNum).Name, "Outdoor Air Drybulb Temperature", "[C]", Surface(SurfNum).OutDryBulbTempEMSOverrideOn,
+            SetupEMSActuator("Surface",
+                             Surface(SurfNum).Name,
+                             "Outdoor Air Drybulb Temperature",
+                             "[C]",
+                             Surface(SurfNum).OutDryBulbTempEMSOverrideOn,
                              Surface(SurfNum).OutDryBulbTempEMSOverrideValue);
 
-            SetupEMSActuator("Surface", Surface(SurfNum).Name, "Outdoor Air Wetbulb Temperature", "[C]", Surface(SurfNum).OutWetBulbTempEMSOverrideOn,
+            SetupEMSActuator("Surface",
+                             Surface(SurfNum).Name,
+                             "Outdoor Air Wetbulb Temperature",
+                             "[C]",
+                             Surface(SurfNum).OutWetBulbTempEMSOverrideOn,
                              Surface(SurfNum).OutWetBulbTempEMSOverrideValue);
             if (Surface(SurfNum).ExtWind) {
-                SetupEMSActuator("Surface", Surface(SurfNum).Name, "Outdoor Air Wind Speed", "[m/s]", Surface(SurfNum).WindSpeedEMSOverrideOn,
+                SetupEMSActuator("Surface",
+                                 Surface(SurfNum).Name,
+                                 "Outdoor Air Wind Speed",
+                                 "[m/s]",
+                                 Surface(SurfNum).WindSpeedEMSOverrideOn,
                                  Surface(SurfNum).WindSpeedEMSOverrideValue);
-                SetupEMSActuator("Surface", Surface(SurfNum).Name, "Outdoor Air Wind Direction", "[degree]", Surface(SurfNum).WindDirEMSOverrideOn,
+                SetupEMSActuator("Surface",
+                                 Surface(SurfNum).Name,
+                                 "Outdoor Air Wind Direction",
+                                 "[degree]",
+                                 Surface(SurfNum).WindDirEMSOverrideOn,
                                  Surface(SurfNum).WindDirEMSOverrideValue);
             }
         }
@@ -2030,13 +2184,29 @@ namespace EMSManager {
 
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
 
-            SetupEMSActuator("Zone", Zone(ZoneNum).Name, "Outdoor Air Drybulb Temperature", "[C]", Zone(ZoneNum).OutDryBulbTempEMSOverrideOn,
+            SetupEMSActuator("Zone",
+                             Zone(ZoneNum).Name,
+                             "Outdoor Air Drybulb Temperature",
+                             "[C]",
+                             Zone(ZoneNum).OutDryBulbTempEMSOverrideOn,
                              Zone(ZoneNum).OutDryBulbTempEMSOverrideValue);
-            SetupEMSActuator("Zone", Zone(ZoneNum).Name, "Outdoor Air Wetbulb Temperature", "[C]", Zone(ZoneNum).OutWetBulbTempEMSOverrideOn,
+            SetupEMSActuator("Zone",
+                             Zone(ZoneNum).Name,
+                             "Outdoor Air Wetbulb Temperature",
+                             "[C]",
+                             Zone(ZoneNum).OutWetBulbTempEMSOverrideOn,
                              Zone(ZoneNum).OutWetBulbTempEMSOverrideValue);
-            SetupEMSActuator("Zone", Zone(ZoneNum).Name, "Outdoor Air Wind Speed", "[m/s]", Zone(ZoneNum).WindSpeedEMSOverrideOn,
+            SetupEMSActuator("Zone",
+                             Zone(ZoneNum).Name,
+                             "Outdoor Air Wind Speed",
+                             "[m/s]",
+                             Zone(ZoneNum).WindSpeedEMSOverrideOn,
                              Zone(ZoneNum).WindSpeedEMSOverrideValue);
-            SetupEMSActuator("Zone", Zone(ZoneNum).Name, "Outdoor Air Wind Direction", "[degree]", Zone(ZoneNum).WindDirEMSOverrideOn,
+            SetupEMSActuator("Zone",
+                             Zone(ZoneNum).Name,
+                             "Outdoor Air Wind Direction",
+                             "[degree]",
+                             Zone(ZoneNum).WindDirEMSOverrideOn,
                              Zone(ZoneNum).WindDirEMSOverrideValue);
         }
     }
