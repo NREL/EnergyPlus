@@ -760,11 +760,6 @@ namespace SwimmingPool {
             Pool(PoolNum).WaterMassFlowRateMax = Pool(PoolNum).WaterVolFlowMax * Density;
             if (!MyPlantScanFlagPool(PoolNum)) {
                 if (Pool(PoolNum).WaterInletNode > 0) {
-<<<<<<< HEAD
-                    InitComponentNodes(0.0, Pool(PoolNum).WaterMassFlowRateMax, Pool(PoolNum).WaterInletNode, Pool(PoolNum).WaterOutletNode,
-                                       Pool(PoolNum).HWLoopNum, Pool(PoolNum).HWLoopSide, Pool(PoolNum).HWBranchNum, Pool(PoolNum).HWCompNum);
-                    PlantUtilities::RegisterPlantCompDesignFlow(Pool(PoolNum).WaterInletNode, Pool(PoolNum).WaterVolFlowMax);
-=======
                     InitComponentNodes(0.0,
                                        Pool(PoolNum).WaterMassFlowRateMax,
                                        Pool(PoolNum).WaterInletNode,
@@ -773,7 +768,7 @@ namespace SwimmingPool {
                                        Pool(PoolNum).HWLoopSide,
                                        Pool(PoolNum).HWBranchNum,
                                        Pool(PoolNum).HWCompNum);
->>>>>>> develop
+                  PlantUtilities::RegisterPlantCompDesignFlow(Pool(PoolNum).WaterInletNode, Pool(PoolNum).WaterVolFlowMax);
                 }
             }
         }
