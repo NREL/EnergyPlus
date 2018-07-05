@@ -18,24 +18,24 @@
 !
 ! Location:                    Washington Dulles Internatioanl Airport, VA
 !
-! Design Days:                 WASHINGTON-DULLES_INTL_VA_USA Annual Heating 99.6%, MaxDB=-12.5캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Heating 99%, MaxDB=-9.7캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Humidification 99.6% DP=>MCDB, DP=-19.9캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Humidification 99% DP=>MCDB, DP=-16.9캜
+! Design Days:                 WASHINGTON-DULLES_INTL_VA_USA Annual Heating 99.6%, MaxDB=-12.5째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Heating 99%, MaxDB=-9.7째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Humidification 99.6% DP=>MCDB, DP=-19.9째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Humidification 99% DP=>MCDB, DP=-16.9째C
 !                              WASHINGTON-DULLES_INTL_VA_USA Annual Heating Wind 99.6% WS=>MCDB, WS=11.9m/s
 !                              WASHINGTON-DULLES_INTL_VA_USA Annual Heating Wind 99% WS=>MCDB, WS=10.8m/s
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DB=>MWB .4%, MaxDB=34캜 MWB=24캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DB=>MWB 1%, MaxDB=32.4캜 MWB=23.5캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DB=>MWB 2%, MaxDB=31캜 MWB=22.8캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling WB=>MDB .4%, MDB=31.5캜 WB=25.4캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling WB=>MDB 1%, MDB=30.3캜 WB=24.7캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling WB=>MDB 2%, MDB=29캜 WB=24캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DP=>MDB .4%, MDB=28.1캜 DP=23.6캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DP=>MDB 1%, MDB=27.3캜 DP=23캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DP=>MDB 2%, MDB=26.7캜 DP=22.4캜
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling Enthalpy=>MDB .4%, MDB=31.5캜 Enthalpy=77.9kJ/kg
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling Enthalpy=>MDB 1%, MDB=30.5캜 Enthalpy=75kJ/kg
-!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling Enthalpy=>MDB 2%, MDB=29.2캜 Enthalpy=72.3kJ/kg
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DB=>MWB .4%, MaxDB=34째C MWB=24째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DB=>MWB 1%, MaxDB=32.4째C MWB=23.5째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DB=>MWB 2%, MaxDB=31째C MWB=22.8째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling WB=>MDB .4%, MDB=31.5째C WB=25.4째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling WB=>MDB 1%, MDB=30.3째C WB=24.7째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling WB=>MDB 2%, MDB=29째C WB=24째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DP=>MDB .4%, MDB=28.1째C DP=23.6째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DP=>MDB 1%, MDB=27.3째C DP=23째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling DP=>MDB 2%, MDB=26.7째C DP=22.4째C
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling Enthalpy=>MDB .4%, MDB=31.5째C Enthalpy=77.9kJ/kg
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling Enthalpy=>MDB 1%, MDB=30.5째C Enthalpy=75kJ/kg
+!                              WASHINGTON-DULLES_INTL_VA_USA Annual Cooling Enthalpy=>MDB 2%, MDB=29.2째C Enthalpy=72.3kJ/kg
 !
 ! Run Period (Weather File):   1/1 through 12/31, WASHINGTON-DULLES_INTL_VA_USA_WMO_724030
 !
@@ -126,7 +126,7 @@
 ! Report Variables:            All available in RDD (442 requested, monthly and annual results)
 !
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Small Office 2 Story 4 zone 550 m2,  !- Name
@@ -255,10 +255,10 @@
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Washington Dc Dulles IntL Ar_VA_USA Extreme Annual Wind Speeds, 1%=9.2m/s, 2.5%=8.2m/s, 5%=7.3m/s
- ! Washington Dc Dulles IntL Ar_VA_USA Extreme Annual Temperatures, Max Drybulb=-17.2캜 Min Drybulb=36.2캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Extreme Annual Temperatures, Max Drybulb=-17.2째C Min Drybulb=36.2째C
  ! Washington Dc Dulles IntL Ar_VA_USA Annual Heating Design Conditions Wind Speed=2.7m/s Wind Dir=310
  ! Coldest Month=JAN
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Heating 99.6%, MaxDB=-11.8캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Heating 99.6%, MaxDB=-11.8째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Htg 99.6% Condns DB,  !- Name
@@ -288,7 +288,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Heating 99%, MaxDB=-9캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Heating 99%, MaxDB=-9째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Htg 99% Condns DB,  !- Name
@@ -318,7 +318,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Humidification 99.6% Design Conditions DP=>MCDB, DP=-19.5캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Humidification 99.6% Design Conditions DP=>MCDB, DP=-19.5째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Hum_n 99.6% Condns DP=>MCDB,  !- Name
@@ -348,7 +348,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Humidification 99% Design Conditions DP=>MCDB, DP=-16.7캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Humidification 99% Design Conditions DP=>MCDB, DP=-16.7째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Hum_n 99% Condns DP=>MCDB,  !- Name
@@ -440,7 +440,7 @@
 
  ! Washington Dc Dulles IntL Ar Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=290
  ! Hottest Month=JUL
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1캜 MWB=23.9캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1째C MWB=23.9째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -469,7 +469,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.7캜 MWB=23.5캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.7째C MWB=23.5째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -498,7 +498,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DB=>MWB) 2%, MaxDB=31.2캜 MWB=22.8캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DB=>MWB) 2%, MaxDB=31.2째C MWB=22.8째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg 2% Condns DB=>MWB,  !- Name
@@ -527,7 +527,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (WB=>MDB) .4%, MDB=31.6캜 WB=25.4캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (WB=>MDB) .4%, MDB=31.6째C WB=25.4째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg .4% Condns WB=>MDB,  !- Name
@@ -556,7 +556,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (WB=>MDB) 1%, MDB=30.3캜 WB=24.7캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (WB=>MDB) 1%, MDB=30.3째C WB=24.7째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg 1% Condns WB=>MDB,  !- Name
@@ -585,7 +585,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (WB=>MDB) 2%, MDB=29.1캜 WB=24.1캜
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (WB=>MDB) 2%, MDB=29.1째C WB=24.1째C
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg 2% Condns WB=>MDB,  !- Name
@@ -614,7 +614,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DP=>MDB) .4%, MDB=27.8캜 DP=23.6캜 HR=0.0186
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DP=>MDB) .4%, MDB=27.8째C DP=23.6째C HR=0.0186
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg .4% Condns DP=>MDB,  !- Name
@@ -643,7 +643,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DP=>MDB) 1%, MDB=27.1캜 DP=23캜 HR=0.0180
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DP=>MDB) 1%, MDB=27.1째C DP=23째C HR=0.0180
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg 1% Condns DP=>MDB,  !- Name
@@ -672,7 +672,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DP=>MDB) 2%, MDB=26.6캜 DP=22.5캜 HR=0.0174
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (DP=>MDB) 2%, MDB=26.6째C DP=22.5째C HR=0.0174
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg 2% Condns DP=>MDB,  !- Name
@@ -701,7 +701,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (Enthalpy=>MDB) .4%, MDB=31.6캜 Enthalpy=78000.0J/kg
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (Enthalpy=>MDB) .4%, MDB=31.6째C Enthalpy=78000.0J/kg
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg .4% Condns Enth=>MDB,  !- Name
@@ -730,7 +730,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (Enthalpy=>MDB) 1%, MDB=30.6캜 Enthalpy=75200.0J/kg
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (Enthalpy=>MDB) 1%, MDB=30.6째C Enthalpy=75200.0J/kg
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg 1% Condns Enth=>MDB,  !- Name
@@ -759,7 +759,7 @@
     0.544,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     1.787;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
- ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (Enthalpy=>MDB) 2%, MDB=29.2캜 Enthalpy=72500.0J/kg
+ ! Washington Dc Dulles IntL Ar_VA_USA Annual Cooling (Enthalpy=>MDB) 2%, MDB=29.2째C Enthalpy=72500.0J/kg
 
   SizingPeriod:DesignDay,
     Washington Dc Dulles IntL Ar Ann Clg 2% Condns Enth=>MDB,  !- Name
@@ -2821,7 +2821,7 @@
     Inlets_SouthZone_1stFloor,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     AirNode_SouthZone_1stFloor,  !- Zone Air Node Name
-    OutletNode_SouthZone_1stFloor;  !- Zone Return Air Node Name
+    OutletNode_SouthZone_1stFloor;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NorthZone_1stFloor,      !- Zone Name
@@ -2829,7 +2829,7 @@
     Inlets_NorthZone_1stFloor,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     AirNode_NorthZone_1stFloor,  !- Zone Air Node Name
-    OutletNode_NorthZone_1stFloor;  !- Zone Return Air Node Name
+    OutletNode_NorthZone_1stFloor;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SouthZone_2ndFloor,      !- Zone Name
@@ -2837,7 +2837,7 @@
     Inlets_SouthZone_2ndFloor,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     AirNode_SouthZone_2ndFloor,  !- Zone Air Node Name
-    OutletNode_SouthZone_2ndFloor;  !- Zone Return Air Node Name
+    OutletNode_SouthZone_2ndFloor;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NorthZone_2ndFloor,      !- Zone Name
@@ -2845,10 +2845,11 @@
     Inlets_NorthZone_2ndFloor,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     AirNode_NorthZone_2ndFloor,  !- Zone Air Node Name
-    OutletNode_NorthZone_2ndFloor;  !- Zone Return Air Node Name
+    OutletNode_NorthZone_2ndFloor;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Equipment_SouthZone_1stFloor,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     DirectAir_SouthZone_1stFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2856,6 +2857,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_1stFloor,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     DirectAir_NorthZone_1stFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2863,6 +2865,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment_SouthZone_2ndFloor,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     DirectAir_SouthZone_2ndFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2870,6 +2873,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_2ndFloor,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     DirectAir_NorthZone_2ndFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3864,9 +3868,9 @@
 
   Output:Variable,*,Heating Coil Electric Power,annual;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,monthly;
+  Output:Variable,*,Heating Coil Heating Energy,monthly;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,annual;
+  Output:Variable,*,Heating Coil Heating Energy,annual;
 
   Output:Variable,*,Heating Coil Gas Energy,monthly;
 
@@ -3884,9 +3888,9 @@
 
   Output:Variable,*,Heating Coil Ancillary Gas Rate,annual;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,monthly;
+  Output:Variable,*,Heating Coil Heating Rate,monthly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,annual;
+  Output:Variable,*,Heating Coil Heating Rate,annual;
 
   Output:Variable,*,Heating Coil Runtime Fraction,monthly;
 

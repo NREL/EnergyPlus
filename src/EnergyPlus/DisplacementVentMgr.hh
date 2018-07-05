@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,64 +55,54 @@ namespace EnergyPlus {
 
 namespace DisplacementVentMgr {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Real64 HAT_MX; // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
-	extern Real64 HA_MX; // HA_MX Convection Coefficient times Area for the upper subzone
-	extern Real64 HAT_OC; // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
-	extern Real64 HA_OC; // HA_OC Convection Coefficient times Area for the lower subzone
-	extern Real64 HAT_FLOOR; // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
-	extern Real64 HA_FLOOR; // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
-	extern Real64 HeightFloorSubzoneTop; // Assumed thickness of floor subzone
-	extern Real64 ThickOccupiedSubzoneMin; // Minimum thickness of occupied subzone
-	extern Real64 HeightIntMass; // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
-	extern Real64 HeightIntMassDefault; // Default height of internal mass surfaces
+    // MODULE VARIABLE DECLARATIONS:
+    extern Real64 HAT_MX;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
+    extern Real64 HA_MX;                   // HA_MX Convection Coefficient times Area for the upper subzone
+    extern Real64 HAT_OC;                  // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
+    extern Real64 HA_OC;                   // HA_OC Convection Coefficient times Area for the lower subzone
+    extern Real64 HAT_FLOOR;               // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
+    extern Real64 HA_FLOOR;                // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
+    extern Real64 HeightFloorSubzoneTop;   // Assumed thickness of floor subzone
+    extern Real64 ThickOccupiedSubzoneMin; // Minimum thickness of occupied subzone
+    extern Real64 HeightIntMass;           // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
+    extern Real64 HeightIntMassDefault;    // Default height of internal mass surfaces
 
-	// SUBROUTINE SPECIFICATIONS:
+    // SUBROUTINE SPECIFICATIONS:
 
-	// Functions
+    // Functions
 
-	void
-	ManageUCSDDVModel( int const ZoneNum ); // index number for the specified zone
+    void ManageUCSDDVModel(int const ZoneNum); // index number for the specified zone
 
-	//**************************************************************************************************
+    //**************************************************************************************************
 
-	void
-	InitUCSDDV( int const ZoneNum );
+    void InitUCSDDV(int const ZoneNum);
 
-	//**************************************************************************************************
+    //**************************************************************************************************
 
-	void
-	HcUCSDDV(
-		int const ZoneNum,
-		Real64 const FractionHeight
-	);
+    void HcUCSDDV(int const ZoneNum, Real64 const FractionHeight);
 
-	//**************************************************************************************************
+    //**************************************************************************************************
 
-	Real64
-	calculateThirdOrderFloorTemperature(
-		Real64 temperatureHistoryTerm,
-		Real64 HAT_floor,
-		Real64 HA_floor,
-		Real64 MCpT_Total,
-		Real64 MCp_Total,
-		Real64 occupiedTemp,
-		Real64 nonAirSystemResponse,
-		Real64 zoneMultiplier,
-		Real64 airCap
-	);
+    Real64 calculateThirdOrderFloorTemperature(Real64 temperatureHistoryTerm,
+                                               Real64 HAT_floor,
+                                               Real64 HA_floor,
+                                               Real64 MCpT_Total,
+                                               Real64 MCp_Total,
+                                               Real64 occupiedTemp,
+                                               Real64 nonAirSystemResponse,
+                                               Real64 zoneMultiplier,
+                                               Real64 airCap);
 
-	void
-	CalcUCSDDV( int const ZoneNum ); // Which Zonenum
+    void CalcUCSDDV(int const ZoneNum); // Which Zonenum
 
-} // DisplacementVentMgr
+} // namespace DisplacementVentMgr
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

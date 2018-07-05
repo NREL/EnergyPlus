@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,14 +52,13 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/HighTempRadiantSystem.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
-
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HighTempRadiantSystem;
@@ -70,92 +69,89 @@ using namespace DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataSizing;
 
-
 namespace EnergyPlus {
-	
-	TEST_F( EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem )
-	{
 
-		bool ErrorsFound;
-	
-		std::string const idf_objects = delimited_string( {
-		    "  ZoneHVAC:HighTemperatureRadiant,",
-			"    ZONERADHEATER,           !- Name",
-			"    ,                        !- Availability Schedule Name",
-			"	 ZONE1,                   !- Zone Name",
-			"	 HeatingDesignCapacity,   !- Heating Design Capacity Method",
-			"	 10000,                   !- Heating Design Capacity {W}",
-			"	 ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
-			"	 ,                        !- Fraction of Autosized Heating Design Capacity",
-			"	 Electricity,             !- Fuel Type",
-			"	 1.0,                     !- Combustion Efficiency",
-			"	 0.80,                    !- Fraction of Input Converted to Radiant Energy",
-			"	 0.00,                    !- Fraction of Input Converted to Latent Energy",
-			"	 0.00,                    !- Fraction of Input that Is Lost",
-			"	 MeanAirTemperature,      !- Temperature Control Type",
-			"	 2.0,                     !- Heating Throttling Range {deltaC}",
-			"	 Radiant Heating Setpoints, !- Heating Setpoint Temperature Schedule Name",
-			"	 0.04,                    !- Fraction of Radiant Energy Incident on People",
-			"	 WALL1,                   !- Surface 1 Name",
-			"	 0.80;                    !- Fraction of Radiant Energy to Surface 1",
-		} );
-		
-		ASSERT_FALSE( process_idf( idf_objects ) );
+TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
+{
 
-		Zone.allocate( 1 );
-		Zone( 1 ).Name = "ZONE1";
-		Surface.allocate( 1 );
-		Surface( 1 ).Name = "WALL1";
-		Surface( 1 ).Zone = 1;
-	
-		ErrorsFound = false;
+    bool ErrorsFound;
 
-		GetHighTempRadiantSystem( ErrorsFound );
+    std::string const idf_objects = delimited_string({
+        "  ZoneHVAC:HighTemperatureRadiant,",
+        "    ZONERADHEATER,           !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "	 ZONE1,                   !- Zone Name",
+        "	 HeatingDesignCapacity,   !- Heating Design Capacity Method",
+        "	 10000,                   !- Heating Design Capacity {W}",
+        "	 ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+        "	 ,                        !- Fraction of Autosized Heating Design Capacity",
+        "	 Electricity,             !- Fuel Type",
+        "	 1.0,                     !- Combustion Efficiency",
+        "	 0.80,                    !- Fraction of Input Converted to Radiant Energy",
+        "	 0.00,                    !- Fraction of Input Converted to Latent Energy",
+        "	 0.00,                    !- Fraction of Input that Is Lost",
+        "	 MeanAirTemperature,      !- Temperature Control Type",
+        "	 2.0,                     !- Heating Throttling Range {deltaC}",
+        "	 Radiant Heating Setpoints, !- Heating Setpoint Temperature Schedule Name",
+        "	 0.04,                    !- Fraction of Radiant Energy Incident on People",
+        "	 WALL1,                   !- Surface 1 Name",
+        "	 0.80;                    !- Fraction of Radiant Energy to Surface 1",
+    });
 
-		std::string const error_string01 = delimited_string( {
-			"   ** Severe  ** Heating Setpoint Temperature Schedule Name not found: RADIANT HEATING SETPOINTS",
-   			"   **   ~~~   ** Occurs for ZoneHVAC:HighTemperatureRadiant = ZONERADHEATER",
-			"   ** Severe  ** Fraction of radiation distributed to surfaces and people sums up to less than 1 for ZONERADHEATER",
-			"   **   ~~~   ** This would result in some of the radiant energy delivered by the high temp radiant heater being lost.",
-			"   **   ~~~   ** The sum of all radiation fractions to surfaces = 0.80000",
-			"   **   ~~~   ** The radiant fraction to people = 4.00000E-002",
-			"   **   ~~~   ** So, all radiant fractions including surfaces and people = 0.84000",
-			"   **   ~~~   ** This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = 0.16000",
-			"   **   ~~~   ** Please check and correct this so that all radiant energy is accounted for in ZoneHVAC:HighTemperatureRadiant = ZONERADHEATER"
-			} );
-	
-		EXPECT_TRUE( compare_err_stream( error_string01, true ) );
-		EXPECT_TRUE( ErrorsFound );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	}
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE1";
+    Surface.allocate(1);
+    Surface(1).Name = "WALL1";
+    Surface(1).Zone = 1;
 
-	TEST_F( EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemScalableFlagSetTest )
-	{
-		int RadSysNum;
-		int SizingTypesNum;
-		
-		DataSizing::DataScalableCapSizingON = false;
-		DataSizing::CurZoneEqNum = 1;
-		
-		RadSysNum = 1;
-		HighTempRadSys.allocate( RadSysNum );
-		HighTempRadSysNumericFields.allocate( RadSysNum );
-		HighTempRadSysNumericFields( RadSysNum ).FieldNames.allocate( 1 );
-		HighTempRadSys( RadSysNum ).Name = "TESTSCALABLEFLAG";
-		HighTempRadSys( RadSysNum ).ZonePtr = 1;
-		HighTempRadSys( RadSysNum ).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
-		HighTempRadSys( RadSysNum ).ScaledHeatingCapacity = 100.0;
-		DataSizing::ZoneEqSizing.allocate( 1 );
-		DataHeatBalance::Zone.allocate( 1 );
-		Zone( 1 ).FloorArea = 10.0;
-		SizingTypesNum = DataHVACGlobals::NumOfSizingTypes;
-		if ( SizingTypesNum < 1 ) SizingTypesNum = 1;
-		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( DataHVACGlobals::NumOfSizingTypes );
-		
-		SizeHighTempRadiantSystem( RadSysNum );
-		EXPECT_FALSE( DataSizing::DataScalableSizingON );
-	
-	}
-	
+    ErrorsFound = false;
+
+    GetHighTempRadiantSystem(ErrorsFound);
+
+    std::string const error_string01 =
+        delimited_string({"   ** Severe  ** Heating Setpoint Temperature Schedule Name not found: RADIANT HEATING SETPOINTS",
+                          "   **   ~~~   ** Occurs for ZoneHVAC:HighTemperatureRadiant = ZONERADHEATER",
+                          "   ** Severe  ** Fraction of radiation distributed to surfaces and people sums up to less than 1 for ZONERADHEATER",
+                          "   **   ~~~   ** This would result in some of the radiant energy delivered by the high temp radiant heater being lost.",
+                          "   **   ~~~   ** The sum of all radiation fractions to surfaces = 0.80000",
+                          "   **   ~~~   ** The radiant fraction to people = 4.00000E-002",
+                          "   **   ~~~   ** So, all radiant fractions including surfaces and people = 0.84000",
+                          "   **   ~~~   ** This means that the fraction of radiant energy that would be lost from the high temperature radiant "
+                          "heater would be = 0.16000",
+                          "   **   ~~~   ** Please check and correct this so that all radiant energy is accounted for in "
+                          "ZoneHVAC:HighTemperatureRadiant = ZONERADHEATER"});
+
+    EXPECT_TRUE(compare_err_stream(error_string01, true));
+    EXPECT_TRUE(ErrorsFound);
 }
 
+TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemScalableFlagSetTest)
+{
+    int RadSysNum;
+    int SizingTypesNum;
+
+    DataSizing::DataScalableCapSizingON = false;
+    DataSizing::CurZoneEqNum = 1;
+
+    RadSysNum = 1;
+    HighTempRadSys.allocate(RadSysNum);
+    HighTempRadSysNumericFields.allocate(RadSysNum);
+    HighTempRadSysNumericFields(RadSysNum).FieldNames.allocate(1);
+    HighTempRadSys(RadSysNum).Name = "TESTSCALABLEFLAG";
+    HighTempRadSys(RadSysNum).ZonePtr = 1;
+    HighTempRadSys(RadSysNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+    HighTempRadSys(RadSysNum).ScaledHeatingCapacity = 100.0;
+    DataSizing::ZoneEqSizing.allocate(1);
+    DataHeatBalance::Zone.allocate(1);
+    Zone(1).FloorArea = 10.0;
+    SizingTypesNum = DataHVACGlobals::NumOfSizingTypes;
+    if (SizingTypesNum < 1) SizingTypesNum = 1;
+    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+
+    SizeHighTempRadiantSystem(RadSysNum);
+    EXPECT_FALSE(DataSizing::DataScalableSizingON);
+}
+
+} // namespace EnergyPlus

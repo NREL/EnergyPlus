@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,35 +58,34 @@ namespace EnergyPlus {
 
 namespace DataIPShortCuts {
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS
-	// na
+    // DERIVED TYPE DEFINITIONS
+    // na
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array1D_string cAlphaFieldNames;
-	extern Array1D_string cNumericFieldNames;
-	extern Array1D_bool lNumericFieldBlanks;
-	extern Array1D_bool lAlphaFieldBlanks;
-	extern Array1D_string cAlphaArgs;
-	extern Array1D< Real64 > rNumericArgs;
-	extern std::string cCurrentModuleObject;
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array1D_string cAlphaFieldNames;
+    extern Array1D_string cNumericFieldNames;
+    extern Array1D_bool lNumericFieldBlanks;
+    extern Array1D_bool lAlphaFieldBlanks;
+    extern Array1D_string cAlphaArgs;
+    extern Array1D<Real64> rNumericArgs;
+    extern std::string cCurrentModuleObject;
 
-	// Clears the global data in DataIPShortCuts.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+    // Clears the global data in DataIPShortCuts.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
 
-} // DataIPShortCuts
+} // namespace DataIPShortCuts
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

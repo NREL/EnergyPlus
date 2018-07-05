@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,78 +52,64 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataHeatBalance.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace MoistureBalanceEMPDManager {
 
-	// Data
-	// MODULE VARIABLE and Function DECLARATIONs
+    // Data
+    // MODULE VARIABLE and Function DECLARATIONs
 
-	struct EMPDReportVarsData {
-		Real64 rv_surface;
-		Real64 RH_surface_layer;
-		Real64 RH_deep_layer;
-		Real64 w_surface_layer;
-		Real64 w_deep_layer;
-		Real64 mass_flux_zone;
-		Real64 mass_flux_deep;
-		Real64 u_surface_layer;
-		Real64 u_deep_layer;
+    struct EMPDReportVarsData
+    {
+        Real64 rv_surface;
+        Real64 RH_surface_layer;
+        Real64 RH_deep_layer;
+        Real64 w_surface_layer;
+        Real64 w_deep_layer;
+        Real64 mass_flux_zone;
+        Real64 mass_flux_deep;
+        Real64 u_surface_layer;
+        Real64 u_deep_layer;
 
-		// Default constructor
-		EMPDReportVarsData() :
-		rv_surface( 0.015 ),
-		RH_surface_layer( 0.0 ),
-		RH_deep_layer( 0.0 ),
-		w_surface_layer( 0.015 ),
-		w_deep_layer( 0.015 ),
-		mass_flux_zone( 0.0 ),
-		mass_flux_deep( 0.0 ),
-		u_surface_layer( 0.0 ),
-		u_deep_layer( 0.0 )
-		{}
-	};
+        // Default constructor
+        EMPDReportVarsData()
+            : rv_surface(0.015), RH_surface_layer(0.0), RH_deep_layer(0.0), w_surface_layer(0.015), w_deep_layer(0.015), mass_flux_zone(0.0),
+              mass_flux_deep(0.0), u_surface_layer(0.0), u_deep_layer(0.0)
+        {
+        }
+    };
 
-	extern Array1D< EMPDReportVarsData > EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
-	extern bool InitEnvrnFlag;
+    extern Array1D<EMPDReportVarsData> EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
+    extern bool InitEnvrnFlag;
 
-	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
+    // SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 
-	// Functions
-	Real64
-	CalcDepthFromPeriod(
-		Real64 const period, // in seconds
-		DataHeatBalance::MaterialProperties const & mat // material
-	);
+    // Functions
+    Real64 CalcDepthFromPeriod(Real64 const period,                           // in seconds
+                               DataHeatBalance::MaterialProperties const &mat // material
+    );
 
-	void
-	GetMoistureBalanceEMPDInput();
+    void GetMoistureBalanceEMPDInput();
 
-	void
-	InitMoistureBalanceEMPD();
+    void InitMoistureBalanceEMPD();
 
-	void
-	CalcMoistureBalanceEMPD(
-		int const SurfNum,
-		Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
-		Real64 const TempZone, // Zone temperature at current time step.
-		Real64 & TempSat // Satutare surface temperature.
-	);
+    void CalcMoistureBalanceEMPD(int const SurfNum,
+                                 Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
+                                 Real64 const TempZone,   // Zone temperature at current time step.
+                                 Real64 &TempSat          // Satutare surface temperature.
+    );
 
-	void
-	clear_state();
+    void clear_state();
 
-	void
-	UpdateMoistureBalanceEMPD( int const SurfNum ); // Surface number
+    void UpdateMoistureBalanceEMPD(int const SurfNum); // Surface number
 
-	void
-	ReportMoistureBalanceEMPD();
+    void ReportMoistureBalanceEMPD();
 
-} // MoistureBalanceEMPDManager
+} // namespace MoistureBalanceEMPDManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

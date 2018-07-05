@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,181 +52,141 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace OutsideEnergySources {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-	extern int const EnergyType_DistrictHeating;
-	extern int const EnergyType_DistrictCooling;
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    extern int const EnergyType_DistrictHeating;
+    extern int const EnergyType_DistrictCooling;
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	//MODULE VARIABLE DECLARATIONS:
-	extern int NumDistrictUnits;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumDistrictUnits;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
+    // SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
 
-	// Types
+    // Types
 
-	struct OutsideEnergySourceSpecs
-	{
-		// Members
-		std::string PlantLoopID; // main plant loop ID
-		std::string SecndryLoopID; // secondary chiller loop (cond loop) ID
-		std::string ScheduleID; // equipment availability schedule
-		std::string Name; // user identifier
-		Real64 NomCap; // design nominal capacity of district service
-		bool NomCapWasAutoSized; // ture if Nominal Capacity was autosize on input
-		int CapFractionSchedNum; // capacity modifier schedule number
-		int InletNodeNum; // Node number on the inlet side of the plant
-		int OutletNodeNum; // Node number on the inlet side of the plant
-		Real64 EnergyTransfer; // cooling energy provided in time step
-		Real64 EnergyRate; // cooling power
-		int EnergyType; // flag for district heating OR cooling
-		int MassFlowReSimIndex;
-		//loop topology variables
-		int LoopNum;
-		int LoopSideNum;
-		int BranchNum;
-		int CompNum;
-		//flags
-		bool OneTimeInitFlag;
-		bool BeginEnvrnInitFlag;
-		bool CheckEquipName;
+    struct OutsideEnergySourceSpecs
+    {
+        // Members
+        std::string PlantLoopID;   // main plant loop ID
+        std::string SecndryLoopID; // secondary chiller loop (cond loop) ID
+        std::string ScheduleID;    // equipment availability schedule
+        std::string Name;          // user identifier
+        Real64 NomCap;             // design nominal capacity of district service
+        bool NomCapWasAutoSized;   // ture if Nominal Capacity was autosize on input
+        int CapFractionSchedNum;   // capacity modifier schedule number
+        int InletNodeNum;          // Node number on the inlet side of the plant
+        int OutletNodeNum;         // Node number on the inlet side of the plant
+        Real64 EnergyTransfer;     // cooling energy provided in time step
+        Real64 EnergyRate;         // cooling power
+        int EnergyType;            // flag for district heating OR cooling
+        int MassFlowReSimIndex;
+        // loop topology variables
+        int LoopNum;
+        int LoopSideNum;
+        int BranchNum;
+        int CompNum;
+        // flags
+        bool OneTimeInitFlag;
+        bool BeginEnvrnInitFlag;
+        bool CheckEquipName;
 
-		// Default Constructor
-		OutsideEnergySourceSpecs() :
-			NomCap( 0.0 ),
-			NomCapWasAutoSized( false ),
-			CapFractionSchedNum( 0 ),
-			InletNodeNum( 0 ),
-			OutletNodeNum( 0 ),
-			EnergyTransfer( 0.0 ),
-			EnergyRate( 0.0 ),
-			EnergyType( 0 ),
-			MassFlowReSimIndex( 0 ),
-			LoopNum( 0 ),
-			LoopSideNum( 0 ),
-			BranchNum( 0 ),
-			CompNum( 0 ),
-			OneTimeInitFlag( true ),
-			BeginEnvrnInitFlag( true ),
-			CheckEquipName( true )
-		{}
+        // Default Constructor
+        OutsideEnergySourceSpecs()
+            : NomCap(0.0), NomCapWasAutoSized(false), CapFractionSchedNum(0), InletNodeNum(0), OutletNodeNum(0), EnergyTransfer(0.0), EnergyRate(0.0),
+              EnergyType(0), MassFlowReSimIndex(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), OneTimeInitFlag(true),
+              BeginEnvrnInitFlag(true), CheckEquipName(true)
+        {
+        }
+    };
 
-	};
+    struct ReportVars
+    {
+        // Members
+        Real64 MassFlowRate;
+        Real64 InletTemp;
+        Real64 OutletTemp;
+        Real64 EnergyTransfer;
 
-	struct ReportVars
-	{
-		// Members
-		Real64 MassFlowRate;
-		Real64 InletTemp;
-		Real64 OutletTemp;
-		Real64 EnergyTransfer;
+        // Default Constructor
+        ReportVars() : MassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0), EnergyTransfer(0.0)
+        {
+        }
+    };
 
-		// Default Constructor
-		ReportVars() :
-			MassFlowRate( 0.0 ),
-			InletTemp( 0.0 ),
-			OutletTemp( 0.0 ),
-			EnergyTransfer( 0.0 )
-		{}
-	};
+    // Object Data
+    extern Array1D<OutsideEnergySourceSpecs> EnergySource;
+    extern Array1D<ReportVars> EnergySourceReport;
 
-	// Object Data
-	extern Array1D< OutsideEnergySourceSpecs > EnergySource;
-	extern Array1D< ReportVars > EnergySourceReport;
+    // Functions
+    void clear_state();
 
-	// Functions
-	void
-	clear_state();
+    void SimOutsideEnergy(std::string const &EnergyType,
+                          std::string const &EquipName,
+                          int const EquipFlowCtrl, // Flow control mode for the equipment
+                          int &CompIndex,
+                          bool const RunFlag,
+                          bool const InitLoopEquip,
+                          Real64 &MyLoad,
+                          Real64 &MaxCap,
+                          Real64 &MinCap,
+                          Real64 &OptCap,
+                          bool const FirstHVACIteration);
 
-	void
-	SimOutsideEnergy(
-		std::string const & EnergyType,
-		std::string const & EquipName,
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int & CompIndex,
-		bool const RunFlag,
-		bool const InitLoopEquip,
-		Real64 & MyLoad,
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const FirstHVACIteration
-	);
+    // End OutsideEnergySources Module Driver Subroutines
+    //******************************************************************************
 
-	// End OutsideEnergySources Module Driver Subroutines
-	//******************************************************************************
+    // Beginning of OutsideEnergySources Module Get Input subroutines
+    //******************************************************************************
 
-	// Beginning of OutsideEnergySources Module Get Input subroutines
-	//******************************************************************************
+    void GetOutsideEnergySourcesInput();
 
-	void
-	GetOutsideEnergySourcesInput();
+    // End of Get Input subroutines for the OutsideEnergySources Module
+    //******************************************************************************
 
-	// End of Get Input subroutines for the OutsideEnergySources Module
-	//******************************************************************************
+    // Beginning Initialization Section of the OutsideEnergySources Module
+    //******************************************************************************
 
-	// Beginning Initialization Section of the OutsideEnergySources Module
-	//******************************************************************************
+    void InitSimVars(int const EnergySourceNum, // Which item being initialized
+                     Real64 &MassFlowRate,
+                     Real64 &InletTemp,
+                     Real64 &OutletTemp,
+                     Real64 const MyLoad);
 
-	void
-	InitSimVars(
-		int const EnergySourceNum, // Which item being initialized
-		Real64 & MassFlowRate,
-		Real64 & InletTemp,
-		Real64 & OutletTemp,
-		Real64 const MyLoad
-	);
+    // End Initialization Section of the OutsideEnergySources Module
+    //******************************************************************************
 
-	// End Initialization Section of the OutsideEnergySources Module
-	//******************************************************************************
+    // Beginning of OutsideEnergySources Module Utility Subroutines
+    // *****************************************************************************
 
-	// Beginning of OutsideEnergySources Module Utility Subroutines
-	// *****************************************************************************
+    void SizeDistrictEnergy(int const EnergySourceNum);
 
-	void
-	SizeDistrictEnergy(
-		int const EnergySourceNum
-	);
+    void SimDistrictEnergy(
+        bool const RunFlag, int const DistrictEqNum, Real64 &MyLoad, Real64 const MassFlowRate, Real64 const InletTemp, Real64 &OutletTemp);
 
-	void
-	SimDistrictEnergy(
-		bool const RunFlag,
-		int const DistrictEqNum,
-		Real64 & MyLoad,
-		Real64 const MassFlowRate,
-		Real64 const InletTemp,
-		Real64 & OutletTemp
-	);
+    // End of OutsideEnergySources Module Utility Subroutines
+    // *****************************************************************************
 
-	// End of OutsideEnergySources Module Utility Subroutines
-	// *****************************************************************************
+    // Beginning of Record Keeping subroutines for the OutsideEnergySources Module
+    // *****************************************************************************
 
-	// Beginning of Record Keeping subroutines for the OutsideEnergySources Module
-	// *****************************************************************************
+    void UpdateRecords(Real64 const MyLoad, int const EqNum, Real64 const MassFlowRate, Real64 const OutletTemp);
 
-	void
-	UpdateRecords(
-		Real64 const MyLoad,
-		int const EqNum,
-		Real64 const MassFlowRate,
-		Real64 const OutletTemp
-	);
+    // End of Record Keeping subroutines for the OutsideEnergySources Module
+    // *****************************************************************************
 
-	// End of Record Keeping subroutines for the OutsideEnergySources Module
-	// *****************************************************************************
+} // namespace OutsideEnergySources
 
-} // OutsideEnergySources
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

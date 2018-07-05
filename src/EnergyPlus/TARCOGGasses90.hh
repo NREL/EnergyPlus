@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,95 +59,84 @@ namespace EnergyPlus {
 
 namespace TARCOGGasses90 {
 
-	// Data
-	//private doe2gas90
+    // Data
+    // private doe2gas90
 
-	// Functions
+    // Functions
 
-	void
-	GASSES90(
-		Real64 const tmean,
-		Array1_int const & iprop,
-		Array1< Real64 > const & frct,
-		Real64 const pres,
-		int const nmix,
-		Array1< Real64 > const & xwght,
-		Array2< Real64 > const & xgcon,
-		Array2< Real64 > const & xgvis,
-		Array2< Real64 > const & xgcp,
-		Real64 & con,
-		Real64 & visc,
-		Real64 & dens,
-		Real64 & cp,
-		Real64 & pr,
-		int const standard,
-		int & nperr,
-		std::string & ErrorMessage
-	);
+    void GASSES90(Real64 const tmean,
+                  Array1_int const &iprop,
+                  Array1<Real64> const &frct,
+                  Real64 const pres,
+                  int const nmix,
+                  Array1<Real64> const &xwght,
+                  Array2<Real64> const &xgcon,
+                  Array2<Real64> const &xgvis,
+                  Array2<Real64> const &xgcp,
+                  Real64 &con,
+                  Real64 &visc,
+                  Real64 &dens,
+                  Real64 &cp,
+                  Real64 &pr,
+                  int const standard,
+                  int &nperr,
+                  std::string &ErrorMessage);
 
-	void
-	GassesLow(
-		Real64 const tmean,
-		Real64 const mwght,
-		Real64 const pressure,
-		Real64 const gama,
-		Real64 & cond,
-		int & nperr,
-		std::string & ErrorMessage
-	);
+    void
+    GassesLow(Real64 const tmean, Real64 const mwght, Real64 const pressure, Real64 const gama, Real64 &cond, int &nperr, std::string &ErrorMessage);
 
-	//  subroutine doe2gas90 (standard, iprop, frct, pres, nmix, con0, dcon, visc0, dvisc, dens0, ddens, pr0, dpr)
-	//    !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!
-	//    !  calculate gas properties using old doe2 format                              !
-	//    !------------------------------------------------------------------------------!
-	//    !  iprop(i)  vector of gas identifiers (for max of w5cog.fi::maxgas gasses)
-	//    !  frct(i)   vector of fraction of gasses in a mixture (for max of w5cog.fi::maxgas gasses)
-	//    !  pres(i)   pressure (default: pres = 1e5)[N/m^2]
-	//    !  nmix(i)   number of gasses in a mixture
-	//    !  con0(o)   thermal conductivity @ mean temperature of 0 C[W/m-K]
-	//    !  dcon(o)   derivative of thermal conductivity wrt temperature x 10^5 [W/m-K^2 x 10^5]
-	//    !  visc0(o)  dynamic viscosity @ mean temperature of 0 C x 10^5 [kg/m-s x 10^5]
-	//    !  dvisc(o)  derivative of dynamic viscosity wrt temperature x 10^8 [kg/m-s-K x 10^8]
-	//    !  dens0(o)  density @ mean temperature of 0 C [kg/m^3]
-	//    !  ddens(o)  derivative of density wrt temperature [kg/m^3-K]
-	//    !  pr0(o)    Prandl number @ mean temperature of 0 C [ - ]
-	//    !  dpr(o)    derivative of Prandl number wrt temperature [ 1/K ]
-	//    !  nperr(o)  error flag (if component fraction in a mixture is 0%)
-	//    !
-	//    !**import:
-	//    !  w5cog.fi::maxgas
-	//    !
-	//    !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!
+    //  subroutine doe2gas90 (standard, iprop, frct, pres, nmix, con0, dcon, visc0, dvisc, dens0, ddens, pr0, dpr)
+    //    !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!
+    //    !  calculate gas properties using old doe2 format                              !
+    //    !------------------------------------------------------------------------------!
+    //    !  iprop(i)  vector of gas identifiers (for max of w5cog.fi::maxgas gasses)
+    //    !  frct(i)   vector of fraction of gasses in a mixture (for max of w5cog.fi::maxgas gasses)
+    //    !  pres(i)   pressure (default: pres = 1e5)[N/m^2]
+    //    !  nmix(i)   number of gasses in a mixture
+    //    !  con0(o)   thermal conductivity @ mean temperature of 0 C[W/m-K]
+    //    !  dcon(o)   derivative of thermal conductivity wrt temperature x 10^5 [W/m-K^2 x 10^5]
+    //    !  visc0(o)  dynamic viscosity @ mean temperature of 0 C x 10^5 [kg/m-s x 10^5]
+    //    !  dvisc(o)  derivative of dynamic viscosity wrt temperature x 10^8 [kg/m-s-K x 10^8]
+    //    !  dens0(o)  density @ mean temperature of 0 C [kg/m^3]
+    //    !  ddens(o)  derivative of density wrt temperature [kg/m^3-K]
+    //    !  pr0(o)    Prandl number @ mean temperature of 0 C [ - ]
+    //    !  dpr(o)    derivative of Prandl number wrt temperature [ 1/K ]
+    //    !  nperr(o)  error flag (if component fraction in a mixture is 0%)
+    //    !
+    //    !**import:
+    //    !  w5cog.fi::maxgas
+    //    !
+    //    !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!
 
-	//    ! Variables
+    //    ! Variables
 
-	//    integer, intent(in) :: nmix, iprop(maxgas)
-	//    REAL(r64), intent(in) :: pres, frct(maxgas)
+    //    integer, intent(in) :: nmix, iprop(maxgas)
+    //    REAL(r64), intent(in) :: pres, frct(maxgas)
 
-	//    REAL(r64), intent(out) :: con0, dcon, visc0, dvisc, dens0, ddens, pr0, dpr
+    //    REAL(r64), intent(out) :: con0, dcon, visc0, dvisc, dens0, ddens, pr0, dpr
 
-	//    REAL(r64) :: con, visc, dens, cp, pr
-	//    integer :: standard, nperr
-	//    character(len=2000) :: ErrMsg
+    //    REAL(r64) :: con, visc, dens, cp, pr
+    //    integer :: standard, nperr
+    //    character(len=2000) :: ErrMsg
 
-	//    call GASSES90(273.15d0, iprop, frct, pres,nmix, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, standard, nperr, ErrMsg)
+    //    call GASSES90(273.15d0, iprop, frct, pres,nmix, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, standard, nperr, ErrMsg)
 
-	//    con0=con
-	//    visc0=visc*10**5
-	//    dens0=dens
-	//    pr0=pr
+    //    con0=con
+    //    visc0=visc*10**5
+    //    dens0=dens
+    //    pr0=pr
 
-	//    call GASSES90(283.15d0,iprop, frct, pres, nmix, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, standard, nperr, ErrMsg)
+    //    call GASSES90(283.15d0,iprop, frct, pres, nmix, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, standard, nperr, ErrMsg)
 
-	//    dcon=(con-con0)/10*10**5
-	//    dvisc=(visc*10**5-visc0)/10*10**3
-	//    ddens=(dens-dens0)/10
-	//    dpr=(pr-pr0)/10
+    //    dcon=(con-con0)/10*10**5
+    //    dvisc=(visc*10**5-visc0)/10*10**3
+    //    ddens=(dens-dens0)/10
+    //    dpr=(pr-pr0)/10
 
-	//  end subroutine doe2gas90
+    //  end subroutine doe2gas90
 
-} // TARCOGGasses90
+} // namespace TARCOGGasses90
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

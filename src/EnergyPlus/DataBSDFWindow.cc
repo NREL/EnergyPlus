@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,75 +54,75 @@ namespace EnergyPlus {
 
 namespace DataBSDFWindow {
 
-	// Module containing the data definitions dealing with calculating window optical
-	// properties from BSDF data
+    // Module containing the data definitions dealing with calculating window optical
+    // properties from BSDF data
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Joseph Klems, Brent Griffith
-	//       DATE WRITTEN   August 2011
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Joseph Klems, Brent Griffith
+    //       DATE WRITTEN   August 2011
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// define the data structures to be used in calculating solar
-	//  transmittance and absorptance and associated arsenal
-	//  of geometry and window state information necessary
+    // PURPOSE OF THIS MODULE:
+    // define the data structures to be used in calculating solar
+    //  transmittance and absorptance and associated arsenal
+    //  of geometry and window state information necessary
 
-	// METHODOLOGY EMPLOYED:
-	// Matrix representation of bidirectional transmittance of radiance
+    // METHODOLOGY EMPLOYED:
+    // Matrix representation of bidirectional transmittance of radiance
 
-	// REFERENCES:
-	// to be added--Complex glazing pubs, WINDOW writeup(s)(?)
+    // REFERENCES:
+    // to be added--Complex glazing pubs, WINDOW writeup(s)(?)
 
-	// OTHER NOTES:
-	// see Joe's draft "Including Non-Specular Fenestrations in EnergyPlus"
+    // OTHER NOTES:
+    // see Joe's draft "Including Non-Specular Fenestrations in EnergyPlus"
 
-	// USE STATEMENTS:
-	// <use statements for data only modules>
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-	using namespace DataVectorTypes;
+    // USE STATEMENTS:
+    // <use statements for data only modules>
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
+    using namespace DataVectorTypes;
 
-	// <use statements for access to subroutines in other modules>
+    // <use statements for access to subroutines in other modules>
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
 
-	int const BasisType_WINDOW( 1 );
-	int const BasisType_Custom( 2 );
+    int const BasisType_WINDOW(1);
+    int const BasisType_Custom(2);
 
-	int const BasisSymmetry_Axisymmetric( 1 );
-	int const BasisSymmetry_None( 2 );
+    int const BasisSymmetry_Axisymmetric(1);
+    int const BasisSymmetry_None(2);
 
-	// Thermal calculations for complex fenestration can be used to generate reports for standard cases
-	// noCondition is used when performing timestep calculations
-	// summerCondtion will override certain parameters so that produced results are matching standard summer WINDOW (software) results
-	// winterCondition will override certain parameters so that produced resuls are matching standard winter WINDOW (software) results
-	int const noCondition( 0 );
-	int const summerCondition( 1 );
-	int const winterCondition( 2 );
+    // Thermal calculations for complex fenestration can be used to generate reports for standard cases
+    // noCondition is used when performing timestep calculations
+    // summerCondtion will override certain parameters so that produced results are matching standard summer WINDOW (software) results
+    // winterCondition will override certain parameters so that produced resuls are matching standard winter WINDOW (software) results
+    int const noCondition(0);
+    int const summerCondition(1);
+    int const winterCondition(2);
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// Structure to keep reference points coefficients for different reference points and illuminance maps
+    // Structure to keep reference points coefficients for different reference points and illuminance maps
 
-	//Allocation of complex fenestration data:  SurfaceWindow(:)%ComplexFen is a structure of type BSDFWindowDescript
-	//defined in DataSurfaces.  ComplexWind(:) is an array of type BSDF WindowGeomDescr defined as a module
-	//variable in WindowComplexManager
+    // Allocation of complex fenestration data:  SurfaceWindow(:)%ComplexFen is a structure of type BSDFWindowDescript
+    // defined in DataSurfaces.  ComplexWind(:) is an array of type BSDF WindowGeomDescr defined as a module
+    // variable in WindowComplexManager
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	int TotComplexFenStates( 0 ); // Number of complex fenestration construction definitions
-	int FirstBSDF( 0 ); // Location of first complex fenestration construction definition in Constr array
-	int MaxBkSurf( 20 ); // was 20    Maximum number of back surfaces in solar overlap & interior solar distribution
-	int TotThermalModels( 0 ); // Number of thermal models
-	//calculation
-	Array3D< Real64 > SUNCOSTS( 60, 24, 3 ); // Timestep values of solar direction cosines
-	Array2D< Real64 > BSDFTempMtrx; // Temporary matrix for holding axisymmetric input
+    int TotComplexFenStates(0); // Number of complex fenestration construction definitions
+    int FirstBSDF(0);           // Location of first complex fenestration construction definition in Constr array
+    int MaxBkSurf(20);          // was 20    Maximum number of back surfaces in solar overlap & interior solar distribution
+    int TotThermalModels(0);    // Number of thermal models
+    // calculation
+    Array3D<Real64> SUNCOSTS(60, 24, 3); // Timestep values of solar direction cosines
+    Array2D<Real64> BSDFTempMtrx;        // Temporary matrix for holding axisymmetric input
 
-	// Object Data
-	Array1D< BSDFWindowGeomDescr > ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
+    // Object Data
+    Array1D<BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
-} // DataBSDFWindow
+} // namespace DataBSDFWindow
 
-} // EnergyPlus
+} // namespace EnergyPlus

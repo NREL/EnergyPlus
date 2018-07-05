@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,125 +52,93 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 #include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace PlantLoadProfile {
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// DERIVED TYPE DEFINITIONS:
+    // Data
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE TYPE DECLARATIONS:
+    // MODULE VARIABLE TYPE DECLARATIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumOfPlantProfile;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumOfPlantProfile;
 
-	// SUBROUTINE SPECIFICATIONS:
+    // SUBROUTINE SPECIFICATIONS:
 
-	// Types
+    // Types
 
-	struct PlantProfileData : public PlantComponent
-	{
-		virtual
-		~PlantProfileData()
-		{}
+    struct PlantProfileData : public PlantComponent
+    {
+        virtual ~PlantProfileData()
+        {
+        }
 
-		// Members
-		std::string Name; // Name of Plant Load Profile object
-		int TypeNum; // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
-		int WLoopNum; // water plant loop index number                      !DSU
-		int WLoopSideNum; // water plant loop side index                        !DSU
-		int WLoopBranchNum; // water plant loop branch index                      !DSU
-		int WLoopCompNum; // water plant loop component index                   !DSU
-		bool Init; // Flag for initialization:  TRUE means do the init
-		bool InitSizing; // Flag for initialization of plant sizing
-		int InletNode;
-		Real64 InletTemp; // Inlet temperature (C)
-		int OutletNode;
-		Real64 OutletTemp; // Outlet temperature (C)
-		int LoadSchedule; // Pointer to schedule object
-		bool EMSOverridePower; // if true, then EMS is calling to override power level
-		Real64 EMSPowerValue; // value EMS is directing to use for power [W]
-		Real64 PeakVolFlowRate; // Peak volumetric flow rate, also water consumption rate (m3/s)
-		int FlowRateFracSchedule; // Pointer to schedule object
-		Real64 VolFlowRate; // Volumetric flow rate (m3/s)
-		Real64 MassFlowRate; // Mass flow rate (kg/s)
-		bool EMSOverrideMassFlow;
-		Real64 EMSMassFlowValue;
-		// Report variables
-		Real64 Power; // Power required to meet the load (W)
-		Real64 Energy; // Energy required to meet the load (J)
-		Real64 HeatingEnergy; // Heating Energy required to meet the load (J)
-		Real64 CoolingEnergy; // Cooling Energy required to meet the load (J)
-		bool SetLoopIndexFlag;
+        // Members
+        std::string Name;   // Name of Plant Load Profile object
+        int TypeNum;        // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
+        int WLoopNum;       // water plant loop index number                      !DSU
+        int WLoopSideNum;   // water plant loop side index                        !DSU
+        int WLoopBranchNum; // water plant loop branch index                      !DSU
+        int WLoopCompNum;   // water plant loop component index                   !DSU
+        bool Init;          // Flag for initialization:  TRUE means do the init
+        bool InitSizing;    // Flag for initialization of plant sizing
+        int InletNode;
+        Real64 InletTemp; // Inlet temperature (C)
+        int OutletNode;
+        Real64 OutletTemp;        // Outlet temperature (C)
+        int LoadSchedule;         // Pointer to schedule object
+        bool EMSOverridePower;    // if true, then EMS is calling to override power level
+        Real64 EMSPowerValue;     // value EMS is directing to use for power [W]
+        Real64 PeakVolFlowRate;   // Peak volumetric flow rate, also water consumption rate (m3/s)
+        int FlowRateFracSchedule; // Pointer to schedule object
+        Real64 VolFlowRate;       // Volumetric flow rate (m3/s)
+        Real64 MassFlowRate;      // Mass flow rate (kg/s)
+        bool EMSOverrideMassFlow;
+        Real64 EMSMassFlowValue;
+        // Report variables
+        Real64 Power;         // Power required to meet the load (W)
+        Real64 Energy;        // Energy required to meet the load (J)
+        Real64 HeatingEnergy; // Heating Energy required to meet the load (J)
+        Real64 CoolingEnergy; // Cooling Energy required to meet the load (J)
+        bool SetLoopIndexFlag;
 
-		// Default Constructor
-		PlantProfileData() :
-			WLoopNum( 0 ),
-			WLoopSideNum( 0 ),
-			WLoopBranchNum( 0 ),
-			WLoopCompNum( 0 ),
-			Init( true ),
-			InitSizing( true ),
-			InletNode( 0 ),
-			InletTemp( 0.0 ),
-			OutletNode( 0 ),
-			OutletTemp( 0.0 ),
-			LoadSchedule( 0 ),
-			EMSOverridePower( false ),
-			EMSPowerValue( 0.0 ),
-			PeakVolFlowRate( 0.0 ),
-			FlowRateFracSchedule( 0 ),
-			VolFlowRate( 0.0 ),
-			MassFlowRate( 0.0 ),
-			EMSOverrideMassFlow( false ),
-			EMSMassFlowValue( 0.0 ),
-			Power( 0.0 ),
-			Energy( 0.0 ),
-			HeatingEnergy( 0.0 ),
-			CoolingEnergy( 0.0 ),
-			SetLoopIndexFlag( true )
-		{}
+        // Default Constructor
+        PlantProfileData()
+            : WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true), InletNode(0), InletTemp(0.0),
+              OutletNode(0), OutletTemp(0.0), LoadSchedule(0), EMSOverridePower(false), EMSPowerValue(0.0), PeakVolFlowRate(0.0),
+              FlowRateFracSchedule(0), VolFlowRate(0.0), MassFlowRate(0.0), EMSOverrideMassFlow(false), EMSMassFlowValue(0.0), Power(0.0),
+              Energy(0.0), HeatingEnergy(0.0), CoolingEnergy(0.0), SetLoopIndexFlag(true)
+        {
+        }
 
-		// Functions
-		static
-		PlantComponent *
-		factory( std::string objectName );
+        // Functions
+        static PlantComponent *factory(std::string objectName);
 
-		void
-		simulate( const PlantLocation & calledFromLocation,
-			  bool const FirstHVACIteration,
-			  Real64 & CurLoad,
-			  bool const RunFlag
-			 ) override;
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
-		void
-		onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
-		void
-		InitPlantProfile();
+        void InitPlantProfile();
 
-		void
-		UpdatePlantProfile();
+        void UpdatePlantProfile();
 
-		void
-		ReportPlantProfile();
-	};
+        void ReportPlantProfile();
+    };
 
-	// Object Data
-	extern Array1D< PlantProfileData > PlantProfile;
+    // Object Data
+    extern Array1D<PlantProfileData> PlantProfile;
 
-	// This could be static inside the class
-	void
-	GetPlantProfileInput();
+    // This could be static inside the class
+    void GetPlantProfileInput();
 
-	// As could this
-	void
-	clear_state();
+    // As could this
+    void clear_state();
 
 } // namespace PlantLoadProfile
 

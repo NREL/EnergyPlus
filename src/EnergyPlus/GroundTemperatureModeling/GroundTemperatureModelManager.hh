@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,37 +52,32 @@
 #include <memory>
 
 // EnergyPlus Headers
+#include <DataGlobals.hh>
 #include <EnergyPlus.hh>
 #include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
-#include <DataGlobals.hh>
 
 namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
 
-	extern int const objectType_KusudaGroundTemp;
-	extern int const objectType_FiniteDiffGroundTemp;
-	extern int const objectType_SiteBuildingSurfaceGroundTemp;
-	extern int const objectType_SiteShallowGroundTemp;
-	extern int const objectType_SiteDeepGroundTemp;
-	extern int const objectType_SiteFCFactorMethodGroundTemp;
-	extern int const objectType_XingGroundTemp;
+    extern int const objectType_KusudaGroundTemp;
+    extern int const objectType_FiniteDiffGroundTemp;
+    extern int const objectType_SiteBuildingSurfaceGroundTemp;
+    extern int const objectType_SiteShallowGroundTemp;
+    extern int const objectType_SiteDeepGroundTemp;
+    extern int const objectType_SiteFCFactorMethodGroundTemp;
+    extern int const objectType_XingGroundTemp;
 
-	extern Array1D_string const CurrentModuleObjects;
+    extern Array1D_string const CurrentModuleObjects;
 
-	extern std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
+    extern std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 
-	std::shared_ptr< BaseGroundTempsModel >
-	GetGroundTempModelAndInit(
-		std::string const & type,
-		std::string const & name
-	);
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(std::string const &type, std::string const &name);
 
-	void
-	clear_state();
+    void clear_state();
 
-}	// GroundTemperatureManager
+} // namespace GroundTemperatureManager
 
-}	// EnergyPlus
+} // namespace EnergyPlus
 
 #endif

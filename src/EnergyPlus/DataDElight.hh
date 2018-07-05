@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,19 +55,19 @@ namespace EnergyPlus {
 
 namespace DataDElight {
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS:
-	extern Real64 const M2FT; // Length:   Meters * M2FT = Feet
-	extern Real64 const FT22M2; // Area:     SquareFeet * FT22M2 = SquareMeter
-	extern Real64 const M22FT2; // Area:     SquareMeter * M22FT2 = SquareFeet
-	extern Real64 const M32FT3; // Volume:       CubicMeter * M32FT3 = CubicFeet
-	extern Real64 const LUX2FC; // Illuminance:  Lux * LUX2FC = Footcandles
+    // MODULE PARAMETER DEFINITIONS:
+    extern Real64 const M2FT;   // Length:   Meters * M2FT = Feet
+    extern Real64 const FT22M2; // Area:     SquareFeet * FT22M2 = SquareMeter
+    extern Real64 const M22FT2; // Area:     SquareMeter * M22FT2 = SquareFeet
+    extern Real64 const M32FT3; // Volume:       CubicMeter * M32FT3 = CubicFeet
+    extern Real64 const LUX2FC; // Illuminance:  Lux * LUX2FC = Footcandles
 
-} // DataDElight
+} // namespace DataDElight
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

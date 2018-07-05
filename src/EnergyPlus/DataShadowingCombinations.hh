@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,42 +58,38 @@ namespace EnergyPlus {
 
 namespace DataShadowingCombinations {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	// Types
+    // Types
 
-	struct ShadowingCombinations
-	{
-		// Members
-		bool UseThisSurf; // True when this surface should be used in calculations
-		int NumGenSurf; // Number of General surfaces for this surf
-		Array1D_int GenSurf; // Array of General Surface Numbers
-		int NumBackSurf; // Number of Back (Interior) surfaces for this surf
-		Array1D_int BackSurf; // Array of Back (Interior) surface numbers
-		int NumSubSurf; // Number of SubSurfaces for this surf
-		Array1D_int SubSurf; // Array of SubSurface surface Numbers
+    struct ShadowingCombinations
+    {
+        // Members
+        bool UseThisSurf;     // True when this surface should be used in calculations
+        int NumGenSurf;       // Number of General surfaces for this surf
+        Array1D_int GenSurf;  // Array of General Surface Numbers
+        int NumBackSurf;      // Number of Back (Interior) surfaces for this surf
+        Array1D_int BackSurf; // Array of Back (Interior) surface numbers
+        int NumSubSurf;       // Number of SubSurfaces for this surf
+        Array1D_int SubSurf;  // Array of SubSurface surface Numbers
 
-		// Default Constructor
-		ShadowingCombinations() :
-			UseThisSurf( false ),
-			NumGenSurf( 0 ),
-			NumBackSurf( 0 ),
-			NumSubSurf( 0 )
-		{}
+        // Default Constructor
+        ShadowingCombinations() : UseThisSurf(false), NumGenSurf(0), NumBackSurf(0), NumSubSurf(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<ShadowingCombinations> ShadowComb;
 
-	// Object Data
-	extern Array1D< ShadowingCombinations > ShadowComb;
+} // namespace DataShadowingCombinations
 
-} // DataShadowingCombinations
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

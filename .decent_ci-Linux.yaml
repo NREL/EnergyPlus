@@ -5,7 +5,7 @@ compilers:
     release_build_enable_pgo: true
     release_build_training_ctest_filter:  -R  "integration.(RefBldg.*|.*Slab|.*[^g]Basement|.*5Zone.*|Rad|Pip|.*Network.*|Window|CentralChillerHeaterSystem_Cooling_Heating|CmplxGlz_.*|ConvectionAdaptiveSmallOffice|DElight.*|DaylightingDevice.*|DisplacementVent_Nat_AirflowNetwork_AdaptiveComfort|DOADualDuctSchool|EMS.*|Flr_Rf_8Sides|FluidCooler|GSHP.*|GeneratorswithPV|HeatPumpWaterToAir.*|HospitalBaselineReheatReportEMS|HospitalLowEnergy|MicroCogeneration|PlantApplicationsGuide.*|PlateHeatExchanger|PurchAirWithDaylighting|RefrigeratedWarehouse|SolarCollectorFlatPlateWater|SurfaceTest|ThermalChimneyTest|UserDefinedRoomAirPatterns|VSHeatPumpWaterToAirEquationFit|WaterHeater.*|_CTFTestsPart2|_HybridVentilationControlGlobalAN|CentralChillerHeaterSystem)"
     release_build_cmake_extra_flags: -DPROFILE_GENERATE:BOOL=OFF -DPROFILE_USE:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DBUILD_DOCS:BOOL=ON
-    cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
+    cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DTEX_INTERACTION="nonstopmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
     collect_performance_results: true
     s3_upload: doc-build
     s3_upload_bucket: energyplus
@@ -67,3 +67,4 @@ compilers:
   - name: custom_check
     commands:
       - ./scripts/dev/license-check.py
+      - ./scripts/dev/verify_formatting.sh

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <HVACDuct.hh>
 #include <BranchNodeConnections.hh>
 #include <DataContaminantBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -54,7 +53,8 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <HVACDuct.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
@@ -63,415 +63,369 @@ namespace EnergyPlus {
 
 namespace HVACDuct {
 
-	// Module containing the routines dealing with the Duct component
-	// in forced air air conditioning systems
+    // Module containing the routines dealing with the Duct component
+    // in forced air air conditioning systems
+
+    // MODULE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   17May2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS MODULE:
+    // To encapsulate the data and routines required to model duct
+    // components in the EnergyPlus HVAC simulation
+
+    // METHODOLOGY EMPLOYED:
+    // At this point ducts are passive elements in the loop that just pass inlet node
+    // conditions to the outlet node. The function of a duct component is to allow the
+    // definition of a bypass branch: a branch must contain at least 1 component.
+
+    // REFERENCES:
+    // na
+
+    // OTHER NOTES:
+    // na
+
+    // USE STATEMENTS:
+    // <use statements for data only modules>
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
+    using DataGlobals::BeginEnvrnFlag;
+    using namespace DataHVACGlobals;
+    using namespace DataLoopNode;
+
+    // <use statements for access to subroutines in other modules>
+
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
+
+    // DERIVED TYPE DEFINITIONS:
+
+    // MODULE VARIABLE DECLARATIONS:
+    int NumDucts(0);
+    Array1D_bool CheckEquipName;
+
+    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
+
+    // <name Public routines, optionally name Private routines within this module>
+
+    // Object Data
+    Array1D<DuctData> Duct;
+
+    // Functions
+
+    void SimDuct(std::string const &CompName,              // name of the duct component
+                 bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep !unused1208
+                 int &CompIndex                            // index of duct component
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   17May2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Manage the simulation of a duct component
+
+        // Using/Aliasing
+        using General::TrimSigDigits;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static bool GetInputFlag(true); // First time, input is "gotten"
+        int DuctNum;                    // index of duct being simulated
+
+        if (GetInputFlag) {
+            GetDuctInput();
+            GetInputFlag = false;
+        }
+
+        // Get the duct component index
+        if (CompIndex == 0) {
+            DuctNum = UtilityRoutines::FindItemInList(CompName, Duct);
+            if (DuctNum == 0) {
+                ShowFatalError("SimDuct: Component not found=" + CompName);
+            }
+            CompIndex = DuctNum;
+        } else {
+            DuctNum = CompIndex;
+            if (DuctNum > NumDucts || DuctNum < 1) {
+                ShowFatalError("SimDuct:  Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Number of Components=" + TrimSigDigits(NumDucts) +
+                               ", Entered Component name=" + CompName);
+            }
+            if (CheckEquipName(DuctNum)) {
+                if (CompName != Duct(DuctNum).Name) {
+                    ShowFatalError("SimDuct: Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Component name=" + CompName +
+                                   ", stored Component Name for that index=" + Duct(DuctNum).Name);
+                }
+                CheckEquipName(DuctNum) = false;
+            }
+        }
+
+        InitDuct(DuctNum);
+
+        CalcDuct(DuctNum);
+
+        UpdateDuct(DuctNum);
+
+        ReportDuct(DuctNum);
+    }
+
+    void GetDuctInput()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   17May2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Obtains input data for ducts and stores it in duct data structures.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses InputProcessor "Get" routines to obtain data.
+
+        // Using/Aliasing
+        using BranchNodeConnections::TestCompSet;
+        using NodeInputManager::GetOnlySingleNode;
+        using namespace DataIPShortCuts;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int DuctNum; // duct index
+        static std::string const RoutineName("GetDuctInput:");
+        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
+        int IOStatus;                   // Used in GetObjectItem
+        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+
+        cCurrentModuleObject = "Duct";
+        NumDucts = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        Duct.allocate(NumDucts);
+        CheckEquipName.dimension(NumDucts, true);
+
+        for (DuctNum = 1; DuctNum <= NumDucts; ++DuctNum) {
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          DuctNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Fred Buhl
-	//       DATE WRITTEN   17May2005
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+            Duct(DuctNum).Name = cAlphaArgs(1);
+            Duct(DuctNum).InletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
+        }
 
-	// PURPOSE OF THIS MODULE:
-	// To encapsulate the data and routines required to model duct
-	// components in the EnergyPlus HVAC simulation
-
-	// METHODOLOGY EMPLOYED:
-	// At this point ducts are passive elements in the loop that just pass inlet node
-	// conditions to the outlet node. The function of a duct component is to allow the
-	// definition of a bypass branch: a branch must contain at least 1 component.
-
-	// REFERENCES:
-	// na
-
-	// OTHER NOTES:
-	// na
-
-	// USE STATEMENTS:
-	// <use statements for data only modules>
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-	using DataGlobals::BeginEnvrnFlag;
-	using namespace DataHVACGlobals;
-	using namespace DataLoopNode;
+        // No output variables
 
-	// <use statements for access to subroutines in other modules>
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-
-	// MODULE VARIABLE DECLARATIONS:
-	int NumDucts( 0 );
-	Array1D_bool CheckEquipName;
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
-
-	// <name Public routines, optionally name Private routines within this module>
+        if (ErrorsFound) {
+            ShowFatalError(RoutineName + " Errors found in input");
+        }
+    }
 
-	// Object Data
-	Array1D< DuctData > Duct;
+    void InitDuct(int const DuctNum) // number of the current duct being simulated
+    {
 
-	// Functions
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   17May2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-	void
-	SimDuct(
-		std::string const & CompName, // name of the duct component
-		bool const EP_UNUSED( FirstHVACIteration ), // TRUE if 1st HVAC simulation of system timestep !unused1208
-		int & CompIndex // index of duct component
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl
-		//       DATE WRITTEN   17May2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Manage the simulation of a duct component
-
-		// METHODOLOGY EMPLOYED:
-		// na
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is for initializations of the Duct Components
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
-		int DuctNum; // index of duct being simulated
-
-		if ( GetInputFlag ) {
-			GetDuctInput();
-			GetInputFlag = false;
-		}
-
-		// Get the duct component index
-		if ( CompIndex == 0 ) {
-			DuctNum = FindItemInList( CompName, Duct );
-			if ( DuctNum == 0 ) {
-				ShowFatalError( "SimDuct: Component not found=" + CompName );
-			}
-			CompIndex = DuctNum;
-		} else {
-			DuctNum = CompIndex;
-			if ( DuctNum > NumDucts || DuctNum < 1 ) {
-				ShowFatalError( "SimDuct:  Invalid CompIndex passed=" + TrimSigDigits( DuctNum ) + ", Number of Components=" + TrimSigDigits( NumDucts ) + ", Entered Component name=" + CompName );
-			}
-			if ( CheckEquipName( DuctNum ) ) {
-				if ( CompName != Duct( DuctNum ).Name ) {
-					ShowFatalError( "SimDuct: Invalid CompIndex passed=" + TrimSigDigits( DuctNum ) + ", Component name=" + CompName + ", stored Component Name for that index=" + Duct( DuctNum ).Name );
-				}
-				CheckEquipName( DuctNum ) = false;
-			}
-		}
-
-		InitDuct( DuctNum );
-
-		CalcDuct( DuctNum );
-
-		UpdateDuct( DuctNum );
-
-		ReportDuct( DuctNum );
-
-	}
-
-	void
-	GetDuctInput()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl
-		//       DATE WRITTEN   17May2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Obtains input data for ducts and stores it in duct data structures.
-
-		// METHODOLOGY EMPLOYED:
-		// Uses InputProcessor "Get" routines to obtain data.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using NodeInputManager::GetOnlySingleNode;
-		using BranchNodeConnections::TestCompSet;
-		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int DuctNum; // duct index
-		static std::string const RoutineName( "GetDuctInput:" );
-		int NumAlphas; // Number of Alphas for each GetObjectItem call
-		int NumNumbers; // Number of Numbers for each GetObjectItem call
-		int IOStatus; // Used in GetObjectItem
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
-
-		cCurrentModuleObject = "Duct";
-		NumDucts = GetNumObjectsFound( cCurrentModuleObject );
-		Duct.allocate( NumDucts );
-		CheckEquipName.dimension( NumDucts, true );
-
-		for ( DuctNum = 1; DuctNum <= NumDucts; ++DuctNum ) {
-			GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Duct, DuctNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
-			Duct( DuctNum ).Name = cAlphaArgs( 1 );
-			Duct( DuctNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			Duct( DuctNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Air Nodes" );
-		}
+        // METHODOLOGY EMPLOYED:
+        // Uses the status flags to trigger initializations
 
-		// No output variables
+        // REFERENCES:
+        // na
 
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + " Errors found in input" );
-		}
+        // USE STATEMENTS:
+        // na
 
-	}
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
 
-	void
-	InitDuct( int const DuctNum ) // number of the current duct being simulated
-	{
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl
-		//       DATE WRITTEN   17May2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is for initializations of the Duct Components
+        // DERIVED TYPE DEFINITIONS
+        // na
 
-		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger initializations
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static bool MyOneTimeFlag(true);
+        static Array1D_bool MyEnvrnFlag;
 
-		// REFERENCES:
-		// na
+        // do one time initializations
+        if (MyOneTimeFlag) {
+            // initialize the environment and sizing flags
+            MyEnvrnFlag.dimension(NumDucts, true);
 
-		// USE STATEMENTS:
-		// na
+            MyOneTimeFlag = false;
+        }
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+        // Do the Begin Environment initializations
+        if (BeginEnvrnFlag && MyEnvrnFlag(DuctNum)) {
+        }
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+        if (!BeginEnvrnFlag) {
+            MyEnvrnFlag(DuctNum) = true;
+        }
+
+        // do these initializations every HVAC time step
+    }
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
+    void CalcDuct(int const EP_UNUSED(DuctNum)) // number of the current duct being simulated !unused1208
+    {
 
-		// DERIVED TYPE DEFINITIONS
-		// na
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   17May2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
-		static Array1D_bool MyEnvrnFlag;
+        // METHODOLOGY EMPLOYED:
+        // na
 
-		// do one time initializations
-		if ( MyOneTimeFlag ) {
-			// initialize the environment and sizing flags
-			MyEnvrnFlag.dimension( NumDucts, true );
+        // REFERENCES:
+        // na
 
-			MyOneTimeFlag = false;
+        // USE STATEMENTS:
+        // na
 
-		}
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
 
-		// Do the Begin Environment initializations
-		if ( BeginEnvrnFlag && MyEnvrnFlag( DuctNum ) ) {
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
 
-		}
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
 
-		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag( DuctNum ) = true;
-		}
+        // DERIVED TYPE DEFINITIONS:
+        // na
 
-		// do these initializations every HVAC time step
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        // na
+    }
 
-	}
+    void UpdateDuct(int const DuctNum) // number of the current duct being simulated
+    {
 
-	void
-	CalcDuct( int const EP_UNUSED( DuctNum ) ) // number of the current duct being simulated !unused1208
-	{
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   17May2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl
-		//       DATE WRITTEN   17May2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+        // PURPOSE OF THIS SUBROUTINE:
+        // Moves duct output to the outlet nodes
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// na
+        // METHODOLOGY EMPLOYED:
+        // na
 
-		// METHODOLOGY EMPLOYED:
-		// na
+        // REFERENCES:
+        // na
 
-		// REFERENCES:
-		// na
+        // Using/Aliasing
+        using DataContaminantBalance::Contaminant;
 
-		// USE STATEMENTS:
-		// na
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+        // SUBROUTINE PARAMETER DEFINITIONS:
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
+        // DERIVED TYPE DEFINITIONS:
+        // na
 
-		// DERIVED TYPE DEFINITIONS:
-		// na
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int InNode;  // inlet node number
+        int OutNode; // outlet node number
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
+        InNode = Duct(DuctNum).InletNodeNum;
+        OutNode = Duct(DuctNum).OutletNodeNum;
+        // Set the outlet air node conditions of the duct
+        Node(OutNode).MassFlowRate = Node(InNode).MassFlowRate;
+        Node(OutNode).Temp = Node(InNode).Temp;
+        Node(OutNode).HumRat = Node(InNode).HumRat;
+        Node(OutNode).Enthalpy = Node(InNode).Enthalpy;
+        Node(OutNode).Quality = Node(InNode).Quality;
+        Node(OutNode).Press = Node(InNode).Press;
+        Node(OutNode).MassFlowRateMin = Node(InNode).MassFlowRateMin;
+        Node(OutNode).MassFlowRateMax = Node(InNode).MassFlowRateMax;
+        Node(OutNode).MassFlowRateMinAvail = Node(InNode).MassFlowRateMinAvail;
+        Node(OutNode).MassFlowRateMaxAvail = Node(InNode).MassFlowRateMaxAvail;
 
-	}
+        if (Contaminant.CO2Simulation) {
+            Node(OutNode).CO2 = Node(InNode).CO2;
+        }
 
-	void
-	UpdateDuct( int const DuctNum ) // number of the current duct being simulated
-	{
+        if (Contaminant.GenericContamSimulation) {
+            Node(OutNode).GenContam = Node(InNode).GenContam;
+        }
+    }
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl
-		//       DATE WRITTEN   17May2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+    void ReportDuct(int const EP_UNUSED(DuctNum)) // number of the current duct being simulated !unused1208
+    {
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Moves duct output to the outlet nodes
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   17May2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-		// METHODOLOGY EMPLOYED:
-		// na
+        // PURPOSE OF THIS SUBROUTINE:
+        // Fill remaining report variables
 
-		// REFERENCES:
-		// na
+        // METHODOLOGY EMPLOYED:
+        // na
 
-		// Using/Aliasing
-		using DataContaminantBalance::Contaminant;
+        // REFERENCES:
+        // na
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
+        // USE STATEMENTS:
+        // na
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
 
-		// DERIVED TYPE DEFINITIONS:
-		// na
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InNode; // inlet node number
-		int OutNode; // outlet node number
+        // DERIVED TYPE DEFINITIONS:
+        // na
 
-		InNode = Duct( DuctNum ).InletNodeNum;
-		OutNode = Duct( DuctNum ).OutletNodeNum;
-		// Set the outlet air node conditions of the duct
-		Node( OutNode ).MassFlowRate = Node( InNode ).MassFlowRate;
-		Node( OutNode ).Temp = Node( InNode ).Temp;
-		Node( OutNode ).HumRat = Node( InNode ).HumRat;
-		Node( OutNode ).Enthalpy = Node( InNode ).Enthalpy;
-		Node( OutNode ).Quality = Node( InNode ).Quality;
-		Node( OutNode ).Press = Node( InNode ).Press;
-		Node( OutNode ).MassFlowRateMin = Node( InNode ).MassFlowRateMin;
-		Node( OutNode ).MassFlowRateMax = Node( InNode ).MassFlowRateMax;
-		Node( OutNode ).MassFlowRateMinAvail = Node( InNode ).MassFlowRateMinAvail;
-		Node( OutNode ).MassFlowRateMaxAvail = Node( InNode ).MassFlowRateMaxAvail;
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        // na
+    }
 
-		if ( Contaminant.CO2Simulation ) {
-			Node( OutNode ).CO2 = Node( InNode ).CO2;
-		}
+} // namespace HVACDuct
 
-		if ( Contaminant.GenericContamSimulation ) {
-			Node( OutNode ).GenContam = Node( InNode ).GenContam;
-		}
-
-	}
-
-	void
-	ReportDuct( int const EP_UNUSED( DuctNum ) ) // number of the current duct being simulated !unused1208
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl
-		//       DATE WRITTEN   17May2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Fill remaining report variables
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-	}
-
-} // HVACDuct
-
-} // EnergyPlus
+} // namespace EnergyPlus

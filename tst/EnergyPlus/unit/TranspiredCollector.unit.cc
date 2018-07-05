@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,8 +58,8 @@
 
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -68,7 +68,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
-
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -88,168 +87,169 @@ using namespace EnergyPlus::HeatBalanceManager;
 
 using DataGlobals::BeginEnvrnFlag;
 
-TEST_F( EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest ) {
-	// Issue #6082
-	bool ErrorsFound = false;
-	int UTSCNum( 1 );
+TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
+{
+    // Issue #6082
+    bool ErrorsFound = false;
+    int UTSCNum(1);
 
-	std::string const idf_objects = delimited_string( {
+    std::string const idf_objects = delimited_string({
 
-		"  Version,8.8;",
+        "  Version,8.9;",
 
-		"  Zone,",
-		"    ZN1_S_Space_1,           !- Name",
-		"    0,                       !- Direction of Relative North {deg}",
-		"    0.000,                   !- X Origin {m}",
-		"    0.000,                   !- Y Origin {m}",
-		"    0.000,                   !- Z Origin {m}",
-		"    1,                       !- Type",
-		"    1.000,                   !- Multiplier",
-		"    3.000,                   !- Ceiling Height {m}",
-		"    644.812;                 !- Volume {m3}",
+        "  Zone,",
+        "    ZN1_S_Space_1,           !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0.000,                   !- X Origin {m}",
+        "    0.000,                   !- Y Origin {m}",
+        "    0.000,                   !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1.000,                   !- Multiplier",
+        "    3.000,                   !- Ceiling Height {m}",
+        "    644.812;                 !- Volume {m3}",
 
-		"  Material,",
-		"    4 in Prefab Stone Wall,  !- Name",
-		"    Smooth,                  !- Roughness",
-		"    0.1016,                  !- Thickness {m}",
-		"    0.858,                   !- Conductivity {W/m-K}",
-		"    1968,                    !- Density {kg/m3}",
-		"    836.8,                   !- Specific Heat {J/kg-K}",
-		"    0.9,                     !- Thermal Absorptance",
-		"    0.7,                     !- Solar Absorptance",
-		"    0.7;                     !- Visible Absorptance",
+        "  Material,",
+        "    4 in Prefab Stone Wall,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    0.1016,                  !- Thickness {m}",
+        "    0.858,                   !- Conductivity {W/m-K}",
+        "    1968,                    !- Density {kg/m3}",
+        "    836.8,                   !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
 
-		"  Construction,",
-		"    Ext-wall,                !- Name",
-		"    4 in Prefab Stone Wall;  !- Outside Layer",
+        "  Construction,",
+        "    Ext-wall,                !- Name",
+        "    4 in Prefab Stone Wall;  !- Outside Layer",
 
-		"  BuildingSurface:Detailed,",
-		"    ZN1_ExtWallSouth_1,      !- Name",
-		"    wall,                    !- Surface Type",
-		"    Ext-Wall,                !- Construction Name",
-		"    ZN1_S_Space_1,           !- Zone Name",
-		"    OtherSideConditionsModel,!- Outside Boundary Condition",
-		"    UTSC OSCM 1,             !- Outside Boundary Condition Object",
-		"    SunExposed,              !- Sun Exposure",
-		"    WindExposed,             !- Wind Exposure",
-		"    0.500,                   !- View Factor to Ground",
-		"    4,                       !- Number of Vertices",
-		"    0.000,0.000,3.000,       !- X,Y,Z ==> Vertex 1 {m}",
-		"    0.000,0.000,1.500,       !- X,Y,Z ==> Vertex 2 {m}",
-		"    50.000,0.000,1.500,      !- X,Y,Z ==> Vertex 3 {m}",
-		"    50.000,0.000,3.000;      !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    ZN1_ExtWallSouth_1,      !- Name",
+        "    wall,                    !- Surface Type",
+        "    Ext-Wall,                !- Construction Name",
+        "    ZN1_S_Space_1,           !- Zone Name",
+        "    OtherSideConditionsModel,!- Outside Boundary Condition",
+        "    UTSC OSCM 1,             !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.500,                   !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000,0.000,3.000,       !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.000,0.000,1.500,       !- X,Y,Z ==> Vertex 2 {m}",
+        "    50.000,0.000,1.500,      !- X,Y,Z ==> Vertex 3 {m}",
+        "    50.000,0.000,3.000;      !- X,Y,Z ==> Vertex 4 {m}",
 
-		"  BuildingSurface:Detailed,",
-		"    ZN1_ExtWallSouth_2,      !- Name",
-		"    wall,                    !- Surface Type",
-		"    Ext-Wall,                !- Construction Name",
-		"    ZN1_S_Space_1,           !- Zone Name",
-		"    OtherSideConditionsModel,!- Outside Boundary Condition",
-		"    UTSC OSCM 1,             !- Outside Boundary Condition Object",
-		"    SunExposed,              !- Sun Exposure",
-		"    WindExposed,             !- Wind Exposure",
-		"    0.500,                   !- View Factor to Ground",
-		"    4,                       !- Number of Vertices",
-		"    0.000,0.000,1.500,       !- X,Y,Z ==> Vertex 1 {m}",
-		"    0.000,0.000,0.000,       !- X,Y,Z ==> Vertex 2 {m}",
-		"    50.000,0.000,0.000,      !- X,Y,Z ==> Vertex 3 {m}",
-		"    50.000,0.000,1.500;      !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    ZN1_ExtWallSouth_2,      !- Name",
+        "    wall,                    !- Surface Type",
+        "    Ext-Wall,                !- Construction Name",
+        "    ZN1_S_Space_1,           !- Zone Name",
+        "    OtherSideConditionsModel,!- Outside Boundary Condition",
+        "    UTSC OSCM 1,             !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.500,                   !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000,0.000,1.500,       !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.000,0.000,0.000,       !- X,Y,Z ==> Vertex 2 {m}",
+        "    50.000,0.000,0.000,      !- X,Y,Z ==> Vertex 3 {m}",
+        "    50.000,0.000,1.500;      !- X,Y,Z ==> Vertex 4 {m}",
 
-		"  SurfaceProperty:OtherSideConditionsModel,",
-		"    UTSC OSCM 1,             !- Name",
-		"    GapConvectionRadiation;  !- Type of Modeling",
+        "  SurfaceProperty:OtherSideConditionsModel,",
+        "    UTSC OSCM 1,             !- Name",
+        "    GapConvectionRadiation;  !- Type of Modeling",
 
-		"  Schedule:Compact,",
-		"    HeatingAvailSched,       !- Name",
-		"    Fraction,                !- Schedule Type Limits Name",
-		"    Through: 12/31,          !- Field 1",
-		"    For: AllDays,            !- Field 2",
-		"    Until: 24:00,1.0;        !- Field 3",
+        "  Schedule:Compact,",
+        "    HeatingAvailSched,       !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
 
-		"  Schedule:Compact,",
-		"    ShopFreeHeatingSetpoints,!- Name",
-		"    Temperature,             !- Schedule Type Limits Name",
-		"    Through: 12/31,          !- Field 1",
-		"    For: AllDays,            !- Field 2",
-		"    Until: 24:00,21.0;       !- Field 3",
+        "  Schedule:Compact,",
+        "    ShopFreeHeatingSetpoints,!- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,21.0;       !- Field 3",
 
-		"  SolarCollector:UnglazedTranspired,",
-		"    OFFICE OA UTSC,          !- Name",
-		"    UTSC OSCM 1,             !- Boundary Conditions Model Name",
-		"    HeatingAvailSched,       !- Availability Schedule Name",
-		"    InletNodeName,           !- Inlet Node Name",
-		"    OutletNodeName,          !- Outlet Node Name",
-		"    OutletNodeName,          !- Setpoint Node Name",
-		"    ZN1_S_Space_1,           !- Zone Node Name",
-		"    ShopFreeHeatingSetpoints,!- Free Heating Setpoint Schedule Name",
-		"    0.001,                   !- Diameter of Perforations in Collector {m}",
-		"    0.020,                   !- Distance Between Perforations in Collector {m}",
-		"    0.9,                     !- Thermal Emissivity of Collector Surface {dimensionless}",
-		"    0.9,                     !- Solar Absorbtivity of Collector Surface {dimensionless}",
-		"    4.0,                     !- Effective Overall Height of Collector",
-		"    0.1,                     !- Effective Gap Thickness of Plenum Behind Collector {m}",
-		"    5.0,                     !- Effective Cross Section Area of Plenum Behind Collector {m2}",
-		"    Triangle,                !- Hole Layout Pattern for Pitch",
-		"    Kutscher1994,            !- Heat Exchange Effectiveness Correlation",
-		"    1.165,                   !- Ratio of Actual Collector Surface Area to Projected Surface Area {dimensionless}",
-		"    MediumRough,             !- Roughness of Collector",
-		"    0.001,                   !- Collector Thickness {m}",
-		"    0.25,                    !- Effectiveness for Perforations with Respect to Wind {dimensionless}",
-		"    0.5,                     !- Discharge Coefficient for Openings with Respect to Buoyancy Driven Flow {dimensionless}",
-		"    ZN1_ExtWallSouth_1,      !- Surface 1 Name",
-		"    ZN1_ExtWallSouth_2;      !- Surface 2 Name",
+        "  SolarCollector:UnglazedTranspired,",
+        "    OFFICE OA UTSC,          !- Name",
+        "    UTSC OSCM 1,             !- Boundary Conditions Model Name",
+        "    HeatingAvailSched,       !- Availability Schedule Name",
+        "    InletNodeName,           !- Inlet Node Name",
+        "    OutletNodeName,          !- Outlet Node Name",
+        "    OutletNodeName,          !- Setpoint Node Name",
+        "    ZN1_S_Space_1,           !- Zone Node Name",
+        "    ShopFreeHeatingSetpoints,!- Free Heating Setpoint Schedule Name",
+        "    0.001,                   !- Diameter of Perforations in Collector {m}",
+        "    0.020,                   !- Distance Between Perforations in Collector {m}",
+        "    0.9,                     !- Thermal Emissivity of Collector Surface {dimensionless}",
+        "    0.9,                     !- Solar Absorbtivity of Collector Surface {dimensionless}",
+        "    4.0,                     !- Effective Overall Height of Collector",
+        "    0.1,                     !- Effective Gap Thickness of Plenum Behind Collector {m}",
+        "    5.0,                     !- Effective Cross Section Area of Plenum Behind Collector {m2}",
+        "    Triangle,                !- Hole Layout Pattern for Pitch",
+        "    Kutscher1994,            !- Heat Exchange Effectiveness Correlation",
+        "    1.165,                   !- Ratio of Actual Collector Surface Area to Projected Surface Area {dimensionless}",
+        "    MediumRough,             !- Roughness of Collector",
+        "    0.001,                   !- Collector Thickness {m}",
+        "    0.25,                    !- Effectiveness for Perforations with Respect to Wind {dimensionless}",
+        "    0.5,                     !- Discharge Coefficient for Openings with Respect to Buoyancy Driven Flow {dimensionless}",
+        "    ZN1_ExtWallSouth_1,      !- Surface 1 Name",
+        "    ZN1_ExtWallSouth_2;      !- Surface 2 Name",
 
-	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	DataGlobals::NumOfTimeStepInHour = 1;
-	DataGlobals::MinutesPerTimeStep = 60;
-	ScheduleManager::ProcessScheduleInput();
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput();
 
-	GetProjectControlData( ErrorsFound ); // read project control data
-	EXPECT_FALSE( ErrorsFound );
+    GetProjectControlData(ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);
 
-	GetZoneData( ErrorsFound );
-	GetZoneEquipmentData();
+    GetZoneData(ErrorsFound);
+    GetZoneEquipmentData();
 
-	GetMaterialData( ErrorsFound ); // read material data
-	EXPECT_FALSE( ErrorsFound ); // expect no errors
+    GetMaterialData(ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-	GetConstructData( ErrorsFound ); // read construction data
-	EXPECT_FALSE( ErrorsFound ); // expect no errors
+    GetConstructData(ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-	GetZoneData( ErrorsFound ); // read zone data
-	EXPECT_FALSE( ErrorsFound ); // expect no errors
+    GetZoneData(ErrorsFound);  // read zone data
+    EXPECT_FALSE(ErrorsFound); // expect no errors
 
-	CosZoneRelNorth.allocate( 1 );
-	SinZoneRelNorth.allocate( 1 );
+    CosZoneRelNorth.allocate(1);
+    SinZoneRelNorth.allocate(1);
 
-	CosZoneRelNorth( 1 ) = std::cos( -Zone( 1 ).RelNorth * DataGlobals::DegToRadians );
-	SinZoneRelNorth( 1 ) = std::sin( -Zone( 1 ).RelNorth * DataGlobals::DegToRadians );
-	CosBldgRelNorth = 1.0;
-	SinBldgRelNorth = 0.0;
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosBldgRelNorth = 1.0;
+    SinBldgRelNorth = 0.0;
 
-	GetSurfaceData( ErrorsFound ); // setup zone geometry and get zone data
-	EXPECT_FALSE( ErrorsFound ); // expect no errors
+    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
+    EXPECT_FALSE(ErrorsFound);   // expect no errors
 
-	DataEnvironment::OutDryBulbTemp = 20.0;
-	DataEnvironment::OutWetBulbTemp = 15.0;
+    DataEnvironment::OutDryBulbTemp = 20.0;
+    DataEnvironment::OutWetBulbTemp = 15.0;
 
-	SetSurfaceOutBulbTempAt();
+    SetSurfaceOutBulbTempAt();
 
-	InitializePsychRoutines();
+    InitializePsychRoutines();
 
-	GetTranspiredCollectorInput();
-	EXPECT_FALSE( ErrorsFound );
+    GetTranspiredCollectorInput();
+    EXPECT_FALSE(ErrorsFound);
 
-	BeginEnvrnFlag = true;
-	OutBaroPress = 101325.0;
-	SkyTemp = 24.0;
-	IsRain = false;
+    BeginEnvrnFlag = true;
+    OutBaroPress = 101325.0;
+    SkyTemp = 24.0;
+    IsRain = false;
 
-	InitTranspiredCollector( UTSCNum );
+    InitTranspiredCollector(UTSCNum);
 
-	EXPECT_DOUBLE_EQ( 22.0, UTSC( UTSCNum ).Tcoll );
-	EXPECT_DOUBLE_EQ( 22.5, UTSC( UTSCNum ).Tplen );
-	EXPECT_NEAR( 19.990, 	UTSC( UTSCNum ).TairHX, 0.001 );
+    EXPECT_DOUBLE_EQ(22.0, UTSC(UTSCNum).Tcoll);
+    EXPECT_DOUBLE_EQ(22.5, UTSC(UTSCNum).Tplen);
+    EXPECT_NEAR(19.990, UTSC(UTSCNum).TairHX, 0.001);
 }

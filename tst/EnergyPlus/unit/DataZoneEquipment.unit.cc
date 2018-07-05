@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,13 +51,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
+#include <DataContaminantBalance.hh>
+#include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataSizing.hh>
-#include <DataContaminantBalance.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <ScheduleManager.hh>
-#include <DataEnvironment.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -65,95 +65,94 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace ObjexxFCL;
 
-TEST_F( EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone )
+TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
 {
 
-	NumOfZones = 2;
-	ZoneEquipConfig.allocate( NumOfZones ); 
+    NumOfZones = 2;
+    ZoneEquipConfig.allocate(NumOfZones);
 
-	ZoneEquipConfig( 1 ).ZoneName = "Zone1";
-	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	ZoneEquipConfig( 1 ).ZoneNode = 1;
+    ZoneEquipConfig(1).ZoneName = "Zone1";
+    ZoneEquipConfig(1).ActualZoneNum = 1;
+    ZoneEquipConfig(1).ZoneNode = 1;
 
-	ZoneEquipConfig( 2 ).ZoneName = "Zone2";
-	ZoneEquipConfig( 2 ).ActualZoneNum = 2;
-	ZoneEquipConfig( 2 ).ZoneNode = 2;
+    ZoneEquipConfig(2).ZoneName = "Zone2";
+    ZoneEquipConfig(2).ActualZoneNum = 2;
+    ZoneEquipConfig(2).ZoneNode = 2;
 
-	ZoneEquipInputsFilled = true;
+    ZoneEquipInputsFilled = true;
 
-	EXPECT_EQ( 0, GetSystemNodeNumberForZone( "NonExistingZone" ) );
-	EXPECT_EQ( 1, GetSystemNodeNumberForZone( "Zone1" ) );
+    EXPECT_EQ(0, GetSystemNodeNumberForZone("NonExistingZone"));
+    EXPECT_EQ(1, GetSystemNodeNumberForZone("Zone1"));
 
-	ZoneEquipConfig.deallocate();
+    ZoneEquipConfig.deallocate();
 }
 
-TEST_F( EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAir )
+TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAir)
 {
-	// #6225
+    // #6225
 
-	DataHeatBalance::Zone.allocate( 1 );
-	DataSizing::OARequirements.allocate( 1 );
-	DataHeatBalance::ZoneIntGain.allocate( 1 );
-	DataHeatBalance::People.allocate( 1 );
-	ScheduleManager::Schedule.allocate( 2 );
-	DataContaminantBalance::ZoneCO2GainFromPeople.allocate( 1 );
-	DataContaminantBalance::ZoneAirCO2.allocate( 1 );
-	DataContaminantBalance::ZoneSysContDemand.allocate( 1 );
+    DataHeatBalance::Zone.allocate(1);
+    DataSizing::OARequirements.allocate(1);
+    DataHeatBalance::ZoneIntGain.allocate(1);
+    DataHeatBalance::People.allocate(1);
+    ScheduleManager::Schedule.allocate(2);
+    DataContaminantBalance::ZoneCO2GainFromPeople.allocate(1);
+    DataContaminantBalance::ZoneAirCO2.allocate(1);
+    DataContaminantBalance::ZoneSysContDemand.allocate(1);
 
-	DataEnvironment::StdRhoAir = 1.20;
+    DataEnvironment::StdRhoAir = 1.20;
 
-	DataHeatBalance::Zone( 1 ).FloorArea = 10.0;
-	DataHeatBalance::Zone( 1 ).TotOccupants = 5.0;
-	DataHeatBalance::Zone( 1 ).ZoneContamControllerSchedIndex = 1;
-	DataHeatBalance::People( 1 ).ZonePtr = 1;
-	DataHeatBalance::TotPeople = 1;
-	DataHeatBalance::People( 1 ).ActivityLevelPtr = 2;
-	DataHeatBalance::People( 1 ).CO2RateFactor = 3.82e-8;
-	DataHeatBalance::People( 1 ).NumberOfPeople = DataHeatBalance::Zone( 1 ).TotOccupants;
+    DataHeatBalance::Zone(1).FloorArea = 10.0;
+    DataHeatBalance::Zone(1).TotOccupants = 5.0;
+    DataHeatBalance::Zone(1).ZoneContamControllerSchedIndex = 1;
+    DataHeatBalance::People(1).ZonePtr = 1;
+    DataHeatBalance::TotPeople = 1;
+    DataHeatBalance::People(1).ActivityLevelPtr = 2;
+    DataHeatBalance::People(1).CO2RateFactor = 3.82e-8;
+    DataHeatBalance::People(1).NumberOfPeople = DataHeatBalance::Zone(1).TotOccupants;
 
-	DataContaminantBalance::Contaminant.CO2Simulation = true;
-	DataContaminantBalance::OutdoorCO2 = 400.0;
-	DataContaminantBalance::ZoneCO2GainFromPeople( 1 ) = 3.82E-8 * 5.0;
+    DataContaminantBalance::Contaminant.CO2Simulation = true;
+    DataContaminantBalance::OutdoorCO2 = 400.0;
+    DataContaminantBalance::ZoneCO2GainFromPeople(1) = 3.82E-8 * 5.0;
 
-	DataSizing::NumOARequirements = 1;
-	DataSizing::OARequirements( 1 ).Name = "ZONE OA";
-	DataSizing::OARequirements( 1 ).OAFlowMethod = DataSizing::ZOAM_ProportionalControlSchOcc;
-	DataSizing::OARequirements( 1 ).OAFlowPerPerson = 0.002;
-	DataSizing::OARequirements( 1 ).OAFlowPerArea = 0.003;
-	DataHeatBalance::ZoneIntGain( 1 ).NOFOCC = 0.5;
-	ScheduleManager::Schedule( 1 ).CurrentValue = 1.0;
-	ScheduleManager::Schedule( 2 ).CurrentValue = 131.881995;
+    DataSizing::NumOARequirements = 1;
+    DataSizing::OARequirements(1).Name = "ZONE OA";
+    DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_ProportionalControlSchOcc;
+    DataSizing::OARequirements(1).OAFlowPerPerson = 0.002;
+    DataSizing::OARequirements(1).OAFlowPerArea = 0.003;
+    DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.5;
+    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    ScheduleManager::Schedule(2).CurrentValue = 131.881995;
 
-	Real64 OAVolumeFlowRate;
-	// Test ZOAM_ProportionalControlSchOcc
-	DataContaminantBalance::ZoneAirCO2( 1 ) = 500.0;
-	OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( 1, 1, false, false );
-	EXPECT_NEAR( 0.031, OAVolumeFlowRate, 0.00001 );
+    Real64 OAVolumeFlowRate;
+    // Test ZOAM_ProportionalControlSchOcc
+    DataContaminantBalance::ZoneAirCO2(1) = 500.0;
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    EXPECT_NEAR(0.031, OAVolumeFlowRate, 0.00001);
 
-	DataContaminantBalance::ZoneAirCO2( 1 ) = 405.0;
-	OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( 1, 1, false, false );
-	EXPECT_NEAR( 0.0308115, OAVolumeFlowRate, 0.00001 );
+    DataContaminantBalance::ZoneAirCO2(1) = 405.0;
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    EXPECT_NEAR(0.0308115, OAVolumeFlowRate, 0.00001);
 
-	// Test ZOAM_ProportionalControlDesOcc
-	DataContaminantBalance::ZoneAirCO2( 1 ) = 500.0;
-	DataSizing::OARequirements( 1 ).OAFlowMethod = DataSizing::ZOAM_ProportionalControlDesOcc;
-	OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( 1, 1, false, false );
-	EXPECT_NEAR( 0.0315879, OAVolumeFlowRate, 0.00001 );
+    // Test ZOAM_ProportionalControlDesOcc
+    DataContaminantBalance::ZoneAirCO2(1) = 500.0;
+    DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_ProportionalControlDesOcc;
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    EXPECT_NEAR(0.0315879, OAVolumeFlowRate, 0.00001);
 
-	// Test ZOAM_IAQP
-	DataSizing::OARequirements( 1 ).OAFlowMethod = DataSizing::ZOAM_IAQP;
-	DataContaminantBalance::ZoneSysContDemand( 1 ).OutputRequiredToCO2SP = 0.2 * DataEnvironment::StdRhoAir;
-	OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( 1, 1, false, false );
-	EXPECT_NEAR( 0.2, OAVolumeFlowRate, 0.00001 );
+    // Test ZOAM_IAQP
+    DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_IAQP;
+    DataContaminantBalance::ZoneSysContDemand(1).OutputRequiredToCO2SP = 0.2 * DataEnvironment::StdRhoAir;
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    EXPECT_NEAR(0.2, OAVolumeFlowRate, 0.00001);
 
-	// Cleanup
-	DataHeatBalance::Zone.deallocate( );
-	DataSizing::OARequirements.deallocate( );
-	DataHeatBalance::ZoneIntGain.deallocate( );
-	ScheduleManager::Schedule.deallocate( );
-	DataHeatBalance::People.deallocate( );
-	DataContaminantBalance::ZoneCO2GainFromPeople.deallocate( );
-	DataContaminantBalance::ZoneAirCO2.deallocate( );
-	DataContaminantBalance::ZoneSysContDemand.deallocate( );
-
+    // Cleanup
+    DataHeatBalance::Zone.deallocate();
+    DataSizing::OARequirements.deallocate();
+    DataHeatBalance::ZoneIntGain.deallocate();
+    ScheduleManager::Schedule.deallocate();
+    DataHeatBalance::People.deallocate();
+    DataContaminantBalance::ZoneCO2GainFromPeople.deallocate();
+    DataContaminantBalance::ZoneAirCO2.deallocate();
+    DataContaminantBalance::ZoneSysContDemand.deallocate();
 }

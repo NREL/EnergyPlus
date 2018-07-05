@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,184 +52,135 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace ElectricBaseboardRadiator {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-	extern int const BaseboardRadiator_Electric;
-	extern std::string const cCMO_BBRadiator_Electric;
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    extern int const BaseboardRadiator_Electric;
+    extern std::string const cCMO_BBRadiator_Electric;
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	//MODULE VARIABLE DECLARATIONS:
-	extern int NumElecBaseboards;
-	extern Array1D< Real64 > QBBElecRadSource; // Need to keep the last value in case we are still iterating
-	extern Array1D< Real64 > QBBElecRadSrcAvg; // Need to keep the last value in case we are still iterating
-	extern Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-	// Record keeping variables used to calculate QBBRadSrcAvg locally
-	extern Array1D< Real64 > LastQBBElecRadSrc; // Need to keep the last value in case we are still iterating
-	extern Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	extern Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	extern Array1D_bool MySizeFlag;
-	extern Array1D_bool CheckEquipName;
-	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumElecBaseboards;
+    extern Array1D<Real64> QBBElecRadSource;     // Need to keep the last value in case we are still iterating
+    extern Array1D<Real64> QBBElecRadSrcAvg;     // Need to keep the last value in case we are still iterating
+    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    // Record keeping variables used to calculate QBBRadSrcAvg locally
+    extern Array1D<Real64> LastQBBElecRadSrc;  // Need to keep the last value in case we are still iterating
+    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    extern Array1D_bool MySizeFlag;
+    extern Array1D_bool CheckEquipName;
+    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
-	// Types
+    // Types
 
-	struct ElecBaseboardParams
-	{
-		// Members
-		std::string EquipName;
-		int EquipType;
-		std::string Schedule;
-		Array1D_string SurfaceName;
-		Array1D_int SurfacePtr;
-		int ZonePtr;
-		int SchedPtr;
-		int TotSurfToDistrib;
-		Real64 NominalCapacity;
-		Real64 BaseboardEfficiency;
-		Real64 AirInletTemp;
-		Real64 AirInletHumRat;
-		Real64 AirOutletTemp;
-		Real64 ElecUseLoad;
-		Real64 ElecUseRate;
-		Real64 FracRadiant;
-		Real64 FracConvect;
-		Real64 FracDistribPerson;
-		Real64 TotPower;
-		Real64 Power;
-		Real64 ConvPower;
-		Real64 RadPower;
-		Real64 TotEnergy;
-		Real64 Energy;
-		Real64 ConvEnergy;
-		Real64 RadEnergy;
-		Array1D< Real64 > FracDistribToSurf;
-		int HeatingCapMethod; // - Method for electric baseboard heating capacity scalable sizing calculation
-		Real64 ScaledHeatingCapacity; // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
+    struct ElecBaseboardParams
+    {
+        // Members
+        std::string EquipName;
+        int EquipType;
+        std::string Schedule;
+        Array1D_string SurfaceName;
+        Array1D_int SurfacePtr;
+        int ZonePtr;
+        int SchedPtr;
+        int TotSurfToDistrib;
+        Real64 NominalCapacity;
+        Real64 BaseboardEfficiency;
+        Real64 AirInletTemp;
+        Real64 AirInletHumRat;
+        Real64 AirOutletTemp;
+        Real64 ElecUseLoad;
+        Real64 ElecUseRate;
+        Real64 FracRadiant;
+        Real64 FracConvect;
+        Real64 FracDistribPerson;
+        Real64 TotPower;
+        Real64 Power;
+        Real64 ConvPower;
+        Real64 RadPower;
+        Real64 TotEnergy;
+        Real64 Energy;
+        Real64 ConvEnergy;
+        Real64 RadEnergy;
+        Array1D<Real64> FracDistribToSurf;
+        int HeatingCapMethod;         // - Method for electric baseboard heating capacity scalable sizing calculation
+        Real64 ScaledHeatingCapacity; // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
 
-		// Default Constructor
-		ElecBaseboardParams() :
-			EquipType( 0 ),
-			ZonePtr( 0 ),
-			SchedPtr( 0 ),
-			TotSurfToDistrib( 0 ),
-			NominalCapacity( 0.0 ),
-			BaseboardEfficiency( 0.0 ),
-			AirInletTemp( 0.0 ),
-			AirInletHumRat( 0.0 ),
-			AirOutletTemp( 0.0 ),
-			ElecUseLoad( 0.0 ),
-			ElecUseRate( 0.0 ),
-			FracRadiant( 0.0 ),
-			FracConvect( 0.0 ),
-			FracDistribPerson( 0.0 ),
-			TotPower( 0.0 ),
-			Power( 0.0 ),
-			ConvPower( 0.0 ),
-			RadPower( 0.0 ),
-			TotEnergy( 0.0 ),
-			Energy( 0.0 ),
-			ConvEnergy( 0.0 ),
-			RadEnergy( 0.0 ),
-			HeatingCapMethod( 0 ),
-			ScaledHeatingCapacity( 0.0 )
-		{}
+        // Default Constructor
+        ElecBaseboardParams()
+            : EquipType(0), ZonePtr(0), SchedPtr(0), TotSurfToDistrib(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0),
+              AirInletHumRat(0.0), AirOutletTemp(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0),
+              TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0),
+              HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
+        {
+        }
+    };
 
-	};
+    struct ElecBaseboardNumericFieldData
+    {
+        // Members
+        Array1D_string FieldNames;
 
-	struct ElecBaseboardNumericFieldData
-	{
-		// Members
-		Array1D_string FieldNames;
+        // Default Constructor
+        ElecBaseboardNumericFieldData()
+        {
+        }
+    };
 
-		// Default Constructor
-		ElecBaseboardNumericFieldData()
-		{}
+    // Object Data
+    extern Array1D<ElecBaseboardParams> ElecBaseboard;
+    extern Array1D<ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
 
-	};
+    // Functions
 
-	// Object Data
-	extern Array1D< ElecBaseboardParams > ElecBaseboard;
-	extern Array1D< ElecBaseboardNumericFieldData > ElecBaseboardNumericFields;
+    void SimElecBaseboard(std::string const &EquipName,
+                          int const ActualZoneNum,
+                          int const ControlledZoneNum,
+                          bool const FirstHVACIteration,
+                          Real64 &PowerMet,
+                          int &CompIndex);
 
-	// Functions
+    void GetElectricBaseboardInput();
 
-	void
-	SimElecBaseboard(
-		std::string const & EquipName,
-		int const ActualZoneNum,
-		int const ControlledZoneNum,
-		bool const FirstHVACIteration,
-		Real64 & PowerMet,
-		int & CompIndex
-	);
+    void InitElectricBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
-	void
-	GetElectricBaseboardInput();
+    void SizeElectricBaseboard(int const BaseboardNum);
 
-	void
-	InitElectricBaseboard(
-		int const BaseboardNum,
-		int const ControlledZoneNumSub,
-		bool const FirstHVACIteration
-	);
+    void CalcElectricBaseboard(int const BaseboardNum, int const ControlledZoneNum);
 
-	void
-	SizeElectricBaseboard( int const BaseboardNum );
+    void UpdateElectricBaseboardOff(Real64 &LoadMet,
+                                    Real64 &QBBCap,
+                                    Real64 &RadHeat,
+                                    Real64 &QBBElecRadSrc,
+                                    Real64 &ElecUseRate,
+                                    Real64 &AirOutletTemp,
+                                    Real64 const AirInletTemp);
 
-	void
-	CalcElectricBaseboard(
-		int const BaseboardNum,
-		int const ControlledZoneNum
-	);
-	
-	void
-	UpdateElectricBaseboardOff(
-		Real64 & LoadMet,
-		Real64 & QBBCap,
-		Real64 & RadHeat,
-		Real64 & QBBElecRadSrc,
-		Real64 & ElecUseRate,
-		Real64 & AirOutletTemp,
-		Real64 const AirInletTemp
-	);
+    void UpdateElectricBaseboardOn(
+        Real64 &AirOutletTemp, Real64 &ElecUseRate, Real64 const AirInletTemp, Real64 const QBBCap, Real64 const CapacitanceAir, Real64 const Effic);
 
-	void
-	UpdateElectricBaseboardOn(
-		Real64 & AirOutletTemp,
-		Real64 & ElecUseRate,
-		Real64 const AirInletTemp,
-		Real64 const QBBCap,
-		Real64 const CapacitanceAir,
-		Real64 const Effic
-	);
-	
-	void
-	UpdateElectricBaseboard( int const BaseboardNum );
+    void UpdateElectricBaseboard(int const BaseboardNum);
 
-	void
-	UpdateBBElecRadSourceValAvg( bool & ElecBaseboardSysOn ); // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBElecRadSourceValAvg(bool &ElecBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-	void
-	DistributeBBElecRadGains();
+    void DistributeBBElecRadGains();
 
-	void
-	ReportElectricBaseboard( int const BaseboardNum );
+    void ReportElectricBaseboard(int const BaseboardNum);
 
-	Real64
-	SumHATsurf( int const ZoneNum ); // Zone number
+    Real64 SumHATsurf(int const ZoneNum); // Zone number
 
-} // ElectricBaseboardRadiator
+} // namespace ElectricBaseboardRadiator
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

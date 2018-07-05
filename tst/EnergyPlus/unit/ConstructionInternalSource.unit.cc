@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,29 +60,29 @@ using namespace EnergyPlus;
 using namespace DataHeatBalance;
 using namespace HeatBalanceManager;
 
-TEST_F( EnergyPlusFixture, ConstructionInternalSource )
+TEST_F(EnergyPlusFixture, ConstructionInternalSource)
 {
 
-	std::string const idf_objects = delimited_string({
-		"	Version,8.4;	",
-		"	Construction:InternalSource,	",
-			"	Slab Floor with Radiant, !- Name",
-			"	4,                       !- Source Present After Layer Number",
-			"	4,                       !- Temperature Calculation Requested After Layer Number",
-			"	2,                       !- Dimensions for the CTF Calculation",
-			"	0.3048,                  !- Tube Spacing {m}",
-			"	CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
-			"	INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
-			"	GYP1,                    !- Layer 3",
-			"	GYP2,                    !- Layer 4",
-			"	FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5",
-	});
+    std::string const idf_objects = delimited_string({
+        "	Version,8.4;	",
+        "	Construction:InternalSource,	",
+        "	Slab Floor with Radiant, !- Name",
+        "	4,                       !- Source Present After Layer Number",
+        "	4,                       !- Temperature Calculation Requested After Layer Number",
+        "	2,                       !- Dimensions for the CTF Calculation",
+        "	0.3048,                  !- Tube Spacing {m}",
+        "	CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
+        "	INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
+        "	GYP1,                    !- Layer 3",
+        "	GYP2,                    !- Layer 4",
+        "	FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5",
+    });
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	bool errorsFound( false );
+    bool errorsFound(false);
 
-	GetConstructData( errorsFound );
+    GetConstructData(errorsFound);
 
-	EXPECT_NEAR( 0.1524, Construct( 1 ).ThicknessPerpend, 0.0001 );
+    EXPECT_NEAR(0.1524, Construct(1).ThicknessPerpend, 0.0001);
 }

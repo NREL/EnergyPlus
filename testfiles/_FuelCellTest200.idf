@@ -23,7 +23,7 @@
 
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Test Harness for MicroCogen,  !- Name
@@ -68,7 +68,7 @@
   Output:Diagnostics,
     DisplayAdvancedReportVariables;  !- Key 1
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -98,7 +98,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5Â°C MCWB=  23.0Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -207,7 +207,7 @@
     Garage inlet,            !- Zone Air Inlet Node or NodeList Name
     SOFC device air intakes, !- Zone Air Exhaust Node or NodeList Name
     Garage Air Node,         !- Zone Air Node Name
-    Garage return;           !- Zone Return Air Node Name
+    Garage return;           !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SOFC device air intakes, !- Name
@@ -216,6 +216,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

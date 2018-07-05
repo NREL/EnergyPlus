@@ -3,7 +3,7 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     anyplace Load Calc,      !- Name
@@ -620,10 +620,11 @@
     OSCTest-Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     OSCTest-ZoneAirNode,     !- Zone Air Node Name
-    OSCTest-ReturnAirNode;   !- Zone Return Air Node Name
+    OSCTest-ReturnAirNode;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Equipment-OSCTest,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     OSCTest-Air,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

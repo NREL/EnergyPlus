@@ -41,7 +41,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 5
 
-  Version,8.8;
+  Version,8.9;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -223,7 +223,7 @@
     -6.00,                   !- Time Zone {hr}
     190;                     !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -253,7 +253,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
+! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2Â°C WB=25.5Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name
@@ -1858,6 +1858,7 @@
 
   ZoneHVAC:EquipmentList,
     Back_Space Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Back_Space Direct Air,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1865,6 +1866,7 @@
 
   ZoneHVAC:EquipmentList,
     Core_Retail Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Core_Retail Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1872,6 +1874,7 @@
 
   ZoneHVAC:EquipmentList,
     Front_Entry Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     Front_Entry Unit Heater, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1879,6 +1882,7 @@
 
   ZoneHVAC:EquipmentList,
     Front_Retail Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Front_Retail Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1886,6 +1890,7 @@
 
   ZoneHVAC:EquipmentList,
     Point_Of_Sale Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Point_Of_Sale Direct Air,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2612,7 +2617,7 @@
     Back_Space Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Back_Space Air Node,     !- Zone Air Node Name
-    Back_Space Return Air Node Name;  !- Zone Return Air Node Name
+    Back_Space Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Core_Retail,             !- Zone Name
@@ -2620,7 +2625,7 @@
     Core_Retail Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Core_Retail Air Node,    !- Zone Air Node Name
-    Core_Retail Return Air Node Name;  !- Zone Return Air Node Name
+    Core_Retail Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Front_Entry,             !- Zone Name
@@ -2628,7 +2633,7 @@
     Front_Entry Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     Front_Entry Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Front_Entry Air Node,    !- Zone Air Node Name
-    Front_Entry Return Air Node Name;  !- Zone Return Air Node Name
+    Front_Entry Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Front_Retail,            !- Zone Name
@@ -2636,7 +2641,7 @@
     Front_Retail Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Front_Retail Air Node,   !- Zone Air Node Name
-    Front_Retail Return Air Node Name;  !- Zone Return Air Node Name
+    Front_Retail Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Point_Of_Sale,           !- Zone Name
@@ -2644,7 +2649,7 @@
     Point_Of_Sale Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Point_Of_Sale Air Node,  !- Zone Air Node Name
-    Point_Of_Sale Return Air Node Name;  !- Zone Return Air Node Name
+    Point_Of_Sale Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Back_Space Inlet Nodes,  !- Name
@@ -3481,7 +3486,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3498,7 +3503,7 @@
     0.058320;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3513,7 +3518,7 @@
     0.046965;                !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3521,7 +3526,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3529,7 +3534,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3537,7 +3542,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3545,7 +3550,7 @@
     -0.000370;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3553,7 +3558,7 @@
     -0.000031;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3561,7 +3566,7 @@
     -0.000216;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3569,7 +3574,7 @@
     0.000833;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand75kw,           !- Name
+    MinDemand75kw,           !- Utility Cost Qualify Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -3579,7 +3584,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -3605,7 +3610,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3622,7 +3627,7 @@
     0.041179;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3630,7 +3635,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3638,7 +3643,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3646,7 +3651,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3654,7 +3659,7 @@
     0.000021;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3662,7 +3667,7 @@
     0.000034;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3670,7 +3675,7 @@
     -0.000203;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3678,7 +3683,7 @@
     0.000807;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand75kw,           !- Name
+    MaxDemand75kw,           !- Utility Cost Qualify Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -3688,7 +3693,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -3712,7 +3717,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -3737,7 +3742,7 @@
     7.63;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5719,7 +5724,7 @@
     0.0,                     !- Cold Weather Operation Ancillary Power {W}
     PSZ-AC:1 Condenser Inlet Node,  !- Condenser Air Inlet Node Name
     PSZ-AC:1 Condenser Outlet Node,  !- Condenser Air Outlet Node Name
-    AutoSize,                !- Condenser Design Air Flow Rate {m3/s}
+    autocalculate,           !- Condenser Design Air Flow Rate {m3/s}
     1.25,                    !- Condenser Air Flow Sizing Factor
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
@@ -5885,13 +5890,16 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
-    0.5,                     !- Minimum Table Output
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6 
+	0.5,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
     Temperature,             !- Input Unit Type for X2
     Dimensionless,           !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     2,                       !- Number of Values for Independent Variable X1
@@ -6435,6 +6443,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.5,                     !- Minimum Table Output
     2.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -6442,6 +6452,7 @@
     Dimensionless,           !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     2,                       !- Number of Values for Independent Variable X1
@@ -7056,7 +7067,7 @@
     0.0,                     !- Cold Weather Operation Ancillary Power {W}
     PSZ-AC:2 Condenser Inlet Node,  !- Condenser Air Inlet Node Name
     PSZ-AC:2 Condenser Outlet Node,  !- Condenser Air Outlet Node Name
-    AutoSize,                !- Condenser Design Air Flow Rate {m3/s}
+    autocalculate,           !- Condenser Design Air Flow Rate {m3/s}
     1.25,                    !- Condenser Air Flow Sizing Factor
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
@@ -7216,7 +7227,7 @@
     0.0,                     !- Cold Weather Operation Ancillary Power {W}
     PSZ-AC:3 Condenser Inlet Node,  !- Condenser Air Inlet Node Name
     PSZ-AC:3 Condenser Outlet Node,  !- Condenser Air Outlet Node Name
-    AutoSize,                !- Condenser Design Air Flow Rate {m3/s}
+    autocalculate,           !- Condenser Design Air Flow Rate {m3/s}
     1.25,                    !- Condenser Air Flow Sizing Factor
     EvaporativelyCooled,     !- Condenser Type
     0.7,                     !- Evaporative Condenser Effectiveness {dimensionless}
@@ -7362,7 +7373,7 @@
     0.0,                     !- Cold Weather Operation Ancillary Power {W}
     PSZ-AC:4 Condenser Inlet Node,  !- Condenser Air Inlet Node Name
     PSZ-AC:4 Condenser Outlet Node,  !- Condenser Air Outlet Node Name
-    AutoSize,                !- Condenser Design Air Flow Rate {m3/s}
+    autocalculate,           !- Condenser Design Air Flow Rate {m3/s}
     1.25,                    !- Condenser Air Flow Sizing Factor
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
@@ -7459,6 +7470,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7466,6 +7479,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7556,6 +7570,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.5,                     !- Minimum Table Output
     1.7,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7563,6 +7579,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7628,6 +7645,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.7,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7635,6 +7654,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7712,6 +7732,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.8,                     !- Minimum Table Output
     1.27,                    !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7719,6 +7741,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7796,6 +7819,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.6,                     !- Minimum Table Output
     1.6,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7803,6 +7828,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7893,6 +7919,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7900,6 +7928,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -8078,6 +8107,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -8085,6 +8116,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -8150,6 +8182,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -8157,6 +8191,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1

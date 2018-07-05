@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,133 +49,109 @@
 #define ThermalChimney_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace ThermalChimney {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// DERIVED TYPE DEFINITIONS
+    // Data
+    // DERIVED TYPE DEFINITIONS
 
-	extern int TotThermalChimney; // Total ThermalChimney Statements in input
+    extern int TotThermalChimney; // Total ThermalChimney Statements in input
 
-	// Subroutine Specifications for the Heat Balance Module
-	// Driver Routines
-	// Get Input routines for module
-	// Algorithms for the module
-	// Reporting routines for module
-	// Utility routines for module
+    // Subroutine Specifications for the Heat Balance Module
+    // Driver Routines
+    // Get Input routines for module
+    // Algorithms for the module
+    // Reporting routines for module
+    // Utility routines for module
 
-	// Types
+    // Types
 
-	struct ThermalChimneyData
-	{
-		// Members
-		std::string Name;
-		int RealZonePtr;
-		std::string RealZoneName;
-		int SchedPtr;
-		std::string SchedName;
-		Real64 AbsorberWallWidth;
-		Real64 AirOutletCrossArea;
-		Real64 DischargeCoeff;
-		int TotZoneToDistrib;
-		Array1D_int ZonePtr;
-		Array1D_string ZoneName;
-		Array1D< Real64 > DistanceThermChimInlet;
-		Array1D< Real64 > RatioThermChimAirFlow;
-		Array1D< Real64 > EachAirInletCrossArea;
+    struct ThermalChimneyData
+    {
+        // Members
+        std::string Name;
+        int RealZonePtr;
+        std::string RealZoneName;
+        int SchedPtr;
+        std::string SchedName;
+        Real64 AbsorberWallWidth;
+        Real64 AirOutletCrossArea;
+        Real64 DischargeCoeff;
+        int TotZoneToDistrib;
+        Array1D_int ZonePtr;
+        Array1D_string ZoneName;
+        Array1D<Real64> DistanceThermChimInlet;
+        Array1D<Real64> RatioThermChimAirFlow;
+        Array1D<Real64> EachAirInletCrossArea;
 
-		// Default Constructor
-		ThermalChimneyData() :
-			RealZonePtr( 0 ),
-			SchedPtr( 0 ),
-			AbsorberWallWidth( 0.0 ),
-			AirOutletCrossArea( 0.0 ),
-			DischargeCoeff( 0.0 ),
-			TotZoneToDistrib( 0 )
-		{}
+        // Default Constructor
+        ThermalChimneyData() : RealZonePtr(0), SchedPtr(0), AbsorberWallWidth(0.0), AirOutletCrossArea(0.0), DischargeCoeff(0.0), TotZoneToDistrib(0)
+        {
+        }
+    };
 
-	};
+    struct ThermChimZnReportVars
+    {
+        // Members
+        Real64 ThermalChimneyHeatLoss; // Heat Gain {Joules} due to ThermalChimney
+        Real64 ThermalChimneyHeatGain; // Heat Loss {Joules} due to ThermalChimney
+        Real64 ThermalChimneyVolume;   // Volume of Air {m3} due to ThermalChimney
+        Real64 ThermalChimneyMass;     // Mass of Air {kg} due to ThermalChimney
 
-	struct ThermChimZnReportVars
-	{
-		// Members
-		Real64 ThermalChimneyHeatLoss; // Heat Gain {Joules} due to ThermalChimney
-		Real64 ThermalChimneyHeatGain; // Heat Loss {Joules} due to ThermalChimney
-		Real64 ThermalChimneyVolume; // Volume of Air {m3} due to ThermalChimney
-		Real64 ThermalChimneyMass; // Mass of Air {kg} due to ThermalChimney
+        // Default Constructor
+        ThermChimZnReportVars() : ThermalChimneyHeatLoss(0.0), ThermalChimneyHeatGain(0.0), ThermalChimneyVolume(0.0), ThermalChimneyMass(0.0)
+        {
+        }
+    };
 
-		// Default Constructor
-		ThermChimZnReportVars() :
-			ThermalChimneyHeatLoss( 0.0 ),
-			ThermalChimneyHeatGain( 0.0 ),
-			ThermalChimneyVolume( 0.0 ),
-			ThermalChimneyMass( 0.0 )
-		{}
+    struct ThermChimReportVars
+    {
+        // Members
+        Real64 OverallTCVolumeFlow;      // Volume of Air {m3/s} due to ThermalChimney
+        Real64 OverallTCVolumeFlowStd;   // Volume of Air {m3/s} due to ThermalChimney at standard conditions
+        Real64 OverallTCMassFlow;        // Mass of Air {kg/s} due to ThermalChimney
+        Real64 OutletAirTempThermalChim; // Air Temp {C} of ThermalChimney
 
-	};
+        // Default Constructor
+        ThermChimReportVars() : OverallTCVolumeFlow(0.0), OverallTCVolumeFlowStd(0.0), OverallTCMassFlow(0.0), OutletAirTempThermalChim(0.0)
+        {
+        }
+    };
 
-	struct ThermChimReportVars
-	{
-		// Members
-		Real64 OverallTCVolumeFlow; // Volume of Air {m3/s} due to ThermalChimney
-		Real64 OverallTCVolumeFlowStd; // Volume of Air {m3/s} due to ThermalChimney at standard conditions
-		Real64 OverallTCMassFlow; // Mass of Air {kg/s} due to ThermalChimney
-		Real64 OutletAirTempThermalChim; // Air Temp {C} of ThermalChimney
+    // Object Data
+    extern Array1D<ThermalChimneyData> ThermalChimneySys;
+    extern Array1D<ThermChimZnReportVars> ZnRptThermChim;
+    extern Array1D<ThermChimReportVars> ThermalChimneyReport;
 
-		// Default Constructor
-		ThermChimReportVars() :
-			OverallTCVolumeFlow( 0.0 ),
-			OverallTCVolumeFlowStd( 0.0 ),
-			OverallTCMassFlow( 0.0 ),
-			OutletAirTempThermalChim( 0.0 )
-		{}
+    // Functions
 
-	};
+    void ManageThermalChimney();
 
-	// Object Data
-	extern Array1D< ThermalChimneyData > ThermalChimneySys;
-	extern Array1D< ThermChimZnReportVars > ZnRptThermChim;
-	extern Array1D< ThermChimReportVars > ThermalChimneyReport;
+    void GetThermalChimney(bool &ErrorsFound); // If errors found in input
 
-	// Functions
+    void CalcThermalChimney();
 
-	void
-	ManageThermalChimney();
+    void ReportThermalChimney();
 
-	void
-	GetThermalChimney( bool & ErrorsFound ); // If errors found in input
+    void GaussElimination(Array2A<Real64> EquaCoef, Array1A<Real64> EquaConst, Array1A<Real64> ThermChimSubTemp, int const NTC);
 
-	void
-	CalcThermalChimney();
+    //        End of Module Subroutines for ThermalChimney
 
-	void
-	ReportThermalChimney();
+    //*****************************************************************************************
 
-	void
-	GaussElimination(
-		Array2A< Real64 > EquaCoef,
-		Array1A< Real64 > EquaConst,
-		Array1A< Real64 > ThermChimSubTemp,
-		int const NTC
-	);
+} // namespace ThermalChimney
 
-	//        End of Module Subroutines for ThermalChimney
-
-	//*****************************************************************************************
-
-} // ThermalChimney
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

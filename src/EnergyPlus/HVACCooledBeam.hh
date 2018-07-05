@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,198 +52,149 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace HVACCooledBeam {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	extern int const Passive_Cooled_Beam;
-	extern int const Active_Cooled_Beam;
-	extern Real64 const NomMassFlowPerBeam; // nominal water mass flow rate per beam [kg/s]
-	extern Real64 const MinWaterVel; // minimum water velocity [m/s]
-	extern Real64 const Coeff2;
-	// DERIVED TYPE DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    extern int const Passive_Cooled_Beam;
+    extern int const Active_Cooled_Beam;
+    extern Real64 const NomMassFlowPerBeam; // nominal water mass flow rate per beam [kg/s]
+    extern Real64 const MinWaterVel;        // minimum water velocity [m/s]
+    extern Real64 const Coeff2;
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array1D_bool CheckEquipName;
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array1D_bool CheckEquipName;
 
-	// INTEGER :: NumPassiveCB = 0
-	// INTEGER :: NumActiveCB = 0
-	extern int NumCB;
+    // INTEGER :: NumPassiveCB = 0
+    // INTEGER :: NumActiveCB = 0
+    extern int NumCB;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACCooledBeam:
+    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACCooledBeam:
 
-	// Types
+    // Types
 
-	struct CoolBeamData
-	{
-		// Members
-		// input data
-		std::string Name; // name of unit
-		std::string UnitType; // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
-		int UnitType_Num; // index to type of unit = 1 (there's only 1 type so far)
-		std::string CBType; // type of cooled beam: active | passive
-		int CBType_Num; // index to type of cooled beam: passive=1; active=2
-		std::string Sched; // availability schedule
-		int SchedPtr; // index to schedule
-		Real64 MaxAirVolFlow; // m3/s (autosizable)
-		Real64 MaxAirMassFlow; // kg/s
-		Real64 MaxCoolWaterVolFlow; // m3/s
-		Real64 MaxCoolWaterMassFlow; // kg/s
-		int AirInNode; // unit air inlet node number
-		int AirOutNode; // unit air outlet node number
-		int CWInNode; // chilled water inlet node
-		int CWOutNode; // chilled water outlet node
-		int ADUNum; // index of corresponding air distribution unit
-		Real64 NumBeams; // number of beams in the zone
-		Real64 BeamLength; // length of individual beam [m]
-		Real64 DesInletWaterTemp; // design inlet water temperature [C]
-		Real64 DesOutletWaterTemp; // design outlet water Temperature [c]
-		Real64 CoilArea; // coil surface area per coil length [m2/m]
-		Real64 a; // model parameter a
-		Real64 n1; // model parameter n0
-		Real64 n2; // model parameter n1
-		Real64 n3; // model parameter n2
-		Real64 a0; // model parameter a0
-		Real64 K1; // model parameter K1
-		Real64 n; // model parameter n
-		Real64 Kin; // Coefficient of Induction Kin
-		Real64 InDiam; // Leaving Pipe Inside Diameter
-		// time step variables
-		Real64 TWIn; // current inlet water temperature [C]
-		Real64 TWOut; // current outlet water temperature [C]
-		Real64 EnthWaterOut; // current outlet water enthalpy [J/kg]
-		Real64 BeamFlow; // supply air flow per beam [m3/s]
-		Real64 CoolWaterMassFlow; // chilled water mass flow rate [kg/s]
-		Real64 BeamCoolingEnergy; // Cooled beam cooling energy of all beams in the zone [J]
-		Real64 BeamCoolingRate; // Cooled beam cooling rate of all beams in the zone [W]
-		Real64 SupAirCoolingEnergy; // Total cooling energy from supply air [J]
-		Real64 SupAirCoolingRate; // Total cooling rate from supply air [W]
-		Real64 SupAirHeatingEnergy; // Total cooling energy from supply air [J]
-		Real64 SupAirHeatingRate; // Total cooling rate from supply air [W]
-		int CWLoopNum; // cooling water plant loop index number
-		int CWLoopSideNum; // cooling water plant loop side index
-		int CWBranchNum; // cooling water plant loop branch index
-		int CWCompNum; // cooling water plant loop component index
-		int CBLoadReSimIndex;
-		int CBMassFlowReSimIndex;
-		int CBWaterOutletTempReSimIndex;
+    struct CoolBeamData
+    {
+        // Members
+        // input data
+        std::string Name;            // name of unit
+        std::string UnitType;        // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+        int UnitType_Num;            // index to type of unit = 1 (there's only 1 type so far)
+        std::string CBType;          // type of cooled beam: active | passive
+        int CBType_Num;              // index to type of cooled beam: passive=1; active=2
+        std::string Sched;           // availability schedule
+        int SchedPtr;                // index to schedule
+        Real64 MaxAirVolFlow;        // m3/s (autosizable)
+        Real64 MaxAirMassFlow;       // kg/s
+        Real64 MaxCoolWaterVolFlow;  // m3/s
+        Real64 MaxCoolWaterMassFlow; // kg/s
+        int AirInNode;               // unit air inlet node number
+        int AirOutNode;              // unit air outlet node number
+        int CWInNode;                // chilled water inlet node
+        int CWOutNode;               // chilled water outlet node
+        int ADUNum;                  // index of corresponding air distribution unit
+        Real64 NumBeams;             // number of beams in the zone
+        Real64 BeamLength;           // length of individual beam [m]
+        Real64 DesInletWaterTemp;    // design inlet water temperature [C]
+        Real64 DesOutletWaterTemp;   // design outlet water Temperature [c]
+        Real64 CoilArea;             // coil surface area per coil length [m2/m]
+        Real64 a;                    // model parameter a
+        Real64 n1;                   // model parameter n0
+        Real64 n2;                   // model parameter n1
+        Real64 n3;                   // model parameter n2
+        Real64 a0;                   // model parameter a0
+        Real64 K1;                   // model parameter K1
+        Real64 n;                    // model parameter n
+        Real64 Kin;                  // Coefficient of Induction Kin
+        Real64 InDiam;               // Leaving Pipe Inside Diameter
+        // time step variables
+        Real64 TWIn;                // current inlet water temperature [C]
+        Real64 TWOut;               // current outlet water temperature [C]
+        Real64 EnthWaterOut;        // current outlet water enthalpy [J/kg]
+        Real64 BeamFlow;            // supply air flow per beam [m3/s]
+        Real64 CoolWaterMassFlow;   // chilled water mass flow rate [kg/s]
+        Real64 BeamCoolingEnergy;   // Cooled beam cooling energy of all beams in the zone [J]
+        Real64 BeamCoolingRate;     // Cooled beam cooling rate of all beams in the zone [W]
+        Real64 SupAirCoolingEnergy; // Total cooling energy from supply air [J]
+        Real64 SupAirCoolingRate;   // Total cooling rate from supply air [W]
+        Real64 SupAirHeatingEnergy; // Total cooling energy from supply air [J]
+        Real64 SupAirHeatingRate;   // Total cooling rate from supply air [W]
+        int CWLoopNum;              // cooling water plant loop index number
+        int CWLoopSideNum;          // cooling water plant loop side index
+        int CWBranchNum;            // cooling water plant loop branch index
+        int CWCompNum;              // cooling water plant loop component index
+        int CBLoadReSimIndex;
+        int CBMassFlowReSimIndex;
+        int CBWaterOutletTempReSimIndex;
+        int CtrlZoneNum;         // control zone index
+        int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
+        int AirLoopNum;          // air loop index that terminal is attached to
 
-		// Default Constructor
-		CoolBeamData() :
-			UnitType_Num( 0 ),
-			CBType_Num( 0 ),
-			SchedPtr( 0 ),
-			MaxAirVolFlow( 0.0 ),
-			MaxAirMassFlow( 0.0 ),
-			MaxCoolWaterVolFlow( 0.0 ),
-			MaxCoolWaterMassFlow( 0.0 ),
-			AirInNode( 0 ),
-			AirOutNode( 0 ),
-			CWInNode( 0 ),
-			CWOutNode( 0 ),
-			ADUNum( 0 ),
-			NumBeams( 0.0 ),
-			BeamLength( 0.0 ),
-			DesInletWaterTemp( 0.0 ),
-			DesOutletWaterTemp( 0.0 ),
-			CoilArea( 0.0 ),
-			a( 0.0 ),
-			n1( 0.0 ),
-			n2( 0.0 ),
-			n3( 0.0 ),
-			a0( 0.0 ),
-			K1( 0.0 ),
-			n( 0.0 ),
-			Kin( 0.0 ),
-			InDiam( 0.0 ),
-			TWIn( 0.0 ),
-			TWOut( 0.0 ),
-			EnthWaterOut( 0.0 ),
-			BeamFlow( 0.0 ),
-			CoolWaterMassFlow( 0.0 ),
-			BeamCoolingEnergy( 0.0 ),
-			BeamCoolingRate( 0.0 ),
-			SupAirCoolingEnergy( 0.0 ),
-			SupAirCoolingRate( 0.0 ),
-			SupAirHeatingEnergy( 0.0 ),
-			SupAirHeatingRate( 0.0 ),
-			CWLoopNum( 0 ),
-			CWLoopSideNum( 0 ),
-			CWBranchNum( 0 ),
-			CWCompNum( 0 ),
-			CBLoadReSimIndex( 0 ),
-			CBMassFlowReSimIndex( 0 ),
-			CBWaterOutletTempReSimIndex( 0 )
-		{}
+        // Default Constructor
+        CoolBeamData()
+            : UnitType_Num(0), CBType_Num(0), SchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), MaxCoolWaterVolFlow(0.0),
+              MaxCoolWaterMassFlow(0.0), AirInNode(0), AirOutNode(0), CWInNode(0), CWOutNode(0), ADUNum(0), NumBeams(0.0), BeamLength(0.0),
+              DesInletWaterTemp(0.0), DesOutletWaterTemp(0.0), CoilArea(0.0), a(0.0), n1(0.0), n2(0.0), n3(0.0), a0(0.0), K1(0.0), n(0.0), Kin(0.0),
+              InDiam(0.0), TWIn(0.0), TWOut(0.0), EnthWaterOut(0.0), BeamFlow(0.0), CoolWaterMassFlow(0.0), BeamCoolingEnergy(0.0),
+              BeamCoolingRate(0.0), SupAirCoolingEnergy(0.0), SupAirCoolingRate(0.0), SupAirHeatingEnergy(0.0), SupAirHeatingRate(0.0), CWLoopNum(0),
+              CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CBLoadReSimIndex(0), CBMassFlowReSimIndex(0), CBWaterOutletTempReSimIndex(0),
+              CtrlZoneNum(0), ctrlZoneInNodeIndex(0), AirLoopNum(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<CoolBeamData> CoolBeam;
 
-	// Object Data
-	extern Array1D< CoolBeamData > CoolBeam;
+    // Functions
 
-	// Functions
+    void SimCoolBeam(std::string const &CompName,   // name of the cooled beam unit
+                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
+                     int const ZoneNum,             // index of zone served by the unit
+                     int const ZoneNodeNum,         // zone node number of zone served by the unit
+                     int &CompIndex,                // which cooled beam unit in data structure
+                     Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
+    );
 
-	void
-	SimCoolBeam(
-		std::string const & CompName, // name of the cooled beam unit
-		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
-		int const ZoneNum, // index of zone served by the unit
-		int const ZoneNodeNum, // zone node number of zone served by the unit
-		int & CompIndex, // which cooled beam unit in data structure
-		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
-	);
+    void GetCoolBeams();
 
-	void
-	GetCoolBeams();
+    void InitCoolBeam(int const CBNum,              // number of the current cooled beam unit being simulated
+                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
+    );
 
-	void
-	InitCoolBeam(
-		int const CBNum, // number of the current cooled beam unit being simulated
-		bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
-	);
+    void SizeCoolBeam(int const CBNum);
 
-	void
-	SizeCoolBeam( int const CBNum );
+    void ControlCoolBeam(int const CBNum,               // number of the current unit being simulated
+                         int const ZoneNum,             // number of zone being served
+                         int const ZoneNodeNum,         // zone node number
+                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                         Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
+    );
 
-	void
-	ControlCoolBeam(
-		int const CBNum, // number of the current unit being simulated
-		int const ZoneNum, // number of zone being served
-		int const ZoneNodeNum, // zone node number
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
-	);
+    void CalcCoolBeam(int const CBNum,     // Unit index
+                      int const ZoneNode,  // zone node number
+                      Real64 const CWFlow, // cold water flow [kg/s]
+                      Real64 &LoadMet,     // load met by unit [W]
+                      Real64 &TWOut        // chilled water outlet temperature [C]
+    );
 
-	void
-	CalcCoolBeam(
-		int const CBNum, // Unit index
-		int const ZoneNode, // zone node number
-		Real64 const CWFlow, // cold water flow [kg/s]
-		Real64 & LoadMet, // load met by unit [W]
-		Real64 & TWOut // chilled water outlet temperature [C]
-	);
+    Real64 CoolBeamResidual(Real64 const CWFlow, // cold water flow rate in kg/s
+                            Array1<Real64> const &Par);
 
-	Real64
-	CoolBeamResidual(
-		Real64 const CWFlow, // cold water flow rate in kg/s
-		Array1< Real64 > const & Par
-	);
+    void UpdateCoolBeam(int const CBNum);
 
-	void
-	UpdateCoolBeam( int const CBNum );
+    void ReportCoolBeam(int const CBNum);
 
-	void
-	ReportCoolBeam( int const CBNum );
+} // namespace HVACCooledBeam
 
-} // HVACCooledBeam
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

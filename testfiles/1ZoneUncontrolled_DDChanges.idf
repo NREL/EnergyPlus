@@ -14,8 +14,8 @@
 !
 ! Location:                Denver, CO
 !
-! Design Days:             Denver Centennial Golden_CO_USA Annual Heating 99%, MaxDB=-16°C
-!                          Denver Centennial Golden_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6°C MWB=15.5°C
+! Design Days:             Denver Centennial Golden_CO_USA Annual Heating 99%, MaxDB=-16Â°C
+!                          Denver Centennial Golden_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6Â°C MWB=15.5Â°C
 !                          Then, these design days with changes for relative humidity (schedule) and
 !                          range changes.  Also the two design days are duplicated for the solar model:
 !                          Zhang Huang aka IWEC2.  Then, the ability to add a Sky Temperature modifier is added.
@@ -91,7 +91,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,4;
 
@@ -567,7 +567,7 @@
   Schedule:Day:Interval,
     DaySchedule5,            !- Name
     Temperature,             !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     until: 24:00,            !- Time 1
     5;                       !- Value Until Time 1
 
@@ -1064,7 +1064,7 @@
   Schedule:Day:List,
     Example Weather Temp,    !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     19.55,                   !- Value 1
     20.1,                    !- <none>
@@ -1166,7 +1166,7 @@
   Schedule:Day:List,
     Example Weather Direct Solar,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     0,                       !- Value 1
     0,                       !- <none>
@@ -1268,7 +1268,7 @@
   Schedule:Day:List,
     Example Weather Diffuse Solar,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     0,                       !- Value 1
     0,                       !- <none>
@@ -1370,7 +1370,7 @@
   Schedule:Day:List,
     Example Weather Relative Humidity,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     82,                      !- Value 1
     81,                      !- <none>
@@ -1505,7 +1505,7 @@
   Schedule:Day:List,
     ListScheduleExample_int, !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     60,                      !- Minutes per Item
     1,                       !- Value 1
     2,                       !- <none>

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,67 +53,67 @@ namespace EnergyPlus {
 
 namespace DataDefineEquip {
 
-	// MODULE INFORMATION
-	//             AUTHOR:  Russ Taylor
-	//       DATE WRITTEN:  Sept 1997
+    // MODULE INFORMATION
+    //             AUTHOR:  Russ Taylor
+    //       DATE WRITTEN:  Sept 1997
 
-	// PURPOSE OF THIS MODULE:
-	// This module  contains the essential coil information that is needed by water and air
-	// loop managers as well as the coil simulations
+    // PURPOSE OF THIS MODULE:
+    // This module  contains the essential coil information that is needed by water and air
+    // loop managers as well as the coil simulations
 
-	// METHODOLOGY EMPLOYED:
-	// Needs description, as appropriate.
+    // METHODOLOGY EMPLOYED:
+    // Needs description, as appropriate.
 
-	// REFERENCES: none
+    // REFERENCES: none
 
-	// OTHER NOTES: none
+    // OTHER NOTES: none
 
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	//MODULE PARAMETER DEFINITIONS
-	int const MaxZoneAirComponents( 1 );
-	//INTEGER, PARAMETER :: MaxZoneAirControls = 4
-	// Equipment Types covered by ZoneAirLoopEquipment:
-	int const DualDuctConstVolume( 1 );
-	int const DualDuctVAV( 2 );
-	int const SingleDuctVAVReheat( 3 );
-	int const SingleDuctConstVolReheat( 4 );
-	int const SingleDuctVAVNoReheat( 5 );
-	int const SingleDuct_SeriesPIU_Reheat( 6 );
-	int const SingleDuct_ParallelPIU_Reheat( 7 );
-	int const SingleDuct_ConstVol_4PipeInduc( 8 );
-	int const SingleDuctVAVReheatVSFan( 9 );
-	int const SingleDuctCBVAVReheat( 10 );
-	int const SingleDuctCBVAVNoReheat( 11 );
-	int const SingleDuctConstVolCooledBeam( 12 );
-	int const DualDuctVAVOutdoorAir( 13 );
-	int const SingleDuctUserDefined( 14 );
-	int const SingleDuctATMixer( 15 );
-	int const SingleDuctConstVolFourPipeBeam( 16 );
+    // MODULE PARAMETER DEFINITIONS
+    int const MaxZoneAirComponents(1);
+    // INTEGER, PARAMETER :: MaxZoneAirControls = 4
+    // Equipment Types covered by ZoneAirLoopEquipment:
+    int const DualDuctConstVolume(1);
+    int const DualDuctVAV(2);
+    int const SingleDuctVAVReheat(3);
+    int const SingleDuctVAVNoReheat(4);
+    int const SingleDuctConstVolReheat(5);
+    int const SingleDuctConstVolNoReheat(6);
+    int const SingleDuct_SeriesPIU_Reheat(7);
+    int const SingleDuct_ParallelPIU_Reheat(8);
+    int const SingleDuct_ConstVol_4PipeInduc(9);
+    int const SingleDuctVAVReheatVSFan(10);
+    int const SingleDuctCBVAVReheat(11);
+    int const SingleDuctCBVAVNoReheat(12);
+    int const SingleDuctConstVolCooledBeam(13);
+    int const DualDuctVAVOutdoorAir(14);
+    int const SingleDuctUserDefined(15);
+    int const SingleDuctATMixer(16);
+    int const SingleDuctConstVolFourPipeBeam(17);
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	//MODULE VARIABLE DECLARATIONS:
-	// components of air system
-	int NumAirDistUnits( 0 );
+    // MODULE VARIABLE DECLARATIONS:
+    // components of air system
+    int NumAirDistUnits(0);
 
-	// Object Data
-	Array1D< ZoneAirEquip > AirDistUnit; // Used to specify zone related
+    // Object Data
+    Array1D<ZoneAirEquip> AirDistUnit; // Used to specify zone related
 
-	// Clears the global data in DataDefineEquip.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state()
-	{
-		NumAirDistUnits = 0;
-		AirDistUnit.deallocate();
-	}
+    // Clears the global data in DataDefineEquip.
+    // Needed for unit tests, should not be normally called.
+    void clear_state()
+    {
+        NumAirDistUnits = 0;
+        AirDistUnit.deallocate();
+    }
 
-} // DataDefineEquip
+} // namespace DataDefineEquip
 
-} // EnergyPlus
+} // namespace EnergyPlus

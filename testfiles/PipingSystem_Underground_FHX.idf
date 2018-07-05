@@ -53,7 +53,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     FHX House,               !- Name
@@ -765,10 +765,11 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone 2 Outlet Node,      !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Return Node;      !- Zone Return Air Node Name
+    Zone 2 Return Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 1 Object Type
     Zone2WTAHP,              !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -905,10 +906,11 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone 1 Outlet Node,      !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Return Node;      !- Zone Return Air Node Name
+    Zone 1 Return Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 1 Object Type
     Zone1WTAHP,              !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

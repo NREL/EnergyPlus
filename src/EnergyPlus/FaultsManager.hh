@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,407 +52,365 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace FaultsManager {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
+    // Data
+    // MODULE PARAMETER DEFINITIONS
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE TYPE DECLARATIONS:
+    // MODULE VARIABLE TYPE DECLARATIONS:
 
-	// ControllerTypeEnum
-	extern int const iController_AirEconomizer;
+    // ControllerTypeEnum
+    extern int const iController_AirEconomizer;
 
-	// Input methods for fouling coils
-	extern int const iFouledCoil_UARated;
-	extern int const iFouledCoil_FoulingFactor;
+    // Input methods for fouling coils
+    extern int const iFouledCoil_UARated;
+    extern int const iFouledCoil_FoulingFactor;
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int const NumFaultTypes;
-	extern int const NumFaultTypesEconomizer;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int const NumFaultTypes;
+    extern int const NumFaultTypesEconomizer;
 
-	// FaultTypeEnum
-	extern int const iFault_TemperatureSensorOffset_OutdoorAir;
-	extern int const iFault_HumiditySensorOffset_OutdoorAir;
-	extern int const iFault_EnthalpySensorOffset_OutdoorAir;
-	extern int const iFault_TemperatureSensorOffset_ReturnAir;
-	extern int const iFault_EnthalpySensorOffset_ReturnAir;
-	extern int const iFault_Fouling_Coil;
-	extern int const iFault_ThermostatOffset;
-	extern int const iFault_HumidistatOffset;
-	extern int const iFault_Fouling_AirFilter;
-	extern int const iFault_TemperatureSensorOffset_ChillerSupplyWater;
-	extern int const iFault_TemperatureSensorOffset_CondenserSupplyWater;
-	extern int const iFault_TemperatureSensorOffset_CoilSupplyAir;
-	extern int const iFault_Fouling_Tower;
-	extern int const iFault_Fouling_Boiler;
-	extern int const iFault_Fouling_Chiller;
-	extern int const iFault_Fouling_EvapCooler;
+    // FaultTypeEnum
+    extern int const iFault_TemperatureSensorOffset_OutdoorAir;
+    extern int const iFault_HumiditySensorOffset_OutdoorAir;
+    extern int const iFault_EnthalpySensorOffset_OutdoorAir;
+    extern int const iFault_TemperatureSensorOffset_ReturnAir;
+    extern int const iFault_EnthalpySensorOffset_ReturnAir;
+    extern int const iFault_Fouling_Coil;
+    extern int const iFault_ThermostatOffset;
+    extern int const iFault_HumidistatOffset;
+    extern int const iFault_Fouling_AirFilter;
+    extern int const iFault_TemperatureSensorOffset_ChillerSupplyWater;
+    extern int const iFault_TemperatureSensorOffset_CondenserSupplyWater;
+    extern int const iFault_TemperatureSensorOffset_CoilSupplyAir;
+    extern int const iFault_Fouling_Tower;
+    extern int const iFault_Fouling_Boiler;
+    extern int const iFault_Fouling_Chiller;
+    extern int const iFault_Fouling_EvapCooler;
 
-	// Types of faults under Group Operational Faults in IDD
-	//  1. Temperature sensor offset (FY14)
-	//  2. Humidity sensor offset (FY14)
-	//  3. Enthalpy sensor offset (FY14)
-	//  4. Fouling coils (FY14)
-	//  5. Thermostat offset (FY15)
-	//  6. Humidistat offset (FY15)
-	//  7. Fouling air filter (FY15)
-	//  8. Chiller Supply Water Temperature Sensor Offset (FY16)
-	//  9. Condenser Supply Water Temperature Sensor Offset (FY16)
-	//  10. Cooling Tower Scaling (FY16)
-	//  11. Coil Supply Air Temperature Sensor Offset (FY16)
-	// coming ...
-	//  Fouling: chillers, boilers, cooling towers
-	//  Damper leakage: return air, outdoor air
-	//  Blockage: pipe
-	//  Meter: air flow, water flow
-	//  CO2 sensor
-	//  Pressure sensor offset
-	//  more
+    // Types of faults under Group Operational Faults in IDD
+    //  1. Temperature sensor offset (FY14)
+    //  2. Humidity sensor offset (FY14)
+    //  3. Enthalpy sensor offset (FY14)
+    //  4. Fouling coils (FY14)
+    //  5. Thermostat offset (FY15)
+    //  6. Humidistat offset (FY15)
+    //  7. Fouling air filter (FY15)
+    //  8. Chiller Supply Water Temperature Sensor Offset (FY16)
+    //  9. Condenser Supply Water Temperature Sensor Offset (FY16)
+    //  10. Cooling Tower Scaling (FY16)
+    //  11. Coil Supply Air Temperature Sensor Offset (FY16)
+    // coming ...
+    //  Fouling: chillers, boilers, cooling towers
+    //  Damper leakage: return air, outdoor air
+    //  Blockage: pipe
+    //  Meter: air flow, water flow
+    //  CO2 sensor
+    //  Pressure sensor offset
+    //  more
 
-	extern Array1D_string const cFaults;
-	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
-	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
-	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
-	//      'FaultModel:Blockage:Branch                   ', &
-	//      'FaultModel:Dirty:AirFilter                   ', &
-	//      'FaultModel:Fouling:Chiller                   ', &
-	//      'FaultModel:Fouling:Boiler                    ', &
-	//      'FaultModel:Fouling:CoolingTower              ', &
-	//      'FaultModel:DamperLeakage:ReturnAir           ', &
-	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
+    extern Array1D_string const cFaults;
+    //      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
+    //      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
+    //      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
+    //      'FaultModel:Blockage:Branch                   ', &
+    //      'FaultModel:Dirty:AirFilter                   ', &
+    //      'FaultModel:Fouling:Chiller                   ', &
+    //      'FaultModel:Fouling:Boiler                    ', &
+    //      'FaultModel:Fouling:CoolingTower              ', &
+    //      'FaultModel:DamperLeakage:ReturnAir           ', &
+    //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	extern Array1D_int const iFaultTypeEnums;
+    extern Array1D_int const iFaultTypeEnums;
 
-	extern bool AnyFaultsInModel; // True if there are operational faults in the model
-	extern int NumFaults; // Total number of all faults
-	extern int NumFaultyEconomizer; // Total number of faults related with the economizer
-	extern int NumFouledCoil; // Total number of fouled coils
-	extern int NumFaultyThermostat; // Total number of faulty thermostat with offset
-	extern int NumFaultyHumidistat; // Total number of faulty humidistat with offset
-	extern int NumFaultyAirFilter;  // Total number of fouled air filters
-	extern int NumFaultyChillerSWTSensor;  // Total number of faulty Chillers Supply Water Temperature Sensor
-	extern int NumFaultyCondenserSWTSensor;  // Total number of faulty Condenser Supply Water Temperature Sensor
-	extern int NumFaultyTowerFouling;  // Total number of faulty Towers with Scaling
-	extern int NumFaultyCoilSATSensor;  // Total number of faulty Coil Supply Air Temperature Sensor
-	extern int NumFaultyBoilerFouling;  // Total number of faulty Boilers with Fouling
-	extern int NumFaultyChillerFouling;  // Total number of faulty Chillers with Fouling
-	extern int NumFaultyEvapCoolerFouling;  // Total number of faulty Evaporative Coolers with Fouling
+    extern bool AnyFaultsInModel;           // True if there are operational faults in the model
+    extern int NumFaults;                   // Total number of all faults
+    extern int NumFaultyEconomizer;         // Total number of faults related with the economizer
+    extern int NumFouledCoil;               // Total number of fouled coils
+    extern int NumFaultyThermostat;         // Total number of faulty thermostat with offset
+    extern int NumFaultyHumidistat;         // Total number of faulty humidistat with offset
+    extern int NumFaultyAirFilter;          // Total number of fouled air filters
+    extern int NumFaultyChillerSWTSensor;   // Total number of faulty Chillers Supply Water Temperature Sensor
+    extern int NumFaultyCondenserSWTSensor; // Total number of faulty Condenser Supply Water Temperature Sensor
+    extern int NumFaultyTowerFouling;       // Total number of faulty Towers with Scaling
+    extern int NumFaultyCoilSATSensor;      // Total number of faulty Coil Supply Air Temperature Sensor
+    extern int NumFaultyBoilerFouling;      // Total number of faulty Boilers with Fouling
+    extern int NumFaultyChillerFouling;     // Total number of faulty Chillers with Fouling
+    extern int NumFaultyEvapCoolerFouling;  // Total number of faulty Evaporative Coolers with Fouling
 
-	// SUBROUTINE SPECIFICATIONS:
+    // SUBROUTINE SPECIFICATIONS:
 
-	// Types
+    // Types
 
-	struct FaultProperties // Base Class for operational faults
-	{
-		// Members
-		std::string Name;
-		std::string FaultType; // Fault type
-		std::string AvaiSchedule; // Availability schedule
-		std::string SeveritySchedule; // Severity schedule, multipliers to the Offset
-		int FaultTypeEnum;
-		int AvaiSchedPtr;
-		int SeveritySchedPtr;
-		Real64 Offset; // offset, + means sensor reading is higher than actual value
-		bool Status; // for future use
+    struct FaultProperties // Base Class for operational faults
+    {
+        // Members
+        std::string Name;
+        std::string FaultType;        // Fault type
+        std::string AvaiSchedule;     // Availability schedule
+        std::string SeveritySchedule; // Severity schedule, multipliers to the Offset
+        int FaultTypeEnum;
+        int AvaiSchedPtr;
+        int SeveritySchedPtr;
+        Real64 Offset; // offset, + means sensor reading is higher than actual value
+        bool Status;   // for future use
 
-		// Default Constructor
-		FaultProperties():
-			Name( "" ),
-			FaultType( "" ),
-			AvaiSchedule( "" ),
-			SeveritySchedule( "" ),
-			FaultTypeEnum( 0 ),
-			AvaiSchedPtr( 0 ),
-			SeveritySchedPtr( 0 ),
-			Offset( 0.0 ),
-			Status( false )
-		{}
+        // Default Constructor
+        FaultProperties()
+            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(0), AvaiSchedPtr(0), SeveritySchedPtr(0), Offset(0.0),
+              Status(false)
+        {
+        }
 
-		// Virtual Destructor
-		virtual ~FaultProperties() = default;
+        // Virtual Destructor
+        virtual ~FaultProperties() = default;
 
-		public:
-			Real64 CalFaultOffsetAct();
+    public:
+        Real64 CalFaultOffsetAct();
+    };
 
-	};
+    struct FaultPropertiesEconomizer : public FaultProperties // Class for fault models related with economizer
+    {
+        // Members
+        int ControllerTypeEnum;
+        int ControllerID;           // Point to a controller associated with the fault
+        std::string ControllerType; // Controller type
+        std::string ControllerName; // Controller name
 
-	struct FaultPropertiesEconomizer : public FaultProperties // Class for fault models related with economizer
-	{
-		// Members
-		int ControllerTypeEnum;
-		int ControllerID; // Point to a controller associated with the fault
-		std::string ControllerType; // Controller type
-		std::string ControllerName; // Controller name
+        // Default Constructor
+        FaultPropertiesEconomizer() : ControllerTypeEnum(0), ControllerID(0), ControllerType(""), ControllerName("")
+        {
+        }
 
-		// Default Constructor
-		FaultPropertiesEconomizer():
-			ControllerTypeEnum( 0 ),
-			ControllerID( 0 ),
-			ControllerType( "" ),
-			ControllerName( "" )
-		{}
+        // Destructor
+        virtual ~FaultPropertiesEconomizer() = default;
+    };
 
-		// Destructor
-		virtual ~FaultPropertiesEconomizer() = default;
+    struct FaultPropertiesThermostat : public FaultProperties // Class for FaultModel:ThermostatOffset
+    {
+        // Members
+        std::string FaultyThermostatName; // The faulty thermostat name
 
-	};
+        // Default Constructor
+        FaultPropertiesThermostat() : FaultyThermostatName("")
+        {
+        }
 
-	struct FaultPropertiesThermostat : public FaultProperties // Class for FaultModel:ThermostatOffset
-	{
-		// Members
-		std::string FaultyThermostatName; // The faulty thermostat name
+        // Destructor
+        virtual ~FaultPropertiesThermostat() = default;
+    };
 
-		// Default Constructor
-		FaultPropertiesThermostat():
-			FaultyThermostatName( "" )
-		{}
+    struct FaultPropertiesHumidistat : public FaultProperties // Class for FaultModel:HumidistatOffset
+    {
+        // Members
+        std::string FaultyThermostatName; // The faulty thermostat name
+        std::string FaultyHumidistatName; // The faulty humidistat name
+        std::string FaultyHumidistatType; // The faulty humidistat type
 
-		// Destructor
-		virtual ~FaultPropertiesThermostat() = default;
+        // Default Constructor
+        FaultPropertiesHumidistat() : FaultyThermostatName(""), FaultyHumidistatName(""), FaultyHumidistatType("")
+        {
+        }
 
-	};
+        // Destructor
+        virtual ~FaultPropertiesHumidistat() = default;
+    };
 
-	struct FaultPropertiesHumidistat : public FaultProperties // Class for FaultModel:HumidistatOffset
-	{
-		// Members
-		std::string FaultyThermostatName; // The faulty thermostat name
-		std::string FaultyHumidistatName; // The faulty humidistat name
-		std::string FaultyHumidistatType; // The faulty humidistat type
+    struct FaultPropertiesFoulingCoil : public FaultProperties // Class for FaultModel:Fouling:Coil
+    {
+        // Members
+        std::string FouledCoilName; // The fouled coil name
+        int FouledCoilID;           // Point to a fouling coil
+        int FoulingInputMethod;     // Coil fouling input method
+        Real64 UAFouled;            // Fouling coil UA under rating conditions
+        Real64 Rfw;                 // Water side fouling factor
+        Real64 Rfa;                 // Air side fouling factor
+        Real64 Aout;                // Coil outside surface area
+        Real64 Aratio;              // Inside to outside surface area ratio
 
-		// Default Constructor
-		FaultPropertiesHumidistat():
-			FaultyThermostatName( "" ),
-			FaultyHumidistatName( "" ),
-			FaultyHumidistatType( "" )
-		{}
+        // Default Constructor
+        FaultPropertiesFoulingCoil()
+            : FouledCoilName(""), FouledCoilID(0), FoulingInputMethod(0), UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0), Aratio(0.0)
+        {
+        }
 
-		// Destructor
-		virtual ~FaultPropertiesHumidistat() = default;
+        // Destructor
+        virtual ~FaultPropertiesFoulingCoil() = default;
+    };
 
-	};
+    struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
+    {
+        // Members
+        std::string FaultyAirFilterFanName;       // The name of the fan corresponding to the fouled air filter
+        std::string FaultyAirFilterFanType;       // The type of the fan corresponding to the fouled air filter
+        std::string FaultyAirFilterFanCurve;      // The name of the fan curve
+        std::string FaultyAirFilterPressFracSche; // Schedule describing variations of the fan pressure rise
+        int FaultyAirFilterFanCurvePtr;           // The index to the curve
+        int FaultyAirFilterPressFracSchePtr;      // The pointer to the schedule
+        Real64 FaultyAirFilterFanPressInc;        // The increase of the fan pressure due to fouled air filter
+        Real64 FaultyAirFilterFanFlowDec;         // The decrease of the fan airflow rate due to fouled air filter
 
-	struct FaultPropertiesFoulingCoil : public FaultProperties // Class for FaultModel:Fouling:Coil
-	{
-		// Members
-		std::string FouledCoilName; // The fouled coil name
-		int FouledCoilID; // Point to a fouling coil
-		int FoulingInputMethod; // Coil fouling input method
-		Real64 UAFouled; // Fouling coil UA under rating conditions
-		Real64 Rfw; // Water side fouling factor
-		Real64 Rfa; // Air side fouling factor
-		Real64 Aout; // Coil outside surface area
-		Real64 Aratio; // Inside to outside surface area ratio
+        // Default Constructor
+        FaultPropertiesAirFilter()
+            : FaultyAirFilterFanName(""), FaultyAirFilterFanType(""), FaultyAirFilterFanCurve(""), FaultyAirFilterPressFracSche(""),
+              FaultyAirFilterFanCurvePtr(0), FaultyAirFilterPressFracSchePtr(0), FaultyAirFilterFanPressInc(0.0), FaultyAirFilterFanFlowDec(0.0)
+        {
+        }
 
-		// Default Constructor
-		FaultPropertiesFoulingCoil():
-			FouledCoilName( "" ),
-			FouledCoilID( 0 ),
-			FoulingInputMethod( 0 ),
-			UAFouled( 0.0 ),
-			Rfw( 0.0 ),
-			Rfa( 0.0 ),
-			Aout( 0.0 ),
-			Aratio( 0.0 )
-		{}
+        // Destructor
+        virtual ~FaultPropertiesAirFilter() = default;
 
-		// Destructor
-		virtual ~FaultPropertiesFoulingCoil() = default;
+    public:
+        bool CheckFaultyAirFilterFanCurve();
+    };
 
-	};
+    struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
+    {
+        // Members
+        std::string CoilType;                // Coil type
+        std::string CoilName;                // Coil name
+        std::string WaterCoilControllerName; // Water coil controller name
 
-	struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
-	{
-		// Members
-		std::string FaultyAirFilterFanName;          // The name of the fan corresponding to the fouled air filter
-		std::string FaultyAirFilterFanType;          // The type of the fan corresponding to the fouled air filter
-		std::string FaultyAirFilterFanCurve;         // The name of the fan curve
-		std::string FaultyAirFilterPressFracSche;    // Schedule describing variations of the fan pressure rise
-		int         FaultyAirFilterFanCurvePtr;      // The index to the curve
-		int         FaultyAirFilterPressFracSchePtr; // The pointer to the schedule
-		Real64      FaultyAirFilterFanPressInc;      // The increase of the fan pressure due to fouled air filter
-		Real64      FaultyAirFilterFanFlowDec;       // The decrease of the fan airflow rate due to fouled air filter
+        // Default Constructor
+        FaultPropertiesCoilSAT() : CoilType(""), CoilName(""), WaterCoilControllerName("")
+        {
+        }
+    };
 
-		// Default Constructor
-		FaultPropertiesAirFilter():
-			FaultyAirFilterFanName( "" ),
-			FaultyAirFilterFanType( "" ),
-			FaultyAirFilterFanCurve( "" ),
-			FaultyAirFilterPressFracSche( "" ),
-			FaultyAirFilterFanCurvePtr( 0 ),
-			FaultyAirFilterPressFracSchePtr( 0 ),
-			FaultyAirFilterFanPressInc( 0.0 ),
-			FaultyAirFilterFanFlowDec( 0.0 )
-		{}
+    struct FaultPropertiesChillerSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+    {
+        // Members
+        std::string ChillerType; // Chiller type
+        std::string ChillerName; // Chiller name
 
-		// Destructor
-		virtual ~FaultPropertiesAirFilter() = default;
+        // Default Constructor
+        FaultPropertiesChillerSWT() : ChillerType(""), ChillerName("")
+        {
+        }
 
-		public:
-			bool CheckFaultyAirFilterFanCurve();
-	};
+        // Destructor
+        virtual ~FaultPropertiesChillerSWT() = default;
 
-	struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
-	{
-		// Members
-		std::string CoilType; // Coil type
-		std::string CoilName; // Coil name
-		std::string WaterCoilControllerName; // Water coil controller name
-	
-		// Default Constructor
-		FaultPropertiesCoilSAT():
-			CoilType( "" ),
-			CoilName( "" ),
-			WaterCoilControllerName( "" )
-		{}
-			
-	};
+    public:
+        void CalFaultChillerSWT(bool FlagConstantFlowChiller,  // True if chiller is constant flow and false if it is variable flow
+                                Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
+                                Real64 Cp,                     // Local fluid specific heat
+                                Real64 EvapInletTemp,          // Chiller evaporator inlet water temperature
+                                Real64 &EvapOutletTemp,        // Chiller evaporator outlet water temperature
+                                Real64 &EvapMassFlowRate,      // Chiller mass flow rate
+                                Real64 &QEvaporator            // Chiller evaporator heat transfer rate
+        );
+    };
 
-	struct FaultPropertiesChillerSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:ChillerSupplyWater
-	{
-		// Members
-		std::string ChillerType; // Chiller type
-		std::string ChillerName; // Chiller name
+    struct FaultPropertiesCondenserSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+    {
+        // Members
+        std::string TowerType; // Tower type
+        std::string TowerName; // Tower name
 
-		// Default Constructor
-		FaultPropertiesChillerSWT():
-			ChillerType( "" ),
-			ChillerName( "" )
-		{}
+        // Default Constructor
+        FaultPropertiesCondenserSWT() : TowerType(""), TowerName("")
+        {
+        }
+    };
 
-		// Destructor
-		virtual ~FaultPropertiesChillerSWT() = default;
+    struct FaultPropertiesTowerFouling : public FaultProperties // Class for FaultModel:Fouling:CoolingTower
+    {
+        // Members
+        std::string TowerType;    // Tower type
+        std::string TowerName;    // Tower name
+        Real64 UAReductionFactor; // UA Reduction Factor
 
-		public:
-			void CalFaultChillerSWT(
-				bool FlagConstantFlowChiller, // True if chiller is constant flow and false if it is variable flow
-				Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
-				Real64 Cp, // Local fluid specific heat
-				Real64 EvapInletTemp, // Chiller evaporator inlet water temperature
-				Real64 & EvapOutletTemp, // Chiller evaporator outlet water temperature
-				Real64 & EvapMassFlowRate, // Chiller mass flow rate
-				Real64 & QEvaporator // Chiller evaporator heat transfer rate
-			);
+        // Default Constructor
+        FaultPropertiesTowerFouling() : TowerType(""), TowerName(""), UAReductionFactor(1.0)
+        {
+        }
 
-	};
+    public:
+        Real64 CalFaultyTowerFoulingFactor();
+    };
 
-	struct FaultPropertiesCondenserSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CondenserSupplyWater
-	{
-		// Members
-		std::string TowerType; // Tower type
-		std::string TowerName; // Tower name
-	
-		// Default Constructor
-		FaultPropertiesCondenserSWT():
-			TowerType( "" ),
-			TowerName( "" )
-		{}
-			
-	};
+    struct FaultPropertiesFouling : public FaultProperties // Class for FaultModel:Fouling
+    {
+        // Members
+        Real64 FoulingFactor; // Fouling Factor
 
-	struct FaultPropertiesTowerFouling : public FaultProperties // Class for FaultModel:Fouling:CoolingTower
-	{
-		// Members
-		std::string TowerType; // Tower type
-		std::string TowerName; // Tower name
-		Real64 UAReductionFactor; //UA Reduction Factor
-	
-		// Default Constructor
-		FaultPropertiesTowerFouling():
-			TowerType( "" ),
-			TowerName( "" ),
-			UAReductionFactor( 1.0 )
-		{}
-		
-		public:
-			Real64 CalFaultyTowerFoulingFactor();
-	};
+        // Default Constructor
+        FaultPropertiesFouling() : FoulingFactor(1.0)
+        {
+        }
 
-	struct FaultPropertiesFouling : public FaultProperties // Class for FaultModel:Fouling
-	{
-		// Members
-		Real64 FoulingFactor; //Fouling Factor
+    public:
+        Real64 CalFoulingFactor(); // To calculate the dynamic fouling factor
+    };
 
-		// Default Constructor
-		FaultPropertiesFouling():
-			FoulingFactor( 1.0 )
-		{}
+    struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Boiler
+    {
+        // Members
+        std::string BoilerType; // Boiler type
+        std::string BoilerName; // Boiler name
 
-		public:
-			Real64 CalFoulingFactor(); // To calculate the dynamic fouling factor
-	};
+        // Default Constructor
+        FaultPropertiesBoilerFouling() : BoilerType(""), BoilerName("")
+        {
+        }
+    };
 
-	struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Boiler
-	{
-		// Members
-		std::string BoilerType; // Boiler type
-		std::string BoilerName; // Boiler name
-	
-		// Default Constructor
-		FaultPropertiesBoilerFouling():
-			BoilerType( "" ),
-			BoilerName( "" )
-		{}
-	};
+    struct FaultPropertiesChillerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Chiller
+    {
+        // Members
+        std::string ChillerType; // Chiller type
+        std::string ChillerName; // Chiller name
 
-	struct FaultPropertiesChillerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Chiller
-	{
-		// Members
-		std::string ChillerType; // Chiller type
-		std::string ChillerName; // Chiller name
-	
-		// Default Constructor
-		FaultPropertiesChillerFouling():
-			ChillerType( "" ),
-			ChillerName( "" )
-		{}
-	};
+        // Default Constructor
+        FaultPropertiesChillerFouling() : ChillerType(""), ChillerName("")
+        {
+        }
+    };
 
-	struct FaultPropertiesEvapCoolerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:EvaporativeCooler
-	{
-		// Members
-		std::string EvapCoolerType; // Evaporative Cooler type
-		std::string EvapCoolerName; // Evaporative Cooler name
-	
-		// Default Constructor
-		FaultPropertiesEvapCoolerFouling():
-			EvapCoolerType( "" ),
-			EvapCoolerName( "" )
-		{}
-	};
+    struct FaultPropertiesEvapCoolerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:EvaporativeCooler
+    {
+        // Members
+        std::string EvapCoolerType; // Evaporative Cooler type
+        std::string EvapCoolerName; // Evaporative Cooler name
 
-	// Object Data
-	extern Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
-	extern Array1D< FaultPropertiesFoulingCoil > FouledCoils;
-	extern Array1D< FaultPropertiesThermostat > FaultsThermostatOffset;
-	extern Array1D< FaultPropertiesHumidistat > FaultsHumidistatOffset;
-	extern Array1D< FaultPropertiesAirFilter > FaultsFouledAirFilters;
-	extern Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
-	extern Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
-	extern Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
-	extern Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
-	extern Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
-	extern Array1D< FaultPropertiesChillerFouling > FaultsChillerFouling;
-	extern Array1D< FaultPropertiesEvapCoolerFouling > FaultsEvapCoolerFouling;
+        // Default Constructor
+        FaultPropertiesEvapCoolerFouling() : EvapCoolerType(""), EvapCoolerName("")
+        {
+        }
+    };
 
-	// Functions
+    // Object Data
+    extern Array1D<FaultPropertiesEconomizer> FaultsEconomizer;
+    extern Array1D<FaultPropertiesFoulingCoil> FouledCoils;
+    extern Array1D<FaultPropertiesThermostat> FaultsThermostatOffset;
+    extern Array1D<FaultPropertiesHumidistat> FaultsHumidistatOffset;
+    extern Array1D<FaultPropertiesAirFilter> FaultsFouledAirFilters;
+    extern Array1D<FaultPropertiesChillerSWT> FaultsChillerSWTSensor;
+    extern Array1D<FaultPropertiesCondenserSWT> FaultsCondenserSWTSensor;
+    extern Array1D<FaultPropertiesTowerFouling> FaultsTowerFouling;
+    extern Array1D<FaultPropertiesCoilSAT> FaultsCoilSATSensor;
+    extern Array1D<FaultPropertiesBoilerFouling> FaultsBoilerFouling;
+    extern Array1D<FaultPropertiesChillerFouling> FaultsChillerFouling;
+    extern Array1D<FaultPropertiesEvapCoolerFouling> FaultsEvapCoolerFouling;
 
-	void
-	CheckAndReadFaults();
+    // Functions
 
-	void
-	clear_state();
+    void CheckAndReadFaults();
 
-} // FaultsManager
+    void clear_state();
 
-} // EnergyPlus
+} // namespace FaultsManager
+
+} // namespace EnergyPlus
 
 #endif

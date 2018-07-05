@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,8 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/SurfaceOctree.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/SurfaceOctree.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -66,369 +66,374 @@ using namespace ObjexxFCL;
 using Vertex = SurfaceOctreeCube::Vertex;
 using Surfaces = SurfaceOctreeCube::Surfaces;
 
-TEST( SurfaceOctreeTest, Basic )
+TEST(SurfaceOctreeTest, Basic)
 {
-	// Surfaces: Simple Unit Cube
-	TotSurfaces = 6;
-	SurfaceData surface;
-	surface.Area = 1.0;
-	surface.Sides = 4;
-	surface.Vertex.dimension( 4 );
-	Surface.dimension( TotSurfaces, surface );
-	Surface( 1 ).Vertex = { Vertex(0,0,0), Vertex(1,0,0), Vertex(1,0,1), Vertex(0,0,1) };
-	Surface( 2 ).Vertex = { Vertex(0,1,0), Vertex(1,1,0), Vertex(1,1,1), Vertex(0,1,1) };
-	Surface( 3 ).Vertex = { Vertex(0,0,0), Vertex(0,1,0), Vertex(0,1,1), Vertex(0,0,1) };
-	Surface( 4 ).Vertex = { Vertex(1,0,0), Vertex(1,1,0), Vertex(1,1,1), Vertex(1,0,1) };
-	Surface( 5 ).Vertex = { Vertex(0,0,0), Vertex(1,0,0), Vertex(1,1,0), Vertex(0,1,0) };
-	Surface( 6 ).Vertex = { Vertex(0,0,1), Vertex(1,0,1), Vertex(1,1,1), Vertex(0,1,1) };
+    // Surfaces: Simple Unit Cube
+    TotSurfaces = 6;
+    SurfaceData surface;
+    surface.Area = 1.0;
+    surface.Sides = 4;
+    surface.Vertex.dimension(4);
+    Surface.dimension(TotSurfaces, surface);
+    Surface(1).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 0, 1), Vertex(0, 0, 1)};
+    Surface(2).Vertex = {Vertex(0, 1, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(0, 1, 1)};
+    Surface(3).Vertex = {Vertex(0, 0, 0), Vertex(0, 1, 0), Vertex(0, 1, 1), Vertex(0, 0, 1)};
+    Surface(4).Vertex = {Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(1, 0, 1)};
+    Surface(5).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(0, 1, 0)};
+    Surface(6).Vertex = {Vertex(0, 0, 1), Vertex(1, 0, 1), Vertex(1, 1, 1), Vertex(0, 1, 1)};
 
-	// Surface octree
-	SurfaceOctreeCube const cube( Surface );
+    // Surface octree
+    SurfaceOctreeCube const cube(Surface);
 
-	EXPECT_EQ( Vertex( 0.0, 0.0, 0.0 ), cube.l() );
-	EXPECT_EQ( Vertex( 0.5, 0.5, 0.5 ), cube.c() );
-	EXPECT_EQ( Vertex( 1.0, 1.0, 1.0 ), cube.u() );
-	EXPECT_EQ( 1.0, cube.w() );
+    EXPECT_EQ(Vertex(0.0, 0.0, 0.0), cube.l());
+    EXPECT_EQ(Vertex(0.5, 0.5, 0.5), cube.c());
+    EXPECT_EQ(Vertex(1.0, 1.0, 1.0), cube.u());
+    EXPECT_EQ(1.0, cube.w());
 
-	{ // Contains
-		EXPECT_TRUE( cube.contains( Vertex(0,1,0) ) );
-		EXPECT_FALSE( cube.contains( Vertex(0,2,0) ) );
-		EXPECT_TRUE( cube.contains( Surface( 1 ) ) );
-		EXPECT_TRUE( cube.contains( Surface( 2 ) ) );
-		EXPECT_TRUE( cube.contains( Surface( 3 ) ) );
-		EXPECT_TRUE( cube.contains( Surface( 4 ) ) );
-		EXPECT_TRUE( cube.contains( Surface( 5 ) ) );
-		EXPECT_TRUE( cube.contains( Surface( 6 ) ) );
-		SurfaceData other_surface( surface );
-		other_surface.Vertex = { Vertex(0,0,0), Vertex(1,0,0), Vertex(1,0,1), 2*Vertex(0,0,1) };
-		EXPECT_FALSE( cube.contains( other_surface ) );
-	}
+    { // Contains
+        EXPECT_TRUE(cube.contains(Vertex(0, 1, 0)));
+        EXPECT_FALSE(cube.contains(Vertex(0, 2, 0)));
+        EXPECT_TRUE(cube.contains(Surface(1)));
+        EXPECT_TRUE(cube.contains(Surface(2)));
+        EXPECT_TRUE(cube.contains(Surface(3)));
+        EXPECT_TRUE(cube.contains(Surface(4)));
+        EXPECT_TRUE(cube.contains(Surface(5)));
+        EXPECT_TRUE(cube.contains(Surface(6)));
+        SurfaceData other_surface(surface);
+        other_surface.Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 0, 1), 2 * Vertex(0, 0, 1)};
+        EXPECT_FALSE(cube.contains(other_surface));
+    }
 
-	// Line/segment/ray intersections with cube enclosing sphere
-	{ // X line through center
-		Vertex const a( -1.0, 0.5, 0.5 ), b( 2.0, 0.5, 0.5 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_TRUE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-		Surfaces surfaces;
-		cube.surfacesSegmentIntersectsSphere( a, b, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-	}
-	{ // Diagonal
-		Vertex const a( 0.0 ), b( 1.0 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_TRUE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-	}
-	{ // Center up half-diagonal
-		Vertex const a( 0.5 ), b( 2.0 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_TRUE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-	}
-	{ // Outward at corner
-		Vertex const a( 1.0 ), b( 2.0 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_TRUE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-	}
-	{ // Tangent at origin
-		Vertex const a( -1.0+1.0e-12, 1.0+1.0e-12, 0.0 ), b( 1.0+1.0e-12, -1.0+1.0e-12, 0.0 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_TRUE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-	}
-	{ // Inward outside but pointing to corner
-		Vertex const a( 3.0 ), b( 2.0 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_FALSE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-	}
-	{ // Just beyond corner
-		Vertex const a( 1.0000001 ), b( 2.0000002 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_FALSE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_FALSE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-	}
-	{ // Way outside cube but along diagonal
-		Vertex const a( 5.0 ), b( 9.0 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_FALSE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_FALSE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-	}
-	{ // Way outside cube with no contact
-		Vertex const a( 9.0 ), b( 12.0, 8.0, 4.0 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_FALSE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_FALSE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_FALSE( cube.lineIntersectsSphere( a, dir ) );
-	}
+    // Line/segment/ray intersections with cube enclosing sphere
+    { // X line through center
+        Vertex const a(-1.0, 0.5, 0.5), b(2.0, 0.5, 0.5), dir((b - a).normalize_zero());
+        EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+        Surfaces surfaces;
+        cube.surfacesSegmentIntersectsSphere(a, b, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+    }
+    { // Diagonal
+        Vertex const a(0.0), b(1.0), dir((b - a).normalize_zero());
+        EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+    }
+    { // Center up half-diagonal
+        Vertex const a(0.5), b(2.0), dir((b - a).normalize_zero());
+        EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+    }
+    { // Outward at corner
+        Vertex const a(1.0), b(2.0), dir((b - a).normalize_zero());
+        EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+    }
+    { // Tangent at origin
+        Vertex const a(-1.0 + 1.0e-12, 1.0 + 1.0e-12, 0.0), b(1.0 + 1.0e-12, -1.0 + 1.0e-12, 0.0), dir((b - a).normalize_zero());
+        EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+    }
+    { // Inward outside but pointing to corner
+        Vertex const a(3.0), b(2.0), dir((b - a).normalize_zero());
+        EXPECT_FALSE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+    }
+    { // Just beyond corner
+        Vertex const a(1.0000001), b(2.0000002), dir((b - a).normalize_zero());
+        EXPECT_FALSE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_FALSE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+    }
+    { // Way outside cube but along diagonal
+        Vertex const a(5.0), b(9.0), dir((b - a).normalize_zero());
+        EXPECT_FALSE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_FALSE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+    }
+    { // Way outside cube with no contact
+        Vertex const a(9.0), b(12.0, 8.0, 4.0), dir((b - a).normalize_zero());
+        EXPECT_FALSE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_FALSE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_FALSE(cube.lineIntersectsSphere(a, dir));
+    }
 
-	// Line/segment/ray intersections with cube
-	{ // X line through center
-		Vertex const a( -1.0, 0.5, 0.5 ), b( 2.0, 0.5, 0.5 ), dir( ( b - a ).normalize_zero() ), dir_inv( SurfaceOctreeCube::safe_inverse( dir ) );
-		EXPECT_TRUE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsCube( a, dir, dir_inv ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir, dir_inv ) );
-		Surfaces surfaces;
-		cube.surfacesSegmentIntersectsCube( a, b, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsCube( a, dir, dir_inv, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsCube( a, dir, dir_inv, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-	}
-	{ // Diagonal
-		Vertex const a( 0.0 ), b( 1.0 ), dir( ( b - a ).normalize_zero() ), dir_inv( 1.0 / dir );
-		EXPECT_TRUE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsCube( a, dir, dir_inv ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir, dir_inv ) );
-	}
-	{ // Center up half-diagonal
-		Vertex const a( 0.5 ), b( 2.0 ), dir( ( b - a ).normalize_zero() ), dir_inv( 1.0 / dir );
-		EXPECT_TRUE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsCube( a, dir, dir_inv ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir, dir_inv ) );
-	}
-	{ // Outward at corner
-		Vertex const a( 1.0 ), b( 2.0 ), dir( ( b - a ).normalize_zero() ), dir_inv( 1.0 / dir );
-		EXPECT_TRUE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsCube( a, dir, dir_inv ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir, dir_inv ) );
-	}
-	{ // Tangent at origin
-		Vertex const a( -1.0+1.0e-12, 1.0+1.0e-12, 0.0 ), b( 1.0+1.0e-12, -1.0+1.0e-12, 0.0 ), dir( ( b - a ).normalize_zero() ), dir_inv( 1.0 / dir.x, 1.0 / dir.y, 0.0 );
-		EXPECT_TRUE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsCube( a, dir, dir_inv ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir, dir_inv ) );
-	}
-	{ // Inward outside but pointing to corner
-		Vertex const a( 3.0 ), b( 2.0 ), dir( ( b - a ).normalize_zero() ), dir_inv( 1.0 / dir );
-		EXPECT_FALSE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsCube( a, dir, dir_inv ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir, dir_inv ) );
-	}
-	{ // Just beyond corner
-		Vertex const a( 1.0000001 ), b( 2.0000002 ), dir( ( b - a ).normalize_zero() ), dir_inv( 1.0 / dir );
-		EXPECT_FALSE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_FALSE( cube.rayIntersectsCube( a, dir, dir_inv ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir, dir_inv ) );
-	}
-	{ // Way outside cube but along diagonal
-		Vertex const a( 5.0 ), b( 9.0 ), dir( ( b - a ).normalize_zero() ), dir_inv( 1.0 / dir );
-		EXPECT_FALSE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_FALSE( cube.rayIntersectsCube( a, dir, dir_inv ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir, dir_inv ) );
-	}
-	{ // Way outside cube with no contact
-		Vertex const a( 9.0 ), b( 12.0, 8.0, 4.0 ), dir( ( b - a ).normalize_zero() ), dir_inv( 1.0 / dir );
-		EXPECT_FALSE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_FALSE( cube.rayIntersectsCube( a, dir, dir_inv ) );
-		EXPECT_FALSE( cube.lineIntersectsCube( a, dir, dir_inv ) );
-	}
+    // Line/segment/ray intersections with cube
+    { // X line through center
+        Vertex const a(-1.0, 0.5, 0.5), b(2.0, 0.5, 0.5), dir((b - a).normalize_zero()), dir_inv(SurfaceOctreeCube::safe_inverse(dir));
+        EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
+        EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
+        Surfaces surfaces;
+        cube.surfacesSegmentIntersectsCube(a, b, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsCube(a, dir, dir_inv, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsCube(a, dir, dir_inv, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+    }
+    { // Diagonal
+        Vertex const a(0.0), b(1.0), dir((b - a).normalize_zero()), dir_inv(1.0 / dir);
+        EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
+        EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
+    }
+    { // Center up half-diagonal
+        Vertex const a(0.5), b(2.0), dir((b - a).normalize_zero()), dir_inv(1.0 / dir);
+        EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
+        EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
+    }
+    { // Outward at corner
+        Vertex const a(1.0), b(2.0), dir((b - a).normalize_zero()), dir_inv(1.0 / dir);
+        EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
+        EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
+    }
+    { // Tangent at origin
+        Vertex const a(-1.0 + 1.0e-12, 1.0 + 1.0e-12, 0.0), b(1.0 + 1.0e-12, -1.0 + 1.0e-12, 0.0), dir((b - a).normalize_zero()),
+            dir_inv(1.0 / dir.x, 1.0 / dir.y, 0.0);
+        EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
+        EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
+    }
+    { // Inward outside but pointing to corner
+        Vertex const a(3.0), b(2.0), dir((b - a).normalize_zero()), dir_inv(1.0 / dir);
+        EXPECT_FALSE(cube.segmentIntersectsCube(a, b));
+        EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
+    }
+    { // Just beyond corner
+        Vertex const a(1.0000001), b(2.0000002), dir((b - a).normalize_zero()), dir_inv(1.0 / dir);
+        EXPECT_FALSE(cube.segmentIntersectsCube(a, b));
+        EXPECT_FALSE(cube.rayIntersectsCube(a, dir, dir_inv));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
+    }
+    { // Way outside cube but along diagonal
+        Vertex const a(5.0), b(9.0), dir((b - a).normalize_zero()), dir_inv(1.0 / dir);
+        EXPECT_FALSE(cube.segmentIntersectsCube(a, b));
+        EXPECT_FALSE(cube.rayIntersectsCube(a, dir, dir_inv));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
+    }
+    { // Way outside cube with no contact
+        Vertex const a(9.0), b(12.0, 8.0, 4.0), dir((b - a).normalize_zero()), dir_inv(1.0 / dir);
+        EXPECT_FALSE(cube.segmentIntersectsCube(a, b));
+        EXPECT_FALSE(cube.rayIntersectsCube(a, dir, dir_inv));
+        EXPECT_FALSE(cube.lineIntersectsCube(a, dir, dir_inv));
+    }
 
-	{ // X-axis aligned line through enclosing sphere but not cube
-		Vertex const a( -1.0, 1.1, 1.1 ), b( 2.0, 1.1, 1.1 ), dir( ( b - a ).normalize_zero() );
+    { // X-axis aligned line through enclosing sphere but not cube
+        Vertex const a(-1.0, 1.1, 1.1), b(2.0, 1.1, 1.1), dir((b - a).normalize_zero());
 
-		EXPECT_TRUE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-		EXPECT_FALSE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_FALSE( cube.rayIntersectsCube( a, dir ) );
-		EXPECT_FALSE( cube.lineIntersectsCube( a, dir ) );
+        EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+        EXPECT_FALSE(cube.segmentIntersectsCube(a, b));
+        EXPECT_FALSE(cube.rayIntersectsCube(a, dir));
+        EXPECT_FALSE(cube.lineIntersectsCube(a, dir));
 
-		Surfaces surfaces;
-		cube.surfacesSegmentIntersectsSphere( a, b, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
+        Surfaces surfaces;
+        cube.surfacesSegmentIntersectsSphere(a, b, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
 
-		surfaces.clear();
-		cube.surfacesSegmentIntersectsCube( a, b, surfaces );
-		EXPECT_EQ( 0u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsCube( a, dir, surfaces );
-		EXPECT_EQ( 0u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsCube( a, dir, surfaces );
-		EXPECT_EQ( 0u, surfaces.size() );
-	}
+        surfaces.clear();
+        cube.surfacesSegmentIntersectsCube(a, b, surfaces);
+        EXPECT_EQ(0u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsCube(a, dir, surfaces);
+        EXPECT_EQ(0u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsCube(a, dir, surfaces);
+        EXPECT_EQ(0u, surfaces.size());
+    }
 
-	// Clean up
-	Surface.deallocate();
-	TotSurfaces = 0;
+    // Clean up
+    Surface.deallocate();
+    TotSurfaces = 0;
 }
 
-TEST( SurfaceOctreeTest, Composite )
+TEST(SurfaceOctreeTest, Composite)
 {
-	// Surfaces: Unit Cube in 2-Unit Cube
-	TotSurfaces = 12;
-	SurfaceData surface;
-	surface.Area = 1.0;
-	surface.Sides = 4;
-	surface.Vertex.dimension( 4 );
-	Surface.dimension( TotSurfaces, surface );
-	// Outer [0,2] cube
-	Surface( 1 ).Vertex = { 2 * Vertex(0,0,0), 2 * Vertex(1,0,0), 2 * Vertex(1,0,1), 2 * Vertex(0,0,1) };
-	Surface( 2 ).Vertex = { 2 * Vertex(0,1,0), 2 * Vertex(1,1,0), 2 * Vertex(1,1,1), 2 * Vertex(0,1,1) };
-	Surface( 3 ).Vertex = { 2 * Vertex(0,0,0), 2 * Vertex(0,1,0), 2 * Vertex(0,1,1), 2 * Vertex(0,0,1) };
-	Surface( 4 ).Vertex = { 2 * Vertex(1,0,0), 2 * Vertex(1,1,0), 2 * Vertex(1,1,1), 2 * Vertex(1,0,1) };
-	Surface( 5 ).Vertex = { 2 * Vertex(0,0,0), 2 * Vertex(1,0,0), 2 * Vertex(1,1,0), 2 * Vertex(0,1,0) };
-	Surface( 6 ).Vertex = { 2 * Vertex(0,0,1), 2 * Vertex(1,0,1), 2 * Vertex(1,1,1), 2 * Vertex(0,1,1) };
-	// Inner [0,1] cube
-	Surface( 7 ).Vertex = { Vertex(0,0,0), Vertex(1,0,0), Vertex(1,0,1), Vertex(0,0,1) };
-	Surface( 8 ).Vertex = { Vertex(0,1,0), Vertex(1,1,0), Vertex(1,1,1), Vertex(0,1,1) };
-	Surface( 9 ).Vertex = { Vertex(0,0,0), Vertex(0,1,0), Vertex(0,1,1), Vertex(0,0,1) };
-	Surface( 10 ).Vertex = { Vertex(1,0,0), Vertex(1,1,0), Vertex(1,1,1), Vertex(1,0,1) };
-	Surface( 11 ).Vertex = { Vertex(0,0,0), Vertex(1,0,0), Vertex(1,1,0), Vertex(0,1,0) };
-	Surface( 12 ).Vertex = { Vertex(0,0,1), Vertex(1,0,1), Vertex(1,1,1), Vertex(0,1,1) };
-	for ( int i = 1; i <= TotSurfaces; ++i ) Surface( i ).Shape = SurfaceShape::Rectangle;
+    // Surfaces: Unit Cube in 2-Unit Cube
+    TotSurfaces = 12;
+    SurfaceData surface;
+    surface.Area = 1.0;
+    surface.Sides = 4;
+    surface.Vertex.dimension(4);
+    Surface.dimension(TotSurfaces, surface);
+    // Outer [0,2] cube
+    Surface(1).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(1, 0, 0), 2 * Vertex(1, 0, 1), 2 * Vertex(0, 0, 1)};
+    Surface(2).Vertex = {2 * Vertex(0, 1, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(1, 1, 1), 2 * Vertex(0, 1, 1)};
+    Surface(3).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(0, 1, 0), 2 * Vertex(0, 1, 1), 2 * Vertex(0, 0, 1)};
+    Surface(4).Vertex = {2 * Vertex(1, 0, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(1, 1, 1), 2 * Vertex(1, 0, 1)};
+    Surface(5).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(1, 0, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(0, 1, 0)};
+    Surface(6).Vertex = {2 * Vertex(0, 0, 1), 2 * Vertex(1, 0, 1), 2 * Vertex(1, 1, 1), 2 * Vertex(0, 1, 1)};
+    // Inner [0,1] cube
+    Surface(7).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 0, 1), Vertex(0, 0, 1)};
+    Surface(8).Vertex = {Vertex(0, 1, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(0, 1, 1)};
+    Surface(9).Vertex = {Vertex(0, 0, 0), Vertex(0, 1, 0), Vertex(0, 1, 1), Vertex(0, 0, 1)};
+    Surface(10).Vertex = {Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(1, 0, 1)};
+    Surface(11).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(0, 1, 0)};
+    Surface(12).Vertex = {Vertex(0, 0, 1), Vertex(1, 0, 1), Vertex(1, 1, 1), Vertex(0, 1, 1)};
+    for (int i = 1; i <= TotSurfaces; ++i)
+        Surface(i).Shape = SurfaceShape::Rectangle;
 
-	// SurfaceOctreeCube
-	SurfaceOctreeCube const cube( Surface );
+    // SurfaceOctreeCube
+    SurfaceOctreeCube const cube(Surface);
 
-	EXPECT_EQ( Vertex( 0.0, 0.0, 0.0 ), cube.l() );
-	EXPECT_EQ( Vertex( 1.0, 1.0, 1.0 ), cube.c() );
-	EXPECT_EQ( Vertex( 2.0, 2.0, 2.0 ), cube.u() );
-	EXPECT_EQ( 2.0, cube.w() );
+    EXPECT_EQ(Vertex(0.0, 0.0, 0.0), cube.l());
+    EXPECT_EQ(Vertex(1.0, 1.0, 1.0), cube.c());
+    EXPECT_EQ(Vertex(2.0, 2.0, 2.0), cube.u());
+    EXPECT_EQ(2.0, cube.w());
 
-	// Cube and enclosing sphere intersections
-	{ // X line through outer and inner cube
-		Vertex const a( -1.0, 0.5, 0.5 ), b( 3.0, 0.5, 0.5 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_TRUE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsCube( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir ) );
+    // Cube and enclosing sphere intersections
+    { // X line through outer and inner cube
+        Vertex const a(-1.0, 0.5, 0.5), b(3.0, 0.5, 0.5), dir((b - a).normalize_zero());
+        EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
+        EXPECT_TRUE(cube.rayIntersectsCube(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir));
 
-		Surfaces surfaces;
-		cube.surfacesSegmentIntersectsSphere( a, b, surfaces );
-		EXPECT_EQ( 12u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 12u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 12u, surfaces.size() );
+        Surfaces surfaces;
+        cube.surfacesSegmentIntersectsSphere(a, b, surfaces);
+        EXPECT_EQ(12u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(12u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(12u, surfaces.size());
 
-		surfaces.clear();
-		cube.surfacesSegmentIntersectsCube( a, b, surfaces );
-		EXPECT_EQ( 12u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsCube( a, dir, surfaces );
-		EXPECT_EQ( 12u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsCube( a, dir, surfaces );
-		EXPECT_EQ( 12u, surfaces.size() );
-	}
-	{ // X line through outer and inner enclosing spheres and outer cube but not inner cube
-		Vertex const a( -1.0, 1.1, 1.1 ), b( 3.0, 1.1, 1.1 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_TRUE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsCube( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir ) );
+        surfaces.clear();
+        cube.surfacesSegmentIntersectsCube(a, b, surfaces);
+        EXPECT_EQ(12u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsCube(a, dir, surfaces);
+        EXPECT_EQ(12u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsCube(a, dir, surfaces);
+        EXPECT_EQ(12u, surfaces.size());
+    }
+    { // X line through outer and inner enclosing spheres and outer cube but not inner cube
+        Vertex const a(-1.0, 1.1, 1.1), b(3.0, 1.1, 1.1), dir((b - a).normalize_zero());
+        EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
+        EXPECT_TRUE(cube.rayIntersectsCube(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir));
 
-		Surfaces surfaces;
-		cube.surfacesSegmentIntersectsSphere( a, b, surfaces );
-		EXPECT_EQ( 12u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 12u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 12u, surfaces.size() );
+        Surfaces surfaces;
+        cube.surfacesSegmentIntersectsSphere(a, b, surfaces);
+        EXPECT_EQ(12u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(12u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(12u, surfaces.size());
 
-		surfaces.clear();
-		cube.surfacesSegmentIntersectsCube( a, b, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsCube( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsCube( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-	}
-	{ // X line through outer but not inner cube
-		Vertex const a( -1.0, 1.5, 1.5 ), b( 3.0, 1.5, 1.5 ), dir( ( b - a ).normalize_zero() );
-		EXPECT_TRUE( cube.segmentIntersectsSphere( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsSphere( a, dir ) );
-		EXPECT_TRUE( cube.segmentIntersectsCube( a, b ) );
-		EXPECT_TRUE( cube.rayIntersectsCube( a, dir ) );
-		EXPECT_TRUE( cube.lineIntersectsCube( a, dir ) );
+        surfaces.clear();
+        cube.surfacesSegmentIntersectsCube(a, b, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsCube(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsCube(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+    }
+    { // X line through outer but not inner cube
+        Vertex const a(-1.0, 1.5, 1.5), b(3.0, 1.5, 1.5), dir((b - a).normalize_zero());
+        EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
+        EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
+        EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
+        EXPECT_TRUE(cube.rayIntersectsCube(a, dir));
+        EXPECT_TRUE(cube.lineIntersectsCube(a, dir));
 
-		Surfaces surfaces;
-		cube.surfacesSegmentIntersectsSphere( a, b, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsSphere( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
+        Surfaces surfaces;
+        cube.surfacesSegmentIntersectsSphere(a, b, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsSphere(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
 
-		surfaces.clear();
-		cube.surfacesSegmentIntersectsCube( a, b, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesRayIntersectsCube( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-		surfaces.clear();
-		cube.surfacesLineIntersectsCube( a, dir, surfaces );
-		EXPECT_EQ( 6u, surfaces.size() );
-	}
+        surfaces.clear();
+        cube.surfacesSegmentIntersectsCube(a, b, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesRayIntersectsCube(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+        surfaces.clear();
+        cube.surfacesLineIntersectsCube(a, dir, surfaces);
+        EXPECT_EQ(6u, surfaces.size());
+    }
 
-	// Function processing
-	{ // Hits cube but predicate never satisfied
-		Vertex const a( -1.0, 0.5, 0.5 ), b( 3.0, 0.5, 0.5 ), dir( ( b - a ).normalize_zero() );
-		auto predicate = []( SurfaceData const & surface ) -> bool { return surface.Shape == SurfaceShape::Triangle; };
-		EXPECT_FALSE( cube.hasSurfaceSegmentIntersectsCube( a, b, predicate ) );
-		EXPECT_FALSE( cube.hasSurfaceRayIntersectsCube( a, dir, predicate ) );
-	}
-	{ // Hits cube and predicate satisfied
-		Vertex const a( -1.0, 0.5, 0.5 ), b( 3.0, 0.5, 0.5 ), dir( ( b - a ).normalize_zero() );
-		auto predicate = []( SurfaceData const & surface ) -> bool { return surface.Shape == SurfaceShape::Rectangle; };
-		EXPECT_TRUE( cube.hasSurfaceSegmentIntersectsCube( a, b, predicate ) );
-		EXPECT_TRUE( cube.hasSurfaceRayIntersectsCube( a, dir, predicate ) );
-	}
-	{ // Misses cube so predicate never tested
-		Vertex const a( -1.0, 3.0, 3.0 ), b( 3.0, 3.0, 3.0 ), dir( ( b - a ).normalize_zero() );
-		auto predicate = []( SurfaceData const & surface ) -> bool { return surface.Shape == SurfaceShape::Rectangle; };
-		EXPECT_FALSE( cube.hasSurfaceSegmentIntersectsCube( a, b, predicate ) );
-		EXPECT_FALSE( cube.hasSurfaceRayIntersectsCube( a, dir, predicate ) );
-	}
-	{ // Hits cube: find max vertices in a surface
-		Vertex const a( -1.0, 0.5, 0.5 ), b( 3.0, 0.5, 0.5 ), dir( ( b - a ).normalize_zero() );
-		std::size_t n( 0 );
-		auto function = [&n]( SurfaceData const & surface ) { n = std::max( n, surface.Vertex.size() ); };
-		cube.processSurfaceRayIntersectsCube( a, dir, function );
-		EXPECT_EQ( 4u, n );
-	}
-	{ // Hits cube: find number of surfaces but no higher than 8
-		Vertex const a( -1.0, 0.5, 0.5 ), b( 3.0, 0.5, 0.5 ), dir( ( b - a ).normalize_zero() );
-		std::size_t n( 0 );
-		auto predicate = [&n]( SurfaceData const & ) -> bool { ++n; return n >= 8u; };
-		cube.processSomeSurfaceRayIntersectsCube( a, dir, predicate );
-		EXPECT_EQ( 8u, n );
-	}
+    // Function processing
+    { // Hits cube but predicate never satisfied
+        Vertex const a(-1.0, 0.5, 0.5), b(3.0, 0.5, 0.5), dir((b - a).normalize_zero());
+        auto predicate = [](SurfaceData const &surface) -> bool { return surface.Shape == SurfaceShape::Triangle; };
+        EXPECT_FALSE(cube.hasSurfaceSegmentIntersectsCube(a, b, predicate));
+        EXPECT_FALSE(cube.hasSurfaceRayIntersectsCube(a, dir, predicate));
+    }
+    { // Hits cube and predicate satisfied
+        Vertex const a(-1.0, 0.5, 0.5), b(3.0, 0.5, 0.5), dir((b - a).normalize_zero());
+        auto predicate = [](SurfaceData const &surface) -> bool { return surface.Shape == SurfaceShape::Rectangle; };
+        EXPECT_TRUE(cube.hasSurfaceSegmentIntersectsCube(a, b, predicate));
+        EXPECT_TRUE(cube.hasSurfaceRayIntersectsCube(a, dir, predicate));
+    }
+    { // Misses cube so predicate never tested
+        Vertex const a(-1.0, 3.0, 3.0), b(3.0, 3.0, 3.0), dir((b - a).normalize_zero());
+        auto predicate = [](SurfaceData const &surface) -> bool { return surface.Shape == SurfaceShape::Rectangle; };
+        EXPECT_FALSE(cube.hasSurfaceSegmentIntersectsCube(a, b, predicate));
+        EXPECT_FALSE(cube.hasSurfaceRayIntersectsCube(a, dir, predicate));
+    }
+    { // Hits cube: find max vertices in a surface
+        Vertex const a(-1.0, 0.5, 0.5), b(3.0, 0.5, 0.5), dir((b - a).normalize_zero());
+        std::size_t n(0);
+        auto function = [&n](SurfaceData const &surface) { n = std::max(n, surface.Vertex.size()); };
+        cube.processSurfaceRayIntersectsCube(a, dir, function);
+        EXPECT_EQ(4u, n);
+    }
+    { // Hits cube: find number of surfaces but no higher than 8
+        Vertex const a(-1.0, 0.5, 0.5), b(3.0, 0.5, 0.5), dir((b - a).normalize_zero());
+        std::size_t n(0);
+        auto predicate = [&n](SurfaceData const &) -> bool {
+            ++n;
+            return n >= 8u;
+        };
+        cube.processSomeSurfaceRayIntersectsCube(a, dir, predicate);
+        EXPECT_EQ(8u, n);
+    }
 
-	// Clean up
-	Surface.deallocate();
-	TotSurfaces = 0;
+    // Clean up
+    Surface.deallocate();
+    TotSurfaces = 0;
 }

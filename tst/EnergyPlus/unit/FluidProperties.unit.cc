@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,37 +62,27 @@ using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::FluidProperties;
 
-TEST_F( EnergyPlusFixture, FluidProperties_GetDensityGlycol)
+TEST_F(EnergyPlusFixture, FluidProperties_GetDensityGlycol)
 {
 
-	std::string const idf_objects = delimited_string({
-		" Version,8.4;",
-		" ",
-	    "FluidProperties:GlycolConcentration,",
-		"  GLHXFluid,       !- Name",
-		"  PropyleneGlycol, !- Glycol Type",
-		"  ,                !- User Defined Glycol Name",
-		"  0.3;             !- Glycol Concentration",
-		" "
-	} );
+    std::string const idf_objects = delimited_string({" Version,8.4;", " ", "FluidProperties:GlycolConcentration,", "  GLHXFluid,       !- Name",
+                                                      "  PropyleneGlycol, !- Glycol Type", "  ,                !- User Defined Glycol Name",
+                                                      "  0.3;             !- Glycol Concentration", " "});
 
-	ASSERT_FALSE(process_idf(idf_objects));
-	EXPECT_FALSE(has_err_output());
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
 
-	int FluidIndex = 0;
+    int FluidIndex = 0;
 
-	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFLUID", -35.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFLUID", -15.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1034.46, GetDensityGlycol( "GLHXFLUID", 5.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1030.51, GetDensityGlycol( "GLHXFLUID", 15.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1026.06, GetDensityGlycol( "GLHXFLUID", 25.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1021.09, GetDensityGlycol( "GLHXFLUID", 35.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1015.62, GetDensityGlycol( "GLHXFLUID", 45.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1003.13, GetDensityGlycol( "GLHXFLUID", 65.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  988.60, GetDensityGlycol( "GLHXFLUID", 85.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  972.03, GetDensityGlycol( "GLHXFLUID", 105.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  953.41, GetDensityGlycol( "GLHXFLUID", 125.0, FluidIndex, "UnitTest" ), 0.01 );
-
+    EXPECT_NEAR(1037.89, GetDensityGlycol("GLHXFLUID", -35.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1037.89, GetDensityGlycol("GLHXFLUID", -15.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1034.46, GetDensityGlycol("GLHXFLUID", 5.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1030.51, GetDensityGlycol("GLHXFLUID", 15.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1026.06, GetDensityGlycol("GLHXFLUID", 25.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1021.09, GetDensityGlycol("GLHXFLUID", 35.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1015.62, GetDensityGlycol("GLHXFLUID", 45.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1003.13, GetDensityGlycol("GLHXFLUID", 65.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(988.60, GetDensityGlycol("GLHXFLUID", 85.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(972.03, GetDensityGlycol("GLHXFLUID", 105.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(953.41, GetDensityGlycol("GLHXFLUID", 125.0, FluidIndex, "UnitTest"), 0.01);
 }
-
-

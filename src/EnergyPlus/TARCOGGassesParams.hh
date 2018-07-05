@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,26 +55,26 @@ namespace EnergyPlus {
 
 namespace TARCOGGassesParams {
 
-	// Data
-	//Max number of gasses
-	extern int const maxgas;
+    // Data
+    // Max number of gasses
+    extern int const maxgas;
 
-	//Standards:
-	extern int const ISO15099; // standard = ISO15099
-	extern int const EN673; // standard = EN 673 / ISO 10292 Declared
-	extern int const EN673Design; // standard = EN 673 / ISO 10292 Design
+    // Standards:
+    extern int const ISO15099;    // standard = ISO15099
+    extern int const EN673;       // standard = EN 673 / ISO 10292 Declared
+    extern int const EN673Design; // standard = EN 673 / ISO 10292 Design
 
-	extern int const MinStandard; // minimum index for standard
-	extern int const MaxStandard; // maximum index for standard
+    extern int const MinStandard; // minimum index for standard
+    extern int const MaxStandard; // maximum index for standard
 
-	//REAL(r64), parameter :: pi       = 3.14159265358979323846d0
-	//REAL(r64), parameter :: UniversalGasConst = 8314.462175d0 !(J/mol*K)
-	extern Real64 const alpha1; // accomodation coefficient for low pressure gas calculations
-	extern Real64 const alpha2; // accomodation coefficient for low pressure gas calculations
-	extern Real64 const InputDataTolerance; // coefficient used for input data tolerance in case for displaying error message
+    // REAL(r64), parameter :: pi       = 3.14159265358979323846d0
+    // REAL(r64), parameter :: UniversalGasConst = 8314.462175d0 !(J/mol*K)
+    extern Real64 const alpha1;             // accomodation coefficient for low pressure gas calculations
+    extern Real64 const alpha2;             // accomodation coefficient for low pressure gas calculations
+    extern Real64 const InputDataTolerance; // coefficient used for input data tolerance in case for displaying error message
 
-} // TARCOGGassesParams
+} // namespace TARCOGGassesParams
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

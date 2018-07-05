@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,97 +46,95 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataUCSDSharedData.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataUCSDSharedData.hh>
 
 namespace EnergyPlus {
 
 namespace DataUCSDSharedData {
 
-	// Module containing the data shared between the UCSD models.
+    // Module containing the data shared between the UCSD models.
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Linda Lawrie
-	//       DATE WRITTEN   March 2005
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   March 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// <description>
+    // PURPOSE OF THIS MODULE:
+    // <description>
 
-	// METHODOLOGY EMPLOYED:
-	// <description>
+    // METHODOLOGY EMPLOYED:
+    // <description>
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// OTHER NOTES:
-	// na
+    // OTHER NOTES:
+    // na
 
-	// USE STATEMENTS:
-	// <use statements for data only modules>
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-	// <use statements for access to subroutines in other modules>
+    // USE STATEMENTS:
+    // <use statements for data only modules>
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
+    // <use statements for access to subroutines in other modules>
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// The Eplus surface numbers will be stored in the arrays Apos according to the
-	// type of surface. The PosZ_Wall array has dimension 2 times the Number of Zones and
-	// for each zone it has 2 positions: the start and end positions in the Apos_Wall array
-	// for that specific zone.
-	Array1D_int APos_Wall;
-	Array1D_int APos_Floor;
-	Array1D_int APos_Ceiling;
-	Array1D_int PosZ_Wall;
-	Array1D_int PosZ_Floor;
-	Array1D_int PosZ_Ceiling;
-	Array1D_int APos_Window;
-	Array1D_int APos_Door;
-	Array1D_int APos_Internal;
-	Array1D_int PosZ_Window;
-	Array1D_int PosZ_Door;
-	Array1D_int PosZ_Internal;
-	// Convection coeficients for the various surfaces
-	Array1D< Real64 > HCeiling;
-	Array1D< Real64 > HWall;
-	Array1D< Real64 > HFloor;
-	Array1D< Real64 > HInternal;
-	Array1D< Real64 > HWindow;
-	Array1D< Real64 > HDoor;
+    // MODULE VARIABLE DECLARATIONS:
+    // The Eplus surface numbers will be stored in the arrays Apos according to the
+    // type of surface. The PosZ_Wall array has dimension 2 times the Number of Zones and
+    // for each zone it has 2 positions: the start and end positions in the Apos_Wall array
+    // for that specific zone.
+    Array1D_int APos_Wall;
+    Array1D_int APos_Floor;
+    Array1D_int APos_Ceiling;
+    Array1D_int PosZ_Wall;
+    Array1D_int PosZ_Floor;
+    Array1D_int PosZ_Ceiling;
+    Array1D_int APos_Window;
+    Array1D_int APos_Door;
+    Array1D_int APos_Internal;
+    Array1D_int PosZ_Window;
+    Array1D_int PosZ_Door;
+    Array1D_int PosZ_Internal;
+    // Convection coeficients for the various surfaces
+    Array1D<Real64> HCeiling;
+    Array1D<Real64> HWall;
+    Array1D<Real64> HFloor;
+    Array1D<Real64> HInternal;
+    Array1D<Real64> HWindow;
+    Array1D<Real64> HDoor;
 
-	// Clears the global data in DataAirLoop.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state()
-	{
-		APos_Wall.deallocate();
-		APos_Floor.deallocate();
-		APos_Ceiling.deallocate();
-		PosZ_Wall.deallocate();
-		PosZ_Floor.deallocate();
-		PosZ_Ceiling.deallocate();
-		APos_Window.deallocate();
-		APos_Door.deallocate();
-		APos_Internal.deallocate();
-		PosZ_Window.deallocate();
-		PosZ_Door.deallocate();
-		PosZ_Internal.deallocate();
-		HCeiling.deallocate();
-		HWall.deallocate();
-		HFloor.deallocate();
-		HInternal.deallocate();
-		HWindow.deallocate();
-		HDoor.deallocate();
-	}
+    // Clears the global data in DataAirLoop.
+    // Needed for unit tests, should not be normally called.
+    void clear_state()
+    {
+        APos_Wall.deallocate();
+        APos_Floor.deallocate();
+        APos_Ceiling.deallocate();
+        PosZ_Wall.deallocate();
+        PosZ_Floor.deallocate();
+        PosZ_Ceiling.deallocate();
+        APos_Window.deallocate();
+        APos_Door.deallocate();
+        APos_Internal.deallocate();
+        PosZ_Window.deallocate();
+        PosZ_Door.deallocate();
+        PosZ_Internal.deallocate();
+        HCeiling.deallocate();
+        HWall.deallocate();
+        HFloor.deallocate();
+        HInternal.deallocate();
+        HWindow.deallocate();
+        HDoor.deallocate();
+    }
 
+} // namespace DataUCSDSharedData
 
-} // DataUCSDSharedData
-
-} // EnergyPlus
+} // namespace EnergyPlus

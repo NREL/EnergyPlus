@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,49 +52,37 @@
 #include <memory>
 
 // EnergyPlus Headers
-#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 #include <EnergyPlus.hh>
+#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
 
-	class XingGroundTempsModel : public BaseGroundTempsModel
-	{
-		public:
-			Real64 depth;
-			Real64 groundThermalDiffisivity;
-			Real64 simTimeInDays;
-			Real64 aveGroundTemp;
-			Real64 surfTempAmplitude_1;
-			Real64 phaseShift_1;
-			Real64 surfTempAmplitude_2;
-			Real64 phaseShift_2;
+class XingGroundTempsModel : public BaseGroundTempsModel
+{
+public:
+    Real64 depth;
+    Real64 groundThermalDiffisivity;
+    Real64 simTimeInDays;
+    Real64 aveGroundTemp;
+    Real64 surfTempAmplitude_1;
+    Real64 phaseShift_1;
+    Real64 surfTempAmplitude_2;
+    Real64 phaseShift_2;
 
-		static std::shared_ptr< XingGroundTempsModel > 
-		XingGTMFactory( 
-			int objectType, 
-			std::string objectName
-		);
+    static std::shared_ptr<XingGroundTempsModel> XingGTMFactory(int objectType, std::string objectName);
 
-		Real64
-		getGroundTemp();
+    Real64 getGroundTemp();
 
-		Real64
-		getGroundTempAtTimeInSeconds(
-			Real64 const depth,
-			Real64 const timeInSecondsOfSim
-		);
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
 
-		Real64
-		getGroundTempAtTimeInMonths(
-			Real64 const depth,
-			int const monthOfSim
-		);
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
 
-		// Destructor
-		~XingGroundTempsModel(){}
+    // Destructor
+    ~XingGroundTempsModel()
+    {
+    }
+};
 
-	};
-
-}
+} // namespace EnergyPlus
 
 #endif

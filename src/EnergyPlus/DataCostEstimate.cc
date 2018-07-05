@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,48 +52,62 @@
 namespace EnergyPlus {
 
 namespace DataCostEstimate {
-	// PURPOSE OF THIS MODULE:
-	// This data-only module is a repository for Cost Estimation variables which are considered
-	// to be "global" in nature in EnergyPlus.
+    // PURPOSE OF THIS MODULE:
+    // This data-only module is a repository for Cost Estimation variables which are considered
+    // to be "global" in nature in EnergyPlus.
 
-	// METHODOLOGY EMPLOYED:
+    // METHODOLOGY EMPLOYED:
 
-	// REFERENCES:
+    // REFERENCES:
 
-	// OTHER NOTES:
+    // OTHER NOTES:
 
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	// CurntBldg holds results for current bldg. cost estimate
-	// RefrnceBldg holds user input for comparison.
+    // CurntBldg holds results for current bldg. cost estimate
+    // RefrnceBldg holds user input for comparison.
 
-	int NumLineItems( 0 ); // number of cost estimate line items
-	bool DoCostEstimate( false ); // set to true if any cost estimating needed
+    int NumLineItems(0);        // number of cost estimate line items
+    bool DoCostEstimate(false); // set to true if any cost estimating needed
 
-	int numMonetaryUnit( 0 );
-	int selectedMonetaryUnit( 0 );
+    int numMonetaryUnit(0);
+    int selectedMonetaryUnit(0);
 
-	// Object Data
-	Array1D< CostLineItemStruct > CostLineItem;
-	CostAdjustmentStruct CurntBldg( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 ); // holds total from line item cost calculations | holds user-defined constant cost model | holds user-defined fraction for design fees | holds user-defined fraction for contractor fees | holds user-defined fraction for contingencies | holds user-defined fraction for bonding costs | holds user-defined fraction for commissioning costs | holds user-defined multiplier to account for regional diffs | the Grand Total of all line items plus all other costs
-	CostAdjustmentStruct RefrncBldg( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 ); // holds total from line item cost calculations | holds user-defined constant cost model | holds user-defined fraction for design fees | holds user-defined fraction for contractor fees | holds user-defined fraction for contingencies | holds user-defined fraction for bonding costs | holds user-defined fraction for commissioning costs | holds user-defined multiplier to account for regional diffs | the Grand Total of all line items plus all other costs
-	Array1D< monetaryUnitType > monetaryUnit;
+    // Object Data
+    Array1D<CostLineItemStruct> CostLineItem;
+    CostAdjustmentStruct CurntBldg(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); // holds total from line item cost calculations | holds user-defined
+                                                                                 // constant cost model | holds user-defined fraction for design fees
+                                                                                 // | holds user-defined fraction for contractor fees | holds
+                                                                                 // user-defined fraction for contingencies | holds user-defined
+                                                                                 // fraction for bonding costs | holds user-defined fraction for
+                                                                                 // commissioning costs | holds user-defined multiplier to account for
+                                                                                 // regional diffs | the Grand Total of all line items plus all other
+                                                                                 // costs
+    CostAdjustmentStruct RefrncBldg(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); // holds total from line item cost calculations | holds user-defined
+                                                                                  // constant cost model | holds user-defined fraction for design fees
+                                                                                  // | holds user-defined fraction for contractor fees | holds
+                                                                                  // user-defined fraction for contingencies | holds user-defined
+                                                                                  // fraction for bonding costs | holds user-defined fraction for
+                                                                                  // commissioning costs | holds user-defined multiplier to account
+                                                                                  // for regional diffs | the Grand Total of all line items plus all
+                                                                                  // other costs
+    Array1D<monetaryUnitType> monetaryUnit;
 
-} // DataCostEstimate
+} // namespace DataCostEstimate
 
-} // EnergyPlus
+} // namespace EnergyPlus

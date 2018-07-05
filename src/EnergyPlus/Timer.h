@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,18 +45,17 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 //#define TIMER_CPU_TIME
 #define TIMER_F90_EPTIME
 
 #if defined(TIMER_F90_EPTIME)
-#  define TSTART(x) x=epelapsedtime()
-#  define TSTOP(x)  x=epelapsedtime()
-#  define TSTAMP(x) x=epelapsedtime()
+#define TSTART(x) x = epelapsedtime()
+#define TSTOP(x) x = epelapsedtime()
+#define TSTAMP(x) x = epelapsedtime()
 #elif defined(TIMER_CPU_TIME)
-#  define TSTART(x) CPU_TIME(x)
-#  define TSTOP(x)  CPU_TIME(x)
-#  define TSTAMP(x) CPU_TIME(x)
+#define TSTART(x) CPU_TIME(x)
+#define TSTOP(x) CPU_TIME(x)
+#define TSTAMP(x) CPU_TIME(x)
 #else
-  NEED_TO_SPECIFY_TIMER
+NEED_TO_SPECIFY_TIMER
 #endif

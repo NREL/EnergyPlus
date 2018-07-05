@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,55 +58,34 @@ namespace EnergyPlus {
 
 namespace DElightManagerF {
 
-	void
-	DElightInputGenerator();
+    void DElightInputGenerator();
 
-	void
-	GenerateDElightDaylightCoefficients(
-		Real64 & dLatitude,
-		int & iErrorFlag
-	);
+    void GenerateDElightDaylightCoefficients(Real64 &dLatitude, int &iErrorFlag);
 
-	void
-	GetInputDElightComplexFenestration(
-		bool & ErrorsFound
-	);
+    void GetInputDElightComplexFenestration(bool &ErrorsFound);
 
-	void
-	CheckForGeometricTransform(
-		bool & doTransform,
-		Real64 & OldAspectRatio,
-		Real64 & NewAspectRatio
-	);
+    void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 
-	std::string
-	ReplaceBlanksWithUnderscores(
-		std::string const & InputString
-	);
+    std::string ReplaceBlanksWithUnderscores(std::string const &InputString);
 
-	void
-	DElightElecLtgCtrl(
-		int iNameLength,
-		std::string cZoneName,
-		Real64 dBldgLat,
-		Real64 dHISKF,
-		Real64 dHISUNF,
-		Real64 dCloudFraction,
-		Real64 dSOLCOSX,
-		Real64 dSOLCOSY,
-		Real64 dSOLCOSZ,
-		Real64 & pdPowerReducFac,
-		int piErrorFlag
-	);
+    void DElightElecLtgCtrl(int iNameLength,
+                            std::string cZoneName,
+                            Real64 dBldgLat,
+                            Real64 dHISKF,
+                            Real64 dHISUNF,
+                            Real64 dCloudFraction,
+                            Real64 dSOLCOSX,
+                            Real64 dSOLCOSY,
+                            Real64 dSOLCOSZ,
+                            Real64 &pdPowerReducFac,
+                            int piErrorFlag);
 
-	std::vector< char >
-	getCharArrayFromString( std::string const & originalString );
+    std::vector<char> getCharArrayFromString(std::string const &originalString);
 
-	std::string
-	getStringFromCharArray( std::vector< char > const & originalCharArray );
+    std::string getStringFromCharArray(std::vector<char> const &originalCharArray);
 
-} // DELIGHTMANAGERF
+} // namespace DElightManagerF
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

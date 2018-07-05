@@ -11,8 +11,8 @@
 !
 ! Location:                Miami, FL
 !
-! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
-!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/21, Summer 7/21.
 !
@@ -22,7 +22,7 @@
 !           There is a single window in the West zone south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -101,7 +101,7 @@
   output:Sqlite,
     simple;                  !- Option Type
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -153,7 +153,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
 ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
 ! Coldest Month=January
-! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
+! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -185,7 +185,7 @@
 
 ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
 ! Hottest Month=July
-! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -1311,6 +1311,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1318,6 +1319,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1325,6 +1327,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1338,7 +1341,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1346,7 +1349,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1354,7 +1357,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -1531,7 +1534,7 @@
     Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     4.0,                     !- Number of Speeds {dimensionless}
     4.0,                     !- Nominal Speed Level {dimensionless}
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
@@ -1547,7 +1550,7 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    8914.185229,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    8914.185229,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.79,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     3.980488789,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.944,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1557,7 +1560,7 @@
     HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp1,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    16456.94607,             !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    16456.94607,             !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.73,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.08,                    !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     1.888,                   !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1567,7 +1570,7 @@
     HPACFFF,                 !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp2,      !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    23463.3646,              !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    23463.3646,              !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.78,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.19,                    !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     2.832,                   !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1577,7 +1580,7 @@
     HPACFFF,                 !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp3,      !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    36991.44197,             !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    36991.44197,             !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     3.866381837,             !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     3.776,                   !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -2037,9 +2040,9 @@
 
   Output:Variable,Zone 3 Reheat Air Outlet Node,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,timestep;
+  Output:Variable,*,Heating Coil Heating Energy,timestep;
 
   Output:Variable,Outside Air Inlet Node,System Node Mass Flow Rate,timestep;
 
