@@ -347,31 +347,66 @@ namespace DaylightingDevices {
                 for (TZoneNum = 1; TZoneNum <= TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
                     SumTZoneLengths += TDDPipe(PipeNum).TZoneLength(TZoneNum);
 
-                    SetupZoneInternalGain(TDDPipe(PipeNum).TZone(TZoneNum), "DaylightingDevice:Tubular", TDDPipe(PipeNum).Name,
-                                          IntGainTypeOf_DaylightingDeviceTubular, TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
+                    SetupZoneInternalGain(TDDPipe(PipeNum).TZone(TZoneNum),
+                                          "DaylightingDevice:Tubular",
+                                          TDDPipe(PipeNum).Name,
+                                          IntGainTypeOf_DaylightingDeviceTubular,
+                                          TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
 
                 } // TZoneNum
 
                 TDDPipe(PipeNum).ExtLength = TDDPipe(PipeNum).TotLength - SumTZoneLengths;
 
                 // Setup report variables: CurrentModuleObject='DaylightingDevice:Tubular'
-                SetupOutputVariable("Tubular Daylighting Device Transmitted Solar Radiation Rate", OutputProcessor::Unit::W,
-                                    TDDPipe(PipeNum).TransmittedSolar, "Zone", "Average", TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate", OutputProcessor::Unit::W,
-                                    TDDPipe(PipeNum).PipeAbsorbedSolar, "Zone", "Average", TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Heat Gain Rate", OutputProcessor::Unit::W, TDDPipe(PipeNum).HeatGain, "Zone",
-                                    "Average", TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Heat Loss Rate", OutputProcessor::Unit::W, TDDPipe(PipeNum).HeatLoss, "Zone",
-                                    "Average", TDDPipe(PipeNum).Name);
+                SetupOutputVariable("Tubular Daylighting Device Transmitted Solar Radiation Rate",
+                                    OutputProcessor::Unit::W,
+                                    TDDPipe(PipeNum).TransmittedSolar,
+                                    "Zone",
+                                    "Average",
+                                    TDDPipe(PipeNum).Name);
+                SetupOutputVariable("Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
+                                    OutputProcessor::Unit::W,
+                                    TDDPipe(PipeNum).PipeAbsorbedSolar,
+                                    "Zone",
+                                    "Average",
+                                    TDDPipe(PipeNum).Name);
+                SetupOutputVariable("Tubular Daylighting Device Heat Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    TDDPipe(PipeNum).HeatGain,
+                                    "Zone",
+                                    "Average",
+                                    TDDPipe(PipeNum).Name);
+                SetupOutputVariable("Tubular Daylighting Device Heat Loss Rate",
+                                    OutputProcessor::Unit::W,
+                                    TDDPipe(PipeNum).HeatLoss,
+                                    "Zone",
+                                    "Average",
+                                    TDDPipe(PipeNum).Name);
 
-                SetupOutputVariable("Tubular Daylighting Device Beam Solar Transmittance", OutputProcessor::Unit::None, TDDPipe(PipeNum).TransSolBeam,
-                                    "Zone", "Average", TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Beam Visible Transmittance", OutputProcessor::Unit::None,
-                                    TDDPipe(PipeNum).TransVisBeam, "Zone", "Average", TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Diffuse Solar Transmittance", OutputProcessor::Unit::None,
-                                    TDDPipe(PipeNum).TransSolDiff, "Zone", "Average", TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Diffuse Visible Transmittance", OutputProcessor::Unit::None,
-                                    TDDPipe(PipeNum).TransVisDiff, "Zone", "Average", TDDPipe(PipeNum).Name);
+                SetupOutputVariable("Tubular Daylighting Device Beam Solar Transmittance",
+                                    OutputProcessor::Unit::None,
+                                    TDDPipe(PipeNum).TransSolBeam,
+                                    "Zone",
+                                    "Average",
+                                    TDDPipe(PipeNum).Name);
+                SetupOutputVariable("Tubular Daylighting Device Beam Visible Transmittance",
+                                    OutputProcessor::Unit::None,
+                                    TDDPipe(PipeNum).TransVisBeam,
+                                    "Zone",
+                                    "Average",
+                                    TDDPipe(PipeNum).Name);
+                SetupOutputVariable("Tubular Daylighting Device Diffuse Solar Transmittance",
+                                    OutputProcessor::Unit::None,
+                                    TDDPipe(PipeNum).TransSolDiff,
+                                    "Zone",
+                                    "Average",
+                                    TDDPipe(PipeNum).Name);
+                SetupOutputVariable("Tubular Daylighting Device Diffuse Visible Transmittance",
+                                    OutputProcessor::Unit::None,
+                                    TDDPipe(PipeNum).TransVisDiff,
+                                    "Zone",
+                                    "Average",
+                                    TDDPipe(PipeNum).Name);
 
             } // PipeNum
 
@@ -473,8 +508,17 @@ namespace DaylightingDevices {
             TDDPipe.allocate(NumOfTDDPipes);
 
             for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              PipeNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 // Pipe name
                 TDDPipe(PipeNum).Name = cAlphaArgs(1);
@@ -726,8 +770,17 @@ namespace DaylightingDevices {
             Shelf.allocate(NumOfShelf);
 
             for (ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              ShelfNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 // Shelf name
                 Shelf(ShelfNum).Name = cAlphaArgs(1);
@@ -1139,6 +1192,7 @@ namespace DaylightingDevices {
         using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataHeatBalance::AnisoSkyMult;
+        using DataHeatBalance::curDifShdgRatioIsoSky;
         using DataHeatBalance::DifShdgRatioHoriz;
         using DataHeatBalance::DifShdgRatioHorizHRTS;
         using DataHeatBalance::DifShdgRatioIsoSky;
@@ -1146,7 +1200,6 @@ namespace DaylightingDevices {
         using DataHeatBalance::MultHorizonZenith;
         using DataHeatBalance::MultIsoSky;
         using DataHeatBalance::SunlitFrac;
-        using DataHeatBalance::curDifShdgRatioIsoSky;
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 
         // Return value

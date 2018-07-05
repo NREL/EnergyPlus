@@ -3342,8 +3342,17 @@ namespace General {
 
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(1));
@@ -3390,8 +3399,17 @@ namespace General {
 
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(1));
@@ -3433,8 +3451,17 @@ namespace General {
 
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 VarDict = true;
                 VarDictOption1 = cAlphaArgs(1);
                 VarDictOption2 = cAlphaArgs(2);
@@ -3443,8 +3470,17 @@ namespace General {
             cCurrentModuleObject = "Output:Constructions";
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (has_prefix(cAlphaArgs(1), "CONSTRUCT")) {
                     Constructions = true;
                 } else if (has_prefix(cAlphaArgs(1), "MAT")) {
@@ -3462,8 +3498,17 @@ namespace General {
             cCurrentModuleObject = "Output:EnergyManagementSystem";
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 EMSoutput = true;
 

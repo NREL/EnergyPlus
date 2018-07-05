@@ -116,7 +116,6 @@ namespace AirflowNetworkSolver {
     using Psychrometrics::PsyCpAirFnWTdb;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace DataAirflowNetwork;
 
     // Data
@@ -728,7 +727,7 @@ namespace AirflowNetworkSolver {
                 DUMPVD("AU:", AU, NNZE, Unit21);
                 DUMPVR("AF:", SUMF, NetworkNumOfNodes, Unit21);
             }
-                // Solve linear system for approximate PZ.
+            // Solve linear system for approximate PZ.
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
             FACSKY(newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM);     // noel
             SLVSKY(newAU, AD, newAU, PZ, newIK, NetworkNumOfNodes, NSYM); // noel
@@ -1281,8 +1280,8 @@ namespace AirflowNetworkSolver {
             Corr = MultizoneSurfaceData(i).Factor;
         }
         CompNum = AirflowNetworkCompData(j).TypeNum;
-        RhozNorm = PsyRhoAirFnPbTdbW(MultizoneSurfaceCrackData(CompNum).StandardP, MultizoneSurfaceCrackData(CompNum).StandardT,
-                                     MultizoneSurfaceCrackData(CompNum).StandardW);
+        RhozNorm = PsyRhoAirFnPbTdbW(
+            MultizoneSurfaceCrackData(CompNum).StandardP, MultizoneSurfaceCrackData(CompNum).StandardT, MultizoneSurfaceCrackData(CompNum).StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * MultizoneSurfaceCrackData(CompNum).StandardT;
 
         expn = MultizoneSurfaceCrackData(CompNum).FlowExpo;
@@ -2880,7 +2879,8 @@ namespace AirflowNetworkSolver {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = MultizoneSurfaceData(i).Factor;
-            RhozNorm = PsyRhoAirFnPbTdbW(MultizoneCompExhaustFanData(CompNum).StandardP, MultizoneCompExhaustFanData(CompNum).StandardT,
+            RhozNorm = PsyRhoAirFnPbTdbW(MultizoneCompExhaustFanData(CompNum).StandardP,
+                                         MultizoneCompExhaustFanData(CompNum).StandardT,
                                          MultizoneCompExhaustFanData(CompNum).StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * MultizoneCompExhaustFanData(CompNum).StandardT;
 
@@ -3338,7 +3338,8 @@ namespace AirflowNetworkSolver {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = PsyRhoAirFnPbTdbW(DisSysCompOutdoorAirData(CompNum).StandardP, DisSysCompOutdoorAirData(CompNum).StandardT,
+            RhozNorm = PsyRhoAirFnPbTdbW(DisSysCompOutdoorAirData(CompNum).StandardP,
+                                         DisSysCompOutdoorAirData(CompNum).StandardT,
                                          DisSysCompOutdoorAirData(CompNum).StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * DisSysCompOutdoorAirData(CompNum).StandardT;
 
@@ -3470,8 +3471,8 @@ namespace AirflowNetworkSolver {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = PsyRhoAirFnPbTdbW(DisSysCompReliefAirData(CompNum).StandardP, DisSysCompReliefAirData(CompNum).StandardT,
-                                         DisSysCompReliefAirData(CompNum).StandardW);
+            RhozNorm = PsyRhoAirFnPbTdbW(
+                DisSysCompReliefAirData(CompNum).StandardP, DisSysCompReliefAirData(CompNum).StandardT, DisSysCompReliefAirData(CompNum).StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * DisSysCompReliefAirData(CompNum).StandardT;
 
             expn = DisSysCompReliefAirData(CompNum).FlowExpo;
@@ -4390,7 +4391,9 @@ namespace AirflowNetworkSolver {
                 } else {
                     ShowRecurringWarningErrorAtEnd("The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " +
                                                        MultizoneCompDetOpeningData(CompNum).Name + " is 0 error continues.",
-                                                   MultizoneCompDetOpeningData(CompNum).WidthErrIndex, ActLw, ActLw);
+                                                   MultizoneCompDetOpeningData(CompNum).WidthErrIndex,
+                                                   ActLw,
+                                                   ActLw);
                 }
                 ActLw = 1.0e-6;
             }
@@ -4404,7 +4407,9 @@ namespace AirflowNetworkSolver {
                 } else {
                     ShowRecurringWarningErrorAtEnd("The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " +
                                                        MultizoneCompDetOpeningData(CompNum).Name + " is 0 error continues.",
-                                                   MultizoneCompDetOpeningData(CompNum).HeightErrIndex, ActLh, ActLh);
+                                                   MultizoneCompDetOpeningData(CompNum).HeightErrIndex,
+                                                   ActLh,
+                                                   ActLh);
                 }
                 ActLh = 1.0e-6;
             }
@@ -5427,4 +5432,4 @@ namespace AirflowNetworkSolver {
 
 } // namespace AirflowNetworkSolver
 
-} // EnergyPlus
+} // namespace EnergyPlus

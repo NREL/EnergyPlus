@@ -183,8 +183,37 @@ namespace ThermalEN673Calc {
         rtot = 0.0;
         sft = 0.0;
         if (GoAhead(nperr)) {
-            EN673ISO10292(nlayer, tout, tind, emis, gap, thick, scon, tilt, iprop, frct, xgcon, xgvis, xgcp, xwght, presure, nmix, theta, standard,
-                          hg, hr, hs, hin, hout, hcin, ibc, rs, ufactor, Ra, Nu, nperr, ErrorMessage);
+            EN673ISO10292(nlayer,
+                          tout,
+                          tind,
+                          emis,
+                          gap,
+                          thick,
+                          scon,
+                          tilt,
+                          iprop,
+                          frct,
+                          xgcon,
+                          xgvis,
+                          xgcp,
+                          xwght,
+                          presure,
+                          nmix,
+                          theta,
+                          standard,
+                          hg,
+                          hr,
+                          hs,
+                          hin,
+                          hout,
+                          hcin,
+                          ibc,
+                          rs,
+                          ufactor,
+                          Ra,
+                          Nu,
+                          nperr,
+                          ErrorMessage);
 
             if (GoAhead(nperr)) {
                 rtot = 1.0 / ufactor;
@@ -363,7 +392,22 @@ namespace ThermalEN673Calc {
                         ipropg(j) = iprop(j, i + 1);
                         frctg(j) = frct(j, i + 1);
                     }
-                    GASSES90(Tm, ipropg, frctg, presure(i + 1), nmix(i + 1), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard, nperr,
+                    GASSES90(Tm,
+                             ipropg,
+                             frctg,
+                             presure(i + 1),
+                             nmix(i + 1),
+                             xwght,
+                             xgcon,
+                             xgvis,
+                             xgcp,
+                             con,
+                             visc,
+                             dens,
+                             cp,
+                             pr,
+                             standard,
+                             nperr,
                              ErrorMessage);
                     Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                     Ra(i) = Gr(i) * pr;
@@ -416,8 +460,23 @@ namespace ThermalEN673Calc {
                                 ipropg(j) = iprop(j, i + 1);
                                 frctg(j) = frct(j, i + 1);
                             } // j, gas mix
-                            GASSES90(Tm, ipropg, frctg, presure(i + 1), nmix(i + 1), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard,
-                                     nperr, ErrorMessage);
+                            GASSES90(Tm,
+                                     ipropg,
+                                     frctg,
+                                     presure(i + 1),
+                                     nmix(i + 1),
+                                     xwght,
+                                     xgcon,
+                                     xgvis,
+                                     xgcp,
+                                     con,
+                                     visc,
+                                     dens,
+                                     cp,
+                                     pr,
+                                     standard,
+                                     nperr,
+                                     ErrorMessage);
                             Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                             Ra(i) = Gr(i) * pr;
                             Nu(i) = A * std::pow(Ra(i), n);

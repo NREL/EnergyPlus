@@ -150,10 +150,14 @@ namespace CommandLineInterface {
 
         opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
 
-        opt.add("L", 0, 1, 0,
+        opt.add("L",
+                0,
+                1,
+                0,
                 "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: "
                 "Dash (e.g., eplus-table.csv)",
-                "-s", "--output-suffix");
+                "-s",
+                "--output-suffix");
 
         opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
