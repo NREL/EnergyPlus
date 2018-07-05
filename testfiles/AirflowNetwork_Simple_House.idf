@@ -1346,6 +1346,12 @@
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
+    Living:West,            !- Surface Name
+    ZoneLeak,                !- Leakage Component Name
+    ,                        !- External Node Name
+    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+  AirflowNetwork:MultiZone:Surface,
     EastRoof,                !- Surface Name
     AtticLeak,               !- Leakage Component Name
     ,                        !- External Node Name
