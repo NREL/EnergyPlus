@@ -55,10 +55,50 @@ namespace EnergyPlus {
 
 namespace UnitarySystems {
 
-    class UnitarySys {
+    // Supply Air Sizing Option
+    extern int const None;
+    extern int const SupplyAirFlowRate;
+    extern int const FlowPerFloorArea;
+    extern int const FractionOfAutoSizedCoolingValue;
+    extern int const FractionOfAutoSizedHeatingValue;
+    extern int const FlowPerCoolingCapacity;
+    extern int const FlowPerHeatingCapacity;
 
-        //bool myOneTimeFlag;
-        //bool getInputOnceFlag;
+    class DesignSpecMSHP
+    {
+        friend class UnitarySys;
+
+    public:
+        DesignSpecMSHP(); // constructor
+        ~DesignSpecMSHP() // destructor
+        {
+        }
+
+        std::string name;
+        static DesignSpecMSHP *factory(int object_type_of_num, std::string const objectName);
+
+    private:
+        int designSpecMSHPType_Num;
+        Real64 noLoadAirFlowRateRatio;
+        int numOfSpeedHeating;
+        int numOfSpeedCooling;
+        std::vector<Real64> coolVolumeFlowRate;
+        std::vector<Real64> coolMassFlowRate;
+        std::vector<Real64> MSCoolingSpeedRatio;
+        std::vector<Real64> heatVolumeFlowRate;
+        std::vector<Real64> heatMassFlowRate;
+        std::vector<Real64> MSHeatingSpeedRatio;
+        bool singleModeFlag;
+
+        static void getDesignSpecMSHP();
+        static void getDesignSpecMSHPdata(bool errorsFound);
+    };
+
+    class UnitarySys
+    {
+
+        // bool myOneTimeFlag;
+        // bool getInputOnceFlag;
 
         enum controlTypeEnum : int
         {
@@ -74,54 +114,185 @@ namespace UnitarySystems {
             dehumidControl_None,
             dehumidControl_CoolReheat,
             dehumidControl_Multimode,
-//            default = dehumidControl_None
+            //            default = dehumidControl_None
         };
 
-        enum supFanLocEnum : int
+        enum fanOpModeEnum : int
+        {
+            fanOpModeNotYetSet,
+            contFanCycCoil,
+            cycFanCycCoil
+        };
+
+        enum fanPlaceEnum : int
         {
             notYetSet,
-            drawThru,
-            blowThru
+            blowThru,
+            drawThru
         };
 
-    public:
-        UnitarySys *compPointer;
-        int TypeOfNum;
-        std::string name;                       // user identifier
-        int availSchedIndex;                    // Pointer to the availability schedule
+        // Airflow control for contant fan mode
+        enum useCompFlow : int
+        {
+            flowNotYetSet,
+            useCompressorOnFlow, // set compressor OFF air flow rate equal to compressor ON air flow rate
+            useCompressorOffFlow // set compressor OFF air flow rate equal to user defined value
+        };
+
+        friend class DesignSpecMSHP;
+        UnitarySys *compPointer; // don't need this here
+        std::string unitType;
+        int sysAvailSchedPtr; // Pointer to the availability schedule
         controlTypeEnum controlType;
-        int controlZoneIndex;
-        dehumCtrlTypeEnum dehumidificationControl;
-        int inletNodeNum;                       // system air node at inlet
-        int outletNodeNum;                      // system air node at outlet
+        int controlZoneNum;
+        dehumCtrlTypeEnum dehumidControlType_Num;
+        bool humidistat;
+        int airInNode;  // system air node at inlet
+        int airOutNode; // system air node at outlet
         bool validASHRAECoolCoil;
         bool validASHRAEHeatCoil;
-        int supplyFanIndex;
-        supFanLocEnum supplyFanLoc;
-        int supplyFanOpModeSchIndex;
+        std::string fanName;
+        int fanIndex;
+        fanPlaceEnum fanPlace;
+        int fanOpModeSchedPtr;
         bool fanExists;
-        int fanTypeNum;
+        int fanType_Num;
         bool requestAutoSize;
         Real64 actualFanVolFlowRate;
         Real64 designFanVolFlowRate;
         int fanAvailSchedPtr;
+        int fanOpMode;
+        std::string ATMixerName;
+        int ATMixerIndex;
+        int ATMixerType;
+        int ATMixerPriNode;
+        int ATMixerSecNode;
+        int ATMixerOutNode;
+        bool ATMixerExists;
+        int nodeNumOfControlledZone;
+        bool airLoopEquipment;
+        int zoneInletNode;
+        int zoneSequenceCoolingNum;
+        int zoneSequenceHeatingNum;
+        bool myGetInputSuccessfulFlag;
+        std::string heatingCoilName;
+        std::string heatingCoilTypeName;
+        bool heatCoilExists;
+        Real64 heatingSizingRatio;
+        int heatingCoilType_Num;
+        bool DXHeatingCoil;
+        int heatingCoilIndex;
+        int heatingCoilAvailSchPtr;
+        Real64 designHeatingCapacity;
+        Real64 maxHeatAirVolFlow;
+        int numOfSpeedHeating;
+        int heatCoilFluidInletNode;
+        Real64 maxHeatCoilFluidFlow;
+        bool multiSpeedHeatingCoil;
+        bool varSpeedHeatingCoil;
+        int systemHeatControlNodeNum;
+        int heatCoilInletNodeNum;
+        int heatCoilOutletNodeNum;
+        bool coolCoilExists;
+        int coolingCoilType_Num;
+        int numOfSpeedCooling;
+        int coolingCoilAvailSchPtr;
+        Real64 designCoolingCapacity;
+        Real64 maxCoolAirVolFlow;
+        int condenserNodeNum;
+        int coolingCoilIndex;
+        bool heatPump;
+        int actualDXCoilIndexForHXAssisted;
+        Real64 maxCoolCoilFluidFlow;
+        int coolCoilFluidInletNode;
+        bool multiSpeedCoolingCoil;
+        bool varSpeedCoolingCoil;
+        int systemCoolControlNodeNum;
+        std::string coolingCoilName;
+        int coolCoilInletNodeNum;
+        int coolCoilOutletNodeNum;
+        int waterCyclingMode;
+        bool ISHundredPercentDOASDXCoil;
+        Real64 designMinOutletTemp;
+        bool runOnSensibleLoad;
+        bool runOnLatentLoad;
+        bool runOnLatentOnlyWithSensible;
+        std::string suppHeatCoilName;
+        std::string suppHeatCoilTypeName;
+        int suppHeatCoilType_Num;
+        bool suppCoilExists;
+        Real64 designSuppHeatingCapacity;
+        int suppCoilAirInletNode;
+        int suppCoilAirOutletNode;
+        int suppCoilFluidInletNode;
+        Real64 maxSuppCoilFluidFlow;
+        int suppHeatCoilIndex;
+        int suppHeatControlNodeNum;
+        int coolingSAFMethod;
+        int heatingSAFMethod;
+        int noCoolHeatSAFMethod;
+        Real64 maxNoCoolHeatAirVolFlow;
+        useCompFlow airFlowControl;
+        bool coolingCoilUpstream;
+        Real64 designMaxOutletTemp;
+        Real64 maxOATSuppHeat;
+        Real64 minOATCompressorCooling;
+        Real64 minOATCompressorHeating;
+        Real64 maxONOFFCyclesperHour;
+        Real64 HPTimeConstant;
+        Real64 onCyclePowerFraction;
+        Real64 fanDelayTime;
+        Real64 ancillaryOnPower;
+        Real64 ancillaryOffPower;
+        Real64 designHRWaterVolumeFlow;
+        Real64 maxHROutletWaterTemp;
+        bool heatRecActive;
+        int heatRecoveryInletNodeNum;
+        int heatRecoveryOutletNodeNum;
+        std::string designSpecMultispeedHPType;
+        std::string designSpecMultispeedHPName;
+        int designSpecMSHPIndex;
+        Real64 noLoadAirFlowRateRatio;
+        DesignSpecMSHP *compPointerMSHP;
+        std::vector<Real64> coolVolumeFlowRate;
+        std::vector<Real64> coolMassFlowRate;
+        std::vector<Real64> MSCoolingSpeedRatio;
+        std::vector<Real64> heatVolumeFlowRate;
+        std::vector<Real64> heatMassFlowRate;
+        std::vector<Real64> MSHeatingSpeedRatio;
+        int singleMode;
+        bool multiOrVarSpeedHeatCoil;
+        bool multiOrVarSpeedCoolCoil;
+
+        static void getInput();
+        static void getInputData(bool errorsFound);
+
+    public:
+        UnitarySys(); // constructor
 
         ~UnitarySys() // destructor
         {
         }
 
-        //UnitarySys(std::string const &objectName); // constructor
-        UnitarySys(); // constructor
+        std::string name; // user identifier
+        int unitarySystemType_Num;
 
-        void simulate(std::string const &objectName, bool const firstHVACIteration, int const &AirLoopNum, int &CompIndex, bool &HeatingActive, bool &CoolingActive);
         static UnitarySys *factory(int object_type_of_num, std::string const objectName);
+
+        void simulate(std::string const &objectName,
+                      bool const firstHVACIteration,
+                      int const &AirLoopNum,
+                      int &CompIndex,
+                      bool &HeatingActive,
+                      bool &CoolingActive);
+
         void init(bool const firstHVACIteration);
-        static void getInput();
-        static void getInputData(bool errorsFound);
 
     };
-    extern std::vector<UnitarySys> unitarySys;
 
-}
-}
-#endif //ENERGYPLUS_UNITARYSYSTEM_HH
+    extern std::vector<UnitarySys> unitarySys;
+    extern std::vector<DesignSpecMSHP> designSpecMSHP;
+
+} // namespace UnitarySystems
+} // namespace EnergyPlus
+#endif // ENERGYPLUS_UNITARYSYSTEM_HH

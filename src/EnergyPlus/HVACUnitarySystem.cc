@@ -4203,7 +4203,7 @@ namespace HVACUnitarySystem {
                         UnitarySystem(UnitarySysNum).FanType_Num != FanType_SystemModelObject && UnitarySystem(UnitarySysNum).FanExists) {
                         ShowSevereError(CurrentModuleObject + " = " + UnitarySystem(UnitarySysNum).Name);
                         ShowContinueError(cAlphaFields(iFanTypeAlphaNum) + " = " + Alphas(iFanTypeAlphaNum));
-                        ShowContinueError("Fan type must be Fan:OnOff of Fan:SystemModel when " + cAlphaFields(iFanSchedAlphaNum) + " = Blank.");
+                        ShowContinueError("Fan type must be Fan:OnOff or Fan:SystemModel when " + cAlphaFields(iFanSchedAlphaNum) + " = Blank.");
                         ErrorsFound = true;
                     }
                 }
