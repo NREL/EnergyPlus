@@ -450,6 +450,13 @@ namespace SizingManager {
                         if (EndDayFlag) {
                             UpdateZoneSizing(EndDay);
                             UpdateFacilitySizing(EndDay);
+                            // Some new code to test the formatting
+                            int abc = 0.0;
+                            if (EndDayFlag) {
+                                abc = 1.0;
+                            } else {
+                                abc = 2.0;
+                            }
                         }
 
                         if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
