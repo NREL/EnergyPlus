@@ -4009,16 +4009,12 @@ namespace HVACUnitarySystem {
                                 AirLoopNumber = AirLoopNum;
                                 AirLoopFound = true;
                                 for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
-                                    if (UnitarySystem(UnitarySysNum).ControlZoneNum == 0) continue;
                                     if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != UnitarySystem(UnitarySysNum).ControlZoneNum) continue;
-                                    //             Find the controlled zone number for the specified thermostat location
+                                    // Find the controlled zone number for the specified thermostat location
                                     UnitarySystem(UnitarySysNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                                    UnitarySystem(UnitarySysNum).ControlZoneNum = ControlledZoneNum;
-                                    //             Determine if system is on air loop served by the thermostat location specified
+                                    // Determine if system is on air loop served by the thermostat location specified
                                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                                         if (ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) == AirLoopNumber) {
-                                            // TotalZonesOnAirLoop doesn't appear to be used anywhere
-                                            //++TotalZonesOnAirLoop;
                                             UnitarySystem(UnitarySysNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                             TotalFloorAreaOnAirLoop += Zone(ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                                         }
@@ -11114,11 +11110,11 @@ namespace HVACUnitarySystem {
                                                              EconomizerFlag);
                                     TempOutletTempDXCoil = HXAssistedCoilOutletTemp(UnitarySystem(UnitarySysNum).CoolingCoilIndex);
                                 }
-                                //                 Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary
-                                //                 may be very near the desired result)
+                                // Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary may be very near the
+                                // desired result)
                                 TempMinPLR = max(0.0, (TempMinPLR - 0.01));
                                 TempMaxPLR = min(1.0, (TempMaxPLR + 0.01));
-                                //                 tighter boundary of solution has been found, CALL RegulaFalsi a second time
+                                // tighter boundary of solution has been found, CALL RegulaFalsi a second time
                                 SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par);
                                 if (SolFla == -1) {
                                     if (!WarmupFlag) {
@@ -11347,10 +11343,9 @@ namespace HVACUnitarySystem {
                         //   If NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
                         if ((NoLoadTempOut - DesOutTemp) < Acc) {
                             PartLoadFrac = 0.0;
-                            //          OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above.
-                            //          if this temp is greater than or very near the desired outlet temp, then run the compressor at PartLoadFrac
-                            //          = 1.
-                            //            ELSEIF ((OutletTempDXCoil > DesOutTemp) .OR. ABS(OutletTempDXCoil - DesOutTemp) .LE. (Acc*2.0d0)) THEN
+                            // OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above.
+                            // IF this temp is greater than or very near the desired outlet temp, then run the compressor at PartLoadFrac = 1.
+                            // ELSEIF ((OutletTempDXCoil > DesOutTemp) .OR. ABS(OutletTempDXCoil - DesOutTemp) .LE. (Acc*2.0d0)) THEN
                         } else if (OutletTempDXCoil > DesOutTemp - (Acc * 2.0)) {
                             PartLoadFrac = 1.0;
                         } else {
@@ -11507,8 +11502,8 @@ namespace HVACUnitarySystem {
                                     }
                                     TempMinPLR = TempMaxPLR;
                                     while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) <= 0.0 && TempMinPLR >= 0.0) {
-                                        //                     pull upper limit of LatentPLR DOwn to last valid limit (i.e. latent output still
-                                        //                     exceeds SystemMoisuterLoad)
+                                        // pull upper limit of LatentPLR down to last valid limit (i.e. latent output still exceeds
+                                        // SystemMoisuterLoad)
                                         TempMaxPLR = TempMinPLR;
                                         //                     find minimum limit of Latent PLR
                                         TempMinPLR -= 0.01;
@@ -11523,7 +11518,7 @@ namespace HVACUnitarySystem {
                                                                  EconomizerFlag);
                                         OutletHumRatDXCoil = HXAssistedCoilOutletHumRat(UnitarySystem(UnitarySysNum).CoolingCoilIndex);
                                     }
-                                    //                   tighter boundary of solution has been found, CALL RegulaFalsi a second time
+                                    // tighter boundary of solution has been found, CALL RegulaFalsi a second time
                                     SolveRoot(HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par);
                                     if (SolFla == -1) {
                                         if (!WarmupFlag) {
@@ -11600,7 +11595,7 @@ namespace HVACUnitarySystem {
 
                         } else if (CoilType_Num == CoilDX_CoolingTwoSpeed) {
 
-                            //               Simulate MultiSpeed DX coil at sensible result
+                            // Simulate MultiSpeed DX coil at sensible result
                             SimDXCoilMultiSpeed(CompName, SpeedRatio, CycRatio, UnitarySystem(UnitarySysNum).CoolingCoilIndex);
 
                             OutletHumRatDXCoil = DXCoilOutletHumRat(UnitarySystem(UnitarySysNum).CoolingCoilIndex);
@@ -11836,7 +11831,7 @@ namespace HVACUnitarySystem {
                     PartLoadFrac);
             }
         } else if (SolFlaLat == -2 && SolFla != -2) {
-            //               RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
+            // RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
             if (NoLoadHumRatOut - FullLoadHumRatOut != 0.0) {
                 PartLoadFrac = (NoLoadHumRatOut - DesOutHumRat) / (NoLoadHumRatOut - FullLoadHumRatOut);
             } else {
