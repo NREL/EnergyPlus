@@ -156,6 +156,7 @@ set( test_src
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
+  Tables.unit.cc
   SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc

@@ -50,11 +50,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Array3D.hh>
-#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <CurveManager.hh>
@@ -368,7 +364,7 @@ namespace CurveManager {
         {
             auto const SELECT_CASE_var(PerfCurve(CurveIndex).InterpolationType);
             if (SELECT_CASE_var == EvaluateCurveToLimits) {
-                CurveValue = PerformanceCurveObject(CurveIndex, Var1, Var2, Var3);
+                CurveValue = PerformanceCurveObject(CurveIndex, Var1, Var2, Var3, Var4);
             } else if (SELECT_CASE_var == LinearInterpolationOfTable) {
                 CurveValue = PerformanceTableObject(CurveIndex, Var1, Var2, Var3);
             } else if (SELECT_CASE_var == LagrangeInterpolationLinearExtrapolation) {
@@ -1443,8 +1439,8 @@ namespace CurveManager {
                 PerfCurve(CurveNum).CurveMin = Numbers(7);
                 PerfCurve(CurveNum).CurveMinPresent = true;
             }
-            if (NumNumbers > 7 && !lNumericFieldBlanks(9)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(9);
+            if (NumNumbers > 7 && !lNumericFieldBlanks(8)) {
+                PerfCurve(CurveNum).CurveMax = Numbers(8);
                 PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
@@ -1865,9 +1861,19 @@ namespace CurveManager {
                                   RoundSigDigits(NumNumbers - 5));
                 ErrorsFound = true;
             } else {
+                Real64 localMin = std::numeric_limits<Real64>::infinity();
+                Real64 localMax = -std::numeric_limits<Real64>::infinity();
                 for (TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex) {
                     TableData(TableNum).X1(TableDataIndex) = Numbers((TableDataIndex - 1) * 2 + 5 + 1);
                     TableData(TableNum).Y(TableDataIndex) = Numbers((TableDataIndex - 1) * 2 + 5 + 2) / TableData(TableNum).NormalPoint;
+                    localMin = std::min(localMin, TableData(TableNum).X1(TableDataIndex));
+                    localMax = std::max(localMax, TableData(TableNum).X1(TableDataIndex));
+                }
+                if (!PerfCurve(CurveNum).Var1MinPresent) {
+                    PerfCurve(CurveNum).Var1Min = localMin;
+                }
+                if (!PerfCurve(CurveNum).Var1MaxPresent) {
+                    PerfCurve(CurveNum).Var1Max = localMax;
                 }
             }
 
@@ -2132,8 +2138,8 @@ namespace CurveManager {
         }
         /*
         for (CurveIndex = 1; CurveIndex <= NumOneVarTab; ++CurveIndex) {
-                inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks,
-        _, cAlphaFieldNames, cNumericFieldNames);
+        inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks,
+_, cAlphaFieldNames, cNumericFieldNames);
                 ++CurveNum;
                 ++TableNum;
                 NumTableEntries = (NumNumbers - 5) / 2;
@@ -2218,8 +2224,8 @@ namespace CurveManager {
 
                 if (Numbers(1) > Numbers(2)) { // error
                         ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                        ShowContinueError(cNumericFieldNames(1) + " [" + RoundSigDigits(Numbers(1), 2) + "] > " + cNumericFieldNames(2) + " [" +
-        RoundSigDigits(Numbers(2), 2) + ']'); ErrorsFound = true;
+                ShowContinueError(cNumericFieldNames(1) + " [" + RoundSigDigits(Numbers(1), 2) + "] > " + cNumericFieldNames(2) + " [" +
+RoundSigDigits(Numbers(2), 2) + ']'); ErrorsFound = true;
                 }
                 if (NumAlphas >= 4) {
                         if (!IsCurveInputTypeValid(Alphas(4))) {
@@ -2260,8 +2266,8 @@ namespace CurveManager {
                 MaxTableNums = (NumNumbers - 5) / 2;
                 if (mod((NumNumbers - 5), 2) != 0) {
                         ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                        ShowContinueError("The number of data entries must be evenly divisable by 2. Number of data entries = " +
-        RoundSigDigits(NumNumbers - 5)); ErrorsFound = true;
+                ShowContinueError("The number of data entries must be evenly divisable by 2. Number of data entries = " +
+RoundSigDigits(NumNumbers - 5)); ErrorsFound = true;
                 }
                 else {
                         for (TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex) {
@@ -2302,8 +2308,8 @@ namespace CurveManager {
                 // create curve objects when regression analysis is required
                 if (PerfCurve(CurveNum).InterpolationType == EvaluateCurveToLimits) {
                         { auto const SELECT_CASE_var(PerfCurve(CurveNum).CurveType);
-                        if ((SELECT_CASE_var == Linear) || (SELECT_CASE_var == Quadratic) || (SELECT_CASE_var == Cubic) || (SELECT_CASE_var ==
-        Quartic) || (SELECT_CASE_var == Exponent)) { TempArray1 = PerfCurveTableData(TableNum).X1;
+                if ((SELECT_CASE_var == Linear) || (SELECT_CASE_var == Quadratic) || (SELECT_CASE_var == Cubic) || (SELECT_CASE_var ==
+Quartic) || (SELECT_CASE_var == Exponent)) { TempArray1 = PerfCurveTableData(TableNum).X1;
                                 TempArray2.allocate(size(PerfCurveTableData(TableNum).Y));
                                 for (VarIndex = 1; VarIndex <= isize(PerfCurveTableData(TableNum).Y); ++VarIndex) {
                                         TempArray2(VarIndex) = PerfCurveTableData(TableNum).Y(1, VarIndex);
@@ -2331,8 +2337,8 @@ namespace CurveManager {
                                 if (PerfCurve(CurveNum).Var1Min < minval(TableData(TableNum).X1)) {
                                         ShowWarningError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                                         ShowContinueError(cNumericFieldNames(1) + " exceeds the data range and will not be used.");
-                                        ShowContinueError(" Entered value = " + RoundSigDigits(Numbers(1), 6) + ", Minimum data range = " +
-        RoundSigDigits(minval(TableData(TableNum).X1), 6)); PerfCurve(CurveNum).Var1Min = minval(TableData(TableNum).X1);
+                                ShowContinueError(" Entered value = " + RoundSigDigits(Numbers(1), 6) + ", Minimum data range = " +
+RoundSigDigits(minval(TableData(TableNum).X1), 6)); PerfCurve(CurveNum).Var1Min = minval(TableData(TableNum).X1);
                                 }
                         }
                         else {
@@ -2342,8 +2348,8 @@ namespace CurveManager {
                                 if (PerfCurve(CurveNum).Var1Max > maxval(TableData(TableNum).X1)) {
                                         ShowWarningError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                                         ShowContinueError(cNumericFieldNames(2) + " exceeds the data range and will not be used.");
-                                        ShowContinueError(" Entered value = " + RoundSigDigits(Numbers(2), 6) + ", Maximum data range = " +
-        RoundSigDigits(maxval(TableData(TableNum).X1), 6)); PerfCurve(CurveNum).Var1Max = maxval(TableData(TableNum).X1);
+                                ShowContinueError(" Entered value = " + RoundSigDigits(Numbers(2), 6) + ", Maximum data range = " +
+RoundSigDigits(maxval(TableData(TableNum).X1), 6)); PerfCurve(CurveNum).Var1Max = maxval(TableData(TableNum).X1);
                                 }
                         }
                         else {
@@ -3102,7 +3108,7 @@ namespace CurveManager {
                     } else {
                         ShowSevereError("GetTableInput: For " + CurrentModuleObject + ": " + Alphas(1));
                         ShowContinueError("...Invalid " + cAlphaFieldNames(2) + " = " + Alphas(2));
-                        ShowContinueError("...Choice not allowed with more than 2 indpendent variables.");
+                        ShowContinueError("...Choice not allowed with more than 2 independent variables.");
                         ErrorsFound = true;
                     }
                 }
