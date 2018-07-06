@@ -213,8 +213,8 @@ namespace PlantLoadProfile {
         if (this->SetLoopIndexFlag) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, _, _,
-                                        _, _, _, errFlag);
+                ScanPlantLoopsForObject(
+                    this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, _, _, _, _, _, errFlag);
                 if (errFlag) {
                     ShowFatalError("InitPlantProfile: Program terminated for previous conditions.");
                 }
@@ -239,8 +239,14 @@ namespace PlantLoadProfile {
 
             Real64 MaxFlowMultiplier = GetScheduleMaxValue(this->FlowRateFracSchedule);
 
-            InitComponentNodes(0.0, this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, this->InletNode, this->OutletNode, this->WLoopNum,
-                               this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
+            InitComponentNodes(0.0,
+                               this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier,
+                               this->InletNode,
+                               this->OutletNode,
+                               this->WLoopNum,
+                               this->WLoopSideNum,
+                               this->WLoopBranchNum,
+                               this->WLoopCompNum);
 
             this->EMSOverrideMassFlow = false;
             this->EMSMassFlowValue = 0.0;
@@ -382,17 +388,26 @@ namespace PlantLoadProfile {
             PlantProfile.allocate(NumOfPlantProfile);
 
             for (ProfileNum = 1; ProfileNum <= NumOfPlantProfile; ++ProfileNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, ProfileNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              ProfileNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              _,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 PlantProfile(ProfileNum).Name = cAlphaArgs(1);
                 PlantProfile(ProfileNum).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
 
-                PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                       NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-                PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                        NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(
+                    cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(
+                    cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
                 PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(cAlphaArgs(4));
 
@@ -417,25 +432,68 @@ namespace PlantLoadProfile {
                 TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), cCurrentModuleObject + " Nodes");
 
                 // Setup report variables
-                SetupOutputVariable("Plant Load Profile Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantProfile(ProfileNum).MassFlowRate, "System",
-                                    "Average", PlantProfile(ProfileNum).Name);
+                SetupOutputVariable("Plant Load Profile Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    PlantProfile(ProfileNum).MassFlowRate,
+                                    "System",
+                                    "Average",
+                                    PlantProfile(ProfileNum).Name);
 
-                SetupOutputVariable("Plant Load Profile Heat Transfer Rate", OutputProcessor::Unit::W, PlantProfile(ProfileNum).Power, "System",
-                                    "Average", PlantProfile(ProfileNum).Name);
+                SetupOutputVariable("Plant Load Profile Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    PlantProfile(ProfileNum).Power,
+                                    "System",
+                                    "Average",
+                                    PlantProfile(ProfileNum).Name);
 
-                SetupOutputVariable("Plant Load Profile Heat Transfer Energy", OutputProcessor::Unit::J, PlantProfile(ProfileNum).Energy, "System",
-                                    "Sum", PlantProfile(ProfileNum).Name, _, "ENERGYTRANSFER", "Heating", _, "Plant"); // is EndUseKey right?
+                SetupOutputVariable("Plant Load Profile Heat Transfer Energy",
+                                    OutputProcessor::Unit::J,
+                                    PlantProfile(ProfileNum).Energy,
+                                    "System",
+                                    "Sum",
+                                    PlantProfile(ProfileNum).Name,
+                                    _,
+                                    "ENERGYTRANSFER",
+                                    "Heating",
+                                    _,
+                                    "Plant"); // is EndUseKey right?
 
-                SetupOutputVariable("Plant Load Profile Heating Energy", OutputProcessor::Unit::J, PlantProfile(ProfileNum).HeatingEnergy, "System",
-                                    "Sum", PlantProfile(ProfileNum).Name, _, "PLANTLOOPHEATINGDEMAND", "Heating", _, "Plant");
+                SetupOutputVariable("Plant Load Profile Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    PlantProfile(ProfileNum).HeatingEnergy,
+                                    "System",
+                                    "Sum",
+                                    PlantProfile(ProfileNum).Name,
+                                    _,
+                                    "PLANTLOOPHEATINGDEMAND",
+                                    "Heating",
+                                    _,
+                                    "Plant");
 
-                SetupOutputVariable("Plant Load Profile Cooling Energy", OutputProcessor::Unit::J, PlantProfile(ProfileNum).CoolingEnergy, "System",
-                                    "Sum", PlantProfile(ProfileNum).Name, _, "PLANTLOOPCOOLINGDEMAND", "Cooling", _, "Plant");
+                SetupOutputVariable("Plant Load Profile Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    PlantProfile(ProfileNum).CoolingEnergy,
+                                    "System",
+                                    "Sum",
+                                    PlantProfile(ProfileNum).Name,
+                                    _,
+                                    "PLANTLOOPCOOLINGDEMAND",
+                                    "Cooling",
+                                    _,
+                                    "Plant");
 
                 if (AnyEnergyManagementSystemInModel) {
-                    SetupEMSActuator("Plant Load Profile", PlantProfile(ProfileNum).Name, "Mass Flow Rate", "[kg/s]",
-                                     PlantProfile(ProfileNum).EMSOverrideMassFlow, PlantProfile(ProfileNum).EMSMassFlowValue);
-                    SetupEMSActuator("Plant Load Profile", PlantProfile(ProfileNum).Name, "Power", "[W]", PlantProfile(ProfileNum).EMSOverridePower,
+                    SetupEMSActuator("Plant Load Profile",
+                                     PlantProfile(ProfileNum).Name,
+                                     "Mass Flow Rate",
+                                     "[kg/s]",
+                                     PlantProfile(ProfileNum).EMSOverrideMassFlow,
+                                     PlantProfile(ProfileNum).EMSMassFlowValue);
+                    SetupEMSActuator("Plant Load Profile",
+                                     PlantProfile(ProfileNum).Name,
+                                     "Power",
+                                     "[W]",
+                                     PlantProfile(ProfileNum).EMSOverridePower,
                                      PlantProfile(ProfileNum).EMSPowerValue);
                 }
 

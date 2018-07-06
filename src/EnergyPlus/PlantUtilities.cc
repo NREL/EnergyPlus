@@ -942,7 +942,12 @@ namespace PlantUtilities {
                     }
                     ShowRecurringSevereErrorAtEnd("Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
                                                       ") splitter inlet flow not match mixer outlet flow",
-                                                  PlantLoop(LoopNum).MFErrIndex1, AbsDifference, AbsDifference, _, "kg/s", "kg/s");
+                                                  PlantLoop(LoopNum).MFErrIndex1,
+                                                  AbsDifference,
+                                                  AbsDifference,
+                                                  _,
+                                                  "kg/s",
+                                                  "kg/s");
                     if (AbsDifference > MassFlowTolerance * 10.0) {
                         ShowSevereError("Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                         ShowContinueErrorTimeStamp("");
@@ -983,7 +988,12 @@ namespace PlantUtilities {
                     }
                     ShowRecurringSevereErrorAtEnd("Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
                                                       ") splitter inlet flow does not match branch outlet flows",
-                                                  PlantLoop(LoopNum).MFErrIndex2, AbsDifference, AbsDifference, _, "kg/s", "kg/s");
+                                                  PlantLoop(LoopNum).MFErrIndex2,
+                                                  AbsDifference,
+                                                  AbsDifference,
+                                                  _,
+                                                  "kg/s",
+                                                  "kg/s");
                     //        IF (AbsDifference > CriteriaDelta_MassFlowRate*10.0d0) THEN
                     //          CALL ShowSevereError('Plant flows do not resolve -- splitter inlet flow does not match branch outlet flows')
                     //          CALL ShowContinueErrorTimeStamp(' ')
@@ -1070,7 +1080,8 @@ namespace PlantUtilities {
 
             // first stage, throw recurring warning that plant loop is getting out of control
             ShowRecurringWarningErrorAtEnd("Plant loop exceeding upper temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
-                                           PlantLoop(LoopNum).MaxTempErrIndex, Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
+                                           PlantLoop(LoopNum).MaxTempErrIndex,
+                                           Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
 
             if (Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp > (PlantLoop(LoopNum).MaxTemp + FatalOverShootOffset)) {
                 hotcold = "hot";
@@ -1082,7 +1093,9 @@ namespace PlantUtilities {
 
             // first stage, throw recurring warning that plant loop is getting out of control
             ShowRecurringWarningErrorAtEnd("Plant loop falling below lower temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
-                                           PlantLoop(LoopNum).MinTempErrIndex, _, Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
+                                           PlantLoop(LoopNum).MinTempErrIndex,
+                                           _,
+                                           Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
 
             if (Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp < (PlantLoop(LoopNum).MinTemp - FatalUnderShootOffset)) {
                 hotcold = "cold";

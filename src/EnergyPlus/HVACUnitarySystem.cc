@@ -510,8 +510,8 @@ namespace HVACUnitarySystem {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DataAirflowNetwork::AirflowNetworkUnitarySystem;
+        using DataAirLoop::AirLoopControlInfo;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterCooling;
@@ -520,10 +520,10 @@ namespace HVACUnitarySystem {
         using DataPlant::TypeOf_UnitarySystemRecovery;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
+        using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilIndex;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::ScanPlantLoopsForObject;
         using SteamCoils::GetCoilMaxSteamFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -1489,12 +1489,12 @@ namespace HVACUnitarySystem {
         // Initialize mass flow rates and speed ratios. Calculate loads and adjust if necessary when using constant fan.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DataAirflowNetwork::AirflowNetworkControlMultizone;
         using DataAirflowNetwork::AirflowNetworkFanActivated;
         using DataAirflowNetwork::SimulateAirflowNetwork;
-        using DataHeatBalFanSys::TempControlType;
+        using DataAirLoop::AirLoopControlInfo;
         using DataHeatBalance::Zone;
+        using DataHeatBalFanSys::TempControlType;
         using DataPlant::PlantLoop;
         using DataZoneControls::StageZoneLogic;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
@@ -2073,12 +2073,12 @@ namespace HVACUnitarySystem {
         using BranchInputManager::GetAirBranchIndex;
         using BranchInputManager::GetBranchFanTypeName;
         using CurveManager::CurveValue;
+        using DataAirLoop::AirToZoneNodeInfo;
+        using DataAirSystems::PrimaryAirSystem;
         using DXCoils::GetCoilCapacityByIndexType;
         using DXCoils::GetDXCoilCapFTCurveIndex;
         using DXCoils::SimDXCoil; // , SetDXCoolingCoilData
         using DXCoils::SimDXCoilMultiSpeed;
-        using DataAirLoop::AirToZoneNodeInfo;
-        using DataAirSystems::PrimaryAirSystem;
         using Fans::FanDesHeatGain;
         using Fans::GetFanDesignVolumeFlowRate;
         using HVACHXAssistedCoolingCoil::GetCoilCapacity;
@@ -3311,9 +3311,6 @@ namespace HVACUnitarySystem {
         using HVACHXAssistedCoolingCoil::GetHXDXCoilType;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataIPShortCuts;
-        using DXCoils::GetDXCoilAvailSchPtr;
-        using DXCoils::SetCoilSystemCoolingData;
-        using DXCoils::SetDXCoolingCoilData;
         using DataAirSystems::PrimaryAirSystem;
         using DataHVACControllers::ControllerSimple_Type;
         using DataHVACControllers::ControllerTypes;
@@ -3323,6 +3320,9 @@ namespace HVACUnitarySystem {
         using DataZoneControls::NumHumidityControlZones;
         using DataZoneControls::NumTempControlledZones;
         using DataZoneControls::TempControlledZone;
+        using DXCoils::GetDXCoilAvailSchPtr;
+        using DXCoils::SetCoilSystemCoolingData;
+        using DXCoils::SetDXCoolingCoilData;
         using General::TrimSigDigits;
         auto &GetWtoAHPSimpleCoilCapacity(WaterToAirHeatPumpSimple::GetCoilCapacity);
         auto &GetWtoAHPSimpleCoilInletNode(WaterToAirHeatPumpSimple::GetCoilInletNode);
@@ -3395,8 +3395,8 @@ namespace HVACUnitarySystem {
         using PackagedThermalStorageCoil::GetTESCoilCoolingAirFlowRate;
         using PackagedThermalStorageCoil::GetTESCoilCoolingCapacity;
         using PackagedThermalStorageCoil::GetTESCoilIndex;
-        using SetPointManager::NodeHasSPMCtrlVarType;
         using SetPointManager::iCtrlVarType_Temp;
+        using SetPointManager::NodeHasSPMCtrlVarType;
         using SingleDuct::GetATMixer;
         using SteamCoils::GetSteamCoilAvailScheduleIndex;
         using UserDefinedComponents::GetUserDefinedCoilAirInletNode;
@@ -10614,15 +10614,15 @@ namespace HVACUnitarySystem {
         //  Meet moisture load if required to do so.
 
         // Using/Aliasing
+        using DataAirLoop::LoopDXCoilRTF;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::KickOffSimulation;
+        using DataGlobals::WarmupFlag;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiMode;
         using DXCoils::SimDXCoilMultiSpeed;
-        using DataAirLoop::LoopDXCoilRTF;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -11934,15 +11934,15 @@ namespace HVACUnitarySystem {
         //  Calculate operating PLR and adjust speed when using multispeed coils.
 
         // Using/Aliasing
-        using DXCoils::DXCoilOutletHumRat;
-        using DXCoils::DXCoilOutletTemp;
-        using DXCoils::SimDXCoil;
-        using DXCoils::SimDXCoilMultiSpeed;
         using DataAirLoop::LoopDXCoilRTF;
         using DataAirLoop::LoopHeatingCoilMaxRTF;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
+        using DXCoils::DXCoilOutletHumRat;
+        using DXCoils::DXCoilOutletTemp;
+        using DXCoils::SimDXCoil;
+        using DXCoils::SimDXCoilMultiSpeed;
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;

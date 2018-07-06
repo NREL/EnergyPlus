@@ -269,14 +269,28 @@ namespace WaterToAirHeatPumpSimple {
 
         if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
             // Cooling mode
-            InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
+            InitSimpleWatertoAirHP(HPNum,
+                                   MaxONOFFCyclesperHour,
+                                   HPTimeConstant,
+                                   FanDelayTime,
+                                   SensLoad,
+                                   LatentLoad,
+                                   CyclingScheme,
+                                   OnOffAirFlowRatio,
                                    FirstHVACIteration);
             CalcHPCoolingSimple(HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(HPNum);
         } else if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingEquationFit) {
             // Heating mode
-            InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, constant_zero, CyclingScheme,
-                                   OnOffAirFlowRatio, FirstHVACIteration);
+            InitSimpleWatertoAirHP(HPNum,
+                                   MaxONOFFCyclesperHour,
+                                   HPTimeConstant,
+                                   FanDelayTime,
+                                   SensLoad,
+                                   constant_zero,
+                                   CyclingScheme,
+                                   OnOffAirFlowRatio,
+                                   FirstHVACIteration);
             CalcHPHeatingSimple(HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(HPNum);
         } else {
@@ -377,8 +391,17 @@ namespace WaterToAirHeatPumpSimple {
 
             ++HPNum;
 
-            inputProcessor->getObjectItem(CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          HPNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
@@ -408,40 +431,78 @@ namespace WaterToAirHeatPumpSimple {
             SimpleWatertoAirHP(HPNum).Twet_Rated = NumArray(22);
             SimpleWatertoAirHP(HPNum).Gamma_Rated = NumArray(23);
 
-            SimpleWatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1),
-                                                                            NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            SimpleWatertoAirHP(HPNum).WaterOutletNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1),
-                                                                             NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
-            SimpleWatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                          NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            SimpleWatertoAirHP(HPNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                           NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            SimpleWatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(
+                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+            SimpleWatertoAirHP(HPNum).WaterOutletNodeNum = GetOnlySingleNode(
+                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+            SimpleWatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            SimpleWatertoAirHP(HPNum).AirOutletNodeNum = GetOnlySingleNode(
+                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Air Nodes");
 
             // Setup Report variables for the cooling coil
             // CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:EquationFit"
-            SetupOutputVariable("Cooling Coil Electric Energy", OutputProcessor::Unit::J, SimpleWatertoAirHP(HPNum).Energy, "System", "Summed",
-                                SimpleWatertoAirHP(HPNum).Name, _, "Electric", "Cooling", _, "System");
-            SetupOutputVariable("Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, SimpleWatertoAirHP(HPNum).EnergyLoadTotal, "System",
-                                "Summed", SimpleWatertoAirHP(HPNum).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
-            SetupOutputVariable("Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, SimpleWatertoAirHP(HPNum).EnergySensible, "System",
-                                "Summed", SimpleWatertoAirHP(HPNum).Name);
-            SetupOutputVariable("Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, SimpleWatertoAirHP(HPNum).EnergyLatent, "System",
-                                "Summed", SimpleWatertoAirHP(HPNum).Name);
-            SetupOutputVariable("Cooling Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, SimpleWatertoAirHP(HPNum).EnergySource,
-                                "System", "Summed", SimpleWatertoAirHP(HPNum).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System");
+            SetupOutputVariable("Cooling Coil Electric Energy",
+                                OutputProcessor::Unit::J,
+                                SimpleWatertoAirHP(HPNum).Energy,
+                                "System",
+                                "Summed",
+                                SimpleWatertoAirHP(HPNum).Name,
+                                _,
+                                "Electric",
+                                "Cooling",
+                                _,
+                                "System");
+            SetupOutputVariable("Cooling Coil Total Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                SimpleWatertoAirHP(HPNum).EnergyLoadTotal,
+                                "System",
+                                "Summed",
+                                SimpleWatertoAirHP(HPNum).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "COOLINGCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Cooling Coil Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                SimpleWatertoAirHP(HPNum).EnergySensible,
+                                "System",
+                                "Summed",
+                                SimpleWatertoAirHP(HPNum).Name);
+            SetupOutputVariable("Cooling Coil Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                SimpleWatertoAirHP(HPNum).EnergyLatent,
+                                "System",
+                                "Summed",
+                                SimpleWatertoAirHP(HPNum).Name);
+            SetupOutputVariable("Cooling Coil Source Side Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                SimpleWatertoAirHP(HPNum).EnergySource,
+                                "System",
+                                "Summed",
+                                SimpleWatertoAirHP(HPNum).Name,
+                                _,
+                                "PLANTLOOPCOOLINGDEMAND",
+                                "COOLINGCOILS",
+                                _,
+                                "System");
 
             // create predefined report entries
             PreDefTableEntry(pdchCoolCoilType, SimpleWatertoAirHP(HPNum).Name, CurrentModuleObject);
             PreDefTableEntry(pdchCoolCoilTotCap, SimpleWatertoAirHP(HPNum).Name, SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
             PreDefTableEntry(pdchCoolCoilSensCap, SimpleWatertoAirHP(HPNum).Name, SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
-            PreDefTableEntry(pdchCoolCoilLatCap, SimpleWatertoAirHP(HPNum).Name,
+            PreDefTableEntry(pdchCoolCoilLatCap,
+                             SimpleWatertoAirHP(HPNum).Name,
                              SimpleWatertoAirHP(HPNum).RatedCapCoolTotal - SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
-            PreDefTableEntry(pdchCoolCoilSHR, SimpleWatertoAirHP(HPNum).Name,
+            PreDefTableEntry(pdchCoolCoilSHR,
+                             SimpleWatertoAirHP(HPNum).Name,
                              SimpleWatertoAirHP(HPNum).RatedCapCoolSens / SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
-            PreDefTableEntry(pdchCoolCoilNomEff, SimpleWatertoAirHP(HPNum).Name,
+            PreDefTableEntry(pdchCoolCoilNomEff,
+                             SimpleWatertoAirHP(HPNum).Name,
                              SimpleWatertoAirHP(HPNum).RatedPowerCool / SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
         }
 
@@ -452,8 +513,17 @@ namespace WaterToAirHeatPumpSimple {
 
             ++HPNum;
 
-            inputProcessor->getObjectItem(CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          WatertoAirHPNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
@@ -474,30 +544,58 @@ namespace WaterToAirHeatPumpSimple {
             SimpleWatertoAirHP(HPNum).HeatPower4 = NumArray(13);
             SimpleWatertoAirHP(HPNum).HeatPower5 = NumArray(14);
 
-            SimpleWatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1),
-                                                                            NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            SimpleWatertoAirHP(HPNum).WaterOutletNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1),
-                                                                             NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
-            SimpleWatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                          NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            SimpleWatertoAirHP(HPNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                           NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            SimpleWatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(
+                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+            SimpleWatertoAirHP(HPNum).WaterOutletNodeNum = GetOnlySingleNode(
+                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+            SimpleWatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            SimpleWatertoAirHP(HPNum).AirOutletNodeNum = GetOnlySingleNode(
+                AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Air Nodes");
 
             // CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:EquationFit"
-            SetupOutputVariable("Heating Coil Electric Energy", OutputProcessor::Unit::J, SimpleWatertoAirHP(HPNum).Energy, "System", "Summed",
-                                SimpleWatertoAirHP(HPNum).Name, _, "Electric", "Heating", _, "System");
-            SetupOutputVariable("Heating Coil Heating Energy", OutputProcessor::Unit::J, SimpleWatertoAirHP(HPNum).EnergyLoadTotal, "System",
-                                "Summed", SimpleWatertoAirHP(HPNum).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System");
-            SetupOutputVariable("Heating Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, SimpleWatertoAirHP(HPNum).EnergySource,
-                                "System", "Summed", SimpleWatertoAirHP(HPNum).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System");
+            SetupOutputVariable("Heating Coil Electric Energy",
+                                OutputProcessor::Unit::J,
+                                SimpleWatertoAirHP(HPNum).Energy,
+                                "System",
+                                "Summed",
+                                SimpleWatertoAirHP(HPNum).Name,
+                                _,
+                                "Electric",
+                                "Heating",
+                                _,
+                                "System");
+            SetupOutputVariable("Heating Coil Heating Energy",
+                                OutputProcessor::Unit::J,
+                                SimpleWatertoAirHP(HPNum).EnergyLoadTotal,
+                                "System",
+                                "Summed",
+                                SimpleWatertoAirHP(HPNum).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HEATINGCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Heating Coil Source Side Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                SimpleWatertoAirHP(HPNum).EnergySource,
+                                "System",
+                                "Summed",
+                                SimpleWatertoAirHP(HPNum).Name,
+                                _,
+                                "PLANTLOOPHEATINGDEMAND",
+                                "HEATINGCOILS",
+                                _,
+                                "System");
 
             // create predefined report entries
             PreDefTableEntry(pdchHeatCoilType, SimpleWatertoAirHP(HPNum).Name, CurrentModuleObject);
             PreDefTableEntry(pdchHeatCoilNomCap, SimpleWatertoAirHP(HPNum).Name, SimpleWatertoAirHP(HPNum).RatedCapHeat);
-            PreDefTableEntry(pdchHeatCoilNomEff, SimpleWatertoAirHP(HPNum).Name,
+            PreDefTableEntry(pdchHeatCoilNomEff,
+                             SimpleWatertoAirHP(HPNum).Name,
                              SimpleWatertoAirHP(HPNum).RatedPowerHeat / SimpleWatertoAirHP(HPNum).RatedCapHeat);
         }
 
@@ -516,70 +614,186 @@ namespace WaterToAirHeatPumpSimple {
 
             if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
                 // COOLING COIL  Setup Report variables for the Heat Pump
-                SetupOutputVariable("Cooling Coil Electric Power", OutputProcessor::Unit::W, SimpleWatertoAirHP(HPNum).Power, "System", "Average",
+                SetupOutputVariable("Cooling Coil Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    SimpleWatertoAirHP(HPNum).Power,
+                                    "System",
+                                    "Average",
                                     SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, SimpleWatertoAirHP(HPNum).QLoadTotal, "System",
-                                    "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, SimpleWatertoAirHP(HPNum).QSensible, "System",
-                                    "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, SimpleWatertoAirHP(HPNum).QLatent, "System",
-                                    "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Source Side Heat Transfer Rate", OutputProcessor::Unit::W, SimpleWatertoAirHP(HPNum).QSource,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Part Load Ratio", OutputProcessor::Unit::None, SimpleWatertoAirHP(HPNum).PartLoadRatio, "System",
-                                    "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, SimpleWatertoAirHP(HPNum).RunFrac, "System",
-                                    "Average", SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Total Cooling Rate",
+                                    OutputProcessor::Unit::W,
+                                    SimpleWatertoAirHP(HPNum).QLoadTotal,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Sensible Cooling Rate",
+                                    OutputProcessor::Unit::W,
+                                    SimpleWatertoAirHP(HPNum).QSensible,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Latent Cooling Rate",
+                                    OutputProcessor::Unit::W,
+                                    SimpleWatertoAirHP(HPNum).QLatent,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Source Side Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    SimpleWatertoAirHP(HPNum).QSource,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Part Load Ratio",
+                                    OutputProcessor::Unit::None,
+                                    SimpleWatertoAirHP(HPNum).PartLoadRatio,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Runtime Fraction",
+                                    OutputProcessor::Unit::None,
+                                    SimpleWatertoAirHP(HPNum).RunFrac,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
 
-                SetupOutputVariable("Cooling Coil Air Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleWatertoAirHP(HPNum).AirMassFlowRate,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Air Inlet Temperature", OutputProcessor::Unit::C, SimpleWatertoAirHP(HPNum).InletAirDBTemp,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Air Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir,
-                                    SimpleWatertoAirHP(HPNum).InletAirHumRat, "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Air Outlet Temperature", OutputProcessor::Unit::C, SimpleWatertoAirHP(HPNum).OutletAirDBTemp,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Air Outlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir,
-                                    SimpleWatertoAirHP(HPNum).OutletAirHumRat, "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                    SimpleWatertoAirHP(HPNum).WaterMassFlowRate, "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Source Side Inlet Temperature", OutputProcessor::Unit::C, SimpleWatertoAirHP(HPNum).InletWaterTemp,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Cooling Coil Source Side Outlet Temperature", OutputProcessor::Unit::C,
-                                    SimpleWatertoAirHP(HPNum).OutletWaterTemp, "System", "Average", SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Air Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    SimpleWatertoAirHP(HPNum).AirMassFlowRate,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Air Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    SimpleWatertoAirHP(HPNum).InletAirDBTemp,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Air Inlet Humidity Ratio",
+                                    OutputProcessor::Unit::kgWater_kgDryAir,
+                                    SimpleWatertoAirHP(HPNum).InletAirHumRat,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Air Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    SimpleWatertoAirHP(HPNum).OutletAirDBTemp,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Air Outlet Humidity Ratio",
+                                    OutputProcessor::Unit::kgWater_kgDryAir,
+                                    SimpleWatertoAirHP(HPNum).OutletAirHumRat,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Source Side Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    SimpleWatertoAirHP(HPNum).WaterMassFlowRate,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Source Side Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    SimpleWatertoAirHP(HPNum).InletWaterTemp,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Cooling Coil Source Side Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    SimpleWatertoAirHP(HPNum).OutletWaterTemp,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
 
             } else if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingEquationFit) {
                 // HEATING COIL Setup Report variables for the Heat Pump
-                SetupOutputVariable("Heating Coil Electric Power", OutputProcessor::Unit::W, SimpleWatertoAirHP(HPNum).Power, "System", "Average",
+                SetupOutputVariable("Heating Coil Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    SimpleWatertoAirHP(HPNum).Power,
+                                    "System",
+                                    "Average",
                                     SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Heating Rate", OutputProcessor::Unit::W, SimpleWatertoAirHP(HPNum).QLoadTotal, "System", "Average",
+                SetupOutputVariable("Heating Coil Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    SimpleWatertoAirHP(HPNum).QLoadTotal,
+                                    "System",
+                                    "Average",
                                     SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Sensible Heating Rate", OutputProcessor::Unit::W, SimpleWatertoAirHP(HPNum).QSensible, "System",
-                                    "Average", SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Sensible Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    SimpleWatertoAirHP(HPNum).QSensible,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
 
-                SetupOutputVariable("Heating Coil Source Side Heat Transfer Rate", OutputProcessor::Unit::W, SimpleWatertoAirHP(HPNum).QSource,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Part Load Ratio", OutputProcessor::Unit::None, SimpleWatertoAirHP(HPNum).PartLoadRatio, "System",
-                                    "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Runtime Fraction", OutputProcessor::Unit::None, SimpleWatertoAirHP(HPNum).RunFrac, "System",
-                                    "Average", SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Source Side Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    SimpleWatertoAirHP(HPNum).QSource,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Part Load Ratio",
+                                    OutputProcessor::Unit::None,
+                                    SimpleWatertoAirHP(HPNum).PartLoadRatio,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Runtime Fraction",
+                                    OutputProcessor::Unit::None,
+                                    SimpleWatertoAirHP(HPNum).RunFrac,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
 
-                SetupOutputVariable("Heating Coil Air Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleWatertoAirHP(HPNum).AirMassFlowRate,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Air Inlet Temperature", OutputProcessor::Unit::C, SimpleWatertoAirHP(HPNum).InletAirDBTemp,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Air Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir,
-                                    SimpleWatertoAirHP(HPNum).InletAirHumRat, "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Air Outlet Temperature", OutputProcessor::Unit::C, SimpleWatertoAirHP(HPNum).OutletAirDBTemp,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Air Outlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir,
-                                    SimpleWatertoAirHP(HPNum).OutletAirHumRat, "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                    SimpleWatertoAirHP(HPNum).WaterMassFlowRate, "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Source Side Inlet Temperature", OutputProcessor::Unit::C, SimpleWatertoAirHP(HPNum).InletWaterTemp,
-                                    "System", "Average", SimpleWatertoAirHP(HPNum).Name);
-                SetupOutputVariable("Heating Coil Source Side Outlet Temperature", OutputProcessor::Unit::C,
-                                    SimpleWatertoAirHP(HPNum).OutletWaterTemp, "System", "Average", SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Air Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    SimpleWatertoAirHP(HPNum).AirMassFlowRate,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Air Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    SimpleWatertoAirHP(HPNum).InletAirDBTemp,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Air Inlet Humidity Ratio",
+                                    OutputProcessor::Unit::kgWater_kgDryAir,
+                                    SimpleWatertoAirHP(HPNum).InletAirHumRat,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Air Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    SimpleWatertoAirHP(HPNum).OutletAirDBTemp,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Air Outlet Humidity Ratio",
+                                    OutputProcessor::Unit::kgWater_kgDryAir,
+                                    SimpleWatertoAirHP(HPNum).OutletAirHumRat,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Source Side Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    SimpleWatertoAirHP(HPNum).WaterMassFlowRate,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Source Side Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    SimpleWatertoAirHP(HPNum).InletWaterTemp,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
+                SetupOutputVariable("Heating Coil Source Side Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    SimpleWatertoAirHP(HPNum).OutletWaterTemp,
+                                    "System",
+                                    "Average",
+                                    SimpleWatertoAirHP(HPNum).Name);
             }
         }
     }
@@ -661,9 +875,18 @@ namespace WaterToAirHeatPumpSimple {
 
         if (MyPlantScanFlag(HPNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(SimpleWatertoAirHP(HPNum).Name, SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum, SimpleWatertoAirHP(HPNum).LoopNum,
-                                    SimpleWatertoAirHP(HPNum).LoopSide, SimpleWatertoAirHP(HPNum).BranchNum, SimpleWatertoAirHP(HPNum).CompNum, _, _,
-                                    _, _, _, errFlag);
+            ScanPlantLoopsForObject(SimpleWatertoAirHP(HPNum).Name,
+                                    SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum,
+                                    SimpleWatertoAirHP(HPNum).LoopNum,
+                                    SimpleWatertoAirHP(HPNum).LoopSide,
+                                    SimpleWatertoAirHP(HPNum).BranchNum,
+                                    SimpleWatertoAirHP(HPNum).CompNum,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    errFlag);
             if (errFlag) {
                 ShowFatalError("InitSimpleWatertoAirHP: Program terminated for previous conditions.");
             }
@@ -758,19 +981,28 @@ namespace WaterToAirHeatPumpSimple {
             SimpleWatertoAirHP(HPNum).RunFrac = 0.0;
             SimpleWatertoAirHP(HPNum).PartLoadRatio = 0.0;
 
-            rho = GetDensityGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName, InitConvTemp,
-                                   PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
-            Cp = GetSpecificHeatGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName, InitConvTemp,
-                                       PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName,
+                                   InitConvTemp,
+                                   PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                   RoutineName);
+            Cp = GetSpecificHeatGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName,
+                                       InitConvTemp,
+                                       PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                       RoutineName);
 
             SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate = rho * SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate;
             SimpleWatertoAirHP(HPNum).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
             SimpleWatertoAirHP(HPNum).HPTimeConstant = HPTimeConstant;
             SimpleWatertoAirHP(HPNum).FanDelayTime = FanDelayTime;
 
-            InitComponentNodes(0.0, SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate, SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
-                               SimpleWatertoAirHP(HPNum).WaterOutletNodeNum, SimpleWatertoAirHP(HPNum).LoopNum, SimpleWatertoAirHP(HPNum).LoopSide,
-                               SimpleWatertoAirHP(HPNum).BranchNum, SimpleWatertoAirHP(HPNum).CompNum);
+            InitComponentNodes(0.0,
+                               SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate,
+                               SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
+                               SimpleWatertoAirHP(HPNum).WaterOutletNodeNum,
+                               SimpleWatertoAirHP(HPNum).LoopNum,
+                               SimpleWatertoAirHP(HPNum).LoopSide,
+                               SimpleWatertoAirHP(HPNum).BranchNum,
+                               SimpleWatertoAirHP(HPNum).CompNum);
 
             SimpleWatertoAirHP(HPNum).SimFlag = true;
 
@@ -848,9 +1080,13 @@ namespace WaterToAirHeatPumpSimple {
             }
         }
 
-        SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate, SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
-                             SimpleWatertoAirHP(HPNum).WaterOutletNodeNum, SimpleWatertoAirHP(HPNum).LoopNum, SimpleWatertoAirHP(HPNum).LoopSide,
-                             SimpleWatertoAirHP(HPNum).BranchNum, SimpleWatertoAirHP(HPNum).CompNum);
+        SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate,
+                             SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
+                             SimpleWatertoAirHP(HPNum).WaterOutletNodeNum,
+                             SimpleWatertoAirHP(HPNum).LoopNum,
+                             SimpleWatertoAirHP(HPNum).LoopSide,
+                             SimpleWatertoAirHP(HPNum).BranchNum,
+                             SimpleWatertoAirHP(HPNum).CompNum);
 
         SimpleWatertoAirHP(HPNum).InletAirDBTemp = Node(AirInletNode).Temp;
         SimpleWatertoAirHP(HPNum).InletAirHumRat = Node(AirInletNode).HumRat;
@@ -1020,7 +1256,8 @@ namespace WaterToAirHeatPumpSimple {
                 HardSizeNoDesRun = true;
                 if (SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate > 0.0) {
                     ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                       SimpleWatertoAirHP(HPNum).Name, "User-Specified Rated Air Flow Rate [m3/s]",
+                                       SimpleWatertoAirHP(HPNum).Name,
+                                       "User-Specified Rated Air Flow Rate [m3/s]",
                                        SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate);
                 }
             } else {
@@ -1037,7 +1274,8 @@ namespace WaterToAirHeatPumpSimple {
                 HardSizeNoDesRun = true;
                 if (SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate > 0.0) {
                     ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                       SimpleWatertoAirHP(HPNum).Name, "User-Specified Rated Air Flow Rate [m3/s]",
+                                       SimpleWatertoAirHP(HPNum).Name,
+                                       "User-Specified Rated Air Flow Rate [m3/s]",
                                        SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate);
                 }
             } else {
@@ -1053,13 +1291,18 @@ namespace WaterToAirHeatPumpSimple {
             if (IsAutoSize) {
                 SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate = RatedAirVolFlowRateDes;
                 ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                   SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes);
+                                   SimpleWatertoAirHP(HPNum).Name,
+                                   "Design Size Rated Air Flow Rate [m3/s]",
+                                   RatedAirVolFlowRateDes);
             } else {
                 if (SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate > 0.0 && RatedAirVolFlowRateDes > 0.0 && !HardSizeNoDesRun) {
                     RatedAirVolFlowRateUser = SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate;
                     ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                       SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateDes,
-                                       "User-Specified Rated Air Flow Rate [m3/s]", RatedAirVolFlowRateUser);
+                                       SimpleWatertoAirHP(HPNum).Name,
+                                       "Design Size Rated Air Flow Rate [m3/s]",
+                                       RatedAirVolFlowRateDes,
+                                       "User-Specified Rated Air Flow Rate [m3/s]",
+                                       RatedAirVolFlowRateUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(RatedAirVolFlowRateDes - RatedAirVolFlowRateUser) / RatedAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
                             ShowMessage("SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
@@ -1091,7 +1334,8 @@ namespace WaterToAirHeatPumpSimple {
                     HardSizeNoDesRun = true;
                     if (SimpleWatertoAirHP(HPNum).RatedCapCoolTotal > 0.0) {
                         ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                           SimpleWatertoAirHP(HPNum).Name, "User-Specified Rated Total Cooling Capacity [W]",
+                                           SimpleWatertoAirHP(HPNum).Name,
+                                           "User-Specified Rated Total Cooling Capacity [W]",
                                            SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
                     }
                 } else {
@@ -1157,7 +1401,8 @@ namespace WaterToAirHeatPumpSimple {
                     HardSizeNoDesRun = true;
                     if (SimpleWatertoAirHP(HPNum).RatedCapCoolTotal > 0.0) {
                         ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                           SimpleWatertoAirHP(HPNum).Name, "User-Specified Rated Total Cooling Capacity [W]",
+                                           SimpleWatertoAirHP(HPNum).Name,
+                                           "User-Specified Rated Total Cooling Capacity [W]",
                                            SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
                     }
                 } else {
@@ -1228,7 +1473,8 @@ namespace WaterToAirHeatPumpSimple {
                     HardSizeNoDesRun = true;
                     if (SimpleWatertoAirHP(HPNum).RatedCapCoolSens > 0.0) {
                         ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                           SimpleWatertoAirHP(HPNum).Name, "User-Specified Rated Sensible Cooling Capacity [W]",
+                                           SimpleWatertoAirHP(HPNum).Name,
+                                           "User-Specified Rated Sensible Cooling Capacity [W]",
                                            SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
                     }
                 } else {
@@ -1295,7 +1541,8 @@ namespace WaterToAirHeatPumpSimple {
                     HardSizeNoDesRun = true;
                     if (SimpleWatertoAirHP(HPNum).RatedCapCoolSens > 0.0) {
                         ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                           SimpleWatertoAirHP(HPNum).Name, "User-Specified Rated Sensible Cooling Capacity [W]",
+                                           SimpleWatertoAirHP(HPNum).Name,
+                                           "User-Specified Rated Sensible Cooling Capacity [W]",
                                            SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
                     }
                 } else {
@@ -1370,14 +1617,19 @@ namespace WaterToAirHeatPumpSimple {
                 if (RatedCapCoolTotalAutoSized) {
                     SimpleWatertoAirHP(HPNum).RatedCapCoolTotal = RatedCapCoolTotalDes;
                     ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                       SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Total Cooling Capacity [W]", RatedCapCoolTotalDes);
+                                       SimpleWatertoAirHP(HPNum).Name,
+                                       "Design Size Rated Total Cooling Capacity [W]",
+                                       RatedCapCoolTotalDes);
                     PreDefTableEntry(pdchCoolCoilTotCap, SimpleWatertoAirHP(HPNum).Name, SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
-                    PreDefTableEntry(pdchCoolCoilLatCap, SimpleWatertoAirHP(HPNum).Name,
+                    PreDefTableEntry(pdchCoolCoilLatCap,
+                                     SimpleWatertoAirHP(HPNum).Name,
                                      SimpleWatertoAirHP(HPNum).RatedCapCoolTotal - SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
                     if (SimpleWatertoAirHP(HPNum).RatedCapCoolTotal != 0.0) {
-                        PreDefTableEntry(pdchCoolCoilSHR, SimpleWatertoAirHP(HPNum).Name,
+                        PreDefTableEntry(pdchCoolCoilSHR,
+                                         SimpleWatertoAirHP(HPNum).Name,
                                          SimpleWatertoAirHP(HPNum).RatedCapCoolSens / SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
-                        PreDefTableEntry(pdchCoolCoilNomEff, SimpleWatertoAirHP(HPNum).Name,
+                        PreDefTableEntry(pdchCoolCoilNomEff,
+                                         SimpleWatertoAirHP(HPNum).Name,
                                          SimpleWatertoAirHP(HPNum).RatedPowerCool / SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
                     } else {
                         PreDefTableEntry(pdchCoolCoilSHR, SimpleWatertoAirHP(HPNum).Name, 0.0);
@@ -1387,8 +1639,11 @@ namespace WaterToAirHeatPumpSimple {
                     if (SimpleWatertoAirHP(HPNum).RatedCapCoolTotal > 0.0 && RatedCapCoolTotalDes > 0.0 && !HardSizeNoDesRun) {
                         RatedCapCoolTotalUser = SimpleWatertoAirHP(HPNum).RatedCapCoolTotal;
                         ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                           SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Total Cooling Capacity [W]", RatedCapCoolTotalDes,
-                                           "User-Specified Rated Total Cooling Capacity [W]", RatedCapCoolTotalUser);
+                                           SimpleWatertoAirHP(HPNum).Name,
+                                           "Design Size Rated Total Cooling Capacity [W]",
+                                           RatedCapCoolTotalDes,
+                                           "User-Specified Rated Total Cooling Capacity [W]",
+                                           RatedCapCoolTotalUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(RatedCapCoolTotalDes - RatedCapCoolTotalUser) / RatedCapCoolTotalUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
@@ -1409,12 +1664,16 @@ namespace WaterToAirHeatPumpSimple {
                 if (RatedCapCoolSensAutoSized) {
                     SimpleWatertoAirHP(HPNum).RatedCapCoolSens = RatedCapCoolSensDes;
                     ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                       SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Sensible Cooling Capacity [W]", RatedCapCoolSensDes);
+                                       SimpleWatertoAirHP(HPNum).Name,
+                                       "Design Size Rated Sensible Cooling Capacity [W]",
+                                       RatedCapCoolSensDes);
                     PreDefTableEntry(pdchCoolCoilSensCap, SimpleWatertoAirHP(HPNum).Name, SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
-                    PreDefTableEntry(pdchCoolCoilLatCap, SimpleWatertoAirHP(HPNum).Name,
+                    PreDefTableEntry(pdchCoolCoilLatCap,
+                                     SimpleWatertoAirHP(HPNum).Name,
                                      SimpleWatertoAirHP(HPNum).RatedCapCoolTotal - SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
                     if (SimpleWatertoAirHP(HPNum).RatedCapCoolTotal != 0.0) {
-                        PreDefTableEntry(pdchCoolCoilSHR, SimpleWatertoAirHP(HPNum).Name,
+                        PreDefTableEntry(pdchCoolCoilSHR,
+                                         SimpleWatertoAirHP(HPNum).Name,
                                          SimpleWatertoAirHP(HPNum).RatedCapCoolSens / SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
                     } else {
                         PreDefTableEntry(pdchCoolCoilSHR, SimpleWatertoAirHP(HPNum).Name, 0.0);
@@ -1423,8 +1682,11 @@ namespace WaterToAirHeatPumpSimple {
                     if (SimpleWatertoAirHP(HPNum).RatedCapCoolSens > 0.0 && RatedCapCoolSensDes > 0.0) {
                         RatedCapCoolSensUser = SimpleWatertoAirHP(HPNum).RatedCapCoolSens;
                         ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                           SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Sensible Cooling Capacity [W]", RatedCapCoolSensDes,
-                                           "User-Specified Rated Sensible Cooling Capacity [W]", RatedCapCoolSensUser);
+                                           SimpleWatertoAirHP(HPNum).Name,
+                                           "Design Size Rated Sensible Cooling Capacity [W]",
+                                           RatedCapCoolSensDes,
+                                           "User-Specified Rated Sensible Cooling Capacity [W]",
+                                           RatedCapCoolSensUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(RatedCapCoolSensDes - RatedCapCoolSensUser) / RatedCapCoolSensUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
@@ -1521,10 +1783,13 @@ namespace WaterToAirHeatPumpSimple {
             if (IsAutoSize) {
                 SimpleWatertoAirHP(HPNum).RatedCapHeat = RatedCapHeatDes;
                 ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                   SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Heating Capacity [W]", RatedCapHeatDes);
+                                   SimpleWatertoAirHP(HPNum).Name,
+                                   "Design Size Rated Heating Capacity [W]",
+                                   RatedCapHeatDes);
                 PreDefTableEntry(pdchHeatCoilNomCap, SimpleWatertoAirHP(HPNum).Name, SimpleWatertoAirHP(HPNum).RatedCapHeat);
                 if (SimpleWatertoAirHP(HPNum).RatedCapHeat != 0.0) {
-                    PreDefTableEntry(pdchHeatCoilNomEff, SimpleWatertoAirHP(HPNum).Name,
+                    PreDefTableEntry(pdchHeatCoilNomEff,
+                                     SimpleWatertoAirHP(HPNum).Name,
                                      SimpleWatertoAirHP(HPNum).RatedPowerHeat / SimpleWatertoAirHP(HPNum).RatedCapHeat);
                 } else {
                     PreDefTableEntry(pdchHeatCoilNomEff, SimpleWatertoAirHP(HPNum).Name, 0.0);
@@ -1533,8 +1798,11 @@ namespace WaterToAirHeatPumpSimple {
                 if (SimpleWatertoAirHP(HPNum).RatedCapHeat > 0.0 && RatedCapHeatDes > 0.0 && !HardSizeNoDesRun) {
                     RatedCapHeatUser = SimpleWatertoAirHP(HPNum).RatedCapHeat;
                     ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                       SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Heating Capacity [W]", RatedCapHeatDes,
-                                       "User-Specified Rated Heating Capacity [W]", RatedCapHeatUser);
+                                       SimpleWatertoAirHP(HPNum).Name,
+                                       "Design Size Rated Heating Capacity [W]",
+                                       RatedCapHeatDes,
+                                       "User-Specified Rated Heating Capacity [W]",
+                                       RatedCapHeatUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(RatedCapHeatDes - RatedCapHeatUser) / RatedCapHeatUser) > AutoVsHardSizingThreshold) {
                             ShowMessage("SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
@@ -1595,8 +1863,11 @@ namespace WaterToAirHeatPumpSimple {
         //   first check to see if coil is connected to a plant loop, no warning on this CALL
         if (IsAutoSize) {
             PltSizNum = MyPlantSizingIndex("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                           SimpleWatertoAirHP(HPNum).Name, SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
-                                           SimpleWatertoAirHP(HPNum).WaterOutletNodeNum, ErrorsFound, false);
+                                           SimpleWatertoAirHP(HPNum).Name,
+                                           SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
+                                           SimpleWatertoAirHP(HPNum).WaterOutletNodeNum,
+                                           ErrorsFound,
+                                           false);
 
             //!   if not found on a plant loop, check condenser loop and warn user if not found
             //    IF(PltSizNum == 0) THEN
@@ -1608,10 +1879,14 @@ namespace WaterToAirHeatPumpSimple {
             //    END IF
 
             if (PltSizNum > 0) {
-                rho = GetDensityGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName, PlantSizData(PltSizNum).ExitTemp,
-                                       PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineNameAlt);
-                Cp = GetSpecificHeatGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName, PlantSizData(PltSizNum).ExitTemp,
-                                           PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineNameAlt);
+                rho = GetDensityGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName,
+                                       PlantSizData(PltSizNum).ExitTemp,
+                                       PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                       RoutineNameAlt);
+                Cp = GetSpecificHeatGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName,
+                                           PlantSizData(PltSizNum).ExitTemp,
+                                           PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                           RoutineNameAlt);
 
                 if (SimpleWatertoAirHP(HPNum).WatertoAirHPType == "HEATING") {
 
@@ -1638,13 +1913,18 @@ namespace WaterToAirHeatPumpSimple {
         if (IsAutoSize) {
             SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate = RatedWaterVolFlowRateDes;
             ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                               SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateDes);
+                               SimpleWatertoAirHP(HPNum).Name,
+                               "Design Size Rated Water Flow Rate [m3/s]",
+                               RatedWaterVolFlowRateDes);
         } else {
             if (SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate > 0.0 && RatedWaterVolFlowRateDes > 0.0) {
                 RatedWaterVolFlowRateUser = SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate;
                 ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                                   SimpleWatertoAirHP(HPNum).Name, "Design Size Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateDes,
-                                   "User-Specified Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateUser);
+                                   SimpleWatertoAirHP(HPNum).Name,
+                                   "Design Size Rated Water Flow Rate [m3/s]",
+                                   RatedWaterVolFlowRateDes,
+                                   "User-Specified Rated Water Flow Rate [m3/s]",
+                                   RatedWaterVolFlowRateUser);
                 if (DisplayExtraWarnings) {
                     if ((std::abs(RatedWaterVolFlowRateDes - RatedWaterVolFlowRateUser) / RatedWaterVolFlowRateUser) > AutoVsHardSizingThreshold) {
                         ShowMessage("SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
@@ -1834,8 +2114,10 @@ namespace WaterToAirHeatPumpSimple {
         SourceSideMassFlowRate = SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
         SourceSideInletTemp = SimpleWatertoAirHP(HPNum).InletWaterTemp;
         SourceSideInletEnth = SimpleWatertoAirHP(HPNum).InletWaterEnthalpy;
-        CpWater = GetSpecificHeatGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName, SourceSideInletTemp,
-                                        PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineNameSourceSideInletTemp);
+        CpWater = GetSpecificHeatGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName,
+                                        SourceSideInletTemp,
+                                        PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                        RoutineNameSourceSideInletTemp);
 
         // Check for flows, do not perform simulation if no flow in load side or source side.
         if (SourceSideMassFlowRate <= 0.0 || LoadSideMassFlowRate <= 0.0) {
@@ -1987,9 +2269,13 @@ namespace WaterToAirHeatPumpSimple {
         if ((SimpleWatertoAirHP(HPNum).WaterCyclingMode) == WaterCycling) {
             // plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
             SimpleWatertoAirHP(HPNum).WaterMassFlowRate = SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate * PartLoadRatio;
-            SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate, SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
-                                 SimpleWatertoAirHP(HPNum).WaterOutletNodeNum, SimpleWatertoAirHP(HPNum).LoopNum, SimpleWatertoAirHP(HPNum).LoopSide,
-                                 SimpleWatertoAirHP(HPNum).BranchNum, SimpleWatertoAirHP(HPNum).CompNum);
+            SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate,
+                                 SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
+                                 SimpleWatertoAirHP(HPNum).WaterOutletNodeNum,
+                                 SimpleWatertoAirHP(HPNum).LoopNum,
+                                 SimpleWatertoAirHP(HPNum).LoopSide,
+                                 SimpleWatertoAirHP(HPNum).BranchNum,
+                                 SimpleWatertoAirHP(HPNum).CompNum);
             if (SimpleWatertoAirHP(HPNum).WaterMassFlowRate > 0.0) {
                 SimpleWatertoAirHP(HPNum).OutletWaterTemp = SourceSideInletTemp + QSource / (SimpleWatertoAirHP(HPNum).WaterMassFlowRate * CpWater);
                 SimpleWatertoAirHP(HPNum).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
@@ -1998,9 +2284,13 @@ namespace WaterToAirHeatPumpSimple {
             if ((SimpleWatertoAirHP(HPNum).WaterCyclingMode) == WaterConstant) {
                 if (SimpleWatertoAirHP(HPNum).WaterFlowMode) {
                     SimpleWatertoAirHP(HPNum).WaterMassFlowRate = SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate;
-                    SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate, SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
-                                         SimpleWatertoAirHP(HPNum).WaterOutletNodeNum, SimpleWatertoAirHP(HPNum).LoopNum,
-                                         SimpleWatertoAirHP(HPNum).LoopSide, SimpleWatertoAirHP(HPNum).BranchNum, SimpleWatertoAirHP(HPNum).CompNum);
+                    SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate,
+                                         SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
+                                         SimpleWatertoAirHP(HPNum).WaterOutletNodeNum,
+                                         SimpleWatertoAirHP(HPNum).LoopNum,
+                                         SimpleWatertoAirHP(HPNum).LoopSide,
+                                         SimpleWatertoAirHP(HPNum).BranchNum,
+                                         SimpleWatertoAirHP(HPNum).CompNum);
                 } else {
                     SimpleWatertoAirHP(HPNum).WaterMassFlowRate = SourceSideMassFlowRate;
                 }
@@ -2126,8 +2416,10 @@ namespace WaterToAirHeatPumpSimple {
         SourceSideMassFlowRate = SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
         SourceSideInletTemp = SimpleWatertoAirHP(HPNum).InletWaterTemp;
         SourceSideInletEnth = SimpleWatertoAirHP(HPNum).InletWaterEnthalpy;
-        CpWater = GetSpecificHeatGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName, SourceSideInletTemp,
-                                        PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineNameSourceSideInletTemp);
+        CpWater = GetSpecificHeatGlycol(PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidName,
+                                        SourceSideInletTemp,
+                                        PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                        RoutineNameSourceSideInletTemp);
 
         // Check for flows, do not perform simulation if no flow in load side or source side.
         if (SourceSideMassFlowRate <= 0.0 || LoadSideMassFlowRate <= 0.0) {
@@ -2212,9 +2504,13 @@ namespace WaterToAirHeatPumpSimple {
         if ((SimpleWatertoAirHP(HPNum).WaterCyclingMode) == WaterCycling) {
             // plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
             SimpleWatertoAirHP(HPNum).WaterMassFlowRate = SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate * PartLoadRatio;
-            SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate, SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
-                                 SimpleWatertoAirHP(HPNum).WaterOutletNodeNum, SimpleWatertoAirHP(HPNum).LoopNum, SimpleWatertoAirHP(HPNum).LoopSide,
-                                 SimpleWatertoAirHP(HPNum).BranchNum, SimpleWatertoAirHP(HPNum).CompNum);
+            SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate,
+                                 SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
+                                 SimpleWatertoAirHP(HPNum).WaterOutletNodeNum,
+                                 SimpleWatertoAirHP(HPNum).LoopNum,
+                                 SimpleWatertoAirHP(HPNum).LoopSide,
+                                 SimpleWatertoAirHP(HPNum).BranchNum,
+                                 SimpleWatertoAirHP(HPNum).CompNum);
             if (SimpleWatertoAirHP(HPNum).WaterMassFlowRate > 0.0) {
                 SimpleWatertoAirHP(HPNum).OutletWaterTemp = SourceSideInletTemp - QSource / (SimpleWatertoAirHP(HPNum).WaterMassFlowRate * CpWater);
                 SimpleWatertoAirHP(HPNum).OutletWaterEnthalpy = SourceSideInletEnth - QSource / SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
@@ -2223,9 +2519,13 @@ namespace WaterToAirHeatPumpSimple {
             if ((SimpleWatertoAirHP(HPNum).WaterCyclingMode) == WaterConstant) {
                 if (SimpleWatertoAirHP(HPNum).WaterFlowMode) {
                     SimpleWatertoAirHP(HPNum).WaterMassFlowRate = SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate;
-                    SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate, SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
-                                         SimpleWatertoAirHP(HPNum).WaterOutletNodeNum, SimpleWatertoAirHP(HPNum).LoopNum,
-                                         SimpleWatertoAirHP(HPNum).LoopSide, SimpleWatertoAirHP(HPNum).BranchNum, SimpleWatertoAirHP(HPNum).CompNum);
+                    SetComponentFlowRate(SimpleWatertoAirHP(HPNum).WaterMassFlowRate,
+                                         SimpleWatertoAirHP(HPNum).WaterInletNodeNum,
+                                         SimpleWatertoAirHP(HPNum).WaterOutletNodeNum,
+                                         SimpleWatertoAirHP(HPNum).LoopNum,
+                                         SimpleWatertoAirHP(HPNum).LoopSide,
+                                         SimpleWatertoAirHP(HPNum).BranchNum,
+                                         SimpleWatertoAirHP(HPNum).CompNum);
                 } else {
                     SimpleWatertoAirHP(HPNum).WaterMassFlowRate = SourceSideMassFlowRate;
                 }
@@ -2346,15 +2646,19 @@ namespace WaterToAirHeatPumpSimple {
             SimpleWatertoAirHP(HPNum).reportCoilFinalSizes) {
 
             if (UtilityRoutines::SameString(SimpleWatertoAirHP(HPNum).WatertoAirHPType, "COOLING")) { // cooling
-                coilSelectionReportObj->setCoilFinalSizes(
-                    SimpleWatertoAirHP(HPNum).Name, "Coil:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",
-                    SimpleWatertoAirHP(HPNum).RatedCapCoolTotal, SimpleWatertoAirHP(HPNum).RatedCapCoolSens,
-                    SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate, SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate);
+                coilSelectionReportObj->setCoilFinalSizes(SimpleWatertoAirHP(HPNum).Name,
+                                                          "Coil:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",
+                                                          SimpleWatertoAirHP(HPNum).RatedCapCoolTotal,
+                                                          SimpleWatertoAirHP(HPNum).RatedCapCoolSens,
+                                                          SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate,
+                                                          SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate);
             } else if (UtilityRoutines::SameString(SimpleWatertoAirHP(HPNum).WatertoAirHPType, "HEATING")) { // heating
-                coilSelectionReportObj->setCoilFinalSizes(
-                    SimpleWatertoAirHP(HPNum).Name, "Coil:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",
-                    SimpleWatertoAirHP(HPNum).RatedCapHeat, SimpleWatertoAirHP(HPNum).RatedCapHeat, SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate,
-                    SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate);
+                coilSelectionReportObj->setCoilFinalSizes(SimpleWatertoAirHP(HPNum).Name,
+                                                          "Coil:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",
+                                                          SimpleWatertoAirHP(HPNum).RatedCapHeat,
+                                                          SimpleWatertoAirHP(HPNum).RatedCapHeat,
+                                                          SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate,
+                                                          SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate);
             }
         }
     }

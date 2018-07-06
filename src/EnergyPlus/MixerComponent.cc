@@ -259,14 +259,23 @@ namespace MixerComponent {
         NumArray.dimension(NumNums, 0.0);
 
         for (MixerNum = 1; MixerNum <= NumMixers; ++MixerNum) {
-            inputProcessor->getObjectItem(CurrentModuleObject, MixerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          MixerNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             MixerCond(MixerNum).MixerName = AlphArray(1);
 
-            MixerCond(MixerNum).OutletNode = GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                               NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            MixerCond(MixerNum).OutletNode = GetOnlySingleNode(
+                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             MixerCond(MixerNum).NumInletNodes = NumAlphas - 2;
 
             for (auto &e : MixerCond)
@@ -299,8 +308,14 @@ namespace MixerComponent {
 
             for (NodeNum = 1; NodeNum <= MixerCond(MixerNum).NumInletNodes; ++NodeNum) {
 
-                MixerCond(MixerNum).InletNode(NodeNum) = GetOnlySingleNode(AlphArray(2 + NodeNum), ErrorsFound, CurrentModuleObject, AlphArray(1),
-                                                                           NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                MixerCond(MixerNum).InletNode(NodeNum) = GetOnlySingleNode(AlphArray(2 + NodeNum),
+                                                                           ErrorsFound,
+                                                                           CurrentModuleObject,
+                                                                           AlphArray(1),
+                                                                           NodeType_Air,
+                                                                           NodeConnectionType_Inlet,
+                                                                           1,
+                                                                           ObjectIsNotParent);
                 if (lAlphaBlanks(2 + NodeNum)) {
                     ShowSevereError(cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
