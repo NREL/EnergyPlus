@@ -888,6 +888,7 @@ namespace Boilers {
         m_operatingLoad = 0.0;
         m_operatingParasiticElectricalPower = 0.0;
         m_operatingMassFlowRate = 0.0;
+        m_operatingOutletTemperature = m_operatingInletTemperature;
         operatingCapacity = m_designNominalCapacity;
         operatingEfficiency = m_designEfficiency;
 
@@ -921,7 +922,6 @@ namespace Boilers {
             if ((m_designFlowMode == FlowModeType::Constant) || (m_designFlowMode == FlowModeType::NotModulated)) {
                 // fix the flow rate at the design level and initialise the outlet temperature to the inlet temperature
                 m_operatingMassFlowRate = m_designMassFlowRate;
-                m_operatingOutletTemperature = m_operatingInletTemperature;
 
                 // update the outlet temperature if the boiler is operating
                 if ((m_operatingMassFlowRate != 0.0) && (m_operatingLoad > 0.0)) {
@@ -960,7 +960,6 @@ namespace Boilers {
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
             m_operatingMassFlowRate = Node(m_nodeHotWaterInletIndex).MassFlowRate;
-            m_operatingOutletTemperature = m_operatingInletTemperature;
 
             if ((m_operatingLoad > 0.0) && (m_operatingMassFlowRate > 0.0)) { // this boiler has a heat load
                 // clamp the operating load and then calculate the outlet temperature
