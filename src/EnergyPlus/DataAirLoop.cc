@@ -89,15 +89,6 @@ namespace DataAirLoop {
     Real64 LoopDXCoilRTF(0.0); // OnOff fan run time fraction in an HVAC Air Loop
     bool AirLoopInputsFilled(false);       // Set to TRUE after first pass through air loop
 
-    Array1D<int> LoopFanOperationMode;         // OnOff fan operation mode
-    Array1D<Real64> LoopSystemOnMassFlowrate;  // Loop mass flow rate during on cycle using an OnOff fan
-    Array1D<Real64> LoopSystemOffMassFlowrate; // Loop mass flow rate during off cycle using an OnOff fan
-    Array1D<Real64> LoopOnOffFanPartLoadRatio; // OnOff fan part load ratio
-    Array1D<Real64> LoopCompCycRatio;          // Loop compressor cycling ratio for multispeed heat pump
-    Array1D<Real64> AFNLoopHeatingCoilMaxRTF;  // Maximum run time fraction for electric or gas heating coil in an HVAC Air Loop
-    Array1D<Real64> AFNLoopOnOffFanRTF;        // OnOff fan run time fraction in an HVAC Air Loop
-    Array1D<Real64> AFNLoopDXCoilRTF;          // OnOff fan run time fraction in an HVAC Air Loop
-
     // Object Data
     Array1D<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
     Array1D<AirLoopOutsideAirConnectData> AirToOANodeInfo;
@@ -106,6 +97,7 @@ namespace DataAirLoop {
     Array1D<AirLoopControlData> AirLoopControlInfo;
     Array1D<AirLoopFlowData> AirLoopFlow;
     Array1D<OutsideAirSysProps> OutsideAirSys;
+    Array1D<AirLoopAFNData> AirLoopAFNInfo;
 
     // Clears the global data in DataAirLoop.
     // Needed for unit tests, should not be normally called.
@@ -114,14 +106,7 @@ namespace DataAirLoop {
         NumOASystems = 0;
         LoopDXCoilRTF = 0.0;
         AirLoopInputsFilled = false;
-        LoopFanOperationMode.deallocate();
-        LoopSystemOnMassFlowrate.deallocate();
-        LoopSystemOffMassFlowrate.deallocate();
-        LoopOnOffFanPartLoadRatio.deallocate();
-        LoopCompCycRatio.deallocate();
-        AFNLoopHeatingCoilMaxRTF.deallocate();
-        AFNLoopOnOffFanRTF.deallocate();
-        AFNLoopDXCoilRTF.deallocate();
+        AirLoopAFNInfo.deallocate();
         AirToZoneNodeInfo.deallocate();
         AirToOANodeInfo.deallocate();
         PriAirSysAvailMgr.deallocate();

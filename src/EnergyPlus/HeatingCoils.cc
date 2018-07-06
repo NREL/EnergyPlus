@@ -1594,7 +1594,7 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataAirLoop::AFNLoopHeatingCoilMaxRTF;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -1728,12 +1728,12 @@ namespace HeatingCoils {
         QCoilActual = HeatingCoilLoad;
         if (std::abs(HeatingCoil(CoilNum).NominalCapacity) < 1.e-8) {
             if (HeatingCoil(CoilNum).AirLoopNum > 0) {
-                AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum) = max(AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum), 0.0);
+                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, 0.0);
             }
         } else {
             if (HeatingCoil(CoilNum).AirLoopNum > 0) {
-                AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum) =
-                    max(AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum), HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
+                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF =
+                    max(AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
             }
         }
 
@@ -1980,7 +1980,7 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataAirLoop::AFNLoopHeatingCoilMaxRTF;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -2164,8 +2164,8 @@ namespace HeatingCoils {
 
         QCoilActual = HeatingCoilLoad;
         if (HeatingCoil(CoilNum).AirLoopNum > 0) {
-            AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum) =
-                max(AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum), HeatingCoil(CoilNum).RTF);
+            AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF =
+                max(AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, HeatingCoil(CoilNum).RTF);
         }
         ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
 

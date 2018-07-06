@@ -993,8 +993,6 @@ namespace HVACFan {
             DataLoopNode::Node(outletNodeNum).GenContam = DataLoopNode::Node(inletNodeNum).GenContam;
         }
 
-        // would like to get rid of this global, used in AFN.
-//        DataAirLoop::LoopOnOffFanRTF = m_fanRunTimeFractionAtSpeed[m_numSpeeds - 1]; // fill with RTF from highest speed level
     }
 
     void FanSystem::report()

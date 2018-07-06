@@ -82,15 +82,6 @@ namespace DataAirLoop {
     // Non-AFN simulations may have multiple air loops and use of these variables may yield unintended results.
     extern Real64 LoopDXCoilRTF; // OnOff fan run time fraction in an HVAC Air Loop
 
-    extern Array1D<int> LoopFanOperationMode;         // OnOff fan operation mode
-    extern Array1D<Real64> LoopSystemOnMassFlowrate;  // Loop mass flow rate during on cycle using an OnOff fan
-    extern Array1D<Real64> LoopSystemOffMassFlowrate; // Loop mass flow rate during off cycle using an OnOff fan
-    extern Array1D<Real64> LoopOnOffFanPartLoadRatio; // OnOff fan part load ratio
-    extern Array1D<Real64> LoopCompCycRatio;          // Loop compressor cycling ratio for multispeed heat pump
-    extern Array1D<Real64> AFNLoopHeatingCoilMaxRTF;  // Maximum run time fraction for electric or gas heating coil in an HVAC Air Loop
-    extern Array1D<Real64> AFNLoopOnOffFanRTF;        // OnOff fan run time fraction in an HVAC Air Loop
-    extern Array1D<Real64> AFNLoopDXCoilRTF;          // OnOff fan run time fraction in an HVAC Air Loop
-
     // Types
 
     struct AirLoopZoneEquipConnectData
@@ -277,6 +268,26 @@ namespace DataAirLoop {
         }
     };
 
+    struct AirLoopAFNData
+    {
+        // Members
+        int LoopFanOperationMode;         // OnOff fan operation mode
+        Real64 LoopSystemOnMassFlowrate;  // Loop mass flow rate during on cycle using an OnOff fan
+        Real64 LoopSystemOffMassFlowrate; // Loop mass flow rate during off cycle using an OnOff fan
+        Real64 LoopOnOffFanPartLoadRatio; // OnOff fan part load ratio
+        Real64 LoopCompCycRatio;          // Loop compressor cycling ratio for multispeed heat pump
+        Real64 AFNLoopHeatingCoilMaxRTF;  // Maximum run time fraction for electric or gas heating coil in an HVAC Air Loop
+        Real64 AFNLoopOnOffFanRTF;        // OnOff fan run time fraction in an HVAC Air Loop
+        Real64 AFNLoopDXCoilRTF;          // OnOff fan run time fraction in an HVAC Air Loop
+
+        // Default Constructor
+        AirLoopAFNData()
+            : LoopFanOperationMode(0), LoopSystemOnMassFlowrate(0.0), LoopSystemOffMassFlowrate(0.0), LoopOnOffFanPartLoadRatio(0.0),
+              LoopCompCycRatio(0.0), AFNLoopHeatingCoilMaxRTF(0.0), AFNLoopOnOffFanRTF(0.0), AFNLoopDXCoilRTF(0.0)
+        {
+        }
+    };
+
     // Object Data
     extern Array1D<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
     extern Array1D<AirLoopOutsideAirConnectData> AirToOANodeInfo;
@@ -285,6 +296,7 @@ namespace DataAirLoop {
     extern Array1D<AirLoopControlData> AirLoopControlInfo;
     extern Array1D<AirLoopFlowData> AirLoopFlow;
     extern Array1D<OutsideAirSysProps> OutsideAirSys;
+    extern Array1D<AirLoopAFNData> AirLoopAFNInfo;
 
     // Clears the global data in DataAirLoop.
     // Needed for unit tests, should not be normally called.

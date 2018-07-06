@@ -394,13 +394,7 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
-
-        using DataAirLoop::AFNLoopDXCoilRTF;
-        using DataAirLoop::AFNLoopHeatingCoilMaxRTF;
-        using DataAirLoop::AFNLoopOnOffFanRTF;
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataAirSystems::PrimaryAirSystem;
 
         // Locals
@@ -432,10 +426,14 @@ namespace AirflowNetworkBalanceManager {
 
         if (present(FirstHVACIteration) && SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
             if (FirstHVACIteration) {
-                AFNLoopHeatingCoilMaxRTF = 0.0;
-                AFNLoopOnOffFanRTF = 0.0;
-                LoopOnOffFanPartLoadRatio = 0.0;
-                AFNLoopDXCoilRTF = 0.0;
+                if (allocated(AirLoopAFNInfo)) {
+                    for (i = 1; i <= DisSysNumOfCVFs; i++) {
+                        AirLoopAFNInfo(i).AFNLoopHeatingCoilMaxRTF = 0.0;
+                        AirLoopAFNInfo(i).AFNLoopOnOffFanRTF = 0.0;
+                        AirLoopAFNInfo(i).AFNLoopDXCoilRTF = 0.0;
+                        AirLoopAFNInfo(i).LoopOnOffFanPartLoadRatio = 0.0;
+                    }
+                }
             }
             Real64 FanMassFlowRate = 0.0;
             int FanOperModeCyc = 0;
@@ -449,7 +447,7 @@ namespace AirflowNetworkBalanceManager {
                     AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
                     break;
                 }
-                if (FanMassFlowRate > VerySmallMassFlow && LoopFanOperationMode(i) == CycFanCycCoil && LoopSystemOnMassFlowrate(i) > 0.0) {
+                if (FanMassFlowRate > VerySmallMassFlow && AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil && AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
                     FanOperModeCyc = CycFanCycCoil;
                     AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
                     if (AFNSupplyFanType == FanType_SimpleOnOff) {
@@ -5010,7 +5008,6 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= DisSysNumOfCVFs; i++) {
             if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
                 OnOffFanFlag = true;
-                break;
             }
         }
 
@@ -5551,8 +5548,7 @@ namespace AirflowNetworkBalanceManager {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
@@ -5780,8 +5776,8 @@ namespace AirflowNetworkBalanceManager {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxExhaustMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (LoopFanOperationMode(AirLoopNum) == CycFanCycComp && LoopOnOffFanPartLoadRatio(AirLoopNum) > 0.0) {
-                MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / LoopOnOffFanPartLoadRatio(AirLoopNum);
+            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ExhaustFanMassFlowRate = MinExhaustMassFlowrate;
             AIRMOV();
@@ -5857,8 +5853,8 @@ namespace AirflowNetworkBalanceManager {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinReliefMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxReliefMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (LoopFanOperationMode(AirLoopNum) == CycFanCycComp && LoopOnOffFanPartLoadRatio(AirLoopNum) > 0.0) {
-                MaxReliefMassFlowrate = MaxReliefMassFlowrate / LoopOnOffFanPartLoadRatio(AirLoopNum);
+            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                MaxReliefMassFlowrate = MaxReliefMassFlowrate / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ReliefMassFlowRate = MinReliefMassFlowrate;
             InitAirflowNetworkData();
@@ -8626,13 +8622,7 @@ namespace AirflowNetworkBalanceManager {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::AFNLoopDXCoilRTF;
-        using DataAirLoop::AFNLoopHeatingCoilMaxRTF;
-        using DataAirLoop::AFNLoopOnOffFanRTF;
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
@@ -8890,7 +8880,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 MaxPartLoadRatio = 0.0;
         MaxOnOffFanRunTimeFraction = 0.0;
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            MaxPartLoadRatio = max(MaxPartLoadRatio, LoopOnOffFanPartLoadRatio(AirLoopNum));
+            MaxPartLoadRatio = max(MaxPartLoadRatio, AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio);
             MaxOnOffFanRunTimeFraction = max(MaxOnOffFanRunTimeFraction, LoopOnOffFanRunTimeFraction(AirLoopNum));
         }
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
@@ -8903,15 +8893,15 @@ namespace AirflowNetworkBalanceManager {
             LoopOnOffFanRunTimeFraction(AirLoopNum) = 1.0;
             // Calculate the part load ratio, can't be greater than 1 for a simple ONOFF fan
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff &&
-                Node(DisSysCompCVFData(FanNum).InletNode).MassFlowRate > VerySmallMassFlow && LoopFanOperationMode(AirLoopNum) == CycFanCycCoil) {
+                Node(DisSysCompCVFData(FanNum).InletNode).MassFlowRate > VerySmallMassFlow && AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
                 // Hard code here
-                PartLoadRatio = LoopOnOffFanPartLoadRatio(AirLoopNum);
-                LoopPartLoadRatio(AirLoopNum) = LoopOnOffFanPartLoadRatio(AirLoopNum);
-                OnOffFanRunTimeFraction = max(AFNLoopHeatingCoilMaxRTF(AirLoopNum), AFNLoopOnOffFanRTF(AirLoopNum), AFNLoopDXCoilRTF(AirLoopNum));
+                PartLoadRatio = AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+                LoopPartLoadRatio(AirLoopNum) = AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+                OnOffFanRunTimeFraction = max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF, AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
                 LoopOnOffFanRunTimeFraction(AirLoopNum) =
-                    max(AFNLoopHeatingCoilMaxRTF(AirLoopNum), AFNLoopOnOffFanRTF(AirLoopNum), AFNLoopDXCoilRTF(AirLoopNum));
+                    max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF, AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
             }
-            AFNLoopHeatingCoilMaxRTF(AirLoopNum) = 0.0;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
 
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && LoopPartLoadRatio(AirLoopNum) < 1.0) {
                 for (std::size_t i = 0; i < AirflowNetworkLinkReport.size(); ++i) {
@@ -8940,17 +8930,17 @@ namespace AirflowNetworkBalanceManager {
                 for (FanNum = 1; FanNum <= DisSysNumOfCVFs; ++FanNum) {
                     if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
                 }
-                if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && LoopFanOperationMode(AirLoopNum) == ContFanCycCoil) {
-                    OnOffRatio = std::abs((LoopSystemOnMassFlowrate(AirLoopNum) - LoopSystemOffMassFlowrate(AirLoopNum)) /
-                                          LoopSystemOnMassFlowrate(AirLoopNum));
+                if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == ContFanCycCoil) {
+                    OnOffRatio = std::abs((AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate - AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate) /
+                        AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate);
                     if (OnOffRatio > 0.1) {
                         ShowWarningError("The absolute percent difference of supply air mass flow rate between HVAC operation and No HVAC operation "
                                          "is above 10% with fan operation mode = ContFanCycCoil.");
                         ShowContinueError("The added zone loads using the AirflowNetwork model may not be accurate because the zone loads are "
                                           "calculated based on the mass flow rate during HVAC operation.");
                         ShowContinueError(
-                            "The mass flow rate during HVAC operation = " + RoundSigDigits(LoopSystemOnMassFlowrate(AirLoopNum), 2) +
-                            " The mass flow rate during no HVAC operation = " + RoundSigDigits(LoopSystemOffMassFlowrate(AirLoopNum), 2));
+                            "The mass flow rate during HVAC operation = " + RoundSigDigits(AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate, 2) +
+                            " The mass flow rate during no HVAC operation = " + RoundSigDigits(AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate, 2));
                         MyOneTimeFlag = false;
                     }
                 }
@@ -9172,7 +9162,7 @@ namespace AirflowNetworkBalanceManager {
                         AirflowNetworkExchangeData(i).SumMMHrGC *= OnOffFanRunTimeFraction;
                     }
                 }
-                if (LoopFanOperationMode(AirLoopNum) == CycFanCycCoil) {
+                if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
                     for (i = 1; i <= NumOfZones; ++i) {
                         AirflowNetworkExchangeData(i).SumMCp += AirflowNetworkMultiExchangeData(i).SumMCp * (1.0 - OnOffFanRunTimeFraction);
                         AirflowNetworkExchangeData(i).SumMCpT += AirflowNetworkMultiExchangeData(i).SumMCpT * (1.0 - OnOffFanRunTimeFraction);

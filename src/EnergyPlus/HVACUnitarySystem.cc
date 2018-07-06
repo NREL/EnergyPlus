@@ -10627,8 +10627,8 @@ namespace HVACUnitarySystem {
         DesOutHumRat = UnitarySystem(UnitarySysNum).DesiredOutletHumRat;
         CoilType_Num = UnitarySystem(UnitarySysNum).CoolingCoilType_Num;
         if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            LoopDXCoilMaxRTFSave = AFNLoopDXCoilRTF(AirLoopNum);
-            AFNLoopDXCoilRTF(AirLoopNum) = 0.0;
+            LoopDXCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
         }
 
         CompName = UnitarySystem(UnitarySysNum).CoolingCoilName;
@@ -11826,7 +11826,7 @@ namespace HVACUnitarySystem {
         UnitarySystem(UnitarySysNum).DehumidificationMode = DehumidMode;
 
         if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            AFNLoopDXCoilRTF(AirLoopNum) = max(AFNLoopDXCoilRTF(AirLoopNum), LoopDXCoilMaxRTFSave);
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
         }
 
         if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_CoolingWater ||
@@ -11939,10 +11939,10 @@ namespace HVACUnitarySystem {
         ControlNode = UnitarySystem(UnitarySysNum).SystemHeatControlNodeNum;
         DesOutTemp = UnitarySystem(UnitarySysNum).DesiredOutletTemp;
         if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            LoopHeatingCoilMaxRTFSave = AFNLoopHeatingCoilMaxRTF(AirLoopNum);
-            AFNLoopHeatingCoilMaxRTF(AirLoopNum) = 0.0;
-            LoopDXCoilMaxRTFSave = AFNLoopDXCoilRTF(AirLoopNum);
-            AFNLoopDXCoilRTF(AirLoopNum) = 0.0;
+            LoopHeatingCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
+            LoopDXCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
         }
 
         CompName = UnitarySystem(UnitarySysNum).HeatingCoilName;
@@ -12509,8 +12509,8 @@ namespace HVACUnitarySystem {
         UnitarySystem(UnitarySysNum).HeatingCycRatio = CycRatio;
 
         if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            AFNLoopHeatingCoilMaxRTF(AirLoopNum) = max(AFNLoopHeatingCoilMaxRTF(AirLoopNum), LoopHeatingCoilMaxRTFSave);
-            AFNLoopDXCoilRTF(AirLoopNum) = max(AFNLoopDXCoilRTF(AirLoopNum), LoopDXCoilMaxRTFSave);
+            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
         }
 
         if (UnitarySystem(UnitarySysNum).HeatingCoilType_Num == Coil_HeatingWater ||
@@ -12610,10 +12610,10 @@ namespace HVACUnitarySystem {
         SensibleLoad = false;
 
         if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            LoopHeatingCoilMaxRTFSave = AFNLoopHeatingCoilMaxRTF(AirLoopNum);
-            AFNLoopHeatingCoilMaxRTF(AirLoopNum) = 0.0;
-            LoopDXCoilMaxRTFSave = AFNLoopDXCoilRTF(AirLoopNum);
-            AFNLoopDXCoilRTF(AirLoopNum) = 0.0;
+            LoopHeatingCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
+            LoopDXCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
         }
 
         // IF there is a fault of coil SAT Sensor (zrp_Nov2016)
@@ -12903,8 +12903,8 @@ namespace HVACUnitarySystem {
         UnitarySystem(UnitarySysNum).SuppHeatPartLoadFrac = PartLoadFrac;
 
         if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            AFNLoopHeatingCoilMaxRTF(AirLoopNum) = max(AFNLoopHeatingCoilMaxRTF(AirLoopNum), LoopHeatingCoilMaxRTFSave);
-            AFNLoopDXCoilRTF(AirLoopNum) = max(AFNLoopDXCoilRTF(AirLoopNum), LoopDXCoilMaxRTFSave);
+            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
         }
 
         if (UnitarySystem(UnitarySysNum).SuppHeatCoilType_Num == Coil_HeatingWater ||
@@ -13733,11 +13733,7 @@ namespace HVACUnitarySystem {
         using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
         using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataAirLoop::AirLoopFlow;
-        using DataAirLoop::LoopCompCycRatio;
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
         using Psychrometrics::PsyHFnTdbW;
 
         // Locals
@@ -13945,11 +13941,11 @@ namespace HVACUnitarySystem {
         }
 
         if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
-            LoopSystemOnMassFlowrate(AirLoopNum) = CompOnMassFlow;
-            LoopSystemOffMassFlowrate(AirLoopNum) = CompOffMassFlow;
-            LoopFanOperationMode(AirLoopNum) = UnitarySystem(UnitarySysNum).FanOpMode;
-            LoopOnOffFanPartLoadRatio(AirLoopNum) = UnitarySystem(UnitarySysNum).FanPartLoadRatio;
-            LoopCompCycRatio(AirLoopNum) = UnitarySystem(UnitarySysNum).CycRatio;
+            AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = CompOnMassFlow;
+            AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = CompOffMassFlow;
+            AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = UnitarySystem(UnitarySysNum).FanOpMode;
+            AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio = UnitarySystem(UnitarySysNum).FanPartLoadRatio;
+            AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio = UnitarySystem(UnitarySysNum).CycRatio;
         }
 
         if (UnitarySystem(UnitarySysNum).FirstPass) {

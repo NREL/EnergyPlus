@@ -1731,10 +1731,7 @@ namespace AirflowNetworkSolver {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::LoopCompCycRatio;
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
@@ -1772,15 +1769,15 @@ namespace AirflowNetworkSolver {
 
         NF = 1;
         if (DisSysCompCVFData(CompNum).FanTypeNum == FanType_SimpleOnOff) {
-            if (LoopFanOperationMode(AirLoopNum) == CycFanCycComp && Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate == 0.0) {
+            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate == 0.0) {
                 GenericDuct(0.1, 0.001, LFLAG, PDROP, n, M, F, DF, NF);
-            } else if (LoopFanOperationMode(AirLoopNum) == CycFanCycComp && LoopSystemOnMassFlowrate(AirLoopNum) > 0.0) {
-                F(1) = LoopSystemOnMassFlowrate(AirLoopNum);
+            } else if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
+                F(1) = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             } else {
                 F(1) = Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate * DisSysCompCVFData(CompNum).Ctrl;
                 if (MultiSpeedHPIndicator == 2) {
-                    F(1) = LoopSystemOnMassFlowrate(AirLoopNum) * LoopCompCycRatio(AirLoopNum) +
-                           LoopSystemOffMassFlowrate(AirLoopNum) * (1.0 - LoopCompCycRatio(AirLoopNum));
+                    F(1) = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate * AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
+                           AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate * (1.0 - AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
                 }
             }
         } else if (DisSysCompCVFData(CompNum).FanTypeNum == FanType_SimpleConstVolume) {
@@ -1791,7 +1788,7 @@ namespace AirflowNetworkSolver {
             }
 
             if (MultiSpeedHPIndicator == 2) {
-                F(1) = LoopSystemOnMassFlowrate(AirLoopNum);
+                F(1) = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             }
         } else if (DisSysCompCVFData(CompNum).FanTypeNum == FanType_SimpleVAV) {
             // Check VAV termals with a damper
@@ -3289,10 +3286,7 @@ namespace AirflowNetworkSolver {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
@@ -3339,8 +3333,8 @@ namespace AirflowNetworkSolver {
             NF = 1;
             F(1) = Node(InletNode).MassFlowRate;
             DF(1) = 0.0;
-            if (LoopFanOperationMode(AirLoopNum) == CycFanCycComp && LoopOnOffFanPartLoadRatio(AirLoopNum) > 0.0) {
-                F(1) = F(1) / LoopOnOffFanPartLoadRatio(AirLoopNum);
+            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                F(1) = F(1) / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             return;
         } else {
@@ -3432,8 +3426,7 @@ namespace AirflowNetworkSolver {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
 
@@ -3482,8 +3475,8 @@ namespace AirflowNetworkSolver {
                 F(1) = ReliefMassFlowRate;
             } else {
                 F(1) = Node(OutletNode).MassFlowRate;
-                if (LoopFanOperationMode(AirLoopNum) == CycFanCycComp && LoopOnOffFanPartLoadRatio(AirLoopNum) > 0.0) {
-                    F(1) = F(1) / LoopOnOffFanPartLoadRatio(AirLoopNum);
+                if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                    F(1) = F(1) / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
                 }
             }
             return;
@@ -3734,22 +3727,17 @@ namespace AirflowNetworkSolver {
         Real64 FT;
         Real64 FTT;
         Real64 RE;
-        Real64 ed;
-        Real64 ld;
-        Real64 g;
-        Real64 AA1;
-        Real64 area;
 
         // Formats
         static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
         // FLOW:
         // Get component properties
-        ed = Rough / Diameter;
-        area = Diameter * Diameter * Pi / 4.0;
-        ld = Length / Diameter;
-        g = 1.14 - 0.868589 * std::log(ed);
-        AA1 = g;
+        Real64 ed = Rough / Diameter;
+        Real64 area = Diameter * Diameter * Pi / 4.0;
+        Real64 ld = Length / Diameter;
+        Real64 g = 1.14 - 0.868589 * std::log(ed);
+        Real64 AA1 = g;
 
         NF = 1;
         if (LFLAG == 1) {

@@ -374,11 +374,7 @@ namespace SimAirServingZones {
         using DataAirflowNetwork::AirflowNetworkControlMultiADS;
         using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
         using DataAirflowNetwork::SimulateAirflowNetwork;
-        using DataAirLoop::LoopCompCycRatio;
-        using DataAirLoop::LoopFanOperationMode; // OnOff fan operation mode
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataConvergParams::AirLoopConvergence;
         using General::RoundSigDigits;
         using HVACControllers::CheckCoilWaterInletNode;
@@ -533,22 +529,7 @@ namespace SimAirServingZones {
         AirLoopConvergence.allocate(NumPrimaryAirSys);
         UnitarySysEqSizing.allocate(NumPrimaryAirSys);
         if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
-            LoopOnOffFanPartLoadRatio.allocate(NumPrimaryAirSys);
-            LoopOnOffFanPartLoadRatio = 0.0;
-            LoopFanOperationMode.allocate(NumPrimaryAirSys);
-            LoopFanOperationMode = 0;
-            LoopSystemOnMassFlowrate.allocate(NumPrimaryAirSys);
-            LoopSystemOnMassFlowrate = 0.0;
-            LoopSystemOffMassFlowrate.allocate(NumPrimaryAirSys);
-            LoopSystemOffMassFlowrate = 0.0;
-            LoopCompCycRatio.allocate(NumPrimaryAirSys);
-            LoopCompCycRatio = 0.0;
-            AFNLoopHeatingCoilMaxRTF.allocate(NumPrimaryAirSys);
-            AFNLoopHeatingCoilMaxRTF = 0.0;
-            AFNLoopOnOffFanRTF.allocate(NumPrimaryAirSys);
-            AFNLoopOnOffFanRTF = 0.0;
-            AFNLoopDXCoilRTF.allocate(NumPrimaryAirSys);
-            AFNLoopDXCoilRTF = 0.0;
+            AirLoopAFNInfo.allocate(NumPrimaryAirSys);
         }
 
         DataHVACGlobals::GetAirPathDataDone = true; // used by HVACUnitarySystem::GetUnitarySystemInputData to determine if airloops are setup yet

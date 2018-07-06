@@ -3712,11 +3712,7 @@ namespace HVACMultiSpeedHeatPump {
         using DataAirflowNetwork::AirflowNetworkControlMultiADS;
         using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
         using DataAirflowNetwork::SimulateAirflowNetwork;
-        using DataAirLoop::LoopCompCycRatio;
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3727,11 +3723,11 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
-            LoopSystemOnMassFlowrate(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = CompOnMassFlow;
-            LoopSystemOffMassFlowrate(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = CompOffMassFlow;
-            LoopFanOperationMode(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = MSHeatPump(MSHeatPumpNum).OpMode;
-            LoopOnOffFanPartLoadRatio(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
-            LoopCompCycRatio(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate = CompOnMassFlow;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate = CompOffMassFlow;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
         }
     }
 

@@ -2588,7 +2588,7 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::AFNLoopOnOffFanRTF;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2612,7 +2612,7 @@ namespace Fans {
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
             if (Fan(FanNum).AirLoopNum > 0) {
-               AFNLoopOnOffFanRTF(Fan(FanNum).AirLoopNum) = Fan(FanNum).FanRuntimeFraction;
+                AirLoopAFNInfo(Fan(FanNum).AirLoopNum).AFNLoopOnOffFanRTF = Fan(FanNum).FanRuntimeFraction;
             }
         }
     }

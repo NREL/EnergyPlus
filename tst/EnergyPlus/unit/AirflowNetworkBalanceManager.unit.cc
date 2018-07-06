@@ -2313,10 +2313,10 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     AirflowNetworkNodeData(3).AirLoopNum = 1;
     AirflowNetworkLinkageData(46).AirLoopNum = 1;
 
-    DataAirLoop::LoopFanOperationMode.allocate(1);
-    DataAirLoop::LoopOnOffFanPartLoadRatio.allocate(1);
-    DataAirLoop::LoopFanOperationMode(1) = 0.0;
-    DataAirLoop::LoopOnOffFanPartLoadRatio(1) = 0.0;
+    DataAirLoop::AirLoopAFNInfo.allocate(1);
+//    DataAirLoop::LoopOnOffFanPartLoadRatio.allocate(1);
+    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    DataAirLoop::AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
     PressureControllerData(1).OANodeNum = DisSysCompReliefAirData(1).OutletNode;
     CalcAirflowNetworkAirBalance();
@@ -11900,14 +11900,12 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
     AirflowNetworkLinkageData(42).AirLoopNum = 1;
     AirflowNetworkLinkageData(67).AirLoopNum = 2;
 
-    DataAirLoop::LoopFanOperationMode.allocate(2);
-    DataAirLoop::LoopOnOffFanPartLoadRatio.allocate(2);
-    DataAirLoop::LoopFanOperationMode(1) = 0.0;
-    DataAirLoop::LoopFanOperationMode(2) = 1.0;
-    DataAirLoop::LoopOnOffFanPartLoadRatio(1) = 0.0;
-    DataAirLoop::LoopOnOffFanPartLoadRatio(2) = 1.0;
-    DataAirLoop::LoopSystemOnMassFlowrate.allocate(2);
-    DataAirLoop::LoopSystemOnMassFlowrate(2) = 0.52;
+    DataAirLoop::AirLoopAFNInfo.allocate(2);
+    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    DataAirLoop::AirLoopAFNInfo(2).LoopFanOperationMode = 1.0;
+    DataAirLoop::AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    DataAirLoop::AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
+    DataAirLoop::AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
 
     CalcAirflowNetworkAirBalance();
 
