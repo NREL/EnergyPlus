@@ -21,7 +21,7 @@ Implementing FEI, based on the ANSI/AMCA standards 208-18 and 207-17, in EnergyP
 The following algorithms and calculation procedures (the SI unit version) are reproduced from the ANSI/AMCA standards 208-18: Calculation of the Fan Energy Index, and 207-17: Fan System Efficiency and Fan System Input Power Calculation.
 The fan energy index (FEI) is defined as a ratio of the electrical input power of a reference fan to the electrical input power of the actual fan for which the FEI is calculated, both calculated at the same duty point, i, which is characterized by a value of airflow (Q<sub>i</sub>) and pressure (P<sub>t,i</sub> or P<sub>s,i</sub>). FEI can be calculated for each point on a fan curve.
 
-$$FEI<sub>t,i</sub>\;or\;FEI<sub>s,i</sub>=\frac{Reference Fan Electrical Input Power}{Actual Fan Electrical Input Power} = \frac{FEP<sub>ref,i</sub>}{FEP<sub>act,i</sub>}$$ (1)
+$$FEI_{t,i}\;or\;FEI_{s,i}=\frac{Reference Fan Electrical Input Power}{Actual Fan Electrical Input Power} = \frac{FEP<sub>ref,i</sub>}{FEP<sub>act,i</sub>}$$ (1)
 
 Where,
 
@@ -29,11 +29,11 @@ FEI<sub>t,i</sub>sub>: FEI based on fan total pressure
 
 FEI<sub>s,i</sub>sub>: FEI based on fan static pressure
 
-We propose to add field as a flag to the current fan model **Fan:SystemMode**l for reporting FEI (considering that it can be substituted for **Fan:ConstantVolume**,** Fan:OnOff**, **Fan:VariableVolume**, and **FanPerformance:NightVentilation** objects and they may be deprecated and eventually removed in the future). We will use the user defined Fan objects to simulate the actual fan electrical input power FEP<sub>act,i</sub> at the design operating point. We will calculate the reference fan electrical input power FEP<sub>ref,i</sub> using the following method.
+We propose to add field as a flag to the current fan model **Fan:SystemMode**l for reporting FEI (considering that it can be substituted for **Fan:ConstantVolume**,**Fan:OnOff**, **Fan:VariableVolume**, and **FanPerformance:NightVentilation** objects and they may be deprecated and eventually removed in the future). We will use the user defined Fan objects to simulate the actual fan electrical input power FEP<sub>act,i</sub> at the design operating point. We will calculate the reference fan electrical input power FEP<sub>ref,i</sub> using the following method.
 
 The reference fan concept is used to normalize the FEI calculation to a consistent power level independent of fan type, fan drive components or any regulatory requirements. The reference fan electrical input power is a function of airflow and fan pressure. The reference fan is defined as one that requires a certain reference fan shaft power, uses a V-belt drive, has a motor efficiency based on the IE3 level for a four-pole 60 Hz motor and does not have a speed control.
 
-$$FEP<sub>ref,i</sub>=H<sub>i,ref</sub>(\frac{1}{\eta_{trans,ref}} )(\frac{1}{\eta_{mtr,ref}})(\frac{1}{\eta_{ctrl,ref}}) $$ (2)
+$$FEP_{ref,i}=H_{i,ref}(\frac{1}{\eta_{trans,ref}} )(\frac{1}{\eta_{mtr,ref}})(\frac{1}{\eta_{ctrl,ref}}) $$ (2)
 
 Where,
 
@@ -111,13 +111,13 @@ $$\eta_{mtr,ref} = A\cdot[log_{10} (H_{t,ref})]^4 + B\cdot[log_{10} (H_{t,ref})]
 
 Table 1 Reference Motor Efficiency Coefficients
 
-|H<sub>t,ref</sub><185 kW (<250 BHP)  | H<sub>t,ref</sub>≥185 kW (≥250 BHP)
-------------- | ------------- | -------------
-A  | -0.003812  |0
-B  | 0.025834  |0
-C  | -0.072577  |0
-D  | 0.125559  |0
-E  | 0.850274  |0.962
+Type |H<sub>t,ref</sub><185 kW (<250 BHP)  | H<sub>t,ref</sub>≥185 kW (≥250 BHP)
+-------------  | -------------  | -------------
+A  | -0.003812 | 0
+B  | 0.025834  | 0
+C  | -0.072577 | 0
+D  | 0.125559  | 0
+E  | 0.850274  | 0.962
 
 #### 4. Reference fan motor controller efficiency
 The reference fan is defined as a constant speed fan. Therefore, the motor controller efficiency is 100%.
@@ -157,14 +157,14 @@ The FEI calculation results will be added to the existing summary report for Equ
 
 Table 2 Fan summary report in EnergyPlus
 
-Type | Total Efficiency [W/W] |Delta Pressure [pa] |Max Air Flow Rate [m<sup>3</sup>/s] | Rated Electric Power [W] | Rated Power Per Max Air Flow Rate [W-s/m3] | Fan Energy Index | End Use
+Case | Type | Total Efficiency [W/W] |Delta Pressure [pa] |Max Air Flow Rate [m<sup>3</sup>/s] | Rated Electric Power [W] | Rated Power Per Max Air Flow Rate [W-s/m3] | Fan Energy Index | End Use
 ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | -------------
 VAV_1_FAN | Fan:SystemModel | 0.60 | 1017.59 | 15.49 | 26070.79 | 1683.36 |1.00 | Fan Energy
 VAV_2_FAN | Fan:SystemModel | 0.62 | 1017.59 | 164.34 | 270814.15 | 1647.92 | 1.00 | Fan Energy
 
 The FEI will also be added to the EIO file as a report variable.
 
-##Testing/Validation/Data Source(s):
+## Testing/Validation/Data Source(s):
 EnergyPlus simulation results will be manually checked and compared with those from the AMCA FEI calculation spreadsheet using the same input in the EnergyPlus model.
 
 ## IDD Object (New):
@@ -267,12 +267,12 @@ Jason Glazor, April 25
 
 We appreciate support from Michael Ivanovich of AMCA and Craig Wray.
 
-##References
+## References
 
 ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
 ANSI/AMCA Standard 208-18: Calculation of the Fan Energy Index, 2018.
 
-##Appendices
+## Appendices
 
 From AMCA 208:
 Table A.2 - Fan Types, Test Configurations and FEI Pressure Basis
