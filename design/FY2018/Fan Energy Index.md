@@ -21,13 +21,13 @@ Implementing FEI, based on the ANSI/AMCA standards 208-18 and 207-17, in EnergyP
 The following algorithms and calculation procedures (the SI unit version) are reproduced from the ANSI/AMCA standards 208-18: Calculation of the Fan Energy Index, and 207-17: Fan System Efficiency and Fan System Input Power Calculation.
 The fan energy index (FEI) is defined as a ratio of the electrical input power of a reference fan to the electrical input power of the actual fan for which the FEI is calculated, both calculated at the same duty point, i, which is characterized by a value of airflow (Q<sub>i</sub>) and pressure (P<sub>t,i</sub> or P<sub>s,i</sub>). FEI can be calculated for each point on a fan curve.
 
-$$FEI_{t,i}\;or\;FEI_{s,i}=\frac{Reference Fan Electrical Input Power}{Actual Fan Electrical Input Power} = \frac{FEP<sub>ref,i</sub>}{FEP<sub>act,i</sub>}$$ (1)
+$$FEI_{t,i}\;or\;FEI_{s,i}=\frac{Reference Fan Electrical Input Power}{Actual Fan Electrical Input Power} = \frac{FEP_{ref,i}}{FEP_{act,i}}$$ (1)
 
 Where,
 
-FEI<sub>t,i</sub>sub>: FEI based on fan total pressure
+FEI<sub>t,i</sub>: FEI based on fan total pressure
 
-FEI<sub>s,i</sub>sub>: FEI based on fan static pressure
+FEI<sub>s,i</sub>: FEI based on fan static pressure
 
 We propose to add field as a flag to the current fan model **Fan:SystemMode**l for reporting FEI (considering that it can be substituted for **Fan:ConstantVolume**,**Fan:OnOff**, **Fan:VariableVolume**, and **FanPerformance:NightVentilation** objects and they may be deprecated and eventually removed in the future). We will use the user defined Fan objects to simulate the actual fan electrical input power FEP<sub>act,i</sub> at the design operating point. We will calculate the reference fan electrical input power FEP<sub>ref,i</sub> using the following method.
 
@@ -46,7 +46,7 @@ H<sub>i,ref</sub>: Reference fan shaft power in kW
 η<sub>ctrl,ref</sub>: Reference fan motor controller efficiency
 
 #### 1. Reference fan shaft power
-Reference fan shaft power (H<sub>i,ref</sub>sub>) is calculated on a fan total pressure basis or a static pressure basis, depending on the category of the reference fan to calculate FEI, as listed in the table. The user should define the fan category for reference.
+Reference fan shaft power (H<sub>i,ref</sub>) is calculated on a fan total pressure basis or a static pressure basis, depending on the category of the reference fan to calculate FEI, as listed in the table. The user should define the fan category for reference.
 
 Fan Category  | FEI Pressure Basis
 ------------- | -------------
@@ -270,14 +270,21 @@ We appreciate support from Michael Ivanovich of AMCA and Craig Wray.
 ## References
 
 ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
+
 ANSI/AMCA Standard 208-18: Calculation of the Fan Energy Index, 2018.
 
 ## Appendices
 
 From AMCA 208:
+
 Table A.2 - Fan Types, Test Configurations and FEI Pressure Basis
+
 From AMCA 207:
+
 Tables A1, A2 (a, b), A3
+
 Tables B1, B2
+
 Tables C1, C2
+
 Tables D1, D2
