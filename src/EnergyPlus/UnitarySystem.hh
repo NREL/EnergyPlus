@@ -55,6 +55,10 @@ namespace EnergyPlus {
 
 namespace UnitarySystems {
 
+    //extern int numDesignSpecMultiSpeedHP;
+    extern int numUnitarySystems;
+    //bool getInputFlag;
+    
     // Supply Air Sizing Option
     extern int const None;
     extern int const SupplyAirFlowRate;
@@ -82,11 +86,11 @@ namespace UnitarySystems {
         Real64 noLoadAirFlowRateRatio;
         int numOfSpeedHeating;
         int numOfSpeedCooling;
-        std::vector<Real64> coolVolumeFlowRate;
-        std::vector<Real64> coolMassFlowRate;
+        //std::vector<Real64> coolVolumeFlowRate;
+        //std::vector<Real64> coolMassFlowRate;
         std::vector<Real64> MSCoolingSpeedRatio;
-        std::vector<Real64> heatVolumeFlowRate;
-        std::vector<Real64> heatMassFlowRate;
+        //std::vector<Real64> heatVolumeFlowRate;
+        //std::vector<Real64> heatMassFlowRate;
         std::vector<Real64> MSHeatingSpeedRatio;
         bool singleModeFlag;
 
@@ -99,6 +103,7 @@ namespace UnitarySystems {
 
         // bool myOneTimeFlag;
         // bool getInputOnceFlag;
+        int fanSpeedRatio;
 
         enum controlTypeEnum : int
         {
@@ -160,6 +165,7 @@ namespace UnitarySystems {
         bool requestAutoSize;
         Real64 actualFanVolFlowRate;
         Real64 designFanVolFlowRate;
+        Real64 designMassFlowRate;
         int fanAvailSchedPtr;
         int fanOpMode;
         std::string ATMixerName;
@@ -263,9 +269,15 @@ namespace UnitarySystems {
         int singleMode;
         bool multiOrVarSpeedHeatCoil;
         bool multiOrVarSpeedCoolCoil;
+        Real64 coolingPartLoadFrac;
+        Real64 heatingPartLoadFrac;
+        Real64 suppHeatPartLoadFrac;
+        Real64 heatCompPartLoadRatio;
+        Real64 speedRatio;
+        Real64 cycRatio;
 
-        static void getInput();
-        static void getInputData(bool errorsFound);
+        static void getUnitarySystemInput();
+        static void getUnitarySystemInputData(bool errorsFound);
 
     public:
         UnitarySys(); // constructor
@@ -279,19 +291,29 @@ namespace UnitarySystems {
 
         static UnitarySys *factory(int object_type_of_num, std::string const objectName);
 
-        void simulate(std::string const &objectName,
+        void simulate(std::string const &unitarySystemName,
                       bool const firstHVACIteration,
                       int const &AirLoopNum,
                       int &CompIndex,
-                      bool &HeatingActive,
-                      bool &CoolingActive);
+                      bool &HeatActive,
+                      bool &CoolActive,
+                      int const OAUnitNum,          // If the system is an equipment of OutdoorAirUnit
+                      Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                      bool const ZoneEquipment);    // TRUE if called as zone equipment
 
-        void init(bool const firstHVACIteration);
+        void initUnitarySystems(bool const firstHVACIteration,
+                                int const &AirLoopNum,
+                                bool const &FirstHVACIteration,
+                                Optional_int_const OAUnitNum,
+                                Optional<Real64 const> OAUCoilOutTemp);
 
     };
 
     extern std::vector<UnitarySys> unitarySys;
     extern std::vector<DesignSpecMSHP> designSpecMSHP;
+    static int getDesignSpecMSHPIndex(std::string const &objectName);
+    static int getUnitarySystemIndex(std::string const &objectName);
+
 
 } // namespace UnitarySystems
 } // namespace EnergyPlus

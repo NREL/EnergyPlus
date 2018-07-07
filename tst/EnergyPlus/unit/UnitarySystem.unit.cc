@@ -439,11 +439,14 @@ TEST_F(ZoneUnitarySystemTest, Test_UnitarySys_factory)
 
     // test calling the sim routine
     int AirLoopNum = 1;
-    int CompIndex = 1;
+    int CompIndex = 0; // zero based index
     bool HeatingActive = false;
     bool CoolingActive = false;
-    mySys.simulate(compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive);
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipFlag = false;
+    thisSys->simulate(compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, ZoneEquipFlag);
 
     // test calling the init routine
-    mySys.init(FirstHVACIteration);
+   // mySys.init(FirstHVACIteration);
 }

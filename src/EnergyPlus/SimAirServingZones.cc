@@ -77,6 +77,7 @@
 #include <DataZoneEquipment.hh>
 #include <DesiccantDehumidifiers.hh>
 #include <EMSManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EvaporativeCoolers.hh>
 #include <Fans.hh>
 #include <Furnaces.hh>
@@ -109,7 +110,6 @@
 #include <SplitterComponent.hh>
 #include <SteamCoils.hh>
 #include <SystemAvailabilityManager.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 #include <UserDefinedComponents.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
@@ -385,8 +385,8 @@ namespace SimAirServingZones {
         using MixedAir::GetOAMixerInletNodeNumber;
         using MixedAir::GetOASysControllerListIndex;
         using MixedAir::GetOASysNumCoolingCoils;
-        using MixedAir::GetOASysNumHeatingCoils;
         using MixedAir::GetOASysNumHXs;
+        using MixedAir::GetOASysNumHeatingCoils;
         using MixedAir::GetOASysNumSimpControllers;
         using MixedAir::GetOASystemNumber;
         using NodeInputManager::GetNodeNums;
@@ -3365,16 +3365,16 @@ namespace SimAirServingZones {
         using EvaporativeCoolers::SimEvapCooler;
         using Fans::SimulateFanComponents;
         using Furnaces::SimFurnace;
-        using HeatingCoils::SimulateHeatingCoilComponents;
-        using HeatRecovery::SimHeatRecovery;
-        using Humidifiers::SimHumidifier;
-        using HVACDuct::SimDuct;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
+        using HVACDuct::SimDuct;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using HVACMultiSpeedHeatPump::SimMSHeatPump;
         using HVACUnitaryBypassVAV::SimUnitaryBypassVAV;
         using HVACUnitarySystem::SimUnitarySystem;
+        using HeatRecovery::SimHeatRecovery;
+        using HeatingCoils::SimulateHeatingCoilComponents;
+        using Humidifiers::SimHumidifier;
         using MixedAir::ManageOutsideAirSystem;
         using SteamCoils::SimulateSteamCoilComponents;
         using UserDefinedComponents::SimCoilUserDefined;
@@ -3481,12 +3481,15 @@ namespace SimAirServingZones {
                     for (int compNum = 1; compNum <= PrimaryAirSystem(AirLoopNum).Branch(branchNum).TotalComponents; ++compNum) {
                         if (CompName == PrimaryAirSystem(AirLoopNum).Branch(branchNum).Comp(compNum).Name) {
                             auto &sim_component(PrimaryAirSystem(AirLoopNum).Branch(branchNum).Comp(compNum));
-                            sim_component.compPointer->simulate(CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive);
+                            int OAUnitNum = 0;
+                            Real64 OAUCoilOutTemp = 0.0;
+                            bool ZoneEquipFlag = false;
+                            sim_component.compPointer->simulate(CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, ZoneEquipFlag);
                             foundComp = true;
                             break;
                         }
                     }
-                    if (foundComp)break;
+                    if (foundComp) break;
                 }
 
             } else if (SELECT_CASE_var == UnitarySystemHVAC) { // 'AirLoopHVAC:UnitarySystem'
