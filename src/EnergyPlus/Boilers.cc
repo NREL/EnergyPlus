@@ -696,7 +696,7 @@ namespace Boilers {
         if (MyEnvrnFlag(BoilerNum) && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             rho = GetDensityGlycol(PlantLoop(Boiler(BoilerNum).LoopNum).FluidName,
-                                   DataGlobals::CWInitConvTemp,
+                                   DataGlobals::HWInitConvTemp,
                                    PlantLoop(Boiler(BoilerNum).LoopNum).FluidIndex,
                                    RoutineName);
             Boiler(BoilerNum).DesMassFlowRate = Boiler(BoilerNum).VolFlowRate * rho;
@@ -818,7 +818,7 @@ namespace Boilers {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
 
                 rho = GetDensityGlycol(PlantLoop(Boiler(BoilerNum).LoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(Boiler(BoilerNum).LoopNum).FluidIndex,
                                        RoutineName);
                 Cp = GetSpecificHeatGlycol(PlantLoop(Boiler(BoilerNum).LoopNum).FluidName,

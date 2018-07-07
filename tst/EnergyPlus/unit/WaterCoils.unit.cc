@@ -378,7 +378,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     SizeWaterCoil(CoilNum);
     EXPECT_NEAR(WaterCoil(CoilNum).InletAirTemp, 16.0, 0.0001); // a mixture of zone air (20 C) and 10% OA (-20 C) = 16 C
     EXPECT_NEAR(WaterCoil(CoilNum).DesTotWaterCoilLoad, 1709.8638, 0.0001);
-    EXPECT_NEAR(WaterCoil(CoilNum).UACoil, 51.3278, 0.0001);
+    EXPECT_NEAR(WaterCoil(CoilNum).UACoil, 51.2456, 0.0001);
     EXPECT_NEAR(WaterCoil(CoilNum).OutletAirTemp, 30.1302, 0.0001); // reasonable delta T above inlet air temp
 }
 
@@ -489,14 +489,14 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     Real64 DesWaterFlowRate = 0;
 
     Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
-    rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
+    rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
     DesWaterFlowRate = WaterCoil(CoilNum).DesWaterHeatingCoilRate / (10.0 * Cp * rho);
 
     // check heating coil design water flow rate
     EXPECT_DOUBLE_EQ(DesWaterFlowRate, WaterCoil(CoilNum).MaxWaterVolFlowRate);
 
     // check coil UA-value sizing
-    EXPECT_NEAR(1439.30, WaterCoil(CoilNum).UACoil, 0.01);
+    EXPECT_NEAR(1435.01, WaterCoil(CoilNum).UACoil, 0.01);
 
     // test single zone VAV reheat coil sizing
     CurZoneEqNum = 1;
@@ -543,7 +543,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     SizeWaterCoil(CoilNum);
 
     // check coil UA-value sizing
-    EXPECT_NEAR(558.656, WaterCoil(CoilNum).UACoil, 0.01); // smaller UA than result above at 1435.00
+    EXPECT_NEAR(577.686, WaterCoil(CoilNum).UACoil, 0.01); // smaller UA than result above at 1435.00
 }
 
 TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
@@ -641,14 +641,14 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     Real64 DesWaterFlowRate = 0;
 
     Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
-    rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
+    rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
     DesWaterFlowRate = WaterCoil(CoilNum).DesWaterHeatingCoilRate / (10.0 * Cp * rho);
 
     // check heating coil design water flow rate
     EXPECT_DOUBLE_EQ(DesWaterFlowRate, WaterCoil(CoilNum).MaxWaterVolFlowRate);
 
     // check coil UA-value sizing
-    EXPECT_NEAR(1439.30, WaterCoil(CoilNum).UACoil, 0.01);
+    EXPECT_NEAR(1435.01, WaterCoil(CoilNum).UACoil, 0.01);
 
     // test single zone VAV reheat coil sizing
     CurZoneEqNum = 1;
@@ -798,14 +798,14 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     Real64 DesWaterFlowRate = 0;
 
     Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
-    rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
+    rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
     DesWaterFlowRate = WaterCoil(CoilNum).DesWaterHeatingCoilRate / (10.0 * Cp * rho);
 
     // check heating coil design water flow rate
     EXPECT_DOUBLE_EQ(DesWaterFlowRate, WaterCoil(CoilNum).MaxWaterVolFlowRate);
 
     // check coil UA-value sizing for low design loop exit temp
-    EXPECT_NEAR(2491.37, WaterCoil(CoilNum).UACoil, 0.01);
+    EXPECT_NEAR(2479.27, WaterCoil(CoilNum).UACoil, 0.01);
 
     Real64 DesCoilInletWaterTempUsed = 0.0;
     Real64 DataFanOpMode = ContFanCycCoil;
@@ -1123,7 +1123,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     Real64 DesWaterFlowRate = 0;
 
     Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
-    rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
+    rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
     DesWaterFlowRate = WaterCoil(CoilNum).DesWaterHeatingCoilRate / (11.0 * Cp * rho);
 
     // check heating coil design water flow rate

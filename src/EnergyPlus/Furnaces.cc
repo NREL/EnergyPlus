@@ -4938,7 +4938,7 @@ namespace Furnaces {
                         GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                     if (Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
-                                               CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
                                                RoutineName);
                         Furnace(FurnaceNum).MaxHeatCoilFluidFlow *= rho;
@@ -5007,7 +5007,7 @@ namespace Furnaces {
                         GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                     if (Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
-                                               CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
                                                RoutineName);
                         Furnace(FurnaceNum).MaxSuppCoilFluidFlow *= rho;
@@ -5079,7 +5079,7 @@ namespace Furnaces {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
-                                                   CWInitConvTemp,
+                                                   DataGlobals::HWInitConvTemp,
                                                    PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
                                                    RoutineName);
                             Furnace(FurnaceNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -5118,7 +5118,7 @@ namespace Furnaces {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
-                                                   CWInitConvTemp,
+                                                   DataGlobals::HWInitConvTemp,
                                                    PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
                                                    RoutineName);
                             Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;

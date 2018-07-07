@@ -1309,7 +1309,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         DesCoilLoad = AutosizeDes * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -1320,7 +1320,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         DesCoilLoad = AutosizeDes * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -1351,7 +1351,7 @@ namespace ReportSizingManager {
                                                        PlantLoop(DataWaterLoopNum).FluidIndex,
                                                        CallingRoutine);
                             rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                                   DataGlobals::CWInitConvTemp,
+                                                   DataGlobals::HWInitConvTemp,
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                             AutosizeDes = DesCoilLoad / (DataWaterCoilSizHeatDeltaT * Cp * rho);
@@ -1761,7 +1761,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         NominalCapacityDes = DesMassFlow * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -1772,7 +1772,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         NominalCapacityDes = DesMassFlow * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -2315,7 +2315,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         AutosizeDes = DataCapacityUsedForSizing / (DataWaterCoilSizHeatDeltaT * Cp * rho);
