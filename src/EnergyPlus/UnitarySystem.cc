@@ -105,13 +105,13 @@ namespace UnitarySystems {
     }
 
     UnitarySys::UnitarySys() // constructor
-        : unitarySystemType_Num(0), sysAvailSchedPtr(0), controlType(controlTypeEnum::controlTypeNone), controlZoneNum(0),
+        : unitarySystemType_Num(0), thisSysInputShouldBeGotten(true), sysAvailSchedPtr(0), controlType(controlTypeEnum::controlTypeNone), controlZoneNum(0),
           dehumidControlType_Num(dehumCtrlTypeEnum::dehumidControl_None), humidistat(false), airInNode(0), airOutNode(0), validASHRAECoolCoil(false),
           validASHRAEHeatCoil(false), fanIndex(0), fanPlace(fanPlaceEnum::notYetSet), fanOpModeSchedPtr(0), fanExists(false), fanType_Num(0),
           requestAutoSize(false), actualFanVolFlowRate(0.0), designFanVolFlowRate(0.0), designMassFlowRate(0.0), fanAvailSchedPtr(0),
           fanOpMode(fanOpModeEnum::fanOpModeNotYetSet), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0),
           ATMixerExists(false), nodeNumOfControlledZone(0), airLoopEquipment(false), zoneInletNode(0), zoneSequenceCoolingNum(0),
-          zoneSequenceHeatingNum(0), myGetInputSuccessfulFlag(false), heatCoilExists(false), heatingSizingRatio(0.0), heatingCoilType_Num(0),
+          zoneSequenceHeatingNum(0), heatCoilExists(false), heatingSizingRatio(0.0), heatingCoilType_Num(0),
           DXHeatingCoil(false), heatingCoilIndex(0), heatingCoilAvailSchPtr(0), designHeatingCapacity(0.0), maxHeatAirVolFlow(0.0),
           numOfSpeedHeating(0), heatCoilFluidInletNode(0), maxHeatCoilFluidFlow(0.0), multiSpeedHeatingCoil(false), varSpeedHeatingCoil(false),
           systemHeatControlNodeNum(0), heatCoilInletNodeNum(0), heatCoilOutletNodeNum(0), coolCoilExists(false), coolingCoilType_Num(0),
@@ -144,10 +144,10 @@ namespace UnitarySystems {
         int unitarySysNum(-1);
 
         // Obtains and Allocates unitary system related parameters from input file
-        if (UnitarySystems::getInputFlag) {
+        if (this->thisSysInputShouldBeGotten) {
             // Get the unitary system input
-            getUnitarySystemInput();
-            UnitarySystems::getInputFlag = false;
+            getUnitarySystemInput(unitarySystemName);
+            this->thisSysInputShouldBeGotten = false;
         }
 
         // Find the correct unitary system Number
@@ -174,12 +174,12 @@ namespace UnitarySystems {
             //}
         }
 
-        if (!this->myGetInputSuccessfulFlag) {
-            // Need to do inputs again for this and any others
-            UnitarySystems::getInputFlag = true;
-            this->getUnitarySystemInput();
-            UnitarySystems::getInputFlag = false;
-        }
+        //if (!this->myGetInputSuccessfulFlag) {
+        //    // Need to do inputs again for this and any others
+        //    UnitarySystems::getInputFlag = true;
+        //    this->getUnitarySystemInput(this->unitarySystemName);
+        //    UnitarySystems::getInputFlag = false;
+        //}
 
         // if (present(HeatActive)) HeatActive = false;
         // if (present(CoolActive)) CoolActive = false;
@@ -368,7 +368,7 @@ namespace UnitarySystems {
     UnitarySys *UnitarySys::factory(int object_type_of_num, std::string const objectName)
     {
         if (UnitarySystems::getInputOnceFlag) {
-            UnitarySys::getUnitarySystemInput();
+            UnitarySys::getUnitarySystemInput(objectName);
             UnitarySystems::getInputOnceFlag = false;
         }
         for (auto &sys : unitarySys) {
@@ -430,19 +430,19 @@ namespace UnitarySystems {
         }
     }
 
-    void UnitarySys::getUnitarySystemInput()
+    void UnitarySys::getUnitarySystemInput(std::string const &objectName)
     {
 
         bool errorsFound(false);
 
-        UnitarySys::getUnitarySystemInputData(errorsFound);
+        UnitarySys::getUnitarySystemInputData(objectName, errorsFound);
 
         if (errorsFound) {
             ShowSevereError("getUnitarySystemInputData: did not find UnitarySystem. Check inputs");
         }
     }
 
-    void UnitarySys::getUnitarySystemInputData(bool errorsFound)
+    void UnitarySys::getUnitarySystemInputData(std::string const &objectName, bool errorsFound)
     {
 
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
@@ -457,11 +457,13 @@ namespace UnitarySystems {
         } else {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                auto const &fields = instance.value();
+                
                 auto const &thisObjectName = instance.key();
+                // only get the current data
+                if (!UtilityRoutines::SameString(objectName, thisObjectName) || getUnitarySystemIndex(objectName) > -1) continue;
+                
+                auto const &fields = instance.value();
                 UnitarySys thisSys;
-
-                if (getUnitarySystemIndex(thisObjectName) > -1) continue;
 
                 ++numUnitarySystems;
 
@@ -1105,8 +1107,8 @@ namespace UnitarySystems {
                 if (!AirLoopFound && !ZoneEquipmentFound && !OASysFound && !DataHVACGlobals::GetAirPathDataDone) {
                     // Unsucessful attempt
                     continue;
-                } else {
-                    thisSys.myGetInputSuccessfulFlag = true;
+                //} else {
+                //    thisSys.myGetInputSuccessfulFlag = true;
                 }
 
                 if (AirLoopNumber == 0 && !ZoneEquipmentFound &&
@@ -4288,6 +4290,7 @@ namespace UnitarySystems {
                 }
 
                 unitarySys.push_back(thisSys);
+                break;
             }
         }
     }

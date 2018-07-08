@@ -146,7 +146,9 @@ namespace UnitarySystems {
 
         friend class DesignSpecMSHP;
         UnitarySys *compPointer; // don't need this here
+        std::string unitarySystemName;
         std::string unitType;
+        bool thisSysInputShouldBeGotten;
         int sysAvailSchedPtr; // Pointer to the availability schedule
         controlTypeEnum controlType;
         int controlZoneNum;
@@ -180,7 +182,6 @@ namespace UnitarySystems {
         int zoneInletNode;
         int zoneSequenceCoolingNum;
         int zoneSequenceHeatingNum;
-        bool myGetInputSuccessfulFlag;
         std::string heatingCoilName;
         std::string heatingCoilTypeName;
         bool heatCoilExists;
@@ -276,8 +277,8 @@ namespace UnitarySystems {
         Real64 speedRatio;
         Real64 cycRatio;
 
-        static void getUnitarySystemInput();
-        static void getUnitarySystemInputData(bool errorsFound);
+        static void getUnitarySystemInput(std::string const &unitarySystemName);
+        static void getUnitarySystemInputData(std::string const &unitarySystemName, bool errorsFound);
 
     public:
         UnitarySys(); // constructor
