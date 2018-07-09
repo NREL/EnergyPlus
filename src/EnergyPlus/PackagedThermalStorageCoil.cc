@@ -2988,14 +2988,10 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                auto const SELECT_CASE_var(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempObjectNum);
-                if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                    (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
+                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve).NumDims == 2) {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
-                } else if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 } else {
-                    assert(false);
+                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
             SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFFlowCurve, AirMassFlowRatio);
@@ -3424,14 +3420,10 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                auto const SELECT_CASE_var(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempObjectNum);
-                if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                    (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
+                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve).NumDims == 2) {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
-                } else if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 } else {
-                    assert(false);
+                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
             SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFFlowCurve, AirMassFlowRatio);
@@ -3977,14 +3969,10 @@ namespace PackagedThermalStorageCoil {
                 }
             } // coil will be wet so use SHR curves
             {
-                auto const SELECT_CASE_var(TESCoil(TESCoilNum).DischargeOnlySHRFTempObjectNum);
-                if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                    (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
+                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve).NumDims == 2) {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
-                } else if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 } else {
-                    assert(false);
+                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
 

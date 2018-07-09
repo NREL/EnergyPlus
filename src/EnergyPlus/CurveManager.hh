@@ -83,8 +83,6 @@ namespace CurveManager {
     extern int const TriQuadratic;
     extern int const Exponent;
     extern int const Quartic;
-    extern int const FuncPressDrop;
-    extern int const MultiVariableLookup;
     extern int const FanPressureRise;
     extern int const ExponentialSkewNormal;
     extern int const Sigmoid;
@@ -107,36 +105,6 @@ namespace CurveManager {
     // Sort Order
     extern int const ASCENDING;
     extern int const DESCENDING;
-
-    // parameters describing curve object/table types
-    extern int const NumAllCurveTypes;
-
-    // curve object/table types (used for warning messages)
-    extern int const CurveType_Linear;
-    extern int const CurveType_Quadratic;
-    extern int const CurveType_Cubic;
-    extern int const CurveType_Quartic;
-    extern int const CurveType_Exponent;
-    extern int const CurveType_BiCubic;
-    extern int const CurveType_BiQuadratic;
-    extern int const CurveType_QuadraticLinear;
-    extern int const CurveType_TriQuadratic;
-    extern int const CurveType_FuncPressDrop;
-    extern int const CurveType_TableOneIV;
-    extern int const CurveType_TableTwoIV;
-    extern int const CurveType_TableMultiIV;
-    extern int const CurveType_FanPressureRise;
-    extern int const CurveType_ExponentialSkewNormal;
-    extern int const CurveType_Sigmoid;
-    extern int const CurveType_RectangularHyperbola1;
-    extern int const CurveType_RectangularHyperbola2;
-    extern int const CurveType_ExponentialDecay;
-    extern int const CurveType_DoubleExponentialDecay;
-    extern int const CurveType_QuadLinear;
-    extern int const CurveType_CubicLinear;
-    extern int const CurveType_ChillerPartLoadWithLift;
-
-    extern Array1D_string const cCurveTypes;
 
     // DERIVED TYPE DEFINITIONS
 

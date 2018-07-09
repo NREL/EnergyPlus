@@ -144,18 +144,16 @@ namespace CurveManager {
     int const TriQuadratic(8);
     int const Exponent(9);
     int const Quartic(10);
-    int const FuncPressDrop(11);
-    int const MultiVariableLookup(12);
-    int const FanPressureRise(13);
-    int const ExponentialSkewNormal(14);
-    int const Sigmoid(15);
-    int const RectangularHyperbola1(16);
-    int const RectangularHyperbola2(17);
-    int const ExponentialDecay(18);
-    int const DoubleExponentialDecay(19);
-    int const QuadLinear(20);
-    int const CubicLinear(21);
-    int const ChillerPartLoadWithLift(22);
+    int const FanPressureRise(11);
+    int const ExponentialSkewNormal(12);
+    int const Sigmoid(13);
+    int const RectangularHyperbola1(14);
+    int const RectangularHyperbola2(15);
+    int const ExponentialDecay(16);
+    int const DoubleExponentialDecay(17);
+    int const QuadLinear(18);
+    int const CubicLinear(19);
+    int const ChillerPartLoadWithLift(20);
 
     // Interpolation Types
     int const LinearInterpolationOfTable(1);
@@ -168,34 +166,6 @@ namespace CurveManager {
     // Sort Order
     int const ASCENDING(1);
     int const DESCENDING(2);
-
-    // parameters describing curve object/table types
-    int const NumAllCurveTypes(23);
-
-    // curve object/table types (used for warning messages)
-    int const CurveType_Linear(1);
-    int const CurveType_Quadratic(2);
-    int const CurveType_Cubic(3);
-    int const CurveType_Quartic(4);
-    int const CurveType_Exponent(5);
-    int const CurveType_BiCubic(6);
-    int const CurveType_BiQuadratic(7);
-    int const CurveType_QuadraticLinear(8);
-    int const CurveType_TriQuadratic(9);
-    int const CurveType_FuncPressDrop(10);
-    int const CurveType_TableOneIV(11);
-    int const CurveType_TableTwoIV(12);
-    int const CurveType_TableMultiIV(13);
-    int const CurveType_FanPressureRise(14);
-    int const CurveType_ExponentialSkewNormal(15);
-    int const CurveType_Sigmoid(16);
-    int const CurveType_RectangularHyperbola1(17);
-    int const CurveType_RectangularHyperbola2(18);
-    int const CurveType_ExponentialDecay(19);
-    int const CurveType_DoubleExponentialDecay(20);
-    int const CurveType_QuadLinear(21);
-    int const CurveType_CubicLinear(22);
-    int const CurveType_ChillerPartLoadWithLift(23);
 
     // DERIVED TYPE DEFINITIONS
 
@@ -1898,8 +1868,7 @@ namespace CurveManager {
             if (PerfCurve(CurveNum).InterpolationType == EvaluateCurveToLimits) {
                 {
                     auto const SELECT_CASE_var(PerfCurve(CurveNum).CurveType);
-                    if ((SELECT_CASE_var == Linear) || (SELECT_CASE_var == Quadratic) || (SELECT_CASE_var == Cubic) || (SELECT_CASE_var == Quartic) ||
-                        (SELECT_CASE_var == Exponent)) {
+                    if ((SELECT_CASE_var == Linear) || (SELECT_CASE_var == Quadratic) || (SELECT_CASE_var == Cubic) || (SELECT_CASE_var == Quartic)) {
                         TempArray1 = PerfCurveTableData(TableNum).X1;
                         TempArray2.allocate(size(PerfCurveTableData(TableNum).Y));
                         for (VarIndex = 1; VarIndex <= isize(PerfCurveTableData(TableNum).Y); ++VarIndex) {
@@ -3283,19 +3252,15 @@ namespace CurveManager {
                                         PerfCurve(CurveIndex).Name);
                 } else {
                     {
-                        auto const SELECT_CASE_var1(PerfCurve(CurveIndex).CurveType);
-                        if ((SELECT_CASE_var1 == Linear) || (SELECT_CASE_var1 == Quadratic) || (SELECT_CASE_var1 == Cubic) ||
-                            (SELECT_CASE_var1 == Quartic) || (SELECT_CASE_var1 == Exponent) || (SELECT_CASE_var1 == FuncPressDrop)) {
-                            // CurrentModuleObject='Curve:Linear/Quadratic/Cubic/Quartic/Exponent/Functional:PressureDrop'
+                        auto const SELECT_CASE_var1(PerfCurve(CurveIndex).NumDims);
+                        if (SELECT_CASE_var1 == 1) {
                             SetupOutputVariable("Performance Curve Input Variable 1 Value",
                                                 OutputProcessor::Unit::None,
                                                 PerfCurve(CurveIndex).CurveInput1,
                                                 "HVAC",
                                                 "Average",
                                                 PerfCurve(CurveIndex).Name);
-                        } else if ((SELECT_CASE_var1 == BiQuadratic) || (SELECT_CASE_var1 == QuadraticLinear) || (SELECT_CASE_var1 == BiCubic) ||
-                                   (SELECT_CASE_var1 == CubicLinear)) {
-                            // CurrentModuleObject='Curve:BiQuadratic/QuadraticLinear/BiCubic/CubicLinear'
+                        } else if (SELECT_CASE_var1 == 2) {
                             SetupOutputVariable("Performance Curve Input Variable 1 Value",
                                                 OutputProcessor::Unit::None,
                                                 PerfCurve(CurveIndex).CurveInput1,
@@ -3308,8 +3273,7 @@ namespace CurveManager {
                                                 "HVAC",
                                                 "Average",
                                                 PerfCurve(CurveIndex).Name);
-                        } else if ((SELECT_CASE_var1 == TriQuadratic) || (SELECT_CASE_var1 == ChillerPartLoadWithLift)) {
-                            // CurrentModuleObject='Curve:TriQuadratic'
+                        } else if (SELECT_CASE_var1 == 3) {
                             SetupOutputVariable("Performance Curve Input Variable 1 Value",
                                                 OutputProcessor::Unit::None,
                                                 PerfCurve(CurveIndex).CurveInput1,
@@ -3328,8 +3292,7 @@ namespace CurveManager {
                                                 "HVAC",
                                                 "Average",
                                                 PerfCurve(CurveIndex).Name);
-                        } else if (SELECT_CASE_var1 == QuadLinear) {
-                            // CurrentModuleObject='Curve:QuadLinear'
+                        } else if (SELECT_CASE_var1 == 4) {
                             SetupOutputVariable("Performance Curve Input Variable 1 Value",
                                                 OutputProcessor::Unit::None,
                                                 PerfCurve(CurveIndex).CurveInput1,
@@ -5476,6 +5439,8 @@ namespace CurveManager {
                 MatrixSize = 6;
                 StrCurve = "QuadraticLinear";
             } else {
+                ShowSevereError(PerfCurve(CurveNum).ObjectType + ": \"" + PerfCurve(CurveNum).Name + "\"");
+                ShowContinueError("Invalid curve type for regression.");
                 return;
             }
         }

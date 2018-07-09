@@ -124,9 +124,6 @@ namespace IceThermalStorage {
     int const IceStorageType_Simple(1);
     int const IceStorageType_Detailed(2);
 
-    int const CurveQuadraticLinear(1);
-    int const CurveCubicLinear(2);
-
     int const DetIceInsideMelt(1);  // Inside melt system--charge starting with bare coil
     int const DetIceOutsideMelt(2); // Outside melt system--charge from existing ice layer on coil
 
@@ -616,6 +613,7 @@ namespace IceThermalStorage {
                     MassFlowstar = DetIceStor(IceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
                     Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, LMTDstar, MassFlowstar));
                 }  else {
+                    Qstar = 0.0;
                     ShowFatalError("Unsupported curve type for detailed ice thermal storage: " + CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType);
                 }
 
@@ -648,6 +646,7 @@ namespace IceThermalStorage {
                                 MassFlowstar = DetIceStor(IceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
                                 Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, LMTDstar, MassFlowstar));
                             } else {
+                                Qstar = 0.0;
                                 ShowFatalError("Unsupported curve type for detailed ice thermal storage: " + CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType);
                             }
 
@@ -766,6 +765,7 @@ namespace IceThermalStorage {
                 } else if (CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType == "Curve:CubicLinear") {
                     Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, LMTDstar, AvgFracCharged));
                 } else {
+                    Qstar = 0.0;
                     ShowFatalError("Unsupported curve type for detailed ice thermal storage: " + CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType);
                 }
 
@@ -798,6 +798,7 @@ namespace IceThermalStorage {
                             } else if (CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType == "Curve:CubicLinear") {
                                 Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, LMTDstar, AvgFracCharged));
                             } else {
+                                Qstar = 0.0;
                                 ShowFatalError("Unsupported curve type for detailed ice thermal storage: " + CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType);
                             }
 

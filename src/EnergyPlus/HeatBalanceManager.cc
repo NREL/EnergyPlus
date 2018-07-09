@@ -1484,7 +1484,6 @@ namespace HeatBalanceManager {
         // na
 
         // Using/Aliasing
-        using CurveManager::CurveType_TableTwoIV;
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveInterpolationMethodNum;
         using CurveManager::GetCurveMinMaxValues;

@@ -5947,7 +5947,8 @@ namespace AirflowNetworkBalanceManager {
         CurveManager::TableData(TableNum).Y.allocate(N);
 
         CurveManager::PerfCurve(CurveNum).Name = name;
-        CurveManager::PerfCurve(CurveNum).ObjectType = CurveManager::CurveType_TableOneIV;
+        CurveManager::PerfCurve(CurveNum).ObjectType = "Table:OneIndependentVariable";
+        CurveManager::PerfCurve(CurveNum).NumDims = 1;
         CurveManager::PerfCurve(CurveNum).TableIndex = TableNum;
         CurveManager::PerfCurve(CurveNum).CurveType = CurveManager::Linear;
         CurveManager::TableLookup(TableNum).InterpolationOrder = 2;

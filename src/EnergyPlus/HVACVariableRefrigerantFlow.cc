@@ -198,9 +198,6 @@ namespace HVACVariableRefrigerantFlow {
     int const FuelTypeOtherFuel1(8); // Fuel type for other fuel #1
     int const FuelTypeOtherFuel2(9); // Fuel type for other fuel #2
 
-    // curve type for equivalent piping losses (not necessarily the same value used in CurveManager)
-    int const BiQuadratic(4);
-
     static std::string const BlankString;
 
     // DERIVED TYPE DEFINITIONS
