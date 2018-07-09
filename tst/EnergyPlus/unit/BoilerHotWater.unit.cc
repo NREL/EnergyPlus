@@ -100,7 +100,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     // see if boiler volume flow rate returned is autosized value
     EXPECT_NEAR(Boilers::Boiler(1).VolFlowRate, 1.2, 0.000001);
     // see if boiler nominal capacity returned is autosized value
-    EXPECT_NEAR(Boilers::Boiler(1).NomCap, 49567438.0, 1.0);
+    EXPECT_NEAR(Boilers::Boiler(1).NomCap, 49376304.0, 1.0);
     // clear
     Boilers::Boiler.deallocate();
     DataSizing::PlantSizData.deallocate();

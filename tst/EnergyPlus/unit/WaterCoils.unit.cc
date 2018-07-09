@@ -1129,3 +1129,105 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     // check heating coil design water flow rate
     EXPECT_DOUBLE_EQ(DesWaterFlowRate, WaterCoil(CoilNum).MaxWaterVolFlowRate);
 }
+TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
+{
+    OutBaroPress = 101325.0;
+    StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
+
+    // set up sizing flags
+    SysSizingRunDone = true;
+
+    // set up plant sizing
+    NumPltSizInput = 1;
+    PlantSizData(1).PlantLoopName = "HotWaterLoop";
+    PlantSizData(1).ExitTemp = 60.0; // hot water coil inlet water temp
+    PlantSizData(1).DeltaT = 10.0;
+
+    // set up plant loop
+    for (int l = 1; l <= TotNumLoops; ++l) {
+        auto &loop(PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(PlantLoop(1).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(PlantLoop(1).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+    PlantLoop(1).Name = "HotWaterLoop";
+    PlantLoop(1).FluidName = "FluidWaterLoop";
+    PlantLoop(1).FluidIndex = 1;
+    PlantLoop(1).FluidName = "WATER";
+    PlantLoop(1).FluidIndex = 1;
+
+    // set up sizing data
+    FinalSysSizing(1).DesMainVolFlow = 1.00;
+    FinalSysSizing(1).HeatSupTemp = 40.0;
+    FinalSysSizing(1).HeatOutTemp = 5.0;
+    FinalSysSizing(1).HeatRetTemp = 20.0;
+    FinalSysSizing(1).HeatOAOption = 1;
+
+    // set up water coil
+    int CoilNum = 1;
+    WaterCoil(CoilNum).Name = "Water Heating Coil";
+    WaterCoil(CoilNum).WaterLoopNum = 1;
+    WaterCoil(CoilNum).WaterCoilType_Num = WaterCoil_SimpleHeating; // Coil:Heating:Water
+    WaterCoil(CoilNum).WaterCoilModel = CoilType_Heating;
+    WaterCoil(CoilNum).WaterCoilType = CoilType_Heating;
+    WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+
+    WaterCoil(CoilNum).RequestingAutoSize = true;
+    WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
+    WaterCoil(CoilNum).UACoil = AutoSize;
+    WaterCoil(CoilNum).MaxWaterVolFlowRate = AutoSize;
+    WaterCoil(CoilNum).CoilPerfInpMeth = UAandFlow;
+    WaterCoil(CoilNum).DesInletAirTemp = AutoSize;
+    WaterCoil(CoilNum).DesOutletAirTemp = AutoSize;
+    WaterCoil(CoilNum).DesInletWaterTemp = AutoSize;
+    WaterCoil(CoilNum).DesInletAirHumRat = AutoSize;
+    WaterCoil(CoilNum).DesOutletAirHumRat = AutoSize;
+
+    WaterCoilNumericFields(CoilNum).FieldNames(2) = "Maximum Water Flow Rate";
+    WaterCoil(CoilNum).WaterInletNodeNum = 1;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoil(CoilNum).WaterInletNodeNum;
+
+    CurZoneEqNum = 0;
+    CurSysNum = 1;
+    CurOASysNum = 0;
+
+    DataWaterLoopNum = 1;
+    NumOfGlycols = 1;
+
+    MyUAAndFlowCalcFlag.allocate(1);
+    MyUAAndFlowCalcFlag(1) = true;
+
+    MySizeFlag.allocate(1);
+    MySizeFlag(1) = true;
+
+    // run water coil sizing
+    SizeWaterCoil(CoilNum);
+    EXPECT_DOUBLE_EQ(1.0, WaterCoil(CoilNum).DesAirVolFlowRate);
+
+    Real64 CpAirStd(0.0);
+    Real64 DesMassFlow(0.0);
+    Real64 DesCoilHeatingLoad(0.0);
+
+    CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+    DesMassFlow = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
+    DesCoilHeatingLoad = DesMassFlow * CpAirStd * (40.0 - 5.0);
+
+    // check heating coil design load
+    EXPECT_DOUBLE_EQ(DesCoilHeatingLoad, WaterCoil(CoilNum).DesWaterHeatingCoilRate);
+
+    Real64 Cp(0.0);
+    Real64 rho(0.0);
+    Real64 DesWaterFlowRate(0.0);
+
+    // now size heating coil hot water flow rate at 60.0C
+    Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, 60.0, PlantLoop(1).FluidIndex, "Unit Test");
+    rho = GetDensityGlycol(PlantLoop(1).FluidName, 60.0, PlantLoop(1).FluidIndex, "Unit Test");
+    DesWaterFlowRate = DesCoilHeatingLoad / (PlantSizData(1).DeltaT * Cp * rho);
+
+    // check heating coil design water flow rate calculated here and sizing results are identical
+    EXPECT_DOUBLE_EQ(DesWaterFlowRate, WaterCoil(CoilNum).MaxWaterVolFlowRate);
+}

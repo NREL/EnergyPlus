@@ -822,7 +822,7 @@ namespace Boilers {
                                        PlantLoop(Boiler(BoilerNum).LoopNum).FluidIndex,
                                        RoutineName);
                 Cp = GetSpecificHeatGlycol(PlantLoop(Boiler(BoilerNum).LoopNum).FluidName,
-                                           Boiler(BoilerNum).TempDesBoilerOut,
+                                           DataGlobals::HWInitConvTemp,
                                            PlantLoop(Boiler(BoilerNum).LoopNum).FluidIndex,
                                            RoutineName);
                 tmpNomCap = Cp * rho * Boiler(BoilerNum).SizFac * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
