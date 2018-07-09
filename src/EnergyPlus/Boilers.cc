@@ -469,23 +469,23 @@ namespace Boilers {
                 }
             }
 
-            Boiler(BoilerNum).TempDesBoilerOut = rNumericArgs(3);
-            Boiler(BoilerNum).VolFlowRate = rNumericArgs(4);
+            // Boiler(BoilerNum).TempDesBoilerOut = rNumericArgs(3);
+            Boiler(BoilerNum).VolFlowRate = rNumericArgs(3);
             if (Boiler(BoilerNum).VolFlowRate == AutoSize) {
                 Boiler(BoilerNum).VolFlowRateWasAutoSized = true;
             }
-            Boiler(BoilerNum).MinPartLoadRat = rNumericArgs(5);
-            Boiler(BoilerNum).MaxPartLoadRat = rNumericArgs(6);
-            Boiler(BoilerNum).OptPartLoadRat = rNumericArgs(7);
+            Boiler(BoilerNum).MinPartLoadRat = rNumericArgs(4);
+            Boiler(BoilerNum).MaxPartLoadRat = rNumericArgs(5);
+            Boiler(BoilerNum).OptPartLoadRat = rNumericArgs(6);
 
-            Boiler(BoilerNum).TempUpLimitBoilerOut = rNumericArgs(8);
+            Boiler(BoilerNum).TempUpLimitBoilerOut = rNumericArgs(7);
             // default to 99.9C if upper temperature limit is left blank.
             if (Boiler(BoilerNum).TempUpLimitBoilerOut <= 0.0) {
                 Boiler(BoilerNum).TempUpLimitBoilerOut = 99.9;
             }
 
-            Boiler(BoilerNum).ParasiticElecLoad = rNumericArgs(9);
-            Boiler(BoilerNum).SizFac = rNumericArgs(10);
+            Boiler(BoilerNum).ParasiticElecLoad = rNumericArgs(8);
+            Boiler(BoilerNum).SizFac = rNumericArgs(9);
             if (Boiler(BoilerNum).SizFac == 0.0) Boiler(BoilerNum).SizFac = 1.0;
 
             Boiler(BoilerNum).BoilerInletNodeNum = GetOnlySingleNode(
@@ -818,11 +818,11 @@ namespace Boilers {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
 
                 rho = GetDensityGlycol(PlantLoop(Boiler(BoilerNum).LoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(Boiler(BoilerNum).LoopNum).FluidIndex,
                                        RoutineName);
                 Cp = GetSpecificHeatGlycol(PlantLoop(Boiler(BoilerNum).LoopNum).FluidName,
-                                           Boiler(BoilerNum).TempDesBoilerOut,
+                                           DataGlobals::HWInitConvTemp,
                                            PlantLoop(Boiler(BoilerNum).LoopNum).FluidIndex,
                                            RoutineName);
                 tmpNomCap = Cp * rho * Boiler(BoilerNum).SizFac * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;

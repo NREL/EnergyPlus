@@ -1700,7 +1700,6 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    0.94,                    !- Nominal Thermal Efficiency",
         "    LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable",
         "    100% efficient,          !- Normalized Boiler Efficiency Curve Name",
-        "    75.00,                   !- Design Water Outlet Temperature {C}",
         "    autosize,                !- Design Water Flow Rate {m3/s}",
         "    0.00,                    !- Minimum Part Load Ratio",
         "    1.00,                    !- Maximum Part Load Ratio",
