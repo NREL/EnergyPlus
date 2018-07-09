@@ -910,7 +910,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
     Real64 rho = 0;
     Real64 DesWaterFlowRate = 0;
 
-    Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, 5.0, PlantLoop(1).FluidIndex, "Unit Test");
+    Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
     rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
     DesWaterFlowRate = WaterCoil(CoilNum).DesWaterCoolingCoilRate / (WaterCoil(CoilNum).DesignWaterDeltaTemp * Cp * rho);
 
@@ -1025,7 +1025,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     Real64 rho = 0;
     Real64 DesWaterFlowRate = 0;
 
-    Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, 5.0, PlantLoop(1).FluidIndex, "Unit Test");
+    Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
     rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, "Unit Test");
     DesWaterFlowRate = WaterCoil(CoilNum).DesWaterCoolingCoilRate / (6.67 * Cp * rho);
     // check cooling coil design water flow rate

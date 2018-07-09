@@ -2914,11 +2914,11 @@ namespace LowTempRadiantSystem {
                     if (PltSizCoolNum > 0) {
                         if (FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad >= SmallLoad) {
                             rho = GetDensityGlycol(PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                   5.0,
+                                                   DataGlobals::CWInitConvTemp,
                                                    PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                    "SizeLowTempRadiantSystem");
                             Cp = GetSpecificHeatGlycol(PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                       5.0,
+                                                       DataGlobals::CWInitConvTemp,
                                                        PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                        "SizeLowTempRadiantSystem");
                             WaterVolFlowMaxCoolDes =

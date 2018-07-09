@@ -1280,7 +1280,8 @@ namespace ReportSizingManager {
                     }
                 } else if (SizingType == CoolingWaterflowSizing) {
                     CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
-                    Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                    Cp = GetSpecificHeatGlycol(
+                        PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     rho = GetDensityGlycol(
                         PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
@@ -1436,8 +1437,10 @@ namespace ReportSizingManager {
                     bCheckForZero = false;
                 } else if (SizingType == CoolingWaterDesAirOutletTempSizing) {
                     if (TermUnitIU) {
-                        Cp =
-                            GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::CWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
                                                DataGlobals::CWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
@@ -2296,8 +2299,10 @@ namespace ReportSizingManager {
                         CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
                     }
                     if (DataCapacityUsedForSizing >= SmallLoad) {
-                        Cp =
-                            GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::CWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
                                                DataGlobals::CWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
