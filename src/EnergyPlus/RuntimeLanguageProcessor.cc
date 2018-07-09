@@ -2717,7 +2717,6 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DataGlobals::TimeStepZone;
         using DataHeatBalance::Construct;
         using General::TrimSigDigits;

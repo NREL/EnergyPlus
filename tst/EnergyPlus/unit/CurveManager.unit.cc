@@ -250,7 +250,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_UserDidNotEnterMinMaxXY)
     CurveManager::GetCurveInput();
     CurveManager::GetCurvesInputFlag = false;
     ASSERT_EQ(1, CurveManager::NumCurves);
-    EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
     bool error = false;
@@ -301,7 +301,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEnt
     ASSERT_EQ(1, CurveManager::NumCurves);
 
     // Linear curve type, specified min/max
-    EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEOVERWRITE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEOVERWRITE"));
     bool error = false;
@@ -361,7 +361,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange_UserDidntEnterM
     ASSERT_EQ(1, CurveManager::NumCurves);
 
     // Linear curve type, specified min/max
-    EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEOVERWRITE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEOVERWRITE"));
     bool error = false;
@@ -469,7 +469,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAndU
     ASSERT_EQ(2, CurveManager::NumCurves);
 
     // BiQuadratic curve type, specified min/max
-    EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(1));
+    EXPECT_EQ(2, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TWOVARS", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TWOVARS"));
     bool error = false;
@@ -524,7 +524,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAndU
 
     // Evaluate 2nd performance curve
     // BiQuadratic curve type, no specified min/max
-    EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(2));
+    EXPECT_EQ(2, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TWOVARS2", CurveManager::GetCurveName(2));
     EXPECT_EQ(2, CurveManager::GetCurveIndex("TWOVARS2"));
     error = false;
@@ -681,7 +681,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMi
     ASSERT_EQ(1, CurveManager::NumCurves);
 
     // QuadraticLinear curve type, no min/max for IVs
-    EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(2, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
     bool error = false;
@@ -826,7 +826,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
     ASSERT_EQ(2, CurveManager::NumCurves);
 
     // QuadraticLinear curve type
-    EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(2, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
     bool error = false;
@@ -856,7 +856,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
     // Test 2nd table with tighter min/max X Y limits than data set
 
     // QuadraticLinear curve type
-    EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(2));
+    EXPECT_EQ(2, CurveManager::PerfCurve(2).NumDims);
     EXPECT_EQ("TESTTABLEMINMAX2", CurveManager::GetCurveName(2));
     EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTTABLEMINMAX2"));
     error = false;

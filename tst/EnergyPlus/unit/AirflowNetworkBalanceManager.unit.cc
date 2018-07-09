@@ -4552,7 +4552,7 @@ TEST_F(EnergyPlusFixture, TestWindPressureTable)
     CurveManager::GetCurveInput();
     CurveManager::GetCurvesInputFlag = false;
     ASSERT_EQ(1, CurveManager::NumCurves);
-    EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("EFACADE_WPCCURVE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("EFACADE_WPCCURVE"));
     EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
@@ -4635,7 +4635,7 @@ TEST_F(EnergyPlusFixture, TestWPCValue)
     CurveManager::GetCurveInput();
     CurveManager::GetCurvesInputFlag = false;
     ASSERT_EQ(1, CurveManager::NumCurves);
-    EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("NFACADE_WPCVALUE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("NFACADE_WPCVALUE"));
     EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));

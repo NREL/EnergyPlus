@@ -1488,7 +1488,6 @@ namespace HeatBalanceManager {
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveInterpolationMethodNum;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::GetCurveObjectTypeNum;
         using CurveManager::LinearInterpolationOfTable;
         using CurveManager::PerfCurve;
         using CurveManager::SetSameIndeVariableValues;
@@ -2084,7 +2083,8 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
-                        if (GetCurveObjectTypeNum(Material(MaterNum).GlassSpecAngTransDataPtr) != CurveType_TableTwoIV) {
+                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
+                        if (PerfCurve(Material(MaterNum).GlassSpecAngTransDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
                             ShowContinueError(cAlphaFieldNames(5) +
@@ -2145,7 +2145,7 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
-                        if (GetCurveObjectTypeNum(Material(MaterNum).GlassSpecAngFRefleDataPtr) != CurveType_TableTwoIV) {
+                        if (PerfCurve(Material(MaterNum).GlassSpecAngFRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
                             ShowContinueError(cAlphaFieldNames(6) +
@@ -2200,7 +2200,7 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
-                        if (GetCurveObjectTypeNum(Material(MaterNum).GlassSpecAngBRefleDataPtr) != CurveType_TableTwoIV) {
+                        if (PerfCurve(Material(MaterNum).GlassSpecAngBRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
                             ShowContinueError(cAlphaFieldNames(7) +
