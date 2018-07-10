@@ -869,7 +869,7 @@ EndEnergyPlus()
 	// Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
 	// indicating that E+ finished its simulation
 	if ( ( NumExternalInterfaces > 0 ) && haveExternalInterfaceBCVTB ) CloseSocket( 1 );
-	std::exit( EXIT_SUCCESS );
+	//std::exit( EXIT_SUCCESS );
 }
 
 int
