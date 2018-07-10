@@ -1938,6 +1938,7 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad()
                                                     plantNotFound);
             if (!plantNotFound) g->plantInfoFound = true;
         }
+        myCoGenSetupFlag_ = false;
     } // cogen setup
 
     // sum up "MyLoad" for all generators on this load center from plant structure

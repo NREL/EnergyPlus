@@ -4247,7 +4247,7 @@ namespace FuelCellElectricGenerator {
     }
 
     void getFuelCellGeneratorHeatRecoveryInfo(std::string const &GeneratorName, // user specified name of Generator
-                                              std::string heatRecoveryCompName)
+                                              std::string &heatRecoveryCompName)
     {
 
         if (GetFuelCellInput) {
