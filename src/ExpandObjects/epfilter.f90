@@ -25819,11 +25819,9 @@ DO iBoiler = 1, numCompactBoiler
     IF (isBoilerCondHotWater) THEN
       CALL AddToObjStr('Efficiency Curve Temperature Evaluation Variable', 'EnteringBoiler ')
       CALL AddToObjFld('Normalized Boiler Efficiency Curve Name', base + blrNameOff,' Condensing Boiler Efficiency Curve')
-      CALL AddToObjStr('Design Boiler Water Outlet Temp {C}','75')
     ELSE
       CALL AddToObjStr('Efficiency Curve Temperature Evaluation Variable', 'LeavingBoiler')
       CALL AddToObjFld('Normalized Boiler Efficiency Curve Name', base + blrNameOff,' Efficiency Curve')
-      CALL AddToObjStr('Design Boiler Water Outlet Temp {C}','81')
     END IF
     CALL AddToObjStr('Max Design Boiler Water Flow Rate {m3/s}','autosize')
     CALL AddToObjFld('Minimum Part Load Ratio',base + blrMinPLROff,'')
