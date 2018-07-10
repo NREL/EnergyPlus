@@ -47,14 +47,27 @@
 
 #include "capi.h"
 
+void WrappedMessageCallback( std::string const &message )
+{
+	const char * msg = message.c_str();
+	if (GLOBAL_MESSAGE_CALLBACK == NULL)
+	{
+		std::cout << "GLOBAL_MESSAGE_CALLBACK is NULL" << std::endl;
+	}
+	else
+	{
+		GLOBAL_MESSAGE_CALLBACK(msg);
+	}
+}
+
 extern "C"
 {
-	int EXPORTCALL CheckConnect()
+	int EXPORTCALL CALLCONV CheckConnect()
 	{
 		return 42;
 	}
 
-	int EXPORTCALL HelloWorld(char * greeting_out, int greeting_out_buffer_count)
+	int EXPORTCALL CALLCONV HelloWorld(char * greeting_out, int greeting_out_buffer_count)
 	{
 		char standard_greeting[] = "Hello, World!";
 		// additional "+ 1" for the end of line marker
@@ -68,7 +81,7 @@ extern "C"
 		return 0;
 	}
 
-	int EXPORTCALL RunEPlus(const char* path, int path_length)
+	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length)
 	{
 		std::string filepath;
 		if (path_length == 0)
@@ -80,6 +93,13 @@ extern "C"
 			filepath = std::string(path, path_length);
 		}
 		EnergyPlusPgm(filepath);
+		return 0;
+	}
+
+	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f)
+	{
+		GLOBAL_MESSAGE_CALLBACK = f;
+		StoreMessageCallback(WrappedMessageCallback);
 		return 0;
 	}
 }

@@ -47,14 +47,23 @@
 
 #pragma once
 #include <stdio.h>
+#include <iostream>
 #include <windows.h>
 #include "EnergyPlusPgm.hh"
 
-#define EXPORTCALL __declspec(dllexport) __stdcall
+#define CALLCONV __stdcall
+#define EXPORTCALL __declspec(dllexport)
+
+typedef void (CALLCONV * MsgCallback)(const char *);
+
+MsgCallback GLOBAL_MESSAGE_CALLBACK;
+
+void WrappedMessageCallback(std::string const &);
 
 extern "C"
 {
-	int EXPORTCALL CheckConnect();
-	int EXPORTCALL HelloWorld(char * greeting_out, int greeting_out_buffer_count);
-	int EXPORTCALL RunEPlus(const char* path, int path_length);
+	int EXPORTCALL CALLCONV CheckConnect();
+	int EXPORTCALL CALLCONV HelloWorld(char * greeting_out, int greeting_out_buffer_count);
+	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length);
+	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f);
 }
