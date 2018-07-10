@@ -92,8 +92,14 @@ namespace DataSizing {
     int const OAFlowMax(6);
 
     Array1D_string const cOAFlowMethodTypes(NumOAFlowMethods,
-                                            {"Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum",
-                                             "IndoorAirQualityProcedure", "ProportionalControlBasedonOccupancySchedule",
+                                            {"Flow/Person",
+                                             "Flow/Zone",
+                                             "Flow/Area",
+                                             "AirChanges/Hour",
+                                             "Sum",
+                                             "Maximum",
+                                             "IndoorAirQualityProcedure",
+                                             "ProportionalControlBasedonOccupancySchedule",
                                              "ProportionalControlBasedOnDesignOccupancy"});
 
     // parameters for outside air

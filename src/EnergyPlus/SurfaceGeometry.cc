@@ -129,9 +129,8 @@ namespace SurfaceGeometry {
     Array1D_string const SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"});
     Array1D_int const BaseSurfIDs(3, {SurfaceClass_Wall, SurfaceClass_Floor, SurfaceClass_Roof});
 
-    Array1D_int const SubSurfIDs(6,
-                                 {SurfaceClass_Window, SurfaceClass_Door, SurfaceClass_GlassDoor, SurfaceClass_Shading, SurfaceClass_TDD_Dome,
-                                  SurfaceClass_TDD_Diffuser});
+    Array1D_int const SubSurfIDs(
+        6, {SurfaceClass_Window, SurfaceClass_Door, SurfaceClass_GlassDoor, SurfaceClass_Shading, SurfaceClass_TDD_Dome, SurfaceClass_TDD_Diffuser});
 
     int const UnenteredAdjacentZoneSurface(-998); // allows users to enter one zone surface ("Zone")
     // referencing another in adjacent zone
@@ -1080,16 +1079,37 @@ namespace SurfaceGeometry {
 
         GetRectDetShdSurfaceData(ErrorsFound, SurfNum, TotRectDetachedFixed, TotRectDetachedBldg);
 
-        GetHTSurfaceData(ErrorsFound, SurfNum, TotHTSurfs, TotDetailedWalls, TotDetailedRoofs, TotDetailedFloors, BaseSurfCls, BaseSurfIDs,
-                         NeedToAddSurfaces);
+        GetHTSurfaceData(
+            ErrorsFound, SurfNum, TotHTSurfs, TotDetailedWalls, TotDetailedRoofs, TotDetailedFloors, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
-        GetRectSurfaces(ErrorsFound, SurfNum, TotRectExtWalls, TotRectIntWalls, TotRectIZWalls, TotRectUGWalls, TotRectRoofs, TotRectCeilings,
-                        TotRectIZCeilings, TotRectGCFloors, TotRectIntFloors, TotRectIZFloors, BaseSurfIDs, NeedToAddSurfaces);
+        GetRectSurfaces(ErrorsFound,
+                        SurfNum,
+                        TotRectExtWalls,
+                        TotRectIntWalls,
+                        TotRectIZWalls,
+                        TotRectUGWalls,
+                        TotRectRoofs,
+                        TotRectCeilings,
+                        TotRectIZCeilings,
+                        TotRectGCFloors,
+                        TotRectIntFloors,
+                        TotRectIZFloors,
+                        BaseSurfIDs,
+                        NeedToAddSurfaces);
 
         GetHTSubSurfaceData(ErrorsFound, SurfNum, TotHTSubs, SubSurfCls, SubSurfIDs, AddedSubSurfaces, NeedToAddSubSurfaces);
 
-        GetRectSubSurfaces(ErrorsFound, SurfNum, TotRectWindows, TotRectDoors, TotRectGlazedDoors, TotRectIZWindows, TotRectIZDoors,
-                           TotRectIZGlazedDoors, SubSurfIDs, AddedSubSurfaces, NeedToAddSubSurfaces);
+        GetRectSubSurfaces(ErrorsFound,
+                           SurfNum,
+                           TotRectWindows,
+                           TotRectDoors,
+                           TotRectGlazedDoors,
+                           TotRectIZWindows,
+                           TotRectIZDoors,
+                           TotRectIZGlazedDoors,
+                           SubSurfIDs,
+                           AddedSubSurfaces,
+                           NeedToAddSubSurfaces);
 
         GetAttShdSurfaceData(ErrorsFound, SurfNum, TotShdSubs);
 
@@ -1139,11 +1159,17 @@ namespace SurfaceGeometry {
                 SurfaceTmp(CurNewSurf).GrossArea = VecLength(SurfaceTmp(CurNewSurf).NewellAreaVector);
                 SurfaceTmp(CurNewSurf).Area = SurfaceTmp(CurNewSurf).GrossArea;
                 SurfaceTmp(CurNewSurf).NetAreaShadowCalc = SurfaceTmp(CurNewSurf).Area;
-                CreateNewellSurfaceNormalVector(SurfaceTmp(CurNewSurf).Vertex, SurfaceTmp(CurNewSurf).Sides,
-                                                SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector);
-                DetermineAzimuthAndTilt(SurfaceTmp(CurNewSurf).Vertex, SurfaceTmp(CurNewSurf).Sides, SurfWorldAz, SurfTilt,
-                                        SurfaceTmp(CurNewSurf).lcsx, SurfaceTmp(CurNewSurf).lcsy, SurfaceTmp(CurNewSurf).lcsz,
-                                        SurfaceTmp(CurNewSurf).GrossArea, SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector);
+                CreateNewellSurfaceNormalVector(
+                    SurfaceTmp(CurNewSurf).Vertex, SurfaceTmp(CurNewSurf).Sides, SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector);
+                DetermineAzimuthAndTilt(SurfaceTmp(CurNewSurf).Vertex,
+                                        SurfaceTmp(CurNewSurf).Sides,
+                                        SurfWorldAz,
+                                        SurfTilt,
+                                        SurfaceTmp(CurNewSurf).lcsx,
+                                        SurfaceTmp(CurNewSurf).lcsy,
+                                        SurfaceTmp(CurNewSurf).lcsz,
+                                        SurfaceTmp(CurNewSurf).GrossArea,
+                                        SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector);
                 SurfaceTmp(CurNewSurf).Azimuth = SurfWorldAz;
                 SurfaceTmp(CurNewSurf).Tilt = SurfTilt;
 
@@ -2256,8 +2282,17 @@ namespace SurfaceGeometry {
 
             if (SELECT_CASE_var == 1) {
                 // This is the valid case
-                inputProcessor->getObjectItem(cCurrentModuleObject, 1, GAlphas, NAlphas, GNum, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                              cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              1,
+                                              GAlphas,
+                                              NAlphas,
+                                              GNum,
+                                              NNum,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 // Even though these will be validated, set defaults in case error here -- wont
                 // cause aborts in later surface gets (hopefully)
@@ -2507,11 +2542,20 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound)) {
+                if (GlobalNames::VerifyUniqueInterObjectName(
+                        UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
 
@@ -2652,11 +2696,20 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound)) {
+                if (GlobalNames::VerifyUniqueInterObjectName(
+                        UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
 
@@ -2677,8 +2730,8 @@ namespace SurfaceGeometry {
                 SurfaceTmp(SurfNum).Sides = 4;
                 SurfaceTmp(SurfNum).Vertex.allocate(SurfaceTmp(SurfNum).Sides);
 
-                MakeRectangularVertices(SurfNum, rNumericArgs(3), rNumericArgs(4), rNumericArgs(5), rNumericArgs(6), rNumericArgs(7),
-                                        RectSurfRefWorldCoordSystem);
+                MakeRectangularVertices(
+                    SurfNum, rNumericArgs(3), rNumericArgs(4), rNumericArgs(5), rNumericArgs(6), rNumericArgs(7), RectSurfRefWorldCoordSystem);
 
                 if (SurfaceTmp(SurfNum).Area <= 0.0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
@@ -2878,11 +2931,20 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              SurfaceNumAlpha,
+                                              rNumericArgs,
+                                              SurfaceNumProp,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound)) {
+                if (GlobalNames::VerifyUniqueInterObjectName(
+                        UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
 
@@ -3177,6 +3239,15 @@ namespace SurfaceGeometry {
                 }
 
                 CheckConvexity(SurfNum, SurfaceTmp(SurfNum).Sides);
+                if (UtilityRoutines::SameString(cAlphaArgs(5), "Surface")) {
+                    if (SurfaceTmp(SurfNum).Sides != static_cast<int>(SurfaceTmp(SurfNum).Vertex.size())) {
+                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
+                                        "\", After CheckConvexity, mismatch between Sides (" + TrimSigDigits(SurfaceTmp(SurfNum).Sides) +
+                                        ") and size of Vertex (" + TrimSigDigits(SurfaceTmp(SurfNum).Vertex.size()) + ").");
+                        ShowContinueError("CheckConvexity is used to verify the convexity of a surface and detect collinear points.");
+                        ErrorsFound = true;
+                    }
+                }
                 if (SurfaceTmp(SurfNum).Construction > 0) {
                     // Check wall height for the CFactor walls
                     if (SurfaceTmp(SurfNum).Class == SurfaceClass_Wall && Construct(SurfaceTmp(SurfNum).Construction).TypeIsCfactorWall) {
@@ -3203,6 +3274,20 @@ namespace SurfaceGeometry {
                 }
             }
         } // Item Looop
+        // Check number of Vertex between base surface and Outside Boundary surface
+        int ExtSurfNum;
+        for (int i = 1; i <= SurfNum; i++) {
+            if (SurfaceTmp(i).ExtBoundCond == UnreconciledZoneSurface && SurfaceTmp(i).ExtBoundCondName != "") {
+                ExtSurfNum = UtilityRoutines::FindItemInList(SurfaceTmp(i).ExtBoundCondName, SurfaceTmp);
+                if (SurfaceTmp(i).Vertex.size() != SurfaceTmp(ExtSurfNum).Vertex.size()) {
+                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(i).Name + "\", Vertex size mismatch between base surface :" +
+                                    SurfaceTmp(i).Name + " and outside boundary surface: " + SurfaceTmp(ExtSurfNum).Name);
+                    ShowContinueError("The vertex sizes are " + TrimSigDigits(SurfaceTmp(i).Vertex.size()) + " for base surface and " +
+                                      TrimSigDigits(SurfaceTmp(ExtSurfNum).Vertex.size()) + " for outside boundary surface. Please check inputs.");
+                    ErrorsFound = true;
+                }
+            }
+        }
     }
 
     void GetRectSurfaces(bool &ErrorsFound,             // Error flag indicator (true if errors found)
@@ -3237,9 +3322,17 @@ namespace SurfaceGeometry {
         using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const cModuleObjects(10, {"Wall:Exterior", "Wall:Adiabatic", "Wall:Interzone", "Wall:Underground", "Roof",
-                                                        "Ceiling:Adiabatic", "Ceiling:Interzone", "Floor:GroundContact", "Floor:Adiabatic",
-                                                        "Floor:Interzone"});
+        static Array1D_string const cModuleObjects(10,
+                                                   {"Wall:Exterior",
+                                                    "Wall:Adiabatic",
+                                                    "Wall:Interzone",
+                                                    "Wall:Underground",
+                                                    "Roof",
+                                                    "Ceiling:Adiabatic",
+                                                    "Ceiling:Interzone",
+                                                    "Floor:GroundContact",
+                                                    "Floor:Adiabatic",
+                                                    "Floor:Interzone"});
 
         int Item;
         int ItemsToGet;
@@ -3320,11 +3413,20 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound)) {
+                if (GlobalNames::VerifyUniqueInterObjectName(
+                        UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
 
@@ -3454,8 +3556,8 @@ namespace SurfaceGeometry {
                 SurfaceTmp(SurfNum).Sides = 4;
                 SurfaceTmp(SurfNum).Vertex.allocate(SurfaceTmp(SurfNum).Sides);
 
-                MakeRectangularVertices(SurfNum, rNumericArgs(3), rNumericArgs(4), rNumericArgs(5), rNumericArgs(6), rNumericArgs(7),
-                                        RectSurfRefWorldCoordSystem);
+                MakeRectangularVertices(
+                    SurfNum, rNumericArgs(3), rNumericArgs(4), rNumericArgs(5), rNumericArgs(6), rNumericArgs(7), RectSurfRefWorldCoordSystem);
 
                 if (SurfaceTmp(SurfNum).Area <= 0.0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
@@ -3616,8 +3718,14 @@ namespace SurfaceGeometry {
         SurfaceTmp(SurfNum).Area = SurfaceTmp(SurfNum).GrossArea;
         SurfaceTmp(SurfNum).NetAreaShadowCalc = SurfaceTmp(SurfNum).Area;
         CreateNewellSurfaceNormalVector(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfAzimuth, SurfTilt, SurfaceTmp(SurfNum).lcsx,
-                                SurfaceTmp(SurfNum).lcsy, SurfaceTmp(SurfNum).lcsz, SurfaceTmp(SurfNum).GrossArea,
+        DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex,
+                                SurfaceTmp(SurfNum).Sides,
+                                SurfAzimuth,
+                                SurfTilt,
+                                SurfaceTmp(SurfNum).lcsx,
+                                SurfaceTmp(SurfNum).lcsy,
+                                SurfaceTmp(SurfNum).lcsz,
+                                SurfaceTmp(SurfNum).GrossArea,
                                 SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         SurfaceTmp(SurfNum).Azimuth = SurfAzimuth;
         SurfaceTmp(SurfNum).Tilt = SurfTilt;
@@ -3802,8 +3910,17 @@ namespace SurfaceGeometry {
         NeedToAddSurfaces = 0;
 
         for (Loop = 1; Loop <= TotHTSubs; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          SurfaceNumAlpha,
+                                          rNumericArgs,
+                                          SurfaceNumProp,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             if (GlobalNames::VerifyUniqueInterObjectName(UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
@@ -4159,11 +4276,20 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound)) {
+                if (GlobalNames::VerifyUniqueInterObjectName(
+                        UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
 
@@ -4314,8 +4440,8 @@ namespace SurfaceGeometry {
                     SurfaceTmp(SurfNum).Multiplier = 1.0;
                 }
 
-                MakeRelativeRectangularVertices(SurfaceTmp(SurfNum).BaseSurf, SurfNum, rNumericArgs(2), rNumericArgs(3), rNumericArgs(4),
-                                                rNumericArgs(5));
+                MakeRelativeRectangularVertices(
+                    SurfaceTmp(SurfNum).BaseSurf, SurfNum, rNumericArgs(2), rNumericArgs(3), rNumericArgs(4), rNumericArgs(5));
 
                 if (SurfaceTmp(SurfNum).Area <= 0.0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
@@ -4859,8 +4985,14 @@ namespace SurfaceGeometry {
         SurfaceTmp(SurfNum).Area = SurfaceTmp(SurfNum).GrossArea;
         SurfaceTmp(SurfNum).NetAreaShadowCalc = SurfaceTmp(SurfNum).Area;
         CreateNewellSurfaceNormalVector(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfAzimuth, SurfTilt, SurfaceTmp(SurfNum).lcsx,
-                                SurfaceTmp(SurfNum).lcsy, SurfaceTmp(SurfNum).lcsz, SurfaceTmp(SurfNum).GrossArea,
+        DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex,
+                                SurfaceTmp(SurfNum).Sides,
+                                SurfAzimuth,
+                                SurfTilt,
+                                SurfaceTmp(SurfNum).lcsx,
+                                SurfaceTmp(SurfNum).lcsy,
+                                SurfaceTmp(SurfNum).lcsz,
+                                SurfaceTmp(SurfNum).GrossArea,
                                 SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         SurfaceTmp(SurfNum).Azimuth = SurfAzimuth;
         SurfaceTmp(SurfNum).Tilt = SurfTilt;
@@ -4995,8 +5127,17 @@ namespace SurfaceGeometry {
         }
 
         for (Loop = 1; Loop <= TotShdSubs; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             if (GlobalNames::VerifyUniqueInterObjectName(UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
@@ -5179,11 +5320,20 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound)) {
+                if (GlobalNames::VerifyUniqueInterObjectName(
+                        UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
 
@@ -5275,8 +5425,8 @@ namespace SurfaceGeometry {
                     SurfaceTmp(SurfNum).Sides = 4;
                     SurfaceTmp(SurfNum).Vertex.allocate(SurfaceTmp(SurfNum).Sides);
 
-                    MakeRelativeRectangularVertices(BaseSurfNum, SurfNum, XLLC - rNumericArgs(3), YLLC + SurfaceTmp(Found).Height + rNumericArgs(1),
-                                                    Length, Depth);
+                    MakeRelativeRectangularVertices(
+                        BaseSurfNum, SurfNum, XLLC - rNumericArgs(3), YLLC + SurfaceTmp(Found).Height + rNumericArgs(1), Length, Depth);
 
                     // Reset surface to be "detached"
                     //    SurfaceTmp(SurfNum)%BaseSurfName='  '
@@ -5439,8 +5589,8 @@ namespace SurfaceGeometry {
                         SurfaceTmp(SurfNum).Sides = 4;
                         SurfaceTmp(SurfNum).Vertex.allocate(SurfaceTmp(SurfNum).Sides);
 
-                        MakeRelativeRectangularVertices(BaseSurfNum, SurfNum, XLLC + SurfaceTmp(Found).Width + rNumericArgs(6),
-                                                        YLLC - rNumericArgs(8), -Depth, Length);
+                        MakeRelativeRectangularVertices(
+                            BaseSurfNum, SurfNum, XLLC + SurfaceTmp(Found).Width + rNumericArgs(6), YLLC - rNumericArgs(8), -Depth, Length);
 
                         // Reset surface to be "detached"
                         //    SurfaceTmp(SurfNum)%BaseSurfName='  '
@@ -5514,8 +5664,17 @@ namespace SurfaceGeometry {
 
         cCurrentModuleObject = "InternalMass";
         for (Loop = 1; Loop <= TotIntMass; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          SurfaceNumAlpha,
+                                          rNumericArgs,
+                                          SurfaceNumProp,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             if (GlobalNames::VerifyUniqueInterObjectName(UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
@@ -5623,8 +5782,17 @@ namespace SurfaceGeometry {
 
         for (Loop = 1; Loop <= TotShadingSurfaceReflectance; ++Loop) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          NumAlpha,
+                                          rNumericArgs,
+                                          NumProp,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(1), SurfaceTmp, TotSurfaces);
             if (SurfNum == 0) {
                 ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid specification");
@@ -5759,8 +5927,17 @@ namespace SurfaceGeometry {
         ExtVentedCavity.allocate(TotExtVentCav);
 
         for (Item = 1; Item <= TotExtVentCav; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // first handle cAlphaArgs
             ErrorInName = false;
             IsBlank = false;
@@ -5934,18 +6111,42 @@ namespace SurfaceGeometry {
             }
             ExtVentedCavity(Item).ActualArea = ExtVentedCavity(Item).ProjArea * ExtVentedCavity(Item).AreaRatio;
 
-            SetupOutputVariable("Surface Exterior Cavity Baffle Surface Temperature", OutputProcessor::Unit::C, ExtVentedCavity(Item).Tbaffle,
-                                "System", "Average", ExtVentedCavity(Item).Name);
-            SetupOutputVariable("Surface Exterior Cavity Air Drybulb Temperature", OutputProcessor::Unit::C, ExtVentedCavity(Item).TAirCav, "System",
-                                "Average", ExtVentedCavity(Item).Name);
-            SetupOutputVariable("Surface Exterior Cavity Total Natural Ventilation Air Change Rate", OutputProcessor::Unit::ach,
-                                ExtVentedCavity(Item).PassiveACH, "System", "Average", ExtVentedCavity(Item).Name);
-            SetupOutputVariable("Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                ExtVentedCavity(Item).PassiveMdotVent, "System", "Average", ExtVentedCavity(Item).Name);
-            SetupOutputVariable("Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                ExtVentedCavity(Item).PassiveMdotWind, "System", "Average", ExtVentedCavity(Item).Name);
-            SetupOutputVariable("Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                ExtVentedCavity(Item).PassiveMdotTherm, "System", "Average", ExtVentedCavity(Item).Name);
+            SetupOutputVariable("Surface Exterior Cavity Baffle Surface Temperature",
+                                OutputProcessor::Unit::C,
+                                ExtVentedCavity(Item).Tbaffle,
+                                "System",
+                                "Average",
+                                ExtVentedCavity(Item).Name);
+            SetupOutputVariable("Surface Exterior Cavity Air Drybulb Temperature",
+                                OutputProcessor::Unit::C,
+                                ExtVentedCavity(Item).TAirCav,
+                                "System",
+                                "Average",
+                                ExtVentedCavity(Item).Name);
+            SetupOutputVariable("Surface Exterior Cavity Total Natural Ventilation Air Change Rate",
+                                OutputProcessor::Unit::ach,
+                                ExtVentedCavity(Item).PassiveACH,
+                                "System",
+                                "Average",
+                                ExtVentedCavity(Item).Name);
+            SetupOutputVariable("Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ExtVentedCavity(Item).PassiveMdotVent,
+                                "System",
+                                "Average",
+                                ExtVentedCavity(Item).Name);
+            SetupOutputVariable("Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ExtVentedCavity(Item).PassiveMdotWind,
+                                "System",
+                                "Average",
+                                ExtVentedCavity(Item).Name);
+            SetupOutputVariable("Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ExtVentedCavity(Item).PassiveMdotTherm,
+                                "System",
+                                "Average",
+                                ExtVentedCavity(Item).Name);
         }
     }
 
@@ -5966,8 +6167,17 @@ namespace SurfaceGeometry {
         for (int obj = 1; obj <= numObjects; ++obj) {
             int alpF = 1;
             int numF = 1;
-            inputProcessor->getObjectItem(cCurrentModuleObject, obj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          obj,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             int Found = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), Surface, TotSurfaces);
             if (Found == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", did not find matching surface");
@@ -6102,10 +6312,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::SurfLocalEnvironment;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::SurfLocalEnvironment;
         using DataSurfaces::TotSurfaces;
+        using DataSurfaces::TotSurfLocalEnv;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6142,8 +6352,17 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= TotSurfLocalEnv; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              NumAlpha,
+                                              rNumericArgs,
+                                              NumNumeric,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 SurfLocalEnvironment(Loop).Name = cAlphaArgs(1);
@@ -6190,8 +6409,8 @@ namespace SurfaceGeometry {
 
                 // Assign outdoor air node number;
                 if (!lAlphaFieldBlanks(5)) {
-                    NodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air,
-                                                NodeConnectionType_Inlet, 1, ObjectIsParent);
+                    NodeNum = GetOnlySingleNode(
+                        cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
                     if (NodeNum == 0 && CheckOutAirNodeNumber(NodeNum)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                         cAlphaFieldNames(5) + " has been found.");
@@ -6250,10 +6469,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::SurfLocalEnvironment;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::SurfLocalEnvironment;
         using DataSurfaces::TotSurfaces;
+        using DataSurfaces::TotSurfLocalEnv;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6290,8 +6509,17 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= TotSrdSurfProperties; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              NumAlpha,
+                                              rNumericArgs,
+                                              NumNumeric,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // A1: Name
@@ -6361,11 +6589,11 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataHeatBalance::HeatTransferAlgosUsed;
         using DataHeatBalance::HighHConvLimit;
         using DataHeatBalance::LowHConvLimit;
         using DataHeatBalance::NumberOfHeatTransferAlgosUsed;
+        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
 
@@ -6407,8 +6635,17 @@ namespace SurfaceGeometry {
         int CountAddHeatSourceSurf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         for (Item = 1; Item <= CountAddHeatSourceSurf; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             Found = UtilityRoutines::FindItemInList(cAlphaArgs(1), Surface, TotSurfaces);
 
             if (Found == 0) {
@@ -6458,8 +6695,17 @@ namespace SurfaceGeometry {
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
         for (Item = 1; Item <= CountHTAlgoObjectsSingleSurf; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ErrorsFoundSingleSurf = false;
             Found = UtilityRoutines::FindItemInList(cAlphaArgs(1), Surface, TotSurfaces);
 
@@ -6502,8 +6748,17 @@ namespace SurfaceGeometry {
         CountHTAlgoObjectsMultiSurf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         for (Item = 1; Item <= CountHTAlgoObjectsMultiSurf; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ErrorsFoundMultiSurf = false;
             {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
@@ -6642,8 +6897,17 @@ namespace SurfaceGeometry {
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
         CountHTAlgoObjectsSurfList = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         for (Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ErrorsFoundSurfList = false;
             {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
@@ -6687,8 +6951,17 @@ namespace SurfaceGeometry {
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
         CountHTAlgoObjectsSurfList = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         for (Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ErrorsFoundByConstruct = false;
             {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
@@ -7113,8 +7386,14 @@ namespace SurfaceGeometry {
             SurfaceTmp(SurfNum).GrossArea = VecLength(SurfaceTmp(SurfNum).NewellAreaVector);
             SurfaceTmp(SurfNum).Area = SurfaceTmp(SurfNum).GrossArea;
             SurfaceTmp(SurfNum).NetAreaShadowCalc = SurfaceTmp(SurfNum).Area;
-            DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfWorldAz, SurfTilt, SurfaceTmp(SurfNum).lcsx,
-                                    SurfaceTmp(SurfNum).lcsy, SurfaceTmp(SurfNum).lcsz, SurfaceTmp(SurfNum).GrossArea,
+            DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex,
+                                    SurfaceTmp(SurfNum).Sides,
+                                    SurfWorldAz,
+                                    SurfTilt,
+                                    SurfaceTmp(SurfNum).lcsx,
+                                    SurfaceTmp(SurfNum).lcsy,
+                                    SurfaceTmp(SurfNum).lcsz,
+                                    SurfaceTmp(SurfNum).GrossArea,
                                     SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
             dotp = dot(SurfaceTmp(SurfNum).NewellSurfaceNormalVector, TestVector);
             if (SurfaceTmp(SurfNum).Class == SurfaceClass_Roof && dotp < -0.000001) {
@@ -7251,8 +7530,14 @@ namespace SurfaceGeometry {
         }
 
         CreateNewellSurfaceNormalVector(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfAzimuth, SurfTilt, SurfaceTmp(SurfNum).lcsx,
-                                SurfaceTmp(SurfNum).lcsy, SurfaceTmp(SurfNum).lcsz, SurfaceTmp(SurfNum).GrossArea,
+        DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex,
+                                SurfaceTmp(SurfNum).Sides,
+                                SurfAzimuth,
+                                SurfTilt,
+                                SurfaceTmp(SurfNum).lcsx,
+                                SurfaceTmp(SurfNum).lcsy,
+                                SurfaceTmp(SurfNum).lcsz,
+                                SurfaceTmp(SurfNum).GrossArea,
                                 SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         if (SurfaceTmp(SurfNum).Class == SurfaceClass_Roof && SurfTilt > 80.0) {
             TiltString = RoundSigDigits(SurfTilt, 1);
@@ -7369,8 +7654,14 @@ namespace SurfaceGeometry {
             SurfaceTmp(SurfNum).Area = SurfaceTmp(SurfNum).GrossArea;
             SurfaceTmp(SurfNum).NetAreaShadowCalc = SurfaceTmp(SurfNum).Area;
             CreateNewellSurfaceNormalVector(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-            DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex, SurfaceTmp(SurfNum).Sides, SurfWorldAz, SurfTilt, SurfaceTmp(SurfNum).lcsx,
-                                    SurfaceTmp(SurfNum).lcsy, SurfaceTmp(SurfNum).lcsz, SurfaceTmp(SurfNum).GrossArea,
+            DetermineAzimuthAndTilt(SurfaceTmp(SurfNum).Vertex,
+                                    SurfaceTmp(SurfNum).Sides,
+                                    SurfWorldAz,
+                                    SurfTilt,
+                                    SurfaceTmp(SurfNum).lcsx,
+                                    SurfaceTmp(SurfNum).lcsy,
+                                    SurfaceTmp(SurfNum).lcsz,
+                                    SurfaceTmp(SurfNum).GrossArea,
                                     SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
             SurfaceTmp(SurfNum).Azimuth = SurfWorldAz;
             SurfaceTmp(SurfNum).Tilt = SurfTilt;
@@ -7425,11 +7716,23 @@ namespace SurfaceGeometry {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NumValidShadingTypes(8);
         static Array1D_string const cValidShadingTypes(NumValidShadingTypes,
-                                                       {"INTERIORSHADE", "EXTERIORSHADE", "EXTERIORSCREEN", "INTERIORBLIND", "EXTERIORBLIND",
-                                                        "BETWEENGLASSSHADE", "BETWEENGLASSBLIND", "SWITCHABLEGLAZING"});
-        static Array1D_int const ValidShadingTypes(NumValidShadingTypes, {WSC_ST_InteriorShade, WSC_ST_ExteriorShade, WSC_ST_ExteriorScreen,
-                                                                          WSC_ST_InteriorBlind, WSC_ST_ExteriorBlind, WSC_ST_BetweenGlassShade,
-                                                                          WSC_ST_BetweenGlassBlind, WSC_ST_SwitchableGlazing});
+                                                       {"INTERIORSHADE",
+                                                        "EXTERIORSHADE",
+                                                        "EXTERIORSCREEN",
+                                                        "INTERIORBLIND",
+                                                        "EXTERIORBLIND",
+                                                        "BETWEENGLASSSHADE",
+                                                        "BETWEENGLASSBLIND",
+                                                        "SWITCHABLEGLAZING"});
+        static Array1D_int const ValidShadingTypes(NumValidShadingTypes,
+                                                   {WSC_ST_InteriorShade,
+                                                    WSC_ST_ExteriorShade,
+                                                    WSC_ST_ExteriorScreen,
+                                                    WSC_ST_InteriorBlind,
+                                                    WSC_ST_ExteriorBlind,
+                                                    WSC_ST_BetweenGlassShade,
+                                                    WSC_ST_BetweenGlassBlind,
+                                                    WSC_ST_SwitchableGlazing});
 
         int const NumValidWindowShadingControlTypes(21);
         static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
@@ -7519,8 +7822,17 @@ namespace SurfaceGeometry {
         ControlNum = 0;
         for (Loop = 1; Loop <= TotWinShadingControl; ++Loop) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          ControlNumAlpha,
+                                          rNumericArgs,
+                                          ControlNumProp,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             ErrorInName = false;
             IsBlank = false;
@@ -7908,8 +8220,17 @@ namespace SurfaceGeometry {
         StormWinNum = 0;
         for (loop = 1; loop <= TotStormWin; ++loop) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject, loop, cAlphaArgs, StormWinNumAlpha, rNumericArgs, StormWinNumProp, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          loop,
+                                          cAlphaArgs,
+                                          StormWinNumAlpha,
+                                          rNumericArgs,
+                                          StormWinNumProp,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ++StormWinNum;
             StormWindow(StormWinNum).BaseWindowNum = UtilityRoutines::FindItemInList(cAlphaArgs(1), Surface, TotSurfaces);
             StormWindow(StormWinNum).StormWinMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Material, TotMaterials);
@@ -8084,8 +8405,17 @@ namespace SurfaceGeometry {
 
         for (Loop = 1; Loop <= TotWinAirflowControl; ++Loop) { // Loop through all surfaces in the input...
 
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          ControlNumAlpha,
+                                          rNumericArgs,
+                                          ControlNumProp,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(1), Surface, TotSurfaces);
             if (SurfNum == 0) {
@@ -8278,8 +8608,17 @@ namespace SurfaceGeometry {
         }
 
         if (TotKivaStgs == 1) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          1,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumProps,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             int numF = 1;
             int alpF = 1;
@@ -8368,8 +8707,17 @@ namespace SurfaceGeometry {
             fndNames(1) = "<Default Foundation>";
 
             for (int Loop = 1; Loop <= TotKivaFnds; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Loop,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumProps,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 int numF = 1;
                 int alpF = 1;
@@ -8832,8 +9180,17 @@ namespace SurfaceGeometry {
 
         OSCNum = 0;
         for (Loop = 1; Loop <= TotOSC; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumProps,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ErrorInName = false;
             IsBlank = false;
             UtilityRoutines::VerifyName(cAlphaArgs(1), OSC, OSCNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name");
@@ -8910,8 +9267,12 @@ namespace SurfaceGeometry {
             }
             if (OSC(Loop).SurfFilmCoef > 0.0) {
                 cAlphaArgs(1) = RoundSigDigits(OSC(Loop).SurfFilmCoef, 3);
-                SetupOutputVariable("Surface Other Side Coefficients Exterior Air Drybulb Temperature", OutputProcessor::Unit::C,
-                                    OSC(Loop).OSCTempCalc, "System", "Average", OSC(Loop).Name);
+                SetupOutputVariable("Surface Other Side Coefficients Exterior Air Drybulb Temperature",
+                                    OutputProcessor::Unit::C,
+                                    OSC(Loop).OSCTempCalc,
+                                    "System",
+                                    "Average",
+                                    OSC(Loop).Name);
             } else {
                 cAlphaArgs(1) = "N/A";
             }
@@ -9005,24 +9366,56 @@ namespace SurfaceGeometry {
             // Note no validation of the below at this time:
             OSCM(OSCMNum).Class = cAlphaArgs(2);
             // setup output vars for modeled coefficients
-            SetupOutputVariable("Surface Other Side Conditions Modeled Convection Air Temperature", OutputProcessor::Unit::C, OSCM(OSCMNum).TConv,
-                                "System", "Average", OSCM(OSCMNum).Name);
-            SetupOutputVariable("Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K,
-                                OSCM(OSCMNum).HConv, "System", "Average", OSCM(OSCMNum).Name);
-            SetupOutputVariable("Surface Other Side Conditions Modeled Radiation Temperature", OutputProcessor::Unit::C, OSCM(OSCMNum).TRad, "System",
-                                "Average", OSCM(OSCMNum).Name);
-            SetupOutputVariable("Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K,
-                                OSCM(OSCMNum).HRad, "System", "Average", OSCM(OSCMNum).Name);
+            SetupOutputVariable("Surface Other Side Conditions Modeled Convection Air Temperature",
+                                OutputProcessor::Unit::C,
+                                OSCM(OSCMNum).TConv,
+                                "System",
+                                "Average",
+                                OSCM(OSCMNum).Name);
+            SetupOutputVariable("Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient",
+                                OutputProcessor::Unit::W_m2K,
+                                OSCM(OSCMNum).HConv,
+                                "System",
+                                "Average",
+                                OSCM(OSCMNum).Name);
+            SetupOutputVariable("Surface Other Side Conditions Modeled Radiation Temperature",
+                                OutputProcessor::Unit::C,
+                                OSCM(OSCMNum).TRad,
+                                "System",
+                                "Average",
+                                OSCM(OSCMNum).Name);
+            SetupOutputVariable("Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient",
+                                OutputProcessor::Unit::W_m2K,
+                                OSCM(OSCMNum).HRad,
+                                "System",
+                                "Average",
+                                OSCM(OSCMNum).Name);
 
             if (AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Other Side Boundary Conditions", OSCM(OSCMNum).Name, "Convection Bulk Air Temperature", "[C]",
-                                 OSCM(OSCMNum).EMSOverrideOnTConv, OSCM(OSCMNum).EMSOverrideTConvValue);
-                SetupEMSActuator("Other Side Boundary Conditions", OSCM(OSCMNum).Name, "Convection Heat Transfer Coefficient", "[W/m2-K]",
-                                 OSCM(OSCMNum).EMSOverrideOnHConv, OSCM(OSCMNum).EMSOverrideHConvValue);
-                SetupEMSActuator("Other Side Boundary Conditions", OSCM(OSCMNum).Name, "Radiation Effective Temperature", "[C]",
-                                 OSCM(OSCMNum).EMSOverrideOnTRad, OSCM(OSCMNum).EMSOverrideTRadValue);
-                SetupEMSActuator("Other Side Boundary Conditions", OSCM(OSCMNum).Name, "Radiation Linear Heat Transfer Coefficient", "[W/m2-K]",
-                                 OSCM(OSCMNum).EMSOverrideOnHrad, OSCM(OSCMNum).EMSOverrideHradValue);
+                SetupEMSActuator("Other Side Boundary Conditions",
+                                 OSCM(OSCMNum).Name,
+                                 "Convection Bulk Air Temperature",
+                                 "[C]",
+                                 OSCM(OSCMNum).EMSOverrideOnTConv,
+                                 OSCM(OSCMNum).EMSOverrideTConvValue);
+                SetupEMSActuator("Other Side Boundary Conditions",
+                                 OSCM(OSCMNum).Name,
+                                 "Convection Heat Transfer Coefficient",
+                                 "[W/m2-K]",
+                                 OSCM(OSCMNum).EMSOverrideOnHConv,
+                                 OSCM(OSCMNum).EMSOverrideHConvValue);
+                SetupEMSActuator("Other Side Boundary Conditions",
+                                 OSCM(OSCMNum).Name,
+                                 "Radiation Effective Temperature",
+                                 "[C]",
+                                 OSCM(OSCMNum).EMSOverrideOnTRad,
+                                 OSCM(OSCMNum).EMSOverrideTRadValue);
+                SetupEMSActuator("Other Side Boundary Conditions",
+                                 OSCM(OSCMNum).Name,
+                                 "Radiation Linear Heat Transfer Coefficient",
+                                 "[W/m2-K]",
+                                 OSCM(OSCMNum).EMSOverrideOnHrad,
+                                 OSCM(OSCMNum).EMSOverrideHradValue);
             }
         }
 
@@ -9091,8 +9484,17 @@ namespace SurfaceGeometry {
         cCurrentModuleObject = "SurfaceControl:MovableInsulation";
         NMatInsul = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         for (Loop = 1; Loop <= NMatInsul; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NAlphas, rNumericArgs, NNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          NAlphas,
+                                          rNumericArgs,
+                                          NNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), SurfaceTmp, TotSurfaces);
             MaterNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Material, TotMaterials);
             SchNum = GetScheduleIndex(cAlphaArgs(4));
@@ -9287,7 +9689,8 @@ namespace SurfaceGeometry {
                 ZoneStruct.SurfaceFace(NActFaces).NSides = Surface(SurfNum).Sides;
                 ZoneStruct.SurfaceFace(NActFaces).SurfNum = SurfNum;
                 ZoneStruct.SurfaceFace(NActFaces).FacePoints({1, Surface(SurfNum).Sides}) = Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides});
-                CreateNewellAreaVector(ZoneStruct.SurfaceFace(NActFaces).FacePoints, ZoneStruct.SurfaceFace(NActFaces).NSides,
+                CreateNewellAreaVector(ZoneStruct.SurfaceFace(NActFaces).FacePoints,
+                                       ZoneStruct.SurfaceFace(NActFaces).NSides,
                                        ZoneStruct.SurfaceFace(NActFaces).NewellAreaVector);
                 SumAreas += VecLength(ZoneStruct.SurfaceFace(NActFaces).NewellAreaVector);
             }
@@ -11675,8 +12078,17 @@ namespace SurfaceGeometry {
 
         if (firstTime) {
             if (inputProcessor->getNumObjectsFound(CurrentModuleObject) == 1) {
-                inputProcessor->getObjectItem(CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              1,
+                                              cAlphas,
+                                              NAlphas,
+                                              rNumerics,
+                                              NNum,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 OldAspectRatio = rNumerics(1);
                 NewAspectRatio = rNumerics(2);
                 transformPlane = cAlphas(1);
