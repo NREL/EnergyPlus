@@ -5982,7 +5982,6 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // move table data to more compact array to allow interpolation using multivariable lookup table method
-        CurveManager::TableLookup(TableNum).NumIndependentVars = 1;
         CurveManager::TableLookup(TableNum).NumX1Vars = N;
         CurveManager::TableLookup(TableNum).X1Var = CurveManager::PerfCurveTableData(TableNum).X1;
         // CurveManager::TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) = CurveManager::PerfCurveTableData( TableNum ).Y( 1, _ );

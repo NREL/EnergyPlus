@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     CurveNum = 2;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     CurveNum = 3;
     PerfCurve(CurveNum).CurveType = BiQuadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_BiQuadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -315,7 +315,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -330,7 +330,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     CurveNum = 2;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -345,7 +345,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     CurveNum = 3;
     PerfCurve(CurveNum).CurveType = BiQuadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_BiQuadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -444,8 +444,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.MSMaxONOFFCyclesperHour.allocate(Coil.NumOfSpeeds);
     Coil.MSLatentCapacityTimeConstant.allocate(Coil.NumOfSpeeds);
     Coil.MSFanPowerPerEvapAirFlowRate.allocate(Coil.NumOfSpeeds);
-    Coil.MSTotCapTempModFacCurveType.allocate(Coil.NumOfSpeeds);
-    Coil.MSEIRTempModFacCurveType.allocate(Coil.NumOfSpeeds);
 
     Coil.MinOATCompressor = -73.27777777777779;
     Coil.CrankcaseHeaterCapacity = 0.0;
@@ -495,7 +493,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.MSCCapFTemp(1) = nCapfT1;
-    Coil.MSTotCapTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nCapfFF1 = 2;
     pCurve = &PerfCurve(nCapfFF1);
@@ -527,7 +524,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.MSEIRFTemp(1) = nEIRfT1;
-    Coil.MSEIRTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nEIRfFF1 = 4;
     pCurve = &PerfCurve(nEIRfFF1);
@@ -591,7 +587,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.MSCCapFTemp(2) = nCapfT2;
-    Coil.MSTotCapTempModFacCurveType(2) = pCurve->CurveType;
 
     int const nCapfFF2 = 8;
     pCurve = &PerfCurve(nCapfFF2);
@@ -623,7 +618,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.MSEIRFTemp(2) = nEIRfT2;
-    Coil.MSEIRTempModFacCurveType(2) = pCurve->CurveType;
 
     int const nEIRfFF2 = 10;
     pCurve = &PerfCurve(nEIRfFF2);
@@ -656,10 +650,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
         PerfomanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == BiQuadratic) {
-            rCurve.ObjectType = CurveType_BiQuadratic;
+            rCurve.ObjectType = "Curve:Biquadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
         } else if (rCurve.CurveType == Quadratic) {
-            rCurve.ObjectType = CurveType_Quadratic;
+            rCurve.ObjectType = "Curve:Quadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
         }
     }
@@ -839,7 +833,6 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.CCapFTemp(1) = nCapfT2;
-    Coil.TotCapTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nCapfFF2 = 2;
     pCurve = &PerfCurve(nCapfFF2);
@@ -871,7 +864,6 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.EIRFTemp(1) = nEIRfT2;
-    Coil.EIRTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nEIRfFF2 = 4;
     pCurve = &PerfCurve(nEIRfFF2);
@@ -904,10 +896,10 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
         PerfomanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == BiQuadratic) {
-            rCurve.ObjectType = CurveType_BiQuadratic;
+            rCurve.ObjectType = "Curve:Biquadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
         } else if (rCurve.CurveType == Quadratic) {
-            rCurve.ObjectType = CurveType_Quadratic;
+            rCurve.ObjectType = "Curve:Quadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
         }
     }

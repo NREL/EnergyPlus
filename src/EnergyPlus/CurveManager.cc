@@ -1928,7 +1928,6 @@ namespace CurveManager {
             }
 
             // move table data to more compact array to allow interpolation using multivariable lookup table method
-            TableLookup(TableNum).NumIndependentVars = 1;
             TableLookup(TableNum).NumX1Vars = size(PerfCurveTableData(TableNum).X1);
             TableLookup(TableNum).X1Var.allocate(TableLookup(TableNum).NumX1Vars);
             TableLookup(TableNum).TableLookupZData.allocate(1, 1, 1, 1, 1, size(PerfCurveTableData(TableNum).Y));
@@ -2086,7 +2085,6 @@ namespace CurveManager {
                     }
 
                     // move table data to more compact array to allow interpolation using multivariable lookup table method
-                    TableLookup(TableNum).NumIndependentVars = 1;
                     TableLookup(TableNum).NumX1Vars = size(PerfCurveTableData(TableNum).X1);
                     TableLookup(TableNum).X1Var.allocate(TableLookup(TableNum).NumX1Vars);
                     TableLookup(TableNum).TableLookupZData.allocate(1, 1, 1, 1, 1, size(PerfCurveTableData(TableNum).Y));
@@ -2735,7 +2733,6 @@ namespace CurveManager {
             }
 
             // move table data to more compact array to allow interpolation using multivariable lookup table method
-            TableLookup(TableNum).NumIndependentVars = 2;
             TableLookup(TableNum).NumX1Vars = size(PerfCurveTableData(TableNum).X1);
             TableLookup(TableNum).NumX2Vars = size(PerfCurveTableData(TableNum).X2);
             TableLookup(TableNum).X1Var.allocate(TableLookup(TableNum).NumX1Vars);
@@ -3023,11 +3020,9 @@ namespace CurveManager {
 
             ReadTableData(CurveNum, CurrentModuleObject, ReadFromFile, FileName, Alphas, Numbers, NumNumbers, ErrorsFound);
 
-            PerfCurve(CurveNum).NumDims = TableLookup(TableNum).NumIndependentVars;
-
             if (PerfCurve(CurveNum).InterpolationType == EvaluateCurveToLimits) {
                 {
-                    auto const SELECT_CASE_var(TableLookup(TableNum).NumIndependentVars);
+                    auto const SELECT_CASE_var(PerfCurve(CurveNum).NumDims);
                     if (SELECT_CASE_var == 1) {
                         TempArray1.allocate(size(TableLookup(TableNum).TableLookupZData(1, 1, 1, 1, 1, _)));
                         TempArray2.allocate(size(TempArray1));
@@ -3076,7 +3071,7 @@ namespace CurveManager {
                 }
             } else {
                 {
-                    auto const SELECT_CASE_var(TableLookup(TableNum).NumIndependentVars);
+                    auto const SELECT_CASE_var(PerfCurve(CurveNum).NumDims);
                     if (SELECT_CASE_var == 1) {
                         // Save array info in performance table arrays in case the performance table routine is selected in regression routine
                         PerfCurveTableData(TableNum).X1.allocate(size(TableLookup(TableNum).X1Var));
@@ -3129,7 +3124,7 @@ namespace CurveManager {
                 // CurrentModuleObject='Table:MultiVariableLookup'
                 if (SELECT_CASE_var == "Table:MultiVariableLookup") {
                     {
-                        auto const SELECT_CASE_var1(TableLookup(PerfCurve(CurveIndex).TableIndex).NumIndependentVars);
+                        auto const SELECT_CASE_var1(PerfCurve(CurveIndex).NumDims);
                         if (SELECT_CASE_var1 == 1) { //- 1 independent variable
                             SetupOutputVariable("Performance Curve Input Variable 1 Value",
                                                 OutputProcessor::Unit::None,
@@ -3564,7 +3559,7 @@ namespace CurveManager {
 
             if (ReadStat < GoodIOStatValue) goto Label1000; // Autodesk:Uninit TotalDataSets was uninitialized after goto jump
 
-            TableLookup(TableNum).NumIndependentVars = NumIVars;
+            PerfCurve(CurveNum).NumDims = NumIVars;
             // Echo table data for user verification
             if (EchoTableDataToEio) {
                 if (WriteHeaderOnce) {
@@ -3591,7 +3586,7 @@ namespace CurveManager {
             }
 
             BaseOffset = 17;
-            TableLookup(TableNum).NumIndependentVars = NumIVars;
+            PerfCurve(CurveNum).NumDims = NumIVars;
             TableLookup(TableNum).NumX1Vars = Numbers(18);
             if (NumIVars > 1) TableLookup(TableNum).NumX2Vars = Numbers(19);
             if (NumIVars > 2) TableLookup(TableNum).NumX3Vars = Numbers(20);
@@ -4763,7 +4758,7 @@ namespace CurveManager {
         }
 
         {
-            auto const SELECT_CASE_var(TableLookup(TableIndex).NumIndependentVars);
+            auto const SELECT_CASE_var(PerfCurve(CurveIndex).NumDims);
             if (SELECT_CASE_var == 1) {
 
                 TempX1Low = minval(PerfCurveTableData(TableIndex).X1);
@@ -4947,9 +4942,9 @@ namespace CurveManager {
 
         if (present(Var2)) {
             V2 = max(min(Var2, PerfCurve(CurveIndex).Var2Max), PerfCurve(CurveIndex).Var2Min);
-            if (TableLookup(TableIndex).NumIndependentVars < 2) {
+            if (PerfCurve(CurveIndex).NumDims < 2) {
                 if (PerfCurve(CurveIndex).NumIVHighErrorIndex == 0) {
-                    ShowWarningError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name +
+                    ShowWarningError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name +
                                      "\"");
                     ShowContinueError("...Excess number of independent variables (2) passed to subroutine when only 1 is required. The excess "
                                       "arguments are ignored.");
@@ -4957,9 +4952,9 @@ namespace CurveManager {
                 }
             }
         } else {
-            if (TableLookup(TableIndex).NumIndependentVars > 1) {
+            if (PerfCurve(CurveIndex).NumDims > 1) {
                 if (PerfCurve(CurveIndex).NumIVLowErrorIndex == 0) {
-                    ShowSevereError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
+                    ShowSevereError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
                     ShowContinueError("...Insufficient number of independent variables (1) passed to subroutine when at least 2 are required.");
                 }
                 ShowRecurringWarningErrorAtEnd(PerfCurve(CurveIndex).ObjectType + " \"" + PerfCurve(CurveIndex).Name +
@@ -4973,9 +4968,9 @@ namespace CurveManager {
 
         if (present(Var3)) {
             V3 = max(min(Var3, PerfCurve(CurveIndex).Var3Max), PerfCurve(CurveIndex).Var3Min);
-            if (TableLookup(TableIndex).NumIndependentVars < 3) {
+            if (PerfCurve(CurveIndex).NumDims < 3) {
                 if (PerfCurve(CurveIndex).NumIVHighErrorIndex == 0) {
-                    ShowWarningError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name +
+                    ShowWarningError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name +
                                      "\"");
                     ShowContinueError("...Excess number of independent variables (3) passed to subroutine when 2 or less are required. The excess "
                                       "arguments are ignored.");
@@ -4983,9 +4978,9 @@ namespace CurveManager {
                 }
             }
         } else {
-            if (TableLookup(TableIndex).NumIndependentVars > 2) {
+            if (PerfCurve(CurveIndex).NumDims > 2) {
                 if (PerfCurve(CurveIndex).NumIVLowErrorIndex == 0) {
-                    ShowSevereError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
+                    ShowSevereError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
                     ShowContinueError("...Insufficient number of independent variables (2) passed to subroutine when at least 3 are required.");
                 }
                 ShowRecurringWarningErrorAtEnd(PerfCurve(CurveIndex).ObjectType + " \"" + PerfCurve(CurveIndex).Name +
@@ -4999,9 +4994,9 @@ namespace CurveManager {
 
         if (present(Var4)) {
             V4 = max(min(Var4, PerfCurve(CurveIndex).Var4Max), PerfCurve(CurveIndex).Var4Min);
-            if (TableLookup(TableIndex).NumIndependentVars < 4) {
+            if (PerfCurve(CurveIndex).NumDims < 4) {
                 if (PerfCurve(CurveIndex).NumIVHighErrorIndex == 0) {
-                    ShowWarningError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name +
+                    ShowWarningError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name +
                                      "\"");
                     ShowContinueError("...Excess number of independent variables (4) passed to subroutine when 3 or less are required. The excess "
                                       "arguments are ignored.");
@@ -5009,9 +5004,9 @@ namespace CurveManager {
                 }
             }
         } else {
-            if (TableLookup(TableIndex).NumIndependentVars > 3) {
+            if (PerfCurve(CurveIndex).NumDims > 3) {
                 if (PerfCurve(CurveIndex).NumIVLowErrorIndex == 0) {
-                    ShowSevereError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
+                    ShowSevereError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
                     ShowContinueError("...Insufficient number of independent variables (3) passed to subroutine when at least 4 are required.");
                 }
                 ShowRecurringWarningErrorAtEnd(PerfCurve(CurveIndex).ObjectType + " \"" + PerfCurve(CurveIndex).Name +
@@ -5025,9 +5020,9 @@ namespace CurveManager {
 
         if (present(Var5)) {
             V5 = max(min(Var5, PerfCurve(CurveIndex).Var5Max), PerfCurve(CurveIndex).Var5Min);
-            if (TableLookup(TableIndex).NumIndependentVars < 5) {
+            if (PerfCurve(CurveIndex).NumDims < 5) {
                 if (PerfCurve(CurveIndex).NumIVHighErrorIndex == 0) {
-                    ShowWarningError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name +
+                    ShowWarningError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name +
                                      "\"");
                     ShowContinueError("...Excess number of independent variables (5) passed to subroutine when 4 or less are required. The excess "
                                       "arguments are ignored.");
@@ -5035,9 +5030,9 @@ namespace CurveManager {
                 }
             }
         } else {
-            if (TableLookup(TableIndex).NumIndependentVars > 4) {
+            if (PerfCurve(CurveIndex).NumDims > 4) {
                 if (PerfCurve(CurveIndex).NumIVLowErrorIndex == 0) {
-                    ShowSevereError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
+                    ShowSevereError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
                     ShowContinueError("...Insufficient number of independent variables (4) passed to subroutine when at least 5 are required.");
                 }
                 ShowRecurringWarningErrorAtEnd(PerfCurve(CurveIndex).ObjectType + " \"" + PerfCurve(CurveIndex).Name +
@@ -5051,9 +5046,9 @@ namespace CurveManager {
 
         if (present(Var6)) {
             V6 = max(min(Var6, PerfCurve(CurveIndex).Var6Max), PerfCurve(CurveIndex).Var6Min);
-            if (TableLookup(TableIndex).NumIndependentVars < 6) {
+            if (PerfCurve(CurveIndex).NumDims < 6) {
                 if (PerfCurve(CurveIndex).NumIVHighErrorIndex == 0) {
-                    ShowSevereError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
+                    ShowSevereError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
                     ShowContinueError("...Excess number of independent variables (6) passed to subroutine when 5 or less are required.");
                 }
                 ShowRecurringWarningErrorAtEnd(PerfCurve(CurveIndex).ObjectType + " \"" + PerfCurve(CurveIndex).Name +
@@ -5063,9 +5058,9 @@ namespace CurveManager {
                                                6.0);
             }
         } else {
-            if (TableLookup(TableIndex).NumIndependentVars > 5) {
+            if (PerfCurve(CurveIndex).NumDims > 5) {
                 if (PerfCurve(CurveIndex).NumIVLowErrorIndex == 0) {
-                    ShowSevereError(PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
+                    ShowSevereError("TableLookupObject: " + PerfCurve(CurveIndex).ObjectType + "\"" + PerfCurve(CurveIndex).Name + "\"");
                     ShowContinueError("...Insufficient number of independent variables (5) passed to subroutine when at least 6 are required.");
                 }
                 ShowRecurringWarningErrorAtEnd(PerfCurve(CurveIndex).ObjectType + " \"" + PerfCurve(CurveIndex).Name +
@@ -5078,7 +5073,7 @@ namespace CurveManager {
         }
 
         {
-            auto const SELECT_CASE_var(TableLookup(TableIndex).NumIndependentVars);
+            auto const SELECT_CASE_var(PerfCurve(CurveIndex).NumDims);
             if (SELECT_CASE_var == 1) {
                 NX = TableLookup(TableIndex).NumX1Vars;
                 NY = 1;
@@ -6022,10 +6017,11 @@ namespace CurveManager {
                         std::string objectName,
                         std::string curveFieldText)
     {
+        // Returns true if errors found
         int curveDim = PerfCurve(CurveIndex).NumDims;
         if (std::find(validDims.begin(),validDims.end(), curveDim) != validDims.end()) {
             // Compatible
-            return true;
+            return false;
         } else {
             // Not compatible
             ShowSevereError(routineName + objectType + "=\"" + objectName + "\"");
@@ -6036,7 +6032,7 @@ namespace CurveManager {
             }
             ShowContinueError("...Input curve=\"" + PerfCurve(CurveIndex).Name + "\" has " + std::to_string(curveDim) + " dimensions.");
             ShowContinueError("...Curve type must have " + validString + " dimension(s).");
-            return false;
+            return true;
         }
     }
 
@@ -6902,7 +6898,6 @@ namespace CurveManager {
 
         // Re-organize TableLookup data structure
         for (TableNum = 1; TableNum <= int(Tables.size()); TableNum++) {
-            TableLookup(Tables(TableNum)).NumIndependentVars = 2;
             TableLookup(Tables(TableNum)).NumX1Vars = size(PerfCurveTableData(Tables(TableNum)).X1);
             TableLookup(Tables(TableNum)).NumX2Vars = size(PerfCurveTableData(Tables(TableNum)).X2);
             TableLookup(Tables(TableNum)).X1Var.allocate(TableLookup(Tables(TableNum)).NumX1Vars);
@@ -7086,7 +7081,6 @@ namespace CurveManager {
                 if (TabOpt == 2) TableNum = Material(Construct(ConstrNum).LayerPoint(Tables(TabNum))).GlassSpecAngFRefleDataPtr;
                 if (TabOpt == 3) TableNum = Material(Construct(ConstrNum).LayerPoint(Tables(TabNum))).GlassSpecAngBRefleDataPtr;
                 if (int(XX1.size()) == TableLookup(PerfCurve(TableNum).TableIndex).NumX1Vars) continue;
-                TableLookup(PerfCurve(TableNum).TableIndex).NumIndependentVars = 2;
                 TableLookup(PerfCurve(TableNum).TableIndex).NumX1Vars = size(PerfCurveTableData(PerfCurve(TableNum).TableIndex).X1);
                 TableLookup(PerfCurve(TableNum).TableIndex).NumX2Vars = size(PerfCurveTableData(PerfCurve(TableNum).TableIndex).X2);
                 TableLookup(PerfCurve(TableNum).TableIndex).X1Var.allocate(TableLookup(PerfCurve(TableNum).TableIndex).NumX1Vars);

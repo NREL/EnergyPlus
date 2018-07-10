@@ -4555,7 +4555,7 @@ TEST_F(EnergyPlusFixture, TestWindPressureTable)
     EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("EFACADE_WPCCURVE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("EFACADE_WPCCURVE"));
-    EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+    EXPECT_EQ("Table:OneIndependentVariable", CurveManager::PerfCurve(1).ObjectType);
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, 0.0));   // In-range value
     EXPECT_DOUBLE_EQ(0.54, CurveManager::CurveValue(1, 105.0));  // In-range value
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, -10.0)); // Minimum x
@@ -4638,7 +4638,7 @@ TEST_F(EnergyPlusFixture, TestWPCValue)
     EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("NFACADE_WPCVALUE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("NFACADE_WPCVALUE"));
-    EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+    EXPECT_EQ("AirflowNetwork:MultiZone:WindPressureCoefficientValues", CurveManager::PerfCurve(1).ObjectType);
     EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(1, 0.0));     // In-range value
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, 105.0)); // In-range value
     EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(1, -10.0));   // Minimum x

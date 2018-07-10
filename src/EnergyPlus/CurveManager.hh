@@ -270,7 +270,6 @@ namespace CurveManager {
     struct TableLookupData
     {
         // Members
-        int NumIndependentVars; // Curve type (see parameter definitions above)
         int InterpolationOrder; // number of points to interpolate (table data only)
         int NumX1Vars;          // Number of variables for independent variable #1
         Array1D<Real64> X1Var;
@@ -288,7 +287,7 @@ namespace CurveManager {
 
         // Default Constructor
         TableLookupData()
-            : NumIndependentVars(0), InterpolationOrder(0), NumX1Vars(0), NumX2Vars(0), NumX3Vars(0), NumX4Vars(0), NumX5Vars(0), NumX6Vars(0)
+            : InterpolationOrder(0), NumX1Vars(0), NumX2Vars(0), NumX3Vars(0), NumX4Vars(0), NumX5Vars(0), NumX6Vars(0)
         {
         }
     };
