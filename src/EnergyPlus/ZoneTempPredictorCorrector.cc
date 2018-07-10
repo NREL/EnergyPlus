@@ -3131,9 +3131,9 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Setpoint revision for onoff thermostat
-        Real64 TempTole = 0.02;
-        Real64 Tprev;
         if (NumOnOffCtrZone > 0) {
+            Real64 TempTole = 0.02;
+            Real64 Tprev;
             for (RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum) {
                 if (TempControlledZone(RelativeZoneNum).DeltaTCutSet > 0.0) {
                     if (ShortenTimeStepSys) {
@@ -3147,17 +3147,16 @@ namespace ZoneTempPredictorCorrector {
                     {   auto const SELECT_CASE_var(TempControlType(ZoneNum));
                     TempControlledZone(RelativeZoneNum).CoolOffFlag = false;
                     TempControlledZone(RelativeZoneNum).HeatOffFlag = false;
+                    if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                        Tprev = MAT(ZoneNum);
+                        if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
+                    } else {
+                        Tprev = ZoneT1(ZoneNum);
+                    }
 
                     if (SELECT_CASE_var == SingleHeatingSetPoint) {
                         TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
                         ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
-                        if (ZoneAirSolutionAlgo == Use3rdOrder) {
-                            Tprev = MAT(ZoneNum);
-                            if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
-                        }
-                        else {
-                            Tprev = ZoneT1(ZoneNum);
-                        }
                         if (Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempTole) {
                             TempZoneThermostatSetPoint(ZoneNum) =
                                 TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempControlledZone(RelativeZoneNum).DeltaTCutSet;
@@ -3182,13 +3181,6 @@ namespace ZoneTempPredictorCorrector {
                     else if (SELECT_CASE_var == SingleCoolingSetPoint) {
                         TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
                         ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
-                        if (ZoneAirSolutionAlgo == Use3rdOrder) {
-                            Tprev = MAT(ZoneNum);
-                            if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
-                        }
-                        else {
-                            Tprev = ZoneT1(ZoneNum);
-                        }
                         if (Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempTole) {
                             TempZoneThermostatSetPoint(ZoneNum) =
                                 TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempControlledZone(RelativeZoneNum).DeltaTCutSet;
@@ -3214,14 +3206,6 @@ namespace ZoneTempPredictorCorrector {
                     else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
                         ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
                         ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
-                        if (ZoneAirSolutionAlgo == Use3rdOrder) {
-                            Tprev = MAT(ZoneNum);
-                            if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
-                        }
-                        else {
-                            Tprev = ZoneT1(ZoneNum);
-                        }
-
                         if (Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempTole) {
                             ZoneThermostatSetPointHi(ZoneNum) =
                                 TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempControlledZone(RelativeZoneNum).DeltaTCutSet;
