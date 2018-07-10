@@ -70,4 +70,6 @@ int main( int argc, char* argv[] )
 	} else {
 		EnergyPlusPgm( argv[1] );
 	}
+	std::cout << "THIS LINE SHOULD DISPLAY." << std::endl << std::flush;
+	return 0;
 }
