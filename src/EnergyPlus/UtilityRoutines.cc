@@ -736,12 +736,22 @@ CloseOutOpenFiles()
 
 	bool exists;
 	bool opened;
+	std::string name;
+	std::string stdin_name("stdin");
+	std::string stdout_name("stdout");
 	int UnitNumber;
 	int ios;
 
 	for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
-		{ IOFlags flags; gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios = flags.ios(); }
-		if ( exists && opened && ios == 0 ) gio::close( UnitNumber );
+		{ IOFlags flags; gio::inquire(UnitNumber, flags); exists = flags.exists(); opened = flags.open(); ios = flags.ios(); name = flags.name(); }
+		if (exists && opened && ios == 0) {
+			//std::cerr << ("Closing " + name + "[") << UnitNumber << "]" << std::endl;
+			if ((name.compare(stdin_name) != 0) && (name.compare(stdout_name) != 0))
+			{
+				//std::cerr << ("Closing " + name + "[") << UnitNumber << "]" << std::endl;
+				gio::close(UnitNumber);
+			}
+		}
 	}
 
 }
