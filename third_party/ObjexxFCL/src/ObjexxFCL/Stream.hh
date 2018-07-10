@@ -27,6 +27,7 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <iostream>
 #ifdef _WIN32
 #ifdef _WIN64
 #define stat _stat64
@@ -506,8 +507,13 @@ public: // Properties
 	Size
 	size() const
 	{
+		// don't attempt to calculate size of std::cout or of anything
+		// returning -1 from tellp(); that just closes the stream.
 		std::ostream & s( const_cast< std::ostream & >( stream_ ) );
-		std::streamoff const pc( s.tellp() ); // Current position
+		if (&s == &std::cout) return 0;
+		std::streampos current_position( s.tellp() );
+		if (current_position == std::streampos(-1)) return 0;
+		std::streamoff const pc( current_position ); // Current position
 		s.seekp( 0, std::ios::beg ); // Beginning of file
 		std::streampos const pb( s.tellp() );
 		s.seekp( 0, std::ios::end ); // End of file
