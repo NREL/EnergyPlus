@@ -96,8 +96,6 @@ namespace SwimmingPool {
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand, Ho-Sung Kim
     //       DATE WRITTEN   June 2012 (F90) and October 2014 (C++)
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // The purpose of this module is to encapsulate the data and algorithms required
@@ -127,10 +125,7 @@ namespace SwimmingPool {
     // System types:
     static std::string const BlankString;
 
-    // DERIVED TYPE DEFINITIONS:
-
     // MODULE VARIABLE DECLARATIONS:
-    // Standard, run-of-the-mill variables...
     int NumSwimmingPools(0); // Number of swimming pools
     Array1D_bool CheckEquipName;
     Array1D_int SurfaceToPoolIndex;
@@ -142,8 +137,6 @@ namespace SwimmingPool {
     Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
 
     // Object Data
     Array1D<SwimmingPoolData> Pool;
@@ -171,8 +164,6 @@ namespace SwimmingPool {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages the simulation of SwimmingPool.
@@ -182,24 +173,9 @@ namespace SwimmingPool {
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus methodology (Get, Init, Calc, Update, Report, etc.)
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalFanSys::SumConvPool;
         using DataHeatBalFanSys::SumLatentPool;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool GetInputFlag(true); // First time, input is "gotten"
@@ -235,16 +211,11 @@ namespace SwimmingPool {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads the input for all swimming pools present in
         // the user input file.  This will contain all of the information needed
         // to simulate a swimming pool.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
@@ -659,18 +630,9 @@ namespace SwimmingPool {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine initializes variables relating to low temperature radiant
-        // systems.
-
-        // METHODOLOGY EMPLOYED:
-        // Simply initializes whatever needs initializing.
-
-        // REFERENCES:
-        // na
+        // This subroutine initializes variables relating to indoor swimming pools.
 
         // Using/Aliasing
         using DataEnvironment::WaterMainsTemp;
@@ -683,19 +645,10 @@ namespace SwimmingPool {
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitSwimmingPool");
         Real64 const MinActivityFactor = 0.0;  // Minimum value for activity factor
         Real64 const MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true); // Flag for one-time initializations
@@ -758,19 +711,7 @@ namespace SwimmingPool {
             Density = GetDensityGlycol("WATER", Pool(PoolNum).PoolWaterTemp, Pool(PoolNum).GlycolIndex, RoutineName);
             Pool(PoolNum).WaterMass = Surface(Pool(PoolNum).SurfacePtr).Area * Pool(PoolNum).AvgDepth * Density;
             Pool(PoolNum).WaterMassFlowRateMax = Pool(PoolNum).WaterVolFlowMax * Density;
-            if (!MyPlantScanFlagPool(PoolNum)) {
-                if (Pool(PoolNum).WaterInletNode > 0) {
-                    InitComponentNodes(0.0,
-                                       Pool(PoolNum).WaterMassFlowRateMax,
-                                       Pool(PoolNum).WaterInletNode,
-                                       Pool(PoolNum).WaterOutletNode,
-                                       Pool(PoolNum).HWLoopNum,
-                                       Pool(PoolNum).HWLoopSide,
-                                       Pool(PoolNum).HWBranchNum,
-                                       Pool(PoolNum).HWCompNum);
-                  PlantUtilities::RegisterPlantCompDesignFlow(Pool(PoolNum).WaterInletNode, Pool(PoolNum).WaterVolFlowMax);
-                }
-            }
+            InitSwimmingPoolPlantNodeFlow(PoolNum, MyPlantScanFlagPool(PoolNum));
         }
 
         if (BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
@@ -929,6 +870,26 @@ namespace SwimmingPool {
         }
     }
 
+    void InitSwimmingPoolPlantNodeFlow(int const PoolNum,             // number of the swimming pool
+                                       bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+    )
+    {
+        
+        if (!MyPlantScanFlagPool) {
+            if (Pool(PoolNum).WaterInletNode > 0) {
+                PlantUtilities::InitComponentNodes(0.0,
+                                   Pool(PoolNum).WaterMassFlowRateMax,
+                                   Pool(PoolNum).WaterInletNode,
+                                   Pool(PoolNum).WaterOutletNode,
+                                   Pool(PoolNum).HWLoopNum,
+                                   Pool(PoolNum).HWLoopSide,
+                                   Pool(PoolNum).HWBranchNum,
+                                   Pool(PoolNum).HWCompNum);
+                PlantUtilities::RegisterPlantCompDesignFlow(Pool(PoolNum).WaterInletNode, Pool(PoolNum).WaterVolFlowMax);
+            }
+        }
+    }
+    
     void CalcSwimmingPool(int const PoolNum // number of the swimming pool
     )
     {
@@ -936,8 +897,6 @@ namespace SwimmingPool {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the components making up the Indoor Swimming Pool model.
@@ -1007,12 +966,6 @@ namespace SwimmingPool {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcSwimmingPool");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 HConvIn;               // convection coefficient for pool
@@ -1154,18 +1107,9 @@ namespace SwimmingPool {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine does any updating that needs to be done for the
-        // swimming pool model.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology
-
-        // REFERENCES:
-        // na
+        // This subroutine does any updating that needs to be done for the swimming pool model.
 
         // Using/Aliasing
         using DataGlobals::TimeStepZone;
@@ -1179,17 +1123,8 @@ namespace SwimmingPool {
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("UpdateSwimmingPool");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;          // surface number/pointer
@@ -1231,8 +1166,6 @@ namespace SwimmingPool {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // To transfer the average value of the pool heat balance term over the entire
@@ -1248,24 +1181,12 @@ namespace SwimmingPool {
         // one or more of the swimming pools was running.  Method borrowed from
         // radiant systems.
 
-        // REFERENCES:
-        // na
-
         // USE STATEMENTS:
         using DataHeatBalFanSys::PoolHeatTransCoefs;
         using DataHeatBalFanSys::QPoolSurfNumerator;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const CloseEnough(0.01); // Some arbitrarily small value to avoid zeros and numbers that are almost the same
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // DO loop counter for surface index
@@ -1321,19 +1242,11 @@ namespace SwimmingPool {
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
         // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
         // and should be updated accordingly.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using namespace DataSurfaces;
@@ -1342,9 +1255,6 @@ namespace SwimmingPool {
 
         // Return value
         Real64 SumHATsurf;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // Surface number
@@ -1390,17 +1300,9 @@ namespace SwimmingPool {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simply produces output for the swimming pool model.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using DataGlobals::SecInHour;
@@ -1411,18 +1313,9 @@ namespace SwimmingPool {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ReportSwimmingPool");
         Real64 const MinDensity = 1.0; // to avoid a divide by zero
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PoolNum;    // pool number index
