@@ -220,7 +220,7 @@ TestInstance::TestInstance(const StringPiece& regexp_str, Prog::MatchKind kind,
   }
 
   // Create re string that will be used for RE and RE2.
-  string re = string(regexp_str);
+  string re = regexp_str.ToString();
   // Accomodate flags.
   // Regexp::Latin1 will be accomodated below.
   if (!(flags & Regexp::OneLine))

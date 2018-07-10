@@ -45,7 +45,7 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
   RE2::Consume(&sp1, re, &i1, &i2, &i3, &i4);
   RE2::FindAndConsume(&sp2, re, &d1, &d2, &d3, &d4);
 
-  s3 = s4 = string(text);
+  s3 = s4 = text.ToString();
   RE2::Replace(&s3, re, "");
   RE2::GlobalReplace(&s4, re, "");
 
@@ -56,7 +56,7 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
 
 // Entry point for libFuzzer.
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
-  if (size == 0 || size > 512)
+  if (size == 0 || size > 1024)
     return 0;
 
   // Crudely limit the use of \p and \P.
