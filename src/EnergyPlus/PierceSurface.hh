@@ -281,8 +281,8 @@ void PierceSurface_polygon(DataSurfaces::SurfaceData const &surface, // Surface
     // History:
     //  Jan 2016: Initial release
 
-    using DataSurfaces::Surface2D;
     using DataSurfaces::nVerticesBig;
+    using DataSurfaces::Surface2D;
     using Vertex2D = Vector2<Real64>;
     Surface2D const &s2d(surface.surface2d);
     int const axis(s2d.axis);

@@ -183,8 +183,17 @@ namespace DataSurfaceLists {
 
             for (Item = 1; Item <= NumOfSurfaceLists; ++Item) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject1, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                              lAlphaBlanks, cAlphaFields, cNumericFields);
+                inputProcessor->getObjectItem(CurrentModuleObject1,
+                                              Item,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
                 UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject1, ErrorsFound);
 
                 SurfList(Item).Name = Alphas(1);
@@ -265,8 +274,17 @@ namespace DataSurfaceLists {
 
             for (Item = 1; Item <= NumOfSurfListVentSlab; ++Item) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject2, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                              lAlphaBlanks, cAlphaFields, cNumericFields);
+                inputProcessor->getObjectItem(CurrentModuleObject2,
+                                              Item,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
                 UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject2, ErrorsFound);
 
                 SlabList(Item).Name = Alphas(1);
@@ -312,8 +330,8 @@ namespace DataSurfaceLists {
                         ErrorsFound = true;
                     }
                     for (SrfList = 1; SrfList <= NumOfSurfaceLists; ++SrfList) {
-                        NameConflict = UtilityRoutines::FindItemInList(SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName,
-                                                                       SurfList(SrfList).NumOfSurfaces);
+                        NameConflict = UtilityRoutines::FindItemInList(
+                            SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName, SurfList(SrfList).NumOfSurfaces);
                         if (NameConflict > 0) { // A slab list includes a surface on a surface list--not allowed
                             ShowSevereError(CurrentModuleObject2 + "=\"" + SlabList(Item).Name + "\", invalid surface specified.");
                             ShowContinueError("Surface=\"" + SlabList(Item).SurfName(SurfNum) + "\" is also on a Surface List.");

@@ -63,13 +63,13 @@ namespace EnergyPlus {
 namespace WindowComplexManager {
 
     // Using/Aliasing
+    using DataBSDFWindow::BasisElemDescr;
+    using DataBSDFWindow::BasisStruct;
     using DataBSDFWindow::BSDFDaylghtPosition;
     using DataBSDFWindow::BSDFGeomDescr;
     using DataBSDFWindow::BSDFStateDescr;
     using DataBSDFWindow::BSDFWindowGeomDescr;
     using DataBSDFWindow::BSDFWindowInputStruct;
-    using DataBSDFWindow::BasisElemDescr;
-    using DataBSDFWindow::BasisStruct;
     using DataVectorTypes::Vector;
 
     // Data

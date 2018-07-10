@@ -340,8 +340,17 @@ namespace Photovoltaics {
 
         cCurrentModuleObject = cPVGeneratorObjectName;
         for (PVnum = 1; PVnum <= NumPVs; ++PVnum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          PVnum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          _,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             PVarray(PVnum).Name = cAlphaArgs(1);
 
@@ -471,8 +480,17 @@ namespace Photovoltaics {
             tmpSimpleModuleParams.allocate(NumSimplePVModuleTypes);
             cCurrentModuleObject = cPVSimplePerfObjectName;
             for (ModNum = 1; ModNum <= NumSimplePVModuleTypes; ++ModNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              ModNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
@@ -512,8 +530,17 @@ namespace Photovoltaics {
             tmpTNRSYSModuleParams.allocate(Num1DiodePVModuleTypes);
             cCurrentModuleObject = cPVEquiv1DiodePerfObjectName;
             for (ModNum = 1; ModNum <= Num1DiodePVModuleTypes; ++ModNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              ModNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
@@ -562,8 +589,17 @@ namespace Photovoltaics {
             cCurrentModuleObject = cPVSandiaPerfObjectName;
             for (ModNum = 1; ModNum <= NumSNLPVModuleTypes; ++ModNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              ModNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
@@ -657,21 +693,50 @@ namespace Photovoltaics {
             }
 
             // set up report variables CurrentModuleObject='Photovoltaics'
-            SetupOutputVariable("Generator Produced DC Electric Power", OutputProcessor::Unit::W, PVarray(PVnum).Report.DCPower, "System", "Average",
+            SetupOutputVariable("Generator Produced DC Electric Power",
+                                OutputProcessor::Unit::W,
+                                PVarray(PVnum).Report.DCPower,
+                                "System",
+                                "Average",
                                 PVarray(PVnum).Name);
-            SetupOutputVariable("Generator Produced DC Electric Energy", OutputProcessor::Unit::J, PVarray(PVnum).Report.DCEnergy, "System", "Sum",
-                                PVarray(PVnum).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant");
-            SetupOutputVariable("Generator PV Array Efficiency", OutputProcessor::Unit::None, PVarray(PVnum).Report.ArrayEfficiency, "System",
-                                "Average", PVarray(PVnum).Name);
+            SetupOutputVariable("Generator Produced DC Electric Energy",
+                                OutputProcessor::Unit::J,
+                                PVarray(PVnum).Report.DCEnergy,
+                                "System",
+                                "Sum",
+                                PVarray(PVnum).Name,
+                                _,
+                                "ElectricityProduced",
+                                "Photovoltaics",
+                                _,
+                                "Plant");
+            SetupOutputVariable("Generator PV Array Efficiency",
+                                OutputProcessor::Unit::None,
+                                PVarray(PVnum).Report.ArrayEfficiency,
+                                "System",
+                                "Average",
+                                PVarray(PVnum).Name);
 
             // CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
             if ((PVarray(PVnum).PVModelType == iTRNSYSPVModel) || (PVarray(PVnum).PVModelType == iSandiaPVModel)) {
-                SetupOutputVariable("Generator PV Cell Temperature", OutputProcessor::Unit::C, PVarray(PVnum).Report.CellTemp, "System", "Average",
+                SetupOutputVariable("Generator PV Cell Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PVarray(PVnum).Report.CellTemp,
+                                    "System",
+                                    "Average",
                                     PVarray(PVnum).Name);
-                SetupOutputVariable("Generator PV Short Circuit Current", OutputProcessor::Unit::A, PVarray(PVnum).Report.ArrayIsc, "System",
-                                    "Average", PVarray(PVnum).Name);
-                SetupOutputVariable("Generator PV Open Circuit Voltage", OutputProcessor::Unit::V, PVarray(PVnum).Report.ArrayVoc, "System",
-                                    "Average", PVarray(PVnum).Name);
+                SetupOutputVariable("Generator PV Short Circuit Current",
+                                    OutputProcessor::Unit::A,
+                                    PVarray(PVnum).Report.ArrayIsc,
+                                    "System",
+                                    "Average",
+                                    PVarray(PVnum).Name);
+                SetupOutputVariable("Generator PV Open Circuit Voltage",
+                                    OutputProcessor::Unit::V,
+                                    PVarray(PVnum).Report.ArrayVoc,
+                                    "System",
+                                    "Average",
+                                    PVarray(PVnum).Name);
             }
 
             // do some checks and setup
@@ -756,8 +821,8 @@ namespace Photovoltaics {
 
         // Using/Aliasing
         using DataGlobals::SecInHour;
-        using DataHVACGlobals::TimeStepSys;
         using DataHeatBalance::QRadSWOutIncident;
+        using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -834,8 +899,8 @@ namespace Photovoltaics {
 
         // Using/Aliasing
         using DataGlobals::NumOfZones;
-        using DataHeatBalFanSys::QPVSysSource;
         using DataHeatBalance::Zone;
+        using DataHeatBalFanSys::QPVSysSource;
         using DataSurfaces::Surface;
         using TranspiredCollector::SetUTSCQdotSource;
 
@@ -904,10 +969,10 @@ namespace Photovoltaics {
         using DataEnvironment::Elevation;
         using DataEnvironment::SOLCOS;
         using DataGlobals::DegToRadians;
-        using DataHeatBalSurface::TempSurfOut;
         using DataHeatBalance::CosIncidenceAngle;
         using DataHeatBalance::QRadSWOutIncident;
         using DataHeatBalance::QRadSWOutIncidentBeam;
+        using DataHeatBalSurface::TempSurfOut;
         using DataSurfaces::Surface;
         using TranspiredCollector::GetUTSCTsColl;
 
@@ -947,36 +1012,48 @@ namespace Photovoltaics {
 
                 if (SELECT_CASE_var == iDecoupledCellIntegration) { // Sandia module temperature model for rack mounted PVs
                     // Calculate back-of-module temperature:
-                    PVarray(PVnum).SNLPVCalc.Tback = SandiaModuleTemperature(
-                        PVarray(PVnum).SNLPVinto.IcBeam, PVarray(PVnum).SNLPVinto.IcDiffuse, PVarray(PVnum).SNLPVinto.WindSpeed,
-                        PVarray(PVnum).SNLPVinto.Tamb, PVarray(PVnum).SNLPVModule.fd, PVarray(PVnum).SNLPVModule.a, PVarray(PVnum).SNLPVModule.b);
+                    PVarray(PVnum).SNLPVCalc.Tback = SandiaModuleTemperature(PVarray(PVnum).SNLPVinto.IcBeam,
+                                                                             PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                                                             PVarray(PVnum).SNLPVinto.WindSpeed,
+                                                                             PVarray(PVnum).SNLPVinto.Tamb,
+                                                                             PVarray(PVnum).SNLPVModule.fd,
+                                                                             PVarray(PVnum).SNLPVModule.a,
+                                                                             PVarray(PVnum).SNLPVModule.b);
 
                     // Calculate cell temperature:
-                    PVarray(PVnum).SNLPVCalc.Tcell =
-                        SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback, PVarray(PVnum).SNLPVinto.IcBeam, PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                               PVarray(PVnum).SNLPVModule.fd, PVarray(PVnum).SNLPVModule.DT0);
+                    PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
+                                                                            PVarray(PVnum).SNLPVinto.IcBeam,
+                                                                            PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                                                            PVarray(PVnum).SNLPVModule.fd,
+                                                                            PVarray(PVnum).SNLPVModule.DT0);
 
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
                     // get back-of-module temperature from elsewhere in EnergyPlus
                     PVarray(PVnum).SNLPVCalc.Tback = TempSurfOut(PVarray(PVnum).SurfacePtr);
 
-                    PVarray(PVnum).SNLPVCalc.Tcell =
-                        SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback, PVarray(PVnum).SNLPVinto.IcBeam, PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                               PVarray(PVnum).SNLPVModule.fd, PVarray(PVnum).SNLPVModule.DT0);
+                    PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
+                                                                            PVarray(PVnum).SNLPVinto.IcBeam,
+                                                                            PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                                                            PVarray(PVnum).SNLPVModule.fd,
+                                                                            PVarray(PVnum).SNLPVModule.DT0);
 
                 } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                     GetUTSCTsColl(PVarray(PVnum).UTSCPtr, PVarray(PVnum).SNLPVCalc.Tback);
 
-                    PVarray(PVnum).SNLPVCalc.Tcell =
-                        SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback, PVarray(PVnum).SNLPVinto.IcBeam, PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                               PVarray(PVnum).SNLPVModule.fd, PVarray(PVnum).SNLPVModule.DT0);
+                    PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
+                                                                            PVarray(PVnum).SNLPVinto.IcBeam,
+                                                                            PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                                                            PVarray(PVnum).SNLPVModule.fd,
+                                                                            PVarray(PVnum).SNLPVModule.DT0);
 
                 } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
                     GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, PVarray(PVnum).SNLPVCalc.Tback);
 
-                    PVarray(PVnum).SNLPVCalc.Tcell =
-                        SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback, PVarray(PVnum).SNLPVinto.IcBeam, PVarray(PVnum).SNLPVinto.IcDiffuse,
-                                               PVarray(PVnum).SNLPVModule.fd, PVarray(PVnum).SNLPVModule.DT0);
+                    PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
+                                                                            PVarray(PVnum).SNLPVinto.IcBeam,
+                                                                            PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                                                            PVarray(PVnum).SNLPVModule.fd,
+                                                                            PVarray(PVnum).SNLPVModule.DT0);
 
                 } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
                     // add calls to PVT models here
@@ -990,48 +1067,82 @@ namespace Photovoltaics {
             PVarray(PVnum).SNLPVCalc.AMa = AbsoluteAirMass(PVarray(PVnum).SNLPVinto.ZenithAngle, PVarray(PVnum).SNLPVinto.Altitude);
 
             // Calculate F1 polynomial function:
-            PVarray(PVnum).SNLPVCalc.F1 = SandiaF1(PVarray(PVnum).SNLPVCalc.AMa, PVarray(PVnum).SNLPVModule.a_0, PVarray(PVnum).SNLPVModule.a_1,
-                                                   PVarray(PVnum).SNLPVModule.a_2, PVarray(PVnum).SNLPVModule.a_3, PVarray(PVnum).SNLPVModule.a_4);
+            PVarray(PVnum).SNLPVCalc.F1 = SandiaF1(PVarray(PVnum).SNLPVCalc.AMa,
+                                                   PVarray(PVnum).SNLPVModule.a_0,
+                                                   PVarray(PVnum).SNLPVModule.a_1,
+                                                   PVarray(PVnum).SNLPVModule.a_2,
+                                                   PVarray(PVnum).SNLPVModule.a_3,
+                                                   PVarray(PVnum).SNLPVModule.a_4);
 
             // Calculate F2 polynomial function:
-            PVarray(PVnum).SNLPVCalc.F2 = SandiaF2(PVarray(PVnum).SNLPVinto.IncidenceAngle, PVarray(PVnum).SNLPVModule.b_0,
-                                                   PVarray(PVnum).SNLPVModule.b_1, PVarray(PVnum).SNLPVModule.b_2, PVarray(PVnum).SNLPVModule.b_3,
-                                                   PVarray(PVnum).SNLPVModule.b_4, PVarray(PVnum).SNLPVModule.b_5);
+            PVarray(PVnum).SNLPVCalc.F2 = SandiaF2(PVarray(PVnum).SNLPVinto.IncidenceAngle,
+                                                   PVarray(PVnum).SNLPVModule.b_0,
+                                                   PVarray(PVnum).SNLPVModule.b_1,
+                                                   PVarray(PVnum).SNLPVModule.b_2,
+                                                   PVarray(PVnum).SNLPVModule.b_3,
+                                                   PVarray(PVnum).SNLPVModule.b_4,
+                                                   PVarray(PVnum).SNLPVModule.b_5);
 
             // Calculate short-circuit current function:
-            PVarray(PVnum).SNLPVCalc.Isc = SandiaIsc(PVarray(PVnum).SNLPVCalc.Tcell, PVarray(PVnum).SNLPVModule.Isc0, PVarray(PVnum).SNLPVinto.IcBeam,
-                                                     PVarray(PVnum).SNLPVinto.IcDiffuse, PVarray(PVnum).SNLPVCalc.F1, PVarray(PVnum).SNLPVCalc.F2,
-                                                     PVarray(PVnum).SNLPVModule.fd, PVarray(PVnum).SNLPVModule.aIsc);
+            PVarray(PVnum).SNLPVCalc.Isc = SandiaIsc(PVarray(PVnum).SNLPVCalc.Tcell,
+                                                     PVarray(PVnum).SNLPVModule.Isc0,
+                                                     PVarray(PVnum).SNLPVinto.IcBeam,
+                                                     PVarray(PVnum).SNLPVinto.IcDiffuse,
+                                                     PVarray(PVnum).SNLPVCalc.F1,
+                                                     PVarray(PVnum).SNLPVCalc.F2,
+                                                     PVarray(PVnum).SNLPVModule.fd,
+                                                     PVarray(PVnum).SNLPVModule.aIsc);
 
             // Calculate effective irradiance function:
-            Ee = SandiaEffectiveIrradiance(PVarray(PVnum).SNLPVCalc.Tcell, PVarray(PVnum).SNLPVCalc.Isc, PVarray(PVnum).SNLPVModule.Isc0,
-                                           PVarray(PVnum).SNLPVModule.aIsc);
+            Ee = SandiaEffectiveIrradiance(
+                PVarray(PVnum).SNLPVCalc.Tcell, PVarray(PVnum).SNLPVCalc.Isc, PVarray(PVnum).SNLPVModule.Isc0, PVarray(PVnum).SNLPVModule.aIsc);
             // Calculate Imp function:
-            PVarray(PVnum).SNLPVCalc.Imp = SandiaImp(PVarray(PVnum).SNLPVCalc.Tcell, Ee, PVarray(PVnum).SNLPVModule.Imp0,
-                                                     PVarray(PVnum).SNLPVModule.aImp, PVarray(PVnum).SNLPVModule.c_0, PVarray(PVnum).SNLPVModule.c_1);
+            PVarray(PVnum).SNLPVCalc.Imp = SandiaImp(PVarray(PVnum).SNLPVCalc.Tcell,
+                                                     Ee,
+                                                     PVarray(PVnum).SNLPVModule.Imp0,
+                                                     PVarray(PVnum).SNLPVModule.aImp,
+                                                     PVarray(PVnum).SNLPVModule.c_0,
+                                                     PVarray(PVnum).SNLPVModule.c_1);
 
             // Calculate Voc function:
-            PVarray(PVnum).SNLPVCalc.Voc =
-                SandiaVoc(PVarray(PVnum).SNLPVCalc.Tcell, Ee, PVarray(PVnum).SNLPVModule.Voc0, PVarray(PVnum).SNLPVModule.NcellSer,
-                          PVarray(PVnum).SNLPVModule.DiodeFactor, PVarray(PVnum).SNLPVModule.BVoc0, PVarray(PVnum).SNLPVModule.mBVoc);
+            PVarray(PVnum).SNLPVCalc.Voc = SandiaVoc(PVarray(PVnum).SNLPVCalc.Tcell,
+                                                     Ee,
+                                                     PVarray(PVnum).SNLPVModule.Voc0,
+                                                     PVarray(PVnum).SNLPVModule.NcellSer,
+                                                     PVarray(PVnum).SNLPVModule.DiodeFactor,
+                                                     PVarray(PVnum).SNLPVModule.BVoc0,
+                                                     PVarray(PVnum).SNLPVModule.mBVoc);
 
             // Calculate Vmp: voltagea at maximum powerpoint
-            PVarray(PVnum).SNLPVCalc.Vmp =
-                SandiaVmp(PVarray(PVnum).SNLPVCalc.Tcell, Ee, PVarray(PVnum).SNLPVModule.Vmp0, PVarray(PVnum).SNLPVModule.NcellSer,
-                          PVarray(PVnum).SNLPVModule.DiodeFactor, PVarray(PVnum).SNLPVModule.BVmp0, PVarray(PVnum).SNLPVModule.mBVmp,
-                          PVarray(PVnum).SNLPVModule.c_2, PVarray(PVnum).SNLPVModule.c_3);
+            PVarray(PVnum).SNLPVCalc.Vmp = SandiaVmp(PVarray(PVnum).SNLPVCalc.Tcell,
+                                                     Ee,
+                                                     PVarray(PVnum).SNLPVModule.Vmp0,
+                                                     PVarray(PVnum).SNLPVModule.NcellSer,
+                                                     PVarray(PVnum).SNLPVModule.DiodeFactor,
+                                                     PVarray(PVnum).SNLPVModule.BVmp0,
+                                                     PVarray(PVnum).SNLPVModule.mBVmp,
+                                                     PVarray(PVnum).SNLPVModule.c_2,
+                                                     PVarray(PVnum).SNLPVModule.c_3);
 
             // Calculate Ix function:
-            PVarray(PVnum).SNLPVCalc.Ix =
-                SandiaIx(PVarray(PVnum).SNLPVCalc.Tcell, Ee, PVarray(PVnum).SNLPVModule.Ix0, PVarray(PVnum).SNLPVModule.aIsc,
-                         PVarray(PVnum).SNLPVModule.aImp, PVarray(PVnum).SNLPVModule.c_4, PVarray(PVnum).SNLPVModule.c_5);
+            PVarray(PVnum).SNLPVCalc.Ix = SandiaIx(PVarray(PVnum).SNLPVCalc.Tcell,
+                                                   Ee,
+                                                   PVarray(PVnum).SNLPVModule.Ix0,
+                                                   PVarray(PVnum).SNLPVModule.aIsc,
+                                                   PVarray(PVnum).SNLPVModule.aImp,
+                                                   PVarray(PVnum).SNLPVModule.c_4,
+                                                   PVarray(PVnum).SNLPVModule.c_5);
 
             // Calculate Vx function:
             PVarray(PVnum).SNLPVCalc.Vx = PVarray(PVnum).SNLPVCalc.Voc / 2.0;
 
             // Calculate Ixx function:
-            PVarray(PVnum).SNLPVCalc.Ixx = SandiaIxx(PVarray(PVnum).SNLPVCalc.Tcell, Ee, PVarray(PVnum).SNLPVModule.Ixx0,
-                                                     PVarray(PVnum).SNLPVModule.aImp, PVarray(PVnum).SNLPVModule.c_6, PVarray(PVnum).SNLPVModule.c_7);
+            PVarray(PVnum).SNLPVCalc.Ixx = SandiaIxx(PVarray(PVnum).SNLPVCalc.Tcell,
+                                                     Ee,
+                                                     PVarray(PVnum).SNLPVModule.Ixx0,
+                                                     PVarray(PVnum).SNLPVModule.aImp,
+                                                     PVarray(PVnum).SNLPVModule.c_6,
+                                                     PVarray(PVnum).SNLPVModule.c_7);
             // Calculate Vxx :
             PVarray(PVnum).SNLPVCalc.Vxx = 0.5 * (PVarray(PVnum).SNLPVCalc.Voc + PVarray(PVnum).SNLPVCalc.Vmp);
 
@@ -1114,9 +1225,9 @@ namespace Photovoltaics {
         using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
+        using DataHeatBalance::QRadSWOutIncident;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataHeatBalance::QRadSWOutIncident;
         using DataSurfaces::Surface;
 
         // Locals
@@ -1200,8 +1311,8 @@ namespace Photovoltaics {
         using DataGlobals::SecInHour;
         using DataSurfaces::Surface;
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
-        using DataHeatBalSurface::TempSurfOut;
         using DataHeatBalance::Zone;
+        using DataHeatBalSurface::TempSurfOut;
         using TranspiredCollector::GetUTSCTsColl;
 
         // Locals

@@ -495,23 +495,23 @@ namespace Psychrometrics {
                                        std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-    // FUNCTION INFORMATION:
-    //       AUTHOR         R. J. Liesen
-    //       DATE WRITTEN   July 2000
-    //       MODIFIED       Name change to signify derivation and temperatures were used
-    //                      with 0C as minimum; LKL January 2008
-    //       RE-ENGINEERED  na
+        // FUNCTION INFORMATION:
+        //       AUTHOR         R. J. Liesen
+        //       DATE WRITTEN   July 2000
+        //       MODIFIED       Name change to signify derivation and temperatures were used
+        //                      with 0C as minimum; LKL January 2008
+        //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS FUNCTION:
-    // This function provides the Relative Humidity in air as a
-    // function of dry bulb temperature and Vapor Density.
+        // PURPOSE OF THIS FUNCTION:
+        // This function provides the Relative Humidity in air as a
+        // function of dry bulb temperature and Vapor Density.
 
-    // METHODOLOGY EMPLOYED:
-    // ideal gas law
-    // Universal gas const for water vapor 461.52 J/(kg K)
+        // METHODOLOGY EMPLOYED:
+        // ideal gas law
+        // Universal gas const for water vapor 461.52 J/(kg K)
 
-    // REFERENCES:
-    // ASHRAE handbook 1993 Fundamentals,
+        // REFERENCES:
+        // ASHRAE handbook 1993 Fundamentals,
 
 #ifdef EP_psych_stats
         ++NumTimesCalled(iPsyRhFnTdbRhovLBnd0C);
@@ -571,18 +571,18 @@ namespace Psychrometrics {
                                std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-    // FUNCTION INFORMATION:
-    //       AUTHOR         George Shih
-    //       DATE WRITTEN   May 1976
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+        // FUNCTION INFORMATION:
+        //       AUTHOR         George Shih
+        //       DATE WRITTEN   May 1976
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS FUNCTION:
-    // This function provides the specific volume from dry-bulb temperature,
-    // humidity ratio and barometric pressure.
+        // PURPOSE OF THIS FUNCTION:
+        // This function provides the specific volume from dry-bulb temperature,
+        // humidity ratio and barometric pressure.
 
-    // REFERENCES:
-    // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 28
+        // REFERENCES:
+        // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 28
 
 #ifdef EP_psych_stats
         ++NumTimesCalled(iPsyVFnTdbWPb);
@@ -616,18 +616,18 @@ namespace Psychrometrics {
                              bool const SuppressWarnings = false           // if calling function is calculating an intermediate state
     )
     {
-    // FUNCTION INFORMATION:
-    //       AUTHOR         George Shih
-    //       DATE WRITTEN   May 1976
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+        // FUNCTION INFORMATION:
+        //       AUTHOR         George Shih
+        //       DATE WRITTEN   May 1976
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS FUNCTION:
-    // This function provides the humidity ratio from dry-bulb temperature
-    // and enthalpy.
+        // PURPOSE OF THIS FUNCTION:
+        // This function provides the humidity ratio from dry-bulb temperature
+        // and enthalpy.
 
-    // REFERENCES:
-    // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P100, EQN 32
+        // REFERENCES:
+        // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P100, EQN 32
 
 #ifdef EP_psych_stats
         ++NumTimesCalled(iPsyWFnTdbH);
@@ -1088,14 +1088,14 @@ namespace Psychrometrics {
                                    std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-    // FUNCTION INFORMATION:
-    //       AUTHOR         George Shih
-    //       DATE WRITTEN   May 1976
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+        // FUNCTION INFORMATION:
+        //       AUTHOR         George Shih
+        //       DATE WRITTEN   May 1976
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS FUNCTION:
-    // This function calculates the dew-point temperature {C} from dry-bulb, wet-bulb and pressure.
+        // PURPOSE OF THIS FUNCTION:
+        // This function calculates the dew-point temperature {C} from dry-bulb, wet-bulb and pressure.
 
 #ifdef EP_psych_stats
         ++NumTimesCalled(iPsyTdpFnTdbTwbPb);
@@ -1168,8 +1168,8 @@ namespace Psychrometrics {
         return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * pow_2(TB) + 8.4791863e-06 * pow_3(TB);
     }
 
-} // Psychrometrics
+} // namespace Psychrometrics
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif
