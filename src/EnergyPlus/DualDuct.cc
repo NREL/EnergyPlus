@@ -310,8 +310,17 @@ namespace DualDuct {
                 // Load the info from the damper
                 CurrentModuleObject = cCMO_DDConstantVolume;
 
-                inputProcessor->getObjectItem(CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                              lAlphaBlanks, cAlphaFields, cNumericFields);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              DamperIndex,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
 
                 // Anything below this line in this control block should use DamperNum
                 DamperNum = DamperIndex;
@@ -329,12 +338,33 @@ namespace DualDuct {
                         ErrorsFound = true;
                     }
                 }
-                Damper(DamperNum).OutletNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                    NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFields(3));
-                Damper(DamperNum).HotAirInletNodeNum = GetOnlySingleNode(AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                         NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields(4));
-                Damper(DamperNum).ColdAirInletNodeNum = GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                          NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields(5));
+                Damper(DamperNum).OutletNodeNum = GetOnlySingleNode(AlphArray(3),
+                                                                    ErrorsFound,
+                                                                    CurrentModuleObject,
+                                                                    AlphArray(1),
+                                                                    NodeType_Air,
+                                                                    NodeConnectionType_Outlet,
+                                                                    1,
+                                                                    ObjectIsNotParent,
+                                                                    cAlphaFields(3));
+                Damper(DamperNum).HotAirInletNodeNum = GetOnlySingleNode(AlphArray(4),
+                                                                         ErrorsFound,
+                                                                         CurrentModuleObject,
+                                                                         AlphArray(1),
+                                                                         NodeType_Air,
+                                                                         NodeConnectionType_Inlet,
+                                                                         1,
+                                                                         ObjectIsNotParent,
+                                                                         cAlphaFields(4));
+                Damper(DamperNum).ColdAirInletNodeNum = GetOnlySingleNode(AlphArray(5),
+                                                                          ErrorsFound,
+                                                                          CurrentModuleObject,
+                                                                          AlphArray(1),
+                                                                          NodeType_Air,
+                                                                          NodeConnectionType_Inlet,
+                                                                          1,
+                                                                          ObjectIsNotParent,
+                                                                          cAlphaFields(5));
 
                 Damper(DamperNum).MaxAirVolFlowRate = NumArray(1);
                 Damper(DamperNum).ZoneMinAirFrac = 0.0;
@@ -397,10 +427,18 @@ namespace DualDuct {
                 }
                 // Setup the Average damper Position output variable
                 // CurrentModuleObject='AirTerminal:DualDuct:ConstantVolume'
-                SetupOutputVariable("Zone Air Terminal Cold Supply Duct Damper Position", OutputProcessor::Unit::None,
-                                    Damper(DamperNum).ColdAirDamperPosition, "System", "Average", Damper(DamperNum).DamperName);
-                SetupOutputVariable("Zone Air Terminal Hot Supply Duct Damper Position", OutputProcessor::Unit::None,
-                                    Damper(DamperNum).HotAirDamperPosition, "System", "Average", Damper(DamperNum).DamperName);
+                SetupOutputVariable("Zone Air Terminal Cold Supply Duct Damper Position",
+                                    OutputProcessor::Unit::None,
+                                    Damper(DamperNum).ColdAirDamperPosition,
+                                    "System",
+                                    "Average",
+                                    Damper(DamperNum).DamperName);
+                SetupOutputVariable("Zone Air Terminal Hot Supply Duct Damper Position",
+                                    OutputProcessor::Unit::None,
+                                    Damper(DamperNum).HotAirDamperPosition,
+                                    "System",
+                                    "Average",
+                                    Damper(DamperNum).DamperName);
 
             } // end Number of Damper Loop
         }
@@ -411,8 +449,17 @@ namespace DualDuct {
                 // Load the info from the damper
                 CurrentModuleObject = cCMO_DDVariableVolume;
 
-                inputProcessor->getObjectItem(CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                              lAlphaBlanks, cAlphaFields, cNumericFields);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              DamperIndex,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
 
                 // Anything below this line in this control block should use DamperNum
                 DamperNum = DamperIndex + NumDualDuctConstVolDampers;
@@ -430,12 +477,33 @@ namespace DualDuct {
                         ErrorsFound = true;
                     }
                 }
-                Damper(DamperNum).OutletNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                    NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFields(3));
-                Damper(DamperNum).HotAirInletNodeNum = GetOnlySingleNode(AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                         NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields(4));
-                Damper(DamperNum).ColdAirInletNodeNum = GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                          NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields(5));
+                Damper(DamperNum).OutletNodeNum = GetOnlySingleNode(AlphArray(3),
+                                                                    ErrorsFound,
+                                                                    CurrentModuleObject,
+                                                                    AlphArray(1),
+                                                                    NodeType_Air,
+                                                                    NodeConnectionType_Outlet,
+                                                                    1,
+                                                                    ObjectIsNotParent,
+                                                                    cAlphaFields(3));
+                Damper(DamperNum).HotAirInletNodeNum = GetOnlySingleNode(AlphArray(4),
+                                                                         ErrorsFound,
+                                                                         CurrentModuleObject,
+                                                                         AlphArray(1),
+                                                                         NodeType_Air,
+                                                                         NodeConnectionType_Inlet,
+                                                                         1,
+                                                                         ObjectIsNotParent,
+                                                                         cAlphaFields(4));
+                Damper(DamperNum).ColdAirInletNodeNum = GetOnlySingleNode(AlphArray(5),
+                                                                          ErrorsFound,
+                                                                          CurrentModuleObject,
+                                                                          AlphArray(1),
+                                                                          NodeType_Air,
+                                                                          NodeConnectionType_Inlet,
+                                                                          1,
+                                                                          ObjectIsNotParent,
+                                                                          cAlphaFields(5));
 
                 Damper(DamperNum).MaxAirVolFlowRate = NumArray(1);
                 Damper(DamperNum).ZoneMinAirFrac = NumArray(2);
@@ -502,12 +570,24 @@ namespace DualDuct {
 
                 // Setup the Average damper Position output variable
                 // CurrentModuleObject='AirTerminal:DualDuct:VAV'
-                SetupOutputVariable("Zone Air Terminal Cold Supply Duct Damper Position", OutputProcessor::Unit::None,
-                                    Damper(DamperNum).ColdAirDamperPosition, "System", "Average", Damper(DamperNum).DamperName);
-                SetupOutputVariable("Zone Air Terminal Hot Supply Duct Damper Position", OutputProcessor::Unit::None,
-                                    Damper(DamperNum).HotAirDamperPosition, "System", "Average", Damper(DamperNum).DamperName);
-                SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                    Damper(DamperNum).OutdoorAirFlowRate, "System", "Average", Damper(DamperNum).DamperName);
+                SetupOutputVariable("Zone Air Terminal Cold Supply Duct Damper Position",
+                                    OutputProcessor::Unit::None,
+                                    Damper(DamperNum).ColdAirDamperPosition,
+                                    "System",
+                                    "Average",
+                                    Damper(DamperNum).DamperName);
+                SetupOutputVariable("Zone Air Terminal Hot Supply Duct Damper Position",
+                                    OutputProcessor::Unit::None,
+                                    Damper(DamperNum).HotAirDamperPosition,
+                                    "System",
+                                    "Average",
+                                    Damper(DamperNum).DamperName);
+                SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    Damper(DamperNum).OutdoorAirFlowRate,
+                                    "System",
+                                    "Average",
+                                    Damper(DamperNum).DamperName);
             } // end Number of Damper Loop
         }
 
@@ -517,8 +597,17 @@ namespace DualDuct {
                 // Load the info from the damper
                 CurrentModuleObject = cCMO_DDVarVolOA;
 
-                inputProcessor->getObjectItem(CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                              lAlphaBlanks, cAlphaFields, cNumericFields);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              DamperIndex,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
 
                 // Anything below this line in this control block should use DamperNum
                 DamperNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
@@ -536,15 +625,35 @@ namespace DualDuct {
                         ErrorsFound = true;
                     }
                 }
-                Damper(DamperNum).OutletNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                    NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFields(3));
-                Damper(DamperNum).OAInletNodeNum = GetOnlySingleNode(AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                     NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields(4));
+                Damper(DamperNum).OutletNodeNum = GetOnlySingleNode(AlphArray(3),
+                                                                    ErrorsFound,
+                                                                    CurrentModuleObject,
+                                                                    AlphArray(1),
+                                                                    NodeType_Air,
+                                                                    NodeConnectionType_Outlet,
+                                                                    1,
+                                                                    ObjectIsNotParent,
+                                                                    cAlphaFields(3));
+                Damper(DamperNum).OAInletNodeNum = GetOnlySingleNode(AlphArray(4),
+                                                                     ErrorsFound,
+                                                                     CurrentModuleObject,
+                                                                     AlphArray(1),
+                                                                     NodeType_Air,
+                                                                     NodeConnectionType_Inlet,
+                                                                     1,
+                                                                     ObjectIsNotParent,
+                                                                     cAlphaFields(4));
 
                 if (!lAlphaBlanks(5)) {
-                    Damper(DamperNum).RecircAirInletNodeNum =
-                        GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1,
-                                          ObjectIsNotParent, cAlphaFields(5));
+                    Damper(DamperNum).RecircAirInletNodeNum = GetOnlySingleNode(AlphArray(5),
+                                                                                ErrorsFound,
+                                                                                CurrentModuleObject,
+                                                                                AlphArray(1),
+                                                                                NodeType_Air,
+                                                                                NodeConnectionType_Inlet,
+                                                                                1,
+                                                                                ObjectIsNotParent,
+                                                                                cAlphaFields(5));
                 } else {
                     // for this model, we intentionally allow not using the recirc side
                     Damper(DamperNum).RecircIsUsed = false;
@@ -631,13 +740,17 @@ namespace DualDuct {
                     CalcOAOnlyMassFlow(DamperNum, DummyOAFlow, Damper(DamperNum).DesignOAFlowRate);
 
                     if (Damper(DamperNum).MaxAirVolFlowRate != AutoSize) {
-                        ReportSizingOutput(CurrentModuleObject, Damper(DamperNum).DamperName, "Maximum Outdoor Air Flow Rate [m3/s]",
+                        ReportSizingOutput(CurrentModuleObject,
+                                           Damper(DamperNum).DamperName,
+                                           "Maximum Outdoor Air Flow Rate [m3/s]",
                                            Damper(DamperNum).DesignOAFlowRate);
 
                         if (Damper(DamperNum).RecircIsUsed) {
                             Damper(DamperNum).DesignRecircFlowRate = Damper(DamperNum).MaxAirVolFlowRate - Damper(DamperNum).DesignOAFlowRate;
                             Damper(DamperNum).DesignRecircFlowRate = max(0.0, Damper(DamperNum).DesignRecircFlowRate);
-                            ReportSizingOutput(CurrentModuleObject, Damper(DamperNum).DamperName, "Maximum Recirculated Air Flow Rate [m3/s]",
+                            ReportSizingOutput(CurrentModuleObject,
+                                               Damper(DamperNum).DamperName,
+                                               "Maximum Recirculated Air Flow Rate [m3/s]",
                                                Damper(DamperNum).DesignRecircFlowRate);
                         } else {
                             if (Damper(DamperNum).MaxAirVolFlowRate < Damper(DamperNum).DesignOAFlowRate) {
@@ -669,12 +782,24 @@ namespace DualDuct {
                 }
 
                 // Setup the Average damper Position output variable
-                SetupOutputVariable("Zone Air Terminal Outdoor Air Duct Damper Position", OutputProcessor::Unit::None,
-                                    Damper(DamperNum).OADamperPosition, "System", "Average", Damper(DamperNum).DamperName);
-                SetupOutputVariable("Zone Air Terminal Recirculated Air Duct Damper Position", OutputProcessor::Unit::None,
-                                    Damper(DamperNum).RecircAirDamperPosition, "System", "Average", Damper(DamperNum).DamperName);
-                SetupOutputVariable("Zone Air Terminal Outdoor Air Fraction", OutputProcessor::Unit::None, Damper(DamperNum).OAFraction, "System",
-                                    "Average", Damper(DamperNum).DamperName);
+                SetupOutputVariable("Zone Air Terminal Outdoor Air Duct Damper Position",
+                                    OutputProcessor::Unit::None,
+                                    Damper(DamperNum).OADamperPosition,
+                                    "System",
+                                    "Average",
+                                    Damper(DamperNum).DamperName);
+                SetupOutputVariable("Zone Air Terminal Recirculated Air Duct Damper Position",
+                                    OutputProcessor::Unit::None,
+                                    Damper(DamperNum).RecircAirDamperPosition,
+                                    "System",
+                                    "Average",
+                                    Damper(DamperNum).DamperName);
+                SetupOutputVariable("Zone Air Terminal Outdoor Air Fraction",
+                                    OutputProcessor::Unit::None,
+                                    Damper(DamperNum).OAFraction,
+                                    "System",
+                                    "Average",
+                                    Damper(DamperNum).DamperName);
 
             } // end Number of Damper Loop
         }
@@ -1032,10 +1157,12 @@ namespace DualDuct {
                 }
                 ReportSizingOutput(DamperType, Damper(DamperNum).DamperName, "Maximum Air Flow Rate [m3/s]", Damper(DamperNum).MaxAirVolFlowRate);
                 if (Damper(DamperNum).DamperType == DualDuct_OutdoorAir) {
-                    ReportSizingOutput(DamperType, Damper(DamperNum).DamperName, "Maximum Outdoor Air Flow Rate [m3/s]",
-                                       Damper(DamperNum).DesignOAFlowRate);
+                    ReportSizingOutput(
+                        DamperType, Damper(DamperNum).DamperName, "Maximum Outdoor Air Flow Rate [m3/s]", Damper(DamperNum).DesignOAFlowRate);
                     if (Damper(DamperNum).RecircIsUsed) {
-                        ReportSizingOutput(DamperType, Damper(DamperNum).DamperName, "Maximum Recirculated Air Flow Rate [m3/s]",
+                        ReportSizingOutput(DamperType,
+                                           Damper(DamperNum).DamperName,
+                                           "Maximum Recirculated Air Flow Rate [m3/s]",
                                            Damper(DamperNum).DesignRecircFlowRate);
                     }
                 }
@@ -1432,9 +1559,9 @@ namespace DualDuct {
         using Psychrometrics::PsyCpAirFnWTdb;
         using Psychrometrics::PsyTdbFnHW;
         using namespace DataGlobals;
-        using DataHVACGlobals::SmallTempDiff;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
+        using DataHVACGlobals::SmallTempDiff;
         using General::TrimSigDigits;
 
         // Locals
@@ -1714,8 +1841,10 @@ namespace DualDuct {
             if (Damper(DamperNum).NoOAFlowInputFromUser) return;
             // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
             if (AirLoopOAFrac > 0.0) {
-                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(Damper(DamperNum).OARequirementsPtr, Damper(DamperNum).ActualZoneNum,
-                                                                     AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag, UseMinOASchFlag);
+                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(Damper(DamperNum).OARequirementsPtr,
+                                                                     Damper(DamperNum).ActualZoneNum,
+                                                                     AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
+                                                                     UseMinOASchFlag);
                 OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
                 // convert OA mass flow rate to supply air flow rate based on air loop OA fraction
@@ -1789,14 +1918,14 @@ namespace DualDuct {
             if (Damper(DamperNum).OAPerPersonMode == PerPersonModeNotSet) PerPersonNotSet = true;
         }
 
-        OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(Damper(DamperNum).OARequirementsPtr, Damper(DamperNum).ActualZoneNum, UseOccSchFlag,
-                                                             UseMinOASchFlag, PerPersonNotSet);
+        OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(
+            Damper(DamperNum).OARequirementsPtr, Damper(DamperNum).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet);
 
         OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
         if (present(MaxOAVolFlow)) {
-            OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(Damper(DamperNum).OARequirementsPtr, Damper(DamperNum).ActualZoneNum, UseOccSchFlag,
-                                                                 UseMinOASchFlag, _, true);
+            OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(
+                Damper(DamperNum).OARequirementsPtr, Damper(DamperNum).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, _, true);
             MaxOAVolFlow = OAVolumeFlowRate;
         }
     }
@@ -2160,8 +2289,17 @@ namespace DualDuct {
 
                     CurrentModuleObject = cCMO_DDVarVolOA;
 
-                    inputProcessor->getObjectItem(CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                                  lAlphaBlanks, cAlphaFields, cNumericFields);
+                    inputProcessor->getObjectItem(CurrentModuleObject,
+                                                  DamperIndex,
+                                                  AlphArray,
+                                                  NumAlphas,
+                                                  NumArray,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericBlanks,
+                                                  lAlphaBlanks,
+                                                  cAlphaFields,
+                                                  cNumericFields);
                     DamperNamesARR(DamperIndex) = AlphArray(1);
                     if (!lAlphaBlanks(5)) {
                         RecircIsUsedARR(DamperIndex) = true;
