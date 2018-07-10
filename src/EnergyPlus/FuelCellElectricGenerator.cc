@@ -4094,6 +4094,7 @@ namespace FuelCellElectricGenerator {
 
         if (MyPlantScanFlag(FCnum) && allocated(PlantLoop)) {
             errFlag = false;
+
             ScanPlantLoopsForObject(FuelCell(FCnum).NameExhaustHX,
                                     TypeOf_Generator_FCExhaust,
                                     FuelCell(FCnum).CWLoopNum,
@@ -4106,6 +4107,9 @@ namespace FuelCellElectricGenerator {
                                     _,
                                     _,
                                     errFlag);
+
+            // if there is a stack cooler option it might be connected to plant as well
+
             if (errFlag) {
                 ShowFatalError("InitFuelCellGenerators: Program terminated due to previous condition(s).");
             }
@@ -4242,6 +4246,22 @@ namespace FuelCellElectricGenerator {
         }
     }
 
+    void getFuelCellGeneratorHeatRecoveryInfo(std::string const &GeneratorName, // user specified name of Generator
+                                              std::string heatRecoveryCompName)
+    {
+
+        if (GetFuelCellInput) {
+
+            // Read input data.
+            GetFuelCellGeneratorInput();
+            GetFuelCellInput = false;
+        }
+
+        int thisFuelCell = UtilityRoutines::FindItemInList(GeneratorName, FuelCell);
+        if (thisFuelCell > 0) {
+            heatRecoveryCompName = FuelCell(thisFuelCell).ExhaustHX.Name;
+        }
+    }
     // End FuelCell Generator Module Utility Subroutines
     // *****************************************************************************
 

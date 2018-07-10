@@ -1924,7 +1924,7 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad()
         bool plantNotFound = false;
         for (auto &g : elecGenCntrlObj) {
             plantNotFound = false;
-            PlantUtilities::ScanPlantLoopsForObject(g->name,
+            PlantUtilities::ScanPlantLoopsForObject(g->compPlantName,
                                                     g->compPlantTypeOf_Num,
                                                     g->cogenLocation.loopNum,
                                                     g->cogenLocation.loopSideNum,
@@ -1974,18 +1974,22 @@ GeneratorController::GeneratorController(std::string const &objectName,
         generatorType = GeneratorType::iCEngine;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorICEngine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_ICEngine;
+        compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:CombustionTurbine")) {
         generatorType = GeneratorType::combTurbine;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorCombTurbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_CTurbine;
+        compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroTurbine")) {
         generatorType = GeneratorType::microturbine;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroturbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroTurbine;
+        compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:Photovoltaic")) {
         generatorType = GeneratorType::pV;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorPV;
         compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
+        compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:PVWatts")) {
         generatorType = GeneratorType::pvWatts;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorPVWatts;
@@ -1993,11 +1997,16 @@ GeneratorController::GeneratorController(std::string const &objectName,
     } else if (UtilityRoutines::SameString(objectType, "Generator:FuelCell")) {
         generatorType = GeneratorType::fuelCell;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
-        compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCStackCooler;
+        // fuel cell has two possible plant component types, stack cooler and exhaust gas HX.
+        // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
+        compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCExhaust;
+        // and the name of plant component is not the same as the generator because of child object references, so fetch that name
+        FuelCellElectricGenerator::getFuelCellGeneratorHeatRecoveryInfo(name, compPlantName);
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
         generatorType = GeneratorType::microCHP;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroCHP;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
+        compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:WindTurbine")) {
         generatorType = GeneratorType::windTurbine;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorWindTurbine;
