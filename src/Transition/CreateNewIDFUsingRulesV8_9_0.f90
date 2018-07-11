@@ -644,6 +644,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      OutArgs(15) = "Coil:Cooling:DX"
                  END IF
 
+             CASE('COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 nodiff=.true.
+                 ! replace cooling coil object type name
+                 CoolingCoilType = InArgs(4)
+                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
+                     OutArgs(4) = "Coil:Cooling:DX"
+                 END IF
+
              CASE('COIL:COOLING:DX:SINGLESPEED')
                  nodiff=.false.
                  ObjectName='Coil:Cooling:DX'

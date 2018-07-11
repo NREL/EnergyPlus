@@ -5864,7 +5864,7 @@ namespace HVACUnitarySystem {
 				}
 			}
 
-			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num != CoilDX_CoolingHXAssisted && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num != CoilDX_CoolingTwoStageWHumControl && UnitarySystem( UnitarySysNum ).DehumidControlType_Num == DehumidControl_Multimode ) {
+			if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num != CoilDX_Cooling && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num != CoilDX_CoolingHXAssisted && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num != CoilDX_CoolingTwoStageWHumControl && UnitarySystem( UnitarySysNum ).DehumidControlType_Num == DehumidControl_Multimode ) {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iDehumidControlAlphaNum ) + " = " + Alphas( iDehumidControlAlphaNum ) );
 				ShowContinueError( "Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil." );
