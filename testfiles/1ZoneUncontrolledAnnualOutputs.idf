@@ -123,7 +123,7 @@
     12,                      !- End Month
     31,                      !- End Day of Month
     2019,                    !- End Year
-    Tuesday,                 !- Day of Week for Start Day
+    Monday,                  !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
