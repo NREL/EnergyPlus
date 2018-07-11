@@ -398,6 +398,172 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
 {
 
     std::string const idf(delimited_string(
+        {"EnergyManagementSystem:Program,",
+          "    ER_Main,                 !- Name",
+          "    IF ER_Humidifier_Status > 0,  !- Program Line 1",
+          "    SET ER_ExtraElecHeatC_Status = 1,  !- Program Line 2",
+          "    SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4,  !- <none>",
+          "    ELSE,                    !- <none>",
+          "    SET ER_ExtraElecHeatC_Status = 0,  !- <none>",
+          "    SET ER_ExtraElecHeatC_SP = NULL,  !- <none>",
+          "    ENDIF,                   !- <none>",
+          "    IF T_OA < 10,            !- <none>",
+          "    ,                        !- <none>",
+          "    SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118,  !- <none>",
+          "    SET FlowRate = (ER_FanMassFlow/1.2)*2118,  !- <none>",
+          "    SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001)),  !- <none>",
+          "    SET ER_ExtraWaterHeatC_Status = 1,  !- <none>",
+          "    SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT,  !- <none>",
+          "    ELSE,                    !- <none>",
+          "    SET ER_ExtraWaterHeatC_Status = 0,  !- <none>",
+          "    SET ER_ExtraWaterHeatC_SP = NULL,  !- <none>",
+          "    ENDIF;                   !- <none>"}));
+
+    json expected = {
+      {"EnergyManagementSystem:Program",
+       {{"ER_Main",
+          {{"lines",
+            {
+              {{"program_line", "IF ER_Humidifier_Status > 0"}},
+              {{"program_line", "SET ER_ExtraElecHeatC_Status = 1"}},
+              {{"program_line", "SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4"}},
+              {{"program_line", "ELSE"}},
+              {{"program_line", "SET ER_ExtraElecHeatC_Status = 0"}},
+              {{"program_line", "SET ER_ExtraElecHeatC_SP = NULL"}},
+              {{"program_line", "ENDIF"}},
+              {{"program_line", "IF T_OA < 10"}},
+              {{}},
+              {{"program_line", "SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118"}},
+              {{"program_line", "SET FlowRate = (ER_FanMassFlow/1.2)*2118"}},
+              {{"program_line", "SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001))"}},
+              {{"program_line", "SET ER_ExtraWaterHeatC_Status = 1"}},
+              {{"program_line", "SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT"}},
+              {{"program_line", "ELSE"}},
+              {{"program_line", "SET ER_ExtraWaterHeatC_Status = 0"}},
+              {{"program_line", "SET ER_ExtraWaterHeatC_SP = NULL"}},
+              {{"program_line", "ENDIF"}},
+            }
+          }}
+        }}
+      },
+      {"GlobalGeometryRules",
+        {{"",
+          {
+            {"starting_vertex_position", "UpperLeftCorner"},
+            {"vertex_entry_direction", "Counterclockwise"},
+            {"coordinate_system", "Relative"},
+            {"daylighting_reference_point_coordinate_system", "Relative"},
+            {"rectangular_surface_coordinate_system", "Relative"}
+          }
+        }}
+      },
+      {"Building",
+        {{"Bldg",
+          {
+            {"north_axis", 0.0},
+            {"terrain", "Suburbs"},
+            {"loads_convergence_tolerance_value", 0.04},
+            {"temperature_convergence_tolerance_value", 0.4000},
+            {"solar_distribution", "FullExterior"},
+            {"maximum_number_of_warmup_days", 25},
+            {"minimum_number_of_warmup_days", 6}
+          }
+        }}
+      }
+    };
+
+    auto const expected_idf(delimited_string({"Building,",
+                                              "  Bldg,",
+                                              "  0.0,",
+                                              "  Suburbs,",
+                                              "  0.04,",
+                                              "  0.4,",
+                                              "  FullExterior,",
+                                              "  25.0,",
+                                              "  6.0;",
+                                              "",
+                                              "EnergyManagementSystem:Program,",
+                                              "  ER_Main,",
+                                              "  IF ER_Humidifier_Status > 0,",
+                                              "  SET ER_ExtraElecHeatC_Status = 1,",
+                                              "  SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4,",
+                                              "  ELSE,",
+                                              "  SET ER_ExtraElecHeatC_Status = 0,",
+                                              "  SET ER_ExtraElecHeatC_SP = NULL,",
+                                              "  ENDIF,",
+                                              "  IF T_OA < 10,",
+                                              "  ,",
+                                              "  SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118,",
+                                              "  SET FlowRate = (ER_FanMassFlow/1.2)*2118,",
+                                              "  SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001)),",
+                                              "  SET ER_ExtraWaterHeatC_Status = 1,",
+                                              "  SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT,",
+                                              "  ELSE,",
+                                              "  SET ER_ExtraWaterHeatC_Status = 0,",
+                                              "  SET ER_ExtraWaterHeatC_SP = NULL,",
+                                              "  ENDIF;",
+                                              "",
+                                              "GlobalGeometryRules,",
+                                              "  UpperLeftCorner,",
+                                              "  Counterclockwise,",
+                                              "  Relative,",
+                                              "  Relative,",
+                                              "  Relative;",
+                                              ""}));
+
+    EXPECT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+    json tmp;
+
+    std::string encoded = encodeIDF();
+    EXPECT_EQ(expected_idf, encoded);
+
+    for (auto it = expected.begin(); it != expected.end(); ++it) {
+        ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+        for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+            ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+            for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+                ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+                if (!tmp.is_array()) {
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                } else {
+                    for (size_t i = 0; i < it_in_in.value().size(); i++) {
+                      for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
+                          if (it_ext.value().empty()) {
+                            EXPECT_EQ(epJSON[it.key()][it_in.key()][it_in_in.key()][i].empty(), it_ext.value().empty());
+                            continue;
+                          }
+                          ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+                          EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                      }
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST_F(InputProcessorFixture, parse_idf_EMSProgram_required_prop_extensible)
+{
+
+    std::string const idf(delimited_string(
+        {"EnergyManagementSystem:Program,",
+          "    ER_Main;                 !- Name"}));
+
+    EXPECT_FALSE(process_idf(idf, false));
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** <root>[EnergyManagementSystem:Program][ER_Main] - Missing required property 'lines'.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
+
+TEST_F(InputProcessorFixture, parse_idf_extensible_blank_required_extensible_fields)
+{
+
+    std::string const idf(delimited_string(
         {"BuildingSurface:Detailed,", "Zn009:Flr001,            !- Name", "    Floor,                   !- Surface Type",
          "    FLOOR38,                 !- Construction Name", "    SCWINDOW,                !- Zone Name",
          "    Surface,                 !- Outside Boundary Condition", "    Zn009:Flr001,            !- Outside Boundary Condition Object",
