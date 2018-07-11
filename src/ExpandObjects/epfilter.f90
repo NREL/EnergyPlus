@@ -1496,9 +1496,9 @@ INTEGER,PARAMETER :: gndTempSurfDecOff = 12
 
   ! Boiler:HotWater (for use with HVACTemplate:Plant:Boiler:ObjectReference)
 INTEGER,PARAMETER :: blrhwNameOff = 1
-INTEGER,PARAMETER :: blrhwInletNodeOff = 12
-INTEGER,PARAMETER :: blrhwOutletNodeOff = 13
-INTEGER,PARAMETER :: blrhwLastFieldOff = 18
+INTEGER,PARAMETER :: blrhwInletNodeOff = 11
+INTEGER,PARAMETER :: blrhwOutletNodeOff = 12
+INTEGER,PARAMETER :: blrhwLastFieldOff = 17
 
   ! Chiller:Electric:EIR (for use with HVACTemplate:Plant:Chiller:ObjectReference)
 INTEGER,PARAMETER :: chleirNameOff = 1
