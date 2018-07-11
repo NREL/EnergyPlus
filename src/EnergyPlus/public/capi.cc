@@ -52,11 +52,23 @@ void WrappedMessageCallback( std::string const &message )
 	const char * msg = message.c_str();
 	if (GLOBAL_MESSAGE_CALLBACK == NULL)
 	{
-		std::cout << "GLOBAL_MESSAGE_CALLBACK is NULL" << std::endl;
+		std::cerr << "GLOBAL_MESSAGE_CALLBACK is NULL" << std::endl;
 	}
 	else
 	{
 		GLOBAL_MESSAGE_CALLBACK(msg);
+	}
+}
+
+void WrappedProgressCallback(int const progress)
+{
+	if (GLOBAL_PROGRESS_CALLBACK == NULL)
+	{
+		std::cerr << "GLOBAL_PROGRESS_CALLBACK is NULL" << std::endl;
+	}
+	else
+	{
+		GLOBAL_PROGRESS_CALLBACK(progress);
 	}
 }
 
@@ -92,7 +104,15 @@ extern "C"
 		{
 			filepath = std::string(path, path_length);
 		}
-		EnergyPlusPgm(filepath);
+		try
+		{
+			EnergyPlusPgm(filepath);
+		}
+		catch (...)
+		{
+			// Don't allow any exceptions to leak out to the caller
+			std::cerr << "Exception encountered" << std::endl;
+		}
 		return 0;
 	}
 
@@ -100,6 +120,13 @@ extern "C"
 	{
 		GLOBAL_MESSAGE_CALLBACK = f;
 		StoreMessageCallback(WrappedMessageCallback);
+		return 0;
+	}
+
+	int EXPORTCALL CALLCONV SetProgressCallback(ProgressCallback f)
+	{
+		GLOBAL_PROGRESS_CALLBACK = f;
+		StoreProgressCallback(WrappedProgressCallback);
 		return 0;
 	}
 }

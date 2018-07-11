@@ -55,10 +55,13 @@
 #define EXPORTCALL __declspec(dllexport)
 
 typedef void (CALLCONV * MsgCallback)(const char *);
+typedef void (CALLCONV * ProgressCallback)(int const);
 
 MsgCallback GLOBAL_MESSAGE_CALLBACK;
+ProgressCallback GLOBAL_PROGRESS_CALLBACK;
 
 void WrappedMessageCallback(std::string const &);
+void WrappedProgressCallback(int const);
 
 extern "C"
 {
@@ -66,4 +69,5 @@ extern "C"
 	int EXPORTCALL CALLCONV HelloWorld(char * greeting_out, int greeting_out_buffer_count);
 	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length);
 	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f);
+	int EXPORTCALL CALLCONV SetProgressCallback(ProgressCallback f);
 }
