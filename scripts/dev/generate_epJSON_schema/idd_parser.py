@@ -271,8 +271,9 @@ def parse_obj(data):
                 root['legacy_idd']['extensibles'] = [field_name]
                 parse_extensibles(root['properties']['extensions']['items'], field_data, field_name)
                 extensible_count += 1
-                if comma_or_semicolon != TOKEN_SEMICOLON:
-                    continue
+                if comma_or_semicolon == TOKEN_SEMICOLON:
+                    return root
+                continue
             elif 'extensible_size' in root and extensible_count >= root['extensible_size'] \
                     and comma_or_semicolon != TOKEN_SEMICOLON:
                 continue
@@ -285,8 +286,9 @@ def parse_obj(data):
                     root['legacy_idd']['extensibles'].append(field_name)
                     parse_extensibles(root['properties']['extensions']['items'], field_data, field_name)
                     extensible_count += 1
-                if comma_or_semicolon != TOKEN_SEMICOLON:
-                    continue
+                if comma_or_semicolon == TOKEN_SEMICOLON:
+                    return root
+                continue
 
             field_name = re.sub('[^0-9a-zA-Z]+', '_', field_name)
             if field_name in root['properties']:
