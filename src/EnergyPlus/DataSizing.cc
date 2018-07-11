@@ -266,6 +266,7 @@ namespace DataSizing {
     Real64 DataDesInletAirTemp(0.0);                // coil inlet air temperature used for warning messages
     Real64 DataDesOutletAirTemp(0.0);               // coil outlet air temperature used for sizing
     Real64 DataDesOutletAirHumRat(0.0);             // coil air outlet humidity ratio used in sizing calculations [kg water / kg dry air]
+    Real64 DataCondWaterInletTemp(0.0);             // DX coil condenser water inlet temp
     Real64 DataCoolCoilCap(0.0);                    // cooling coil capacity used for sizing with scalable inputs [W]
     Real64 DataFlowUsedForSizing(0.0);              // air flow rate used for sizing with scalable inputs [m3/s]
     Real64 DataAirFlowUsedForSizing(0.0);           // air flow rate used for sizing with scalable inputs [m3/s]
@@ -431,6 +432,7 @@ namespace DataSizing {
         DataDesInletAirTemp = 0.0;
         DataDesOutletAirTemp = 0.0;
         DataDesOutletAirHumRat = 0.0;
+        DataCondWaterInletTemp = 0.0;
         DataCoolCoilCap = 0.0;
         DataFlowUsedForSizing = 0.0;
         DataAirFlowUsedForSizing = 0.0;

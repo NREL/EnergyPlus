@@ -2452,8 +2452,9 @@ namespace ReportSizingManager {
                     // check for dry coil and reset outlet humrat if needed
                     DesSatEnthAtWaterInTemp = PsyHFnTdbW(DataDesInletWaterTemp, PsyWFnTdpPb(DataDesInletWaterTemp, StdBaroPress));
                     DesHumRatAtWaterInTemp = PsyWFnTdbH(DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine);
-                    if (AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat &&
-                        DataCapacityUsedForSizing > 0.0) { // flow here is water vol flow rate
+                    if (AutosizeDes < DataDesInletAirHumRat &&
+                        DesHumRatAtWaterInTemp >
+                            DataDesInletAirHumRat) { // flow here is water vol flow rate //TRANE take out DataCapacityUsedForSizing > 0
                         if (DataDesInletAirHumRat > AutosizeDes && UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
                             ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                              "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio.");
@@ -2576,7 +2577,12 @@ namespace ReportSizingManager {
                                 } else {
                                     CoilOutTemp = FinalSysSizing(CurSysNum).CoolSupTemp;
                                 }
-                                CoilOutHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
+                                if (DataDesOutletAirHumRat > 0.0) {
+                                    CoilOutHumRat = DataDesOutletAirHumRat;
+                                } else {
+                                    CoilOutHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
+                                }
+
                                 if (PrimaryAirSystem(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                                     CoilInTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
                                     CoilInHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
@@ -2593,7 +2599,11 @@ namespace ReportSizingManager {
                                                    (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetHumRatAtCoolPeak;
                                 }
                             }
-                            OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
+                            if (DataCondWaterInletTemp > 0) {     // TRANE
+                                OutTemp = DataCondWaterInletTemp; // use condenser water inlet temp if defined // TRANE
+                            } else {                              // TRANE
+                                OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
+                            }
                             if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
                                 UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
                                 rhoair = StdRhoAir;
@@ -3484,10 +3494,12 @@ namespace ReportSizingManager {
         }
     }
 
-    void GetCoilDesFlowT(int SysNum,         // central air system index
-                         Real64 CpAir,       // specific heat to be used in calculations [J/kgC]
-                         Real64 &DesFlow,    // returned design mass flow [kg/s]
-                         Real64 &DesExitTemp // returned design coil exit temperature [kg/s]
+    void GetCoilDesFlowT(int SysNum,           // central air system index
+                         Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
+                         Real64 &DesFlow,      // returned design mass flow [kg/s]
+                         Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
+                         Real64 &DesExitHumRat // returned design coil exit humidity ratio // returned design coil exit temperature [kg/s] //TRANE fix
+                                               // coil sizing inconsistency
     )
     {
         // FUNCTION INFORMATION:
@@ -3542,9 +3554,11 @@ namespace ReportSizingManager {
         }
         if (CoolCapCtrl == VAV) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
+            DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
             DesFlow = FinalSysSizing(SysNum).MassFlowAtCoolPeak / StdRhoAir;
         } else if (CoolCapCtrl == OnOff) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
+            DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
             DesFlow = DataAirFlowUsedForSizing;
         } else if (CoolCapCtrl == VT) {
             if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
@@ -3557,6 +3571,7 @@ namespace ReportSizingManager {
             DesExitTemp =
                 max(FinalSysSizing(SysNum).CoolSupTemp, AvgZoneTemp - ZoneCoolLoadSum / (StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
             DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
         } else if (CoolCapCtrl == Bypass) {
             if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
@@ -3574,6 +3589,7 @@ namespace ReportSizingManager {
             } else {
                 DesFlow = TotFlow;
             }
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
         }
     }
 

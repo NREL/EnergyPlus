@@ -77,10 +77,11 @@ namespace ReportSizingManager {
                        std::string const &CallingRoutine // name of calling rotuine for warning messages
     );
 
-    void GetCoilDesFlowT(int SysNum,         // central air system index
-                         Real64 CpAir,       // specific heat to be used in calculations [J/kgC]
-                         Real64 &DesFlow,    // returned design mass flow [kg/s]
-                         Real64 &DesExitTemp // returned design coil exit temperature [kg/s]
+    void GetCoilDesFlowT(int SysNum,           // central air system index
+                         Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
+                         Real64 &DesFlow,      // returned design mass flow [kg/s]
+                         Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
+                         Real64 &DesExitHumRat // returned design coil exit humidity ratio
     );
 
 } // namespace ReportSizingManager
