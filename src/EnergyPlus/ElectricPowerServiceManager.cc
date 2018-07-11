@@ -207,20 +207,24 @@ void ElectricPowerServiceManager::getPowerManagerInput()
         }
     } else {
         // issue #4639. see if there are any generators, inverters, converters, or storage devcies, that really need a ElectricLoadCenter:Distribution
+        bool errorsFound(false);
         int numGenLists = inputProcessor->getNumObjectsFound("ElectricLoadCenter:Generators");
         if (numGenLists > 0) {
-            ShowWarningError("ElectricLoadCenter:Generators input object requires an ElectricLoadCenterDistribution input object.");
+            ShowSevereError("ElectricLoadCenter:Generators input object requires an ElectricLoadCenterDistribution input object.");
+            errorsFound = true;
         }
         int numInverters = inputProcessor->getNumObjectsFound("ElectricLoadCenter:Inverter:Simple");
         numInverters += inputProcessor->getNumObjectsFound("ElectricLoadCenter:Inverter:FunctionOfPower");
         numInverters += inputProcessor->getNumObjectsFound("ElectricLoadCenter:Inverter:LookUpTable");
         if (numInverters > 0) {
-            ShowWarningError("ElectricLoadCenter:Inverter:* input objects require an ElectricLoadCenter:Distribution input object.");
+            ShowSevereError("ElectricLoadCenter:Inverter:* input objects require an ElectricLoadCenter:Distribution input object.");
+            errorsFound = true;
         }
         int numStorage = inputProcessor->getNumObjectsFound("ElectricLoadCenter:Storage:Simple");
         numStorage += inputProcessor->getNumObjectsFound("ElectricLoadCenter:Storage:Battery");
         if (numStorage > 0) {
-            ShowWarningError("ElectricLoadCenter:Storage:* input objects require an ElectricLoadCenter:Distribution input object.");
+            ShowSevereError("ElectricLoadCenter:Storage:* input objects require an ElectricLoadCenter:Distribution input object.");
+            errorsFound = true;
         }
         int numGenerators = inputProcessor->getNumObjectsFound("Generator:InternalCombustionEngine");
         numGenerators += inputProcessor->getNumObjectsFound("Generator:CombustionTurbine");
@@ -229,8 +233,14 @@ void ElectricPowerServiceManager::getPowerManagerInput()
         numGenerators += inputProcessor->getNumObjectsFound("Generator:Photovoltaic");
         numGenerators += inputProcessor->getNumObjectsFound("Generator:WindTurbine");
         if (numGenerators > 0) {
-            ShowWarningError("Electric generator input objects require and ElectricLoadCenter:Distribution input object.");
+            ShowSevereError("Electric generator input objects require an ElectricLoadCenter:Distribution input object.");
+            errorsFound = true;
         }
+
+        if (errorsFound) {
+            ShowFatalError("Simulation halted because of missing input objects related to ElectricLoadCenter.");
+        }
+
         // if user input did not include an Electric Load center, create a simple default one here for reporting purposes
         //   but only if there are any other electricity components set up (yet) for metering
         int anyElectricityPresent = GetMeterIndex("ELECTRICITY:FACILITY");
