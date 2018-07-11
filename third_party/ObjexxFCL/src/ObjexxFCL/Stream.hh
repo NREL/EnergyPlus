@@ -378,7 +378,9 @@ public: // Properties
 	size() const
 	{
 		std::istream & s( const_cast< std::istream & >( stream_ ) );
-		std::streamoff const pc( s.tellg() ); // Current position
+		std::streampos stream_position( s.tellg() );
+		if (stream_position == std::streampos(-1)) return 0;
+		std::streamoff const pc( stream_position ); // Current position
 		s.seekg( 0, std::ios::beg ); // Beginning of file
 		std::streampos const pb( s.tellg() );
 		s.seekg( 0, std::ios::end ); // End of file
@@ -429,6 +431,8 @@ public: // Methods
 	rewind( bool const = true )
 	{
 		stream_.clear();
+		std::streampos current_position( stream_.tellg() );
+		if (current_position == std::streampos(-1)) return true;
 		stream_.seekg( 0, std::ios::beg );
 		return true;
 	}
@@ -694,6 +698,8 @@ public: // Methods
 	rewind( bool const = true )
 	{
 		stream_.clear();
+		std::streampos current_position( stream_.tellg() );
+		if (current_position == std::streampos(-1)) return true;
 		stream_.seekg( 0, std::ios::beg );
 		stream_.seekp( 0, std::ios::beg );
 		return true;
@@ -815,6 +821,8 @@ public: // Methods
 	rewind( bool const = true )
 	{
 		stream_.clear();
+		std::streampos current_position( stream_.tellg() );
+		if (current_position == std::streampos(-1)) return true;
 		stream_.seekg( 0, std::ios::beg );
 		return true;
 	}
