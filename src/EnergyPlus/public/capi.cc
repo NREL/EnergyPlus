@@ -112,6 +112,7 @@ extern "C"
 		{
 			// Don't allow any exceptions to leak out to the caller
 			std::cerr << "Exception encountered" << std::endl;
+			return 1;
 		}
 		return 0;
 	}
