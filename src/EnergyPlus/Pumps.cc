@@ -454,12 +454,12 @@ namespace Pumps {
                     PumpEquip(PumpNum).PressureCurve_Index = -1;
                 } else {
                     ErrorsFound |= CurveManager::CheckCurveDims(
-                        PumpEquip(PumpNum).PressureCurve_Index,   // Curve index
+                        TempCurveIndex,                 // Curve index
                         {1},                            // Valid dimensions
                         RoutineName,                    // Routine name
-                        cCurrentModuleObject,            // Object Type
-                        PumpEquip(PumpNum).Name,   // Object Name
-                        cAlphaFieldNames(6));               // Field Name
+                        cCurrentModuleObject,           // Object Type
+                        PumpEquip(PumpNum).Name,        // Object Name
+                        cAlphaFieldNames(6));           // Field Name
 
                     if (!ErrorsFound) {
                         PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
@@ -644,7 +644,7 @@ namespace Pumps {
                     PumpEquip(PumpNum).PressureCurve_Index = -1;
                 } else {
                     ErrorsFound |= CurveManager::CheckCurveDims(
-                        PumpEquip(PumpNum).PressureCurve_Index,   // Curve index
+                        TempCurveIndex,   // Curve index
                         {1},                            // Valid dimensions
                         RoutineName,                    // Routine name
                         cCurrentModuleObject,            // Object Type

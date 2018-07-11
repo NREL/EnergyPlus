@@ -2671,7 +2671,7 @@
 
   Table:OneIndependentVariable,
     FanPowerRatioCurve,      !- Name
-    Exponent,                !- Curve Type
+    Cubic,                   !- Curve Type
     LagrangeinterpolationLinearExtrapolation,  !- Interpolation Method
     0.0,                     !- Minimum Value of X
     1.5,                     !- Maximum Value of X

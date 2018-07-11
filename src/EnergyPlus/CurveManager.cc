@@ -1744,9 +1744,6 @@ namespace CurveManager {
                 } else if (SELECT_CASE_var == "QUARTIC") {
                     PerfCurve(CurveNum).CurveType = Quartic;
                     TableLookup(TableNum).InterpolationOrder = 5;
-                } else if (SELECT_CASE_var == "EXPONENT") {
-                    PerfCurve(CurveNum).CurveType = Exponent;
-                    TableLookup(TableNum).InterpolationOrder = 4;
                 } else {
                     ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                     ShowContinueError(cAlphaFieldNames(2) + " [" + Alphas(2) + "] is not a valid choice. ");
@@ -2372,9 +2369,6 @@ namespace CurveManager {
                 } else if (SELECT_CASE_var == "QUADRATICLINEAR") {
                     PerfCurve(CurveNum).CurveType = QuadraticLinear;
                     TableLookup(TableNum).InterpolationOrder = 3;
-                } else if (SELECT_CASE_var == "TRIQUADRATIC") {
-                    PerfCurve(CurveNum).CurveType = TriQuadratic;
-                    TableLookup(TableNum).InterpolationOrder = 3;
                 } else {
                     ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                     ShowContinueError(cAlphaFieldNames(2) + " [" + Alphas(2) + "] is not a valid choice. ");
@@ -2790,16 +2784,10 @@ namespace CurveManager {
                     PerfCurve(CurveNum).CurveType = Cubic;
                 } else if (SELECT_CASE_var == "QUARTIC") {
                     PerfCurve(CurveNum).CurveType = Quartic;
-                } else if (SELECT_CASE_var == "EXPONENT") {
-                    PerfCurve(CurveNum).CurveType = Exponent;
                 } else if (SELECT_CASE_var == "BIQUADRATIC") {
                     PerfCurve(CurveNum).CurveType = BiQuadratic;
                 } else if (SELECT_CASE_var == "QUADRATICINEAR") {
                     PerfCurve(CurveNum).CurveType = QuadraticLinear;
-                } else if (SELECT_CASE_var == "BICUBIC") {
-                    PerfCurve(CurveNum).CurveType = BiCubic;
-                } else if (SELECT_CASE_var == "TRIQUADRATIC") {
-                    PerfCurve(CurveNum).CurveType = TriQuadratic;
                 } else {
                     ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                     ShowContinueError(cAlphaFieldNames(3) + " [" + Alphas(3) + "] is not a valid choice. ");
@@ -6030,8 +6018,9 @@ namespace CurveManager {
             for (std::size_t i = 1; i < validDims.size(); i++) {
                 validString += " or " + std::to_string(validDims[i]);
             }
+            std::string plural = validDims.size() > 1 ? "s" : "";
             ShowContinueError("...Input curve=\"" + PerfCurve(CurveIndex).Name + "\" has " + std::to_string(curveDim) + " dimensions.");
-            ShowContinueError("...Curve type must have " + validString + " dimension(s).");
+            ShowContinueError("...Curve type must have " + validString + " dimension" + plural + ".");
             return true;
         }
     }

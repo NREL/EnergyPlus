@@ -734,7 +734,6 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError(
                             "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues.");
                     } else {
-                        // Verify Curve Object, only legal type is linear or quadratic
                         ErrorsFound |= CurveManager::CheckCurveDims(
                             OccupantVentilationControl(i).ComfortLowTempCurveNum,   // Curve index
                             {1},                            // Valid dimensions
@@ -748,10 +747,9 @@ namespace AirflowNetworkBalanceManager {
                     OccupantVentilationControl(i).ComfortHighTempCurveName = Alphas(3);
                     OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(Alphas(3)); // convert curve name to number
                     if (OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
-                        // Verify Curve Object, only legal type is BiQuadratic
                         ErrorsFound |= CurveManager::CheckCurveDims(
                             OccupantVentilationControl(i).ComfortHighTempCurveNum,   // Curve index
-                            {2},                            // Valid dimensions
+                            {1},                            // Valid dimensions
                             RoutineName,                    // Routine name
                             CurrentModuleObject,            // Object Type
                             OccupantVentilationControl(i).Name,    // Object Name
