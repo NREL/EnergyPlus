@@ -171,8 +171,12 @@ namespace WeatherManager {
 
     static std::string const BlankString;
     Array1D_string const DaysOfWeek(7, {"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"});
-    std::map<std::string, WeekDay> weekDayLookUp{{"SUNDAY", WeekDay::Sunday},       {"MONDAY", WeekDay::Monday},     {"TUESDAY", WeekDay::Tuesday},
-                                                 {"WEDNESDAY", WeekDay::Wednesday}, {"THURSDAY", WeekDay::Thursday}, {"FRIDAY", WeekDay::Friday},
+    std::map<std::string, WeekDay> weekDayLookUp{{"SUNDAY", WeekDay::Sunday},
+                                                 {"MONDAY", WeekDay::Monday},
+                                                 {"TUESDAY", WeekDay::Tuesday},
+                                                 {"WEDNESDAY", WeekDay::Wednesday},
+                                                 {"THURSDAY", WeekDay::Thursday},
+                                                 {"FRIDAY", WeekDay::Friday},
                                                  {"SATURDAY", WeekDay::Saturday}};
 
     bool Debugout(false);
@@ -618,9 +622,17 @@ namespace WeatherManager {
         DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
         int Num = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
         for (int i = 1; i <= Num; i++) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, i, DataIPShortCuts::cAlphaArgs, NumAlpha,
-                                          DataIPShortCuts::rNumericArgs, NumNumber, IOStat, DataIPShortCuts::lNumericFieldBlanks,
-                                          DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames);
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                          i,
+                                          DataIPShortCuts::cAlphaArgs,
+                                          NumAlpha,
+                                          DataIPShortCuts::rNumericArgs,
+                                          NumNumber,
+                                          IOStat,
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
             underwaterBoundaries.push_back(UnderwaterBoundary());
             underwaterBoundaries[i - 1].Name = DataIPShortCuts::cAlphaArgs(1);
             underwaterBoundaries[i - 1].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs(1);
@@ -702,9 +714,17 @@ namespace WeatherManager {
         int NumAlpha = 0, NumNumber = 0, IOStat = 0;
         DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
         if (inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject) == 0) return;
-        inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, 1, DataIPShortCuts::cAlphaArgs, NumAlpha, DataIPShortCuts::rNumericArgs,
-                                      NumNumber, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks,
-                                      DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames);
+        inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                      1,
+                                      DataIPShortCuts::cAlphaArgs,
+                                      NumAlpha,
+                                      DataIPShortCuts::rNumericArgs,
+                                      NumNumber,
+                                      IOStat,
+                                      DataIPShortCuts::lNumericFieldBlanks,
+                                      DataIPShortCuts::lAlphaFieldBlanks,
+                                      DataIPShortCuts::cAlphaFieldNames,
+                                      DataIPShortCuts::cNumericFieldNames);
         DataEnvironment::varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(1));
         DataEnvironment::varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(2));
         DataEnvironment::varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(3));
@@ -733,13 +753,19 @@ namespace WeatherManager {
                     DataSurfaces::Surface(SurfNum).NewVertex(n).y = Xb * SurfaceGeometry::SinBldgRelNorth + Yb * SurfaceGeometry::CosBldgRelNorth;
                     DataSurfaces::Surface(SurfNum).NewVertex(n).z = DataSurfaces::Surface(SurfNum).Vertex(n).z;
                 }
-                Vectors::CreateNewellSurfaceNormalVector(DataSurfaces::Surface(SurfNum).NewVertex, DataSurfaces::Surface(SurfNum).Sides,
+                Vectors::CreateNewellSurfaceNormalVector(DataSurfaces::Surface(SurfNum).NewVertex,
+                                                         DataSurfaces::Surface(SurfNum).Sides,
                                                          DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector);
                 Real64 SurfWorldAz = 0.0;
                 Real64 SurfTilt = 0.0;
-                Vectors::DetermineAzimuthAndTilt(DataSurfaces::Surface(SurfNum).NewVertex, DataSurfaces::Surface(SurfNum).Sides, SurfWorldAz,
-                                                 SurfTilt, DataSurfaces::Surface(SurfNum).lcsx, DataSurfaces::Surface(SurfNum).lcsy,
-                                                 DataSurfaces::Surface(SurfNum).lcsz, DataSurfaces::Surface(SurfNum).GrossArea,
+                Vectors::DetermineAzimuthAndTilt(DataSurfaces::Surface(SurfNum).NewVertex,
+                                                 DataSurfaces::Surface(SurfNum).Sides,
+                                                 SurfWorldAz,
+                                                 SurfTilt,
+                                                 DataSurfaces::Surface(SurfNum).lcsx,
+                                                 DataSurfaces::Surface(SurfNum).lcsy,
+                                                 DataSurfaces::Surface(SurfNum).lcsz,
+                                                 DataSurfaces::Surface(SurfNum).GrossArea,
                                                  DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector);
                 DataSurfaces::Surface(SurfNum).Azimuth = SurfWorldAz;
                 DataSurfaces::Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * DegToRadians);
@@ -790,8 +816,19 @@ namespace WeatherManager {
         static gio::Fmt DateFormat("(I2.2,'/',I2.2)");
         static gio::Fmt DateFormatwithYear("(I2.2,'/',I2.2,'/',I4.4)");
         static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
-        static Array1D_string const ValidDayNames(12, {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday",
-                                                       "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
+        static Array1D_string const ValidDayNames(12,
+                                                  {"Sunday",
+                                                   "Monday",
+                                                   "Tuesday",
+                                                   "Wednesday",
+                                                   "Thursday",
+                                                   "Friday",
+                                                   "Saturday",
+                                                   "Holiday",
+                                                   "SummerDesignDay",
+                                                   "WinterDesignDay",
+                                                   "CustomDay1",
+                                                   "CustomDay2"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace changed to GetBranchInputOneTimeFlag////////////
@@ -838,27 +875,27 @@ namespace WeatherManager {
             SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, OutDryBulbTemp, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Outdoor Air Dewpoint Temperature", OutputProcessor::Unit::C, OutDewPointTemp, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, OutWetBulbTemp, "Zone", "Average", "Environment");
-            SetupOutputVariable("Site Outdoor Air Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, OutHumRat, "Zone", "Average",
-                                "Environment");
+            SetupOutputVariable(
+                "Site Outdoor Air Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, OutHumRat, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Outdoor Air Relative Humidity", OutputProcessor::Unit::Perc, OutRelHum, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Outdoor Air Barometric Pressure", OutputProcessor::Unit::Pa, OutBaroPress, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Wind Speed", OutputProcessor::Unit::m_s, WindSpeed, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Wind Direction", OutputProcessor::Unit::deg, WindDir, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Sky Temperature", OutputProcessor::Unit::C, SkyTemp, "Zone", "Average", "Environment");
-            SetupOutputVariable("Site Horizontal Infrared Radiation Rate per Area", OutputProcessor::Unit::W_m2, HorizIRSky, "Zone", "Average",
-                                "Environment");
-            SetupOutputVariable("Site Diffuse Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, DifSolarRad, "Zone", "Average",
-                                "Environment");
-            SetupOutputVariable("Site Direct Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, BeamSolarRad, "Zone", "Average",
-                                "Environment");
+            SetupOutputVariable(
+                "Site Horizontal Infrared Radiation Rate per Area", OutputProcessor::Unit::W_m2, HorizIRSky, "Zone", "Average", "Environment");
+            SetupOutputVariable(
+                "Site Diffuse Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, DifSolarRad, "Zone", "Average", "Environment");
+            SetupOutputVariable(
+                "Site Direct Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, BeamSolarRad, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Precipitation Depth", OutputProcessor::Unit::m, LiquidPrecipitation, "Zone", "Sum", "Environment");
-            SetupOutputVariable("Site Ground Reflected Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, GndSolarRad, "Zone", "Average",
-                                "Environment");
+            SetupOutputVariable(
+                "Site Ground Reflected Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, GndSolarRad, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Ground Temperature", OutputProcessor::Unit::C, GroundTemp, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Surface Ground Temperature", OutputProcessor::Unit::C, GroundTemp_Surface, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Deep Ground Temperature", OutputProcessor::Unit::C, GroundTemp_Deep, "Zone", "Average", "Environment");
-            SetupOutputVariable("Site Simple Factor Model Ground Temperature", OutputProcessor::Unit::C, GroundTempFC, "Zone", "Average",
-                                "Environment");
+            SetupOutputVariable(
+                "Site Simple Factor Model Ground Temperature", OutputProcessor::Unit::C, GroundTempFC, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, OutEnthalpy, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Outdoor Air Density", OutputProcessor::Unit::kg_m3, OutAirDensity, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Solar Azimuth Angle", OutputProcessor::Unit::deg, SolarAzimuthAngle, "Zone", "Average", "Environment");
@@ -869,23 +906,23 @@ namespace WeatherManager {
             SetupOutputVariable("Site Exterior Horizontal Sky Illuminance", OutputProcessor::Unit::lux, HISKF, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Exterior Horizontal Beam Illuminance", OutputProcessor::Unit::lux, HISUNF, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Exterior Beam Normal Illuminance", OutputProcessor::Unit::lux, HISUNFnorm, "Zone", "Average", "Environment");
-            SetupOutputVariable("Site Sky Diffuse Solar Radiation Luminous Efficacy", OutputProcessor::Unit::lum_W, PDIFLW, "Zone", "Average",
-                                "Environment");
-            SetupOutputVariable("Site Beam Solar Radiation Luminous Efficacy", OutputProcessor::Unit::lum_W, PDIRLW, "Zone", "Average",
-                                "Environment");
+            SetupOutputVariable(
+                "Site Sky Diffuse Solar Radiation Luminous Efficacy", OutputProcessor::Unit::lum_W, PDIFLW, "Zone", "Average", "Environment");
+            SetupOutputVariable(
+                "Site Beam Solar Radiation Luminous Efficacy", OutputProcessor::Unit::lum_W, PDIRLW, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Daylighting Model Sky Clearness", OutputProcessor::Unit::None, SkyClearness, "Zone", "Average", "Environment");
-            SetupOutputVariable("Site Daylighting Model Sky Brightness", OutputProcessor::Unit::None, SkyBrightness, "Zone", "Average",
-                                "Environment");
+            SetupOutputVariable(
+                "Site Daylighting Model Sky Brightness", OutputProcessor::Unit::None, SkyBrightness, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Daylight Saving Time Status", OutputProcessor::Unit::None, DSTIndicator, "Zone", "State", "Environment");
             SetupOutputVariable("Site Day Type Index", OutputProcessor::Unit::None, RptDayType, "Zone", "State", "Environment");
             SetupOutputVariable("Site Mains Water Temperature", OutputProcessor::Unit::C, WaterMainsTemp, "Zone", "Average", "Environment");
 
             if (AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Weather Data", "Environment", "Outdoor Dry Bulb", "[C]", EMSOutDryBulbOverrideOn, EMSOutDryBulbOverrideValue);
-                SetupEMSActuator("Weather Data", "Environment", "Outdoor Dew Point", "[C]", EMSOutDewPointTempOverrideOn,
-                                 EMSOutDewPointTempOverrideValue);
-                SetupEMSActuator("Weather Data", "Environment", "Outdoor Relative Humidity", "[%]", EMSOutRelHumOverrideOn,
-                                 EMSOutRelHumOverrideValue);
+                SetupEMSActuator(
+                    "Weather Data", "Environment", "Outdoor Dew Point", "[C]", EMSOutDewPointTempOverrideOn, EMSOutDewPointTempOverrideValue);
+                SetupEMSActuator(
+                    "Weather Data", "Environment", "Outdoor Relative Humidity", "[%]", EMSOutRelHumOverrideOn, EMSOutRelHumOverrideValue);
                 SetupEMSActuator("Weather Data", "Environment", "Diffuse Solar", "[W/m2]", EMSDifSolarRadOverrideOn, EMSDifSolarRadOverrideValue);
                 SetupEMSActuator("Weather Data", "Environment", "Direct Solar", "[W/m2]", EMSBeamSolarRadOverrideOn, EMSBeamSolarRadOverrideValue);
                 SetupEMSActuator("Weather Data", "Environment", "Wind Speed", "[m/s]", EMSWindSpeedOverrideOn, EMSWindSpeedOverrideValue);
@@ -2133,8 +2170,12 @@ namespace WeatherManager {
                     if (DayOfSim == curSimDayForEndOfRunPeriod) {
                         curSimDayForEndOfRunPeriod += Environment(Envrn).RawSimDays;
                         if (StartDatesCycleShouldBeReset) {
-                            ResetWeekDaysByMonth(Environment(Envrn).MonWeekDay, LeapYearAdd, Environment(Envrn).StartMonth,
-                                                 Environment(Envrn).StartDay, Environment(Envrn).EndMonth, Environment(Envrn).EndDay,
+                            ResetWeekDaysByMonth(Environment(Envrn).MonWeekDay,
+                                                 LeapYearAdd,
+                                                 Environment(Envrn).StartMonth,
+                                                 Environment(Envrn).StartDay,
+                                                 Environment(Envrn).EndMonth,
+                                                 Environment(Envrn).EndDay,
                                                  Environment(Envrn).RollDayTypeOnRepeat);
                             if (DaylightSavingIsActive) {
                                 SetDSTDateRanges(Environment(Envrn).MonWeekDay, DSTIndex);
@@ -2201,8 +2242,12 @@ namespace WeatherManager {
                                 if (Loop > 366) Loop = 1;
                                 if (Loop == JDay5End) break;
                             }
-                            ResetWeekDaysByMonth(Environment(Envrn).MonWeekDay, LeapYearAdd, Environment(Envrn).StartMonth,
-                                                 Environment(Envrn).StartDay, Environment(Envrn).EndMonth, Environment(Envrn).EndDay,
+                            ResetWeekDaysByMonth(Environment(Envrn).MonWeekDay,
+                                                 LeapYearAdd,
+                                                 Environment(Envrn).StartMonth,
+                                                 Environment(Envrn).StartDay,
+                                                 Environment(Envrn).EndMonth,
+                                                 Environment(Envrn).EndDay,
                                                  Environment(Envrn).RollDayTypeOnRepeat);
                             if (DaylightSavingIsActive) {
                                 SetDSTDateRanges(Environment(Envrn).MonWeekDay, DSTIndex);
@@ -2230,13 +2275,23 @@ namespace WeatherManager {
 
                     if (DayOfSim < curSimDayForEndOfRunPeriod) {
                         if (Environment(Envrn).RollDayTypeOnRepeat || CurrentYearIsLeapYear) {
-                            ResetWeekDaysByMonth(Environment(Envrn).MonWeekDay, LeapYearAdd, Environment(Envrn).StartMonth,
-                                                 Environment(Envrn).StartDay, Environment(Envrn).EndMonth, Environment(Envrn).EndDay,
-                                                 Environment(Envrn).RollDayTypeOnRepeat, true);
+                            ResetWeekDaysByMonth(Environment(Envrn).MonWeekDay,
+                                                 LeapYearAdd,
+                                                 Environment(Envrn).StartMonth,
+                                                 Environment(Envrn).StartDay,
+                                                 Environment(Envrn).EndMonth,
+                                                 Environment(Envrn).EndDay,
+                                                 Environment(Envrn).RollDayTypeOnRepeat,
+                                                 true);
                         } else {
-                            ResetWeekDaysByMonth(Environment(Envrn).MonWeekDay, LeapYearAdd, Environment(Envrn).StartMonth,
-                                                 Environment(Envrn).StartDay, Environment(Envrn).EndMonth, Environment(Envrn).EndDay,
-                                                 Environment(Envrn).RollDayTypeOnRepeat, false);
+                            ResetWeekDaysByMonth(Environment(Envrn).MonWeekDay,
+                                                 LeapYearAdd,
+                                                 Environment(Envrn).StartMonth,
+                                                 Environment(Envrn).StartDay,
+                                                 Environment(Envrn).EndMonth,
+                                                 Environment(Envrn).EndDay,
+                                                 Environment(Envrn).RollDayTypeOnRepeat,
+                                                 false);
                         }
                         if (DaylightSavingIsActive) {
                             SetDSTDateRanges(Environment(Envrn).MonWeekDay, DSTIndex);
@@ -2784,10 +2839,40 @@ namespace WeatherManager {
                 }
                 if (ReadStatus == 0) {
                     // Reduce ugly code
-                    InterpretWeatherDataLine(WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress,
-                                             ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum,
-                                             DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight,
-                                             PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo,
+                    InterpretWeatherDataLine(WeatherDataLine,
+                                             ErrorFound,
+                                             WYear,
+                                             WMonth,
+                                             WDay,
+                                             WHour,
+                                             WMinute,
+                                             DryBulb,
+                                             DewPoint,
+                                             RelHum,
+                                             AtmPress,
+                                             ETHoriz,
+                                             ETDirect,
+                                             IRHoriz,
+                                             GLBHoriz,
+                                             DirectRad,
+                                             DiffuseRad,
+                                             GLBHorizIllum,
+                                             DirectNrmIllum,
+                                             DiffuseHorizIllum,
+                                             ZenLum,
+                                             WindDir,
+                                             WindSpeed,
+                                             TotalSkyCover,
+                                             OpaqueSkyCover,
+                                             Visibility,
+                                             CeilHeight,
+                                             PresWeathObs,
+                                             PresWeathConds,
+                                             PrecipWater,
+                                             AerosolOptDepth,
+                                             SnowDepth,
+                                             DaysSinceLastSnow,
+                                             Albedo,
                                              LiquidPrecip);
                 } else if (ReadStatus < 0) {
                     if (NumRewinds > 0) {
@@ -2801,10 +2886,40 @@ namespace WeatherManager {
                             gio::read(WeatherFileUnitNumber, fmtA, flags) >> WeatherDataLine;
                             ReadStatus = flags.ios();
                         }
-                        InterpretWeatherDataLine(WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum,
-                                                 AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum,
-                                                 DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight,
-                                                 PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo,
+                        InterpretWeatherDataLine(WeatherDataLine,
+                                                 ErrorFound,
+                                                 WYear,
+                                                 WMonth,
+                                                 WDay,
+                                                 WHour,
+                                                 WMinute,
+                                                 DryBulb,
+                                                 DewPoint,
+                                                 RelHum,
+                                                 AtmPress,
+                                                 ETHoriz,
+                                                 ETDirect,
+                                                 IRHoriz,
+                                                 GLBHoriz,
+                                                 DirectRad,
+                                                 DiffuseRad,
+                                                 GLBHorizIllum,
+                                                 DirectNrmIllum,
+                                                 DiffuseHorizIllum,
+                                                 ZenLum,
+                                                 WindDir,
+                                                 WindSpeed,
+                                                 TotalSkyCover,
+                                                 OpaqueSkyCover,
+                                                 Visibility,
+                                                 CeilHeight,
+                                                 PresWeathObs,
+                                                 PresWeathConds,
+                                                 PrecipWater,
+                                                 AerosolOptDepth,
+                                                 SnowDepth,
+                                                 DaysSinceLastSnow,
+                                                 Albedo,
                                                  LiquidPrecip);
                     }
                 }
@@ -2837,29 +2952,85 @@ namespace WeatherManager {
                     // Do the range checks on the first set of fields -- no others.
                     ErrorsFound = false;
                     if (DryBulb >= 99.9)
-                        inputProcessor->rangeCheck(ErrorsFound, "DryBulb Temperature", "WeatherFile", "Severe", ">= -90", (DryBulb >= -90.0), "<= 70",
-                                                   (DryBulb <= 70.0), RoundSigDigits(DryBulb, 2), WeatherFileLocationTitle);
-                    if (DewPoint < 99.9)
-                        inputProcessor->rangeCheck(ErrorsFound, "DewPoint Temperature", "WeatherFile", "Severe", ">= -90", (DewPoint >= -90.0),
-                                                   "<= 70", (DewPoint <= 70.0), RoundSigDigits(DewPoint, 2), WeatherFileLocationTitle);
-                    if (RelHum < 999.0)
-                        inputProcessor->rangeCheck(ErrorsFound, "Relative Humidity", "WeatherFile", "Severe", "> 0", (RelHum >= 0.0), "<= 110",
-                                                   (RelHum <= 110.0), RoundSigDigits(RelHum, 0), WeatherFileLocationTitle);
-                    if (AtmPress < 999999.0)
-                        inputProcessor->rangeCheck(ErrorsFound, "Atmospheric Pressure", "WeatherFile", "Severe", "> 31000", (AtmPress > 31000.0),
-                                                   "<=120000", (AtmPress <= 120000.0), RoundSigDigits(AtmPress, 0), WeatherFileLocationTitle);
-                    if (DirectRad < 9999.0)
-                        inputProcessor->rangeCheck(ErrorsFound, "Direct Radiation", "WeatherFile", "Severe", ">= 0", (DirectRad >= 0.0), _, _, _,
+                        inputProcessor->rangeCheck(ErrorsFound,
+                                                   "DryBulb Temperature",
+                                                   "WeatherFile",
+                                                   "Severe",
+                                                   ">= -90",
+                                                   (DryBulb >= -90.0),
+                                                   "<= 70",
+                                                   (DryBulb <= 70.0),
+                                                   RoundSigDigits(DryBulb, 2),
                                                    WeatherFileLocationTitle);
+                    if (DewPoint < 99.9)
+                        inputProcessor->rangeCheck(ErrorsFound,
+                                                   "DewPoint Temperature",
+                                                   "WeatherFile",
+                                                   "Severe",
+                                                   ">= -90",
+                                                   (DewPoint >= -90.0),
+                                                   "<= 70",
+                                                   (DewPoint <= 70.0),
+                                                   RoundSigDigits(DewPoint, 2),
+                                                   WeatherFileLocationTitle);
+                    if (RelHum < 999.0)
+                        inputProcessor->rangeCheck(ErrorsFound,
+                                                   "Relative Humidity",
+                                                   "WeatherFile",
+                                                   "Severe",
+                                                   "> 0",
+                                                   (RelHum >= 0.0),
+                                                   "<= 110",
+                                                   (RelHum <= 110.0),
+                                                   RoundSigDigits(RelHum, 0),
+                                                   WeatherFileLocationTitle);
+                    if (AtmPress < 999999.0)
+                        inputProcessor->rangeCheck(ErrorsFound,
+                                                   "Atmospheric Pressure",
+                                                   "WeatherFile",
+                                                   "Severe",
+                                                   "> 31000",
+                                                   (AtmPress > 31000.0),
+                                                   "<=120000",
+                                                   (AtmPress <= 120000.0),
+                                                   RoundSigDigits(AtmPress, 0),
+                                                   WeatherFileLocationTitle);
+                    if (DirectRad < 9999.0)
+                        inputProcessor->rangeCheck(
+                            ErrorsFound, "Direct Radiation", "WeatherFile", "Severe", ">= 0", (DirectRad >= 0.0), _, _, _, WeatherFileLocationTitle);
                     if (DiffuseRad < 9999.0)
-                        inputProcessor->rangeCheck(ErrorsFound, "Diffuse Radiation", "WeatherFile", "Severe", ">= 0", (DiffuseRad >= 0.0), _, _, _,
+                        inputProcessor->rangeCheck(ErrorsFound,
+                                                   "Diffuse Radiation",
+                                                   "WeatherFile",
+                                                   "Severe",
+                                                   ">= 0",
+                                                   (DiffuseRad >= 0.0),
+                                                   _,
+                                                   _,
+                                                   _,
                                                    WeatherFileLocationTitle);
                     if (WindDir < 999.0)
-                        inputProcessor->rangeCheck(ErrorsFound, "Wind Direction", "WeatherFile", "Severe", ">=0", (WindDir >= 0.0), "<=360",
-                                                   (WindDir <= 360.0), RoundSigDigits(WindDir, 0), WeatherFileLocationTitle);
+                        inputProcessor->rangeCheck(ErrorsFound,
+                                                   "Wind Direction",
+                                                   "WeatherFile",
+                                                   "Severe",
+                                                   ">=0",
+                                                   (WindDir >= 0.0),
+                                                   "<=360",
+                                                   (WindDir <= 360.0),
+                                                   RoundSigDigits(WindDir, 0),
+                                                   WeatherFileLocationTitle);
                     if (WindSpeed < 999.0)
-                        inputProcessor->rangeCheck(ErrorsFound, "Wind Speed", "WeatherFile", "Severe", ">=0", (WindSpeed >= 0.0), "<=40",
-                                                   (WindSpeed <= 40.0), RoundSigDigits(WindSpeed, 2), WeatherFileLocationTitle);
+                        inputProcessor->rangeCheck(ErrorsFound,
+                                                   "Wind Speed",
+                                                   "WeatherFile",
+                                                   "Severe",
+                                                   ">=0",
+                                                   (WindSpeed >= 0.0),
+                                                   "<=40",
+                                                   (WindSpeed <= 40.0),
+                                                   RoundSigDigits(WindSpeed, 2),
+                                                   WeatherFileLocationTitle);
                     if (ErrorsFound) {
                         ShowSevereError("Out of Range errors found with initial day of WeatherFile");
                     }
@@ -2961,10 +3132,40 @@ namespace WeatherManager {
                         }
                     }
                     if (ReadStatus == 0) {
-                        InterpretWeatherDataLine(WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum,
-                                                 AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum,
-                                                 DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight,
-                                                 PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo,
+                        InterpretWeatherDataLine(WeatherDataLine,
+                                                 ErrorFound,
+                                                 WYear,
+                                                 WMonth,
+                                                 WDay,
+                                                 WHour,
+                                                 WMinute,
+                                                 DryBulb,
+                                                 DewPoint,
+                                                 RelHum,
+                                                 AtmPress,
+                                                 ETHoriz,
+                                                 ETDirect,
+                                                 IRHoriz,
+                                                 GLBHoriz,
+                                                 DirectRad,
+                                                 DiffuseRad,
+                                                 GLBHorizIllum,
+                                                 DirectNrmIllum,
+                                                 DiffuseHorizIllum,
+                                                 ZenLum,
+                                                 WindDir,
+                                                 WindSpeed,
+                                                 TotalSkyCover,
+                                                 OpaqueSkyCover,
+                                                 Visibility,
+                                                 CeilHeight,
+                                                 PresWeathObs,
+                                                 PresWeathConds,
+                                                 PrecipWater,
+                                                 AerosolOptDepth,
+                                                 SnowDepth,
+                                                 DaysSinceLastSnow,
+                                                 Albedo,
                                                  LiquidPrecip);
                     } else {                                         // ReadStatus /=0
                         if (ReadStatus < 0 && NumDataPeriods == 1) { // Standard End-of-file, rewind and position to first day...
@@ -2977,11 +3178,41 @@ namespace WeatherManager {
                                     ReadStatus = flags.ios();
                                 }
 
-                                InterpretWeatherDataLine(WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum,
-                                                         AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum,
-                                                         DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover,
-                                                         Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth,
-                                                         SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip);
+                                InterpretWeatherDataLine(WeatherDataLine,
+                                                         ErrorFound,
+                                                         WYear,
+                                                         WMonth,
+                                                         WDay,
+                                                         WHour,
+                                                         WMinute,
+                                                         DryBulb,
+                                                         DewPoint,
+                                                         RelHum,
+                                                         AtmPress,
+                                                         ETHoriz,
+                                                         ETDirect,
+                                                         IRHoriz,
+                                                         GLBHoriz,
+                                                         DirectRad,
+                                                         DiffuseRad,
+                                                         GLBHorizIllum,
+                                                         DirectNrmIllum,
+                                                         DiffuseHorizIllum,
+                                                         ZenLum,
+                                                         WindDir,
+                                                         WindSpeed,
+                                                         TotalSkyCover,
+                                                         OpaqueSkyCover,
+                                                         Visibility,
+                                                         CeilHeight,
+                                                         PresWeathObs,
+                                                         PresWeathConds,
+                                                         PrecipWater,
+                                                         AerosolOptDepth,
+                                                         SnowDepth,
+                                                         DaysSinceLastSnow,
+                                                         Albedo,
+                                                         LiquidPrecip);
                             } else {
                                 BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + BlankString +
                                             RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
@@ -3066,8 +3297,14 @@ namespace WeatherManager {
                         TomorrowVariables.DayOfMonth = WDay;
                         TomorrowVariables.DayOfYear = JulianDay(WMonth, WDay, LeapYearAdd);
                         TomorrowVariables.DayOfYear_Schedule = JulianDay(WMonth, WDay, 1);
-                        CalculateDailySolarCoeffs(TomorrowVariables.DayOfYear, A, B, C, AVSC, TomorrowVariables.EquationOfTime,
-                                                  TomorrowVariables.SinSolarDeclinAngle, TomorrowVariables.CosSolarDeclinAngle);
+                        CalculateDailySolarCoeffs(TomorrowVariables.DayOfYear,
+                                                  A,
+                                                  B,
+                                                  C,
+                                                  AVSC,
+                                                  TomorrowVariables.EquationOfTime,
+                                                  TomorrowVariables.SinSolarDeclinAngle,
+                                                  TomorrowVariables.CosSolarDeclinAngle);
                         if (CurDayOfWeek <= 7) {
                             CurDayOfWeek = mod(CurDayOfWeek, 7) + 1;
                         }
@@ -3388,11 +3625,15 @@ namespace WeatherManager {
                 auto const SELECT_CASE_var(WPSkyTemperature(Environment(Environ).WP_Type1).CalculationType);
 
                 if (SELECT_CASE_var == WP_ScheduleValue) {
-                    GetScheduleValuesForDay(WPSkyTemperature(Environment(Environ).WP_Type1).SchedulePtr, TomorrowSkyTemp,
-                                            TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek);
+                    GetScheduleValuesForDay(WPSkyTemperature(Environment(Environ).WP_Type1).SchedulePtr,
+                                            TomorrowSkyTemp,
+                                            TomorrowVariables.DayOfYear_Schedule,
+                                            CurDayOfWeek);
                 } else if (SELECT_CASE_var == WP_DryBulbDelta) {
-                    GetScheduleValuesForDay(WPSkyTemperature(Environment(Environ).WP_Type1).SchedulePtr, TomorrowSkyTemp,
-                                            TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek);
+                    GetScheduleValuesForDay(WPSkyTemperature(Environment(Environ).WP_Type1).SchedulePtr,
+                                            TomorrowSkyTemp,
+                                            TomorrowVariables.DayOfYear_Schedule,
+                                            CurDayOfWeek);
                     for (Hour = 1; Hour <= 24; ++Hour) {
                         for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
                             TomorrowSkyTemp(TS, Hour) = TomorrowOutDryBulbTemp(TS, Hour) - TomorrowSkyTemp(TS, Hour);
@@ -3400,8 +3641,10 @@ namespace WeatherManager {
                     }
 
                 } else if (SELECT_CASE_var == WP_DewPointDelta) {
-                    GetScheduleValuesForDay(WPSkyTemperature(Environment(Environ).WP_Type1).SchedulePtr, TomorrowSkyTemp,
-                                            TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek);
+                    GetScheduleValuesForDay(WPSkyTemperature(Environment(Environ).WP_Type1).SchedulePtr,
+                                            TomorrowSkyTemp,
+                                            TomorrowVariables.DayOfYear_Schedule,
+                                            CurDayOfWeek);
                     for (Hour = 1; Hour <= 24; ++Hour) {
                         for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
                             TomorrowSkyTemp(TS, Hour) = TomorrowOutDewPointTemp(TS, Hour) - TomorrowSkyTemp(TS, Hour);
@@ -3993,8 +4236,14 @@ namespace WeatherManager {
         DesignDay(EnvrnNum).DaylightSavingIndex = DesDayInput(EnvrnNum).DSTIndicator;
 
         //  Set up Solar parameters for day
-        CalculateDailySolarCoeffs(DesignDay(EnvrnNum).DayOfYear, A, B, C, AVSC, DesignDay(EnvrnNum).EquationOfTime,
-                                  DesignDay(EnvrnNum).SinSolarDeclinAngle, DesignDay(EnvrnNum).CosSolarDeclinAngle);
+        CalculateDailySolarCoeffs(DesignDay(EnvrnNum).DayOfYear,
+                                  A,
+                                  B,
+                                  C,
+                                  AVSC,
+                                  DesignDay(EnvrnNum).EquationOfTime,
+                                  DesignDay(EnvrnNum).SinSolarDeclinAngle,
+                                  DesignDay(EnvrnNum).CosSolarDeclinAngle);
 
         if (PrintDDHeader && DoWeatherInitReporting) {
             gio::write(OutputFileInits, EnvDDHdFormat);
@@ -4153,8 +4402,8 @@ namespace WeatherManager {
             auto const SELECT_CASE_var(DesDayInput(EnvrnNum).HumIndType);
 
             if (SELECT_CASE_var == DDHumIndType_WetBulb) {
-                HumidityRatio = PsyWFnTdbTwbPb(DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue, DesDayInput(EnvrnNum).PressBarom,
-                                               RoutineNamePsyWFnTdbTwbPb);
+                HumidityRatio = PsyWFnTdbTwbPb(
+                    DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue, DesDayInput(EnvrnNum).PressBarom, RoutineNamePsyWFnTdbTwbPb);
                 ConstantHumidityRatio = true;
 
             } else if (SELECT_CASE_var == DDHumIndType_DewPoint) {
@@ -4257,8 +4506,8 @@ namespace WeatherManager {
                     TomorrowOutRelHum(TS, Hour) =
                         PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(TS, Hour), OutHumRat, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
                 } else {
-                    HumidityRatio = PsyWFnTdbRhPb(TomorrowOutDryBulbTemp(TS, Hour), DDHumIndModifier(TS, Hour, EnvrnNum) / 100.0,
-                                                  DesDayInput(EnvrnNum).PressBarom);
+                    HumidityRatio = PsyWFnTdbRhPb(
+                        TomorrowOutDryBulbTemp(TS, Hour), DDHumIndModifier(TS, Hour, EnvrnNum) / 100.0, DesDayInput(EnvrnNum).PressBarom);
                     // TomorrowOutRelHum values set earlier
                     TomorrowOutDewPointTemp(TS, Hour) = PsyTdpFnWPb(HumidityRatio, DesDayInput(EnvrnNum).PressBarom);
                 }
@@ -4314,8 +4563,11 @@ namespace WeatherManager {
                         CurTime = double(Hour) + TS1TimeOffset;
                     }
 
-                    CalculateSunDirectionCosines(CurTime, DesignDay(EnvrnNum).EquationOfTime, DesignDay(EnvrnNum).SinSolarDeclinAngle,
-                                                 DesignDay(EnvrnNum).CosSolarDeclinAngle, SUNCOS);
+                    CalculateSunDirectionCosines(CurTime,
+                                                 DesignDay(EnvrnNum).EquationOfTime,
+                                                 DesignDay(EnvrnNum).SinSolarDeclinAngle,
+                                                 DesignDay(EnvrnNum).CosSolarDeclinAngle,
+                                                 SUNCOS);
                     CosZenith = SUNCOS(3);
                     if (CosZenith < SunIsUpValue) {
                         BeamRad = 0.0;
@@ -4696,22 +4948,41 @@ namespace WeatherManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DayCorrection(Pi * 2.0 / 366.0);
-        static Array1D<Real64> const SineSolDeclCoef(9, {0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951,
-                                                         -0.00011691,
-                                                         0.00002096}); // Fitted coefficients of Fourier series | Sine of declination coefficients
-        static Array1D<Real64> const EqOfTimeCoef(9, {0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502,
-                                                      -0.00167992}); // Fitted coefficients of Fourier Series | Equation of Time coefficients
-        static Array1D<Real64> const ASHRAE_A_Coef(9, {1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445,
-                                                       1.1198}); // Fitted coefficients of Fourier Series | ASHRAE A Factor coefficients
-                                                                 // English (original) units:
-                                                                 //              368.49341,.366502,24.538624,-.169983,-1.193417,            &
-                                                                 //              .313261,-1.076093,-.543376,.355197 ,                       &
+        static Array1D<Real64> const SineSolDeclCoef(
+            9, {0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096}); // Fitted coefficients
+                                                                                                                                // of Fourier series |
+                                                                                                                                // Sine of declination
+                                                                                                                                // coefficients
+        static Array1D<Real64> const EqOfTimeCoef(
+            9, {0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992}); // Fitted coefficients
+                                                                                                                                // of Fourier Series |
+                                                                                                                                // Equation of Time
+                                                                                                                                // coefficients
+        static Array1D<Real64> const ASHRAE_A_Coef(9,
+                                                   {1161.6685,
+                                                    1.1554,
+                                                    77.3575,
+                                                    -0.5359,
+                                                    -3.7622,
+                                                    0.9875,
+                                                    -3.3924,
+                                                    -1.7445,
+                                                    1.1198}); // Fitted coefficients of Fourier Series | ASHRAE A Factor coefficients
+                                                              // English (original) units:
+                                                              //              368.49341,.366502,24.538624,-.169983,-1.193417,            &
+                                                              //              .313261,-1.076093,-.543376,.355197 ,                       &
 
-        static Array1D<Real64> const ASHRAE_B_Coef(9, {0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034,
-                                                       -0.0011867}); // Fitted coefficients of Fourier Series | ASHRAE B Factor coefficients
-        static Array1D<Real64> const ASHRAE_C_Coef(9,
-                                                   {0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275,
-                                                    -0.00170515}); // Fitted coefficients of Fourier Series | ASHRAE C Factor coefficients
+        static Array1D<Real64> const ASHRAE_B_Coef(
+            9, {0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867}); // Fitted coefficients of
+                                                                                                                             // Fourier Series |
+                                                                                                                             // ASHRAE B Factor
+                                                                                                                             // coefficients
+        static Array1D<Real64> const ASHRAE_C_Coef(
+            9, {0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515}); // Fitted
+                                                                                                                                 // coefficients of
+                                                                                                                                 // Fourier Series |
+                                                                                                                                 // ASHRAE C Factor
+                                                                                                                                 // coefficients
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -4994,8 +5265,15 @@ namespace WeatherManager {
         // List directed reads, as possible.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const Header(8, {"LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS", "GROUND TEMPERATURES",
-                                               "HOLIDAYS/DAYLIGHT SAVING", "COMMENTS 1", "COMMENTS 2", "DATA PERIODS"});
+        static Array1D_string const Header(8,
+                                           {"LOCATION",
+                                            "DESIGN CONDITIONS",
+                                            "TYPICAL/EXTREME PERIODS",
+                                            "GROUND TEMPERATURES",
+                                            "HOLIDAYS/DAYLIGHT SAVING",
+                                            "COMMENTS 1",
+                                            "COMMENTS 2",
+                                            "DATA PERIODS"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string Line;
@@ -5663,8 +5941,12 @@ namespace WeatherManager {
 
     static int findYearForWeekday(int const month, int const day, WeekDay const weekday)
     {
-        static std::map<WeekDay, int> defaultYear{{WeekDay::Sunday, 2017},    {WeekDay::Monday, 2007},   {WeekDay::Tuesday, 2013},
-                                                  {WeekDay::Wednesday, 2014}, {WeekDay::Thursday, 2015}, {WeekDay::Friday, 2010},
+        static std::map<WeekDay, int> defaultYear{{WeekDay::Sunday, 2017},
+                                                  {WeekDay::Monday, 2007},
+                                                  {WeekDay::Tuesday, 2013},
+                                                  {WeekDay::Wednesday, 2014},
+                                                  {WeekDay::Thursday, 2015},
+                                                  {WeekDay::Friday, 2010},
                                                   {WeekDay::Saturday, 2011}};
         int rem = calculateDayOfYear(month, day) % 7;
         WeekDay firstWeekDay = static_cast<WeekDay>(static_cast<int>(weekday) - rem + 1);
@@ -5673,8 +5955,12 @@ namespace WeatherManager {
 
     static int findLeapYearForWeekday(int const month, int const day, WeekDay const weekday)
     {
-        static std::map<WeekDay, int> defaultYear{{WeekDay::Sunday, 2012},    {WeekDay::Monday, 1996},   {WeekDay::Tuesday, 2008},
-                                                  {WeekDay::Wednesday, 1992}, {WeekDay::Thursday, 2004}, {WeekDay::Friday, 2016},
+        static std::map<WeekDay, int> defaultYear{{WeekDay::Sunday, 2012},
+                                                  {WeekDay::Monday, 1996},
+                                                  {WeekDay::Tuesday, 2008},
+                                                  {WeekDay::Wednesday, 1992},
+                                                  {WeekDay::Thursday, 2004},
+                                                  {WeekDay::Friday, 2016},
                                                   {WeekDay::Saturday, 2000}};
         int rem = calculateDayOfYear(month, day, true) % 7;
         WeekDay firstWeekDay = static_cast<WeekDay>(static_cast<int>(weekday) - rem + 1);
@@ -5721,13 +6007,22 @@ namespace WeatherManager {
         //	LocalLeapYearAdd = 1;
         //}
         for (Loop = 1; Loop <= TotRunPers; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          NumAlpha,
+                                          rNumericArgs,
+                                          NumNumeric,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             // A1, \field Name
             if (!lAlphaFieldBlanks(1)) {
-                GlobalNames::VerifyUniqueInterObjectName(RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                         ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(
+                    RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             }
 
             ++Count;
@@ -5977,8 +6272,8 @@ namespace WeatherManager {
             // calculate the annual start and end days from the user inputted month and day
             RunPeriodInput(Loop).monWeekDay = 0;
             if (RunPeriodInput(Loop).dayOfWeek != 0 && !ErrorsFound) {
-                SetupWeekDaysByMonth(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).dayOfWeek,
-                                     RunPeriodInput(Loop).monWeekDay);
+                SetupWeekDaysByMonth(
+                    RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).dayOfWeek, RunPeriodInput(Loop).monWeekDay);
             }
         }
 
@@ -5993,8 +6288,8 @@ namespace WeatherManager {
             RunPeriodInput(1).endJulianDate = JulianDay(RunPeriodInput(1).endMonth, RunPeriodInput(1).endDay, LeapYearAdd);
             RunPeriodInput(1).monWeekDay = 0;
             if (RunPeriodInput(1).dayOfWeek != 0 && !ErrorsFound) {
-                SetupWeekDaysByMonth(RunPeriodInput(1).startMonth, RunPeriodInput(1).startDay, RunPeriodInput(1).dayOfWeek,
-                                     RunPeriodInput(1).monWeekDay);
+                SetupWeekDaysByMonth(
+                    RunPeriodInput(1).startMonth, RunPeriodInput(1).startDay, RunPeriodInput(1).dayOfWeek, RunPeriodInput(1).monWeekDay);
             }
         } else if (TotRunPers > 1 && FullAnnualRun) {
             TotRunPers = 1;
@@ -6021,8 +6316,19 @@ namespace WeatherManager {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const ValidNames(12, {"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY",
-                                                    "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2"});
+        static Array1D_string const ValidNames(12,
+                                               {"SUNDAY",
+                                                "MONDAY",
+                                                "TUESDAY",
+                                                "WEDNESDAY",
+                                                "THURSDAY",
+                                                "FRIDAY",
+                                                "SATURDAY",
+                                                "HOLIDAY",
+                                                "SUMMERDESIGNDAY",
+                                                "WINTERDESIGNDAY",
+                                                "CUSTOMDAY1",
+                                                "CUSTOMDAY2"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;   // Number of alphas being input
@@ -6047,10 +6353,19 @@ namespace WeatherManager {
         Count = 0;
         cCurrentModuleObject = "SizingPeriod:WeatherFileDays";
         for (Loop = 1; Loop <= RPD1; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                     ErrorsFound);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumerics,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(
+                RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++Count;
             RunPeriodDesignInput(Count).title = cAlphaArgs(1);
             RunPeriodDesignInput(Count).periodType = "User Selected WeatherFile RunPeriod (Design)";
@@ -6137,17 +6452,28 @@ namespace WeatherManager {
             }
             RunPeriodDesignInput(Count).monWeekDay = 0;
             if (RunPeriodDesignInput(1).dayOfWeek != 0 && !ErrorsFound) {
-                SetupWeekDaysByMonth(RunPeriodDesignInput(1).startMonth, RunPeriodDesignInput(1).startDay, RunPeriodDesignInput(1).dayOfWeek,
+                SetupWeekDaysByMonth(RunPeriodDesignInput(1).startMonth,
+                                     RunPeriodDesignInput(1).startDay,
+                                     RunPeriodDesignInput(1).dayOfWeek,
                                      RunPeriodDesignInput(1).monWeekDay);
             }
         }
 
         cCurrentModuleObject = "SizingPeriod:WeatherFileConditionType";
         for (Loop = 1; Loop <= RPD2; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                     ErrorsFound);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Loop,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumerics,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(
+                RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++Count;
             RunPeriodDesignInput(Count).title = cAlphaArgs(1);
             RunPeriodDesignInput(Count).periodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs(2);
@@ -6232,7 +6558,9 @@ namespace WeatherManager {
             }
             RunPeriodDesignInput(1).monWeekDay = 0;
             if (RunPeriodDesignInput(1).dayOfWeek != 0 && !ErrorsFound) {
-                SetupWeekDaysByMonth(RunPeriodDesignInput(1).startMonth, RunPeriodDesignInput(1).startDay, RunPeriodDesignInput(1).dayOfWeek,
+                SetupWeekDaysByMonth(RunPeriodDesignInput(1).startMonth,
+                                     RunPeriodDesignInput(1).startDay,
+                                     RunPeriodDesignInput(1).dayOfWeek,
                                      RunPeriodDesignInput(1).monWeekDay);
             }
         }
@@ -6473,8 +6801,17 @@ namespace WeatherManager {
         NumFound = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         if (NumFound == 1) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          1,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             if (NumAlphas != 2) {
                 ShowSevereError(cCurrentModuleObject + ": Insufficient fields, must have Start AND End Dates");
                 ErrorsFound = true;
@@ -6553,11 +6890,27 @@ namespace WeatherManager {
         using namespace OutputReportPredefined;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const ValidNames(12, {"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY",
-                                                    "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2"});
+        static Array1D_string const ValidNames(12,
+                                               {"SUNDAY",
+                                                "MONDAY",
+                                                "TUESDAY",
+                                                "WEDNESDAY",
+                                                "THURSDAY",
+                                                "FRIDAY",
+                                                "SATURDAY",
+                                                "HOLIDAY",
+                                                "SUMMERDESIGNDAY",
+                                                "WINTERDESIGNDAY",
+                                                "CUSTOMDAY1",
+                                                "CUSTOMDAY2"});
         static Array1D_string const HumidityIndicatingType({0, DDHumIndType_Count - 1},
-                                                           {"Wetbulb [C]", "Dewpoint [C]", "Enthalpy [J/kg]", "Humidity Ratio []", "Schedule []",
-                                                            "WetBulbProfileDefaultMultipliers []", "WetBulbProfileDifferenceSchedule []",
+                                                           {"Wetbulb [C]",
+                                                            "Dewpoint [C]",
+                                                            "Enthalpy [J/kg]",
+                                                            "Humidity Ratio []",
+                                                            "Schedule []",
+                                                            "WetBulbProfileDefaultMultipliers []",
+                                                            "WetBulbProfileDifferenceSchedule []",
                                                             "WetBulbProfileMultiplierSchedule []"});
 
         //  REAL(r64), PARAMETER, DIMENSION(24) :: DefaultTempRangeMult=(/ .87d0,.92d0,.96d0,.99d0,1.0d0,.98d0,.93d0,  &
@@ -6628,8 +6981,17 @@ namespace WeatherManager {
             // Call Input Get routine to retrieve design day data
             MaxDryBulbEntered = false;
             PressureEntered = false;
-            inputProcessor->getObjectItem(cCurrentModuleObject, DDLoop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          DDLoop,
+                                          cAlphaArgs,
+                                          NumAlpha,
+                                          rNumericArgs,
+                                          NumNumerics,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             DesDayInput(EnvrnNum).Title = cAlphaArgs(1); // Environment name
             Environment(EnvrnNum).Title = DesDayInput(EnvrnNum).Title;
@@ -6731,8 +7093,16 @@ namespace WeatherManager {
             if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType_Difference && DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType_Profile) {
                 testval = DesDayInput(EnvrnNum).MaxDryBulb - DesDayInput(EnvrnNum).DailyDBRange;
                 errFlag = false;
-                inputProcessor->rangeCheck(errFlag, cAlphaFieldNames(3), cCurrentModuleObject, "Severe", ">= -90", (testval >= -90.0), "<= 70",
-                                           (testval <= 70.0), _, DesDayInput(EnvrnNum).Title);
+                inputProcessor->rangeCheck(errFlag,
+                                           cAlphaFieldNames(3),
+                                           cCurrentModuleObject,
+                                           "Severe",
+                                           ">= -90",
+                                           (testval >= -90.0),
+                                           "<= 70",
+                                           (testval <= 70.0),
+                                           _,
+                                           DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
                 }
@@ -6753,14 +7123,22 @@ namespace WeatherManager {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = DesDayInput(EnvrnNum).TempRangeSchPtr;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Drybulb Temperature Range Modifier Schedule Value", unitType,
-                                                SPSiteDryBulbRangeModScheduleValue(EnvrnNum), "Zone", "Average", cAlphaArgs(4));
+                            SetupOutputVariable("Sizing Period Site Drybulb Temperature Range Modifier Schedule Value",
+                                                unitType,
+                                                SPSiteDryBulbRangeModScheduleValue(EnvrnNum),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(4));
                         } else if (SPSiteScheduleUnits(schPtr) != units) {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = DesDayInput(EnvrnNum).TempRangeSchPtr;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Drybulb Temperature Range Modifier Schedule Value", unitType,
-                                                SPSiteDryBulbRangeModScheduleValue(EnvrnNum), "Zone", "Average", cAlphaArgs(4));
+                            SetupOutputVariable("Sizing Period Site Drybulb Temperature Range Modifier Schedule Value",
+                                                unitType,
+                                                SPSiteDryBulbRangeModScheduleValue(EnvrnNum),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(4));
                         }
                         if (cAlphaArgs(3) == "MultiplierSchedule") {
                             if (!CheckDayScheduleValueMinMax(DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, ">=", 1.0, "<=")) {
@@ -6791,8 +7169,16 @@ namespace WeatherManager {
                         testval = maxval(DDDBRngModifier(_, _, EnvrnNum));
                         testval = DesDayInput(EnvrnNum).MaxDryBulb - testval;
                         errFlag = false;
-                        inputProcessor->rangeCheck(errFlag, cAlphaFieldNames(4), cCurrentModuleObject, "Severe", ">= -90", (testval >= -90.0),
-                                                   "<= 70", (testval <= 70.0), _, DesDayInput(EnvrnNum).Title);
+                        inputProcessor->rangeCheck(errFlag,
+                                                   cAlphaFieldNames(4),
+                                                   cCurrentModuleObject,
+                                                   "Severe",
+                                                   ">= -90",
+                                                   (testval >= -90.0),
+                                                   "<= 70",
+                                                   (testval <= 70.0),
+                                                   _,
+                                                   DesDayInput(EnvrnNum).Title);
                         if (errFlag) {
                             ErrorsFound = true;
                         }
@@ -6830,8 +7216,15 @@ namespace WeatherManager {
                 }
                 errFlag = false;
                 DesDayInput(EnvrnNum).HumIndType = DDHumIndType_WetBulb;
-                inputProcessor->rangeCheck(errFlag, cAlphaFieldNames(5) + " - Wet-Bulb", cCurrentModuleObject, "Severe", ">= -90",
-                                           (DesDayInput(EnvrnNum).HumIndValue >= -90.0), "<= 70", (DesDayInput(EnvrnNum).HumIndValue <= 70.0), _,
+                inputProcessor->rangeCheck(errFlag,
+                                           cAlphaFieldNames(5) + " - Wet-Bulb",
+                                           cCurrentModuleObject,
+                                           "Severe",
+                                           ">= -90",
+                                           (DesDayInput(EnvrnNum).HumIndValue >= -90.0),
+                                           "<= 70",
+                                           (DesDayInput(EnvrnNum).HumIndValue <= 70.0),
+                                           _,
                                            DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     //        CALL ShowContinueError(TRIM(cCurrentModuleObject)//': Occured in '//TRIM(DesDayInput(EnvrnNum)%Title))
@@ -6849,8 +7242,15 @@ namespace WeatherManager {
                 }
                 errFlag = false;
                 DesDayInput(EnvrnNum).HumIndType = DDHumIndType_DewPoint;
-                inputProcessor->rangeCheck(errFlag, cAlphaFieldNames(5) + " - Dew-Point", cCurrentModuleObject, "Severe", ">= -90",
-                                           (DesDayInput(EnvrnNum).HumIndValue >= -90.0), "<= 70", (DesDayInput(EnvrnNum).HumIndValue <= 70.0), _,
+                inputProcessor->rangeCheck(errFlag,
+                                           cAlphaFieldNames(5) + " - Dew-Point",
+                                           cCurrentModuleObject,
+                                           "Severe",
+                                           ">= -90",
+                                           (DesDayInput(EnvrnNum).HumIndValue >= -90.0),
+                                           "<= 70",
+                                           (DesDayInput(EnvrnNum).HumIndValue <= 70.0),
+                                           _,
                                            DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6868,8 +7268,15 @@ namespace WeatherManager {
                 }
                 errFlag = false;
                 DesDayInput(EnvrnNum).HumIndType = DDHumIndType_HumRatio;
-                inputProcessor->rangeCheck(errFlag, cAlphaFieldNames(5) + " - Humidity-Ratio", cCurrentModuleObject, "Severe", ">= 0",
-                                           (DesDayInput(EnvrnNum).HumIndValue >= 0.0), "<= .03", (DesDayInput(EnvrnNum).HumIndValue <= 0.03), _,
+                inputProcessor->rangeCheck(errFlag,
+                                           cAlphaFieldNames(5) + " - Humidity-Ratio",
+                                           cCurrentModuleObject,
+                                           "Severe",
+                                           ">= 0",
+                                           (DesDayInput(EnvrnNum).HumIndValue >= 0.0),
+                                           "<= .03",
+                                           (DesDayInput(EnvrnNum).HumIndValue <= 0.03),
+                                           _,
                                            DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6887,9 +7294,16 @@ namespace WeatherManager {
                 }
                 errFlag = false;
                 DesDayInput(EnvrnNum).HumIndType = DDHumIndType_Enthalpy;
-                inputProcessor->rangeCheck(errFlag, cAlphaFieldNames(5) + " - Enthalpy", "SizingPeriod:DesignDay", "Severe", ">= 0.0",
-                                           (DesDayInput(EnvrnNum).HumIndValue >= 0.0), "<= 130000", (DesDayInput(EnvrnNum).HumIndValue <= 130000.0),
-                                           _, DesDayInput(EnvrnNum).Title);
+                inputProcessor->rangeCheck(errFlag,
+                                           cAlphaFieldNames(5) + " - Enthalpy",
+                                           "SizingPeriod:DesignDay",
+                                           "Severe",
+                                           ">= 0.0",
+                                           (DesDayInput(EnvrnNum).HumIndValue >= 0.0),
+                                           "<= 130000",
+                                           (DesDayInput(EnvrnNum).HumIndValue <= 130000.0),
+                                           _,
+                                           DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
                 }
@@ -6969,14 +7383,22 @@ namespace WeatherManager {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = DesDayInput(EnvrnNum).HumIndSchPtr;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Humidity Condition Schedule Value", unitType,
-                                                SPSiteHumidityConditionScheduleValue(EnvrnNum), "Zone", "Average", cAlphaArgs(6));
+                            SetupOutputVariable("Sizing Period Site Humidity Condition Schedule Value",
+                                                unitType,
+                                                SPSiteHumidityConditionScheduleValue(EnvrnNum),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(6));
                         } else if (SPSiteScheduleUnits(schPtr) != units) {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = DesDayInput(EnvrnNum).HumIndSchPtr;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Humidity Condition Schedule Value", unitType,
-                                                SPSiteHumidityConditionScheduleValue(EnvrnNum), "Zone", "Average", cAlphaArgs(6));
+                            SetupOutputVariable("Sizing Period Site Humidity Condition Schedule Value",
+                                                unitType,
+                                                SPSiteHumidityConditionScheduleValue(EnvrnNum),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(6));
                         }
 
                         {
@@ -7080,14 +7502,22 @@ namespace WeatherManager {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = DesDayInput(EnvrnNum).BeamSolarSchPtr;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Beam Solar Schedule Value", unitType, SPSiteBeamSolarScheduleValue(EnvrnNum),
-                                                "Zone", "Average", cAlphaArgs(11));
+                            SetupOutputVariable("Sizing Period Site Beam Solar Schedule Value",
+                                                unitType,
+                                                SPSiteBeamSolarScheduleValue(EnvrnNum),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(11));
                         } else if (SPSiteScheduleUnits(schPtr) != units) {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = DesDayInput(EnvrnNum).BeamSolarSchPtr;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Beam Solar Schedule Value", unitType, SPSiteBeamSolarScheduleValue(EnvrnNum),
-                                                "Zone", "Average", cAlphaArgs(11));
+                            SetupOutputVariable("Sizing Period Site Beam Solar Schedule Value",
+                                                unitType,
+                                                SPSiteBeamSolarScheduleValue(EnvrnNum),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(11));
                         }
                         if (!CheckDayScheduleValueMinMax(DesDayInput(EnvrnNum).BeamSolarSchPtr, 0.0, ">=")) {
                             ShowSevereError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -7118,14 +7548,22 @@ namespace WeatherManager {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = DesDayInput(EnvrnNum).DiffuseSolarSchPtr;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Diffuse Solar Schedule Value", unitType,
-                                                SPSiteDiffuseSolarScheduleValue(EnvrnNum), "Zone", "Average", cAlphaArgs(12));
+                            SetupOutputVariable("Sizing Period Site Diffuse Solar Schedule Value",
+                                                unitType,
+                                                SPSiteDiffuseSolarScheduleValue(EnvrnNum),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(12));
                         } else if (SPSiteScheduleUnits(schPtr) != units) {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = DesDayInput(EnvrnNum).DiffuseSolarSchPtr;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Diffuse Solar Schedule Value", unitType,
-                                                SPSiteDiffuseSolarScheduleValue(EnvrnNum), "Zone", "Average", cAlphaArgs(12));
+                            SetupOutputVariable("Sizing Period Site Diffuse Solar Schedule Value",
+                                                unitType,
+                                                SPSiteDiffuseSolarScheduleValue(EnvrnNum),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(12));
                         }
                         if (!CheckDayScheduleValueMinMax(DesDayInput(EnvrnNum).DiffuseSolarSchPtr, 0.0, ">=")) {
                             ShowSevereError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -7347,8 +7785,17 @@ namespace WeatherManager {
 
         for (Item = 1; Item <= NumWPSkyTemperatures; ++Item) {
             MultipleEnvironments = false;
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlpha,
+                                          rNumericArgs,
+                                          NumNumerics,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             {
                 auto const SELECT_CASE_var(cAlphaArgs(1));
@@ -7459,14 +7906,22 @@ namespace WeatherManager {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value", unitType,
-                                                SPSiteSkyTemperatureScheduleValue(envFound), "Zone", "Average", cAlphaArgs(3));
+                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value",
+                                                unitType,
+                                                SPSiteSkyTemperatureScheduleValue(envFound),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(3));
                         } else if (SPSiteScheduleUnits(schPtr) != units) {
                             ++NumSPSiteScheduleNamePtrs;
                             SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
                             SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value", unitType,
-                                                SPSiteSkyTemperatureScheduleValue(envFound), "Zone", "Average", cAlphaArgs(3));
+                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value",
+                                                unitType,
+                                                SPSiteSkyTemperatureScheduleValue(envFound),
+                                                "Zone",
+                                                "Average",
+                                                cAlphaArgs(3));
                         }
                         WPSkyTemperature(Item).IsSchedule = true;
                         WPSkyTemperature(Item).SchedulePtr = Found;
@@ -7692,8 +8147,17 @@ namespace WeatherManager {
         NumObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         if (NumObjects == 1) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          1,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             if (UtilityRoutines::SameString(AlphArray(1), "Schedule")) {
                 WaterMainsTempsMethod = ScheduleMethod;
@@ -7982,8 +8446,19 @@ namespace WeatherManager {
         static Array1D<Real64> const BDirLumEff(8, {-4.55, -3.46, -4.90, -5.84, -3.97, -1.25, 0.77, 1.58});
         static Array1D<Real64> const CDirLumEff(8, {-2.98, -1.21, -1.71, -1.99, -1.75, -1.51, -1.26, -1.10});
         static Array1D<Real64> const DDirLumEff(8, {117.12, 12.38, -8.81, -4.56, -6.16, -26.73, -34.44, -8.29});
-        static Array1D<Real64> const ExtraDirNormIll(12, {131153.0, 130613.0, 128992.0, 126816.0, 124731.0, 123240.0, 122652.0, 123120.0, 124576.0,
-                                                          126658.0, 128814.0, 130471.0}); // Monthly exterrestrial direct normal illuminance (lum/m2)
+        static Array1D<Real64> const ExtraDirNormIll(12,
+                                                     {131153.0,
+                                                      130613.0,
+                                                      128992.0,
+                                                      126816.0,
+                                                      124731.0,
+                                                      123240.0,
+                                                      122652.0,
+                                                      123120.0,
+                                                      124576.0,
+                                                      126658.0,
+                                                      128814.0,
+                                                      130471.0}); // Monthly exterrestrial direct normal illuminance (lum/m2)
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8043,8 +8518,9 @@ namespace WeatherManager {
         if (SkyBrightness <= 0.0) {
             DirLumEff = 0.0;
         } else {
-            DirLumEff = max(0.0, ADirLumEff(ISkyClearness) + BDirLumEff(ISkyClearness) * AtmosMoisture +
-                                     CDirLumEff(ISkyClearness) * std::exp(5.73 * SunZenith - 5.0) + DDirLumEff(ISkyClearness) * SkyBrightness);
+            DirLumEff = max(0.0,
+                            ADirLumEff(ISkyClearness) + BDirLumEff(ISkyClearness) * AtmosMoisture +
+                                CDirLumEff(ISkyClearness) * std::exp(5.73 * SunZenith - 5.0) + DDirLumEff(ISkyClearness) * SkyBrightness);
         }
     }
 
@@ -8796,16 +9272,24 @@ namespace WeatherManager {
                                                 (365 - DataPeriods(CurCount).DataStJDay + 1) + (DataPeriods(CurCount).DataEnJDay - 1 + 1);
                                         }
                                     } else { // weather file has actual year(s)
-                                        JGDate(GregorianToJulian, DataPeriods(CurCount).DataStJDay, DataPeriods(CurCount).StYear,
-                                               DataPeriods(CurCount).StMon, DataPeriods(CurCount).StDay);
-                                        JGDate(GregorianToJulian, DataPeriods(CurCount).DataEnJDay, DataPeriods(CurCount).EnYear,
-                                               DataPeriods(CurCount).EnMon, DataPeriods(CurCount).EnDay);
+                                        JGDate(GregorianToJulian,
+                                               DataPeriods(CurCount).DataStJDay,
+                                               DataPeriods(CurCount).StYear,
+                                               DataPeriods(CurCount).StMon,
+                                               DataPeriods(CurCount).StDay);
+                                        JGDate(GregorianToJulian,
+                                               DataPeriods(CurCount).DataEnJDay,
+                                               DataPeriods(CurCount).EnYear,
+                                               DataPeriods(CurCount).EnMon,
+                                               DataPeriods(CurCount).EnDay);
                                         DataPeriods(CurCount).NumDays = DataPeriods(CurCount).DataEnJDay - DataPeriods(CurCount).DataStJDay + 1;
                                     }
                                     // Have processed the last item for this, can set up Weekdays for months
                                     DataPeriods(CurCount).MonWeekDay = 0;
                                     if (!ErrorsFound) {
-                                        SetupWeekDaysByMonth(DataPeriods(CurCount).StMon, DataPeriods(CurCount).StDay, DataPeriods(CurCount).WeekDay,
+                                        SetupWeekDaysByMonth(DataPeriods(CurCount).StMon,
+                                                             DataPeriods(CurCount).StDay,
+                                                             DataPeriods(CurCount).WeekDay,
                                                              DataPeriods(CurCount).MonWeekDay);
                                     }
                                 }
