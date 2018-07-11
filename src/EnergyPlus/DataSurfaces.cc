@@ -571,7 +571,8 @@ namespace DataSurfaces {
                 slab.xl = xl;
                 slab.xu = xu;
                 assert(crossEdges.size() >= 2u);
-                std::sort(crossEdges.begin(), crossEdges.end(),
+                std::sort(crossEdges.begin(),
+                          crossEdges.end(),
                           [](CrossEdge const &e1, CrossEdge const &e2) -> bool // Lambda to sort by x_mid
                           {
                               return std::get<0>(e1) + std::get<1>(e1) <

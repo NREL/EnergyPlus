@@ -251,8 +251,8 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // Using/Aliasing
-        using HeatBalFiniteDiffManager::SurfaceFD;
         using HeatBalanceAirManager::ManageAirHeatBalance;
+        using HeatBalFiniteDiffManager::SurfaceFD;
         using OutputReportTabular::GatherComponentLoadsSurface; // for writing tabular compoonent loads output reports
         using ThermalComfort::ManageThermalComfort;
 
@@ -347,12 +347,12 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // Using/Aliasing
-        using DataDElight::LUX2FC;
+        using DataDaylighting::mapResultsToReport;
         using DataDaylighting::NoDaylighting;
         using DataDaylighting::TotIllumMaps;
         using DataDaylighting::ZoneDaylight;
-        using DataDaylighting::mapResultsToReport;
         using DataDaylightingDevices::NumOfTDDPipes;
+        using DataDElight::LUX2FC;
         using namespace SolarShading;
         using ConvectionCoefficients::InitInteriorConvectionCoeffs;
         using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -361,8 +361,8 @@ namespace HeatBalanceSurfaceManager {
         using DataRoomAirModel::IsZoneDV;
         using DataRoomAirModel::IsZoneUI;
         using DataSystemVariables::GoodIOStatValue;
-        using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
         using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
+        using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
         using InternalHeatGains::ManageInternalHeatGains;
         // RJH DElight Modification Begin
         using namespace DElightManagerF;
@@ -612,8 +612,17 @@ namespace HeatBalanceSurfaceManager {
                 dCloudFraction = CloudFraction;
                 // Init Error Flag to 0 (no Warnings or Errors)
                 iErrorFlag = 0;
-                DElightElecLtgCtrl(len(Zone(NZ).Name), Zone(NZ).Name, dLatitude, dHISKFFC, dHISUNFFC, dCloudFraction, dSOLCOS1, dSOLCOS2, dSOLCOS3,
-                                   dPowerReducFac, iErrorFlag);
+                DElightElecLtgCtrl(len(Zone(NZ).Name),
+                                   Zone(NZ).Name,
+                                   dLatitude,
+                                   dHISKFFC,
+                                   dHISUNFFC,
+                                   dCloudFraction,
+                                   dSOLCOS1,
+                                   dSOLCOS2,
+                                   dSOLCOS3,
+                                   dPowerReducFac,
+                                   iErrorFlag);
                 // Check Error Flag for Warnings or Errors returning from DElight
                 // RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
                 if (iErrorFlag != 0) {
@@ -1536,194 +1545,458 @@ namespace HeatBalanceSurfaceManager {
         // Setup surface report variables CurrentModuleObject='Opaque Surfaces'
         for (loop = 1; loop <= TotSurfaces; ++loop) {
             if (!Surface(loop).HeatTransSurf) continue;
-            SetupOutputVariable("Surface Inside Face Temperature", OutputProcessor::Unit::C, TempSurfInRep(loop), "Zone", "State",
-                                Surface(loop).Name);
+            SetupOutputVariable(
+                "Surface Inside Face Temperature", OutputProcessor::Unit::C, TempSurfInRep(loop), "Zone", "State", Surface(loop).Name);
 
             if (Surface(loop).ExtBoundCond != KivaFoundation) {
-                SetupOutputVariable("Surface Outside Face Temperature", OutputProcessor::Unit::C, TempSurfOut(loop), "Zone", "State",
-                                    Surface(loop).Name);
+                SetupOutputVariable(
+                    "Surface Outside Face Temperature", OutputProcessor::Unit::C, TempSurfOut(loop), "Zone", "State", Surface(loop).Name);
             }
 
-            SetupOutputVariable("Surface Inside Face Adjacent Air Temperature", OutputProcessor::Unit::C, TempEffBulkAir(loop), "Zone", "State",
+            SetupOutputVariable(
+                "Surface Inside Face Adjacent Air Temperature", OutputProcessor::Unit::C, TempEffBulkAir(loop), "Zone", "State", Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Convection Heat Transfer Coefficient",
+                                OutputProcessor::Unit::W_m2K,
+                                HConvIn(loop),
+                                "Zone",
+                                "State",
                                 Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Convection Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HConvIn(loop), "Zone",
-                                "State", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Convection Heat Gain Rate", OutputProcessor::Unit::W, QdotConvInRep(loop), "Zone", "State",
+            SetupOutputVariable(
+                "Surface Inside Face Convection Heat Gain Rate", OutputProcessor::Unit::W, QdotConvInRep(loop), "Zone", "State", Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Convection Heat Gain Rate per Area",
+                                OutputProcessor::Unit::W_m2,
+                                QdotConvInRepPerArea(loop),
+                                "Zone",
+                                "State",
                                 Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Convection Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotConvInRepPerArea(loop),
-                                "Zone", "State", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Convection Heat Gain Energy", OutputProcessor::Unit::J, QConvInReport(loop), "Zone", "Sum",
-                                Surface(loop).Name);
+            SetupOutputVariable(
+                "Surface Inside Face Convection Heat Gain Energy", OutputProcessor::Unit::J, QConvInReport(loop), "Zone", "Sum", Surface(loop).Name);
 
-            SetupOutputVariable("Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate", OutputProcessor::Unit::W,
-                                QdotRadNetSurfInRep(loop), "Zone", "State", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2,
-                                QdotRadNetSurfInRepPerArea(loop), "Zone", "State", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy", OutputProcessor::Unit::J,
-                                QRadNetSurfInReport(loop), "Zone", "Sum", Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
+                                OutputProcessor::Unit::W,
+                                QdotRadNetSurfInRep(loop),
+                                "Zone",
+                                "State",
+                                Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area",
+                                OutputProcessor::Unit::W_m2,
+                                QdotRadNetSurfInRepPerArea(loop),
+                                "Zone",
+                                "State",
+                                Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy",
+                                OutputProcessor::Unit::J,
+                                QRadNetSurfInReport(loop),
+                                "Zone",
+                                "Sum",
+                                Surface(loop).Name);
 
             if (Surface(loop).Class != SurfaceClass_Window) {
-                SetupOutputVariable("Surface Inside Face Solar Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadSolarInRep(loop), "Zone",
-                                    "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Inside Face Solar Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2,
-                                    QdotRadSolarInRepPerArea(loop), "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Inside Face Solar Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadSolarInReport(loop), "Zone",
-                                    "Sum", Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Solar Radiation Heat Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    QdotRadSolarInRep(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Solar Radiation Heat Gain Rate per Area",
+                                    OutputProcessor::Unit::W_m2,
+                                    QdotRadSolarInRepPerArea(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Solar Radiation Heat Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    QRadSolarInReport(loop),
+                                    "Zone",
+                                    "Sum",
+                                    Surface(loop).Name);
 
-                SetupOutputVariable("Surface Inside Face Lights Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadLightsInRep(loop), "Zone",
-                                    "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Inside Face Lights Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2,
-                                    QdotRadLightsInRepPerArea(loop), "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Inside Face Lights Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadLightsInReport(loop),
-                                    "Zone", "Sum", Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Lights Radiation Heat Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    QdotRadLightsInRep(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Lights Radiation Heat Gain Rate per Area",
+                                    OutputProcessor::Unit::W_m2,
+                                    QdotRadLightsInRepPerArea(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Lights Radiation Heat Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    QRadLightsInReport(loop),
+                                    "Zone",
+                                    "Sum",
+                                    Surface(loop).Name);
             }
 
-            SetupOutputVariable("Surface Inside Face Internal Gains Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadIntGainsInRep(loop),
-                                "Zone", "State", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2,
-                                QdotRadIntGainsInRepPerArea(loop), "Zone", "State", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Internal Gains Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadIntGainsInReport(loop),
-                                "Zone", "Sum", Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Internal Gains Radiation Heat Gain Rate",
+                                OutputProcessor::Unit::W,
+                                QdotRadIntGainsInRep(loop),
+                                "Zone",
+                                "State",
+                                Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area",
+                                OutputProcessor::Unit::W_m2,
+                                QdotRadIntGainsInRepPerArea(loop),
+                                "Zone",
+                                "State",
+                                Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Internal Gains Radiation Heat Gain Energy",
+                                OutputProcessor::Unit::J,
+                                QRadIntGainsInReport(loop),
+                                "Zone",
+                                "Sum",
+                                Surface(loop).Name);
 
-            SetupOutputVariable("Surface Inside Face System Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadHVACInRep(loop), "Zone",
-                                "State", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face System Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2,
-                                QdotRadHVACInRepPerArea(loop), "Zone", "State", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face System Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadHVACInReport(loop), "Zone",
-                                "Sum", Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face System Radiation Heat Gain Rate",
+                                OutputProcessor::Unit::W,
+                                QdotRadHVACInRep(loop),
+                                "Zone",
+                                "State",
+                                Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face System Radiation Heat Gain Rate per Area",
+                                OutputProcessor::Unit::W_m2,
+                                QdotRadHVACInRepPerArea(loop),
+                                "Zone",
+                                "State",
+                                Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face System Radiation Heat Gain Energy",
+                                OutputProcessor::Unit::J,
+                                QRadHVACInReport(loop),
+                                "Zone",
+                                "Sum",
+                                Surface(loop).Name);
 
             if (Surface(loop).ExtBoundCond == ExternalEnvironment || DisplayAdvancedReportVariables) {
-                SetupOutputVariable("Surface Outside Face Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, Surface(loop).OutDryBulbTemp,
-                                    "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, Surface(loop).OutWetBulbTemp,
-                                    "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Surface(loop).WindSpeed, "Zone",
-                                    "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Surface(loop).WindDir, "Zone",
-                                    "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Convection Heat Gain Rate", OutputProcessor::Unit::W, QdotConvOutRep(loop), "Zone", "State",
+                SetupOutputVariable("Surface Outside Face Outdoor Air Drybulb Temperature",
+                                    OutputProcessor::Unit::C,
+                                    Surface(loop).OutDryBulbTemp,
+                                    "Zone",
+                                    "State",
                                     Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Convection Heat Gain Rate per Area", OutputProcessor::Unit::W_m2,
-                                    QdotConvOutRepPerArea(loop), "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Convection Heat Gain Energy", OutputProcessor::Unit::J, QConvOutReport(loop), "Zone", "Sum",
+                SetupOutputVariable("Surface Outside Face Outdoor Air Wetbulb Temperature",
+                                    OutputProcessor::Unit::C,
+                                    Surface(loop).OutWetBulbTemp,
+                                    "Zone",
+                                    "State",
                                     Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Convection Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HcExtSurf(loop),
-                                    "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Net Thermal Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadOutRep(loop),
-                                    "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2,
-                                    QdotRadOutRepPerArea(loop), "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Net Thermal Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadOutReport(loop),
-                                    "Zone", "Sum", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K,
-                                    HAirExtSurf(loop), "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K,
-                                    HSkyExtSurf(loop), "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K,
-                                    HGrdExtSurf(loop), "Zone", "State", Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Outdoor Air Wind Speed",
+                                    OutputProcessor::Unit::m_s,
+                                    Surface(loop).WindSpeed,
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Outdoor Air Wind Direction",
+                                    OutputProcessor::Unit::deg,
+                                    Surface(loop).WindDir,
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Convection Heat Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    QdotConvOutRep(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Convection Heat Gain Rate per Area",
+                                    OutputProcessor::Unit::W_m2,
+                                    QdotConvOutRepPerArea(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Convection Heat Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    QConvOutReport(loop),
+                                    "Zone",
+                                    "Sum",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Convection Heat Transfer Coefficient",
+                                    OutputProcessor::Unit::W_m2K,
+                                    HcExtSurf(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Net Thermal Radiation Heat Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    QdotRadOutRep(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area",
+                                    OutputProcessor::Unit::W_m2,
+                                    QdotRadOutRepPerArea(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Net Thermal Radiation Heat Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    QRadOutReport(loop),
+                                    "Zone",
+                                    "Sum",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient",
+                                    OutputProcessor::Unit::W_m2K,
+                                    HAirExtSurf(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient",
+                                    OutputProcessor::Unit::W_m2K,
+                                    HSkyExtSurf(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient",
+                                    OutputProcessor::Unit::W_m2K,
+                                    HGrdExtSurf(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
                 if (Surface(loop).Class != SurfaceClass_Window) {
-                    SetupOutputVariable("Surface Outside Face Solar Radiation Heat Gain Rate", OutputProcessor::Unit::W, SWOutAbsTotalReport(loop),
-                                        "Zone", "Average", Surface(loop).Name);
-                    SetupOutputVariable("Surface Outside Face Solar Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2,
-                                        QRadSWOutAbs(loop), "Zone", "Average", Surface(loop).Name);
-                    SetupOutputVariable("Surface Outside Face Solar Radiation Heat Gain Energy", OutputProcessor::Unit::J, SWOutAbsEnergyReport(loop),
-                                        "Zone", "Sum", Surface(loop).Name);
+                    SetupOutputVariable("Surface Outside Face Solar Radiation Heat Gain Rate",
+                                        OutputProcessor::Unit::W,
+                                        SWOutAbsTotalReport(loop),
+                                        "Zone",
+                                        "Average",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Outside Face Solar Radiation Heat Gain Rate per Area",
+                                        OutputProcessor::Unit::W_m2,
+                                        QRadSWOutAbs(loop),
+                                        "Zone",
+                                        "Average",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Outside Face Solar Radiation Heat Gain Energy",
+                                        OutputProcessor::Unit::J,
+                                        SWOutAbsEnergyReport(loop),
+                                        "Zone",
+                                        "Sum",
+                                        Surface(loop).Name);
                 }
             }
             if (Surface(loop).Class == SurfaceClass_Floor || Surface(loop).Class == SurfaceClass_Wall ||
                 Surface(loop).Class == SurfaceClass_IntMass || Surface(loop).Class == SurfaceClass_Roof || Surface(loop).Class == SurfaceClass_Door) {
                 //      IF (DisplayAdvancedReportVariables) THEN  !CurrentModuleObject='Opaque Surfaces(Advanced)'
-                SetupOutputVariable("Surface Inside Face Conduction Heat Transfer Rate", OutputProcessor::Unit::W, OpaqSurfInsFaceConduction(loop),
-                                    "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Inside Face Conduction Heat Gain Rate", OutputProcessor::Unit::W, OpaqSurfInsFaceCondGainRep(loop),
-                                    "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Inside Face Conduction Heat Loss Rate", OutputProcessor::Unit::W, OpaqSurfInsFaceCondLossRep(loop),
-                                    "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Inside Face Conduction Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2,
-                                    OpaqSurfInsFaceConductionFlux(loop), "Zone", "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Inside Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J,
-                                    OpaqSurfInsFaceConductionEnergy(loop), "Zone", "Sum", Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Conduction Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    OpaqSurfInsFaceConduction(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Conduction Heat Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    OpaqSurfInsFaceCondGainRep(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Conduction Heat Loss Rate",
+                                    OutputProcessor::Unit::W,
+                                    OpaqSurfInsFaceCondLossRep(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Conduction Heat Transfer Rate per Area",
+                                    OutputProcessor::Unit::W_m2,
+                                    OpaqSurfInsFaceConductionFlux(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Conduction Heat Transfer Energy",
+                                    OutputProcessor::Unit::J,
+                                    OpaqSurfInsFaceConductionEnergy(loop),
+                                    "Zone",
+                                    "Sum",
+                                    Surface(loop).Name);
 
                 if (Surface(loop).ExtBoundCond != KivaFoundation) {
-                    SetupOutputVariable("Surface Outside Face Conduction Heat Transfer Rate", OutputProcessor::Unit::W,
-                                        OpaqSurfOutsideFaceConduction(loop), "Zone", "State", Surface(loop).Name);
-                    SetupOutputVariable("Surface Outside Face Conduction Heat Gain Rate", OutputProcessor::Unit::W, OpaqSurfExtFaceCondGainRep(loop),
-                                        "Zone", "State", Surface(loop).Name);
-                    SetupOutputVariable("Surface Outside Face Conduction Heat Loss Rate", OutputProcessor::Unit::W, OpaqSurfExtFaceCondLossRep(loop),
-                                        "Zone", "State", Surface(loop).Name);
-                    SetupOutputVariable("Surface Outside Face Conduction Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2,
-                                        OpaqSurfOutsideFaceConductionFlux(loop), "Zone", "State", Surface(loop).Name);
-                    SetupOutputVariable("Surface Outside Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J,
-                                        OpaqSurfOutsideFaceConductionEnergy(loop), "Zone", "Sum", Surface(loop).Name);
+                    SetupOutputVariable("Surface Outside Face Conduction Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        OpaqSurfOutsideFaceConduction(loop),
+                                        "Zone",
+                                        "State",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Outside Face Conduction Heat Gain Rate",
+                                        OutputProcessor::Unit::W,
+                                        OpaqSurfExtFaceCondGainRep(loop),
+                                        "Zone",
+                                        "State",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Outside Face Conduction Heat Loss Rate",
+                                        OutputProcessor::Unit::W,
+                                        OpaqSurfExtFaceCondLossRep(loop),
+                                        "Zone",
+                                        "State",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Outside Face Conduction Heat Transfer Rate per Area",
+                                        OutputProcessor::Unit::W_m2,
+                                        OpaqSurfOutsideFaceConductionFlux(loop),
+                                        "Zone",
+                                        "State",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Outside Face Conduction Heat Transfer Energy",
+                                        OutputProcessor::Unit::J,
+                                        OpaqSurfOutsideFaceConductionEnergy(loop),
+                                        "Zone",
+                                        "Sum",
+                                        Surface(loop).Name);
 
-                    SetupOutputVariable("Surface Average Face Conduction Heat Transfer Rate", OutputProcessor::Unit::W,
-                                        OpaqSurfAvgFaceConduction(loop), "Zone", "State", Surface(loop).Name);
-                    SetupOutputVariable("Surface Average Face Conduction Heat Gain Rate", OutputProcessor::Unit::W, OpaqSurfAvgFaceCondGainRep(loop),
-                                        "Zone", "State", Surface(loop).Name);
-                    SetupOutputVariable("Surface Average Face Conduction Heat Loss Rate", OutputProcessor::Unit::W, OpaqSurfAvgFaceCondLossRep(loop),
-                                        "Zone", "State", Surface(loop).Name);
-                    SetupOutputVariable("Surface Average Face Conduction Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2,
-                                        OpaqSurfAvgFaceConductionFlux(loop), "Zone", "State", Surface(loop).Name);
-                    SetupOutputVariable("Surface Average Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J,
-                                        OpaqSurfAvgFaceConductionEnergy(loop), "Zone", "Sum", Surface(loop).Name);
+                    SetupOutputVariable("Surface Average Face Conduction Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        OpaqSurfAvgFaceConduction(loop),
+                                        "Zone",
+                                        "State",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Average Face Conduction Heat Gain Rate",
+                                        OutputProcessor::Unit::W,
+                                        OpaqSurfAvgFaceCondGainRep(loop),
+                                        "Zone",
+                                        "State",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Average Face Conduction Heat Loss Rate",
+                                        OutputProcessor::Unit::W,
+                                        OpaqSurfAvgFaceCondLossRep(loop),
+                                        "Zone",
+                                        "State",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Average Face Conduction Heat Transfer Rate per Area",
+                                        OutputProcessor::Unit::W_m2,
+                                        OpaqSurfAvgFaceConductionFlux(loop),
+                                        "Zone",
+                                        "State",
+                                        Surface(loop).Name);
+                    SetupOutputVariable("Surface Average Face Conduction Heat Transfer Energy",
+                                        OutputProcessor::Unit::J,
+                                        OpaqSurfAvgFaceConductionEnergy(loop),
+                                        "Zone",
+                                        "Sum",
+                                        Surface(loop).Name);
 
-                    SetupOutputVariable("Surface Heat Storage Rate", OutputProcessor::Unit::W, OpaqSurfStorageConduction(loop), "Zone", "State",
+                    SetupOutputVariable(
+                        "Surface Heat Storage Rate", OutputProcessor::Unit::W, OpaqSurfStorageConduction(loop), "Zone", "State", Surface(loop).Name);
+                    SetupOutputVariable("Surface Heat Storage Gain Rate",
+                                        OutputProcessor::Unit::W,
+                                        OpaqSurfStorageGainRep(loop),
+                                        "Zone",
+                                        "State",
                                         Surface(loop).Name);
-                    SetupOutputVariable("Surface Heat Storage Gain Rate", OutputProcessor::Unit::W, OpaqSurfStorageGainRep(loop), "Zone", "State",
+                    SetupOutputVariable("Surface Heat Storage Loss Rate",
+                                        OutputProcessor::Unit::W,
+                                        OpaqSurfStorageCondLossRep(loop),
+                                        "Zone",
+                                        "State",
                                         Surface(loop).Name);
-                    SetupOutputVariable("Surface Heat Storage Loss Rate", OutputProcessor::Unit::W, OpaqSurfStorageCondLossRep(loop), "Zone", "State",
+                    SetupOutputVariable("Surface Heat Storage Rate per Area",
+                                        OutputProcessor::Unit::W_m2,
+                                        OpaqSurfStorageConductionFlux(loop),
+                                        "Zone",
+                                        "State",
                                         Surface(loop).Name);
-                    SetupOutputVariable("Surface Heat Storage Rate per Area", OutputProcessor::Unit::W_m2, OpaqSurfStorageConductionFlux(loop),
-                                        "Zone", "State", Surface(loop).Name);
-                    SetupOutputVariable("Surface Heat Storage Energy", OutputProcessor::Unit::J, OpaqSurfStorageConductionEnergy(loop), "Zone", "Sum",
+                    SetupOutputVariable("Surface Heat Storage Energy",
+                                        OutputProcessor::Unit::J,
+                                        OpaqSurfStorageConductionEnergy(loop),
+                                        "Zone",
+                                        "Sum",
                                         Surface(loop).Name);
                 }
 
                 //      ENDIF
                 // CurrentModuleObject='Opaque Surfaces'
 
-                SetupOutputVariable("Surface Inside Face Beam Solar Radiation Heat Gain Rate", OutputProcessor::Unit::W,
-                                    OpaqSurfInsFaceBeamSolAbsorbed(loop), "Zone", "State", Surface(loop).Name);
+                SetupOutputVariable("Surface Inside Face Beam Solar Radiation Heat Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    OpaqSurfInsFaceBeamSolAbsorbed(loop),
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
             }
             if (Construct(Surface(loop).Construction).SourceSinkPresent) {
-                SetupOutputVariable("Surface Internal Source Location Temperature", OutputProcessor::Unit::C, TempSource(loop), "Zone", "State",
+                SetupOutputVariable(
+                    "Surface Internal Source Location Temperature", OutputProcessor::Unit::C, TempSource(loop), "Zone", "State", Surface(loop).Name);
+                SetupOutputVariable("Surface Internal User Specified Location Temperature",
+                                    OutputProcessor::Unit::C,
+                                    TempUserLoc(loop),
+                                    "Zone",
+                                    "State",
                                     Surface(loop).Name);
-                SetupOutputVariable("Surface Internal User Specified Location Temperature", OutputProcessor::Unit::C, TempUserLoc(loop), "Zone",
-                                    "State", Surface(loop).Name);
             }
             if (Surface(loop).Class == SurfaceClass_Window) { // CurrentModuleObject='Windows'
-                SetupOutputVariable("Surface Shading Device Is On Time Fraction", OutputProcessor::Unit::None,
-                                    SurfaceWindow(loop).FracTimeShadingDeviceOn, "Zone", "Average", Surface(loop).Name);
-                SetupOutputVariable("Surface Storm Window On Off Status", OutputProcessor::Unit::None, SurfaceWindow(loop).StormWinFlag, "Zone",
-                                    "State", Surface(loop).Name);
-                SetupOutputVariable("Surface Window Blind Slat Angle", OutputProcessor::Unit::deg, SurfaceWindow(loop).SlatAngThisTSDeg, "Zone",
-                                    "State", Surface(loop).Name);
+                SetupOutputVariable("Surface Shading Device Is On Time Fraction",
+                                    OutputProcessor::Unit::None,
+                                    SurfaceWindow(loop).FracTimeShadingDeviceOn,
+                                    "Zone",
+                                    "Average",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Storm Window On Off Status",
+                                    OutputProcessor::Unit::None,
+                                    SurfaceWindow(loop).StormWinFlag,
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Window Blind Slat Angle",
+                                    OutputProcessor::Unit::deg,
+                                    SurfaceWindow(loop).SlatAngThisTSDeg,
+                                    "Zone",
+                                    "State",
+                                    Surface(loop).Name);
             }
             //    IF (DisplayAdvancedReportVariables) THEN  !CurrentModuleObject='Opaque Surfaces(Advanced)'
-            SetupOutputVariable("Surface Inside Face Convection Classification Index", OutputProcessor::Unit::None,
-                                Surface(loop).IntConvClassification, "Zone", "Average", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Convection Model Equation Index", OutputProcessor::Unit::None, Surface(loop).IntConvHcModelEq,
-                                "Zone", "Average", Surface(loop).Name);
-            SetupOutputVariable("Surface Inside Face Convection Reference Air Index", OutputProcessor::Unit::None, Surface(loop).TAirRef, "Zone",
-                                "Average", Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Convection Classification Index",
+                                OutputProcessor::Unit::None,
+                                Surface(loop).IntConvClassification,
+                                "Zone",
+                                "Average",
+                                Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Convection Model Equation Index",
+                                OutputProcessor::Unit::None,
+                                Surface(loop).IntConvHcModelEq,
+                                "Zone",
+                                "Average",
+                                Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Convection Reference Air Index",
+                                OutputProcessor::Unit::None,
+                                Surface(loop).TAirRef,
+                                "Zone",
+                                "Average",
+                                Surface(loop).Name);
             if (Surface(loop).ExtBoundCond == ExternalEnvironment) {
-                SetupOutputVariable("Surface Outside Face Convection Classification Index", OutputProcessor::Unit::None,
-                                    Surface(loop).OutConvClassification, "Zone", "Average", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Forced Convection Model Equation Index", OutputProcessor::Unit::None,
-                                    Surface(loop).OutConvHfModelEq, "Zone", "Average", Surface(loop).Name);
-                SetupOutputVariable("Surface Outside Face Natural Convection Model Equation Index", OutputProcessor::Unit::None,
-                                    Surface(loop).OutConvHnModelEq, "Zone", "Average", Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Convection Classification Index",
+                                    OutputProcessor::Unit::None,
+                                    Surface(loop).OutConvClassification,
+                                    "Zone",
+                                    "Average",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Forced Convection Model Equation Index",
+                                    OutputProcessor::Unit::None,
+                                    Surface(loop).OutConvHfModelEq,
+                                    "Zone",
+                                    "Average",
+                                    Surface(loop).Name);
+                SetupOutputVariable("Surface Outside Face Natural Convection Model Equation Index",
+                                    OutputProcessor::Unit::None,
+                                    Surface(loop).OutConvHnModelEq,
+                                    "Zone",
+                                    "Average",
+                                    Surface(loop).Name);
             }
 
-            SetupOutputVariable("Surface Inside Face Heat Source Gain Rate per Area", OutputProcessor::Unit::W_m2, QAdditionalHeatSourceInside(loop),
-                                "Zone", "Average", Surface(loop).Name);
-            SetupOutputVariable("Surface Outside Face Heat Source Gain Rate per Area", OutputProcessor::Unit::W_m2,
-                                QAdditionalHeatSourceOutside(loop), "Zone", "Average", Surface(loop).Name);
+            SetupOutputVariable("Surface Inside Face Heat Source Gain Rate per Area",
+                                OutputProcessor::Unit::W_m2,
+                                QAdditionalHeatSourceInside(loop),
+                                "Zone",
+                                "Average",
+                                Surface(loop).Name);
+            SetupOutputVariable("Surface Outside Face Heat Source Gain Rate per Area",
+                                OutputProcessor::Unit::W_m2,
+                                QAdditionalHeatSourceOutside(loop),
+                                "Zone",
+                                "Average",
+                                Surface(loop).Name);
 
             //     ENDIF
             if (DisplayAdvancedReportVariables) {
-                SetupOutputVariable("Surface Construction Index", OutputProcessor::Unit::None, Surface(loop).Construction, "Zone", "Average",
-                                    Surface(loop).Name);
+                SetupOutputVariable(
+                    "Surface Construction Index", OutputProcessor::Unit::None, Surface(loop).Construction, "Zone", "Average", Surface(loop).Name);
             }
         }
 
@@ -2527,28 +2800,28 @@ namespace HeatBalanceSurfaceManager {
 
                                         if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) { // Blind on
                                             for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                                AbsDiffWin(Lay) =
-                                                    InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                                  Construct(ConstrNumSh).BlAbsDiff({1, MaxSlatAngs}, Lay));
-                                                AbsDiffWinGnd(Lay) =
-                                                    InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                                  Construct(ConstrNumSh).BlAbsDiffGnd({1, MaxSlatAngs}, Lay));
-                                                AbsDiffWinSky(Lay) =
-                                                    InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                                  Construct(ConstrNumSh).BlAbsDiffSky({1, MaxSlatAngs}, Lay));
+                                                AbsDiffWin(Lay) = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                                                SurfaceWindow(SurfNum).MovableSlats,
+                                                                                Construct(ConstrNumSh).BlAbsDiff({1, MaxSlatAngs}, Lay));
+                                                AbsDiffWinGnd(Lay) = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                                                   SurfaceWindow(SurfNum).MovableSlats,
+                                                                                   Construct(ConstrNumSh).BlAbsDiffGnd({1, MaxSlatAngs}, Lay));
+                                                AbsDiffWinSky(Lay) = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                                                   SurfaceWindow(SurfNum).MovableSlats,
+                                                                                   Construct(ConstrNumSh).BlAbsDiffSky({1, MaxSlatAngs}, Lay));
                                             }
-                                            SurfaceWindow(SurfNum).ExtDiffAbsByShade =
-                                                InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                              Construct(ConstrNumSh).AbsDiffBlind) *
-                                                (SkySolarInc + GndSolarInc);
+                                            SurfaceWindow(SurfNum).ExtDiffAbsByShade = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                                                                     SurfaceWindow(SurfNum).MovableSlats,
+                                                                                                     Construct(ConstrNumSh).AbsDiffBlind) *
+                                                                                       (SkySolarInc + GndSolarInc);
                                             if (Blind(SurfaceWindow(SurfNum).BlindNumber).SlatOrientation == Horizontal) {
                                                 ACosTlt = std::abs(Surface(SurfNum).CosTilt);
-                                                AbsDiffBlindGnd =
-                                                    InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                                  Construct(ConstrNumSh).AbsDiffBlindGnd);
-                                                AbsDiffBlindSky =
-                                                    InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                                  Construct(ConstrNumSh).AbsDiffBlindSky);
+                                                AbsDiffBlindGnd = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                                                SurfaceWindow(SurfNum).MovableSlats,
+                                                                                Construct(ConstrNumSh).AbsDiffBlindGnd);
+                                                AbsDiffBlindSky = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                                                SurfaceWindow(SurfNum).MovableSlats,
+                                                                                Construct(ConstrNumSh).AbsDiffBlindSky);
                                                 SurfaceWindow(SurfNum).ExtDiffAbsByShade =
                                                     SkySolarInc * (0.5 * ACosTlt * AbsDiffBlindGnd + (1.0 - 0.5 * ACosTlt) * AbsDiffBlindSky) +
                                                     GndSolarInc * ((1.0 - 0.5 * ACosTlt) * AbsDiffBlindGnd + 0.5 * ACosTlt * AbsDiffBlindSky);
@@ -2576,12 +2849,12 @@ namespace HeatBalanceSurfaceManager {
                                                                      AWinSurf(Lay, SurfNum) * BeamSolar; // AWinSurf is from InteriorSolarDistribution
                                         if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
                                             if (Blind(SurfaceWindow(SurfNum).BlindNumber).SlatOrientation == Horizontal) {
-                                                AbsDiffGlassLayGnd =
-                                                    InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                                  Construct(ConstrNumSh).BlAbsDiffGnd({1, 19}, Lay));
-                                                AbsDiffGlassLaySky =
-                                                    InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                                  Construct(ConstrNumSh).BlAbsDiffSky({1, 19}, Lay));
+                                                AbsDiffGlassLayGnd = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                                                   SurfaceWindow(SurfNum).MovableSlats,
+                                                                                   Construct(ConstrNumSh).BlAbsDiffGnd({1, 19}, Lay));
+                                                AbsDiffGlassLaySky = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                                                   SurfaceWindow(SurfNum).MovableSlats,
+                                                                                   Construct(ConstrNumSh).BlAbsDiffSky({1, 19}, Lay));
                                                 QRadSWwinAbs(Lay, SurfNum) =
                                                     SkySolarInc * (0.5 * ACosTlt * AbsDiffGlassLayGnd + (1.0 - 0.5 * ACosTlt) * AbsDiffGlassLaySky) +
                                                     GndSolarInc * ((1.0 - 0.5 * ACosTlt) * AbsDiffGlassLayGnd + 0.5 * ACosTlt * AbsDiffGlassLaySky) +
@@ -2859,18 +3132,20 @@ namespace HeatBalanceSurfaceManager {
                                             BlNum = SurfaceWindow(SurfNum).BlindNumber;
                                             ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
                                             SlatAng = SurfaceWindow(SurfNum).SlatAngThisTS;
-                                            TBlBmBm = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation,
-                                                                         Blind(BlNum).SlatThickness);
-                                            TBlBmDif = InterpProfSlatAng(ProfAng, SlatAng, SurfaceWindow(SurfNum).MovableSlats,
-                                                                         Blind(BlNum).SolFrontBeamDiffTrans);
+                                            TBlBmBm = BlindBeamBeamTrans(
+                                                ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                            TBlBmDif = InterpProfSlatAng(
+                                                ProfAng, SlatAng, SurfaceWindow(SurfNum).MovableSlats, Blind(BlNum).SolFrontBeamDiffTrans);
                                             SurfaceWindow(SurfNum).DividerQRadOutAbs =
-                                                DividerAbs * (DivIncSolarOutBm * (TBlBmBm + TBlBmDif) +
-                                                              DivIncSolarOutDif * InterpSlatAng(SlatAng, SurfaceWindow(SurfNum).MovableSlats,
-                                                                                                Blind(BlNum).SolFrontDiffDiffTrans));
+                                                DividerAbs *
+                                                (DivIncSolarOutBm * (TBlBmBm + TBlBmDif) +
+                                                 DivIncSolarOutDif *
+                                                     InterpSlatAng(SlatAng, SurfaceWindow(SurfNum).MovableSlats, Blind(BlNum).SolFrontDiffDiffTrans));
                                             SurfaceWindow(SurfNum).DividerQRadInAbs =
-                                                DividerAbs * (DivIncSolarInBm * (TBlBmBm + TBlBmDif) +
-                                                              DivIncSolarInDif * InterpSlatAng(SlatAng, SurfaceWindow(SurfNum).MovableSlats,
-                                                                                               Blind(BlNum).SolFrontDiffDiffTrans));
+                                                DividerAbs *
+                                                (DivIncSolarInBm * (TBlBmBm + TBlBmDif) +
+                                                 DivIncSolarInDif *
+                                                     InterpSlatAng(SlatAng, SurfaceWindow(SurfNum).MovableSlats, Blind(BlNum).SolFrontDiffDiffTrans));
 
                                         } else if (ShadeFlag == ExtShadeOn) { // Exterior shade
                                             SurfaceWindow(SurfNum).DividerQRadOutAbs = DividerAbs *
@@ -3112,7 +3387,8 @@ namespace HeatBalanceSurfaceManager {
                             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn)
                                 QRadSWwinAbs(IGlass, SurfNum) += QS(ZoneNum) * Construct(ConstrNumSh).AbsDiffBack(IGlass);
                             if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn) {
-                                BlAbsDiffBk = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
+                                BlAbsDiffBk = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                            SurfaceWindow(SurfNum).MovableSlats,
                                                             Construct(ConstrNumSh).BlAbsDiffBack(_, IGlass));
                                 QRadSWwinAbs(IGlass, SurfNum) += QS(ZoneNum) * BlAbsDiffBk;
                             }
@@ -3121,15 +3397,15 @@ namespace HeatBalanceSurfaceManager {
                         if (ShadeFlag == IntShadeOn)
                             SurfaceWindow(SurfNum).IntLWAbsByShade = QL(ZoneNum) * Construct(ConstrNumSh).ShadeAbsorpThermal * TMULT(ZoneNum);
                         if (ShadeFlag == IntBlindOn) {
-                            EffBlEmiss = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                       SurfaceWindow(SurfNum).EffShBlindEmiss);
+                            EffBlEmiss = InterpSlatAng(
+                                SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats, SurfaceWindow(SurfNum).EffShBlindEmiss);
                             SurfaceWindow(SurfNum).IntLWAbsByShade = QL(ZoneNum) * EffBlEmiss * TMULT(ZoneNum);
                         }
                         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn)
                             SurfaceWindow(SurfNum).IntSWAbsByShade = QS(ZoneNum) * Construct(ConstrNumSh).AbsDiffBackShade;
                         if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
-                            AbsDiffBkBl = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                        Construct(ConstrNumSh).AbsDiffBackBlind);
+                            AbsDiffBkBl = InterpSlatAng(
+                                SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats, Construct(ConstrNumSh).AbsDiffBackBlind);
                             SurfaceWindow(SurfNum).IntSWAbsByShade = QS(ZoneNum) * AbsDiffBkBl;
                         }
                         // Correct for divider shadowing
@@ -3138,9 +3414,9 @@ namespace HeatBalanceSurfaceManager {
 
                     } else if (ShadeFlag == SwitchableGlazing) { // Switchable glazing
                         for (IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
-                            QRadSWwinAbs(IGlass, SurfNum) +=
-                                QS(ZoneNum) * InterpSw(SurfaceWindow(SurfNum).SwitchingFactor, Construct(ConstrNum).AbsDiffBack(IGlass),
-                                                       Construct(ConstrNumSh).AbsDiffBack(IGlass));
+                            QRadSWwinAbs(IGlass, SurfNum) += QS(ZoneNum) * InterpSw(SurfaceWindow(SurfNum).SwitchingFactor,
+                                                                                    Construct(ConstrNum).AbsDiffBack(IGlass),
+                                                                                    Construct(ConstrNumSh).AbsDiffBack(IGlass));
                         }
 
                     } // End of shading flag check
@@ -3171,8 +3447,8 @@ namespace HeatBalanceSurfaceManager {
                             DividerSolAbs *= Material(MatNumSh).Trans;
                             DividerThermAbs *= Material(MatNumSh).TransThermal;
                         } else if (ShadeFlag == IntBlindOn) {
-                            DividerSolAbs *= InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                           Blind(BlNum).SolBackDiffDiffTrans);
+                            DividerSolAbs *= InterpSlatAng(
+                                SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats, Blind(BlNum).SolBackDiffDiffTrans);
                             DividerThermAbs *=
                                 InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats, Blind(BlNum).IRBackTrans);
                         }
@@ -3471,7 +3747,8 @@ namespace HeatBalanceSurfaceManager {
                 ITABSF(SurfNum) =
                     InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats, SurfaceWindow(SurfNum).EffShBlindEmiss) +
                     InterpSlatAng(
-                        SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
+                        SurfaceWindow(SurfNum).SlatAngThisTS,
+                        SurfaceWindow(SurfNum).MovableSlats,
                         SurfaceWindow(SurfNum).EffGlassEmiss); // For shades, following interpolation just returns value of first element in array
         }
 
@@ -3492,7 +3769,8 @@ namespace HeatBalanceSurfaceManager {
                 if (ShadeFlag != SwitchableGlazing) {
                     SUM1 += Surface(SurfNum).Area * ITABSF(SurfNum);
                 } else { // Switchable glazing
-                    SUM1 += Surface(SurfNum).Area * InterpSw(SurfaceWindow(SurfNum).SwitchingFactor, Construct(ConstrNum).InsideAbsorpThermal,
+                    SUM1 += Surface(SurfNum).Area * InterpSw(SurfaceWindow(SurfNum).SwitchingFactor,
+                                                             Construct(ConstrNum).InsideAbsorpThermal,
                                                              Construct(SurfaceWindow(SurfNum).ShadedConstruction).InsideAbsorpThermal);
                 }
 
@@ -3511,9 +3789,11 @@ namespace HeatBalanceSurfaceManager {
                             TauShIR = Material(MatNumSh).TransThermal;
                             EffShDevEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                             if (ShadeFlag == IntBlindOn) {
-                                TauShIR = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
+                                TauShIR = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                        SurfaceWindow(SurfNum).MovableSlats,
                                                         Blind(SurfaceWindow(SurfNum).BlindNumber).IRBackTrans);
-                                EffShDevEmiss = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
+                                EffShDevEmiss = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                              SurfaceWindow(SurfNum).MovableSlats,
                                                               SurfaceWindow(SurfNum).EffShBlindEmiss);
                             }
                             SUM1 += SurfaceWindow(SurfNum).DividerArea * (EffShDevEmiss + DividerThermAbs * TauShIR);
@@ -3671,7 +3951,8 @@ namespace HeatBalanceSurfaceManager {
                                 if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
                                     AbsDiffLayWin = Construct(ConstrNumSh).AbsDiffBack(Lay);
                                 } else if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
-                                    AbsDiffLayWin = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
+                                    AbsDiffLayWin = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                                  SurfaceWindow(SurfNum).MovableSlats,
                                                                   Construct(ConstrNumSh).BlAbsDiffBack(_, Lay));
                                 }
                             }
@@ -3693,9 +3974,10 @@ namespace HeatBalanceSurfaceManager {
                                 TransDiffWin = Construct(ConstrNumSh).TransDiff;
                                 DiffAbsShade = Construct(ConstrNumSh).AbsDiffBackShade;
                             } else if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
-                                TransDiffWin = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
-                                                             Construct(ConstrNumSh).BlTransDiff);
-                                DiffAbsShade = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats,
+                                TransDiffWin = InterpSlatAng(
+                                    SurfaceWindow(SurfNum).SlatAngThisTS, SurfaceWindow(SurfNum).MovableSlats, Construct(ConstrNumSh).BlTransDiff);
+                                DiffAbsShade = InterpSlatAng(SurfaceWindow(SurfNum).SlatAngThisTS,
+                                                             SurfaceWindow(SurfNum).MovableSlats,
                                                              Construct(ConstrNumSh).AbsDiffBackBlind);
                             }
                         }
@@ -4217,8 +4499,8 @@ namespace HeatBalanceSurfaceManager {
         // Using/Aliasing
         using CoolingPanelSimple::UpdateCoolingPanelSourceValAvg;
         using ElectricBaseboardRadiator::UpdateBBElecRadSourceValAvg;
-        using HWBaseboardRadiator::UpdateBBRadSourceValAvg;
         using HighTempRadiantSystem::UpdateHTRadSourceValAvg;
+        using HWBaseboardRadiator::UpdateBBRadSourceValAvg;
         using LowTempRadiantSystem::UpdateRadSysSourceValAvg;
         using SteamBaseboardRadiator::UpdateBBSteamRadSourceValAvg;
         using SwimmingPool::UpdatePoolSourceValAvg;
@@ -5153,7 +5435,8 @@ namespace HeatBalanceSurfaceManager {
                         HConvExtFD(SurfNum) = HighHConvLimit;
                         HMassConvExtFD(SurfNum) =
                             HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                            ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                TempOutsideAirFD(SurfNum),
                                                 PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOtherSideCoefNoCalcExt)) +
                               RhoVaporAirOut(SurfNum)) *
                              PsyCpAirFnWTdb(OutHumRat, TempOutsideAirFD(SurfNum)));
@@ -5202,7 +5485,8 @@ namespace HeatBalanceSurfaceManager {
                         HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                         HMassConvExtFD(SurfNum) =
                             HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                            ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                TempOutsideAirFD(SurfNum),
                                                 PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOtherSideCoefCalcExt)) +
                               RhoVaporAirOut(SurfNum)) *
                              PsyCpAirFnWTdb(OutHumRat, TempOutsideAirFD(SurfNum)));
@@ -5246,7 +5530,8 @@ namespace HeatBalanceSurfaceManager {
                         RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat, OutBaroPress);
                         HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                         HMassConvExtFD(SurfNum) =
-                            HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                            HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                                      TempOutsideAirFD(SurfNum),
                                                                       PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOSCM)) +
                                                     RhoVaporAirOut(SurfNum)) *
                                                    PsyCpAirFnWTdb(OutHumRat, TempOutsideAirFD(SurfNum)));
@@ -5299,8 +5584,15 @@ namespace HeatBalanceSurfaceManager {
                     if (Surface(SurfNum).ExtWind) {
 
                         // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in subroutine)
-                        InitExteriorConvectionCoeff(SurfNum, HMovInsul, RoughSurf, AbsThermSurf, TH(1, 1, SurfNum), HcExtSurf(SurfNum),
-                                                    HSkyExtSurf(SurfNum), HGrdExtSurf(SurfNum), HAirExtSurf(SurfNum));
+                        InitExteriorConvectionCoeff(SurfNum,
+                                                    HMovInsul,
+                                                    RoughSurf,
+                                                    AbsThermSurf,
+                                                    TH(1, 1, SurfNum),
+                                                    HcExtSurf(SurfNum),
+                                                    HSkyExtSurf(SurfNum),
+                                                    HGrdExtSurf(SurfNum),
+                                                    HAirExtSurf(SurfNum));
 
                         if (IsRain) { // Raining: since wind exposed, outside surface gets wet
 
@@ -5320,7 +5612,8 @@ namespace HeatBalanceSurfaceManager {
                                 HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                                 HMassConvExtFD(SurfNum) =
                                     HConvExtFD(SurfNum) /
-                                    ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                    ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                        TempOutsideAirFD(SurfNum),
                                                         PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
                                       RhoVaporAirOut(SurfNum)) *
                                      PsyCpAirFnWTdb(OutHumRat, TempOutsideAirFD(SurfNum)));
@@ -5337,7 +5630,8 @@ namespace HeatBalanceSurfaceManager {
                                 HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                                 HMassConvExtFD(SurfNum) =
                                     HConvExtFD(SurfNum) /
-                                    ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                    ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                        TempOutsideAirFD(SurfNum),
                                                         PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
                                       RhoVaporAirOut(SurfNum)) *
                                      PsyCpAirFnWTdb(OutHumRat, TempOutsideAirFD(SurfNum)));
@@ -5358,7 +5652,8 @@ namespace HeatBalanceSurfaceManager {
                                 HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                                 HMassConvExtFD(SurfNum) =
                                     HConvExtFD(SurfNum) /
-                                    ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                    ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                        TempOutsideAirFD(SurfNum),
                                                         PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvDrySurf)) +
                                       RhoVaporAirOut(SurfNum)) *
                                      PsyCpAirFnWTdb(OutHumRat, TempOutsideAirFD(SurfNum)));
@@ -5374,8 +5669,15 @@ namespace HeatBalanceSurfaceManager {
                     } else { // No wind
 
                         // Calculate exterior heat transfer coefficients for windspeed = 0
-                        InitExteriorConvectionCoeff(SurfNum, HMovInsul, RoughSurf, AbsThermSurf, TH(1, 1, SurfNum), HcExtSurf(SurfNum),
-                                                    HSkyExtSurf(SurfNum), HGrdExtSurf(SurfNum), HAirExtSurf(SurfNum));
+                        InitExteriorConvectionCoeff(SurfNum,
+                                                    HMovInsul,
+                                                    RoughSurf,
+                                                    AbsThermSurf,
+                                                    TH(1, 1, SurfNum),
+                                                    HcExtSurf(SurfNum),
+                                                    HSkyExtSurf(SurfNum),
+                                                    HGrdExtSurf(SurfNum),
+                                                    HAirExtSurf(SurfNum));
 
                         TempExt = Surface(SurfNum).OutDryBulbTemp;
 
@@ -5387,7 +5689,8 @@ namespace HeatBalanceSurfaceManager {
                             HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                             HMassConvExtFD(SurfNum) =
                                 HConvExtFD(SurfNum) /
-                                ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                    TempOutsideAirFD(SurfNum),
                                                     PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameNoWind)) +
                                   RhoVaporAirOut(SurfNum)) *
                                  PsyCpAirFnWTdb(OutHumRat, TempOutsideAirFD(SurfNum)));
@@ -5434,7 +5737,8 @@ namespace HeatBalanceSurfaceManager {
                             HConvExtFD(SurfNum) = HConvIn(SurfNum);
                             HMassConvExtFD(SurfNum) =
                                 HConvExtFD(SurfNum) /
-                                ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                    TempOutsideAirFD(SurfNum),
                                                     PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOther)) +
                                   RhoVaporAirOut(SurfNum)) *
                                  PsyCpAirFnWTdb(OutHumRat, TempOutsideAirFD(SurfNum)));
@@ -5457,7 +5761,8 @@ namespace HeatBalanceSurfaceManager {
                             HConvExtFD(SurfNum) = HConvIn(Surface(SurfNum).ExtBoundCond);
                             HMassConvExtFD(SurfNum) =
                                 HConvExtFD(SurfNum) /
-                                ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                    TempOutsideAirFD(SurfNum),
                                                     PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameIZPart)) +
                                   RhoVaporAirOut(SurfNum)) *
                                  PsyCpAirFnWTdb(OutHumRat, TempOutsideAirFD(SurfNum)));
@@ -5543,19 +5848,19 @@ namespace HeatBalanceSurfaceManager {
         using DataMoistureBalance::RhoVaporSurfIn;
         using DataMoistureBalance::TempOutsideAirFD;
         using DataMoistureBalanceEMPD::HeatFluxLatent;
-        using DataMoistureBalanceEMPD::RVSurfLayer;
         using DataMoistureBalanceEMPD::RVSurface;
         using DataMoistureBalanceEMPD::RVSurfaceOld;
+        using DataMoistureBalanceEMPD::RVSurfLayer;
         using DataZoneEquipment::ZoneEquipConfig;
         using DaylightingDevices::FindTDDPipe;
         using General::RoundSigDigits;
-        using HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff;
-        using HeatBalFiniteDiffManager::SurfaceFD;
         using HeatBalanceHAMTManager::ManageHeatBalHAMT;
         using HeatBalanceHAMTManager::UpdateHeatBalHAMT;
         using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
         using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
         using HeatBalanceSurfaceManager::CalculateZoneMRT;
+        using HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff;
+        using HeatBalFiniteDiffManager::SurfaceFD;
         using MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD;
         using MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -5641,8 +5946,12 @@ namespace HeatBalanceSurfaceManager {
                 MinIterations = 1;
             }
             if (DisplayAdvancedReportVariables) {
-                SetupOutputVariable("Surface Inside Face Heat Balance Calculation Iteration Count", OutputProcessor::Unit::None, InsideSurfIterations,
-                                    "ZONE", "Sum", "Simulation");
+                SetupOutputVariable("Surface Inside Face Heat Balance Calculation Iteration Count",
+                                    OutputProcessor::Unit::None,
+                                    InsideSurfIterations,
+                                    "ZONE",
+                                    "Sum",
+                                    "Simulation");
             }
         }
         if (BeginEnvrnFlag && MyEnvrnFlag) {
@@ -6219,8 +6528,15 @@ namespace HeatBalanceSurfaceManager {
 
                                         // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in
                                         // subroutine)
-                                        InitExteriorConvectionCoeff(SurfNum, 0.0, RoughSurf, EmisOut, TH11, HcExtSurf(SurfNum), HSkyExtSurf(SurfNum),
-                                                                    HGrdExtSurf(SurfNum), HAirExtSurf(SurfNum));
+                                        InitExteriorConvectionCoeff(SurfNum,
+                                                                    0.0,
+                                                                    RoughSurf,
+                                                                    EmisOut,
+                                                                    TH11,
+                                                                    HcExtSurf(SurfNum),
+                                                                    HSkyExtSurf(SurfNum),
+                                                                    HGrdExtSurf(SurfNum),
+                                                                    HAirExtSurf(SurfNum));
 
                                         if (IsRain) {                    // Raining: since wind exposed, outside window surface gets wet
                                             HcExtSurf(SurfNum) = 1000.0; // Reset HcExtSurf because of wetness
@@ -6229,8 +6545,15 @@ namespace HeatBalanceSurfaceManager {
                                     } else { // Not Wind exposed
 
                                         // Calculate exterior heat transfer coefficients for windspeed = 0
-                                        InitExteriorConvectionCoeff(SurfNum, 0.0, RoughSurf, EmisOut, TH11, HcExtSurf(SurfNum), HSkyExtSurf(SurfNum),
-                                                                    HGrdExtSurf(SurfNum), HAirExtSurf(SurfNum));
+                                        InitExteriorConvectionCoeff(SurfNum,
+                                                                    0.0,
+                                                                    RoughSurf,
+                                                                    EmisOut,
+                                                                    TH11,
+                                                                    HcExtSurf(SurfNum),
+                                                                    HSkyExtSurf(SurfNum),
+                                                                    HGrdExtSurf(SurfNum),
+                                                                    HAirExtSurf(SurfNum));
                                     }
                                 } else { // Interior Surface
 
@@ -6396,8 +6719,8 @@ namespace HeatBalanceSurfaceManager {
                             ShowContinueErrorTimeStamp("");
                         }
                     } else {
-                        ShowRecurringWarningErrorAtEnd("Inside surface heat balance convergence problem continues", InsideSurfErrCount, MaxDelTemp,
-                                                       MaxDelTemp, _, "[C]", "[C]");
+                        ShowRecurringWarningErrorAtEnd(
+                            "Inside surface heat balance convergence problem continues", InsideSurfErrCount, MaxDelTemp, MaxDelTemp, _, "[C]", "[C]");
                     }
                 }
                 break; // DO loop
@@ -6447,8 +6770,10 @@ namespace HeatBalanceSurfaceManager {
                     SumHmAW(ZoneNum) += FD_Area_fac * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
                     Real64 const MAT_zone(MAT(ZoneNum));
                     SumHmARa(ZoneNum) +=
-                        FD_Area_fac * PsyRhoAirFnPbTdbW(OutBaroPress, MAT_zone,
-                                                        PsyWFnTdbRhPb(MAT_zone, PsyRhFnTdbRhovLBnd0C(MAT_zone, RhoVaporAirIn(SurfNum)),
+                        FD_Area_fac * PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                        MAT_zone,
+                                                        PsyWFnTdbRhPb(MAT_zone,
+                                                                      PsyRhFnTdbRhovLBnd0C(MAT_zone, RhoVaporAirIn(SurfNum)),
                                                                       OutBaroPress)); // surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C(
                                                                                       // surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
                     SumHmARaW(ZoneNum) += FD_Area_fac * RhoVaporSurfIn(SurfNum);
@@ -6481,7 +6806,8 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatGain(ZoneNum) += WinHeatGain(SurfNum);
         }
         for (int ZoneNum = (PartialResimulate ? ZoneToResimulate() : 1), ZoneNum_end = (PartialResimulate ? ZoneToResimulate() : NumOfZones);
-             ZoneNum <= ZoneNum_end; ++ZoneNum) {
+             ZoneNum <= ZoneNum_end;
+             ++ZoneNum) {
             if (ZoneWinHeatGain(ZoneNum) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneNum) = ZoneWinHeatGain(ZoneNum);
                 ZoneWinHeatGainRepEnergy(ZoneNum) = ZoneWinHeatGainRep(ZoneNum) * TimeStepZoneSec;
@@ -6531,10 +6857,20 @@ namespace HeatBalanceSurfaceManager {
                             zone.TempOutOfBoundsReported = true;
                         }
                         ShowRecurringSevereErrorAtEnd("Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
-                                                      surface.LowTempErrCount, TH12, TH12, _, "C", "C");
+                                                      surface.LowTempErrCount,
+                                                      TH12,
+                                                      TH12,
+                                                      _,
+                                                      "C",
+                                                      "C");
                     } else {
                         ShowRecurringSevereErrorAtEnd("Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
-                                                      surface.LowTempErrCount, TH12, TH12, _, "C", "C");
+                                                      surface.LowTempErrCount,
+                                                      TH12,
+                                                      TH12,
+                                                      _,
+                                                      "C",
+                                                      "C");
                     }
                 } else {
                     if (surface.HighTempErrCount == 0) {
@@ -6562,10 +6898,20 @@ namespace HeatBalanceSurfaceManager {
                             zone.TempOutOfBoundsReported = true;
                         }
                         ShowRecurringSevereErrorAtEnd("Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
-                                                      surface.HighTempErrCount, TH12, TH12, _, "C", "C");
+                                                      surface.HighTempErrCount,
+                                                      TH12,
+                                                      TH12,
+                                                      _,
+                                                      "C",
+                                                      "C");
                     } else {
                         ShowRecurringSevereErrorAtEnd("Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
-                                                      surface.HighTempErrCount, TH12, TH12, _, "C", "C");
+                                                      surface.HighTempErrCount,
+                                                      TH12,
+                                                      TH12,
+                                                      _,
+                                                      "C",
+                                                      "C");
                     }
                 }
                 if (zone.EnforcedReciprocity) {
@@ -7030,11 +7376,26 @@ namespace HeatBalanceSurfaceManager {
 
         for (iter = 1; iter <= 3; ++iter) { // this is a sequential solution approach.
 
-            CalcPassiveExteriorBaffleGap(ExtVentedCavity(CavNum).SurfPtrs, holeArea, ExtVentedCavity(CavNum).Cv, ExtVentedCavity(CavNum).Cd,
-                                         ExtVentedCavity(CavNum).HdeltaNPL, ExtVentedCavity(CavNum).SolAbsorp, ExtVentedCavity(CavNum).LWEmitt,
-                                         ExtVentedCavity(CavNum).Tilt, AspRat, ExtVentedCavity(CavNum).PlenGapThick,
-                                         ExtVentedCavity(CavNum).BaffleRoughness, ExtVentedCavity(CavNum).QdotSource, TmpTscoll, TmpTaPlen, HcPlen,
-                                         HrPlen, Isc, MdotVent, VdotWind, VdotThermal);
+            CalcPassiveExteriorBaffleGap(ExtVentedCavity(CavNum).SurfPtrs,
+                                         holeArea,
+                                         ExtVentedCavity(CavNum).Cv,
+                                         ExtVentedCavity(CavNum).Cd,
+                                         ExtVentedCavity(CavNum).HdeltaNPL,
+                                         ExtVentedCavity(CavNum).SolAbsorp,
+                                         ExtVentedCavity(CavNum).LWEmitt,
+                                         ExtVentedCavity(CavNum).Tilt,
+                                         AspRat,
+                                         ExtVentedCavity(CavNum).PlenGapThick,
+                                         ExtVentedCavity(CavNum).BaffleRoughness,
+                                         ExtVentedCavity(CavNum).QdotSource,
+                                         TmpTscoll,
+                                         TmpTaPlen,
+                                         HcPlen,
+                                         HrPlen,
+                                         Isc,
+                                         MdotVent,
+                                         VdotWind,
+                                         VdotThermal);
 
         } // sequential solution
         // now fill results into derived types
@@ -7084,10 +7445,10 @@ namespace HeatBalanceSurfaceManager {
         // Using/Aliasing
         using DataGlobals::CompLoadReportIsReq;
         using DataGlobals::HourOfDay;
+        using DataGlobals::isPulseZoneSizing;
         using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::NumOfZones;
         using DataGlobals::TimeStep;
-        using DataGlobals::isPulseZoneSizing;
         using DataHeatBalance::ITABSF;
         using DataHeatBalance::TMULT;
         using DataSizing::CurOverallSimDay;

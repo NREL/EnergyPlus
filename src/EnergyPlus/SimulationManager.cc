@@ -238,9 +238,9 @@ namespace SimulationManager {
         using DataEnvironment::CurrentOverallSimDay;
         using DataEnvironment::EndMonthFlag;
         using DataEnvironment::EnvironmentName;
+        using DataEnvironment::TotalOverallSimDays;
         using DataEnvironment::TotDesDays;
         using DataEnvironment::TotRunDesPersDays;
-        using DataEnvironment::TotalOverallSimDays;
         using DataHVACGlobals::TimeStepSys;
 
         using BranchInputManager::InvalidBranchDefinitions;
@@ -253,12 +253,12 @@ namespace SimulationManager {
         using DataErrorTracking::AskForConnectionsReport;
         using DataErrorTracking::ExitDuringSimulations;
         using DemandManager::InitDemandManagers;
-        using EMSManager::CheckIfAnyEMS;
-        using EMSManager::ManageEMS;
         using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
         using EconomicLifeCycleCost::GetInputForLifeCycleCost;
         using EconomicTariff::ComputeTariff; // added for computing annual utility costs
         using EconomicTariff::WriteTabularTariffReports;
+        using EMSManager::CheckIfAnyEMS;
+        using EMSManager::ManageEMS;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
         using General::TrimSigDigits;
         using HVACControllers::DumpAirLoopStatistics;
@@ -282,8 +282,8 @@ namespace SimulationManager {
         using namespace DataTimings;
         using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
-        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using OutputProcessor::isFinalYear;
+        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
         using PlantPipingSystemsManager::CheckIfAnySlabs;
         using PlantPipingSystemsManager::SimulateGroundDomains;
@@ -698,9 +698,9 @@ namespace SimulationManager {
         using DataEnvironment::IgnoreBeamRadiation;
         using DataEnvironment::IgnoreDiffuseRadiation;
         using DataEnvironment::IgnoreSolarRadiation;
-        using DataHVACGlobals::LimitNumSysSteps;
         using DataHVACGlobals::deviationFromSetPtThresholdClg;
         using DataHVACGlobals::deviationFromSetPtThresholdHtg;
+        using DataHVACGlobals::LimitNumSysSteps;
         using General::RoundSigDigits;
         using namespace DataIPShortCuts;
 
@@ -739,8 +739,17 @@ namespace SimulationManager {
         CurrentModuleObject = "Version";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          Alphas,
+                                          NumAlpha,
+                                          Number,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             std::string::size_type const lenVer(len(MatchVersion));
             if ((lenVer > 0) && (MatchVersion[lenVer - 1] == '0')) {
                 Which = static_cast<int>(index(Alphas(1).substr(0, lenVer - 2), MatchVersion.substr(0, lenVer - 2)));
@@ -763,8 +772,17 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         CondFDAlgo = false;
         if (Num > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          Alphas,
+                                          NumAlpha,
+                                          Number,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(Alphas(1));
                 if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
@@ -778,8 +796,17 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                inputProcessor->getObjectItem(CurrentModuleObject, Item, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              Item,
+                                              Alphas,
+                                              NumAlpha,
+                                              Number,
+                                              NumNumber,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(Alphas(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -794,8 +821,17 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              1,
+                                              Alphas,
+                                              NumAlpha,
+                                              Number,
+                                              NumNumber,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(Alphas(3));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -809,8 +845,17 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                inputProcessor->getObjectItem(CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              1,
+                                              cAlphaArgs,
+                                              NumAlpha,
+                                              Number,
+                                              NumNumber,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -824,8 +869,17 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                inputProcessor->getObjectItem(CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              1,
+                                              cAlphaArgs,
+                                              NumAlpha,
+                                              Number,
+                                              NumNumber,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -839,8 +893,17 @@ namespace SimulationManager {
         CurrentModuleObject = "Timestep";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          Alphas,
+                                          NumAlpha,
+                                          Number,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             NumOfTimeStepInHour = Number(1);
             if (NumOfTimeStepInHour <= 0 || NumOfTimeStepInHour > 60) {
                 Alphas(1) = RoundSigDigits(NumOfTimeStepInHour);
@@ -891,8 +954,17 @@ namespace SimulationManager {
         CurrentModuleObject = "ConvergenceLimits";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          Alphas,
+                                          NumAlpha,
+                                          Number,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             MinInt = int(Number(1));
             if (MinInt > MinutesPerTimeStep) {
                 MinInt = MinutesPerTimeStep;
@@ -1007,8 +1079,17 @@ namespace SimulationManager {
         CurrentModuleObject = "OutputControl:ReportingTolerances";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          Alphas,
+                                          NumAlpha,
+                                          Number,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             if (!lNumericFieldBlanks(1)) {
                 deviationFromSetPtThresholdHtg = -Number(1);
             } else {
@@ -1032,8 +1113,17 @@ namespace SimulationManager {
         NumRunControl = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumRunControl > 0) {
             RunControlInInput = true;
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          Alphas,
+                                          NumAlpha,
+                                          Number,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             if (Alphas(1) == "YES") DoZoneSizing = true;
             if (Alphas(2) == "YES") DoSystemSizing = true;
             if (Alphas(3) == "YES") DoPlantSizing = true;
@@ -1427,8 +1517,8 @@ namespace SimulationManager {
         using OutputProcessor::NumTotalIVariable;
         using OutputProcessor::NumTotalRVariable;
         using OutputProcessor::NumVarMeterArrays;
-        using OutputReportTabular::MonthlyFieldSetInputCount;
         using OutputReportTabular::maxUniqueKeyCount;
+        using OutputReportTabular::MonthlyFieldSetInputCount;
         using SolarShading::MAXHCArrayBounds;
         using SolarShading::maxNumberOfFigures;
         using namespace DataRuntimeLanguage;
@@ -2489,8 +2579,16 @@ namespace SimulationManager {
                 ChildOutNodeName = BlankString;
                 ChildInNodeNum = 0;
                 ChildOutNodeNum = 0;
-                GetChildrenData(ParentNodeList(Loop).CType, ParentNodeList(Loop).CName, NumChildren, ChildCType, ChildCName, ChildInNodeName,
-                                ChildInNodeNum, ChildOutNodeName, ChildOutNodeNum, ErrorsFound);
+                GetChildrenData(ParentNodeList(Loop).CType,
+                                ParentNodeList(Loop).CName,
+                                NumChildren,
+                                ChildCType,
+                                ChildCName,
+                                ChildInNodeName,
+                                ChildInNodeNum,
+                                ChildOutNodeName,
+                                ChildOutNodeNum,
+                                ErrorsFound);
                 if (Loop > 1) gio::write(OutputFileDebug, "(1X,60('='))");
                 gio::write(OutputFileDebug, fmtA) << " Parent Node," + ParentNodeList(Loop).CType + ':' + ParentNodeList(Loop).CName + ',' +
                                                          ParentNodeList(Loop).InletNodeName + ',' + ParentNodeList(Loop).OutletNodeName;
@@ -2578,8 +2676,18 @@ namespace SimulationManager {
             ResourceTypes.dimension(NumVariables, 0);
             EndUses.allocate(NumVariables);
             Groups.allocate(NumVariables);
-            GetMeteredVariables(CompSets(Loop).CType, CompSets(Loop).CName, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses,
-                                Groups, VarNames, _, VarIDs);
+            GetMeteredVariables(CompSets(Loop).CType,
+                                CompSets(Loop).CName,
+                                VarIndexes,
+                                VarTypes,
+                                IndexTypes,
+                                unitsForVar,
+                                ResourceTypes,
+                                EndUses,
+                                Groups,
+                                VarNames,
+                                _,
+                                VarIDs);
             for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
                 gio::write(OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)")
                     << VarIndexes(Loop1) << VarIDs(Loop1) << VarNames(Loop1) << unitEnumToString(unitsForVar(Loop1))
@@ -2705,15 +2813,15 @@ void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use si
     using DemandManager::DemandManagerHBIterations;
     using DemandManager::DemandManagerHVACIterations;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
-    using HVACManager::SimHVAC;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
+    using HVACManager::SimHVAC;
     using RefrigeratedCase::ManageRefrigeratedCaseRacks;
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
     // using HVACManager::CalcAirFlowSimple;
     using DataContaminantBalance::Contaminant;
-    using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using DataHeatBalance::ZoneAirMassFlow;
+    using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
     using namespace ZoneEquipmentManager;
     // using ZoneEquipmentManager::CalcAirFlowSimple;
