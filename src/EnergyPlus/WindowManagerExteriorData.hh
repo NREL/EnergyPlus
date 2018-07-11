@@ -97,7 +97,7 @@ namespace WindowManager {
     // Construction numbers in EnergyPlus are not stored in orders and it can contain wall numbers
     // in between. So we will just use map to store layers so that we get optimized search.
     // using LayersBSDF_Map = std::map< int, std::shared_ptr< IGU_BSDFLayers > >;
-    using Layers_Map = std::map<int, std::shared_ptr<IGU_Layers>>;
+    using Layers_Map = std::map<int, IGU_Layers>;
 
     // Test if surface is hit by beam defined with vector
     bool isSurfaceHit(const int t_SurfNum, const DataVectorTypes::Vector &t_Ray);
@@ -169,10 +169,10 @@ namespace WindowManager {
     private:
         CWindowConstructionsSimplified();
 
-        std::shared_ptr<IGU_Layers> getLayers(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
+        IGU_Layers getLayers(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
 
         // Need separate layer properties for Solar and Visible range
-        std::map<FenestrationCommon::WavelengthRange, std::shared_ptr<Layers_Map>> m_Layers;
+        std::map<FenestrationCommon::WavelengthRange, Layers_Map> m_Layers;
         std::map<std::pair<FenestrationCommon::WavelengthRange, int>, std::shared_ptr<MultiLayerOptics::CMultiLayerScattered>> m_Equivalent;
     };
 

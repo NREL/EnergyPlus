@@ -283,23 +283,18 @@ namespace WindowManager {
 
     CWindowConstructionsSimplified::CWindowConstructionsSimplified()
     {
-        m_Layers[WavelengthRange::Solar] = std::make_shared<Layers_Map>();
-        m_Layers[WavelengthRange::Visible] = std::make_shared<Layers_Map>();
+        m_Layers[WavelengthRange::Solar] = Layers_Map();
+        m_Layers[WavelengthRange::Visible] = Layers_Map();
     }
 
     void CWindowConstructionsSimplified::pushLayer(WavelengthRange const t_Range, int const t_ConstrNum, std::shared_ptr<CScatteringLayer> const &t_Layer)
     {
-        std::shared_ptr<Layers_Map> aMap = m_Layers.at(t_Range);
-        auto it = aMap->find(t_ConstrNum);
-        std::shared_ptr<IGU_Layers> iguLayers = nullptr;
-        if (it != aMap->end()) {
-            iguLayers = it->second;
-        } else {
-            iguLayers = std::make_shared<IGU_Layers>();
-            (*aMap)[t_ConstrNum] = iguLayers;
+        Layers_Map & aMap = m_Layers.at(t_Range);
+        const auto it = aMap.find(t_ConstrNum);
+        if (it == aMap.end()) {
+            aMap[t_ConstrNum] = IGU_Layers();
         }
-
-        iguLayers->push_back(t_Layer);
+        aMap.at(t_ConstrNum).push_back( t_Layer );        
     }
 
     std::shared_ptr<CMultiLayerScattered> CWindowConstructionsSimplified::getEquivalentLayer(WavelengthRange const t_Range, int const t_ConstrNum)
@@ -308,7 +303,7 @@ namespace WindowManager {
         if (it == m_Equivalent.end()) {
             // Layer was not requested before. Need to create it now.
             // shared_ptr< vector< double > > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
-            IGU_Layers iguLayers = *getLayers(t_Range, t_ConstrNum);
+            IGU_Layers iguLayers = getLayers(t_Range, t_ConstrNum);
             std::shared_ptr<CMultiLayerScattered> aEqLayer = std::make_shared<CMultiLayerScattered>(iguLayers[0]);
             for (auto i = 1u; i < iguLayers.size(); ++i) {
                 aEqLayer->addLayer(iguLayers[i]);
@@ -322,15 +317,15 @@ namespace WindowManager {
         return m_Equivalent.at(std::make_pair(t_Range, t_ConstrNum));
     }
 
-    std::shared_ptr<IGU_Layers> CWindowConstructionsSimplified::getLayers(WavelengthRange const t_Range, int const t_ConstrNum) const
+    IGU_Layers CWindowConstructionsSimplified::getLayers(WavelengthRange const t_Range, int const t_ConstrNum) const
     {
-        std::shared_ptr< Layers_Map > aMap = m_Layers.at(t_Range);
-        auto it = aMap->find(t_ConstrNum);
-        if (it == aMap->end()) {
+        Layers_Map aMap = m_Layers.at(t_Range);
+        auto it = aMap.find(t_ConstrNum);
+        if (it == aMap.end()) {
             ShowFatalError("Incorrect construction selection.");
             //throw std::runtime_error("Incorrect construction selection.");
         }
-        return aMap->at(t_ConstrNum);
+        return aMap.at(t_ConstrNum);
     }
 
 } // namespace WindowManager

@@ -186,7 +186,7 @@ namespace WindowManager {
         NumSurfaceScreens = TotScreens;
         if (NumSurfaceScreens > 0) CalcWindowScreenProperties();
 
-        auto aWinConstSimp = CWindowConstructionsSimplified::instance();
+        auto & aWinConstSimp = CWindowConstructionsSimplified::instance();
         for (auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             auto &construction(Construct(ConstrNum));
             if (construction.isGlazingConstruction()) {
@@ -492,7 +492,6 @@ namespace WindowManager {
 
     std::shared_ptr<ICellDescription> CWCEVenetianBlindCellFactory::getCellDescription()
     {
-        assert(m_Material != nullptr);
         const auto blindDataPtr = m_Material.BlindDataPtr;
         auto &blind(Blind(blindDataPtr));
         assert(blindDataPtr > 0);
@@ -515,7 +514,6 @@ namespace WindowManager {
 
     std::shared_ptr<ICellDescription> CWCEScreenCellFactory::getCellDescription()
     {
-        assert(m_Material != nullptr);
         auto diameter = m_Material.Thickness; // Thickness in this case is diameter
         // ratio is not saved withing material but rather calculated from transmittance
         const auto ratio = 1.0 - sqrt(m_Material.Trans);
