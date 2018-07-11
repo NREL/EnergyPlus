@@ -182,8 +182,8 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     using General::JulianDay;
     using WeatherManager::GetNextEnvironment;
     using WeatherManager::ManageWeather;
-    using WeatherManager::RPReadAllWeatherData;
     using WeatherManager::ResetEnvironmentCounter;
+    using WeatherManager::RPReadAllWeatherData;
     using namespace DataEnvironment;
     using namespace DataGlobals;
     using namespace DataReportingFlags;

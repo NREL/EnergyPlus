@@ -326,8 +326,17 @@ namespace ZoneDehumidifier {
 
         for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, ZoneDehumidIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          ZoneDehumidIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
 
             // A1,  \field Name
@@ -348,12 +357,12 @@ namespace ZoneDehumidifier {
             }
 
             // A3 , \field Air Inlet Node Name
-            ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum = GetOnlySingleNode(Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                                              NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum = GetOnlySingleNode(
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             // A4 , \field Air Outlet Node Name
-            ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum = GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                                               NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum = GetOnlySingleNode(
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             // N1,  \field Rated Water Removal
             ZoneDehumid(ZoneDehumidIndex).RatedWaterRemoval = Numbers(1);
@@ -510,8 +519,11 @@ namespace ZoneDehumidifier {
                 ZoneDehumid(ZoneDehumidIndex).CondensateCollectMode = CondensateDiscarded;
             } else {
                 ZoneDehumid(ZoneDehumidIndex).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(ZoneDehumid(ZoneDehumidIndex).Name, CurrentModuleObject, ZoneDehumid(ZoneDehumidIndex).CondensateCollectName,
-                                         ErrorsFound, ZoneDehumid(ZoneDehumidIndex).CondensateTankID,
+                SetupTankSupplyComponent(ZoneDehumid(ZoneDehumidIndex).Name,
+                                         CurrentModuleObject,
+                                         ZoneDehumid(ZoneDehumidIndex).CondensateCollectName,
+                                         ErrorsFound,
+                                         ZoneDehumid(ZoneDehumidIndex).CondensateTankID,
                                          ZoneDehumid(ZoneDehumidIndex).CondensateTankSupplyARRID);
             }
 
@@ -530,34 +542,96 @@ namespace ZoneDehumidifier {
 
         for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex) {
             // Set up report variables for the dehumidifiers
-            SetupOutputVariable("Zone Dehumidifier Sensible Heating Rate", OutputProcessor::Unit::W, ZoneDehumid(ZoneDehumidIndex).SensHeatingRate,
-                                "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Sensible Heating Energy", OutputProcessor::Unit::J,
-                                ZoneDehumid(ZoneDehumidIndex).SensHeatingEnergy, "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Removed Water Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                ZoneDehumid(ZoneDehumidIndex).WaterRemovalRate, "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Removed Water Mass", OutputProcessor::Unit::kg, ZoneDehumid(ZoneDehumidIndex).WaterRemoved,
-                                "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Electric Power", OutputProcessor::Unit::W, ZoneDehumid(ZoneDehumidIndex).ElecPower, "System",
-                                "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Electric Energy", OutputProcessor::Unit::J, ZoneDehumid(ZoneDehumidIndex).ElecConsumption,
-                                "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name, _, "Electric", "COOLING", _, "System");
-            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Power", OutputProcessor::Unit::W,
-                                ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecPower, "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Energy", OutputProcessor::Unit::J,
-                                ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecCons, "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Part Load Ratio", OutputProcessor::Unit::None, ZoneDehumid(ZoneDehumidIndex).DehumidPLR, "System",
-                                "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Runtime Fraction", OutputProcessor::Unit::None, ZoneDehumid(ZoneDehumidIndex).DehumidRTF, "System",
-                                "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Outlet Air Temperature", OutputProcessor::Unit::C, ZoneDehumid(ZoneDehumidIndex).OutletAirTemp,
-                                "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Sensible Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneDehumid(ZoneDehumidIndex).SensHeatingRate,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneDehumid(ZoneDehumidIndex).SensHeatingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Removed Water Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ZoneDehumid(ZoneDehumidIndex).WaterRemovalRate,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Removed Water Mass",
+                                OutputProcessor::Unit::kg,
+                                ZoneDehumid(ZoneDehumidIndex).WaterRemoved,
+                                "System",
+                                "Sum",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Electric Power",
+                                OutputProcessor::Unit::W,
+                                ZoneDehumid(ZoneDehumidIndex).ElecPower,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Electric Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneDehumid(ZoneDehumidIndex).ElecConsumption,
+                                "System",
+                                "Sum",
+                                ZoneDehumid(ZoneDehumidIndex).Name,
+                                _,
+                                "Electric",
+                                "COOLING",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Power",
+                                OutputProcessor::Unit::W,
+                                ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecPower,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecCons,
+                                "System",
+                                "Sum",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                ZoneDehumid(ZoneDehumidIndex).DehumidPLR,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                ZoneDehumid(ZoneDehumidIndex).DehumidRTF,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
+            SetupOutputVariable("Zone Dehumidifier Outlet Air Temperature",
+                                OutputProcessor::Unit::C,
+                                ZoneDehumid(ZoneDehumidIndex).OutletAirTemp,
+                                "System",
+                                "Average",
+                                ZoneDehumid(ZoneDehumidIndex).Name);
 
             if (ZoneDehumid(ZoneDehumidIndex).CondensateCollectMode == CondensateToTank) {
-                SetupOutputVariable("Zone Dehumidifier Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                    ZoneDehumid(ZoneDehumidIndex).DehumidCondVolFlowRate, "System", "Average", ZoneDehumid(ZoneDehumidIndex).Name);
-                SetupOutputVariable("Zone Dehumidifier Condensate Volume", OutputProcessor::Unit::m3, ZoneDehumid(ZoneDehumidIndex).DehumidCondVol,
-                                    "System", "Sum", ZoneDehumid(ZoneDehumidIndex).Name, _, "OnSiteWater", "Condensate", _, "System");
+                SetupOutputVariable("Zone Dehumidifier Condensate Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    ZoneDehumid(ZoneDehumidIndex).DehumidCondVolFlowRate,
+                                    "System",
+                                    "Average",
+                                    ZoneDehumid(ZoneDehumidIndex).Name);
+                SetupOutputVariable("Zone Dehumidifier Condensate Volume",
+                                    OutputProcessor::Unit::m3,
+                                    ZoneDehumid(ZoneDehumidIndex).DehumidCondVol,
+                                    "System",
+                                    "Sum",
+                                    ZoneDehumid(ZoneDehumidIndex).Name,
+                                    _,
+                                    "OnSiteWater",
+                                    "Condensate",
+                                    _,
+                                    "System");
             }
         }
     }
@@ -737,8 +811,8 @@ namespace ZoneDehumidifier {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using Psychrometrics::PsyCpAirFnWTdb;
-        using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyHfgAirFnWTdb;
+        using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::RhoH2O;
 
@@ -812,7 +886,8 @@ namespace ZoneDehumidifier {
                 } else {
                     ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                        "\": Water Removal Rate Curve output is <= 0.0 warning continues...",
-                                                   ZoneDehumid(ZoneDehumNum).WaterRemovalCurveErrorIndex, WaterRemovalRateFactor,
+                                                   ZoneDehumid(ZoneDehumNum).WaterRemovalCurveErrorIndex,
+                                                   WaterRemovalRateFactor,
                                                    WaterRemovalRateFactor);
                 }
                 WaterRemovalRateFactor = 0.0;
@@ -845,7 +920,8 @@ namespace ZoneDehumidifier {
                 } else {
                     ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                        "\": Energy Factor Curve output is <= 0.0 warning continues...",
-                                                   ZoneDehumid(ZoneDehumNum).EnergyFactorCurveErrorIndex, EnergyFactorAdjFactor,
+                                                   ZoneDehumid(ZoneDehumNum).EnergyFactorCurveErrorIndex,
+                                                   EnergyFactorAdjFactor,
                                                    EnergyFactorAdjFactor);
                 }
                 ElectricPowerAvg = 0.0;
@@ -871,7 +947,9 @@ namespace ZoneDehumidifier {
                     } else {
                         ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Part Load Fraction Correlation Curve output < 0.7 warning continues...",
-                                                       ZoneDehumid(ZoneDehumNum).LowPLFErrorIndex, PLF, PLF);
+                                                       ZoneDehumid(ZoneDehumNum).LowPLFErrorIndex,
+                                                       PLF,
+                                                       PLF);
                     }
                     PLF = 0.7;
                 }
@@ -886,7 +964,9 @@ namespace ZoneDehumidifier {
                     } else {
                         ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Part Load Fraction Correlation Curve output > 1.0 warning continues...",
-                                                       ZoneDehumid(ZoneDehumNum).HighPLFErrorIndex, PLF, PLF);
+                                                       ZoneDehumid(ZoneDehumNum).HighPLFErrorIndex,
+                                                       PLF,
+                                                       PLF);
                     }
                     PLF = 1.0;
                 }
@@ -920,7 +1000,9 @@ namespace ZoneDehumidifier {
                     } else {
                         ShowRecurringWarningErrorAtEnd(ZoneDehumid(ZoneDehumNum).UnitType + " \"" + ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Runtime fraction for zone dehumidifier exceeded 1.0 warning continues...",
-                                                       ZoneDehumid(ZoneDehumNum).HighRTFErrorIndex, RunTimeFraction, RunTimeFraction);
+                                                       ZoneDehumid(ZoneDehumNum).HighRTFErrorIndex,
+                                                       RunTimeFraction,
+                                                       RunTimeFraction);
                     }
                     RunTimeFraction = 1.0;
                 }

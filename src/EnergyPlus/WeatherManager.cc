@@ -4948,34 +4948,53 @@ namespace WeatherManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DayCorrection(Pi * 2.0 / 366.0);
-        static Array1D<Real64> const SineSolDeclCoef(
-            9, {0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096}); // Fitted coefficients
-                                                                                                                                // of Fourier series |
-                                                                                                                                // Sine of declination
-                                                                                                                                // coefficients
-        static Array1D<Real64> const EqOfTimeCoef(
-            9, {0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992}); // Fitted coefficients
-                                                                                                                                // of Fourier Series |
-                                                                                                                                // Equation of Time
-                                                                                                                                // coefficients
+        static Array1D<Real64> const SineSolDeclCoef(9,
+                                                     {0.00561800,
+                                                      0.0657911,
+                                                      -0.392779,
+                                                      0.00064440,
+                                                      -0.00618495,
+                                                      -0.00010101,
+                                                      -0.00007951,
+                                                      -0.00011691,
+                                                      0.00002096}); // Fitted coefficients of Fourier series | Sine of declination coefficients
+        static Array1D<Real64> const EqOfTimeCoef(9,
+                                                  {0.00021971,
+                                                   -0.122649,
+                                                   0.00762856,
+                                                   -0.156308,
+                                                   -0.0530028,
+                                                   -0.00388702,
+                                                   -0.00123978,
+                                                   -0.00270502,
+                                                   -0.00167992}); // Fitted coefficients of Fourier Series | Equation of Time coefficients
         static Array1D<Real64> const ASHRAE_A_Coef(
             9, {1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445, 1.1198}); // Fitted coefficients of Fourier Series | ASHRAE A
-                                                                                                  // Factor coefficients English (original) units:
-                                                                                                  //              368.49341,.366502,24.538624,-.169983,-1.193417,
-                                                                                                  //              & .313261,-1.076093,-.543376,.355197
-                                                                                                  //              ,                       &
+                                                                                                  // Factor coefficients
+        // English (original) units:
+        //              368.49341,.366502,24.538624,-.169983,-1.193417,            &
+        //              .313261,-1.076093,-.543376,.355197 ,                       &
 
-        static Array1D<Real64> const ASHRAE_B_Coef(
-            9, {0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867}); // Fitted coefficients of
-                                                                                                                             // Fourier Series |
-                                                                                                                             // ASHRAE B Factor
-                                                                                                                             // coefficients
-        static Array1D<Real64> const ASHRAE_C_Coef(
-            9, {0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515}); // Fitted
-                                                                                                                                 // coefficients of
-                                                                                                                                 // Fourier Series |
-                                                                                                                                 // ASHRAE C Factor
-                                                                                                                                 // coefficients
+        static Array1D<Real64> const ASHRAE_B_Coef(9,
+                                                   {0.171631,
+                                                    -0.00400448,
+                                                    -0.0344923,
+                                                    0.00000209,
+                                                    0.00325428,
+                                                    -0.00085429,
+                                                    0.00229562,
+                                                    0.0009034,
+                                                    -0.0011867}); // Fitted coefficients of Fourier Series | ASHRAE B Factor coefficients
+        static Array1D<Real64> const ASHRAE_C_Coef(9,
+                                                   {0.0905151,
+                                                    -0.00322522,
+                                                    -0.0407966,
+                                                    0.000104164,
+                                                    0.00745899,
+                                                    -0.00086461,
+                                                    0.0013111,
+                                                    0.000808275,
+                                                    -0.00170515}); // Fitted coefficients of Fourier Series | ASHRAE C Factor coefficients
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
