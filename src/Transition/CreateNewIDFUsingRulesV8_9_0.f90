@@ -819,7 +819,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs=Blank
                  ObjectName='Coil:Cooling:DX:CurveFit:Speed'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1)=TRIM(TempArgs(1)) // ' Low Speed Performance' ! Name
+                 OutArgs(1)=TRIM(TempArgs(1)) // ' Speed 1 Performance' ! Name
 
                  ! Capacity is scaled by the capacity at high speed - but only if it's not autosized
                  ErrFlag=.false.
@@ -829,7 +829,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    CALL ShowWarningError( &
                      'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
                      ' Low Speed Gross Rated Total Cooling Capacity='//trim(TempArgs(15))//' was replaced with default sizing fraction.'//  &
-                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Gross Total Cooling Capacity Fraction = 0.3333.',Auditf)
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 1 Performance, Gross Total Cooling Capacity Fraction = 0.3333.',Auditf)
                  ELSE
                    DXTempValue1 = ProcessNumber(TempArgs(15),ErrFlag)
                    IF (ErrFlag) THEN
@@ -858,7 +858,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    CALL ShowWarningError( &
                      'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
                      ' Low Speed Gross Rated Air Flow Rate='//trim(TempArgs(18))//' was replaced with default sizing fraction.'//  &
-                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Evaporator Air Flow Rate Fraction = 0.3333.',Auditf)
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 1 Performance, Evaporator Air Flow Rate Fraction = 0.3333.',Auditf)
                  ELSE
                    DXTempValue1 = ProcessNumber(TempArgs(18),ErrFlag)
                    IF (ErrFlag) THEN
@@ -887,7 +887,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    CALL ShowWarningError( &
                      'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
                      ' Low Speed Evaporative Condenser Air Flow Rate='//trim(TempArgs(28))//' was replaced with default sizing fraction.'//  &
-                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Condenser Air Flow Rate Fraction = 0.3333.',Auditf)
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 1 Performance, Condenser Air Flow Rate Fraction = 0.3333.',Auditf)
                  ELSE
                    DXTempValue1 = ProcessNumber(TempArgs(28),ErrFlag)
                    IF (ErrFlag) THEN
@@ -921,7 +921,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    CALL ShowWarningError( &
                      'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
                      ' Low Speed Evaporative Condenser Air Flow Rate='//trim(TempArgs(29))//' was replaced with default sizing fraction.'//  &
-                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Condenser Pump Power Fraction = 0.3333.',Auditf)
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 1 Performance, Condenser Pump Power Fraction = 0.3333.',Auditf)
                  ELSE
                    DXTempValue1 = ProcessNumber(TempArgs(29),ErrFlag)
                    IF (ErrFlag) THEN
@@ -959,7 +959,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs=Blank
                  ObjectName='Coil:Cooling:DX:CurveFit:Speed'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1)=TRIM(TempArgs(1)) // ' High Speed Performance' ! Name
+                 OutArgs(1)=TRIM(TempArgs(1)) // ' Speed 2 Performance' ! Name
                  OutArgs(2)='1.0' ! Gross Total Cooling Capacity Fraction
                  OutArgs(3)='1.0' ! Evaporator Air Flow Rate Fraction
                  OutArgs(4)='1.0' ! Condenser Air Flow Rate Fraction
