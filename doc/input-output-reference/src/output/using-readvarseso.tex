@@ -4,9 +4,11 @@
 
 The ReadVarsESO program is distributed with EnergyPlus as a simple approach to converting the standard output files (\textbf{eplusout.eso, eplusout.mtr}) into files that can be put directly into a spreadsheet program and then used to create graphs or do other statistical operations. ReadVarsESO can read the complex output files and sort the data into time-based form, it is a very quick application but does not have a lot of features.~ Note that all the \textbf{Output:Meter} and \textbf{Output:Meter:Cumulative} objects are included on the \textbf{eplusout.eso} file as well as the \textbf{eplusout.mtr} file.~ You can choose the \textbf{Output:Meter:MeterFileOnly} or \textbf{Output:Meter:Cumulative:MeterFileOnly} objects if you do not want a particular meter to show up on the \textbf{eplusout.eso} file. If you wish to see only the metered outputs, the \textbf{eplusout.mtr} file will typically be a lot smaller than the \textbf{eplusout.eso} file.
 
-The ReadVarsESO program has a very simple set of inputs. By default, you will get all the variables listed in the Output:Variable (\textbf{eplusout.eso}) or Output:Meter (\textbf{eplusout.mtr}) objects into the appropriate output files. The outputs from ReadVarsESO are limited to 255 variables (Microsoft Excel™ limit). You can tailor how many variables to list by specifying variables for the ReadVarsESO runs.
+The ReadVarsESO program has a very simple set of inputs. By default, you will get all the variables listed in the Output:Variable (\textbf{eplusout.eso}) or Output:Meter (\textbf{eplusout.mtr}) objects into the appropriate output files, and the outputs will be limited to 255 variables (a legacy Microsoft Excel™ limit). You can tailor how many variables to list by specifying variables for the ReadVarsESO runs.
 
 You can override the 255 variable limit by specifying an argument on the command line (\textbf{EP-Launch} has a special option for this). You use ``unlimited'' or ``nolimit'' on the command line to get as many variables into your output file as desired. Again, this will be limited either by the number of variables in the \textbf{eplusout.eso} or \textbf{eplusout.mtr} files or the contents of the ``rvi'' file. If you want to use this option, you must include two arguments to the command line of the ReadVars program -- 1) the ``rvi'' file and 2) the ``unlimited'' argument.
+
+By default, ReadVarsESO also included a trailing space on the header line, which can result in parsing difficulties, since the last variable will essentially have a blank character at the end.  In EnergyPlus 9.0, a new command line option (fixheader) was added to ReadVarsESO to allow eliminating this extra padding.  Just like with the variable limit command line argument, to use this one, you must first include an argument for the rvi file, which is a required first positional argument.  If you aren't using an rvi file, just include blank quotes to indicate no rvi use while satisfying the ReadVarsESO argument requirements.
 
 % table 41
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
@@ -24,6 +26,7 @@ Option & Description \tabularnewline
 
 < filename > & To use any of these options, you must include a file name (“rvi” file) as the first argument. \tabularnewline
 Unlimited (or Nolimit) & Variables of any number will be produced on the output file. \tabularnewline
+FixHeader & The CSV header line will not have a trailing space on the line, to ease with parsing variable information \tabularnewline
 Timestep & Only variables with reported frequency “timestep” (or detailed) will be produced on the output file. \tabularnewline
 Hourly & Only variables with reported frequency “hourly”~ will be produced on the output file. \tabularnewline
 Daily & Only variables with reported frequency “daily”~ will be produced on the output file. \tabularnewline

@@ -6008,12 +6008,11 @@ namespace ConvectionCoefficients {
                     AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
                     AirChangeRate = min(AirChangeRate, MaxACH);
                     AirChangeRate = max(AirChangeRate, 0.0);
-                    Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
                 } else {
                     AirChangeRate = 0.0;
-                    Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
                 }
                 tmpHc = CalcFisherPedersenCeilDiffuserFloor(AirChangeRate);
+                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
 
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserCeiling) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -6024,12 +6023,11 @@ namespace ConvectionCoefficients {
                     AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
                     AirChangeRate = min(AirChangeRate, MaxACH);
                     AirChangeRate = max(AirChangeRate, 0.0);
-                    Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
                 } else {
                     AirChangeRate = 0.0;
-                    Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
                 }
                 tmpHc = CalcFisherPedersenCeilDiffuserCeiling(AirChangeRate);
+                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
 
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserWalls) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -6040,12 +6038,11 @@ namespace ConvectionCoefficients {
                     AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume * ZoneMult);
                     AirChangeRate = min(AirChangeRate, MaxACH);
                     AirChangeRate = max(AirChangeRate, 0.0);
-                    Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
                 } else {
                     AirChangeRate = 0.0;
-                    Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
                 }
                 tmpHc = CalcFisherPedersenCeilDiffuserWalls(AirChangeRate);
+                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
 
             } else if (SELECT_CASE_var == HcInt_AlamdariHammondStableHorizontal) {
                 ZoneNum = Surface(SurfNum).Zone;
