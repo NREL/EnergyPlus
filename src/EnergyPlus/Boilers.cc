@@ -424,6 +424,26 @@ namespace Boilers {
                     cCurrentModuleObject,            // Object Type
                     Boiler(BoilerNum).Name,         // Object Name
                     cAlphaFieldNames(4));               // Field Name
+
+                // if curve uses temperature, make sure water temp mode has been set
+                if (CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).NumDims == 2) {                                // curve uses water temperature
+                    if (Boiler(BoilerNum).CurveTempMode == BoilerTempModeNotSet) { // throw error
+                        if (!lAlphaFieldBlanks(3)) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                            ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError("Boiler using curve type of " + CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType + " must specify " +
+                                              cAlphaFieldNames(3));
+                            ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
+                        } else {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                            ShowContinueError("Field " + cAlphaFieldNames(3) + " is blank");
+                            ShowContinueError("Boiler using curve type of " + CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType +
+                                              " must specify either EnteringBoiler or LeavingBoiler");
+                        }
+                        ErrorsFound = true;
+                    }
+                }
+
             } else if (!lAlphaFieldBlanks(4)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
@@ -431,24 +451,6 @@ namespace Boilers {
                 ErrorsFound = true;
             }
 
-            // if curve uses temperature, make sure water temp mode has been set
-            if (CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).NumDims == 2) {                                // curve uses water temperature
-                if (Boiler(BoilerNum).CurveTempMode == BoilerTempModeNotSet) { // throw error
-                    if (!lAlphaFieldBlanks(3)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                        ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Boiler using curve type of " + CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType + " must specify " +
-                                          cAlphaFieldNames(3));
-                        ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
-                    } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                        ShowContinueError("Field " + cAlphaFieldNames(3) + " is blank");
-                        ShowContinueError("Boiler using curve type of " + CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType +
-                                          " must specify either EnteringBoiler or LeavingBoiler");
-                    }
-                    ErrorsFound = true;
-                }
-            }
 
             Boiler(BoilerNum).TempDesBoilerOut = rNumericArgs(3);
             Boiler(BoilerNum).VolFlowRate = rNumericArgs(4);

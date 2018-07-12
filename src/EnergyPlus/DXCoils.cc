@@ -2933,7 +2933,7 @@ namespace DXCoils {
             if (!lAlphaBlanks(18) && NumAlphas > 17) {
                 DXCoil(DXCoilNum).SHRFFlow(1) = GetCurveIndex(Alphas(18)); // convert curve name to number
                 // DXCoil(DXCoilNum)%SHRFFlow2 = DXCoil(DXCoilNum)%SHRFFlow(1)
-                if (DXCoil(DXCoilNum).SHRFTemp(1) == 0) {
+                if (DXCoil(DXCoilNum).SHRFFlow(1) == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(18) + "=\"" + Alphas(18) + "\".");
                 } else {
@@ -4279,6 +4279,17 @@ namespace DXCoils {
                             CurrentModuleObject,           // Object Type
                             DXCoil(DXCoilNum).Name,        // Object Name
                             cAlphaFields(18 + (I - 1) * 6));  // Field Name
+
+                        if (!ErrorsFound) {
+                            CurveVal = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(I), RatedOutdoorAirTemp, RatedInletAirTemp);
+                            if (CurveVal > 1.10 || CurveVal < 0.90) {
+                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", curve values");
+                                ShowContinueError(cAlphaFields(18 + (I - 1) * 6) + " = " + Alphas(18 + (I - 1) * 6));
+                                ShowContinueError("..." + cAlphaFields(18 + (I - 1) * 6) +
+                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
+                            }
+                        }
                     }
                 }
 

@@ -1745,9 +1745,11 @@ namespace CurveManager {
                     PerfCurve(CurveNum).CurveType = Quartic;
                     TableLookup(TableNum).InterpolationOrder = 5;
                 } else {
-                    ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                    ShowContinueError(cAlphaFieldNames(2) + " [" + Alphas(2) + "] is not a valid choice. ");
-                    ErrorsFound = true;
+                    if (Alphas(3) == "EVALUATECURVETOLIMITS") {
+                        ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                        ShowContinueError(cAlphaFieldNames(2) + " [" + Alphas(2) + "] is not a valid choice. ");
+                        ErrorsFound = true;
+                    }
                 }
             }
 
@@ -2370,9 +2372,11 @@ namespace CurveManager {
                     PerfCurve(CurveNum).CurveType = QuadraticLinear;
                     TableLookup(TableNum).InterpolationOrder = 3;
                 } else {
-                    ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                    ShowContinueError(cAlphaFieldNames(2) + " [" + Alphas(2) + "] is not a valid choice. ");
-                    ErrorsFound = true;
+                    if (Alphas(3) == "EVALUATECURVETOLIMITS") {
+                        ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                        ShowContinueError(cAlphaFieldNames(2) + " [" + Alphas(2) + "] is not a valid choice. ");
+                        ErrorsFound = true;
+                    }
                 }
             }
             {
@@ -2786,12 +2790,14 @@ namespace CurveManager {
                     PerfCurve(CurveNum).CurveType = Quartic;
                 } else if (SELECT_CASE_var == "BIQUADRATIC") {
                     PerfCurve(CurveNum).CurveType = BiQuadratic;
-                } else if (SELECT_CASE_var == "QUADRATICINEAR") {
+                } else if (SELECT_CASE_var == "QUADRATICLINEAR") {
                     PerfCurve(CurveNum).CurveType = QuadraticLinear;
                 } else {
-                    ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                    ShowContinueError(cAlphaFieldNames(3) + " [" + Alphas(3) + "] is not a valid choice. ");
-                    ErrorsFound = true;
+                    if (Alphas(2) == "EVALUATECURVETOLIMITS") {
+                        ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                        ShowContinueError(cAlphaFieldNames(3) + " [" + Alphas(3) + "] is not a valid choice. ");
+                        ErrorsFound = true;
+                    }
                 }
             }
 
