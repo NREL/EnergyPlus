@@ -8,7 +8,7 @@ Users and interface developers are requesting that EnergyPlus handle dates in a 
 
 EnergyPlus will be modified to always have a real year associated with the simulation and output appropriate dates and times. Simulations that would violate date and time rules (e.g. simulate 2016 without February 29) will no longer be allowed unless requested. Information from the weather file information will no longer take precedence over objects in the input simulation file. Some weather file inputs (e.g. the leap year flag) will always be ignored.
 
-The **RunPeriod** and **RunPeriod:CustomRange** objects will be combined into a single RunPeriod object that specifies start and end dates as valid calendar dates. Schedule:File will be extended to allow multiple years in a single schedule file. The simulation year will be added SQLite output.
+The **RunPeriod** and **RunPeriod:CustomRange** objects will be combined into a single **RunPeriod** object that specifies start and end dates as valid calendar dates. Schedule:File will be extended to allow multiple years in a single schedule file. The simulation year will be added SQLite output.
 
 ## Approach ##
 
@@ -185,13 +185,25 @@ Another important case to consider are multiyear simulations with leap years. Fo
 
 **Jason Glazer, Re: February 29:** Assuming that the TMY3 or IWEC or what ever does not have a February 29 day of data, what are you going to do for February 29? If it is repeating the February 28 data that could be introduce errors since no smoothing would be done from February 28 midnight to February 29 1AM.
 
-**Response:** The ability to skip the leap day is retained in the current implementation, there are too many EPWs in the wild that are missing that day.
+*Response:* The ability to skip the leap day is retained in the current implementation, there are too many EPWs in the wild that are missing that day.
 
 **Jason Glazer, Re: Outputs:** The year of the simulation should also appear in the tabular output file in the input verification and output summary table and perhaps other outputs.
 
-**Response:** The current implementation includes annual outputs in the ESO.
+*Response:* The current implementation includes annual outputs in the ESO.
 
-(More to be transcribed)
+**Dan Macumber, Re: Begin/End Year:** What happens if End Year is specified but Begin Year is not or End Year < Begin Year, etc.
+
+*Response:* These would be invalid and are severe errors.
+
+**Lixing Gu, Re: Removal of repetition field:** When this field is removed, how do you keep the same existing capability to allow multiyear simulations using the same single year weather?
+
+*Response:* The number of years in the old repetition field will need to be reflected in the difference between the start year and the end year in the input object, and the "Treat as Actual Weather" field should be set to "No" (which is the default) to get nearly the current behavior. The one difference will be that the weekdays are incremented and not reset; leap years (or the lack thereof) are handled the same way as they are currently in the repeated run period scenario.
+
+**Dan Macumber, Re: Output Changes:** Could this be a new field in an output request object? The default could be to not include years in output for one release, then the default could change to include years, then the option could be deprecated.
+
+**Jason Glazer, Re: Output Changes:** I think that it is important that timestamped output be an option for the normal ESO/MTR output files even if not supported by ReadVarsESO immediately. Although it would be good if ReadVarsESO was modified to support this new format.
+
+*Response:* An additional annual output frequency was added to provide output at a yearly frequency. As part of that work, a year field was added to the SQL output and a yearly timestamp was added to the ESO/MTR.
 
 ## Appendix D: Design and Implementation ##
 

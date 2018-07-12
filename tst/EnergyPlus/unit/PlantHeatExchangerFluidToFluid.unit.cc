@@ -2282,7 +2282,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
     PlantHeatExchangerFluidToFluid::FluidHX(1).AvailSchedNum = -1;
 
@@ -2381,7 +2381,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
     PlantHeatExchangerFluidToFluid::FluidHX(1).AvailSchedNum = -1;
 

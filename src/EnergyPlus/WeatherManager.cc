@@ -793,8 +793,6 @@ namespace WeatherManager {
 
         // Using/Aliasing
         using General::BetweenDates;
-        using General::InvJulianDay;
-        using General::JulianDay;
         using namespace DataSystemVariables;
         using DataHeatBalance::AdaptiveComfortRequested_ASH55;
         using DataHeatBalance::AdaptiveComfortRequested_CEN15251;
@@ -1075,8 +1073,8 @@ namespace WeatherManager {
                             ThisWeekDay = 0;
                             for (Loop = 1; Loop <= NumDataPeriods; ++Loop) {
                                 if (!Environment(Envrn).ActualWeather) {
-                                    RunStJDay = JulianDay(DataPeriods(Loop).StMon, DataPeriods(Loop).StDay, LeapYearAdd);
-                                    RunEnJDay = JulianDay(DataPeriods(Loop).EnMon, DataPeriods(Loop).EnDay, LeapYearAdd);
+                                    RunStJDay = General::OrdinalDay(DataPeriods(Loop).StMon, DataPeriods(Loop).StDay, LeapYearAdd);
+                                    RunEnJDay = General::OrdinalDay(DataPeriods(Loop).EnMon, DataPeriods(Loop).EnDay, LeapYearAdd);
                                     if (!BetweenDates(Environment(Envrn).StartJDay, RunStJDay, RunEnJDay)) continue;
                                     if (!BetweenDates(Environment(Envrn).EndJDay, RunStJDay, RunEnJDay)) continue;
                                     OkRun = true;
@@ -1226,8 +1224,8 @@ namespace WeatherManager {
                                             ErrorsFound = true;
                                         }
                                         if (DataPeriods(1).StMon == 1 && DataPeriods(1).StDay == 1) {
-                                            RunStJDay = JulianDay(DataPeriods(1).StMon, DataPeriods(1).StDay, LeapYearAdd);
-                                            RunEnJDay = JulianDay(DataPeriods(1).EnMon, DataPeriods(1).EnDay, LeapYearAdd);
+                                            RunStJDay = General::OrdinalDay(DataPeriods(1).StMon, DataPeriods(1).StDay, LeapYearAdd);
+                                            RunEnJDay = General::OrdinalDay(DataPeriods(1).EnMon, DataPeriods(1).EnDay, LeapYearAdd);
                                             if (RunEnJDay - RunStJDay + 1 != 365) {
                                                 ShowSevereError(RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files "
                                                                               "that do not contain 365 days.");
@@ -1250,12 +1248,12 @@ namespace WeatherManager {
                             // Only need to set Week days for Run Days
                             RunPeriodStartDayOfWeek = TWeekDay;
                             WeekDayTypes = 0;
-                            JDay5Start = JulianDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
-                            JDay5End = JulianDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
+                            JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
+                            JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
                             if (JDay5End >= JDay5Start) {
                                 curSimDayForEndOfRunPeriod = DayOfSim + (JDay5End - JDay5Start) + LeapYearAdd;
                             } else {
-                                curSimDayForEndOfRunPeriod = DayOfSim + JulianDay(12, 31, LeapYearAdd) - JDay5Start + JDay5End;
+                                curSimDayForEndOfRunPeriod = DayOfSim + General::OrdinalDay(12, 31, LeapYearAdd) - JDay5Start + JDay5End;
                             }
                             Loop = JDay5Start;
                             while (true) {
@@ -1800,7 +1798,6 @@ namespace WeatherManager {
         // na
 
         // Using/Aliasing
-        using General::JulianDay;
 
         // Argument array dimensioning
 
@@ -1894,8 +1891,8 @@ namespace WeatherManager {
         }
 
         DSTIndex = 0;
-        JDay = JulianDay(ActStartMonth, ActStartDay, LeapYearAdd);
-        JDay1 = JulianDay(ActEndMonth, ActEndDay, LeapYearAdd);
+        JDay = General::OrdinalDay(ActStartMonth, ActStartDay, LeapYearAdd);
+        JDay1 = General::OrdinalDay(ActEndMonth, ActEndDay, LeapYearAdd);
         if (JDay1 >= JDay) {
             DSTIndex({JDay, JDay1}) = 1;
         } else {
@@ -1925,8 +1922,6 @@ namespace WeatherManager {
         // na
 
         // Using/Aliasing
-        using General::InvJulianDay;
-        using General::JulianDay;
 
         // Argument array dimensioning
 
@@ -1958,7 +1953,7 @@ namespace WeatherManager {
         for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
             if (SpecialDays(Loop).WthrFile && !UseSpecialDays) continue;
             if (SpecialDays(Loop).DateType <= MonthDay) {
-                JDay = JulianDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd);
+                JDay = General::OrdinalDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd);
                 if (SpecialDays(Loop).Duration == 1 && Environment(Envrn).ApplyWeekendRule) {
                     if (WeekDayTypes(JDay) == 1) {
                         // Sunday, must go to Monday
@@ -1971,7 +1966,7 @@ namespace WeatherManager {
                         if (JDay == 366 && LeapYearAdd == 0) JDay = 1;
                     }
                 }
-                InvJulianDay(JDay, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay, LeapYearAdd);
+                General::InvOrdinalDay(JDay, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay, LeapYearAdd);
             } else if (SpecialDays(Loop).DateType == NthDayInMonth) {
                 if (SpecialDays(Loop).WeekDay >= MonWeekDay(SpecialDays(Loop).Month)) {
                     ThisDay = SpecialDays(Loop).WeekDay - MonWeekDay(SpecialDays(Loop).Month) + 1;
@@ -1986,7 +1981,7 @@ namespace WeatherManager {
                 }
                 SpecialDays(Loop).ActStMon = SpecialDays(Loop).Month;
                 SpecialDays(Loop).ActStDay = ThisDay;
-                JDay = JulianDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
+                JDay = General::OrdinalDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
             } else { // LastWeekDayInMonth
                 ThisDay = SpecialDays(Loop).WeekDay - MonWeekDay(SpecialDays(Loop).Month) + 1;
                 while (ThisDay + 7 <= ActEndDayOfMonth(SpecialDays(Loop).Month)) {
@@ -1994,7 +1989,7 @@ namespace WeatherManager {
                 }
                 SpecialDays(Loop).ActStMon = SpecialDays(Loop).Month;
                 SpecialDays(Loop).ActStDay = ThisDay;
-                JDay = JulianDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
+                JDay = General::OrdinalDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
             }
             if (SpecialDayTypes(JDay) != 0) {
                 ShowWarningError(RoutineName + "Special Day definition (" + SpecialDays(Loop).Name +
@@ -2041,8 +2036,6 @@ namespace WeatherManager {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using General::InvJulianDay;
-        using General::JulianDay;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2183,8 +2176,8 @@ namespace WeatherManager {
                             SetSpecialDayDates(Environment(Envrn).MonWeekDay);
                         }
                         ++YearOfSim;
-                        DataGlobals::CalendarYear += 1;
-                        DataGlobals::CalendarYearChr = std::to_string(DataGlobals::CalendarYear);
+                        //DataGlobals::CalendarYear += 1;
+                        //DataGlobals::CalendarYearChr = std::to_string(DataGlobals::CalendarYear);
                         FirstSimDayofYear = 1;
                         ReadWeatherForDay(FirstSimDayofYear, Envrn, false); // Read tomorrow's weather
                     } else {
@@ -2224,11 +2217,11 @@ namespace WeatherManager {
                             }
                             // need to reset MonWeekDay and WeekDayTypes
                             if (!CurrentYearIsLeapYear) {
-                                JDay5Start = JulianDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, 0);
-                                JDay5End = JulianDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, 0);
+                                JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, 0);
+                                JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, 0);
                             } else {
-                                JDay5Start = JulianDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
-                                JDay5End = JulianDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
+                                JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
+                                JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
                             }
                             if (!Environment(Envrn).ActualWeather)
                                 curSimDayForEndOfRunPeriod = DayOfSim + Environment(Envrn).RawSimDays + LeapYearAdd - 1;
@@ -2450,7 +2443,6 @@ namespace WeatherManager {
         // INTERPOL(IBLAST) legacy code.
 
         // Using/Aliasing
-        using General::JulianDay;
         using ScheduleManager::UpdateScheduleValues;
         using namespace GroundTemperatureManager;
 
@@ -2473,7 +2465,7 @@ namespace WeatherManager {
         }
 
         if (HourOfDay == 1) { // Should investigate whether BeginDayFlag is always set here and use that instead
-            DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
+            DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
         }
 
         UpdateScheduleValues();
@@ -2688,7 +2680,6 @@ namespace WeatherManager {
         // This subroutine reads the appropriate day of EPW weather data.
 
         // Using/Aliasing
-        using General::JulianDay;
         using General::RoundSigDigits;
         using ScheduleManager::GetScheduleValuesForDay;
 
@@ -3295,8 +3286,8 @@ namespace WeatherManager {
                         TomorrowVariables.Year = WYear;
                         TomorrowVariables.Month = WMonth;
                         TomorrowVariables.DayOfMonth = WDay;
-                        TomorrowVariables.DayOfYear = JulianDay(WMonth, WDay, LeapYearAdd);
-                        TomorrowVariables.DayOfYear_Schedule = JulianDay(WMonth, WDay, 1);
+                        TomorrowVariables.DayOfYear = General::OrdinalDay(WMonth, WDay, LeapYearAdd);
+                        TomorrowVariables.DayOfYear_Schedule = General::OrdinalDay(WMonth, WDay, 1);
                         CalculateDailySolarCoeffs(TomorrowVariables.DayOfYear,
                                                   A,
                                                   B,
@@ -4097,7 +4088,6 @@ namespace WeatherManager {
         // ASHRAE Handbook of Fundamentals?
 
         // Using/Aliasing
-        using General::JulianDay;
         using General::RoundSigDigits;
         using ScheduleManager::GetSingleDayScheduleValues;
 
@@ -4199,7 +4189,7 @@ namespace WeatherManager {
         DesignDay(EnvrnNum).Year = CurrentYear; // f90 date_and_time implemented. full 4 digit year !+ 1900
         DesignDay(EnvrnNum).Month = DesDayInput(EnvrnNum).Month;
         DesignDay(EnvrnNum).DayOfMonth = DesDayInput(EnvrnNum).DayOfMonth;
-        DesignDay(EnvrnNum).DayOfYear = JulianDay(DesignDay(EnvrnNum).Month, DesignDay(EnvrnNum).DayOfMonth, 0);
+        DesignDay(EnvrnNum).DayOfYear = General::OrdinalDay(DesignDay(EnvrnNum).Month, DesignDay(EnvrnNum).DayOfMonth, 0);
         gio::write(CurMnDy, MnDyFmt) << DesDayInput(EnvrnNum).Month << DesDayInput(EnvrnNum).DayOfMonth;
         // EnvironmentName = DesDayInput( EnvrnNum ).Title;
         RunPeriodEnvironment = false;
@@ -4948,26 +4938,16 @@ namespace WeatherManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DayCorrection(Pi * 2.0 / 366.0);
-        static Array1D<Real64> const SineSolDeclCoef(9,
-                                                     {0.00561800,
-                                                      0.0657911,
-                                                      -0.392779,
-                                                      0.00064440,
-                                                      -0.00618495,
-                                                      -0.00010101,
-                                                      -0.00007951,
-                                                      -0.00011691,
-                                                      0.00002096}); // Fitted coefficients of Fourier series | Sine of declination coefficients
-        static Array1D<Real64> const EqOfTimeCoef(9,
-                                                  {0.00021971,
-                                                   -0.122649,
-                                                   0.00762856,
-                                                   -0.156308,
-                                                   -0.0530028,
-                                                   -0.00388702,
-                                                   -0.00123978,
-                                                   -0.00270502,
-                                                   -0.00167992}); // Fitted coefficients of Fourier Series | Equation of Time coefficients
+        static Array1D<Real64> const SineSolDeclCoef(
+            9, {0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096}); // Fitted coefficients
+                                                                                                                                // of Fourier series |
+                                                                                                                                // Sine of declination
+                                                                                                                                // coefficients
+        static Array1D<Real64> const EqOfTimeCoef(
+            9, {0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992}); // Fitted coefficients
+                                                                                                                                // of Fourier Series |
+                                                                                                                                // Equation of Time
+                                                                                                                                // coefficients
         static Array1D<Real64> const ASHRAE_A_Coef(
             9, {1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445, 1.1198}); // Fitted coefficients of Fourier Series | ASHRAE A
                                                                                                   // Factor coefficients
@@ -4975,26 +4955,17 @@ namespace WeatherManager {
         //              368.49341,.366502,24.538624,-.169983,-1.193417,            &
         //              .313261,-1.076093,-.543376,.355197 ,                       &
 
-        static Array1D<Real64> const ASHRAE_B_Coef(9,
-                                                   {0.171631,
-                                                    -0.00400448,
-                                                    -0.0344923,
-                                                    0.00000209,
-                                                    0.00325428,
-                                                    -0.00085429,
-                                                    0.00229562,
-                                                    0.0009034,
-                                                    -0.0011867}); // Fitted coefficients of Fourier Series | ASHRAE B Factor coefficients
-        static Array1D<Real64> const ASHRAE_C_Coef(9,
-                                                   {0.0905151,
-                                                    -0.00322522,
-                                                    -0.0407966,
-                                                    0.000104164,
-                                                    0.00745899,
-                                                    -0.00086461,
-                                                    0.0013111,
-                                                    0.000808275,
-                                                    -0.00170515}); // Fitted coefficients of Fourier Series | ASHRAE C Factor coefficients
+        static Array1D<Real64> const ASHRAE_B_Coef(
+            9, {0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867}); // Fitted coefficients of
+                                                                                                                             // Fourier Series |
+                                                                                                                             // ASHRAE B Factor
+                                                                                                                             // coefficients
+        static Array1D<Real64> const ASHRAE_C_Coef(
+            9, {0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515}); // Fitted
+                                                                                                                                 // coefficients of
+                                                                                                                                 // Fourier Series |
+                                                                                                                                 // ASHRAE C Factor
+                                                                                                                                 // coefficients
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5637,7 +5608,6 @@ namespace WeatherManager {
         // Legacy subroutine CKBLDE.
 
         // Using/Aliasing
-        using General::JulianDay;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -5995,7 +5965,6 @@ namespace WeatherManager {
         //  simulation dates
 
         // Using/Aliasing
-        using General::JulianDay;
         using General::TrimSigDigits;
         using namespace DataSystemVariables;
         using namespace DataIPShortCuts;
@@ -6221,6 +6190,8 @@ namespace WeatherManager {
                     computeJulianDate(RunPeriodInput(Loop).endYear, RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay);
             }
 
+            RunPeriodInput(Loop).numSimYears = RunPeriodInput(Loop).endYear - RunPeriodInput(Loop).startYear + 1;
+
             // A3,  \field Use Weather File Holidays and Special Days
             if (lAlphaFieldBlanks(3) || UtilityRoutines::SameString(cAlphaArgs(3), "YES")) {
                 RunPeriodInput(Loop).useHolidays = true;
@@ -6296,8 +6267,8 @@ namespace WeatherManager {
             TotRunPers = 1;
             WeathSimReq = true;
             RunPeriodInput.allocate(TotRunPers);
-            RunPeriodInput(1).startJulianDate = JulianDay(RunPeriodInput(1).startMonth, RunPeriodInput(1).startDay, LeapYearAdd);
-            RunPeriodInput(1).endJulianDate = JulianDay(RunPeriodInput(1).endMonth, RunPeriodInput(1).endDay, LeapYearAdd);
+            RunPeriodInput(1).startJulianDate = General::OrdinalDay(RunPeriodInput(1).startMonth, RunPeriodInput(1).startDay, LeapYearAdd);
+            RunPeriodInput(1).endJulianDate = General::OrdinalDay(RunPeriodInput(1).endMonth, RunPeriodInput(1).endDay, LeapYearAdd);
             RunPeriodInput(1).monWeekDay = 0;
             if (RunPeriodInput(1).dayOfWeek != 0 && !ErrorsFound) {
                 SetupWeekDaysByMonth(
@@ -6322,7 +6293,6 @@ namespace WeatherManager {
         //  simulation dates
 
         // Using/Aliasing
-        using General::JulianDay;
         using General::TrimSigDigits;
         using namespace DataSystemVariables;
         using namespace DataIPShortCuts;
@@ -6450,16 +6420,16 @@ namespace WeatherManager {
 
             // calculate the annual start and end days from the user inputted month and day
             RunPeriodDesignInput(Count).startJulianDate =
-                JulianDay(RunPeriodDesignInput(Count).startMonth, RunPeriodDesignInput(Count).startDay, LeapYearAdd);
+                General::OrdinalDay(RunPeriodDesignInput(Count).startMonth, RunPeriodDesignInput(Count).startDay, LeapYearAdd);
             RunPeriodDesignInput(Count).endJulianDate =
-                JulianDay(RunPeriodDesignInput(Count).endMonth, RunPeriodDesignInput(Count).endDay, LeapYearAdd);
+                General::OrdinalDay(RunPeriodDesignInput(Count).endMonth, RunPeriodDesignInput(Count).endDay, LeapYearAdd);
             if (RunPeriodDesignInput(Count).startJulianDate <= RunPeriodDesignInput(Count).endJulianDate) {
                 RunPeriodDesignInput(Count).totalDays =
                     (RunPeriodDesignInput(Count).endJulianDate - RunPeriodDesignInput(Count).startJulianDate + 1) *
                     RunPeriodDesignInput(Count).numSimYears;
             } else {
-                RunPeriodDesignInput(Count).totalDays =
-                    (JulianDay(12, 31, LeapYearAdd) - RunPeriodDesignInput(Count).startJulianDate + 1 + RunPeriodDesignInput(Count).endJulianDate) *
+                RunPeriodDesignInput(Count).totalDays = (General::OrdinalDay(12, 31, LeapYearAdd) - RunPeriodDesignInput(Count).startJulianDate + 1 +
+                                                         RunPeriodDesignInput(Count).endJulianDate) *
                     RunPeriodDesignInput(Count).numSimYears;
             }
             RunPeriodDesignInput(Count).monWeekDay = 0;
@@ -6720,7 +6690,6 @@ namespace WeatherManager {
         // na
 
         // Using/Aliasing
-        using General::JulianDay;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6749,7 +6718,7 @@ namespace WeatherManager {
 
             Warn = 0;
 
-            JDay = JulianDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd) - 1;
+            JDay = General::OrdinalDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd) - 1;
 
             for (Loop1 = 1; Loop1 <= SpecialDays(Loop).Duration; ++Loop1) {
                 ++JDay;
@@ -8626,7 +8595,6 @@ namespace WeatherManager {
         // reads in the line and processes as appropriate.
 
         // Using/Aliasing
-        using General::JulianDay;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static gio::Fmt fmtLD("*");
@@ -8950,13 +8918,13 @@ namespace WeatherManager {
                         }
                     }
                     TypicalExtremePeriods(Count).StartJDay =
-                        JulianDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, 0);
-                    TypicalExtremePeriods(Count).EndJDay = JulianDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, 0);
+                        General::OrdinalDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, 0);
+                    TypicalExtremePeriods(Count).EndJDay = General::OrdinalDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, 0);
                     if (TypicalExtremePeriods(Count).StartJDay <= TypicalExtremePeriods(Count).EndJDay) {
                         TypicalExtremePeriods(Count).TotalDays = TypicalExtremePeriods(Count).EndJDay - TypicalExtremePeriods(Count).StartJDay + 1;
                     } else {
                         TypicalExtremePeriods(Count).TotalDays =
-                            JulianDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay + 1 + TypicalExtremePeriods(Count).EndJDay;
+                            General::OrdinalDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay + 1 + TypicalExtremePeriods(Count).EndJDay;
                     }
                 }
 
@@ -9138,16 +9106,16 @@ namespace WeatherManager {
                     ++Count;
                 }
                 for (Count = 1; Count <= NumEPWTypExtSets; ++Count) {
-                    // JulianDay (Month,Day,LeapYearValue)
+                    // General::OrdinalDay (Month,Day,LeapYearValue)
                     TypicalExtremePeriods(Count).StartJDay =
-                        JulianDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, LeapYearAdd);
+                        General::OrdinalDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, LeapYearAdd);
                     TypicalExtremePeriods(Count).EndJDay =
-                        JulianDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, LeapYearAdd);
+                        General::OrdinalDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, LeapYearAdd);
                     if (TypicalExtremePeriods(Count).StartJDay <= TypicalExtremePeriods(Count).EndJDay) {
                         TypicalExtremePeriods(Count).TotalDays = TypicalExtremePeriods(Count).EndJDay - TypicalExtremePeriods(Count).StartJDay + 1;
                     } else {
                         TypicalExtremePeriods(Count).TotalDays =
-                            JulianDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay + 1 + TypicalExtremePeriods(Count).EndJDay;
+                            General::OrdinalDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay + 1 + TypicalExtremePeriods(Count).EndJDay;
                     }
                 }
 
@@ -9274,9 +9242,9 @@ namespace WeatherManager {
                                     }
                                     if (DataPeriods(CurCount).StYear == 0 || DataPeriods(CurCount).EnYear == 0) {
                                         DataPeriods(CurCount).DataStJDay =
-                                            JulianDay(DataPeriods(CurCount).StMon, DataPeriods(CurCount).StDay, LeapYearAdd);
+                                            General::OrdinalDay(DataPeriods(CurCount).StMon, DataPeriods(CurCount).StDay, LeapYearAdd);
                                         DataPeriods(CurCount).DataEnJDay =
-                                            JulianDay(DataPeriods(CurCount).EnMon, DataPeriods(CurCount).EnDay, LeapYearAdd);
+                                            General::OrdinalDay(DataPeriods(CurCount).EnMon, DataPeriods(CurCount).EnDay, LeapYearAdd);
                                         if (DataPeriods(CurCount).DataStJDay <= DataPeriods(CurCount).DataEnJDay) {
                                             DataPeriods(CurCount).NumDays = DataPeriods(CurCount).DataEnJDay - DataPeriods(CurCount).DataStJDay + 1;
                                         } else {
@@ -9836,8 +9804,6 @@ namespace WeatherManager {
 
         // Using/Aliasing
         using General::BetweenDates;
-        using General::InvJulianDay;
-        using General::JulianDay;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9869,16 +9835,16 @@ namespace WeatherManager {
 
             env.StartMonth = runPer.startMonth;
             env.StartDay = runPer.startDay;
-            env.StartJDay = JulianDay(runPer.startMonth, runPer.startDay, LeapYearAdd);
+            env.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, LeapYearAdd);
             env.TotalDays = runPer.totalDays;
             env.EndMonth = runPer.endMonth;
             env.EndDay = runPer.endDay;
-            env.EndJDay = JulianDay(runPer.endMonth, runPer.endDay, LeapYearAdd);
+            env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, LeapYearAdd);
             env.NumSimYears = runPer.numSimYears;
             if (env.StartJDay <= env.EndJDay) {
                 env.TotalDays = (env.EndJDay - env.StartJDay + 1) * env.NumSimYears;
             } else {
-                env.TotalDays = (JulianDay(12, 31, LeapYearAdd) - env.StartJDay + 1 + env.EndJDay) * env.NumSimYears;
+                env.TotalDays = (General::OrdinalDay(12, 31, LeapYearAdd) - env.StartJDay + 1 + env.EndJDay) * env.NumSimYears;
             }
             TotRunDesPersDays += env.TotalDays;
             env.UseDST = runPer.useDST;
@@ -9904,71 +9870,67 @@ namespace WeatherManager {
 
             env.StartMonth = runPer.startMonth;
             env.StartDay = runPer.startDay;
+            env.StartYear = runPer.startYear;
             env.EndMonth = runPer.endMonth;
             env.EndDay = runPer.endDay;
+            env.EndYear = runPer.endYear;
             env.NumSimYears = runPer.numSimYears;
+            env.CurrentYear = runPer.startYear;
+            env.IsLeapYear = runPer.isLeapYear;
+            env.TreatYearsAsConsecutive = true;
             if (runPer.actualWeather) {
-                env.CurrentYear = runPer.startYear;
-                env.IsLeapYear = isLeapYear(runPer.startYear);
-                env.TreatYearsAsConsecutive = true;
-                env.StartYear = runPer.startYear;
-                env.EndYear = runPer.endYear;
-                JGDate(GregorianToJulian, env.StartDate, env.StartYear, env.StartMonth, env.StartDay);
-                JGDate(GregorianToJulian, env.EndDate, env.EndYear, env.EndMonth, env.EndDay);
-                env.StartJDay = env.StartDate;
-                env.EndJDay = env.EndDate;
+                // This will require leap years to be present, thus Julian days can be used for all the calculations
+                env.StartJDay = runPer.startJulianDate;
+                env.EndJDay = runPer.endJulianDate;
                 env.TotalDays = env.EndDate - env.StartDate + 1;
                 env.RawSimDays = env.EndDate - env.StartDate + 1;
                 env.MatchYear = true;
                 env.ActualWeather = true;
-            } else if (runPer.BeginYear < 100) { // std RunPeriod
-                env.CurrentYear = 0;
-                if (!WFAllowsLeapYears) {
-                    env.IsLeapYear = false; // explicit set
-                    LocalLeapYearAdd = 0;
-                } else {
-                    env.IsLeapYear = true; // explicit set
-                    LocalLeapYearAdd = 1;
-                }
-                env.TreatYearsAsConsecutive = false;
+            } else { // std RunPeriod
                 env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-                env.StartJDay = JulianDay(runPer.startMonth, runPer.startDay, LocalLeapYearAdd);
-                env.EndJDay = JulianDay(runPer.endMonth, runPer.endDay, LocalLeapYearAdd);
-                // need message if isleapyear and wfleapyearind=0
-                if (env.StartJDay <= env.EndJDay) {
-                    env.RawSimDays = (env.EndJDay - env.StartJDay + 1);
-                    env.TotalDays = (env.EndJDay - env.StartJDay + 1) * env.NumSimYears;
-                } else {
-                    env.RawSimDays = (JulianDay(12, 31, LeapYearAdd) - env.StartJDay + 1 + env.EndJDay);
-                    env.TotalDays = (JulianDay(12, 31, LeapYearAdd) - env.StartJDay + 1 + env.EndJDay) * env.NumSimYears;
-                }
 
-            } else { // Using Runperiod and StartYear option.
-                env.CurrentYear = runPer.BeginYear;
-                env.IsLeapYear = isLeapYear(env.CurrentYear);
-                env.TreatYearsAsConsecutive = true;
-                env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-                env.StartJDay = JulianDay(runPer.startMonth, runPer.startDay, LeapYearAdd);
-                env.EndJDay = JulianDay(runPer.endMonth, runPer.endDay, LeapYearAdd);
-                env.TotalDays = 0;
-                for (Loop1 = 1; Loop1 <= env.NumSimYears; ++Loop1) {
-                    if (!isLeapYear(runPer.BeginYear - 1 + Loop1) || !WFAllowsLeapYears) {
-                        JDay1 = JulianDay(runPer.startMonth, runPer.startDay, 0);
-                        JDay2 = JulianDay(runPer.endMonth, runPer.endDay, 0);
-                        if (JDay1 <= JDay2) {
-                            if (Loop1 == 1) env.RawSimDays = (JDay2 - JDay1 + 1);
-                            env.TotalDays += (JDay2 - JDay1 + 1);
-                        } else {
-                            if (Loop1 == 1) env.RawSimDays = JulianDay(12, 31, 0) - JDay1 + 1 + JDay2;
-                            env.TotalDays += JulianDay(12, 31, 0) - JDay1 + 1 + JDay2;
-                        }
-                    } else { // Leap Year
-                        JDay1 = JulianDay(runPer.startMonth, runPer.startDay, 1);
-                        JDay2 = JulianDay(runPer.endMonth, runPer.endDay, 1);
-                        if (JDay1 <= JDay2) {
-                            env.TotalDays += (JDay2 - JDay1 + 1);
-                        } else {
-                            env.TotalDays += JulianDay(12, 31, 1) - JDay1 + 1 + JDay2;
+                if (env.StartYear == env.EndYear) {
+                    // Short-circuit all the calculations, we're in a single year
+                    if (!WFAllowsLeapYears) {
+                        env.IsLeapYear = false; // explicit set
+                        LocalLeapYearAdd = 0;
+                    } else {
+                        env.IsLeapYear = true; // explicit set
+                        LocalLeapYearAdd = 1;
+                    }
+                    env.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, LocalLeapYearAdd);
+                    env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, LocalLeapYearAdd);
+                    env.RawSimDays = (env.EndJDay - env.StartJDay + 1);
+                    env.TotalDays = env.RawSimDays;
+                } else {
+                    // Environment crosses year boundaries
+                    env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
+                    env.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, runPer.isLeapYear ? 1 : 0);
+                    env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, isLeapYear(runPer.endYear) ? 1 : 0);
+                    env.TotalDays = 0;
+                    for (Loop1 = 1; Loop1 <= env.NumSimYears; ++Loop1) {
+                        if (!isLeapYear(runPer.startYear - 1 + Loop1) || !WFAllowsLeapYears) {
+                            JDay1 = General::OrdinalDay(runPer.startMonth, runPer.startDay, 0);
+                            JDay2 = General::OrdinalDay(runPer.endMonth, runPer.endDay, 0);
+                            if (JDay1 <= JDay2) {
+                                if (Loop1 == 1) {
+                                    env.RawSimDays = (JDay2 - JDay1 + 1);
+                                }
+                                env.TotalDays += (JDay2 - JDay1 + 1);
+                            } else {
+                                if (Loop1 == 1) {
+                                    env.RawSimDays = General::OrdinalDay(12, 31, 0) - JDay1 + 1 + JDay2;
+                                }
+                                env.TotalDays += General::OrdinalDay(12, 31, 0) - JDay1 + 1 + JDay2;
+                            }
+                        } else { // Leap Year
+                            JDay1 = General::OrdinalDay(runPer.startMonth, runPer.startDay, 1);
+                            JDay2 = General::OrdinalDay(runPer.endMonth, runPer.endDay, 1);
+                            if (JDay1 <= JDay2) {
+                                env.TotalDays += (JDay2 - JDay1 + 1);
+                            } else {
+                                env.TotalDays += General::OrdinalDay(12, 31, 1) - JDay1 + 1 + JDay2;
+                            }
                         }
                     }
                 }

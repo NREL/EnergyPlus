@@ -179,7 +179,6 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     //	and data structure containing daily average of required weather data.
 
     // USE STATEMENTS:
-    using General::JulianDay;
     using WeatherManager::GetNextEnvironment;
     using WeatherManager::ManageWeather;
     using WeatherManager::ResetEnvironmentCounter;

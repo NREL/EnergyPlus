@@ -8195,7 +8195,6 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::JulianDay;
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -8237,10 +8236,10 @@ namespace SurfaceGeometry {
             StormWindow(StormWinNum).StormWinDistance = rNumericArgs(1);
             StormWindow(StormWinNum).MonthOn = rNumericArgs(2);
             StormWindow(StormWinNum).DayOfMonthOn = rNumericArgs(3);
-            StormWindow(StormWinNum).DateOn = JulianDay(StormWindow(StormWinNum).MonthOn, StormWindow(StormWinNum).DayOfMonthOn, 1);
+            StormWindow(StormWinNum).DateOn = General::OrdinalDay(StormWindow(StormWinNum).MonthOn, StormWindow(StormWinNum).DayOfMonthOn, 1);
             StormWindow(StormWinNum).MonthOff = rNumericArgs(4);
             StormWindow(StormWinNum).DayOfMonthOff = rNumericArgs(5);
-            StormWindow(StormWinNum).DateOff = JulianDay(StormWindow(StormWinNum).MonthOff, StormWindow(StormWinNum).DayOfMonthOff, 1);
+            StormWindow(StormWinNum).DateOff = General::OrdinalDay(StormWindow(StormWinNum).MonthOff, StormWindow(StormWinNum).DayOfMonthOff, 1);
 
             if (StormWindow(StormWinNum).DateOn == StormWindow(StormWinNum).DateOff) {
                 ShowSevereError(cCurrentModuleObject + ": Date On = Date Off -- not allowed, occurred in WindowProperty:StormWindow Input #" +

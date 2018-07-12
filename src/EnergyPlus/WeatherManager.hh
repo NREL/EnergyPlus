@@ -397,14 +397,14 @@ namespace WeatherManager {
         bool RollDayTypeOnRepeat;     // If repeating run period, increment day type on repeat.
         bool TreatYearsAsConsecutive; // When year rolls over, increment year and recalculate Leap Year
         bool actualWeather;           // true when using actual weather data
-        int BeginYear;
+        //int BeginYear;
 
         // Default Constructor
         RunPeriodData()
             : totalDays(0), startMonth(1), startDay(1), startJulianDate(0), startYear(2017), endMonth(12), endDay(31), endJulianDate(0), endYear(0),
               dayOfWeek(0), startWeekDay(WeekDay::Sunday), useDST(false), useHolidays(false), applyWeekendRule(false), useRain(true), useSnow(true),
-              monWeekDay(12, 0), numSimYears(1), isLeapYear(false), RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), actualWeather(false),
-              BeginYear(0)
+              monWeekDay(12, 0), numSimYears(1), isLeapYear(false), RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), actualWeather(false)
+              //BeginYear(0)
         {
         }
     };
