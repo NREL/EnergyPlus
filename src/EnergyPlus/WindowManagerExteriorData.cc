@@ -275,10 +275,13 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //   CWindowConstructionsSimplified
     ///////////////////////////////////////////////////////////////////////////////
+    std::unique_ptr<CWindowConstructionsSimplified> CWindowConstructionsSimplified::p_inst = nullptr;
+
     CWindowConstructionsSimplified &CWindowConstructionsSimplified::instance()
     {
         if(p_inst == nullptr) {
-            p_inst = std::unique_ptr<CWindowConstructionsSimplified>(new CWindowConstructionsSimplified());
+	        p_inst =
+	        		std::unique_ptr<CWindowConstructionsSimplified>(new CWindowConstructionsSimplified());
         }
         return *p_inst;
     }
