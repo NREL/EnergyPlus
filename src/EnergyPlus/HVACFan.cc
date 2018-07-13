@@ -340,37 +340,37 @@ namespace HVACFan {
         Real64 refFanMotorCtrlEff;
         Real64 refFanElecPower;
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
+        // SUBROUTINE PARAMETER DEFINITIONS:
 
-		// Calculate reference fan shaft power 
-		RhoAir = PsyRhoAirFnPbTdbW(DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
-		refFanShaftPower = (designAirVolFlowRate + 0.118) * (deltaPress + 100 * RhoAir / DataEnvironment::StdRhoAir ) / (1000 * 0.66);
+        // Calculate reference fan shaft power 
+        RhoAir = PsyRhoAirFnPbTdbW(DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
+        refFanShaftPower = (designAirVolFlowRate + 0.118) * (deltaPress + 100 * RhoAir / DataEnvironment::StdRhoAir ) / (1000 * 0.66);
 
-		// Calculate reference reference fan transmission efficiency
-		refFanTransEff = 0.96 * pow((refFanShaftPower / (refFanShaftPower + 1.64)), 0.05);
+        // Calculate reference reference fan transmission efficiency
+        refFanTransEff = 0.96 * pow((refFanShaftPower / (refFanShaftPower + 1.64)), 0.05);
 
-		// Calculate reference reference fan motor efficiency
-		refFanMotorOutput = refFanShaftPower / refFanTransEff;
-		if (refFanMotorOutput < 185.0) {
-			refFanMotorEff = -0.003812 * pow(std::log10(refFanMotorOutput), 4) + 0.025834 * pow(std::log10(refFanMotorOutput), 3)
-				- 0.072577 * pow(std::log10(refFanMotorOutput), 2) + 0.125559 * std::log10(refFanMotorOutput) + 0.850274;
-		} else {
-			refFanMotorEff = 0.962;
-		}
+        // Calculate reference reference fan motor efficiency
+        refFanMotorOutput = refFanShaftPower / refFanTransEff;
+        if (refFanMotorOutput < 185.0) {
+            refFanMotorEff = -0.003812 * pow(std::log10(refFanMotorOutput), 4) + 0.025834 * pow(std::log10(refFanMotorOutput), 3)
+                - 0.072577 * pow(std::log10(refFanMotorOutput), 2) + 0.125559 * std::log10(refFanMotorOutput) + 0.850274;
+        } else {
+            refFanMotorEff = 0.962;
+        }
 
-		// Calculate reference reference fan motor controller  efficiency
-		refFanMotorCtrlEff = 1;
+        // Calculate reference reference fan motor controller  efficiency
+        refFanMotorCtrlEff = 1;
 
-		refFanElecPower = refFanShaftPower / (refFanTransEff * refFanMotorEff * refFanMotorCtrlEff);
+        refFanElecPower = refFanShaftPower / (refFanTransEff * refFanMotorEff * refFanMotorCtrlEff);
 
-		m_designPointFEI = refFanElecPower * 1000 / designElecPower;
+        m_designPointFEI = refFanElecPower * 1000 / designElecPower;
 
 	}
 
     FanSystem::FanSystem( // constructor
         std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
-          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), fanIsSecondaryDriver(false), m_fanType_Num(0),
+          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), fanIsSecondaryDriver(false), m_reportFEIFlag(false), m_designPointFEI(0.0), m_fanType_Num(0),
           m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
           m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::powerSizingMethodNotSet), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
@@ -382,7 +382,7 @@ namespace HVACFan {
           m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0), m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0),
           m_faultyFilterFlag(false), m_faultyFilterIndex(0),
 
-          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_reportFEIFlag(false), m_designPointFEI(0.0)
+          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0)
     // oneTimePowerCurveCheck_( true )
     {
 
@@ -542,12 +542,12 @@ namespace HVACFan {
             m_endUseSubcategoryName = "General";
         }
 
-		if (isAlphaFieldBlank(10)) {
-			m_reportFEIFlag = false;
+        if (isAlphaFieldBlank(10)) {
+            m_reportFEIFlag = false;
         } else if (UtilityRoutines::SameString(alphaArgs(10), "Yes")) {
-			m_reportFEIFlag = true;
+            m_reportFEIFlag = true;
         } else if (UtilityRoutines::SameString(alphaArgs(10), "No")) {
-			m_reportFEIFlag = false;
+            m_reportFEIFlag = false;
         } else {
             ShowSevereError(routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
             ShowContinueError("Invalid " + alphaFieldNames(10) + " = " + alphaArgs(10));

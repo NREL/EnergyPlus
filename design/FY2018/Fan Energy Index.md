@@ -29,7 +29,9 @@ FEI<sub>t,i</sub>: FEI based on fan total pressure
 
 FEI<sub>s,i</sub>: FEI based on fan static pressure
 
-We propose to add field as a flag to the current fan model **Fan:SystemMode**l for reporting FEI (considering that it can be substituted for **Fan:ConstantVolume**,**Fan:OnOff**, **Fan:VariableVolume**, and **FanPerformance:NightVentilation** objects and they may be deprecated and eventually removed in the future). We will use the user defined Fan objects to simulate the actual fan electrical input power FEP<sub>act,i</sub> at the design operating point. We will calculate the reference fan electrical input power FEP<sub>ref,i</sub> using the following method.
+We propose to add field as a flag to the current fan model **Fan:SystemModel** for reporting FEI (considering that it can be substituted for **Fan:ConstantVolume**,**Fan:OnOff**, **Fan:VariableVolume**, and **FanPerformance:NightVentilation** objects and they may be deprecated and eventually removed in the future). We will use the user defined Fan objects to simulate the actual fan electrical input power FEP<sub>act,i</sub> at the design operating point. We will calculate the reference fan electrical input power FEP<sub>ref,i</sub> using the following method.
+
+Reference fan shaft power (H<sub>i,ref</sub>) is calculated on a fan total pressure basis or a static pressure basis, depending on the category of the reference fan to calculate FEI. However, in EnergyPlus **Fan:SystemModel**, only total pressure is defined. So the FEI is reportable only for limited category of fans that are calculated based on the fan total pressure, namely Centrifugal Housed, Centrifugal Inline, Centrifugal PRV Supply, Axial Inline, Laboratory Exhaust, Jet Fan and Circulating 
 
 The reference fan concept is used to normalize the FEI calculation to a consistent power level independent of fan type, fan drive components or any regulatory requirements. The reference fan electrical input power is a function of airflow and fan pressure. The reference fan is defined as one that requires a certain reference fan shaft power, uses a V-belt drive, has a motor efficiency based on the IE3 level for a four-pole 60 Hz motor and does not have a speed control.
 
@@ -46,23 +48,7 @@ H<sub>i,ref</sub>: Reference fan shaft power in kW
 η<sub>ctrl,ref</sub>: Reference fan motor controller efficiency
 
 #### 1. Reference fan shaft power
-Reference fan shaft power (H<sub>i,ref</sub>) is calculated on a fan total pressure basis or a static pressure basis, depending on the category of the reference fan to calculate FEI, as listed in the table. The user should define the fan category for reference.
-
-Fan Category  | FEI Pressure Basis
-------------- | -------------
-Centrifugal Housed  | Total
-Centrifugal Inline  | Total
-Centrifugal Unhoused  | Static
-Centrifugal PRV Exhaust  | Static
-Centrifugal PRV Supply  | Total
-Axial Inline  | Total
-Axial Panel  | Static
-Axial PRV | Static
-Laboratory Exhaust  | Total
-Jet Fan  | Total
-Circulating  | Total
-
-When calculated on a fan total pressure basis:
+Reference fan shaft power (H<sub>i,ref</sub>) is calculated on a fan total pressure basis:
 
 $$H_{i,ref}=\frac{(Q_i + Q_0)(P_{t,i} + P_0 \times \frac{\rho}{\rho_{std}} )}{1000 \times \eta_0}$$ (3)
 
@@ -82,32 +68,22 @@ P<sub>0</sub>: 100 Pa
 
 η<sub>0</sub>: 66%
 
-When calculated on a fan static pressure basis:
-
-$$H_{i,ref}=\frac{(Q_i + Q_0)(P_{s,i} + P_0 \times \frac{\rho}{\rho_{std}} )}{1000 \times \eta_0}$$ (4)
-
-Where,
-
-P<sub>t,i</sub>: Fan static pressure in Pa
-
-η<sub>0</sub>: 60%
-
 
 #### 2. Reference fan transmission efficiency
 For consistency, the reference fan is defined as one having a V-belt drive transmission, regardless of the drive arrangement of the actual fan for which the FEI is calculated. The reference fan transmission efficiency is calculated using the same equations as found in ANSI/AMCA Standard 207 for V-belt drives:
 
-$$\eta_{trans,ref}=0.96(\frac{H_{i,ref}}{H_{i,ref}+1.64})^{.05}$$  (5)
+$$\eta_{trans,ref}=0.96(\frac{H_{i,ref}}{H_{i,ref}+1.64})^{.05}$$  (4)
 
 #### 3. Reference fan motor efficiency
 The reference fan is defined as having a motor efficiency based on the IE3 level for a four-pole 60 Hz motor. In order to simplify the calculation of part load efficiency for this reference fan motor and to avoid sizing and otherwise identifying a specific motor for this reference fan, a curve fit is used through the IE3 motor efficiency requirements. The result is a reference motor efficiency that varies continuously based on the required motor output power.
 
 Reference fan motor output power:
 
-$$H_{t,ref}=\frac{H_{i,ref}}{\eta_{trans,ref}} $$ (6)
+$$H_{t,ref}=\frac{H_{i,ref}}{\eta_{trans,ref}} $$ (5)
 
 The reference fan motor efficiency is calculated according to Equation (7) using the coefficients A–E found in Table 1:
 
-$$\eta_{mtr,ref} = A\cdot[log_{10} (H_{t,ref})]^4 + B\cdot[log_{10} (H_{t,ref})]^3 +C\cdot[log_{10} (H_{t,ref})]^2 +D\cdot[log_{10} (H_{t,ref})]^1 + E $$(7)
+$$\eta_{mtr,ref} = A\cdot[log_{10} (H_{t,ref})]^4 + B\cdot[log_{10} (H_{t,ref})]^3 +C\cdot[log_{10} (H_{t,ref})]^2 +D\cdot[log_{10} (H_{t,ref})]^1 + E $$(6)
 
 Table 1 Reference Motor Efficiency Coefficients
 
@@ -121,43 +97,27 @@ E  | 0.850274  | 0.962
 
 #### 4. Reference fan motor controller efficiency
 The reference fan is defined as a constant speed fan. Therefore, the motor controller efficiency is 100%.
-$$\eta_{ctrl,ref} = 1 $$ (8)
+$$\eta_{ctrl,ref} = 1 $$ (7)
 
 
 ## Approach
 We propose to add field as a flag to the current fan model **Fan:SystemModel** for reporting FEI object, and fields for the user input to calculate the FEI based on ANSI/AMCA standards 207-17 and 208-18.
 
-**Fan:SystemModel,**
 ```json
+**Fan:SystemModel,**
   A10, \field Report Fan Energy Index
        \type choice
        \key Yes
        \key No
        \default No
        \note If Yes, design point FEI will be calculated and reported.
-  A11 ,\field Reference Fan Category
-       \note Category of the reference fan to calculate FEI
-       \note This field is used to define consistent test standards, test procedures and the pressure used for FEI calculation
-       \note The fan Category of the reference fan is required to calculate the reference fan electrical input power
-       \type choice
-       \key CentrifugalHoused
-       \key CentrifugalInline
-       \key CentrifugalUnhoused
-       \key CentrifugalPRVExhaust
-       \key CentrifugalPRVSupply
-       \key AxialInline
-       \key AxialPanel
-       \key AxialPRV
-       \key LaboratoryExhaust
-       \key JetFan
-       \key Circulating
 ```
 
 The FEI calculation results will be added to the existing summary report for Equipment Summary | Fans, as shown in Table 2.
 
 Table 2 Fan summary report in EnergyPlus
 
-Case | Type | Total Efficiency [W/W] |Delta Pressure [pa] |Max Air Flow Rate [m<sup>3</sup>/s] | Rated Electric Power [W] | Rated Power Per Max Air Flow Rate [W-s/m3] | Fan Energy Index | End Use
+Case | Type | Total Efficiency [W/W] | Delta Pressure [pa] | Max Air Flow Rate [m<sup>3</sup>/s] | Rated Electric Power [W] | Rated Power Per Max Air Flow Rate [W-s/m3] | Fan Energy Index | End Use
 ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | -------------
 VAV_1_FAN | Fan:SystemModel | 0.60 | 1017.59 | 15.49 | 26070.79 | 1683.36 |1.00 | Fan Energy
 VAV_2_FAN | Fan:SystemModel | 0.62 | 1017.59 | 164.34 | 270814.15 | 1647.92 | 1.00 | Fan Energy

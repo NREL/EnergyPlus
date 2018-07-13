@@ -118,6 +118,10 @@ This optional numeric field is used when a Zone name is entered in the previous 
 
 This optional field allows entering a user-defined name for the end use subcategory that will be used to meter this fan's electric energy consumption. If this field is omitted or left blank the fan will be assigned to the ``General'' end use subcategory.  End use subcategories are helpful to organize reports in the tabular summary table and appear on special meter outputs. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.
 
+\paragraph{Field: Report Fan Energy Index}\label{field-report-fan-energy-index}
+
+This optional field allows reporting of the design point Fan Energy Index, as an energy-efficiency metric for fans including their motors and drives. This metric provides a standardized and consistent basis for comparing fan energy performance across fan types and sizes at a given fan operating point. Fan specifiers can use it to understand and communicate fan-efficiency design intent, while legislative and regulatory bodies can use it to define energy-efficiency requirements of fans.
+
 \paragraph{Field: Number of Speeds}\label{field-num-speeds-fansysmodel}
 
 This numeric field is used to specify the number of different speed levels available when Speed Control Method is set to Discrete.  This field and the remaining field sets are not used when the Speed Control Method is set to Continuous.  For a constant volume fan enter a value of 1.0.  A value of 1.0 will use the fan's maximum design and no additional field sets are needed.  When set to a value greater than 1 then a pair of flow and power fraction inputs are provided for each speed in the remaining input fields.

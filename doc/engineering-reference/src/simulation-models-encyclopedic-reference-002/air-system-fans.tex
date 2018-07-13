@@ -726,6 +726,108 @@ VFD input power (electrical, W) is:
 
 \({\dot Q_{toair}} = {H_{fan}} + \left( {{H_{motor}} - {H_{fan}}} \right) \cdot {f_{motortoair}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
 
+\subsection{Fan Energy Index}\label{fan-energy-index}
+
+Fan Energy Index (FEI) is an energy-efficiency metric for fans including their motors and drives. This metric provides a standardized and consistent basis for comparing fan energy performance across fan types and sizes at a given fan operating point. Fan specifiers can use it to understand and communicate fan-efficiency design intent, while legislative and regulatory bodies can use it to define energy-efficiency requirements of fans.
+
+ANSI/AMCA Standard 208-18 defines the calculation method for FEI. The standard has been written to support the adoption of energy efficient fans in the energy and construction codes and standards (e.g., ASHRAE Standards 90.1, 189.1, and California Appliances Standards Title 20) and to support utility rebate programs. FEI is a replacement for fan efficiency grade (FEG), a metric currently referenced in model energy codes and standards such as ASHRAE 90.1, ASHRAE 189.1, and IECC and in federal regulations in several Asian countries.
+
+FEI is defined as a ratio of the electrical input power of a reference fan to the electrical input power of the actual fan for which the FEI is calculated, both calculated at the same duty point, i, which is characterized by a value of airflow \((Q_i)\) and pressure (\(P_{t,i}\) or \(P_{s,i}\)). FEI can be calculated for each point on a fan curve.
+
+$$FEI_{t,i}\;or\;FEI_{s,i}=\frac{Reference Fan Electrical Input Power}{Actual Fan Electrical Input Power} = \frac{FEP_{ref,i}}{FEP_{act,i}} \quad (1) $$ 
+Where,
+
+\(FEI_{t,i}\): FEI based on fan total pressure
+
+\(FEI_{s,i}\): FEI based on fan static pressure
+
+We propose to add field as a flag to the current fan model \emph{Fan:SystemModel} for reporting FEI (considering that it can be substituted for \emph{Fan:ConstantVolume},\emph{Fan:OnOff}, \emph{Fan:VariableVolume}, and \emph{FanPerformance:NightVentilation} objects and they may be deprecated and eventually removed in the future). We will use the user defined Fan objects to simulate the actual fan electrical input power \(FEP_{act,i}\) at the design operating point. We will calculate the reference fan electrical input power \(FEP_{ref,i}\) using the following method.
+
+Reference fan shaft power (\(H_{i,ref}\)) is calculated on a fan total pressure basis or a static pressure basis, depending on the category of the reference fan to calculate FEI. However, in EnergyPlus \emph{Fan:SystemModel}, only total pressure is defined. So the FEI is reportable only for limited category of fans that are calculated based on the fan total pressure, namely Centrifugal Housed, Centrifugal Inline, Centrifugal PRV Supply, Axial Inline, Laboratory Exhaust, Jet Fan and Circulating 
+
+The reference fan concept is used to normalize the FEI calculation to a consistent power level independent of fan type, fan drive components or any regulatory requirements. The reference fan electrical input power is a function of airflow and fan pressure. The reference fan is defined as one that requires a certain reference fan shaft power, uses a V-belt drive, has a motor efficiency based on the IE3 level for a four-pole 60 Hz motor and does not have a speed control.
+
+$$FEP_{ref,i}=H_{i,ref}(\frac{1}{\eta_{trans,ref}} )(\frac{1}{\eta_{mtr,ref}})(\frac{1}{\eta_{ctrl,ref}}) \quad (2) $$ 
+
+Where,
+
+\(H_{i,ref}\): Reference fan shaft power in kW
+
+\(\eta_{trans,ref}\): Reference fan transmission efficiency
+
+\(\eta_{mtr,ref}\): Reference fan motor efficiency
+
+\(\eta_{ctrl,ref}\): Reference fan motor controller efficiency
+
+\emph{Reference fan shaft power}
+
+Reference fan shaft power (\(H_{i,ref}\)) is calculated on a fan total pressure basis:
+
+$$H_{i,ref}=\frac{(Q_i + Q_0)(P_{t,i} + P_0 \times \frac{\rho}{\rho_{std}} )}{1000 \times \eta_0} \quad (3) $$ 
+
+
+Where,
+
+\(Q_i\): Fan air flow in \(m_3/s\)
+
+\(P_{t,i}\): Fan total pressure in Pa
+
+\(\rho\): Air density in \(kg/m_3\)
+
+\(\rho_{std}\): Standard air density, 1.2 \(kg/m_3\)
+
+\(Q_0\): 0.118 \(m_3/s\)
+
+\(P_0\): 100 Pa
+
+\(\eta_0:\) 66\% 
+
+\emph{Reference fan transmission efficiency}
+
+For consistency, the reference fan is defined as one having a V-belt drive transmission, regardless of the drive arrangement of the actual fan for which the FEI is calculated. The reference fan transmission efficiency is calculated using the same equations as found in ANSI/AMCA Standard 207 for V-belt drives:
+
+$$eta_{trans,ref}=0.96(\frac{H_{i,ref}}{H_{i,ref}+1.64})^{.05} \quad (4) $$ 
+
+\emph{Reference fan motor efficiency}
+
+The reference fan is defined as having a motor efficiency based on the IE3 level for a four-pole 60 Hz motor. In order to simplify the calculation of part load efficiency for this reference fan motor and to avoid sizing and otherwise identifying a specific motor for this reference fan, a curve fit is used through the IE3 motor efficiency requirements. The result is a reference motor efficiency that varies continuously based on the required motor output power.
+
+Reference fan motor output power:
+
+$$H_{t,ref}=\frac{H_{i,ref}}{\eta_{trans,ref}} \quad (5) $$ 
+
+The reference fan motor efficiency is calculated according to Equation (7) using the coefficients A–E found in Table 1:
+
+$$\eta_{mtr,ref} = A\cdot[log_{10} (H_{t,ref})]^4 + B\cdot[log_{10} (H_{t,ref})]^3 +C\cdot[log_{10} (H_{t,ref})]^2 +D\cdot[log_{10} (H_{t,ref})]^1 + E \quad (6) $$ 
+
+% table 73
+\begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}}
+\caption{Reference Motor Efficiency Coefficients \label{table:reference-motor-efficiency-coefficients}} \tabularnewline
+\toprule 
+Type & \(H_{t,ref}\)$<$185 kW ($<$250 BHP) & \(H_{t,ref}\)$\geq$185 kW ($\geq$250 BHP) \tabularnewline \midrule
+\midrule
+\endfirsthead
+
+\caption[]{Reference Motor Efficiency Coefficients} \tabularnewline
+\toprule 
+Type & \(H_{t,ref}\)$<$185 kW ($<$250 BHP) & \(H_{t,ref}\)$\geq$185 kW ($\geq$250 BHP) \tabularnewline \midrule
+\midrule
+\endhead
+
+A & -0.003812 & 0 \tabularnewline
+B & 0.025834 & 0 \tabularnewline
+C & -0.072577 & 0 \tabularnewline
+D & 0.125559 & 0 \tabularnewline
+E & 0.850274 & 0.962 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{Reference fan motor controller efficiency}
+
+The reference fan is defined as a constant speed fan. Therefore, the motor controller efficiency is 100$\%$.
+$$\eta_{ctrl,ref} = 1 \quad (7) $$ 
+
+
 \subsection{References}\label{references-002}
 
 AMCA. 1990a. ``Fans and Systems''. Publication 201-90. Arlington Heights, IL: Air Movement and Control Association International.
