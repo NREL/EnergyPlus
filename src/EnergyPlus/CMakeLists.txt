@@ -649,7 +649,7 @@ if (WIN32)
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
-add_library( energyplusapi SHARED  CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
+add_library( energyplusapi SHARED  CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh public/capi.cc public/capi.hh )
 target_link_libraries( energyplusapi energypluslib )
 
 set_target_properties(
