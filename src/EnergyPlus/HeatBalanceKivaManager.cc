@@ -736,21 +736,25 @@ namespace HeatBalanceKivaManager {
                     for (auto &wl : wallSurfaces) {
 
                         auto &v = Surfaces(wl).Vertex;
+                        auto numVs = v.size();
                         // Enforce quadrilateralism
-                        if (v.size() != 4) {
-                            ErrorsFound = true;
-                            ShowSevereError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name +
-                                            "\", only quadrilateral wall surfaces are allowed to reference Foundation Outside Boundary Conditions.");
-                            ShowContinueError("Surface=\"" + Surfaces(wl).Name + "\", has " + General::TrimSigDigits(v.size()) + " vertices.");
+                        if (numVs > 4) {
+                            ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", wall surfaces with more than four vertices referencing");
+                            ShowContinueError("...Foundation Outside Boundary Conditions may not be interpreted correctly in the 2D finite difference model.");
+                            ShowContinueError("Surface=\"" + Surfaces(wl).Name + "\", has " + General::TrimSigDigits(numVs) + " vertices.");
+                            ShowContinueError("Consider separating the wall into separate surfaces, each spanning from the floor slab to the top of the foundation wall.");
                         }
 
                         // sort vertices by Z-value
-                        std::vector<int> zs = {0, 1, 2, 3};
+                        std::vector<int> zs(numVs);
+                        std::iota(zs.begin(), zs.end(),0);
                         sort(zs.begin(), zs.end(), [v](int a, int b) { return v[a].z < v[b].z; });
 
                         Real64 perimeter = distance(v[zs[0]], v[zs[1]]);
 
-                        Real64 surfHeight = (v[zs[2]].z + v[zs[2]].z) / 2.0 - (v[zs[0]].z + v[zs[1]].z) / 2.0;
+                        // Simplistic approximation for average surface height that accommodates most shapes without
+                        // dealing with polygon projections on a plane and piecewise integration.
+                        Real64 surfHeight = (v[zs[numVs-2]].z + v[zs[numVs-1]].z) / 2.0 - (v[zs[0]].z + v[zs[1]].z) / 2.0;
                         // round to avoid numerical precision differences
                         surfHeight = std::round((surfHeight)*1000.0) / 1000.0;
 
