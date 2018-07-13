@@ -144,41 +144,48 @@ namespace StandardRatings {
     Array1D_int const TotalNumOfTemperatureBins(6, {9, 10, 13, 15, 18, 9}); // Total number of temperature
     // bins for a region
     Array1D<Real64> const StandardDesignHeatingRequirement(16,
-                                                           {1465.36, 2930.71, 4396.07, 5861.42, 7326.78, 8792.14, 10257.49, 11722.85, 14653.56,
-                                                            17584.27, 20514.98, 23445.70, 26376.41, 29307.12, 32237.83, 38099.26});
+                                                           {1465.36,
+                                                            2930.71,
+                                                            4396.07,
+                                                            5861.42,
+                                                            7326.78,
+                                                            8792.14,
+                                                            10257.49,
+                                                            11722.85,
+                                                            14653.56,
+                                                            17584.27,
+                                                            20514.98,
+                                                            23445.70,
+                                                            26376.41,
+                                                            29307.12,
+                                                            32237.83,
+                                                            38099.26});
     // Standardized DHRs from ANSI/AHRI 210/240
     Real64 const CorrectionFactor(0.77); // A correction factor which tends to improve the agreement
     // between calculated and measured building loads, dimensionless.
     Real64 const CyclicDegradationCoeff(0.25);
     Array1D<Real64> const OutdoorDesignTemperature(6, {2.78, -2.78, -8.33, -15.0, -23.33, -1.11});
     // Outdoor design temperature for a region from ANSI/AHRI 210/240
-    Array1D<Real64> const OutdoorBinTemperature(18,
-                                                {16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44,
-                                                 -22.22, -25.00, -27.78, -30.56});
+    Array1D<Real64> const OutdoorBinTemperature(
+        18, {16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56});
     // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp(18,
-                                                                {0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0,
-                                                                 0.0, 0.0, 0.0, 0.0, 0.0});
+    Array1D<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp(
+        18, {0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
     // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionTwoFracBinHoursAtOutdoorBinTemp(18,
-                                                                {0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0,
-                                                                 0.0, 0.0, 0.0, 0.0, 0.0});
+    Array1D<Real64> const RegionTwoFracBinHoursAtOutdoorBinTemp(
+        18, {0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
     // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionThreeFracBinHoursAtOutdoorBinTemp(18,
-                                                                  {0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002,
-                                                                   0.001, 0.0, 0.0, 0.0, 0.0, 0.0});
+    Array1D<Real64> const RegionThreeFracBinHoursAtOutdoorBinTemp(
+        18, {0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0});
     // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionFourFracBinHoursAtOutdoorBinTemp(18,
-                                                                 {0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013,
-                                                                  0.006, 0.002, 0.001, 0.0, 0.0, 0.0});
+    Array1D<Real64> const RegionFourFracBinHoursAtOutdoorBinTemp(
+        18, {0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0});
     // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionFiveFracBinHoursAtOutdoorBinTemp(18,
-                                                                 {0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038,
-                                                                  0.029, 0.018, 0.01, 0.005, 0.002, 0.001});
+    Array1D<Real64> const RegionFiveFracBinHoursAtOutdoorBinTemp(
+        18, {0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001});
     // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp(18,
-                                                                {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0,
-                                                                 0.0, 0.0, 0.0, 0.0, 0.0});
+    Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp(
+        18, {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
     int const NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
@@ -383,8 +390,8 @@ namespace StandardRatings {
                     }
 
                 } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
-                    Cp = GetSpecificHeatGlycol(PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, PlantLoop(CondLoopNum).FluidIndex,
-                                               RoutineName);
+                    Cp = GetSpecificHeatGlycol(
+                        PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, PlantLoop(CondLoopNum).FluidIndex, RoutineName);
 
                     Rho =
                         GetDensityGlycol(PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, PlantLoop(CondLoopNum).FluidIndex, RoutineName);
@@ -402,8 +409,14 @@ namespace StandardRatings {
                     Par(11) = OpenMotorEff;
                     CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
                     CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
-                    SolveRoot(Acc, IterMax, SolFla, CondenserOutletTemp, ReformEIRChillerCondInletTempResidual, CondenserOutletTemp0,
-                              CondenserOutletTemp1, Par);
+                    SolveRoot(Acc,
+                              IterMax,
+                              SolFla,
+                              CondenserOutletTemp,
+                              ReformEIRChillerCondInletTempResidual,
+                              CondenserOutletTemp0,
+                              CondenserOutletTemp1,
+                              Par);
                     if (SolFla == -1) {
                         ShowWarningError("Iteration limit exceeded in calculating Reform Chiller IPLV");
                         ShowContinueError("Reformulated Chiller IPLV calculation failed for " + ChillerName);
@@ -968,68 +981,181 @@ namespace StandardRatings {
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) { // Coil:Cooling:DX:SingleSpeed
 
-                CheckCurveLimitsForStandardRatings(DXCoilName, DXCoilType, DXCoilType_Num, CapFTempCurveIndex(1), CapFFlowCurveIndex(1),
-                                                   EIRFTempCurveIndex(1), EIRFFlowCurveIndex(1), PLFFPLRCurveIndex(1));
+                CheckCurveLimitsForStandardRatings(DXCoilName,
+                                                   DXCoilType,
+                                                   DXCoilType_Num,
+                                                   CapFTempCurveIndex(1),
+                                                   CapFFlowCurveIndex(1),
+                                                   EIRFTempCurveIndex(1),
+                                                   EIRFFlowCurveIndex(1),
+                                                   PLFFPLRCurveIndex(1));
 
                 // Calculated Net Cooling Capacity, SEER, EER, and IEER of single speed DX cooling coils
-                SingelSpeedDXCoolingCoilStandardRatings(DXCoilName, DXCoilType, CapFTempCurveIndex(1), CapFFlowCurveIndex(1), EIRFTempCurveIndex(1),
-                                                        EIRFFlowCurveIndex(1), PLFFPLRCurveIndex(1), RatedTotalCapacity(1), RatedCOP(1),
-                                                        RatedAirVolFlowRate(1), FanPowerPerEvapAirFlowRateFromInput(1), NetCoolingCapRated(1), SEER,
-                                                        EER, IEER);
+                SingelSpeedDXCoolingCoilStandardRatings(DXCoilName,
+                                                        DXCoilType,
+                                                        CapFTempCurveIndex(1),
+                                                        CapFFlowCurveIndex(1),
+                                                        EIRFTempCurveIndex(1),
+                                                        EIRFFlowCurveIndex(1),
+                                                        PLFFPLRCurveIndex(1),
+                                                        RatedTotalCapacity(1),
+                                                        RatedCOP(1),
+                                                        RatedAirVolFlowRate(1),
+                                                        FanPowerPerEvapAirFlowRateFromInput(1),
+                                                        NetCoolingCapRated(1),
+                                                        SEER,
+                                                        EER,
+                                                        IEER);
 
                 // Writes the net rated cooling capacity, SEER, EER and IEER values to the EIO file and standard tabular output tables
-                ReportDXCoilRating(DXCoilType, DXCoilName, DXCoilType_Num, NetCoolingCapRated(1), SEER * ConvFromSIToIP, EER, EER * ConvFromSIToIP,
-                                   IEER * ConvFromSIToIP, NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF * ConvFromSIToIP, RegionNum);
+                ReportDXCoilRating(DXCoilType,
+                                   DXCoilName,
+                                   DXCoilType_Num,
+                                   NetCoolingCapRated(1),
+                                   SEER * ConvFromSIToIP,
+                                   EER,
+                                   EER * ConvFromSIToIP,
+                                   IEER * ConvFromSIToIP,
+                                   NetHeatingCapRatedHighTemp,
+                                   NetHeatingCapRatedLowTemp,
+                                   HSPF * ConvFromSIToIP,
+                                   RegionNum);
 
                 if (ASHRAE127StdRprt) {
-                    DXCoolingCoilDataCenterStandardRatings(DXCoilName, DXCoilType, CapFTempCurveIndex(1), CapFFlowCurveIndex(1),
-                                                           EIRFTempCurveIndex(1), EIRFFlowCurveIndex(1), PLFFPLRCurveIndex(1), RatedTotalCapacity(1),
-                                                           RatedCOP(1), RatedAirVolFlowRate(1), FanPowerPerEvapAirFlowRateFromInput(1),
-                                                           NetTotCoolingCapRated, TotElectricPowerRated);
+                    DXCoolingCoilDataCenterStandardRatings(DXCoilName,
+                                                           DXCoilType,
+                                                           CapFTempCurveIndex(1),
+                                                           CapFFlowCurveIndex(1),
+                                                           EIRFTempCurveIndex(1),
+                                                           EIRFFlowCurveIndex(1),
+                                                           PLFFPLRCurveIndex(1),
+                                                           RatedTotalCapacity(1),
+                                                           RatedCOP(1),
+                                                           RatedAirVolFlowRate(1),
+                                                           FanPowerPerEvapAirFlowRateFromInput(1),
+                                                           NetTotCoolingCapRated,
+                                                           TotElectricPowerRated);
                     ReportDXCoolCoilDataCenterApplication(DXCoilType, DXCoilName, DXCoilType_Num, NetTotCoolingCapRated, TotElectricPowerRated);
                 }
             } else if (SELECT_CASE_var == CoilDX_HeatingEmpirical) { // Coil:Heating:DX:SingleSpeed
 
-                CheckCurveLimitsForStandardRatings(DXCoilName, DXCoilType, DXCoilType_Num, CapFTempCurveIndex(1), CapFFlowCurveIndex(1),
-                                                   EIRFTempCurveIndex(1), EIRFFlowCurveIndex(1), PLFFPLRCurveIndex(1));
+                CheckCurveLimitsForStandardRatings(DXCoilName,
+                                                   DXCoilType,
+                                                   DXCoilType_Num,
+                                                   CapFTempCurveIndex(1),
+                                                   CapFFlowCurveIndex(1),
+                                                   EIRFTempCurveIndex(1),
+                                                   EIRFFlowCurveIndex(1),
+                                                   PLFFPLRCurveIndex(1));
                 // Calculate the standard ratings for single speed DX heating coil
-                SingleSpeedDXHeatingCoilStandardRatings(
-                    RatedTotalCapacity(1), RatedCOP(1), CapFFlowCurveIndex(1), CapFTempCurveIndex(1), EIRFFlowCurveIndex(1), EIRFTempCurveIndex(1),
-                    RatedAirVolFlowRate(1), FanPowerPerEvapAirFlowRateFromInput(1), NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF,
-                    RegionNum, MinOATCompressor, OATempCompressorOn, OATempCompressorOnOffBlank, DefrostControl);
+                SingleSpeedDXHeatingCoilStandardRatings(RatedTotalCapacity(1),
+                                                        RatedCOP(1),
+                                                        CapFFlowCurveIndex(1),
+                                                        CapFTempCurveIndex(1),
+                                                        EIRFFlowCurveIndex(1),
+                                                        EIRFTempCurveIndex(1),
+                                                        RatedAirVolFlowRate(1),
+                                                        FanPowerPerEvapAirFlowRateFromInput(1),
+                                                        NetHeatingCapRatedHighTemp,
+                                                        NetHeatingCapRatedLowTemp,
+                                                        HSPF,
+                                                        RegionNum,
+                                                        MinOATCompressor,
+                                                        OATempCompressorOn,
+                                                        OATempCompressorOnOffBlank,
+                                                        DefrostControl);
 
                 // Writes the HSPF value to the EIO file and standard tabular output tables
-                ReportDXCoilRating(DXCoilType, DXCoilName, DXCoilType_Num, NetCoolingCapRated(1), SEER * ConvFromSIToIP, EER, EER * ConvFromSIToIP,
-                                   IEER * ConvFromSIToIP, NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF * ConvFromSIToIP, RegionNum);
+                ReportDXCoilRating(DXCoilType,
+                                   DXCoilName,
+                                   DXCoilType_Num,
+                                   NetCoolingCapRated(1),
+                                   SEER * ConvFromSIToIP,
+                                   EER,
+                                   EER * ConvFromSIToIP,
+                                   IEER * ConvFromSIToIP,
+                                   NetHeatingCapRatedHighTemp,
+                                   NetHeatingCapRatedLowTemp,
+                                   HSPF * ConvFromSIToIP,
+                                   RegionNum);
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) { // Coil:Cooling:DX:MultiSpeed,
 
                 for (spnum = 1; spnum <= ns; ++spnum) {
-                    CheckCurveLimitsForStandardRatings(DXCoilName, DXCoilType, DXCoilType_Num, CapFTempCurveIndex(spnum), CapFFlowCurveIndex(spnum),
-                                                       EIRFTempCurveIndex(spnum), EIRFFlowCurveIndex(spnum), PLFFPLRCurveIndex(spnum));
+                    CheckCurveLimitsForStandardRatings(DXCoilName,
+                                                       DXCoilType,
+                                                       DXCoilType_Num,
+                                                       CapFTempCurveIndex(spnum),
+                                                       CapFFlowCurveIndex(spnum),
+                                                       EIRFTempCurveIndex(spnum),
+                                                       EIRFFlowCurveIndex(spnum),
+                                                       PLFFPLRCurveIndex(spnum));
                 }
                 // Calculate the standard ratings for multispeed DX cooling coil
-                MultiSpeedDXCoolingCoilStandardRatings(DXCoilName, DXCoilType, CapFTempCurveIndex, CapFFlowCurveIndex, EIRFTempCurveIndex,
-                                                       EIRFFlowCurveIndex, PLFFPLRCurveIndex, RatedTotalCapacity, RatedCOP, RatedAirVolFlowRate,
-                                                       FanPowerPerEvapAirFlowRateFromInput, ns, NetCoolingCapRated(ns), SEER);
+                MultiSpeedDXCoolingCoilStandardRatings(DXCoilName,
+                                                       DXCoilType,
+                                                       CapFTempCurveIndex,
+                                                       CapFFlowCurveIndex,
+                                                       EIRFTempCurveIndex,
+                                                       EIRFFlowCurveIndex,
+                                                       PLFFPLRCurveIndex,
+                                                       RatedTotalCapacity,
+                                                       RatedCOP,
+                                                       RatedAirVolFlowRate,
+                                                       FanPowerPerEvapAirFlowRateFromInput,
+                                                       ns,
+                                                       NetCoolingCapRated(ns),
+                                                       SEER);
                 // Writes the SEER value to the EIO file and standard tabular output tables
-                ReportDXCoilRating(DXCoilType, DXCoilName, DXCoilType_Num, NetCoolingCapRated(ns), SEER * ConvFromSIToIP, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                   0.0, 0);
+                ReportDXCoilRating(
+                    DXCoilType, DXCoilName, DXCoilType_Num, NetCoolingCapRated(ns), SEER * ConvFromSIToIP, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedHeating) { // Coil:Heating:DX:MultiSpeed
 
                 for (spnum = 1; spnum <= ns; ++spnum) {
-                    CheckCurveLimitsForStandardRatings(DXCoilName, DXCoilType, DXCoilType_Num, CapFTempCurveIndex(spnum), CapFFlowCurveIndex(spnum),
-                                                       EIRFTempCurveIndex(spnum), EIRFFlowCurveIndex(spnum), PLFFPLRCurveIndex(spnum));
+                    CheckCurveLimitsForStandardRatings(DXCoilName,
+                                                       DXCoilType,
+                                                       DXCoilType_Num,
+                                                       CapFTempCurveIndex(spnum),
+                                                       CapFFlowCurveIndex(spnum),
+                                                       EIRFTempCurveIndex(spnum),
+                                                       EIRFFlowCurveIndex(spnum),
+                                                       PLFFPLRCurveIndex(spnum));
                 }
                 // Calculate Net heatig capacity and HSPF of multispeed DX heating coils
-                MultiSpeedDXHeatingCoilStandardRatings(
-                    DXCoilName, DXCoilType, CapFTempCurveIndex, CapFFlowCurveIndex, EIRFTempCurveIndex, EIRFFlowCurveIndex, PLFFPLRCurveIndex,
-                    RatedTotalCapacity, RatedCOP, RatedAirVolFlowRate, FanPowerPerEvapAirFlowRateFromInput, ns, NetHeatingCapRatedHighTemp,
-                    NetHeatingCapRatedLowTemp, HSPF, RegionNum, MinOATCompressor, OATempCompressorOn, OATempCompressorOnOffBlank, DefrostControl);
+                MultiSpeedDXHeatingCoilStandardRatings(DXCoilName,
+                                                       DXCoilType,
+                                                       CapFTempCurveIndex,
+                                                       CapFFlowCurveIndex,
+                                                       EIRFTempCurveIndex,
+                                                       EIRFFlowCurveIndex,
+                                                       PLFFPLRCurveIndex,
+                                                       RatedTotalCapacity,
+                                                       RatedCOP,
+                                                       RatedAirVolFlowRate,
+                                                       FanPowerPerEvapAirFlowRateFromInput,
+                                                       ns,
+                                                       NetHeatingCapRatedHighTemp,
+                                                       NetHeatingCapRatedLowTemp,
+                                                       HSPF,
+                                                       RegionNum,
+                                                       MinOATCompressor,
+                                                       OATempCompressorOn,
+                                                       OATempCompressorOnOffBlank,
+                                                       DefrostControl);
                 // Writes the HSPF value to the EIO file and standard tabular output tables
-                ReportDXCoilRating(DXCoilType, DXCoilName, DXCoilType_Num, NetCoolingCapRated(ns), SEER * ConvFromSIToIP, EER, EER * ConvFromSIToIP,
-                                   IEER * ConvFromSIToIP, NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF * ConvFromSIToIP, RegionNum);
+                ReportDXCoilRating(DXCoilType,
+                                   DXCoilName,
+                                   DXCoilType_Num,
+                                   NetCoolingCapRated(ns),
+                                   SEER * ConvFromSIToIP,
+                                   EER,
+                                   EER * ConvFromSIToIP,
+                                   IEER * ConvFromSIToIP,
+                                   NetHeatingCapRatedHighTemp,
+                                   NetHeatingCapRatedLowTemp,
+                                   HSPF * ConvFromSIToIP,
+                                   RegionNum);
 
             } else {
                 //... other DX Coil types will follow here
@@ -2762,8 +2888,8 @@ namespace StandardRatings {
                             HeatingCapCurveHSPFLimitsExceeded = true;
                         }
                     } else if (SELECT_CASE_var1 == "BIQUADRATIC") {
-                        GetCurveMinMaxValues(CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin,
-                                             HeatingCapODBTempMax);
+                        GetCurveMinMaxValues(
+                            CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin, HeatingCapODBTempMax);
 
                         // Checking the limits of capacity modifying curve for temperatures (IEER high and low test conditions)
                         if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
@@ -2786,8 +2912,8 @@ namespace StandardRatings {
                             HeatingEIRCurveHSPFLimitsExceeded = true;
                         }
                     } else if (SELECT_CASE_var1 == "BIQUADRATIC") {
-                        GetCurveMinMaxValues(EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin,
-                                             HeatingEIRODBTempMax);
+                        GetCurveMinMaxValues(
+                            EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
 
                         // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
                         if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
@@ -2937,8 +3063,8 @@ namespace StandardRatings {
                         }
 
                     } else if (SELECT_CASE_var1 == "BIQUADRATIC") {
-                        GetCurveMinMaxValues(CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin,
-                                             HeatingCapODBTempMax);
+                        GetCurveMinMaxValues(
+                            CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin, HeatingCapODBTempMax);
 
                         // Checking the limits of capacity modifying curve for temperatures (HSPF high and low test conditions)
                         if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
@@ -2963,8 +3089,8 @@ namespace StandardRatings {
                             HeatingEIRCurveHSPFLimitsExceeded = true;
                         }
                     } else if (SELECT_CASE_var1 == "BIQUADRATIC") {
-                        GetCurveMinMaxValues(EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin,
-                                             HeatingEIRODBTempMax);
+                        GetCurveMinMaxValues(
+                            EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
 
                         // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
                         if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
