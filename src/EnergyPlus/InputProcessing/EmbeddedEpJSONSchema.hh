@@ -48,18 +48,17 @@
 #ifndef InputProcessing_EmbeddedEpJSONSchema_HH
 #define InputProcessing_EmbeddedEpJSONSchema_HH
 
+#include <cstddef>
 #include <cstdint>
 #include <utility>
-#include <cstddef>
 
 namespace EnergyPlus {
 
 namespace EmbeddedEpJSONSchema {
 
-	std::pair< std::uint8_t const *, std::size_t > embeddedEpJSONSchema();
-
+    std::pair<std::uint8_t const *, std::size_t> embeddedEpJSONSchema();
 }
 
-}
+} // namespace EnergyPlus
 
 #endif // InputProcessing_EmbeddedEpJSONSchema_HH

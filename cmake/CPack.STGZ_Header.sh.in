@@ -65,7 +65,7 @@ tail $use_new_tail_syntax +###CPACK_HEADER_LENGTH### "$0" | gunzip | (cd "${inst
 
 echo "Unpacking to directory ${install_directory} was successful."
 
-link_err () 
+link_err ()
 {
 	echo "Error creating symbolic links"
 	exit 0
@@ -92,12 +92,13 @@ if [ ! "$link_directory" = "n" ]; then
   ln -sf "${install_directory}/${package_name}/energyplus" "${link_directory}/EnergyPlus" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/energyplus" "${link_directory}/energyplus" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
+  ln -sf "${install_directory}/${package_name}/Energy+.schema.epJSON" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PostProcess/EP-Compare/EP-Compare" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/EPMacro" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/ExpandObjects" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PostProcess/HVAC-Diagram" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/IDFVersionUpdater" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/ParametricPreProcessor/parametricpreprocessor" "${link_directory}" 2> /dev/null > /dev/null || link_err
+  ln -sf "${install_directory}/${package_name}/PreProcess/ParametricPreProcessor/ParametricPreprocessor" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PreProcess/FMUParser/parser" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PostProcess/ReadVarsESO" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/runenergyplus" "${link_directory}" 2> /dev/null > /dev/null || link_err
@@ -108,19 +109,20 @@ if [ ! "$link_directory" = "n" ]; then
   ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/Transition-V8-2-0-to-V8-3-0" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-	(   
+	(
 		cat <<-HERE
       rm -f "${link_directory}/Basement"
       rm -f "${link_directory}/BasementGHT.idd"
       rm -f "${link_directory}/convertESOMTR"
       rm -f "${link_directory}/EnergyPlus"
       rm -f "${link_directory}/Energy+.idd"
+      rm -f "${link_directory}/Energy+.schema.epJSON"
       rm -f "${link_directory}/EP-Compare"
       rm -f "${link_directory}/EPMacro"
       rm -f "${link_directory}/ExpandObjects"
       rm -f "${link_directory}/HVAC-Diagram"
       rm -f "${link_directory}/IDFVersionUpdater"
-      rm -f "${link_directory}/parametricpreprocessor"
+      rm -f "${link_directory}/ParametricPreprocessor"
       rm -f "${link_directory}/parser"
       rm -f "${link_directory}/ReadVarsESO"
       rm -f "${link_directory}/runenergyplus"

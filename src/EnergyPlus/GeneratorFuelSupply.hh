@@ -55,35 +55,30 @@ namespace EnergyPlus {
 
 namespace GeneratorFuelSupply {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
+    // na
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
+    // SUBROUTINE SPECIFICATIONS FOR MODULE
 
-	// <name Public routines, optionally name Private routines within this module>
+    // <name Public routines, optionally name Private routines within this module>
 
-	// Functions
+    // Functions
 
-	void
-	GetGeneratorFuelSupplyInput();
+    void GetGeneratorFuelSupplyInput();
 
-	//******************************************************************************
+    //******************************************************************************
 
-	void
-	SetupFuelConstituentData(
-		int const FuelSupplyNum,
-		bool & ErrorsFound
-	);
+    void SetupFuelConstituentData(int const FuelSupplyNum, bool &ErrorsFound);
 
-} // GeneratorFuelSupply
+} // namespace GeneratorFuelSupply
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

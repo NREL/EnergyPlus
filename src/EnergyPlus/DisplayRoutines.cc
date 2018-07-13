@@ -53,199 +53,190 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DisplayRoutines.hh>
 #include <DataGlobals.hh>
 #include <DataSystemVariables.hh>
+#include <DisplayRoutines.hh>
 
 namespace EnergyPlus {
 
-void
-DisplayString( std::string const & String ) // String to be displayed
+void DisplayString(std::string const &String) // String to be displayed
 {
 
-	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Linda Lawrie
-	//       DATE WRITTEN   Version 1.0
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   Version 1.0
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS SUBROUTINE:
-	// This subroutine provides a call to display strings during program execution.
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine provides a call to display strings during program execution.
 
-	// METHODOLOGY EMPLOYED:
+    // METHODOLOGY EMPLOYED:
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// Using/Aliasing
-	using DataGlobals::KickOffSimulation;
-	using DataSystemVariables::DeveloperFlag;
+    // Using/Aliasing
+    using DataGlobals::KickOffSimulation;
+    using DataSystemVariables::DeveloperFlag;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
 
-	// SUBROUTINE PARAMETER DEFINITIONS:
+    // SUBROUTINE PARAMETER DEFINITIONS:
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// DERIVED TYPE DEFINITIONS
-	// na
+    // DERIVED TYPE DEFINITIONS
+    // na
 
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	// na
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    // na
 
-	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	std::cout << String << std::endl;
-
+    if (KickOffSimulation && !DeveloperFlag) return;
+    std::cout << String << std::endl;
 }
 
-void
-DisplayString( char const * String ) // String to be displayed
+void DisplayString(char const *String) // String to be displayed
 {
 
-	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Linda Lawrie
-	//       DATE WRITTEN   Version 1.0
-	//       MODIFIED       na
-	//       RE-ENGINEERED  Overload to avoid std::string creation overhead
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   Version 1.0
+    //       MODIFIED       na
+    //       RE-ENGINEERED  Overload to avoid std::string creation overhead
 
-	// PURPOSE OF THIS SUBROUTINE:
-	// This subroutine provides a call to display strings during program execution.
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine provides a call to display strings during program execution.
 
-	// METHODOLOGY EMPLOYED:
+    // METHODOLOGY EMPLOYED:
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// Using/Aliasing
-	using DataGlobals::KickOffSimulation;
-	using DataGlobals::fMessagePtr;
-	using DataSystemVariables::DeveloperFlag;
+    // Using/Aliasing
+    using DataGlobals::fMessagePtr;
+    using DataGlobals::KickOffSimulation;
+    using DataSystemVariables::DeveloperFlag;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
 
-	// SUBROUTINE PARAMETER DEFINITIONS:
+    // SUBROUTINE PARAMETER DEFINITIONS:
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// DERIVED TYPE DEFINITIONS
-	// na
+    // DERIVED TYPE DEFINITIONS
+    // na
 
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	// na
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    // na
 
-	if ( fMessagePtr ) fMessagePtr( String );
+    if (fMessagePtr) fMessagePtr(String);
 
-	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	std::cout << String << std::endl;
-
+    if (KickOffSimulation && !DeveloperFlag) return;
+    std::cout << String << std::endl;
 }
 
-void
-DisplayNumberAndString(
-	int const Number, // number to be displayed
-	std::string const & String // String to be displayed
+void DisplayNumberAndString(int const Number,         // number to be displayed
+                            std::string const &String // String to be displayed
 )
 {
 
-	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Linda Lawrie
-	//       DATE WRITTEN   Version 1.0
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   Version 1.0
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS SUBROUTINE:
-	// This subroutine provides a call to display (at set point on screen for screen positioning models) card images
-	// during program parsing.
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine provides a call to display (at set point on screen for screen positioning models) card images
+    // during program parsing.
 
-	// METHODOLOGY EMPLOYED:
-	// usage:= call DisplayNumberAndString(numbr,string)
+    // METHODOLOGY EMPLOYED:
+    // usage:= call DisplayNumberAndString(numbr,string)
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// Using/Aliasing
-	using DataGlobals::KickOffSimulation;
-	using DataSystemVariables::DeveloperFlag;
-	using DataGlobals::fMessagePtr;
+    // Using/Aliasing
+    using DataGlobals::fMessagePtr;
+    using DataGlobals::KickOffSimulation;
+    using DataSystemVariables::DeveloperFlag;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
 
-	// SUBROUTINE PARAMETER DEFINITIONS:
+    // SUBROUTINE PARAMETER DEFINITIONS:
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// DERIVED TYPE DEFINITIONS
-	// na
+    // DERIVED TYPE DEFINITIONS
+    // na
 
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	std::stringstream sstm;
-	sstm << String << ' ' << Number;
-	if ( fMessagePtr ) fMessagePtr( sstm.str() );
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    std::stringstream sstm;
+    sstm << String << ' ' << Number;
+    if (fMessagePtr) fMessagePtr(sstm.str());
 
-	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	std::cout << String << ' ' << Number << std::endl;
+    if (KickOffSimulation && !DeveloperFlag) return;
+    std::cout << String << ' ' << Number << std::endl;
 }
 
-void
-DisplaySimDaysProgress( // This doesn't do anything!
-	int const CurrentSimDay, // Current Simulation Day
-	int const TotalSimDays // Total number of Simulation Days
+void DisplaySimDaysProgress( // This doesn't do anything!
+    int const CurrentSimDay, // Current Simulation Day
+    int const TotalSimDays   // Total number of Simulation Days
 )
 {
 
-	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Linda Lawrie
-	//       DATE WRITTEN   Version 1.0
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   Version 1.0
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS SUBROUTINE:
-	// This subroutine provides a call for "progress" during simulation.
-	// Progress is percent of current days vs total days.
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine provides a call for "progress" during simulation.
+    // Progress is percent of current days vs total days.
 
-	// METHODOLOGY EMPLOYED:
-	// Needs description, as appropriate.
+    // METHODOLOGY EMPLOYED:
+    // Needs description, as appropriate.
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// Using/Aliasing
-	using DataGlobals::KickOffSimulation;
-	using DataGlobals::fProgressPtr;
-	using DataSystemVariables::DeveloperFlag;
+    // Using/Aliasing
+    using DataGlobals::fProgressPtr;
+    using DataGlobals::KickOffSimulation;
+    using DataSystemVariables::DeveloperFlag;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
+    // Locals
+    // SUBROUTINE ARGUMENT DEFINITIONS:
 
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    // na
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// DERIVED TYPE DEFINITIONS
-	// na
+    // DERIVED TYPE DEFINITIONS
+    // na
 
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static int percent( 0 ); // Current percent progress
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    static int percent(0); // Current percent progress
 
-	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	if ( TotalSimDays > 0 ) {
-		percent = nint( ( ( float ) CurrentSimDay / ( float ) TotalSimDays ) * 100.0 );
-		percent = min( percent, 100 );
-	} else {
-		percent = 0;
-	}
+    if (KickOffSimulation && !DeveloperFlag) return;
+    if (TotalSimDays > 0) {
+        percent = nint(((float)CurrentSimDay / (float)TotalSimDays) * 100.0);
+        percent = min(percent, 100);
+    } else {
+        percent = 0;
+    }
 
-	if ( fProgressPtr ) fProgressPtr( percent );
-
+    if (fProgressPtr) fProgressPtr(percent);
 }
 
-
-} // EnergyPlus
+} // namespace EnergyPlus

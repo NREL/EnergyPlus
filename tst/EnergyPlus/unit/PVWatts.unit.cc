@@ -53,272 +53,250 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <PVWatts.hh>
-#include <DataSurfaces.hh>
-#include <DataHVACGlobals.hh>
-#include <DataGlobals.hh>
 #include <DataEnvironment.hh>
-#include <WeatherManager.hh>
+#include <DataGlobals.hh>
+#include <DataHVACGlobals.hh>
+#include <DataSurfaces.hh>
 #include <ElectricPowerServiceManager.hh>
+#include <PVWatts.hh>
+#include <WeatherManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 
-TEST_F( EnergyPlusFixture, PVWattsGenerator_Constructor )
+TEST_F(EnergyPlusFixture, PVWattsGenerator_Constructor)
 {
-	using namespace PVWatts;
+    using namespace PVWatts;
 
-	PVWattsGenerator pvw("PVArray", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
-	EXPECT_DOUBLE_EQ(4000.0, pvw.getDCSystemCapacity());
-	EXPECT_EQ(ModuleType::STANDARD, pvw.getModuleType());
-	EXPECT_EQ(ArrayType::FIXED_ROOF_MOUNTED, pvw.getArrayType());
-	EXPECT_DOUBLE_EQ(0.14, pvw.getSystemLosses());
-	EXPECT_EQ(GeometryType::TILT_AZIMUTH, pvw.getGeometryType());
-	EXPECT_DOUBLE_EQ(20.0, pvw.getTilt());
-	EXPECT_DOUBLE_EQ(180.0, pvw.getAzimuth());
-	EXPECT_DOUBLE_EQ(0.4, pvw.getGroundCoverageRatio());
+    PVWattsGenerator pvw("PVArray", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
+    EXPECT_DOUBLE_EQ(4000.0, pvw.getDCSystemCapacity());
+    EXPECT_EQ(ModuleType::STANDARD, pvw.getModuleType());
+    EXPECT_EQ(ArrayType::FIXED_ROOF_MOUNTED, pvw.getArrayType());
+    EXPECT_DOUBLE_EQ(0.14, pvw.getSystemLosses());
+    EXPECT_EQ(GeometryType::TILT_AZIMUTH, pvw.getGeometryType());
+    EXPECT_DOUBLE_EQ(20.0, pvw.getTilt());
+    EXPECT_DOUBLE_EQ(180.0, pvw.getAzimuth());
+    EXPECT_DOUBLE_EQ(0.4, pvw.getGroundCoverageRatio());
 
-	ASSERT_THROW(PVWattsGenerator pvw2("", -1000.0, ModuleType::PREMIUM, ArrayType::FIXED_OPEN_RACK, 1.1, GeometryType::TILT_AZIMUTH, 91.0, 360.0, 0, -0.1), std::runtime_error);
-	std::string const error_string = delimited_string({
-		"   ** Severe  ** PVWatts: name cannot be blank.",
-		"   ** Severe  ** PVWatts: DC system capacity must be greater than zero.",
-		"   ** Severe  ** PVWatts: Invalid system loss value 1.10",
-		"   ** Severe  ** PVWatts: Invalid tilt: 91.00",
-		"   ** Severe  ** PVWatts: Invalid azimuth: 360.00",
-		"   ** Severe  ** PVWatts: Invalid ground coverage ratio: -0.10",
-		"   **  Fatal  ** Errors found in getting PVWatts input",
-		"   ...Summary of Errors that led to program termination:",
-		"   ..... Reference severe error count=6",
-		"   ..... Last severe error=PVWatts: Invalid ground coverage ratio: -0.10"
-	});
-	EXPECT_TRUE( compare_err_stream( error_string, true ) );
+    ASSERT_THROW(
+        PVWattsGenerator pvw2("", -1000.0, ModuleType::PREMIUM, ArrayType::FIXED_OPEN_RACK, 1.1, GeometryType::TILT_AZIMUTH, 91.0, 360.0, 0, -0.1),
+        std::runtime_error);
+    std::string const error_string = delimited_string(
+        {"   ** Severe  ** PVWatts: name cannot be blank.", "   ** Severe  ** PVWatts: DC system capacity must be greater than zero.",
+         "   ** Severe  ** PVWatts: Invalid system loss value 1.10", "   ** Severe  ** PVWatts: Invalid tilt: 91.00",
+         "   ** Severe  ** PVWatts: Invalid azimuth: 360.00", "   ** Severe  ** PVWatts: Invalid ground coverage ratio: -0.10",
+         "   **  Fatal  ** Errors found in getting PVWatts input", "   ...Summary of Errors that led to program termination:",
+         "   ..... Reference severe error count=6", "   ..... Last severe error=PVWatts: Invalid ground coverage ratio: -0.10"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputs )
+TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
 {
-	using namespace PVWatts;
-	const std::string idfTxt = delimited_string({
-		"Version, 8.9;",
-		"Generator:PVWatts,",
-		"PVWattsArray1,",
-		"5,",
-		"4000,",
-		"Premium,",
-		"OneAxis,",
-		",",
-		",",
-		",",
-		";",
-		"Generator:PVWatts,",
-		"PVWattsArray2,",
-		"5,",
-		"4000,",
-		"Premium,",
-		"OneAxis,",
-		",",
-		",",
-		",",
-		",",
-		",",
-		";",
-		"Generator:PVWatts,",
-		"PVWattsArray3,",
-		"5,",
-		"4000,",
-		"Premium,",
-		"OneAxis,",
-		",",
-		",",
-		"21,",
-		"175,",
-		",",
-		"0.5;",
-		"Output:Variable,*,Generator Produced DC Electric Power,timestep;"
-	});
-	process_idf(idfTxt);
-	EXPECT_FALSE(has_err_output());
-	PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator("PVWattsArray1");
-	EXPECT_EQ(pvw1.getModuleType(), ModuleType::PREMIUM);
-	EXPECT_EQ(pvw1.getArrayType(), ArrayType::ONE_AXIS);
-	EXPECT_DOUBLE_EQ(0.4, pvw1.getGroundCoverageRatio());
-	PVWattsGenerator &pvw2 = GetOrCreatePVWattsGenerator("PVWattsArray2");
-	EXPECT_DOUBLE_EQ(0.4, pvw2.getGroundCoverageRatio());
-	PVWattsGenerator &pvw3 = GetOrCreatePVWattsGenerator("PVWattsArray3");
-	EXPECT_DOUBLE_EQ(175.0, pvw3.getAzimuth());
-	EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
-	EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
-	EXPECT_EQ(static_cast<int>(PVWattsGenerators.size()), 3);
-
+    using namespace PVWatts;
+    const std::string idfTxt = delimited_string({"Version, 8.9;",
+                                                 "Generator:PVWatts,",
+                                                 "PVWattsArray1,",
+                                                 "5,",
+                                                 "4000,",
+                                                 "Premium,",
+                                                 "OneAxis,",
+                                                 ",",
+                                                 ",",
+                                                 ",",
+                                                 ";",
+                                                 "Generator:PVWatts,",
+                                                 "PVWattsArray2,",
+                                                 "5,",
+                                                 "4000,",
+                                                 "Premium,",
+                                                 "OneAxis,",
+                                                 ",",
+                                                 ",",
+                                                 ",",
+                                                 ",",
+                                                 ",",
+                                                 ";",
+                                                 "Generator:PVWatts,",
+                                                 "PVWattsArray3,",
+                                                 "5,",
+                                                 "4000,",
+                                                 "Premium,",
+                                                 "OneAxis,",
+                                                 ",",
+                                                 ",",
+                                                 "21,",
+                                                 "175,",
+                                                 ",",
+                                                 "0.5;",
+                                                 "Output:Variable,*,Generator Produced DC Electric Power,timestep;"});
+    process_idf(idfTxt);
+    EXPECT_FALSE(has_err_output());
+    PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator("PVWattsArray1");
+    EXPECT_EQ(pvw1.getModuleType(), ModuleType::PREMIUM);
+    EXPECT_EQ(pvw1.getArrayType(), ArrayType::ONE_AXIS);
+    EXPECT_DOUBLE_EQ(0.4, pvw1.getGroundCoverageRatio());
+    PVWattsGenerator &pvw2 = GetOrCreatePVWattsGenerator("PVWattsArray2");
+    EXPECT_DOUBLE_EQ(0.4, pvw2.getGroundCoverageRatio());
+    PVWattsGenerator &pvw3 = GetOrCreatePVWattsGenerator("PVWattsArray3");
+    EXPECT_DOUBLE_EQ(175.0, pvw3.getAzimuth());
+    EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
+    EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
+    EXPECT_EQ(static_cast<int>(PVWattsGenerators.size()), 3);
 }
 
-TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputsFailure )
+TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
 {
-	using namespace PVWatts;
-	const std::string idfTxt = delimited_string({
-		"Version, 8.9;",
-		"Generator:PVWatts,",
-		"PVWattsArray1,",
-		"5,",
-		"4000,",
-		"Primo,", // misspelled
-		"FixedRoofMount,", // misspelled
-		",",
-		"asdf,",
-		",",
-		";",
-		"Output:Variable,*,Generator Produced DC Electric Power,timestep;"
-	});
-	ASSERT_TRUE(process_idf(idfTxt));
-	ASSERT_THROW( GetOrCreatePVWattsGenerator("PVWattsArray1"), std::runtime_error );
-	std::string const error_string = delimited_string({
-		"   ** Severe  ** PVWatts: Invalid Module Type: PRIMO",
-		"   ** Severe  ** PVWatts: Invalid Array Type: FIXEDROOFMOUNT",
-		"   ** Severe  ** PVWatts: Invalid Geometry Type: ASDF",
-		"   **  Fatal  ** Errors found in getting PVWatts input",
-		"   ...Summary of Errors that led to program termination:",
-		"   ..... Reference severe error count=3",
-		"   ..... Last severe error=PVWatts: Invalid Geometry Type: ASDF"
-	});
-	EXPECT_TRUE( compare_err_stream( error_string, true ) );
+    using namespace PVWatts;
+    const std::string idfTxt = delimited_string({"Version, 8.9;", "Generator:PVWatts,", "PVWattsArray1,", "5,", "4000,",
+                                                 "Primo,",          // misspelled
+                                                 "FixedRoofMount,", // misspelled
+                                                 ",", "asdf,", ",", ";", "Output:Variable,*,Generator Produced DC Electric Power,timestep;"});
+    EXPECT_FALSE(process_idf(idfTxt, false));
+    ASSERT_THROW(GetOrCreatePVWattsGenerator("PVWattsArray1"), std::runtime_error);
+    std::string const error_string = delimited_string(
+        {"   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_geometry_type] - \"asdf\" - Failed to match against any enum values.",
+         "   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_type] - \"FixedRoofMount\" - Failed to match against any enum values.",
+         "   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][module_type] - \"Primo\" - Failed to match against any enum values.",
+         "   ** Severe  ** PVWatts: Invalid Module Type: PRIMO", "   ** Severe  ** PVWatts: Invalid Array Type: FIXEDROOFMOUNT",
+         "   ** Severe  ** PVWatts: Invalid Geometry Type: ASDF", "   **  Fatal  ** Errors found in getting PVWatts input",
+         "   ...Summary of Errors that led to program termination:", "   ..... Reference severe error count=6",
+         "   ..... Last severe error=PVWatts: Invalid Geometry Type: ASDF"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F( EnergyPlusFixture, PVWattsGenerator_Calc )
+TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
 {
-	using namespace PVWatts;
-	// USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw
-	// 6/15 at 7am
-	DataGlobals::TimeStep = 1;
-	DataGlobals::TimeStepZone = 1.0;
-	DataHVACGlobals::TimeStepSys = 1.0;
-	DataGlobals::BeginTimeStepFlag = true;
-	DataGlobals::MinutesPerTimeStep = 60;
-	DataGlobals::NumOfTimeStepInHour = 1;
-	WeatherManager::AllocateWeatherData(); // gets us the albedo array initialized
-	DataEnvironment::Year = 1986;
-	DataEnvironment::Month = 6;
-	DataEnvironment::DayOfMonth = 15;
-	DataGlobals::HourOfDay = 8; // 8th hour of day, 7-8am
-	WeatherManager::WeatherFileLatitude = 33.45;
-	WeatherManager::WeatherFileLongitude = -111.98;
-	WeatherManager::WeatherFileTimeZone = -7;
-	DataEnvironment::BeamSolarRad = 728;
-	DataEnvironment::DifSolarRad = 70;
-	DataEnvironment::WindSpeed = 3.1;
-	DataEnvironment::OutDryBulbTemp = 31.7;
+    using namespace PVWatts;
+    // USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw
+    // 6/15 at 7am
+    DataGlobals::TimeStep = 1;
+    DataGlobals::TimeStepZone = 1.0;
+    DataHVACGlobals::TimeStepSys = 1.0;
+    DataGlobals::BeginTimeStepFlag = true;
+    DataGlobals::MinutesPerTimeStep = 60;
+    DataGlobals::NumOfTimeStepInHour = 1;
+    WeatherManager::AllocateWeatherData(); // gets us the albedo array initialized
+    DataEnvironment::Year = 1986;
+    DataEnvironment::Month = 6;
+    DataEnvironment::DayOfMonth = 15;
+    DataGlobals::HourOfDay = 8; // 8th hour of day, 7-8am
+    WeatherManager::WeatherFileLatitude = 33.45;
+    WeatherManager::WeatherFileLongitude = -111.98;
+    WeatherManager::WeatherFileTimeZone = -7;
+    DataEnvironment::BeamSolarRad = 728;
+    DataEnvironment::DifSolarRad = 70;
+    DataEnvironment::WindSpeed = 3.1;
+    DataEnvironment::OutDryBulbTemp = 31.7;
 
-	PVWattsGenerator pvwa("PVWattsArrayA", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
-	pvwa.setCellTemperature(30.345);
-	pvwa.setPlaneOfArrayIrradiance(92.257);
-	pvwa.calc();
-	Real64 generatorPower, generatorEnergy, thermalPower, thermalEnergy;
-	pvwa.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
-	EXPECT_DOUBLE_EQ(thermalPower, 0.0);
-	EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
-	EXPECT_NEAR(generatorPower, 884.137, 0.5);
-	EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
+    PVWattsGenerator pvwa("PVWattsArrayA", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
+    pvwa.setCellTemperature(30.345);
+    pvwa.setPlaneOfArrayIrradiance(92.257);
+    pvwa.calc();
+    Real64 generatorPower, generatorEnergy, thermalPower, thermalEnergy;
+    pvwa.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
+    EXPECT_DOUBLE_EQ(thermalPower, 0.0);
+    EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
+    EXPECT_NEAR(generatorPower, 884.137, 0.5);
+    EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-	PVWattsGenerator pvwb("PVWattsArrayB", 3000.0, ModuleType::PREMIUM, ArrayType::ONE_AXIS, 0.16, GeometryType::TILT_AZIMUTH, 25.0, 100.);
-	pvwb.setCellTemperature(38.620);
-	pvwb.setPlaneOfArrayIrradiance(478.641);
-	pvwb.calc();
-	pvwb.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
-	EXPECT_DOUBLE_EQ(thermalPower, 0.0);
-	EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
-	EXPECT_NEAR(generatorPower, 1621.100, 0.5);
-	EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
+    PVWattsGenerator pvwb("PVWattsArrayB", 3000.0, ModuleType::PREMIUM, ArrayType::ONE_AXIS, 0.16, GeometryType::TILT_AZIMUTH, 25.0, 100.);
+    pvwb.setCellTemperature(38.620);
+    pvwb.setPlaneOfArrayIrradiance(478.641);
+    pvwb.calc();
+    pvwb.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
+    EXPECT_DOUBLE_EQ(thermalPower, 0.0);
+    EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
+    EXPECT_NEAR(generatorPower, 1621.100, 0.5);
+    EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-	PVWattsGenerator pvwc("PVWattsArrayC", 1000.0, ModuleType::THIN_FILM, ArrayType::FIXED_OPEN_RACK, 0.1, GeometryType::TILT_AZIMUTH, 30.0, 140.);
-	pvwc.setCellTemperature(33.764);
-	pvwc.setPlaneOfArrayIrradiance(255.213);
-	pvwc.calc();
-	pvwc.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
-	EXPECT_DOUBLE_EQ(thermalPower, 0.0);
-	EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
-	EXPECT_NEAR(generatorPower, 433.109, 0.5);
-	EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
+    PVWattsGenerator pvwc("PVWattsArrayC", 1000.0, ModuleType::THIN_FILM, ArrayType::FIXED_OPEN_RACK, 0.1, GeometryType::TILT_AZIMUTH, 30.0, 140.);
+    pvwc.setCellTemperature(33.764);
+    pvwc.setPlaneOfArrayIrradiance(255.213);
+    pvwc.calc();
+    pvwc.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
+    EXPECT_DOUBLE_EQ(thermalPower, 0.0);
+    EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
+    EXPECT_NEAR(generatorPower, 433.109, 0.5);
+    EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-	PVWattsGenerator pvwd("PVWattsArrayD", 5500.0, ModuleType::STANDARD, ArrayType::ONE_AXIS_BACKTRACKING, 0.05, GeometryType::TILT_AZIMUTH, 34.0, 180.);
-	pvwd.setCellTemperature(29.205);
-	pvwd.setPlaneOfArrayIrradiance(36.799);
-	pvwd.calc();
-	pvwd.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
-	EXPECT_DOUBLE_EQ(thermalPower, 0.0);
-	EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
-	EXPECT_NEAR(generatorPower, 2485.686, 0.5);
-	EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
+    PVWattsGenerator pvwd("PVWattsArrayD", 5500.0, ModuleType::STANDARD, ArrayType::ONE_AXIS_BACKTRACKING, 0.05, GeometryType::TILT_AZIMUTH, 34.0,
+                          180.);
+    pvwd.setCellTemperature(29.205);
+    pvwd.setPlaneOfArrayIrradiance(36.799);
+    pvwd.calc();
+    pvwd.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
+    EXPECT_DOUBLE_EQ(thermalPower, 0.0);
+    EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
+    EXPECT_NEAR(generatorPower, 2485.686, 0.5);
+    EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-	PVWattsGenerator pvwe("PVWattsArrayE", 3800.0, ModuleType::PREMIUM, ArrayType::TWO_AXIS, 0.08, GeometryType::TILT_AZIMUTH, 34.0, 180.);
-	pvwe.setCellTemperature(42.229);
-	pvwe.setPlaneOfArrayIrradiance(647.867);
-	pvwe.calc();
-	pvwe.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
-	EXPECT_DOUBLE_EQ(thermalPower, 0.0);
-	EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
-	EXPECT_NEAR(generatorPower, 2759.937, 0.5);
-	EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
-
-
+    PVWattsGenerator pvwe("PVWattsArrayE", 3800.0, ModuleType::PREMIUM, ArrayType::TWO_AXIS, 0.08, GeometryType::TILT_AZIMUTH, 34.0, 180.);
+    pvwe.setCellTemperature(42.229);
+    pvwe.setPlaneOfArrayIrradiance(647.867);
+    pvwe.calc();
+    pvwe.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
+    EXPECT_DOUBLE_EQ(thermalPower, 0.0);
+    EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
+    EXPECT_NEAR(generatorPower, 2759.937, 0.5);
+    EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 }
 
-TEST_F( EnergyPlusFixture, PVWattsInverter_Constructor )
+TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
 {
-	const std::string idfTxt = delimited_string({
-		"Version, 8.9;",
-		"ElectricLoadCenter:Distribution,",
-		"ELC1,",
-		"GeneratorList1,",
-		"Baseload,",
-		",",
-		",",
-		",",
-		"DirectCurrentWithInverter,",
-		"Inverter1;",
-		"ElectricLoadCenter:Inverter:PVWatts,",
-		"Inverter1,",
-		"1.10,",
-		"0.96;",
-		"ElectricLoadCenter:Generators,",
-		"GeneratorList1,",
-		"PVWattsArray1,",
-		"Generator:PVWatts,",
-		"1500,",
-		",",
-		",",
-		"PVWattsArray2,",
-		"Generator:PVWatts,",
-		"2500,",
-		",",
-		";",
-		"Generator:PVWatts,",
-		"PVWattsArray1,",
-		"5,",
-		"1500,",
-		"Standard,",
-		"OneAxis,",
-		",",
-		",",
-		",",
-		";",
-		"Generator:PVWatts,",
-		"PVWattsArray2,",
-		"5,",
-		"2500,",
-		"Standard,",
-		"OneAxis,",
-		",",
-		",",
-		",",
-		",",
-		",",
-		";"
-	});
-	ASSERT_TRUE(process_idf(idfTxt));
-	auto eplc(ElectPowerLoadCenter(1));
-	ASSERT_TRUE(eplc.inverterPresent);
-	EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
-	DataHVACGlobals::TimeStepSys = 1.0;
-	eplc.inverterObj->simulate(884.018);
-	EXPECT_NEAR(eplc.inverterObj->aCPowerOut(), 842.527, 0.001);
-
+    const std::string idfTxt = delimited_string({"Version, 8.9;",
+                                                 "ElectricLoadCenter:Distribution,",
+                                                 "ELC1,",
+                                                 "GeneratorList1,",
+                                                 "Baseload,",
+                                                 ",",
+                                                 ",",
+                                                 ",",
+                                                 "DirectCurrentWithInverter,",
+                                                 "Inverter1;",
+                                                 "ElectricLoadCenter:Inverter:PVWatts,",
+                                                 "Inverter1,",
+                                                 "1.10,",
+                                                 "0.96;",
+                                                 "ElectricLoadCenter:Generators,",
+                                                 "GeneratorList1,",
+                                                 "PVWattsArray1,",
+                                                 "Generator:PVWatts,",
+                                                 "1500,",
+                                                 ",",
+                                                 ",",
+                                                 "PVWattsArray2,",
+                                                 "Generator:PVWatts,",
+                                                 "2500,",
+                                                 ",",
+                                                 ";",
+                                                 "Generator:PVWatts,",
+                                                 "PVWattsArray1,",
+                                                 "5,",
+                                                 "1500,",
+                                                 "Standard,",
+                                                 "OneAxis,",
+                                                 ",",
+                                                 ",",
+                                                 ",",
+                                                 ";",
+                                                 "Generator:PVWatts,",
+                                                 "PVWattsArray2,",
+                                                 "5,",
+                                                 "2500,",
+                                                 "Standard,",
+                                                 "OneAxis,",
+                                                 ",",
+                                                 ",",
+                                                 ",",
+                                                 ",",
+                                                 ",",
+                                                 ";"});
+    ASSERT_TRUE(process_idf(idfTxt));
+    auto eplc(ElectPowerLoadCenter(1));
+    ASSERT_TRUE(eplc.inverterPresent);
+    EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
+    DataHVACGlobals::TimeStepSys = 1.0;
+    eplc.inverterObj->simulate(884.018);
+    EXPECT_NEAR(eplc.inverterObj->aCPowerOut(), 842.527, 0.001);
 }

@@ -49,249 +49,207 @@
 #define InputProcessor_hh_INCLUDED
 
 // C++ Headers
-#include <string>
-#include <vector>
-#include <unordered_map>
 #include <map>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1S.fwd.hh>
 #include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.fwd.hh>
 #include <ObjexxFCL/Optional.hh>
 
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 #include <InputProcessing/DataStorage.hh>
 
 class IdfParser;
-class State;
+class Validation;
 
 namespace EnergyPlus {
 
-	class InputProcessor {
-	public:
-		using json = nlohmann::json;
+class InputProcessor
+{
+public:
+    using json = nlohmann::json;
 
-		friend class EnergyPlusFixture;
-		friend class InputProcessorFixture;
+    friend class EnergyPlusFixture;
+    friend class InputProcessorFixture;
 
-		json::parser_callback_t callback;
+    json::parser_callback_t callback;
 
-		InputProcessor();
+    InputProcessor();
 
-		static
-		std::unique_ptr< InputProcessor >
-		factory();
+    static std::unique_ptr<InputProcessor> factory();
 
-		template< typename T >
-		T *
-		objectFactory( std::string const & objectName )
-		{
-			T * p = data->objectFactory< T >( objectName );
-			if ( p != nullptr ) return p;
-			auto const & fields = getFields( T::canonicalObjectType(), objectName );
-			p = data->addObject< T >( objectName, fields );
-			return p;
-		}
+    template <typename T> T *objectFactory(std::string const &objectName)
+    {
+        T *p = data->objectFactory<T>(objectName);
+        if (p != nullptr) return p;
+        auto const &fields = getFields(T::canonicalObjectType(), objectName);
+        p = data->addObject<T>(objectName, fields);
+        return p;
+    }
 
-		template< typename T >
-		T *
-		objectFactory()
-		{
-			T * p = data->objectFactory< T >();
-			if ( p != nullptr ) return p;
-			auto const & fields = getFields( T::canonicalObjectType() );
-			p = data->addObject< T >( fields );
-			return p;
-		}
+    template <typename T> T *objectFactory()
+    {
+        T *p = data->objectFactory<T>();
+        if (p != nullptr) return p;
+        auto const &fields = getFields(T::canonicalObjectType());
+        p = data->addObject<T>(fields);
+        return p;
+    }
 
-		std::pair< bool, std::string >
-		convertInsensitiveObjectType( std::string const & objectType );
+    std::pair<bool, std::string> convertInsensitiveObjectType(std::string const &objectType);
 
-		void
-		initializeMaps();
+    void initializeMaps();
 
-		void
-		processInput();
+    void processInput();
 
-		int
-		getNumSectionsFound( std::string const & SectionWord );
+    int getNumSectionsFound(std::string const &SectionWord);
 
-		int
-		getNumObjectsFound( std::string const & ObjectWord );
+    int getNumObjectsFound(std::string const &ObjectWord);
 
-		void
-		getObjectItem(
-			std::string const & Object,
-			int const Number,
-			Array1S_string Alphas,
-			int & NumAlphas,
-			Array1S< Real64 > Numbers,
-			int & NumNumbers,
-			int & Status,
-			Optional< Array1D_bool > NumBlank = _,
-			Optional< Array1D_bool > AlphaBlank = _,
-			Optional< Array1D_string > AlphaFieldNames = _,
-			Optional< Array1D_string > NumericFieldNames = _
-		);
+    bool findDefault(std::string &default_value, json const &schema_field_obj);
 
-		int
-		getIDFObjNum(
-			std::string const & Object,
-			int const Number
-		);
+    bool findDefault(Real64 &default_value, json const &schema_field_obj);
 
-		int
-		getJSONObjNum(
-			std::string const & Object,
-			int const Number
-		);
+    std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
-		int
-		getObjectItemNum(
-			std::string const & ObjType, // Object Type (ref: IDD Objects)
-			std::string const & ObjName // Name of the object type
-		);
+    void getObjectItem(std::string const &Object,
+                       int const Number,
+                       Array1S_string Alphas,
+                       int &NumAlphas,
+                       Array1S<Real64> Numbers,
+                       int &NumNumbers,
+                       int &Status,
+                       Optional<Array1D_bool> NumBlank = _,
+                       Optional<Array1D_bool> AlphaBlank = _,
+                       Optional<Array1D_string> AlphaFieldNames = _,
+                       Optional<Array1D_string> NumericFieldNames = _);
 
-		int
-		getObjectItemNum(
-			std::string const & ObjType, // Object Type (ref: IDD Objects)
-			std::string const & NameTypeVal, // Object "name" field type ( used as search key )
-			std::string const & ObjName // Name of the object type
-		);
+    int getIDFObjNum(std::string const &Object, int const Number);
 
-		void
-		rangeCheck(
-			bool & ErrorsFound, // Set to true if error detected
-			std::string const & WhatFieldString, // Descriptive field for string
-			std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
-			std::string const & ErrorLevel, // 'Warning','Severe','Fatal')
-			Optional_string_const LowerBoundString = _, // String for error message, if applicable
-			Optional_bool_const LowerBoundCondition = _, // Condition for error condition, if applicable
-			Optional_string_const UpperBoundString = _, // String for error message, if applicable
-			Optional_bool_const UpperBoundCondition = _, // Condition for error condition, if applicable
-			Optional_string_const ValueString = _, // Value with digits if to be displayed with error
-			Optional_string_const WhatObjectName = _ // ObjectName -- used for error messages
-		);
+    int getJSONObjNum(std::string const &Object, int const Number);
 
-		void
-		getMaxSchemaArgs(
-			int & NumArgs,
-			int & NumAlpha,
-			int & NumNumeric
-		);
+    int getObjectItemNum(std::string const &ObjType, // Object Type (ref: IDD Objects)
+                         std::string const &ObjName  // Name of the object type
+    );
 
-		void
-		getObjectDefMaxArgs(
-			std::string const & ObjectWord, // Object for definition
-			int & NumArgs, // How many arguments (max) this Object can have
-			int & NumAlpha, // How many Alpha arguments (max) this Object can have
-			int & NumNumeric // How many Numeric arguments (max) this Object can have
-		);
+    int getObjectItemNum(std::string const &ObjType,     // Object Type (ref: IDD Objects)
+                         std::string const &NameTypeVal, // Object "name" field type ( used as search key )
+                         std::string const &ObjName      // Name of the object type
+    );
 
-		void
-		preProcessorCheck( bool & PreP_Fatal ); // True if a preprocessor flags a fatal error
+    void rangeCheck(bool &ErrorsFound,                           // Set to true if error detected
+                    std::string const &WhatFieldString,          // Descriptive field for string
+                    std::string const &WhatObjectString,         // Descriptive field for object, Zone Name, etc.
+                    std::string const &ErrorLevel,               // 'Warning','Severe','Fatal')
+                    Optional_string_const LowerBoundString = _,  // String for error message, if applicable
+                    Optional_bool_const LowerBoundCondition = _, // Condition for error condition, if applicable
+                    Optional_string_const UpperBoundString = _,  // String for error message, if applicable
+                    Optional_bool_const UpperBoundCondition = _, // Condition for error condition, if applicable
+                    Optional_string_const ValueString = _,       // Value with digits if to be displayed with error
+                    Optional_string_const WhatObjectName = _     // ObjectName -- used for error messages
+    );
 
-		void
-		preScanReportingVariables();
+    void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);
 
-		void
-		reportOrphanRecordObjects();
+    void getObjectDefMaxArgs(std::string const &ObjectWord, // Object for definition
+                             int &NumArgs,                  // How many arguments (max) this Object can have
+                             int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
+                             int &NumNumeric                // How many Numeric arguments (max) this Object can have
+    );
 
-	private:
-		struct ObjectInfo
-		{
-			ObjectInfo() = default;
+    void preProcessorCheck(bool &PreP_Fatal); // True if a preprocessor flags a fatal error
 
-			ObjectInfo( std::string const & objectType, std::string const & objectName )
-			:
-			objectType( objectType ),
-			objectName( objectName )
-			{}
+    void preScanReportingVariables();
 
-			ObjectInfo( std::string && objectType, std::string && objectName )
-			:
-			objectType( objectType ),
-			objectName( objectName )
-			{}
+    void reportOrphanRecordObjects();
 
-			std::string objectType = "";
-			std::string objectName = "";
-		};
+private:
+    struct ObjectInfo
+    {
+        ObjectInfo() = default;
 
-		struct ObjectCache
-		{
-			ObjectCache() = default;
+        ObjectInfo(std::string const &objectType, std::string const &objectName) : objectType(objectType), objectName(objectName)
+        {
+        }
 
-			ObjectCache( json::const_iterator const & schemaIterator, std::vector< json::const_iterator > const & inputObjectIterators )
-			:
-			schemaIterator( schemaIterator ),
-			inputObjectIterators( inputObjectIterators )
-			{}
+        ObjectInfo(std::string &&objectType, std::string &&objectName) : objectType(objectType), objectName(objectName)
+        {
+        }
 
-			ObjectCache( json::const_iterator && schemaIterator, std::vector< json::const_iterator > && inputObjectIterators )
-			:
-			schemaIterator( schemaIterator ),
-			inputObjectIterators( inputObjectIterators )
-			{}
+        std::string objectType = "";
+        std::string objectName = "";
+    };
 
-			json::const_iterator schemaIterator;
-			std::vector< json::const_iterator > inputObjectIterators;
-		};
+    struct ObjectCache
+    {
+        ObjectCache() = default;
 
-		void
-		addVariablesForMonthlyReport( std::string const & reportName );
+        ObjectCache(json::const_iterator const &schemaIterator, std::vector<json::const_iterator> const &inputObjectIterators)
+            : schemaIterator(schemaIterator), inputObjectIterators(inputObjectIterators)
+        {
+        }
 
-		void
-		addRecordToOutputVariableStructure(
-			std::string const & KeyValue,
-			std::string const & VariableName
-		);
+        ObjectCache(json::const_iterator &&schemaIterator, std::vector<json::const_iterator> &&inputObjectIterators)
+            : schemaIterator(schemaIterator), inputObjectIterators(inputObjectIterators)
+        {
+        }
 
-		std::vector < std::string > const &
-		validationErrors();
+        json::const_iterator schemaIterator;
+        std::vector<json::const_iterator> inputObjectIterators;
+    };
 
-		std::vector < std::string > const &
-		validationWarnings();
+    void addVariablesForMonthlyReport(std::string const &reportName);
 
-		json const &
-		getFields( std::string const & objectType, std::string const & objectName );
+    void addRecordToOutputVariableStructure(std::string const &KeyValue, std::string const &VariableName);
 
-		json const &
-		getFields( std::string const & objectType );
+    std::vector<std::string> const &validationErrors();
 
-		inline std::string convertToUpper( std::string s ) {
-			size_t len = s.size();
-			for ( size_t i = 0 ; i < len ; ++i ) {
-				char c = s[ i ];
-				s[i] = ( 'a' <= c && c <= 'z' ) ? c ^ 0x20 : c; // ASCII only
-			}
-			return s;
-		}
+    std::vector<std::string> const &validationWarnings();
 
-		void
-		clear_state();
+    void checkVersionMatch();
 
-		using UnorderedObjectTypeMap = std::unordered_map < std::string, std::string >;
-		using UnorderedObjectCacheMap = std::unordered_map< std::string, ObjectCache >;
-		using UnorderedUnusedObjectMap = std::map< const json::object_t * const, ObjectInfo >;
+    bool processErrors();
 
-		std::unique_ptr< IdfParser > idf_parser;
-		std::unique_ptr< State > state;
-		std::unique_ptr< DataStorage > data;
-		json schema;
-		json epJSON;
-		UnorderedObjectTypeMap caseInsensitiveObjectMap;
-		UnorderedObjectCacheMap objectCacheMap;
-		UnorderedUnusedObjectMap unusedInputs;
-		char s[ 129 ] = { 0 };
+    json const &getFields(std::string const &objectType, std::string const &objectName);
 
-	}; // InputProcessor
+    json const &getFields(std::string const &objectType);
 
-	extern std::unique_ptr< InputProcessor > inputProcessor;
-}
+    inline std::string convertToUpper(std::string s)
+    {
+        size_t len = s.size();
+        for (size_t i = 0; i < len; ++i) {
+            char c = s[i];
+            s[i] = ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ASCII only
+        }
+        return s;
+    }
+
+    void clear_state();
+
+    using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
+    using UnorderedObjectCacheMap = std::unordered_map<std::string, ObjectCache>;
+    using UnorderedUnusedObjectMap = std::map<const json::object_t *const, ObjectInfo>;
+
+    std::unique_ptr<IdfParser> idf_parser;
+    std::unique_ptr<Validation> validation;
+    std::unique_ptr<DataStorage> data;
+    json schema;
+    json epJSON;
+    UnorderedObjectTypeMap caseInsensitiveObjectMap;
+    UnorderedObjectCacheMap objectCacheMap;
+    UnorderedUnusedObjectMap unusedInputs;
+    char s[129] = {0};
+
+}; // InputProcessor
+
+extern std::unique_ptr<InputProcessor> inputProcessor;
+} // namespace EnergyPlus
 
 #endif

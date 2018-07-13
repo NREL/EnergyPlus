@@ -45,18 +45,17 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 //#define TIMER_CPU_TIME
 #define TIMER_F90_EPTIME
 
 #if defined(TIMER_F90_EPTIME)
-#  define TSTART(x) x=epelapsedtime()
-#  define TSTOP(x)  x=epelapsedtime()
-#  define TSTAMP(x) x=epelapsedtime()
+#define TSTART(x) x = epelapsedtime()
+#define TSTOP(x) x = epelapsedtime()
+#define TSTAMP(x) x = epelapsedtime()
 #elif defined(TIMER_CPU_TIME)
-#  define TSTART(x) CPU_TIME(x)
-#  define TSTOP(x)  CPU_TIME(x)
-#  define TSTAMP(x) CPU_TIME(x)
+#define TSTART(x) CPU_TIME(x)
+#define TSTOP(x) CPU_TIME(x)
+#define TSTAMP(x) CPU_TIME(x)
 #else
-  NEED_TO_SPECIFY_TIMER
+NEED_TO_SPECIFY_TIMER
 #endif

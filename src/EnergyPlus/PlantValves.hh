@@ -52,120 +52,91 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace PlantValves {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumTemperingValves;
-	extern Array1D_bool CheckEquipName;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumTemperingValves;
+    extern Array1D_bool CheckEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
+    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
-	// Types
+    // Types
 
-	struct TemperValveData
-	{
-		// Members
-		// user input data
-		std::string Name; // User identifier
-		int PltInletNodeNum; // Node number on the inlet side of the plant
-		int PltOutletNodeNum; // Node number on the outlet side of the plant
-		int PltStream2NodeNum; // Node number on the outlet side of the second stream
-		int PltSetPointNodeNum; // Node number for the setpoint node.
-		int PltPumpOutletNodeNum; // node number for the pump outlet (for flow rate)
-		// Calculated and from elsewhere
-		bool Init; // flag for initializationL true means do the initializations
-		Real64 FlowDivFract; // Fraction of flow sent down diversion path
-		Real64 Stream2SourceTemp; // Temperature [C] of stream 2 being mixed
-		Real64 InletTemp; // Temperature [C] of inlet to valve
-		Real64 SetPointTemp; // setpoint Temperatures [C] at control node.
-		Real64 MixedMassFlowRate; // Flow rate downstream of mixer [kg/s]
-		Real64 DivertedFlowRate; // flow rate through tempering valve's diversion path [kg/s]
-		//loop topology variables
-		int LoopNum;
-		int LoopSideNum;
-		int BranchNum;
-		int CompNum;
+    struct TemperValveData
+    {
+        // Members
+        // user input data
+        std::string Name;         // User identifier
+        int PltInletNodeNum;      // Node number on the inlet side of the plant
+        int PltOutletNodeNum;     // Node number on the outlet side of the plant
+        int PltStream2NodeNum;    // Node number on the outlet side of the second stream
+        int PltSetPointNodeNum;   // Node number for the setpoint node.
+        int PltPumpOutletNodeNum; // node number for the pump outlet (for flow rate)
+        // Calculated and from elsewhere
+        bool Init;                // flag for initializationL true means do the initializations
+        Real64 FlowDivFract;      // Fraction of flow sent down diversion path
+        Real64 Stream2SourceTemp; // Temperature [C] of stream 2 being mixed
+        Real64 InletTemp;         // Temperature [C] of inlet to valve
+        Real64 SetPointTemp;      // setpoint Temperatures [C] at control node.
+        Real64 MixedMassFlowRate; // Flow rate downstream of mixer [kg/s]
+        Real64 DivertedFlowRate;  // flow rate through tempering valve's diversion path [kg/s]
+        // loop topology variables
+        int LoopNum;
+        int LoopSideNum;
+        int BranchNum;
+        int CompNum;
 
-		// Default Constructor
-		TemperValveData() :
-			PltInletNodeNum( 0 ),
-			PltOutletNodeNum( 0 ),
-			PltStream2NodeNum( 0 ),
-			PltSetPointNodeNum( 0 ),
-			PltPumpOutletNodeNum( 0 ),
-			Init( true ),
-			FlowDivFract( 0.0 ),
-			Stream2SourceTemp( 0.0 ),
-			InletTemp( 0.0 ),
-			SetPointTemp( 0.0 ),
-			MixedMassFlowRate( 0.0 ),
-			DivertedFlowRate( 0.0 ),
-			LoopNum( 0 ),
-			LoopSideNum( 0 ),
-			BranchNum( 0 ),
-			CompNum( 0 )
-		{}
+        // Default Constructor
+        TemperValveData()
+            : PltInletNodeNum(0), PltOutletNodeNum(0), PltStream2NodeNum(0), PltSetPointNodeNum(0), PltPumpOutletNodeNum(0), Init(true),
+              FlowDivFract(0.0), Stream2SourceTemp(0.0), InletTemp(0.0), SetPointTemp(0.0), MixedMassFlowRate(0.0), DivertedFlowRate(0.0), LoopNum(0),
+              LoopSideNum(0), BranchNum(0), CompNum(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
 
-	// Object Data
-	extern Array1D< TemperValveData > TemperValve; // dimension to No. of TemperingValve objects
+    // Functions
 
-	// Functions
+    void SimPlantValves(int const CompTypeNum,
+                        std::string const &CompName,
+                        int &CompNum,
+                        bool const RunFlag, // unused1208
+                        bool &InitLoopEquip,
+                        Real64 &MyLoad, // unused1208
+                        Real64 &MaxCap,
+                        Real64 &MinCap,
+                        Real64 &OptCap,
+                        bool const FirstHVACIteration // TRUE if First iteration of simulation
+    );
 
-	void
-	SimPlantValves(
-		int const CompTypeNum,
-		std::string const & CompName,
-		int & CompNum,
-		bool const RunFlag, // unused1208
-		bool & InitLoopEquip,
-		Real64 & MyLoad, // unused1208
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
-	);
+    void GetPlantValvesInput();
 
-	void
-	GetPlantValvesInput();
+    void InitPlantValves(int const CompTypeNum, int const CompNum);
 
-	void
-	InitPlantValves(
-		int const CompTypeNum,
-		int const CompNum
-	);
+    void CalcPlantValves(int const CompTypeNum, int const CompNum);
 
-	void
-	CalcPlantValves(
-		int const CompTypeNum,
-		int const CompNum
-	);
+    void UpdatePlantValves(int const CompTypeNum, int const CompNum);
 
-	void
-	UpdatePlantValves(
-		int const CompTypeNum,
-		int const CompNum
-	);
+    void ReportPlantValves();
 
-	void
-	ReportPlantValves();
+} // namespace PlantValves
 
-} // PlantValves
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

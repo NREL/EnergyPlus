@@ -1,6 +1,6 @@
 \section{Output:Table:SummaryReports}\label{outputtablesummaryreports}
 
-The Output:Table:SummaryReports object controls which predefined tabular reports are produced.~ The easiest option is to specify ``AllSummary'' which will produce all of the summary reports described in this section and does not include the Zone Component Load report. In addition, ``AllMonthly'' will produce all of the monthly reports described. If all predefined reports are needed. ``AllSummaryAndMonthly'' shows all of the summary and monthly predefined reports and does not include the Zone Component Load report. The ``AllSummaryAndSizingPeriod'' option and ``AllSummaryMonthlyAndSizingPeriod'' option are similar and add the Zone Component Load report. Including the Zone Component Load Summary report may increase the simulation run time.
+The Output:Table:SummaryReports object controls which predefined tabular reports are produced.~ The easiest option is to specify ``AllSummary'' which will produce all of the summary reports described in this section and does not include any of the Component Load Summary reports. In addition, ``AllMonthly'' will produce all of the monthly reports described. If all predefined reports are needed. ``AllSummaryAndMonthly'' shows all of the summary and monthly predefined reports and does not include any of the Component Load Summary reports. The ``AllSummaryAndSizingPeriod'' option and ``AllSummaryMonthlyAndSizingPeriod'' option are similar and add the Zone Component Load Summary, AirLoop Component Load Summary, and Facility Component Load Summary reports. Including the Component Load Summary reports will increase the simulation run time.
 
 \subsection{Inputs}\label{inputs-064}
 
@@ -148,12 +148,18 @@ The HVAC Sizing Summary report (key: HVACSizingSummary) produces a report that i
 \item
   System Design Air Flow Rates which includes the following columns for each air loop: the calculated cooling air flow rate, the user specified air flow rate for cooling, the calculated heating air flow rate, the user specified air flow rate for heating.
 \item
+  Coil Sizing Summary which includes the following types of information for each coil: coil type, HVAC location, capacity and flow rates at the zone peak, system peak, and final values, design day name and time for the zone peak and system peak, zone conditions at the system peak, etc. This table is a subset of the Coil Sizing Details table. See the Output Details and Examples document for a complete description of each column.
+\item
   \emph{Note:} values listed as ``calculated'' are the unaltered result of the zone or system sizing calculations, using the design sizing period weather and schedules specified in the input. Values listed as ``user specified'' are either the calculated values modified by global or zone sizing factors or values specified with the \emph{flow/zone} or \emph{flow/system} design air flow method.
 \end{itemize}
 
 \paragraph{Component Sizing Summary}\label{component-sizing-summary}
 
 The Component Sizing Summary report (key: ComponentSizingSummary) produces a report that includes different tables depending on the kinds of HVAC components that exist in the input file. A table is shown for each type of HVAC component that is sized. The table lists the objects of that type of component that appear in the input file and one or more parameters related to that component.~ For example, the AirTerminal:SingleDuct:VAV:Reheat component creates a table showing the maximum air flow rate from the sizing calculations and the maximum reheat water flow rate. Another example is the Fan:VariableVolume object which shows a table with both the maximum and minimum flow rates for each fan based on the results from the sizing calculations.
+
+\paragraph{Coil Sizing Details}\label{coil-sizing-details}
+
+The Coil Sizing Details report (key: CoilSizingDetails) produces a report that includes includes the following types of information for each coil: coil type, HVAC location, capacity and flow rates at the zone peak, system peak, and final values, design day name and time for the zone peak and system peak, zone conditions at the system peak, coil entering and leaving conditions, supply fan information, related plant sizing information, etc. See the Output Details and Examples document for a complete description of each column.
 
 \paragraph{Outdoor Air Summary}\label{outdoor-air-summary}
 
@@ -365,6 +371,8 @@ Contains the time of the peak load and the outside dry bulb and wet bulb tempera
 This table shows some ratios that may be handy in evaluating the results. It contains the percentage of outside air, the airflow per floor area, the airflow per capacity, the floor area per capacity and the capacity per floor area. It also shows the number of people.
 
 The Air Loop Component Summary tables also include tables that indicate the zones included in the aggregated results for heating and cooling.
+
+If the time of the peak load for each Zone for cooling exactly matches the time of the peak load for the AirLoop or Facility than the Estimated Cooling Peak Load Components will represent a sum of the values from the corresponding zones. Likewise the Estimated Heating Peak Load Components will add up for the AirLoop or Facility if the times of the heating peaks exactly match. This is not necessarily the case for Peak Conditions or the Engineering Checks tables. Since the sizing of Airloops is based on the system sizing they usually will be different than the sum of the corresonding zones. 
 
 \paragraph{Standard 62.1 Summary}\label{standard-62.1-summary}
 

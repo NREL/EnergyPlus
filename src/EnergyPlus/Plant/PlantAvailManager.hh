@@ -45,42 +45,30 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PLANTLOCATION_HH_INCLUDED
-#define PLANTLOCATION_HH_INCLUDED
+#ifndef PlantOperationPlantAvailManager_hh_INCLUDED
+#define PlantOperationPlantAvailManager_hh_INCLUDED
 
 namespace EnergyPlus {
+namespace DataPlant {
 
-struct PlantLocation
-{
-	// Members
-	int loopNum;
-	int loopSideNum;
-	int branchNum;
-	int compNum;
+    struct PlantAvailMgrData
+    {
+        // Members
+        int NumAvailManagers;            // number of availability managers for this plant loop
+        int AvailStatus;                 // system availability status
+        int StartTime;                   // cycle on time (in SimTimeSteps)
+        int StopTime;                    // cycle off time (in SimTimeSteps)
+        Array1D_string AvailManagerName; // name of each availability manager
+        Array1D_int AvailManagerType;    // type of availability manager
+        Array1D_int AvailManagerNum;     // index of availability manager
 
-	// Default Constructor
-	PlantLocation() :
-		loopNum( 0 ),
-		loopSideNum( 0 ),
-		branchNum( 0 ),
-		compNum( 0 )
-	{}
+        // Default Constructor
+        PlantAvailMgrData() : NumAvailManagers(0), AvailStatus(0), StartTime(0), StopTime(0)
+        {
+        }
+    };
 
-	// Member Constructor
-	PlantLocation(
-		int const loopNum,
-		int const loopSideNum,
-		int const branchNum,
-		int const compNum
-	) :
-		loopNum( loopNum ),
-		loopSideNum( loopSideNum ),
-		branchNum( branchNum ),
-		compNum( compNum )
-	{}
-
-};
-
-}
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif
