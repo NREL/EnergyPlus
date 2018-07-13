@@ -136,10 +136,16 @@ namespace HVACFan {
         // Mass Flow Rate Control Variables
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
 
+		// FEI
+		bool m_reportFEIFlag; // Indicate whether to calculate and report the Fan Energy Index for the fan
+		Real64 m_designPointFEI; // Fan Energy Index for the fan at the design operating point
+
     private: // methods
         void init();
 
         void set_size();
+
+        void report_fei();
 
         void calcSimpleSystemFan(Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
                                  Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
