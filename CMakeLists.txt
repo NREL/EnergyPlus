@@ -65,6 +65,8 @@ option( BUILD_DOCS "Build LaTeX-pdf documentation" OFF )
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
 option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
 option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
+
+
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
 # we are making python a required dependency, so find it here...starting off by requiring at least 2.7
@@ -180,6 +182,10 @@ configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" 
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
+
+# Include scripts for enabling the testing of 179D compliance
+include(cmake/179DReporting.cmake)
+
 
 if( BUILD_TESTING )
   ADD_SUBDIRECTORY(third_party/gtest)
