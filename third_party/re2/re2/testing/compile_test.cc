@@ -316,4 +316,82 @@ TEST(TestCompile, Bug26705922) {
             reverse);
 }
 
+TEST(TestCompile, Bug35237384) {
+  // Bug in the compiler caused inefficient bytecode to be generated for
+  // nested nullable subexpressions.
+
+  string forward;
+
+  Dump("a**{3,}", Regexp::Latin1|Regexp::NeverCapture, &forward, NULL);
+  EXPECT_EQ("3+ byte [61-61] -> 3\n"
+            "4. nop -> 5\n"
+            "5+ byte [61-61] -> 5\n"
+            "6. nop -> 7\n"
+            "7+ byte [61-61] -> 7\n"
+            "8. match! 0\n",
+            forward);
+
+  Dump("(a*|b*)*{3,}", Regexp::Latin1|Regexp::NeverCapture, &forward, NULL);
+  EXPECT_EQ("3+ nop -> 6\n"
+            "4+ nop -> 8\n"
+            "5. nop -> 21\n"
+            "6+ byte [61-61] -> 6\n"
+            "7. nop -> 3\n"
+            "8+ byte [62-62] -> 8\n"
+            "9. nop -> 3\n"
+            "10+ byte [61-61] -> 10\n"
+            "11. nop -> 21\n"
+            "12+ byte [62-62] -> 12\n"
+            "13. nop -> 21\n"
+            "14+ byte [61-61] -> 14\n"
+            "15. nop -> 18\n"
+            "16+ byte [62-62] -> 16\n"
+            "17. nop -> 18\n"
+            "18+ nop -> 14\n"
+            "19+ nop -> 16\n"
+            "20. match! 0\n"
+            "21+ nop -> 10\n"
+            "22+ nop -> 12\n"
+            "23. nop -> 18\n",
+      forward);
+
+  Dump("((|S.+)+|(|S.+)+|){2}", Regexp::Latin1|Regexp::NeverCapture, &forward, NULL);
+  EXPECT_EQ("3+ nop -> 36\n"
+            "4+ nop -> 31\n"
+            "5. nop -> 33\n"
+            "6+ byte [00-09] -> 8\n"
+            "7. byte [0b-ff] -> 8\n"
+            "8+ nop -> 6\n"
+            "9+ nop -> 29\n"
+            "10. nop -> 28\n"
+            "11+ byte [00-09] -> 13\n"
+            "12. byte [0b-ff] -> 13\n"
+            "13+ nop -> 11\n"
+            "14+ nop -> 26\n"
+            "15. nop -> 28\n"
+            "16+ byte [00-09] -> 18\n"
+            "17. byte [0b-ff] -> 18\n"
+            "18+ nop -> 16\n"
+            "19+ nop -> 36\n"
+            "20. nop -> 33\n"
+            "21+ byte [00-09] -> 23\n"
+            "22. byte [0b-ff] -> 23\n"
+            "23+ nop -> 21\n"
+            "24+ nop -> 31\n"
+            "25. nop -> 33\n"
+            "26+ nop -> 28\n"
+            "27. byte [53-53] -> 11\n"
+            "28. match! 0\n"
+            "29+ nop -> 28\n"
+            "30. byte [53-53] -> 6\n"
+            "31+ nop -> 33\n"
+            "32. byte [53-53] -> 21\n"
+            "33+ nop -> 29\n"
+            "34+ nop -> 26\n"
+            "35. nop -> 28\n"
+            "36+ nop -> 33\n"
+            "37. byte [53-53] -> 16\n",
+      forward);
+}
+
 }  // namespace re2
