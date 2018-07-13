@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <InputProcessing/IdfParser.hh>
-#include <milo/dtoa.hpp>
-#include <milo/itoa.hpp>
+#include <milo/dtoa.h>
+#include <milo/itoa.h>
 
 #ifdef _WIN32
 std::string const NL("\r\n"); // Platform newline
