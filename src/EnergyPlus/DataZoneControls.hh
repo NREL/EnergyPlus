@@ -137,6 +137,8 @@ namespace DataZoneControls {
         bool HeatModeLast;
         bool CoolModeLastSave;
         bool HeatModeLastSave;
+        bool CoolOffFlag;  // Cooling off flag
+        bool HeatOffFlag;  // Heating off flag
 
         // Default Constructor
         ZoneTempControls()
@@ -147,7 +149,8 @@ namespace DataZoneControls {
               OpTempRadiativeFractionSched(0), AdaptiveComfortTempControl(false), AdaptiveComfortModelTypeIndex(0), ZoneOvercoolRange(0.0),
               ZoneOvercoolControl(false), OvercoolCntrlModeScheduled(false), ZoneOvercoolConstRange(0.0), ZoneOvercoolRangeSchedIndex(0),
               ZoneOvercoolControlRatio(0.0), DehumidifyingSchedIndex(0), DeltaTCutSet(0), ZoneThermostatSetPointHi(0.0),
-              ZoneThermostatSetPointLo(0.0), CoolModeLast(false), HeatModeLast(false), CoolModeLastSave(false), HeatModeLastSave(false)
+              ZoneThermostatSetPointLo(0.0), CoolModeLast(false), HeatModeLast(false), CoolModeLastSave(false), HeatModeLastSave(false),
+              CoolOffFlag(false), HeatOffFlag(false)
 
         {
         }

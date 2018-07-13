@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <ConfiguredFunctions.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 
@@ -307,6 +308,80 @@ TEST_F(InputProcessorFixture, parse_empty_fields)
                          //								{"solar_distribution", ""},
                          {"maximum_number_of_warmup_days", 25},
                          {"minimum_number_of_warmup_days", 6}}}}}};
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+    json tmp;
+    for (auto it = expected.begin(); it != expected.end(); ++it) {
+        ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+        for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+            ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+            for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+                ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+            }
+        }
+    }
+}
+
+TEST_F(InputProcessorFixture, parse_two_RunPeriod)
+{
+    std::string const idf(delimited_string({
+        "  RunPeriod,",
+        "    ,                        !- Name",
+        "    1,                       !- Begin Month",
+        "    1,                       !- Begin Day of Month",
+        "    1,                       !- End Month",
+        "    31,                      !- End Day of Month",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+        "",
+        "  RunPeriod,",
+        "    ,                        !- Name",
+        "    7,                       !- Begin Month",
+        "    1,                       !- Begin Day of Month",
+        "    7,                       !- End Month",
+        "    31,                      !- End Day of Month",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+    }));
+
+    json expected = {
+      {"RunPeriod", {
+        {"RunPeriod 1", {
+          {"apply_weekend_holiday_rule", "No"},
+          {"begin_day_of_month", 1},
+          {"begin_month", 1},
+          {"day_of_week_for_start_day", "Tuesday"},
+          {"end_day_of_month", 31},
+          {"end_month", 1},
+          {"use_weather_file_daylight_saving_period", "Yes"},
+          {"use_weather_file_holidays_and_special_days", "Yes"},
+          {"use_weather_file_rain_indicators", "Yes"},
+          {"use_weather_file_snow_indicators", "Yes"}
+        }},
+        {"RunPeriod 2", {
+          {"apply_weekend_holiday_rule", "No"},
+          {"begin_day_of_month", 1},
+          {"begin_month", 7},
+          {"day_of_week_for_start_day", "Tuesday"},
+          {"end_day_of_month", 31},
+          {"end_month", 7},
+          {"use_weather_file_daylight_saving_period", "Yes"},
+          {"use_weather_file_holidays_and_special_days", "Yes"},
+          {"use_weather_file_rain_indicators", "Yes"},
+          {"use_weather_file_snow_indicators", "Yes"}
+        }}
+      }}
+    };
 
     ASSERT_TRUE(process_idf(idf));
     json &epJSON = getEpJSON();
@@ -2891,6 +2966,33 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                                               false, false, false, false, false, true,  false, false, false, false, false, true}),
                            lNumericBlanks));
     EXPECT_EQ(1, IOStatus);
+    // test logical return for ValidateComponent
+    bool IsNotOK = false;
+    ValidateComponent(CurrentModuleObject, "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
+    EXPECT_FALSE(IsNotOK);
+    ValidateComponent(CurrentModuleObject, "Furnace ACDXCoil 2", IsNotOK, CurrentModuleObject);
+    EXPECT_TRUE(IsNotOK);
+    IsNotOK = false;
+    ValidateComponent(CurrentModuleObject + "x", "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
+    EXPECT_TRUE(IsNotOK);
+
+    // test int return for getObjectItemNum
+    int ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, "Furnace ACDXCoil 1");
+    EXPECT_GT(ItemNum, 0); // object type and name are correct, ItemNum is > 0
+    // corrupt object type
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject + "x", "Furnace ACDXCoil 1");
+    EXPECT_EQ(ItemNum, -1); // object type is invalid, ItemNum = -1
+    // corrupt object name
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, "Furnace ACDXCoil 2");
+    EXPECT_EQ(ItemNum, 0); // object name is invalid, ItemNum = 0
+
+    std::string CompValType = "x";
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, CompValType, "Furnace ACDXCoil 1");
+    EXPECT_EQ(ItemNum, 0); // developer error, CompValType is invalid, ItemNum = 0
+
+    CompValType = "indoor_air_inlet_node_name";
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, CompValType, "DX Cooling Coil Air Inlet Node");
+    EXPECT_GT(ItemNum, 0); // Object type is valid, CompValType is valid, CompValType name is valid, ItemNum > 0
 }
 
 TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
