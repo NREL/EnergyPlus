@@ -339,8 +339,8 @@ TEST_F(ZoneUnitarySystemTest, Test_UnitarySys_factory)
         "  2,                              !- Number of Speeds for Cooling",
         "  No,                             !- Single Mode Operation",
         "  ,                               !- No Load Supply Air Flow Rate Ratio",
-        "  1,                              !- Heating Speed 1 Supply Air Flow Ratio",
-        "  1,                              !- Cooling Speed 1 Supply Air Flow Ratio",
+        "  AutoSize,                       !- Heating Speed 1 Supply Air Flow Ratio",
+        "  AutoSize,                       !- Cooling Speed 1 Supply Air Flow Ratio",
         "  AutoSize,                       !- Heating Speed 2 Supply Air Flow Ratio",
         "  AutoSize;                       !- Cooling Speed 2 Supply Air Flow Ratio",
 
@@ -368,7 +368,7 @@ TEST_F(ZoneUnitarySystemTest, Test_UnitarySys_factory)
 
         "Coil:Cooling:DX:MultiSpeed,",
         "  DX Cooling Coil,                !- Name",
-        "  ,                               !- Availability Schedule Name",
+        "  AlwaysOne,                      !- Availability Schedule Name",
         "  Cooling Coil Air Inlet Node,    !- Air Inlet Node Name",
         "  Zone 2 Inlet Node,              !- Air Outlet Node Name",
         "  ,                               !- Condenser Air Inlet Node Name",
@@ -494,6 +494,48 @@ TEST_F(ZoneUnitarySystemTest, Test_UnitarySys_factory)
     // test the object name
     EXPECT_EQ(compName, thisSys->name);
 
+    OutputReportPredefined::SetPredefinedTables();
+
+    ScheduleManager::ProcessScheduleInput(); // read schedules
+
+    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+
+    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+
+    // set up node conditions to test UnitarySystem set point based control
+    // Unitary system air inlet node = 1
+    DataLoopNode::Node(1).MassFlowRate = 1.0;
+    DataLoopNode::Node(1).MassFlowRateMaxAvail = 1.0;
+    // DataLoopNode::Node(1).MassFlowRate = thisSys->designMassFlowRate;
+    // DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->designMassFlowRate; // max avail at fan inlet so fan won't limit flow
+
+    // test COOLING condition
+    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
+    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
+    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+
+    // Cooling coil air inlet node = 3
+    DataLoopNode::Node(3).MassFlowRateMax = 1.0; // max at fan outlet so fan won't limit flow
+    // DataLoopNode::Node(3).MassFlowRateMax = thisSys->designMassFlowRate; // max at fan outlet so fan won't limit flow
+    // Cooling coil air outlet node = 2
+    DataLoopNode::Node(2).TempSetPoint = 17.0;
+
+    // test calling the sim routine
+    int AirLoopNum = 0;
+    int CompIndex = 0; // zero based index
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipFlag = true;
+    DataGlobals::SysSizingCalc = false; // permits unitary system sizing
+    EXPECT_EQ(compName, thisSys->name);
+    thisSys->simulate(compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, ZoneEquipFlag);
+    EXPECT_EQ(compName, thisSys->name);
+
+    // test calling the init routine
+   // mySys.init(FirstHVACIteration);
+
     // calling the factory with an invalid type or name should call ShowFatalError, which will trigger a runtime exception
     // call with a wrong name
     compName = "Test";
@@ -503,16 +545,4 @@ TEST_F(ZoneUnitarySystemTest, Test_UnitarySys_factory)
     compTypeOfNum = 9;
     EXPECT_THROW(mySys.factory(compTypeOfNum, compName), std::runtime_error);
 
-    // test calling the sim routine
-    int AirLoopNum = 1;
-    int CompIndex = 0; // zero based index
-    bool HeatingActive = false;
-    bool CoolingActive = false;
-    int OAUnitNum = 0;
-    Real64 OAUCoilOutTemp = 0.0;
-    bool ZoneEquipFlag = false;
-    thisSys->simulate(compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, ZoneEquipFlag);
-
-    // test calling the init routine
-   // mySys.init(FirstHVACIteration);
 }

@@ -1686,26 +1686,26 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance)
     EXPECT_NEAR(Node(2).Temp, 16.0, 0.001);
 
     // expect design spec data to match inputs
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(1), 0.1000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(1), 0.1010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(2), 0.2000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(2), 0.2010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(3), 0.3000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(3), 0.3010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(4), 0.4000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(4), 0.4010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(5), 0.5000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(5), 0.5010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(6), 0.6000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(6), 0.6010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(7), 0.7000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(7), 0.7010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(8), 0.8000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(8), 0.8010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(9), 0.9000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(9), 0.9010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(10), 1.0000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(10), 1.0000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(1), 0.1000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(1), 0.1010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(2), 0.2000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(2), 0.2010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(3), 0.3000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(3), 0.3010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(4), 0.4000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(4), 0.4010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(5), 0.5000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(5), 0.5010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(6), 0.6000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(6), 0.6010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(7), 0.7000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(7), 0.7010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(8), 0.8000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(8), 0.8010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(9), 0.9000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(9), 0.9010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(10), 1.0000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(10), 1.0000, 0.00001);
 
     // autosized air flow and capacity, unitary sytsem capacity matches coils
     EXPECT_EQ(UnitarySystem(1).MaxCoolAirVolFlow, 1.5);
@@ -1765,9 +1765,9 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance)
 
     // spot check MSHP volume flow rate data
     EXPECT_EQ(UnitarySystem(1).CoolVolumeFlowRate(7),
-              UnitarySystem(1).CoolVolumeFlowRate(10) * HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(7));
+              UnitarySystem(1).CoolVolumeFlowRate(10) * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(7));
     EXPECT_EQ(UnitarySystem(1).HeatVolumeFlowRate(7),
-              UnitarySystem(1).HeatVolumeFlowRate(10) * HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(7));
+              UnitarySystem(1).HeatVolumeFlowRate(10) * HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(7));
 }
 
 TEST_F(ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl)
@@ -5818,15 +5818,15 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
     EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(3), 0.094120, 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(3), UnitarySystem(1).CoolVolumeFlowRate(3), 0.000001);
 
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(1), 0.333333, 0.000001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(2), 0.666666, 0.000001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(3), 1.000000, 0.000001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(1), 0.333333, 0.000001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(2), 0.666666, 0.000001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(3), 1.000000, 0.000001);
 
-    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(1), UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(1),
+    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(1), UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(1),
                 0.000001);
-    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(2), UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(2),
+    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(2), UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(2),
                 0.000001);
-    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(3), UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(3),
+    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(3), UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(3),
                 0.000001);
 
     // 10 heating speeds with autosized MSHP design spec yielding equally distributed air flow at 1/10 per speed
@@ -6659,61 +6659,61 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
     Node(InletNode).MassFlowRateMaxAvail = UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * StdRhoAir;
     Iter = 4;
     UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHP(1).CoolingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     Iter = 1;
     UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHP(1).CoolingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     Iter = 2;
     UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHP(1).CoolingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     Iter = 3;
     UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHP(1).CoolingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
 
     Iter = 4;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHP(1).HeatingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
     Iter = 1;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHP(1).HeatingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
     Iter = 2;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHP(1).HeatingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
     Iter = 3;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHP(1).HeatingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
 
     UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).CoolMassFlowRate(1);
 

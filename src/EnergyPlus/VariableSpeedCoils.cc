@@ -4099,7 +4099,7 @@ namespace VariableSpeedCoils {
         using CurveManager::CurveValue;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using HVACUnitarySystem::DesignSpecMSHP;
+        using HVACUnitarySystem::DesignSpecMSHPLegacy;
 
         // Locals
         Real64 QLoadTotal; // placeholder for calculating SHR
@@ -4677,15 +4677,15 @@ namespace VariableSpeedCoils {
             rhoA = PsyRhoAirFnPbTdbW(OutBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
             // HPWH, the mass flow rate will be updated by a revised entering air density
 
-            if (VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > 0 && allocated(HVACUnitarySystem::DesignSpecMSHP)) {
+            if (VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > 0 && allocated(HVACUnitarySystem::DesignSpecMSHPLegacy)) {
                 if (VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
-                    if (HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).NumOfSpeedCooling !=
+                    if (HVACUnitarySystem::DesignSpecMSHPLegacy(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).NumOfSpeedCooling !=
                         VarSpeedCoil(DXCoilNum).NumOfSpeeds) {
                         ShowFatalError("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil(DXCoilNum).Name +
                                        " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object.");
                     }
                 } else {
-                    if (HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).NumOfSpeedHeating !=
+                    if (HVACUnitarySystem::DesignSpecMSHPLegacy(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).NumOfSpeedHeating !=
                         VarSpeedCoil(DXCoilNum).NumOfSpeeds) {
                         ShowFatalError("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil(DXCoilNum).Name +
                                        " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object.");
@@ -4699,11 +4699,11 @@ namespace VariableSpeedCoils {
                     if (VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
                         VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
                             VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
-                            HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).CoolingVolFlowRatio(Mode);
+                            HVACUnitarySystem::DesignSpecMSHPLegacy(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).CoolingVolFlowRatio(Mode);
                     } else {
                         VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
                             VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
-                            HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).HeatingVolFlowRatio(Mode);
+                            HVACUnitarySystem::DesignSpecMSHPLegacy(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).HeatingVolFlowRatio(Mode);
                     }
                     VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
                         VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);

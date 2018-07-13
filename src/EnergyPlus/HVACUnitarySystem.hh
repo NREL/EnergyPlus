@@ -157,7 +157,7 @@ namespace HVACUnitarySystem {
 
     // Types
 
-    struct DesignSpecMSHPData
+    struct DesignSpecMSHPLegacyData
     {
         // Members
         std::string Name;                    // Name of the design specification MSHP
@@ -169,7 +169,7 @@ namespace HVACUnitarySystem {
         Real64 NoLoadAirFlowRateRatio;       // fraction of supply air flow rate multiplier
 
         // Default Constructor
-        DesignSpecMSHPData() : NumOfSpeedCooling(0), NumOfSpeedHeating(0), SingleModeFlag(false), NoLoadAirFlowRateRatio(1.0)
+        DesignSpecMSHPLegacyData() : NumOfSpeedCooling(0), NumOfSpeedHeating(0), SingleModeFlag(false), NoLoadAirFlowRateRatio(1.0)
         {
         }
     };
@@ -327,7 +327,7 @@ namespace HVACUnitarySystem {
         Array1D<Real64> MSHeatingSpeedRatio; // Fan speed ratio in heating mode
         Array1D<Real64> MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
         Real64 NoHeatCoolSpeedRatio;         // Fan speed ratio when no cooling or heating
-        int DesignSpecMSHPIndex;             // Index to design specification multispeed heat pump object
+        int DesignSpecMSHPLegacyIndex;             // Index to design specification multispeed heat pump object
         bool MultiSpeedCoolingCoil;          // TRUE when cooling coil multispeed
         bool MultiSpeedHeatingCoil;          // TRUE when heating coil multispeed
         bool VarSpeedCoolingCoil;            // TRUE when cooling coil variable speed
@@ -514,7 +514,7 @@ namespace HVACUnitarySystem {
               DesiredOutletHumRat(1.0), CoolingPartLoadFrac(0.0), HeatingPartLoadFrac(0.0), SuppHeatPartLoadFrac(0.0), SupHeaterLoad(0.0),
               SenLoadLoss(0.0), LatLoadLoss(0.0), SensibleLoadMet(0.0), LatentLoadMet(0.0), InitHeatPump(true), WaterCyclingMode(0), HeatCoolMode(0),
               NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0), IdleVolumeAirRate(0), IdleMassFlowRate(0), CheckFanFlow(true),
-              NoHeatCoolSpeedRatio(1.0), DesignSpecMSHPIndex(0), MultiSpeedCoolingCoil(false), MultiSpeedHeatingCoil(false),
+              NoHeatCoolSpeedRatio(1.0), DesignSpecMSHPLegacyIndex(0), MultiSpeedCoolingCoil(false), MultiSpeedHeatingCoil(false),
               VarSpeedCoolingCoil(false), VarSpeedHeatingCoil(false), CoolingSpeedNum(0), HeatingSpeedNum(0), CoolingSpeedRatio(1.0),
               CoolingFanSpeedRatio(1.0), HeatingSpeedRatio(1.0), HeatingFanSpeedRatio(1.0), CoolingCycRatio(0.0), HeatingCycRatio(0.0),
               PartLoadFrac(0.0), CompPartLoadRatio(0.0), ElecPower(0.0), ElecPowerConsumption(0.0), TotCoolEnergyRate(0.0), SensCoolEnergyRate(0.0),
@@ -563,7 +563,7 @@ namespace HVACUnitarySystem {
     };
 
     // Object Data
-    extern Array1D<DesignSpecMSHPData> DesignSpecMSHP;
+    extern Array1D<DesignSpecMSHPLegacyData> DesignSpecMSHPLegacy;
     extern Array1D<UnitarySystemData> UnitarySystem;
     extern Array1D<UnitarySystemNumericFieldData> UnitarySystemNumericFields;
 
