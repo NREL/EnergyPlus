@@ -1697,6 +1697,12 @@ namespace ReportSizingManager {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                         } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
+                        } else if (ZoneEqPTUnit) {
+                            if (ZoneEqSizing(CurZoneEqNum).OAVolFlow > 0.0) {
+                                CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
+                            } else {
+                                CoilInTemp = FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak;
+                            }
                         } else {
                             CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
                         }

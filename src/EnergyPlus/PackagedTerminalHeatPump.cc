@@ -310,6 +310,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         ZoneEqDXCoil = true;
+        ZoneEqPTUnit = true;
 
         // Initialize the packaged terminal heat pump
         InitPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
@@ -320,6 +321,7 @@ namespace PackagedTerminalHeatPump {
         ReportPTUnit(PTUnitNum);
 
         ZoneEqDXCoil = false;
+        ZoneEqPTUnit = false;
     }
 
     void SimPTUnit(int const PTUnitNum,           // number of the current Packaged Terminal Heat Pump being simulated
@@ -4848,6 +4850,7 @@ namespace PackagedTerminalHeatPump {
         DataZoneNumber = PTUnit(PTUnitNum).ZonePtr;
 
         if (CurZoneEqNum > 0) {
+
             if (PTUnit(PTUnitNum).HVACSizingIndex > 0) {
                 zoneHVACIndex = PTUnit(PTUnitNum).HVACSizingIndex;
                 SizingMethod = CoolingAirflowSizing;
