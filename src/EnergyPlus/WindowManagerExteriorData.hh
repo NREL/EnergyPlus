@@ -166,10 +166,15 @@ namespace WindowManager {
         std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(FenestrationCommon::WavelengthRange const t_Range,
                                                                                    int const t_ConstrNum);
 
+        static void clearState();
+
+        
     private:
         CWindowConstructionsSimplified();
 
         IGU_Layers getLayers(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
+
+        static std::unique_ptr<CWindowConstructionsSimplified> p_inst;
 
         // Need separate layer properties for Solar and Visible range
         std::map<FenestrationCommon::WavelengthRange, Layers_Map> m_Layers;

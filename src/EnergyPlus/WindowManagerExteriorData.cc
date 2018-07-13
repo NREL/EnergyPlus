@@ -277,8 +277,10 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     CWindowConstructionsSimplified &CWindowConstructionsSimplified::instance()
     {
-        static CWindowConstructionsSimplified p_inst;
-        return p_inst;
+        if(p_inst == nullptr) {
+            p_inst = std::unique_ptr<CWindowConstructionsSimplified>(new CWindowConstructionsSimplified());
+        }
+        return *p_inst;
     }
 
     CWindowConstructionsSimplified::CWindowConstructionsSimplified()
@@ -315,6 +317,10 @@ namespace WindowManager {
         }
 
         return m_Equivalent.at(std::make_pair(t_Range, t_ConstrNum));
+    }
+
+    void CWindowConstructionsSimplified::clearState() {
+        p_inst = nullptr;
     }
 
     IGU_Layers CWindowConstructionsSimplified::getLayers(WavelengthRange const t_Range, int const t_ConstrNum) const

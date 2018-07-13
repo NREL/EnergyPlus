@@ -83,6 +83,7 @@
 #include <WindowManager.hh>
 #include <WindowManagerExteriorOptical.hh>
 #include <WindowManagerExteriorThermal.hh>
+#include <WindowManagerExteriorData.hh>
 #include <WindowModel.hh>
 
 namespace EnergyPlus {
@@ -415,6 +416,7 @@ namespace WindowManager {
         rfvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
         rbvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
         CosPhiIndepVar = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+        CWindowConstructionsSimplified::clearState();
     }
 
     void InitWindowOpticalCalculations()
