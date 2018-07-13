@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <ConfiguredFunctions.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 
@@ -2891,6 +2892,33 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                                               false, false, false, false, false, true,  false, false, false, false, false, true}),
                            lNumericBlanks));
     EXPECT_EQ(1, IOStatus);
+    // test logical return for ValidateComponent
+    bool IsNotOK = false;
+    ValidateComponent(CurrentModuleObject, "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
+    EXPECT_FALSE(IsNotOK);
+    ValidateComponent(CurrentModuleObject, "Furnace ACDXCoil 2", IsNotOK, CurrentModuleObject);
+    EXPECT_TRUE(IsNotOK);
+    IsNotOK = false;
+    ValidateComponent(CurrentModuleObject + "x", "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
+    EXPECT_TRUE(IsNotOK);
+
+    // test int return for getObjectItemNum
+    int ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, "Furnace ACDXCoil 1");
+    EXPECT_GT(ItemNum, 0); // object type and name are correct, ItemNum is > 0
+    // corrupt object type
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject + "x", "Furnace ACDXCoil 1");
+    EXPECT_EQ(ItemNum, -1); // object type is invalid, ItemNum = -1
+    // corrupt object name
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, "Furnace ACDXCoil 2");
+    EXPECT_EQ(ItemNum, 0); // object name is invalid, ItemNum = 0
+
+    std::string CompValType = "x";
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, CompValType, "Furnace ACDXCoil 1");
+    EXPECT_EQ(ItemNum, 0); // developer error, CompValType is invalid, ItemNum = 0
+
+    CompValType = "indoor_air_inlet_node_name";
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, CompValType, "DX Cooling Coil Air Inlet Node");
+    EXPECT_GT(ItemNum, 0); // Object type is valid, CompValType is valid, CompValType name is valid, ItemNum > 0
 }
 
 TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)

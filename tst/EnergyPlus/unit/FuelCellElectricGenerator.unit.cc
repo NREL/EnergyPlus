@@ -64,7 +64,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest_LowInletEnthalySover1)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
 
         "ElectricLoadCenter:Distribution,",
         "Electric Load Center Distribution 1,    !- Name",

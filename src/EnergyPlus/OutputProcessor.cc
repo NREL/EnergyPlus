@@ -82,8 +82,9 @@
 #include <ScheduleManager.hh>
 #include <SortAndStringUtilities.hh>
 #include <UtilityRoutines.hh>
-#include <milo/dtoa.hpp>
-#include <milo/itoa.hpp>
+#include <milo/dtoa.h>
+#include <milo/itoa.h>
+#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -638,7 +639,7 @@ namespace OutputProcessor {
         for (Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
             if (ReqRepVars(Loop).Key.empty()) continue;
             if (!UtilityRoutines::SameString(ReqRepVars(Loop).VarName, VariableName)) continue;
-            if (!RE2::FullMatch(KeyedValue, "(?i)" + ReqRepVars(Loop).Key)) continue;
+            if (!(UtilityRoutines::SameString(ReqRepVars(Loop).Key, KeyedValue) || RE2::FullMatch(KeyedValue, "(?i)" + ReqRepVars(Loop).Key))) continue;
 
             //   A match.  Make sure doesn't duplicate
 
