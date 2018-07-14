@@ -848,7 +848,7 @@ namespace HWBaseboardRadiator {
             WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
 
             rho = GetDensityGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                   CWInitConvTemp,
+                                   DataGlobals::HWInitConvTemp,
                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                    RoutineName);
 
@@ -1080,7 +1080,7 @@ namespace HWBaseboardRadiator {
                                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                                    RoutineName);
                         rho = GetDensityGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                               CWInitConvTemp,
+                                               HWInitConvTemp,
                                                PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                                RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -1127,7 +1127,7 @@ namespace HWBaseboardRadiator {
                 } else if (HWBaseboard(BaseboardNum).RatedCapacity == AutoSize || HWBaseboard(BaseboardNum).RatedCapacity == 0.0) {
                     DesCoilLoad = RatedCapacityDes;
                     rho = GetDensityGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                           CWInitConvTemp,
+                                           DataGlobals::HWInitConvTemp,
                                            PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                            RoutineNameFull);
                     WaterMassFlowRateStd = HWBaseboard(BaseboardNum).WaterVolFlowRateMax * rho;
