@@ -965,7 +965,7 @@ namespace FourPipeBeam {
         }
         if (this->beamHeatingPresent) {
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->hWLocation.loopNum).FluidName,
-                                                    DataGlobals::CWInitConvTemp,
+                                                    DataGlobals::HWInitConvTemp,
                                                     DataPlant::PlantLoop(this->hWLocation.loopNum).FluidIndex,
                                                     routineName);
             this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
@@ -1040,7 +1040,7 @@ namespace FourPipeBeam {
         if (vDotDesignHWWasAutosized) {
             this->vDotDesignHW = this->vDotNormRatedHW * this->totBeamLength;
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->hWLocation.loopNum).FluidName,
-                                                    DataGlobals::CWInitConvTemp,
+                                                    DataGlobals::HWInitConvTemp,
                                                     DataPlant::PlantLoop(this->hWLocation.loopNum).FluidIndex,
                                                     routineName);
             this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
