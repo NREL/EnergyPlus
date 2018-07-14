@@ -177,9 +177,15 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 3;
     bool ErrorsFound = false;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode =
-        NodeInputManager::GetOnlySingleNode("Zone 1 Node", ErrorsFound, "Zone", "BeamTest", DataLoopNode::NodeType_Air,
-                                            DataLoopNode::NodeConnectionType_ZoneNode, 1, DataLoopNode::ObjectIsNotParent, "Test zone node");
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode("Zone 1 Node",
+                                                                                         ErrorsFound,
+                                                                                         "Zone",
+                                                                                         "BeamTest",
+                                                                                         DataLoopNode::NodeType_Air,
+                                                                                         DataLoopNode::NodeConnectionType_ZoneNode,
+                                                                                         1,
+                                                                                         DataLoopNode::ObjectIsNotParent,
+                                                                                         "Test zone node");
 
     DataDefineEquip::NumAirDistUnits = 1;
     DataDefineEquip::AirDistUnit.allocate(1);
