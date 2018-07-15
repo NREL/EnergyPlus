@@ -166,6 +166,7 @@ namespace UnitarySystems {
         UnitarySys *compPointer; // don't need this here
         std::string unitarySystemName;
         std::string unitType;
+        int unitarySysNum;
         bool myGetInputSuccessfulFlag;
         bool thisSysInputShouldBeGotten;
         int sysAvailSchedPtr; // Pointer to the availability schedule
@@ -257,6 +258,7 @@ namespace UnitarySystems {
         Real64 maxSuppCoilFluidFlow;
         int suppHeatCoilIndex;
         int suppHeatControlNodeNum;
+        Real64 supHeaterLoad;
         int coolingSAFMethod;
         int heatingSAFMethod;
         int noCoolHeatSAFMethod;
@@ -529,7 +531,14 @@ namespace UnitarySystems {
                                       Optional_bool HXUnitOn = _                 // Flag to control HX for HXAssisted Cooling Coil
         );
 
-        void updateUnitarySystemControl(int const AirLoopNum,    // number of the current air loop being simulated
+        void controlUnitarySystemtoLoad(int const AirLoopNum,                      // Primary air loop number
+                                        bool const FirstHVACIteration,             // True when first HVAC iteration
+                                        int &CompOn,                               // Determines if compressor is on or off
+                                        Optional<Real64 const> OAUCoilOutTemp = _, // the coil inlet temperature of OutdoorAirUnit
+                                        Optional_bool HXUnitOn = _                 // Flag to control HX for HXAssisted Cooling Coil
+        );
+
+        void updateUnitarySystemControl(int const AirLoopNum,  // number of the current air loop being simulated
                                         int const OutNode,       // coil outlet node number
                                         int const ControlNode,   // control node number
                                         Real64 &OnOffAirFlowRatio,
@@ -539,7 +548,15 @@ namespace UnitarySystems {
                                         Optional<Real64 const> MaxOutletTemp = _ // limits heating coil outlet temp [C]
         );
 
-        void initLoadBasedControl(int const AirLoopNum,    // number of the current air loop being simulated
+        void controlUnitarySystemOutput(int const AirLoopNum,          // Index to air loop
+                                        bool const FirstHVACIteration, // True when first HVAC iteration
+                                        Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
+                                        Real64 const ZoneLoad,
+                                        Real64 &FullSensibleOutput,
+                                        Optional_bool HXUnitOn = _, // Flag to control HX for HXAssisted Cooling Coil
+                                        Optional_int CompOn = _);
+
+        void initLoadBasedControl(int const AirLoopNum, // number of the current air loop being simulated
                                   bool const FirstHVACIteration,
                                   Real64 &OnOffAirFlowRatio,
                                   Real64 &ZoneLoad
@@ -670,6 +687,14 @@ namespace UnitarySystems {
 
         Real64 HeatingCoilVarSpeedCycResidual(Real64 const CycRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                               std::vector<Real64> const &Par // par(1) = DX coil number
+        );
+
+        Real64 calcUnitarySystemLoadResidual(Real64 const PartLoadRatio, // DX cooling coil part load ratio
+                                             std::vector<Real64> const &Par   // Function parameters
+        );
+
+        void setSpeedVariables(bool const SensibleLoad,   // True when meeting a sensible load (not a moisture load)
+                               Real64 const PartLoadRatio // operating PLR
         );
     };
 
