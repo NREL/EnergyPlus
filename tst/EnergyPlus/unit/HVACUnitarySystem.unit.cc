@@ -124,7 +124,6 @@ using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
 
 using DataEnvironment::OutDryBulbTemp;
 using General::TrimSigDigits;
-using General::TrimSigDigits;
 using WaterCoils::SimpleAnalysis;
 using WaterCoils::WaterCoil;
 using WaterCoils::WaterCoil_Cooling;
@@ -2359,9 +2358,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTest
     int iCoolingSizingType(1);
     int iHeatingSizingType(1);
     bool FirstHVACIteration(true);
-    Array1D_int SizingTypes({DataSizing::None, DataSizing::SupplyAirFlowRate, DataSizing::FlowPerFloorArea,
-                             DataSizing::FractionOfAutosizedCoolingAirflow, DataSizing::FractionOfAutosizedHeatingAirflow,
-                             DataSizing::FlowPerCoolingCapacity, DataSizing::FlowPerHeatingCapacity});
+    Array1D_int SizingTypes({DataSizing::None,
+                             DataSizing::SupplyAirFlowRate,
+                             DataSizing::FlowPerFloorArea,
+                             DataSizing::FractionOfAutosizedCoolingAirflow,
+                             DataSizing::FractionOfAutosizedHeatingAirflow,
+                             DataSizing::FlowPerCoolingCapacity,
+                             DataSizing::FlowPerHeatingCapacity});
 
     //	int const None( 1 );
     //	int const SupplyAirFlowRate( 2 );
@@ -2863,8 +2866,14 @@ TEST_F(EnergyPlusFixture, HVACUnitarySystem_CalcUnitaryCoolingSystem)
 
     WaterCoil(1).TotWaterCoolingCoilRate = 0.0;
 
-    CalcUnitaryCoolingSystem(UnitarySysNum, FirstHVACIteration, AirLoopNum, UnitarySystem(UnitarySysNum).CoolingCycRatio, CompOn, OnOffAirFlowRatio,
-                             CoilCoolHeatRat, false);
+    CalcUnitaryCoolingSystem(UnitarySysNum,
+                             FirstHVACIteration,
+                             AirLoopNum,
+                             UnitarySystem(UnitarySysNum).CoolingCycRatio,
+                             CompOn,
+                             OnOffAirFlowRatio,
+                             CoilCoolHeatRat,
+                             false);
 
     EXPECT_NEAR(27530.0, WaterCoil(1).TotWaterCoolingCoilRate, 2.0);
 }
@@ -5808,7 +5817,8 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
     EXPECT_EQ(UnitarySystem(1).DesignCoolingCapacity, DXCoil(UnitarySystem(1).CoolingCoilIndex).MSRatedTotCap(UnitarySystem(1).NumOfSpeedCooling));
     // 64-bit MSVS shows these next variables as identical yet other compilers show diff's, changing ASSERT_EQ to EXPECT_NEAR
     EXPECT_NEAR(UnitarySystem(1).DesignHeatingCapacity,
-                VarSpeedCoil(UnitarySystem(1).HeatingCoilIndex).MSRatedTotCap(UnitarySystem(1).NumOfSpeedHeating), 0.001);
+                VarSpeedCoil(UnitarySystem(1).HeatingCoilIndex).MSRatedTotCap(UnitarySystem(1).NumOfSpeedHeating),
+                0.001);
 
     // 3 cooling speeds with autosized MSHP design spec yielding equally distributed air flow at 1/3 per speed
     EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(1), 0.031373, 0.000001);
@@ -5822,11 +5832,14 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
     EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(2), 0.666666, 0.000001);
     EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(3), 1.000000, 0.000001);
 
-    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(1), UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(1),
+    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(1),
+                UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(1),
                 0.000001);
-    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(2), UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(2),
+    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(2),
+                UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(2),
                 0.000001);
-    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(3), UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(3),
+    EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(3),
+                UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(3),
                 0.000001);
 
     // 10 heating speeds with autosized MSHP design spec yielding equally distributed air flow at 1/10 per speed
@@ -8347,9 +8360,10 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     // these next 2 variables are used to modulate the coil PLR irrespective of the fan PLR - they are non-zero when the model is called and CAN be 0
     // when load exceeds capacity the ASHRAE model is the only model that uses these variables, and flow is determined by Heat/CoolWaterFlowRatio *
     // max other models will show 0 here and in this case water flow will equal max flow * PartLoadRatio
-    EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.0135, 0.0001); // heating coil water flow ratio, heating coil is on
-    EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.0, 0.0001);    // cooling coil water flow ratio, cooling coil is off
-    EXPECT_NEAR(UnitarySystem(1).FanPartLoadRatio, UnitarySystem(1).MaxNoCoolHeatAirMassFlow / UnitarySystem(1).MaxHeatAirMassFlow,
+    EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.01374, 0.0001); // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.0, 0.0001);     // cooling coil water flow ratio, cooling coil is off
+    EXPECT_NEAR(UnitarySystem(1).FanPartLoadRatio,
+                UnitarySystem(1).MaxNoCoolHeatAirMassFlow / UnitarySystem(1).MaxHeatAirMassFlow,
                 0.0001);                                                    // fan PLR at minimum speed
     EXPECT_LT(Node(OutletNode).Temp, UnitarySystem(1).DesignMaxOutletTemp); // outlet temperature does not exceed max limit
 
@@ -8375,9 +8389,10 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     EXPECT_GT(Node(InletNode).MassFlowRate, UnitarySystem(1).MaxNoCoolHeatAirMassFlow);       // air flow higher than low speed fan flow
     EXPECT_LT(Node(InletNode).MassFlowRate, UnitarySystem(1).MaxHeatAirMassFlow);             // air flow lower than high speed fan flow
     EXPECT_DOUBLE_EQ(Node(InletNode).MassFlowRate, Node(OutletNode).MassFlowRate);            // inlet = outlet flow rate
-    EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.0655, 0.0001);                     // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.0667, 0.0001);                     // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.0, 0.0001);                        // cooling coil water flow ratio, cooling coil is off
-    EXPECT_NEAR(UnitarySystem(1).FanPartLoadRatio, 0.6197,
+    EXPECT_NEAR(UnitarySystem(1).FanPartLoadRatio,
+                0.6198,
                 0.0001); // fan PLR above minimum and below maximum speed (0-1 means fraction between no load flow and full flow)
     EXPECT_NEAR(Node(OutletNode).Temp, UnitarySystem(1).DesignMaxOutletTemp, 0.01); // outlet temperature modulated to meet max limit
 
@@ -8401,7 +8416,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     // test model performance
     EXPECT_NEAR(ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 10.0); // Watts
     EXPECT_DOUBLE_EQ(Node(InletNode).MassFlowRate, Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
-    EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.2489, 0.001);                       // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.2532, 0.001);                       // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.0, 0.0001);                         // cooling coil water flow ratio, cooling coil is off
     EXPECT_EQ(UnitarySystem(1).FanPartLoadRatio, 1.0); // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
     EXPECT_GT(Node(OutletNode).Temp, UnitarySystem(1).DesignMaxOutletTemp); // outlet temperature exceeds max limit
@@ -8425,10 +8440,11 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
 
     // test model performance
     EXPECT_GT(ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);                            // Watts - system CANNOT meet load
-    EXPECT_NEAR(Qsens_sys, 11330.43, 0.1);                                                                        // system maxed out on capacity
+    EXPECT_NEAR(Qsens_sys, 11316.64, 0.1);                                                                        // system maxed out on capacity
     EXPECT_DOUBLE_EQ(Node(InletNode).MassFlowRate, Node(OutletNode).MassFlowRate);                                // inlet = outlet flow rate
     EXPECT_EQ(Node(UnitarySystem(1).HeatCoilFluidInletNode).MassFlowRate, UnitarySystem(1).MaxHeatCoilFluidFlow); // water coil water flow rate at max
-    EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.0,
+    EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio,
+                0.0,
                 0.0001); // heating coil water flow ratio not set, heating coil is on since function returned when load exceeded capacity
     EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.0, 0.0001); // cooling coil water flow ratio, cooling coil is off
     EXPECT_EQ(UnitarySystem(1).FanPartLoadRatio, 1.0); // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
@@ -8473,7 +8489,8 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     EXPECT_DOUBLE_EQ(Node(InletNode).MassFlowRate, Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
     EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.0, 0.0001);                         // heating coil water flow ratio, heating coil is off
     EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.103, 0.001);                        // cooling coil water flow ratio, cooling coil is on
-    EXPECT_NEAR(UnitarySystem(1).FanPartLoadRatio, UnitarySystem(1).MaxNoCoolHeatAirMassFlow / UnitarySystem(1).MaxCoolAirMassFlow,
+    EXPECT_NEAR(UnitarySystem(1).FanPartLoadRatio,
+                UnitarySystem(1).MaxNoCoolHeatAirMassFlow / UnitarySystem(1).MaxCoolAirMassFlow,
                 0.0001);                                                    // fan PLR at minimum speed
     EXPECT_GT(Node(OutletNode).Temp, UnitarySystem(1).DesignMinOutletTemp); // outlet temperature is not below min limit
 
@@ -8550,7 +8567,8 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     EXPECT_DOUBLE_EQ(Node(InletNode).MassFlowRate, Node(OutletNode).MassFlowRate);                                // inlet = outlet flow rate
     EXPECT_EQ(Node(UnitarySystem(1).CoolCoilFluidInletNode).MassFlowRate, UnitarySystem(1).MaxCoolCoilFluidFlow); // water coil water flow rate at max
     EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.0, 0.0001); // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.0,
+    EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio,
+                0.0,
                 0.001); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
     EXPECT_NEAR(UnitarySystem(1).FanPartLoadRatio, 1.0, 0.0001);            // fan PLR at maximum speed
     EXPECT_LT(Node(OutletNode).Temp, UnitarySystem(1).DesignMinOutletTemp); // outlet temperature below minimum temperature limit

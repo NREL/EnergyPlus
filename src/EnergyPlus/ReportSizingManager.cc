@@ -1280,7 +1280,8 @@ namespace ReportSizingManager {
                     }
                 } else if (SizingType == CoolingWaterflowSizing) {
                     CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
-                    Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                    Cp = GetSpecificHeatGlycol(
+                        PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     rho = GetDensityGlycol(
                         PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
@@ -1309,7 +1310,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         DesCoilLoad = AutosizeDes * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -1320,7 +1321,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         DesCoilLoad = AutosizeDes * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -1351,7 +1352,7 @@ namespace ReportSizingManager {
                                                        PlantLoop(DataWaterLoopNum).FluidIndex,
                                                        CallingRoutine);
                             rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                                   DataGlobals::CWInitConvTemp,
+                                                   DataGlobals::HWInitConvTemp,
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                             AutosizeDes = DesCoilLoad / (DataWaterCoilSizHeatDeltaT * Cp * rho);
@@ -1436,8 +1437,10 @@ namespace ReportSizingManager {
                     bCheckForZero = false;
                 } else if (SizingType == CoolingWaterDesAirOutletTempSizing) {
                     if (TermUnitIU) {
-                        Cp =
-                            GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::CWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
                                                DataGlobals::CWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
@@ -1761,7 +1764,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         NominalCapacityDes = DesMassFlow * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -1772,7 +1775,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         NominalCapacityDes = DesMassFlow * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -2296,8 +2299,10 @@ namespace ReportSizingManager {
                         CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
                     }
                     if (DataCapacityUsedForSizing >= SmallLoad) {
-                        Cp =
-                            GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::CWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
                                                DataGlobals::CWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
@@ -2315,7 +2320,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         AutosizeDes = DataCapacityUsedForSizing / (DataWaterCoilSizHeatDeltaT * Cp * rho);

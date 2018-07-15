@@ -129,7 +129,6 @@ namespace UnitarySystems {
             controlTypeLoad,
             controlTypeSetpoint,
             controlTypeCCMASHRAE,
-            default = controlTypeNone
         };
 
         enum dehumCtrlTypeEnum : int
@@ -137,7 +136,6 @@ namespace UnitarySystems {
             dehumidControl_None,
             dehumidControl_CoolReheat,
             dehumidControl_Multimode,
-            //            default = dehumidControl_None
         };
 
         enum fanOpModeEnum : int
@@ -431,6 +429,8 @@ namespace UnitarySystems {
         int MSpdLatPLRIterIndex;                        // used in MultiSpeed calculations
         int MSpdCycLatPLRIter;                          // used in MultiSpeed calculations
         int MSpdCycLatPLRIterIndex;                     // used in MultiSpeed calculations
+        int maxIterIndex;
+        int regulaFalsiFailedIndex;
         int LatMaxIterIndex;                            // used in PLR calculations for moisture load
         int LatRegulaFalsIFailedIndex;                  // used in PLR calculations for moisture load
                                                         // EMS variables
