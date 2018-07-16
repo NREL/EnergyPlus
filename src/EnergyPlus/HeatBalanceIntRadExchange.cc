@@ -267,11 +267,18 @@ namespace HeatBalanceIntRadExchange {
             auto &zone_info(ZoneInfo(ZoneNum));
             auto &zone_ScriptF(zone_info.ScriptF); // Tuned Transposed
             auto &zone_SurfacePtr(zone_info.SurfacePtr);
+            auto &surface_temp(zone_info.surfaceTemp);
+            auto &surface_emiss(zone_info.Emissivity);
+            // auto &surface_temp_interactions(zone_info.surfaceTempInteractions);
             int const n_zone_Surfaces(zone_info.NumOfSurfaces);
             size_type const s_zone_Surfaces(n_zone_Surfaces);
 
+            // Map<MatrixXd> surface_temp_interactions(zone_info.surfaceTempInteractions.data(), n_zone_Surfaces, n_zone_Surfaces);
+            // Map<ArrayXd> surface_emiss(zone_info.surfaceEmiss.data(), n_zone_Surfaces);
+            // Map<ArrayXd> surface_temp(zone_info.surfaceTemp.data(), n_zone_Surfaces);
+
             // Map<ArrayXd> emissivity(zone_info.Emissivity.data(), n_zone_Surfaces);
-            MatrixXd surface_temp_interactions(n_zone_Surfaces, n_zone_Surfaces);
+            // MatrixXd surface_temp_interactions(n_zone_Surfaces, n_zone_Surfaces);
 
             // Calculate ScriptF if first time step in environment and surface heat-balance iterations not yet started;
             // recalculate ScriptF if status of window interior shades or blinds has changed from
@@ -320,21 +327,21 @@ namespace HeatBalanceIntRadExchange {
                     for (int ZoneSurfNum = 1; ZoneSurfNum <= n_zone_Surfaces; ++ZoneSurfNum) {
                         SurfNum = zone_SurfacePtr(ZoneSurfNum);
                         ConstrNum = Surface(SurfNum).Construction;
-                        zone_info.Emissivity(ZoneSurfNum) = Construct(ConstrNum).InsideAbsorpThermal;
+                        surface_emiss(ZoneSurfNum) = Construct(ConstrNum).InsideAbsorpThermal;
                         auto const &surface_window(SurfaceWindow(SurfNum));
                         if (Construct(ConstrNum).TypeIsWindow &&
                             (surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn)) {
-                            zone_info.Emissivity(ZoneSurfNum) =
+                            surface_emiss(ZoneSurfNum) =
                                 InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss) +
                                 InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffGlassEmiss);
                         }
                         if (Surface(SurfNum).MovInsulIntPresent) {
                             HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
-                            zone_info.Emissivity(ZoneSurfNum) = Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
+                            surface_emiss(ZoneSurfNum) = Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
                         }
                     }
 
-                    CalcScriptF(n_zone_Surfaces, zone_info.Area, zone_info.F, zone_info.Emissivity, zone_ScriptF);
+                    CalcScriptF(n_zone_Surfaces, zone_info.Area, zone_info.F, surface_emiss, zone_ScriptF);
                     // precalc - multiply by StefanBoltzmannConstant
                     zone_ScriptF *= StefanBoltzmannConst;
                 }
@@ -343,8 +350,8 @@ namespace HeatBalanceIntRadExchange {
 
             Map<MatrixXd> scriptF(zone_ScriptF.data(), n_zone_Surfaces, n_zone_Surfaces);
 
-            ArrayXd surface_temp(n_zone_Surfaces);
-            ArrayXd surface_emiss(n_zone_Surfaces);
+            // ArrayXd surface_temp(n_zone_Surfaces);
+            // ArrayXd surface_emiss(n_zone_Surfaces);
 
             for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
             {
@@ -354,58 +361,65 @@ namespace HeatBalanceIntRadExchange {
                 auto const &construct(Construct(ConstrNum));
 
                 if (construct.WindowTypeEQL) {
-                    surface_temp(i) = surface_window.EffInsSurfTemp;
-                    surface_emiss(i) = EQLWindowInsideEffectiveEmiss(ConstrNum);
+                    surface_temp[i] = surface_window.EffInsSurfTemp;
+                    surface_emiss[i] = EQLWindowInsideEffectiveEmiss(ConstrNum);
                 } else if (construct.WindowTypeBSDF) {
-                    surface_temp(i) = surface_window.EffInsSurfTemp;
-                    surface_emiss(i) = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
+                    surface_temp[i] = surface_window.EffInsSurfTemp;
+                    surface_emiss[i] = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
                 } else if (construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
                     if (SurfIterations == 0 && surface_window.ShadingFlag <= 0) {
-                        surface_temp(i) = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
-                        surface_emiss(i) = construct.InsideAbsorpThermal;
+                        surface_temp[i] = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
+                        surface_emiss[i] = construct.InsideAbsorpThermal;
                     } else if (surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn) {
-                        surface_temp(i) = surface_window.EffInsSurfTemp;
-                        surface_emiss(i) = InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss) +
+                        surface_temp[i] = surface_window.EffInsSurfTemp;
+                        surface_emiss[i] = InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss) +
                                        InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffGlassEmiss);
                     } else {
-                        surface_temp(i) = SurfaceTemp(surface_num);
-                        surface_emiss(i) = construct.InsideAbsorpThermal;
+                        surface_temp[i] = SurfaceTemp(surface_num);
+                        surface_emiss[i] = construct.InsideAbsorpThermal;
                     }
                 } else {
-                    surface_temp(i) = SurfaceTemp(surface_num);
-                    surface_emiss(i) = construct.InsideAbsorpThermal;
+                    surface_temp[i] = SurfaceTemp(surface_num);
+                    surface_emiss[i] = construct.InsideAbsorpThermal;
                 }
             }
 
-            // std::cout << "surface_temp\n";
-            // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
-            // {
-            //     std::cout << surface_temp(i) << ",";
-            // }
-            // std::cout << std::endl;
-            // std::cout << std::endl;
+            for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+            {
+                surface_temp[i] += KelvinConv;
+                surface_temp[i] *= surface_temp[i];
+                surface_temp[i] *= surface_temp[i];
+            }
 
-            surface_temp += KelvinConv;
+           //  // std::cout << "surface_temp\n";
+           //  // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+           //  // {
+           //  //     std::cout << surface_temp(i) << ",";
+           //  // }
+           //  // std::cout << std::endl;
+           //  // std::cout << std::endl;
 
-            // std::cout << "surface_temp + KelvinConv\n";
-            // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
-            // {
-            //     std::cout << surface_temp(i) << ",";
-            // }
-            // std::cout << std::endl;
-            // std::cout << std::endl;
+            // surface_temp += KelvinConv;
 
-            surface_temp *= surface_temp; // pow_2
+           //  // std::cout << "surface_temp + KelvinConv\n";
+           //  // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+           //  // {
+           //  //     std::cout << surface_temp(i) << ",";
+           //  // }
+           //  // std::cout << std::endl;
+           //  // std::cout << std::endl;
 
-            // std::cout << "surface_temp pow2\n";
-            // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
-            // {
-            //     std::cout << surface_temp(i) << ",";
-            // }
-            // std::cout << std::endl;
-            // std::cout << std::endl;
+            // surface_temp *= surface_temp; // pow_2
 
-            surface_temp *= surface_temp; // pow_4
+           //  // std::cout << "surface_temp pow2\n";
+           //  // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+           //  // {
+           //  //     std::cout << surface_temp(i) << ",";
+           //  // }
+           //  // std::cout << std::endl;
+           //  // std::cout << std::endl;
+
+            // surface_temp *= surface_temp; // pow_4
 
             // std::cout << "surface_temp pow4\n";
             // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
@@ -415,17 +429,67 @@ namespace HeatBalanceIntRadExchange {
             // std::cout << std::endl;
             // std::cout << std::endl;
 
-            // std::cout << "surface_temp_interactions\n";
-            for (int i = 0; i < n_zone_Surfaces; ++i) { // receiving surface
-                for (int j = 0; j < n_zone_Surfaces; ++j) { // sending surface
-                    surface_temp_interactions(i, j) = scriptF(i, j) * (surface_temp(j) - surface_temp(i)); /// send - receive
-                   // std::cout << surface_temp_interactions(i, j) << ",";
+            // surface_temp += KelvinConv;
+            // surface_temp *= surface_temp; // pow_2
+            // surface_temp *= surface_temp; // pow_4
+
+            // surface_temp_interactions = scriptF.transpose();
+            // surface_temp_interactions = scriptF;
+
+            // // std::cout << "surface_temp_interactions\n";
+            // size_type lSR(0u);
+            // for (int i = 0; i < n_zone_Surfaces; ++i) { // receiving surface
+            //     auto const val = zone_info.surfaceTemp[i];
+            //     for (int j = 0; j < n_zone_Surfaces; ++j) { // sending surface
+            //         // surface_temp_interactions(i, j) = scriptF(j, i) * (surface_temp[j] - surface_temp[i]); /// send - receive
+            //         zone_info.surfaceTempInteractions[j*n_zone_Surfaces + i] *= (zone_info.surfaceTemp[j] - val); /// send - receive
+            //        // std::cout << surface_temp_interactions(i, j) << ",";
+            //     }
+            //    // std::cout << std::endl;
+            // }
+            size_type lSR(0u);
+            for (int recv = 0; recv < n_zone_Surfaces; ++recv) { // receiving surface
+                RecSurfNum = zone_SurfacePtr[recv];
+                ConstrNumRec = Surface(RecSurfNum).Construction;
+                auto const &construct(Construct(ConstrNumRec));
+                auto &netLWRadToRecSurf(NetLWRadToSurf(RecSurfNum));
+
+                auto const recv_surface_temp = zone_info.surfaceTemp[recv];
+
+                // Calculate net long-wave radiation for opaque surfaces and incident
+                // long-wave radiation for windows.
+                if (construct.TypeIsWindow) {
+                    auto &surface_window(SurfaceWindow(RecSurfNum));
+                    Real64 scriptF_acc(0.0);           // Local accumulator
+                    Real64 netLWRadToRecSurf_cor(zone_ScriptF[recv*n_zone_Surfaces + recv] * recv_surface_temp); // Correction
+                    Real64 IRfromParentZone_acc(0.0);  // Local accumulator
+                    for (int send = 0; send < n_zone_Surfaces; ++send, ++lSR) { // sending surface
+                        Real64 const scriptF(zone_ScriptF[lSR]);
+                        Real64 const scriptF_temp_ink_4th(scriptF * recv_surface_temp);
+                        // Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
+                        IRfromParentZone_acc += scriptF_temp_ink_4th;
+
+                        scriptF_acc += ((recv == send) ? 0 : scriptF);
+                    }
+                    netLWRadToRecSurf += IRfromParentZone_acc - netLWRadToRecSurf_cor - (scriptF_acc * recv_surface_temp);
+                    surface_window.IRfromParentZone += IRfromParentZone_acc / surface_emiss[recv];
+                } else {
+                    double netLWRadToRecSurf_acc = 0;
+                    for (int send = 0; send < n_zone_Surfaces; ++send, ++lSR) { // sending surface
+                        netLWRadToRecSurf_acc += ((recv == send) ? 0 : zone_ScriptF[lSR] * (zone_info.surfaceTemp[send] - recv_surface_temp)); /// send - receive
+                    }
+                    netLWRadToRecSurf += netLWRadToRecSurf_acc;
                 }
-               // std::cout << std::endl;
             }
-            for (int i = 0; i < n_zone_Surfaces; ++i) {
-                surface_temp_interactions(i, i) = 0;
-            }
+
+            // Cinverse -= emissivity.matrix().asDiagonal();
+            // scriptF.array().colwise() *=
+            // Cinverse.array().colwise() *= (emissivity / (1.0 - emissivity));
+            // scriptF = Cinverse.transpose();
+            // for (int i = 0; i < n_zone_Surfaces; ++i) {
+            //     surface_temp_interactions(i, i) = 0;
+            // }
+            // surface_temp_interactions.diagonal().array() = 0;
             // std::cout << std::endl;
             // std::cout << std::endl;
 
@@ -466,15 +530,15 @@ namespace HeatBalanceIntRadExchange {
            // std::cout << std::endl;
            // std::cout << std::endl;
 
-            auto const NetLWRadToSurf_acc = surface_temp_interactions.rowwise().sum();
+            // auto const NetLWRadToSurf_acc = surface_temp_interactions.rowwise().sum();
 
-            // std::cout << "NetLWRadToSurf_acc\n";
-            for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
-            {
-                auto const surface_num = zone_SurfacePtr[i];
-                NetLWRadToSurf(surface_num) += NetLWRadToSurf_acc(i);
-                // std::cout << NetLWRadToSurf_acc(i) << ",";
-            }
+            // // std::cout << "NetLWRadToSurf_acc\n";
+            // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+            // {
+            //     auto const surface_num = zone_SurfacePtr[i];
+            //     NetLWRadToSurf(surface_num) += NetLWRadToSurf_acc[i];
+            //     // std::cout << NetLWRadToSurf_acc(i) << ",";
+            // }
             // std::cout << std::endl;
             // std::cout << std::endl;
 
@@ -483,41 +547,42 @@ namespace HeatBalanceIntRadExchange {
 
 
 //             // precalculate the fourth power of surface temperature as part of strategy to reduce calculation time - Glazer 2011-04-22
-//             for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum) {
-//                 SendSurfNum = zone_SurfacePtr[SendZoneSurfNum];
-//                 auto const &surface_window(SurfaceWindow(SendSurfNum));
-//                 ConstrNumSend = Surface(SendSurfNum).Construction;
-//                 auto const &construct(Construct(ConstrNumSend));
-//                 if (construct.WindowTypeEQL || construct.WindowTypeBSDF) {
-//                     SendSurfTemp = surface_window.EffInsSurfTemp;
-//                 } else if (construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
-//                     if (SurfIterations == 0 && surface_window.ShadingFlag <= 0) {
-//                         SendSurfTemp = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
-//                     } else if (surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn) {
-//                         SendSurfTemp = surface_window.EffInsSurfTemp;
-//                     } else {
-//                         SendSurfTemp = SurfaceTemp(SendSurfNum);
-//                     }
-//                 } else {
-//                     SendSurfTemp = SurfaceTemp(SendSurfNum);
-//                 }
-// #ifdef EP_HBIRE_SEQ
-//                 SendSurfaceTempInKto4thPrecalc[SendZoneSurfNum] = pow_4(SendSurfTemp + KelvinConv);
-// #else
-//                 SendSurfaceTempInKto4thPrecalc(SendSurfNum) = pow_4(SendSurfTemp + KelvinConv);
-// #endif
-//             }
+// //             for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum) {
+// //                 // SendSurfNum = zone_SurfacePtr[SendZoneSurfNum];
+// //                 // auto const &surface_window(SurfaceWindow(SendSurfNum));
+// //                 // ConstrNumSend = Surface(SendSurfNum).Construction;
+// //                 // auto const &construct(Construct(ConstrNumSend));
+// //                 // if (construct.WindowTypeEQL || construct.WindowTypeBSDF) {
+// //                 //     SendSurfTemp = surface_window.EffInsSurfTemp;
+// //                 // } else if (construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
+// //                 //     if (SurfIterations == 0 && surface_window.ShadingFlag <= 0) {
+// //                 //         SendSurfTemp = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
+// //                 //     } else if (surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn) {
+// //                 //         SendSurfTemp = surface_window.EffInsSurfTemp;
+// //                 //     } else {
+// //                 //         SendSurfTemp = SurfaceTemp(SendSurfNum);
+// //                 //     }
+// //                 // } else {
+// //                 //     SendSurfTemp = SurfaceTemp(SendSurfNum);
+// //                 // }
+// //                 SendSurfTemp = surface_temp(SendZoneSurfNum);
+// // #ifdef EP_HBIRE_SEQ
+// //                 SendSurfaceTempInKto4thPrecalc[SendZoneSurfNum] = pow_4(SendSurfTemp + KelvinConv);
+// // #else
+// //                 SendSurfaceTempInKto4thPrecalc(SendSurfNum) = pow_4(SendSurfTemp + KelvinConv);
+// // #endif
+// //             }
 
-//             std::cout << "SendSurfaceTempInKto4thPrecalc\n";
-//             for (size_type i = 0; i < s_zone_Surfaces; ++i) {
-//                 std::cout << SendSurfaceTempInKto4thPrecalc[i] << ",";
-//             }
-//             std::cout << std::endl;
-//             std::cout << std::endl;
+//             // std::cout << "SendSurfaceTempInKto4thPrecalc\n";
+//             // for (size_type i = 0; i < s_zone_Surfaces; ++i) {
+//             //     std::cout << SendSurfaceTempInKto4thPrecalc[i] << ",";
+//             // }
+//             // std::cout << std::endl;
+//             // std::cout << std::endl;
 
 //             // These are the money loops
 //             size_type lSR(0u);
-//             std::cout << "netLWRadToRecSurf_acc\n";
+//             // std::cout << "netLWRadToRecSurf_acc\n";
 //             // std::cout << "RecSurfTempInKTo4th\n";
 //             // std::cout << "testing\n";
 //             for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
@@ -526,35 +591,38 @@ namespace HeatBalanceIntRadExchange {
 //                 auto const &construct(Construct(ConstrNumRec));
 //                 auto &surface_window(SurfaceWindow(RecSurfNum));
 //                 auto &netLWRadToRecSurf(NetLWRadToSurf(RecSurfNum));
-//                 if (construct.WindowTypeEQL) {
-//                     RecSurfEmiss = EQLWindowInsideEffectiveEmiss(ConstrNumRec);
-//                     RecSurfTemp = surface_window.EffInsSurfTemp;
-//                 } else if (construct.WindowTypeBSDF && surface_window.ShadingFlag == IntShadeOn) {
-//                     RecSurfTemp = surface_window.EffInsSurfTemp;
-//                     RecSurfEmiss = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
-//                 } else if (construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
-//                     if (SurfIterations == 0 && surface_window.ShadingFlag <= 0) {
-//                         // If the window is bare this TS and it is the first time through we use the previous TS glass
-//                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
-//                         // the previous time step this temperature is a better starting value than the shade temperature.
-//                         RecSurfTemp = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
-//                         RecSurfEmiss = construct.InsideAbsorpThermal;
-//                         // For windows with an interior shade or blind an effective inside surface temp
-//                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
-//                     } else if (surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn) {
-//                         RecSurfTemp = surface_window.EffInsSurfTemp;
-//                         RecSurfEmiss = InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss) +
-//                                        InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffGlassEmiss);
-//                     } else {
-//                         RecSurfTemp = SurfaceTemp(RecSurfNum);
-//                         RecSurfEmiss = construct.InsideAbsorpThermal;
-//                     }
-//                 } else {
-//                     RecSurfTemp = SurfaceTemp(RecSurfNum);
-//                     RecSurfEmiss = construct.InsideAbsorpThermal;
-//                 }
+//                 // if (construct.WindowTypeEQL) {
+//                 //     RecSurfEmiss = EQLWindowInsideEffectiveEmiss(ConstrNumRec);
+//                 //     RecSurfTemp = surface_window.EffInsSurfTemp;
+//                 // } else if (construct.WindowTypeBSDF && surface_window.ShadingFlag == IntShadeOn) {
+//                 //     RecSurfTemp = surface_window.EffInsSurfTemp;
+//                 //     RecSurfEmiss = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
+//                 // } else if (construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
+//                 //     if (SurfIterations == 0 && surface_window.ShadingFlag <= 0) {
+//                 //         // If the window is bare this TS and it is the first time through we use the previous TS glass
+//                 //         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
+//                 //         // the previous time step this temperature is a better starting value than the shade temperature.
+//                 //         RecSurfTemp = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
+//                 //         RecSurfEmiss = construct.InsideAbsorpThermal;
+//                 //         // For windows with an interior shade or blind an effective inside surface temp
+//                 //         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
+//                 //     } else if (surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn) {
+//                 //         RecSurfTemp = surface_window.EffInsSurfTemp;
+//                 //         RecSurfEmiss = InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss) +
+//                 //                        InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffGlassEmiss);
+//                 //     } else {
+//                 //         RecSurfTemp = SurfaceTemp(RecSurfNum);
+//                 //         RecSurfEmiss = construct.InsideAbsorpThermal;
+//                 //     }
+//                 // } else {
+//                 //     RecSurfTemp = SurfaceTemp(RecSurfNum);
+//                 //     RecSurfEmiss = construct.InsideAbsorpThermal;
+//                 // }
+//                 // RecSurfTemp = surface_temp(RecZoneSurfNum);
+//                 // RecSurfEmiss = surface_emiss(RecZoneSurfNum);
 //                 // precalculate the fourth power of surface temperature as part of strategy to reduce calculation time - Glazer 2011-04-22
-//                 RecSurfTempInKTo4th = pow_4(RecSurfTemp + KelvinConv);
+//                 // RecSurfTempInKTo4th = pow_4(RecSurfTemp + KelvinConv);
+//                 RecSurfTempInKTo4th = surface_temp(RecZoneSurfNum);
 //                 // std::cout << RecSurfTempInKTo4th << ",";
 //                 //      IF (ABS(RecSurfTempInKTo4th) > 1.d100) THEN
 //                 //        SendZoneSurfNum=0
@@ -603,8 +671,11 @@ namespace HeatBalanceIntRadExchange {
 //                             // auto const testing = zone_ScriptF[lSR] * (SendSurfaceTempInKto4thPrecalc[SendZoneSurfNum] -
 //                             //                                               RecSurfTempInKTo4th); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
 //                             // std::cout << testing << ",";
-//                             netLWRadToRecSurf_acc += zone_ScriptF[lSR] * (SendSurfaceTempInKto4thPrecalc[SendZoneSurfNum] -
-//                                                                           RecSurfTempInKTo4th); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
+//                             // netLWRadToRecSurf_acc += zone_ScriptF[lSR] * (surface_temp(SendZoneSurfNum) - RecSurfTempInKTo4th);
+//                             // netLWRadToRecSurf_acc += scriptF(SendZoneSurfNum, RecZoneSurfNum) * (surface_temp(SendZoneSurfNum) - surface_temp(RecZoneSurfNum)); /// send - receive
+//                             surface_temp_interactions(RecZoneSurfNum, SendZoneSurfNum) = scriptF(SendZoneSurfNum, RecZoneSurfNum) * (surface_temp(SendZoneSurfNum) - surface_temp(RecZoneSurfNum)); /// send - receive
+//                             // netLWRadToRecSurf_acc += zone_ScriptF[lSR] * (SendSurfaceTempInKto4thPrecalc[SendZoneSurfNum] -
+//                             //                                               RecSurfTempInKTo4th); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
 // #else
 //                             SendSurfNum = zone_SurfacePtr[SendZoneSurfNum] - 1;
 //                             netLWRadToRecSurf_acc += zone_ScriptF[lSR] * (SendSurfaceTempInKto4thPrecalc[SendSurfNum] -
@@ -612,15 +683,29 @@ namespace HeatBalanceIntRadExchange {
 // #endif
 //                         } else {
 //                             // std::cout << "0,";
+//                             surface_temp_interactions(RecZoneSurfNum, RecZoneSurfNum) = 0;
 //                         }
 //                     }
 //                     netLWRadToRecSurf += netLWRadToRecSurf_acc;
-//                     std::cout << netLWRadToRecSurf_acc << ",";
+//                     // std::cout << netLWRadToRecSurf_acc << ",";
 //                     // std::cout << std::endl;
 //                 }
 //            }
-//            std::cout << std::endl;
-//            std::cout << std::endl;
+
+//             auto const NetLWRadToSurf_acc = surface_temp_interactions.rowwise().sum();
+
+//             // std::cout << "NetLWRadToSurf_acc\n";
+//             for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+//             {
+//                 auto const surface_num = zone_SurfacePtr[i];
+//                 if (NetLWRadToSurf(surface_num) != NetLWRadToSurf_acc(i)) {
+//                     std::string test = "";
+//                 }
+//                 NetLWRadToSurf(surface_num) += NetLWRadToSurf_acc(i);
+//                 // std::cout << NetLWRadToSurf_acc(i) << ",";
+//             }
+//            // std::cout << std::endl;
+//            // std::cout << std::endl;
 
 
 
@@ -702,7 +787,8 @@ namespace HeatBalanceIntRadExchange {
 
         // FLOW:
 
-        ZoneInfo.allocate(NumOfZones); // Allocate the entire derived type
+        ZoneInfo.reserve(NumOfZones);
+        // ZoneInfo.allocate(NumOfZones); // Allocate the entire derived type
 
         ScanForReports("ViewFactorInfo", ViewFactorReport, _, Option1);
 
@@ -728,54 +814,60 @@ namespace HeatBalanceIntRadExchange {
                                                          "Convergence";
             }
 
-            ZoneInfo(ZoneNum).Name = Zone(ZoneNum).Name;
-
             NumOfZoneSurfaces = 0;
             for (int SurfNum = Zone(ZoneNum).SurfaceFirst, SurfNum_end = Zone(ZoneNum).SurfaceLast; SurfNum <= SurfNum_end; ++SurfNum) {
                 if (Surface(SurfNum).HeatTransSurf) ++NumOfZoneSurfaces;
             }
-            ZoneInfo(ZoneNum).NumOfSurfaces = NumOfZoneSurfaces;
+
+            ZoneViewFactorInformation zoneViewFactorInformation(NumOfZoneSurfaces);
+
+            zoneViewFactorInformation.Name = Zone(ZoneNum).Name;
+
+            // zoneViewFactorInformation.NumOfSurfaces = NumOfZoneSurfaces;
             MaxNumOfZoneSurfaces = max(MaxNumOfZoneSurfaces, NumOfZoneSurfaces);
             if (NumOfZoneSurfaces < 1) ShowFatalError("No surfaces in a zone in InitInteriorRadExchange");
 
             // Allocate the parts of the derived type
-            ZoneInfo(ZoneNum).F.dimension(NumOfZoneSurfaces, NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).ScriptF.dimension(NumOfZoneSurfaces, NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).Area.dimension(NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).Emissivity.dimension(NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).Azimuth.dimension(NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).Tilt.dimension(NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).SurfacePtr.dimension(NumOfZoneSurfaces, 0);
+            zoneViewFactorInformation.F.dimension(NumOfZoneSurfaces, NumOfZoneSurfaces, 0.0);
+            zoneViewFactorInformation.ScriptF.dimension(NumOfZoneSurfaces, NumOfZoneSurfaces, 0.0);
+            zoneViewFactorInformation.Area.dimension(NumOfZoneSurfaces, 0.0);
+            zoneViewFactorInformation.Emissivity.dimension(NumOfZoneSurfaces, 0.0);
+            zoneViewFactorInformation.Azimuth.dimension(NumOfZoneSurfaces, 0.0);
+            zoneViewFactorInformation.Tilt.dimension(NumOfZoneSurfaces, 0.0);
+            zoneViewFactorInformation.SurfacePtr.dimension(NumOfZoneSurfaces, 0);
+            zoneViewFactorInformation.surfaceTempInteractions.dimension(NumOfZoneSurfaces, NumOfZoneSurfaces, 0.0);
+            zoneViewFactorInformation.surfaceTemp.dimension(NumOfZoneSurfaces, 0);
+            zoneViewFactorInformation.surfaceEmiss.dimension(NumOfZoneSurfaces, 0);
 
             // Initialize the surface pointer array
             ZoneSurfNum = 0;
             for (int SurfNum = Zone(ZoneNum).SurfaceFirst, SurfNum_end = Zone(ZoneNum).SurfaceLast; SurfNum <= SurfNum_end; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;
                 ++ZoneSurfNum;
-                ZoneInfo(ZoneNum).SurfacePtr(ZoneSurfNum) = SurfNum;
+                zoneViewFactorInformation.SurfacePtr(ZoneSurfNum) = SurfNum;
             }
             // Initialize the area and emissivity arrays
             for (ZoneSurfNum = 1; ZoneSurfNum <= NumOfZoneSurfaces; ++ZoneSurfNum) {
-                int const SurfNum = ZoneInfo(ZoneNum).SurfacePtr(ZoneSurfNum);
+                int const SurfNum = zoneViewFactorInformation.SurfacePtr(ZoneSurfNum);
 
                 //************************************************
                 if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) {
-                    ZoneInfo(ZoneNum).Area(ZoneSurfNum) = Surface(SurfNum).Area;
+                    zoneViewFactorInformation.Area(ZoneSurfNum) = Surface(SurfNum).Area;
                 } else {
                     // Double area for infrared transparent (IRT) surfaces
-                    ZoneInfo(ZoneNum).Area(ZoneSurfNum) = 2.0 * Surface(SurfNum).Area;
+                    zoneViewFactorInformation.Area(ZoneSurfNum) = 2.0 * Surface(SurfNum).Area;
                 }
                 //***********************************************
 
-                ZoneInfo(ZoneNum).Emissivity(ZoneSurfNum) = Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
-                ZoneInfo(ZoneNum).Azimuth(ZoneSurfNum) = Surface(SurfNum).Azimuth;
-                ZoneInfo(ZoneNum).Tilt(ZoneSurfNum) = Surface(SurfNum).Tilt;
+                zoneViewFactorInformation.Emissivity(ZoneSurfNum) = Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
+                zoneViewFactorInformation.Azimuth(ZoneSurfNum) = Surface(SurfNum).Azimuth;
+                zoneViewFactorInformation.Tilt(ZoneSurfNum) = Surface(SurfNum).Tilt;
             }
 
             if (NumOfZoneSurfaces == 1) {
                 // If there is only one surface in a zone, then there is no radiant exchange
-                ZoneInfo(ZoneNum).F = 0.0;
-                ZoneInfo(ZoneNum).ScriptF = 0.0;
+                zoneViewFactorInformation.F = 0.0;
+                zoneViewFactorInformation.ScriptF = 0.0;
                 if (DisplayAdvancedReportVariables)
                     gio::write(OutputFileInits, fmtA) << "Surface View Factor Check Values," + Zone(ZoneNum).Name + ",0,0,0,-1,0,0";
                 continue; // Go to the next zone in the  ZoneNum DO loop
@@ -787,10 +879,10 @@ namespace HeatBalanceIntRadExchange {
 
             if (NumZonesWithUserFbyS > 0) {
 
-                GetInputViewFactorsbyName(ZoneInfo(ZoneNum).Name,
+                GetInputViewFactorsbyName(zoneViewFactorInformation.Name,
                                           NumOfZoneSurfaces,
-                                          ZoneInfo(ZoneNum).F,
-                                          ZoneInfo(ZoneNum).SurfacePtr,
+                                          zoneViewFactorInformation.F,
+                                          zoneViewFactorInformation.SurfacePtr,
                                           NoUserInputF,
                                           ErrorsFound); // Obtains user input view factors from input file
             }
@@ -799,21 +891,21 @@ namespace HeatBalanceIntRadExchange {
 
                 // Calculate the view factors and make sure they satisfy reciprocity
                 CalcApproximateViewFactors(NumOfZoneSurfaces,
-                                           ZoneInfo(ZoneNum).Area,
-                                           ZoneInfo(ZoneNum).Azimuth,
-                                           ZoneInfo(ZoneNum).Tilt,
-                                           ZoneInfo(ZoneNum).F,
-                                           ZoneInfo(ZoneNum).SurfacePtr);
+                                           zoneViewFactorInformation.Area,
+                                           zoneViewFactorInformation.Azimuth,
+                                           zoneViewFactorInformation.Tilt,
+                                           zoneViewFactorInformation.F,
+                                           zoneViewFactorInformation.SurfacePtr);
             }
 
             if (ViewFactorReport) { // Allocate and save user or approximate view factors for reporting.
                 SaveApproximateViewFactors.allocate(NumOfZoneSurfaces, NumOfZoneSurfaces);
-                SaveApproximateViewFactors = ZoneInfo(ZoneNum).F;
+                SaveApproximateViewFactors = zoneViewFactorInformation.F;
             }
 
             FixViewFactors(NumOfZoneSurfaces,
-                           ZoneInfo(ZoneNum).Area,
-                           ZoneInfo(ZoneNum).F,
+                           zoneViewFactorInformation.Area,
+                           zoneViewFactorInformation.F,
                            ZoneNum,
                            CheckValue1,
                            CheckValue2,
@@ -822,22 +914,22 @@ namespace HeatBalanceIntRadExchange {
                            FixedRowSum);
 
             // Calculate the script F factors
-            CalcScriptF(NumOfZoneSurfaces, ZoneInfo(ZoneNum).Area, ZoneInfo(ZoneNum).F, ZoneInfo(ZoneNum).Emissivity, ZoneInfo(ZoneNum).ScriptF);
+            CalcScriptF(NumOfZoneSurfaces, zoneViewFactorInformation.Area, zoneViewFactorInformation.F, zoneViewFactorInformation.Emissivity, zoneViewFactorInformation.ScriptF);
 
             if (ViewFactorReport) { // Write to SurfInfo File
                 // Zone Surface Information Output
-                gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone Information," + ZoneInfo(ZoneNum).Name + ',' +
+                gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone Information," + zoneViewFactorInformation.Name + ',' +
                                                          RoundSigDigits(NumOfZoneSurfaces);
 
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                     gio::write(OutputFileInits, "(A,',',A,$)")
-                        << "Surface View Factor - Surface Information," + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                               cSurfaceClass(Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Class)
-                        << RoundSigDigits(ZoneInfo(ZoneNum).Area(SurfNum), 4) + ',' + RoundSigDigits(ZoneInfo(ZoneNum).Azimuth(SurfNum), 4) + ',' +
-                               RoundSigDigits(ZoneInfo(ZoneNum).Tilt(SurfNum), 4) + ',' + RoundSigDigits(ZoneInfo(ZoneNum).Emissivity(SurfNum), 4) +
-                               ',' + RoundSigDigits(Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Sides);
-                    for (Vindex = 1; Vindex <= Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Sides; ++Vindex) {
-                        auto &Vertex = Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Vertex(Vindex);
+                        << "Surface View Factor - Surface Information," + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
+                               cSurfaceClass(Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Class)
+                        << RoundSigDigits(zoneViewFactorInformation.Area(SurfNum), 4) + ',' + RoundSigDigits(zoneViewFactorInformation.Azimuth(SurfNum), 4) + ',' +
+                               RoundSigDigits(zoneViewFactorInformation.Tilt(SurfNum), 4) + ',' + RoundSigDigits(zoneViewFactorInformation.Emissivity(SurfNum), 4) +
+                               ',' + RoundSigDigits(Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Sides);
+                    for (Vindex = 1; Vindex <= Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Sides; ++Vindex) {
+                        auto &Vertex = Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Vertex(Vindex);
                         gio::write(OutputFileInits, "(3(',',A),$)")
                             << RoundSigDigits(Vertex.x, 4) << RoundSigDigits(Vertex.y, 4) << RoundSigDigits(Vertex.z, 4);
                     }
@@ -847,15 +939,15 @@ namespace HeatBalanceIntRadExchange {
                 gio::write(OutputFileInits, "(A,A,$)") << "Approximate or User Input ViewFactors"
                                                        << ",To Surface,Surface Class,RowSum";
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                    gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
+                    gio::write(OutputFileInits, "(',',A,$)") << Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name;
                 }
                 gio::write(OutputFileInits);
 
                 for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
                     RowSum = sum(SaveApproximateViewFactors(_, Findex));
                     gio::write(OutputFileInits, "(A,3(',',A),$)")
-                        << "View Factor" << Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name
-                        << cSurfaceClass(Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
+                        << "View Factor" << Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name
+                        << cSurfaceClass(Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                         gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(SaveApproximateViewFactors(SurfNum, Findex), 4);
                     }
@@ -867,51 +959,51 @@ namespace HeatBalanceIntRadExchange {
                 gio::write(OutputFileInits, "(A,A,$)") << "Final ViewFactors"
                                                        << ",To Surface,Surface Class,RowSum";
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                    gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
+                    gio::write(OutputFileInits, "(',',A,$)") << Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name;
                 }
                 gio::write(OutputFileInits);
 
                 for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                    RowSum = sum(ZoneInfo(ZoneNum).F(_, Findex));
+                    RowSum = sum(zoneViewFactorInformation.F(_, Findex));
                     gio::write(OutputFileInits, "(A,3(',',A),$)")
-                        << "View Factor" << Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name
-                        << cSurfaceClass(Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
+                        << "View Factor" << Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name
+                        << cSurfaceClass(Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(ZoneInfo(ZoneNum).F(SurfNum, Findex), 4);
+                        gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(zoneViewFactorInformation.F(SurfNum, Findex), 4);
                     }
                     gio::write(OutputFileInits);
                 }
 
                 if (Option1 == "IDF") {
                     gio::write(OutputFileDebug, fmtA) << "!======== original input factors ===========================";
-                    gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + ZoneInfo(ZoneNum).Name + ',';
+                    gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + zoneViewFactorInformation.Name + ',';
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                         for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
                             if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
-                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
+                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name + ',' +
+                                                                         RoundSigDigits(zoneViewFactorInformation.F(Findex, SurfNum), 6) + ',';
                             } else {
-                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
+                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name + ',' +
+                                                                         RoundSigDigits(zoneViewFactorInformation.F(Findex, SurfNum), 6) + ';';
                             }
                         }
                     }
                     gio::write(OutputFileDebug, fmtA) << "!============= end of data ======================";
 
                     gio::write(OutputFileDebug, fmtA) << "!============ final view factors =======================";
-                    gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + ZoneInfo(ZoneNum).Name + ',';
+                    gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + zoneViewFactorInformation.Name + ',';
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                         for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
                             if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
-                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
+                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name + ',' +
+                                                                         RoundSigDigits(zoneViewFactorInformation.F(Findex, SurfNum), 6) + ',';
                             } else {
-                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
+                                gio::write(OutputFileDebug, fmtA) << "  " + Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name + ',' +
+                                                                         RoundSigDigits(zoneViewFactorInformation.F(Findex, SurfNum), 6) + ';';
                             }
                         }
                     }
@@ -923,13 +1015,13 @@ namespace HeatBalanceIntRadExchange {
                 gio::write(OutputFileInits, "(A,A,$)") << "Script F Factors"
                                                        << ",X Surface";
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                    gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
+                    gio::write(OutputFileInits, "(',',A,$)") << Surface(zoneViewFactorInformation.SurfacePtr(SurfNum)).Name;
                 }
                 gio::write(OutputFileInits);
                 for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                    gio::write(OutputFileInits, "(A,',',A,$)") << "Script F Factor" << Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name;
+                    gio::write(OutputFileInits, "(A,',',A,$)") << "Script F Factor" << Surface(zoneViewFactorInformation.SurfacePtr(Findex)).Name;
                     for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(ZoneInfo(ZoneNum).ScriptF(Findex, SurfNum), 4);
+                        gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(zoneViewFactorInformation.ScriptF(Findex, SurfNum), 4);
                     }
                     gio::write(OutputFileInits);
                 }
@@ -941,7 +1033,7 @@ namespace HeatBalanceIntRadExchange {
 
             RowSum = 0.0;
             for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                RowSum += sum(ZoneInfo(ZoneNum).F(_, Findex));
+                RowSum += sum(zoneViewFactorInformation.F(_, Findex));
             }
             RowSum = std::abs(RowSum - NumOfZoneSurfaces);
             FixedRowSum = std::abs(FixedRowSum - NumOfZoneSurfaces);
@@ -951,6 +1043,7 @@ namespace HeatBalanceIntRadExchange {
                                                            RoundSigDigits(FinalCheckValue, 6) + ',' + RoundSigDigits(NumIterations) + ',' +
                                                            RoundSigDigits(FixedRowSum, 6) + ',' + RoundSigDigits(RowSum, 6);
             }
+            ZoneInfo.push_back(zoneViewFactorInformation);
         }
 
         if (ErrorsFound) {
@@ -1508,6 +1601,8 @@ namespace HeatBalanceIntRadExchange {
         ++NumCalcScriptF_Calls;
 #endif
 
+        // Array2D<Real64>::size_type l(0u);
+
         // Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
         Map<const ArrayXd> areas(A.data(), N);
         MatrixXd CMatrix(N, N);
@@ -1535,12 +1630,50 @@ namespace HeatBalanceIntRadExchange {
 
         // map the scriptF matrix so it can be assigned to
         Map<MatrixXd> scriptF(ScriptF.data(), N, N);
-        scriptF = CMatrix.inverse();
+        // scriptF = CMatrix.inverse();
+
+        // Array2D<Real64> Cinverse(N, N);
+        // Map<MatrixXd> cinverse(Cinverse.data(), N, N);
+        MatrixXd Cinverse(N, N);
+        Cinverse = CMatrix.inverse();
 
         // calculate the scriptF values
-        scriptF.array().colwise() *= excitation;
-        scriptF -= emissivity.matrix().asDiagonal();
-        scriptF.array().rowwise() *= (emissivity / (1.0 - emissivity)).transpose();
+        // scriptF.array().colwise() *= excitation;
+        // scriptF -= emissivity.matrix().asDiagonal();
+        // scriptF.array().rowwise() *= (emissivity / (1.0 - emissivity)).transpose();
+
+        // l = 0u;
+        // for (int j = 1; j <= N; ++j) {
+        //     Real64 const e_j(excitation(j-1));
+        //     for (int i = 1; i <= N; ++i, ++l) {
+        //         Cinverse[l] *= e_j; // [ l ] == ( i, j )
+        //     }
+        // }
+
+        // cinverse.array().colwise() *= excitation;
+        Cinverse *= excitation.matrix().asDiagonal();
+
+        Cinverse -= emissivity.matrix().asDiagonal();
+        Cinverse.array().colwise() *= (emissivity / (1.0 - emissivity));
+        scriptF = Cinverse.transpose();
+        // scriptF = Cinverse;
+        // scriptF.array().rowwise() *= (emissivity / (1.0 - emissivity)).transpose();
+
+        // Array2D<Real64>::size_type m(0u);
+        // for (int i = 1; i <= N; ++i) { // Inefficient order for cache but can reuse multiplier so faster choice depends on N
+        //     Real64 const EMISS_i(EMISS(i));
+        //     Real64 const EMISS_fac(EMISS_i / (1.0 - EMISS_i));
+        //     l = static_cast<Array2D<Real64>::size_type>(i - 1);
+        //     for (int j = 1; j <= N; ++j, l += N, ++m) {
+        //         // if (i == j) {
+        //         //     //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
+        //         //     ScriptF[m] = EMISS_fac * (Cinverse[l] - EMISS_i); // [ l ] = ( i, j ), [ m ] == ( j, i )
+        //         // } else {
+        //             //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
+        //             ScriptF[m] = EMISS_fac * Cinverse[l]; // [ l ] == ( i, j ), [ m ] == ( j, i )
+        //         // }
+        //     }
+        // }
     }
 
 } // namespace HeatBalanceIntRadExchange
