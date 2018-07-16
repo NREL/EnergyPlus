@@ -1537,6 +1537,7 @@ namespace EMSManager {
         } // NumOfNodes > 0
 
         if (NumOutsideAirNodes > 0) {
+            DataGlobals::AnyLocalEnvironmentsInModel = true;
             for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= NumOutsideAirNodes; ++OutsideAirNodeNum) {
                 NodeNum = OutsideAirNodeList(OutsideAirNodeNum);
                 SetupEMSActuator("Outdoor Air System Node",
@@ -1563,6 +1564,12 @@ namespace EMSManager {
                                  "[degree]",
                                  Node(NodeNum).EMSOverrideOutAirWindDir,
                                  Node(NodeNum).EMSValueForOutAirWindDir);
+                for (int ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed; ActuatorUsedLoop++) {
+                    if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName, "Outdoor Air System Node") && UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,NodeID(NodeNum))) {
+                        Node(NodeNum).IsLocalNode = true;
+                        break;
+                    }
+                }
             }
         }
     }
