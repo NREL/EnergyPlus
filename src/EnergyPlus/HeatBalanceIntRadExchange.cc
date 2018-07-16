@@ -188,23 +188,14 @@ namespace HeatBalanceIntRadExchange {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int RecSurfNum;  // Counter within DO loop (refers to main surface derived type index) RECEIVING SURFACE
-        int SendSurfNum; // Counter within DO loop (refers to main surface derived type index) SENDING SURFACE
 
         int ConstrNumRec;                  // Receiving surface construction number
-        int ConstrNumSend;                 // Sending surface construction number
-        Real64 RecSurfTemp;                // Receiving surface temperature (C)
-        Real64 SendSurfTemp;               // Sending surface temperature (C)
-        Real64 RecSurfEmiss;               // Inside surface emissivity
         int SurfNum;                       // Surface number
         int ConstrNum;                     // Construction number
         bool IntShadeOrBlindStatusChanged; // True if status of interior shade or blind on at least
         // one window in a zone has changed from previous time step
         int ShadeFlag;     // Window shading status current time step
         int ShadeFlagPrev; // Window shading status previous time step
-
-        // variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
-        Real64 RecSurfTempInKTo4th; // Receiving surface temperature in K to 4th power
-        static Array1D<Real64> SendSurfaceTempInKto4thPrecalc;
 
         // FLOW:
 
@@ -213,11 +204,6 @@ namespace HeatBalanceIntRadExchange {
 #endif
         if (CalcInteriorRadExchangefirstTime) {
             InitInteriorRadExchange();
-#ifdef EP_HBIRE_SEQ
-            SendSurfaceTempInKto4thPrecalc.allocate(MaxNumOfZoneSurfaces);
-#else
-            SendSurfaceTempInKto4thPrecalc.allocate(TotSurfaces);
-#endif
             CalcInteriorRadExchangefirstTime = false;
             if (DeveloperFlag) {
                 std::string tdstring;
@@ -270,7 +256,6 @@ namespace HeatBalanceIntRadExchange {
             auto &surface_temp(zone_info.surfaceTemp);
             auto &surface_emiss(zone_info.Emissivity);
             int const n_zone_Surfaces(zone_info.NumOfSurfaces);
-            size_type const s_zone_Surfaces(n_zone_Surfaces);
 
             // Calculate ScriptF if first time step in environment and surface heat-balance iterations not yet started;
             // recalculate ScriptF if status of window interior shades or blinds has changed from
@@ -347,35 +332,38 @@ namespace HeatBalanceIntRadExchange {
                 auto const ConstrNum = Surface(surface_num).Construction;
                 auto const &construct(Construct(ConstrNum));
 
+                Real64 surface_temperature(0);
+                Real64 surface_emissivity(0);
+
                 if (construct.WindowTypeEQL) {
-                    surface_temp[i] = surface_window.EffInsSurfTemp;
-                    surface_emiss[i] = EQLWindowInsideEffectiveEmiss(ConstrNum);
+                    surface_temperature = surface_window.EffInsSurfTemp;
+                    surface_emissivity = EQLWindowInsideEffectiveEmiss(ConstrNum);
                 } else if (construct.WindowTypeBSDF) {
-                    surface_temp[i] = surface_window.EffInsSurfTemp;
-                    surface_emiss[i] = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
+                    surface_temperature = surface_window.EffInsSurfTemp;
+                    surface_emissivity = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
                 } else if (construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
                     if (SurfIterations == 0 && surface_window.ShadingFlag <= 0) {
-                        surface_temp[i] = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
-                        surface_emiss[i] = construct.InsideAbsorpThermal;
+                        surface_temperature = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
+                        surface_emissivity = construct.InsideAbsorpThermal;
                     } else if (surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn) {
-                        surface_temp[i] = surface_window.EffInsSurfTemp;
-                        surface_emiss[i] = InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss) +
+                        surface_temperature = surface_window.EffInsSurfTemp;
+                        surface_emissivity = InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss) +
                                        InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffGlassEmiss);
                     } else {
-                        surface_temp[i] = SurfaceTemp(surface_num);
-                        surface_emiss[i] = construct.InsideAbsorpThermal;
+                        surface_temperature = SurfaceTemp(surface_num);
+                        surface_emissivity = construct.InsideAbsorpThermal;
                     }
                 } else {
-                    surface_temp[i] = SurfaceTemp(surface_num);
-                    surface_emiss[i] = construct.InsideAbsorpThermal;
+                    surface_temperature = SurfaceTemp(surface_num);
+                    surface_emissivity = construct.InsideAbsorpThermal;
                 }
-            }
 
-            for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
-            {
-                surface_temp[i] += KelvinConv;
-                surface_temp[i] *= surface_temp[i];
-                surface_temp[i] *= surface_temp[i];
+                surface_temperature += KelvinConv;
+                surface_temperature *= surface_temperature;
+                surface_temperature *= surface_temperature;
+
+                surface_temp[i] = surface_temperature;
+                surface_emiss[i] = surface_emissivity;
             }
 
             size_type lSR(0u);
@@ -405,7 +393,7 @@ namespace HeatBalanceIntRadExchange {
                     netLWRadToRecSurf += IRfromParentZone_acc - netLWRadToRecSurf_cor - (scriptF_acc * recv_surface_temp);
                     surface_window.IRfromParentZone += IRfromParentZone_acc / surface_emiss[recv];
                 } else {
-                    double netLWRadToRecSurf_acc = 0;
+                    Real64 netLWRadToRecSurf_acc = 0;
                     for (int send = 0; send < n_zone_Surfaces; ++send, ++lSR) { // sending surface
                         netLWRadToRecSurf_acc += ((recv == send) ? 0 : zone_ScriptF[lSR] * (zone_info.surfaceTemp[send] - recv_surface_temp)); /// send - receive
                     }
@@ -491,7 +479,6 @@ namespace HeatBalanceIntRadExchange {
         // FLOW:
 
         ZoneInfo.reserve(NumOfZones);
-        // ZoneInfo.allocate(NumOfZones); // Allocate the entire derived type
 
         ScanForReports("ViewFactorInfo", ViewFactorReport, _, Option1);
 
@@ -526,7 +513,6 @@ namespace HeatBalanceIntRadExchange {
 
             zoneViewFactorInformation.Name = Zone(ZoneNum).Name;
 
-            // zoneViewFactorInformation.NumOfSurfaces = NumOfZoneSurfaces;
             MaxNumOfZoneSurfaces = max(MaxNumOfZoneSurfaces, NumOfZoneSurfaces);
             if (NumOfZoneSurfaces < 1) ShowFatalError("No surfaces in a zone in InitInteriorRadExchange");
 
@@ -1100,9 +1086,6 @@ namespace HeatBalanceIntRadExchange {
         Real64 CheckConvergeTolerance; // check value for actual warning
 
         bool Converged;
-        int i;
-        int j;
-        static int LargestSurf(0);
 
         // FLOW:
         OriginalCheckValue = std::abs(sum(F) - N);

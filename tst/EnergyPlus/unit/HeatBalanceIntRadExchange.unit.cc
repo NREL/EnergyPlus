@@ -50,6 +50,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// Eigen Headers
+#include <Eigen/Dense>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
