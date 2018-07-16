@@ -57,8 +57,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <Eigen/Dense>
-#include <Eigen/LU>
 
 namespace EnergyPlus {
 

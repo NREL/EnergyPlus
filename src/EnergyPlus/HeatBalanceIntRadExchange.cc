@@ -538,9 +538,7 @@ namespace HeatBalanceIntRadExchange {
             zoneViewFactorInformation.Azimuth.dimension(NumOfZoneSurfaces, 0.0);
             zoneViewFactorInformation.Tilt.dimension(NumOfZoneSurfaces, 0.0);
             zoneViewFactorInformation.SurfacePtr.dimension(NumOfZoneSurfaces, 0);
-            zoneViewFactorInformation.surfaceTempInteractions.dimension(NumOfZoneSurfaces, NumOfZoneSurfaces, 0.0);
             zoneViewFactorInformation.surfaceTemp.dimension(NumOfZoneSurfaces, 0);
-            zoneViewFactorInformation.surfaceEmiss.dimension(NumOfZoneSurfaces, 0);
 
             // Initialize the surface pointer array
             ZoneSurfNum = 0;
@@ -1333,50 +1331,15 @@ namespace HeatBalanceIntRadExchange {
 
         // map the scriptF matrix so it can be assigned to
         Map<MatrixXd> scriptF(ScriptF.data(), N, N);
-        // scriptF = CMatrix.inverse();
 
-        // Array2D<Real64> Cinverse(N, N);
-        // Map<MatrixXd> cinverse(Cinverse.data(), N, N);
         MatrixXd Cinverse(N, N);
         Cinverse = CMatrix.inverse();
 
-        // calculate the scriptF values
-        // scriptF.array().colwise() *= excitation;
-        // scriptF -= emissivity.matrix().asDiagonal();
-        // scriptF.array().rowwise() *= (emissivity / (1.0 - emissivity)).transpose();
-
-        // l = 0u;
-        // for (int j = 1; j <= N; ++j) {
-        //     Real64 const e_j(excitation(j-1));
-        //     for (int i = 1; i <= N; ++i, ++l) {
-        //         Cinverse[l] *= e_j; // [ l ] == ( i, j )
-        //     }
-        // }
-
-        // cinverse.array().colwise() *= excitation;
         Cinverse *= excitation.matrix().asDiagonal();
 
         Cinverse -= emissivity.matrix().asDiagonal();
         Cinverse.array().colwise() *= (emissivity / (1.0 - emissivity));
         scriptF = Cinverse.transpose();
-        // scriptF = Cinverse;
-        // scriptF.array().rowwise() *= (emissivity / (1.0 - emissivity)).transpose();
-
-        // Array2D<Real64>::size_type m(0u);
-        // for (int i = 1; i <= N; ++i) { // Inefficient order for cache but can reuse multiplier so faster choice depends on N
-        //     Real64 const EMISS_i(EMISS(i));
-        //     Real64 const EMISS_fac(EMISS_i / (1.0 - EMISS_i));
-        //     l = static_cast<Array2D<Real64>::size_type>(i - 1);
-        //     for (int j = 1; j <= N; ++j, l += N, ++m) {
-        //         // if (i == j) {
-        //         //     //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
-        //         //     ScriptF[m] = EMISS_fac * (Cinverse[l] - EMISS_i); // [ l ] = ( i, j ), [ m ] == ( j, i )
-        //         // } else {
-        //             //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
-        //             ScriptF[m] = EMISS_fac * Cinverse[l]; // [ l ] == ( i, j ), [ m ] == ( j, i )
-        //         // }
-        //     }
-        // }
     }
 
 } // namespace HeatBalanceIntRadExchange

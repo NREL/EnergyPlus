@@ -52,10 +52,6 @@
 //
 // Language: C++
 
-#ifndef EIGEN_USE_MKL_ALL
-#define EIGEN_USE_MKL_ALL 1
-#endif
-
 // C++ Headers
 #include <cstdint> // C++11
 
