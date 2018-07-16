@@ -1186,7 +1186,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
 
         "  SetpointManager:OutdoorAirReset,",
         "    Hot Water Loop Setpoint Manager,  !- Name",
@@ -1244,7 +1244,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
 
         "  SetpointManager:OutdoorAirReset,",
         "    Hot Water Loop Setpoint Manager,  !- Name",
@@ -1295,4 +1295,132 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     Real64 SetPt = 80.0 - ((2.0 - -17.778) / (21.11 - -17.778)) * (80.0 - 35.0);
     // check OA Reset Set Point Manager sim
     EXPECT_EQ(SetPt, DataLoopNode::Node(1).TempSetPointLo);
+}
+
+TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
+{
+    std::string const idf_objects = delimited_string({
+        "Version,8.4;",
+        "SetpointManager:SingleZone:Reheat,",
+        "    SupAirTemp MngrKitchen,    !- Name",
+        "    Temperature,              !- Control Variable",
+        "    12.8,                     !- Minimum Supply Air Temperature",
+        "    40.0,                     !- Maximum Supply Air Temperature",
+        "    Kitchen,                  !- Control Zone Name",
+        "    Kitchen Air Node,         !- Zone Node Name",
+        "    Kitchen Inlet Node Name,    !- Zone Inlet Node Name",
+        "    Equipment Outlet Node;    !- Setpoint Node or NodeList Name",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    DataGlobals::NumOfZones = 1;
+
+    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone(1).Name = "KITCHEN";
+
+    DataLoopNode::Node.allocate(3);
+
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+
+    SetPointManager::GetSetPointManagerInputs();
+
+    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    DataAirLoop::AirLoopInputsFilled = true;
+
+    ASSERT_THROW(SetPointManager::InitSetPointManagers(), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** SetpointManager:SingleZone:Reheat=\"SUPAIRTEMP MNGRKITCHEN\", The zone inlet node of KITCHEN INLET NODE NAME",
+        "   **   ~~~   ** is not found in Zone = Uncontrolled Zone. Please check inputs.",
+        "   ** Severe  ** SetpointManager:SingleZone:Reheat=\"SUPAIRTEMP MNGRKITCHEN\", The zone inlet node is not connected to an air loop.",
+        "   **  Fatal  ** InitSetPointManagers: Errors found in getting SetPointManager input.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=SetpointManager:SingleZone:Reheat=\"SUPAIRTEMP MNGRKITCHEN\", The zone inlet node is not connected to an air loop.",
+        });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    DataZoneEquipment::ZoneEquipInputsFilled = false;
+    DataAirLoop::AirLoopInputsFilled = false;
+
+}
+TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
+{
+    std::string const idf_objects = delimited_string({
+        "Version,8.4;",
+        "SetpointManager:SingleZone:Heating,",
+        "  Heating Supply Air Temp Manager 1,  !- Name",
+        "  Temperature,             !- Control Variable",
+        "  -99.,                    !- Minimum Supply Air Temperature{ C }",
+        "  45.,                     !- Maximum Supply Air Temperature{ C }",
+        "  ZSF1,                    !- Control Zone Name",
+        "  ZSF1 Node,               !- Zone Node Name",
+        "  ZNF1 Inlet Node,         !- Zone Inlet Node Name",
+        "  Air Loop 1 Outlet Node;  !- Setpoint Node or NodeList Name",
+
+        "SetpointManager:SingleZone:Cooling,",
+        "  Cooling Supply Air Temp Manager 1,  !- Name",
+        "  Temperature,             !- Control Variable",
+        "  14.,                     !- Minimum Supply Air Temperature{ C }",
+        "  99.,                     !- Maximum Supply Air Temperature{ C }",
+        "  ZSF1,                    !- Control Zone Name",
+        "  ZSF1 Node,               !- Zone Node Name",
+        "  ZNF1 Inlet Node,         !- Zone Inlet Node Name",
+        "  Zone Equipment 1 Inlet Node;  !- Setpoint Node or NodeList Name",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    DataGlobals::NumOfZones = 1;
+
+    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone(1).Name = "ZSF1";
+
+    DataLoopNode::Node.allocate(3);
+
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+
+    SetPointManager::GetSetPointManagerInputs();
+
+    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    DataAirLoop::AirLoopInputsFilled = true;
+
+    ASSERT_THROW(SetPointManager::InitSetPointManagers(), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** SetpointManager:SingleZone:Heating=\"HEATING SUPPLY AIR TEMP MANAGER 1\", The zone inlet node of ZNF1 INLET NODE",
+        "   **   ~~~   ** is not found in Zone = Uncontrolled Zone. Please check inputs.",
+        "   ** Severe  ** SetpointManager:SingleZone:Cooling=\"COOLING SUPPLY AIR TEMP MANAGER 1\", The zone inlet node of ZNF1 INLET NODE",
+        "   **   ~~~   ** is not found in Zone = Uncontrolled Zone. Please check inputs.",
+        "   **  Fatal  ** InitSetPointManagers: Errors found in getting SetPointManager input.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=SetpointManager:SingleZone:Cooling=\"COOLING SUPPLY AIR TEMP MANAGER 1\", The zone inlet node of ZNF1 INLET NODE",
+        });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    DataZoneEquipment::ZoneEquipInputsFilled = false;
+    DataAirLoop::AirLoopInputsFilled = false;
+
 }

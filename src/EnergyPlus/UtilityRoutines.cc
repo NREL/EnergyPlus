@@ -750,8 +750,8 @@ void EndEnergyPlus()
     using namespace DataTimings;
     using namespace DataErrorTracking;
     using ExternalInterface::CloseSocket;
-    using ExternalInterface::NumExternalInterfaces;
     using ExternalInterface::haveExternalInterfaceBCVTB;
+    using ExternalInterface::NumExternalInterfaces;
     using General::RoundSigDigits;
     using SolarShading::ReportSurfaceErrors;
 
@@ -1429,7 +1429,8 @@ void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit
     if (len(Message) < 50) {
         ShowErrorMessage(" **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
                              CreateSysTimeIntervalString(),
-                         OutUnit1, OutUnit2);
+                         OutUnit1,
+                         OutUnit2);
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
                                             CreateSysTimeIntervalString());
@@ -1437,7 +1438,8 @@ void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit
     } else {
         ShowErrorMessage(" **   ~~~   ** " + Message);
         ShowErrorMessage(" **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(),
-                         OutUnit1, OutUnit2);
+                         OutUnit1,
+                         OutUnit2);
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
                                             CreateSysTimeIntervalString());
@@ -1646,8 +1648,8 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Messag
     }
 
     ++TotalSevereErrors;
-    StoreRecurringErrorMessage(" ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits,
-                               ReportSumUnits);
+    StoreRecurringErrorMessage(
+        " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
 }
 
 void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
@@ -1704,8 +1706,8 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Messa
     }
 
     ++TotalWarningErrors;
-    StoreRecurringErrorMessage(" ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits,
-                               ReportSumUnits);
+    StoreRecurringErrorMessage(
+        " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
 }
 
 void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
@@ -1761,8 +1763,8 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Mess
         if (has(Message, MessageSearch(Loop))) ++MatchCounts(Loop);
     }
 
-    StoreRecurringErrorMessage(" **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits,
-                               ReportSumUnits);
+    StoreRecurringErrorMessage(
+        " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
 }
 
 void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation

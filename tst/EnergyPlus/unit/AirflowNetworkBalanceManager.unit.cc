@@ -49,12 +49,14 @@
 
 // Google test headers
 #include <gtest/gtest.h>
+#include <exception>
 
 // EnergyPlus Headers
 #include <AirflowNetworkBalanceManager.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataSurfaces.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -3004,7 +3006,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.9;",
+        "  Version,9.0;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -7075,7 +7077,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.9;",
+        {"Version,9.0;",
          "Material,",
          "  A1 - 1 IN STUCCO,        !- Name",
          "  Smooth,                  !- Roughness",
@@ -7763,7 +7765,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,8.9;",
+        {"Version,9.0;",
          "SimulationControl,",
          "  No,                      !- Do Zone Sizing Calculation",
          "  No,                      !- Do System Sizing Calculation",
@@ -8208,6 +8210,34 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     for (auto value : CurveManager::PerfCurveTableData(6).Y) {
         EXPECT_NEAR(valsForRightWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
     }
+}
+
+TEST_F(EnergyPlusFixture, AFN_CheckNumOfFansInAirLoopTest)
+{
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 3;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(3);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf = "Fan:VariableVolume";
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CVF";
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).Name = "VAV";
+
+    ASSERT_THROW(ValidateDistributionSystem(), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: An AirLoop branch, , has two or more fans: CVF,VAV",
+        "   **   ~~~   ** The AirflowNetwork model allows a single supply fan in an AirLoop only. Please make "
+        "changes in the input file accordingly.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=ValidateDistributionSystem: An AirLoop branch, , has two or more fans: CVF,VAV",
+        });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
 }
 
 } // namespace EnergyPlus
