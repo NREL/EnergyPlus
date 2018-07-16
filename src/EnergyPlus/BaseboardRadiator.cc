@@ -661,7 +661,7 @@ namespace BaseboardRadiator {
             RhoAirStdInit = StdRhoAir;
             WaterInletNode = Baseboard(BaseboardNum).WaterInletNode;
             rho = GetDensityGlycol(PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidName,
-                                   DataGlobals::CWInitConvTemp,
+                                   DataGlobals::HWInitConvTemp,
                                    PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidIndex,
                                    RoutineName);
             Baseboard(BaseboardNum).WaterMassFlowRateMax = rho * Baseboard(BaseboardNum).WaterVolFlowRateMax;
@@ -673,7 +673,7 @@ namespace BaseboardRadiator {
                                Baseboard(BaseboardNum).LoopSideNum,
                                Baseboard(BaseboardNum).BranchNum,
                                Baseboard(BaseboardNum).CompNum);
-            Node(WaterInletNode).Temp = 60.0;
+            Node(WaterInletNode).Temp = DataGlobals::HWInitConvTemp;
             Cp = GetSpecificHeatGlycol(PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidName,
                                        Node(WaterInletNode).Temp,
                                        PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidIndex,
@@ -848,7 +848,7 @@ namespace BaseboardRadiator {
                                                    PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidIndex,
                                                    RoutineName);
                         rho = GetDensityGlycol(PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidIndex,
                                                RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -910,7 +910,7 @@ namespace BaseboardRadiator {
                     Baseboard(BaseboardNum).AirInletHumRat = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtHeatPeak;
                     WaterInletNode = Baseboard(BaseboardNum).WaterInletNode;
                     rho = GetDensityGlycol(PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
+                                           DataGlobals::HWInitConvTemp,
                                            PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidIndex,
                                            RoutineName);
                     Node(WaterInletNode).MassFlowRate = rho * Baseboard(BaseboardNum).WaterVolFlowRateMax;
