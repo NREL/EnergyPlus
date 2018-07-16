@@ -631,41 +631,10 @@ add_custom_target( GenerateEmbeddedEpJSONSchema
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    DEPENDS generate_embeddedable_epJSON_schema )
 
-MESSAGE(STATUS "ENERGYPLUS_SOURCE_DIR:    " ${EnergyPlus_SOURCE_DIR})
-
-set(MKL_SDL True)
-set(MKL_MULTI_THREADED True)
-set(MKL_ROOT $ENV{MKLROOT} CACHE PATH "Folder contains MKL")
-
-message(${MKL_SDL})
-message(${MKL_ROOT}/lib/)
-
-find_package(MKL REQUIRED)
-include_directories(${MKL_INCLUDE_DIR})
-
-add_definitions(-DEIGEN_USE_MKL_ALL)
-
-# set(INTEL_ROOT "${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/" CACHE PATH "Folder contains intel libs")
-# set(MKL_SDL True)
-# #set(MKL_STATAIC True)
-# set(MKL_MULTI_THREADED True)
-# set(CMAKE_MODULE_PATH ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/cmake)
-# set(MKL_ROOT ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/)
-# set(MKL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/third_party/Intel-MKL/include/)
-# find_package(MKL REQUIRED)
-
-#set(
-#        INTELMKL
-#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_lp64.a
-#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_thread.a
-#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_core.a
-#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libiomp5.so
-#)
-
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva ${MKL_LIBRARIES} )
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva )
 add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
