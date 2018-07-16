@@ -598,5 +598,6 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_noPowerFFlowCurve)
     // uses flow weighted power calculation. 0% of time at 0% flow and 85% of time at 100% flow
     locExpectPower = (0.0 * 0.25 + 0.85 * 1.0) * HVACFan::fanObjs[0]->designElecPower; // expect 85% of full power
     EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
+}
 
 } // namespace EnergyPlus
