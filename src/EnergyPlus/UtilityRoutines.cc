@@ -628,7 +628,7 @@ AbortEnergyPlus()
 	// Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
 	// indicating that E+ terminated with an error.
 	if ( NumExternalInterfaces > 0 ) CloseSocket( -1 );
-	std::exit( EXIT_FAILURE );
+	// std::exit( EXIT_FAILURE );
 
 }
 

@@ -58,6 +58,9 @@
 	void
 	CreateCurrentDateTimeString( std::string & CurrentDateTimeString );
 
+	int ENERGYPLUSLIB_API
+	EnergyPlusPgmReturnCodes(std::string const & filepath = std::string());
+
 	void ENERGYPLUSLIB_API
 	EnergyPlusPgm( std::string const & filepath = std::string() );
 

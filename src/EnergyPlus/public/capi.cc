@@ -95,6 +95,7 @@ extern "C"
 
 	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length)
 	{
+		int status(EXIT_FAILURE);
 		std::string filepath;
 		if (path_length == 0)
 		{
@@ -106,15 +107,15 @@ extern "C"
 		}
 		try
 		{
-			EnergyPlusPgm(filepath);
+			status = EnergyPlusPgmReturnCodes(filepath);
 		}
 		catch (...)
 		{
 			// Don't allow any exceptions to leak out to the caller
 			std::cerr << "Exception encountered" << std::endl;
-			return 1;
+			return EXIT_FAILURE;
 		}
-		return 0;
+		return status;
 	}
 
 	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f)

@@ -64,12 +64,13 @@ int main( int argc, char* argv[] )
 	StoreMessageCallback( message_callback_handler );
 	StoreProgressCallback( progress_callback_handler );
 
+	int status(EXIT_FAILURE);
 	if ( argc < 2 ) {
 		std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	} else {
-		EnergyPlusPgm( argv[1] );
+		status = EnergyPlusPgmReturnCodes( argv[1] );
 	}
 	std::cout << "THIS LINE SHOULD DISPLAY." << std::endl << std::flush;
-	return 0;
+	return status;
 }
