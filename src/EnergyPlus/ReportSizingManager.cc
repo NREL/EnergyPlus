@@ -1490,8 +1490,9 @@ namespace ReportSizingManager {
                     } else {
                         AutosizeDes = FinalZoneSizing(CurZoneEqNum).CoolDesHumRat;
                     }
-                    if (AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 &&
-                        UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) { // zone coil uses mDot>0, sys coil uses cap > 0
+                    if (AutosizeDes > DataDesInletAirHumRat &&
+                        UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) { // zone coil uses mDot>0, take out DataCapacityUsedForSizing >
+                                                                                       // 0 because now called before capacity is sized
                         ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                          "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
                         ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
@@ -1508,7 +1509,9 @@ namespace ReportSizingManager {
                     // check for dry coil and reset outlet humrat if needed
                     DesSatEnthAtWaterInTemp = PsyHFnTdbW(DataDesInletWaterTemp, PsyWFnTdpPb(DataDesInletWaterTemp, StdBaroPress));
                     DesHumRatAtWaterInTemp = PsyWFnTdbH(DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine);
-                    if (AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0) {
+                    if (AutosizeDes < DataDesInletAirHumRat &&
+                        DesHumRatAtWaterInTemp >
+                            DataDesInletAirHumRat) { // take out DataCapacityUsedForSizing > 0 because now called before capacity is sized
                         if (DataDesInletAirHumRat > AutosizeDes && UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
                             ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                              "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio.");
@@ -2439,8 +2442,10 @@ namespace ReportSizingManager {
                     } else {
                         AutosizeDes = FinalSysSizing(CurSysNum).CoolSupHumRat;
                     }
-                    if (AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 &&
-                        UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) { // flow here is water vol flow rate
+                    if (AutosizeDes > DataDesInletAirHumRat &&
+                        UtilityRoutines::SameString(CompType,
+                                                    "COIL:COOLING:WATER")) { // flow here is water vol flow rate, take out DataCapacityUsedForSizing >
+                                                                             // 0 because now called before capacity is sized
                         ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                          "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
                         ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
@@ -2458,8 +2463,8 @@ namespace ReportSizingManager {
                     DesSatEnthAtWaterInTemp = PsyHFnTdbW(DataDesInletWaterTemp, PsyWFnTdpPb(DataDesInletWaterTemp, StdBaroPress));
                     DesHumRatAtWaterInTemp = PsyWFnTdbH(DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine);
                     if (AutosizeDes < DataDesInletAirHumRat &&
-                        DesHumRatAtWaterInTemp >
-                            DataDesInletAirHumRat) { // flow here is water vol flow rate //TRANE take out DataCapacityUsedForSizing > 0
+                        DesHumRatAtWaterInTemp > DataDesInletAirHumRat) { // flow here is water vol flow rate, take out DataCapacityUsedForSizing > 0
+                                                                          // because now called before capacity is sized
                         if (DataDesInletAirHumRat > AutosizeDes && UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
                             ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                              "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio.");
