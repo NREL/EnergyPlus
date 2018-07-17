@@ -3827,7 +3827,7 @@ namespace PackagedTerminalHeatPump {
 
                     if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
                                                RoutineName);
 
@@ -3898,7 +3898,7 @@ namespace PackagedTerminalHeatPump {
 
                     if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
                                                RoutineName);
                         PTUnit(PTUnitNum).MaxSuppCoilFluidFlow =
@@ -4252,7 +4252,7 @@ namespace PackagedTerminalHeatPump {
                     if (CoilMaxVolFlowRate != AutoSize) {
 
                         rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
                                                RoutineNameSpace);
                         PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -4275,7 +4275,7 @@ namespace PackagedTerminalHeatPump {
                     CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
                     if (CoilMaxVolFlowRate != AutoSize) {
                         rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
                                                RoutineNameSpace);
                         PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
