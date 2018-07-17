@@ -1279,7 +1279,6 @@ namespace ReportSizingManager {
                         }
                     }
                 } else if (SizingType == CoolingWaterflowSizing) {
-                    CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
                     Cp = GetSpecificHeatGlycol(
                         PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     rho = GetDensityGlycol(
@@ -1364,8 +1363,13 @@ namespace ReportSizingManager {
                 } else if (SizingType == HeatingWaterDesAirInletTempSizing) {
                     if (TermUnitPIU && (CurTermUnitSizingNum > 0)) {
                         MinFlowFrac = TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac;
-                        AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
-                                      FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
+                        if (TermUnitSizing(CurTermUnitSizingNum).InducesPlenumAir) {
+                            AutosizeDes = (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac) +
+                                          (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneRetTempAtHeatPeak * (1.0 - MinFlowFrac));
+                        } else {
+                            AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
+                                          FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
+                        }
                     } else if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
                         AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                     } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
