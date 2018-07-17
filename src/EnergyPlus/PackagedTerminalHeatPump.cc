@@ -218,6 +218,7 @@ namespace PackagedTerminalHeatPump {
         MyOneTimeFlag = true;
         PTUnitUniqueNames.clear();
         PTUnit.deallocate();
+        GetPTUnitInputFlag = true;
     }
 
     void SimPackagedTerminalUnit(std::string const &CompName,   // name of the packaged terminal heat pump
