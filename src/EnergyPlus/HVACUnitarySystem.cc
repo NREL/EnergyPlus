@@ -2612,47 +2612,59 @@ namespace HVACUnitarySystem {
             UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).CoolMassFlowRate(1);
             UnitarySystem(UnitarySysNum).IdleSpeedRatio = UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(1);
 
-        } else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_Cooling ) {
+        } else if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_Cooling) {
 
-            if ( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) {
-                if ( !allocated( UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate ) ) UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
-                if ( !allocated( UnitarySystem( UnitarySysNum ).CoolMassFlowRate ) ) UnitarySystem( UnitarySysNum ).CoolMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
-                if ( !allocated( UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
+            if (UnitarySystem(UnitarySysNum).NumOfSpeedCooling > 0) {
+                if (!allocated(UnitarySystem(UnitarySysNum).CoolVolumeFlowRate))
+                    UnitarySystem(UnitarySysNum).CoolVolumeFlowRate.allocate(UnitarySystem(UnitarySysNum).NumOfSpeedCooling);
+                if (!allocated(UnitarySystem(UnitarySysNum).CoolMassFlowRate))
+                    UnitarySystem(UnitarySysNum).CoolMassFlowRate.allocate(UnitarySystem(UnitarySysNum).NumOfSpeedCooling);
+                if (!allocated(UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio))
+                    UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio.allocate(UnitarySystem(UnitarySysNum).NumOfSpeedCooling);
             }
 
-            MSHPIndex = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
-            if ( MSHPIndex > 0 ) {
-                for ( Iter = DesignSpecMSHP( MSHPIndex ).NumOfSpeedCooling; Iter >= 1; --Iter ) { // use reverse order since we divide by HeatVolumeFlowRate(max)
-                    if ( DesignSpecMSHP( MSHPIndex ).CoolingVolFlowRatio( Iter ) == AutoSize ) {
-                        DesignSpecMSHP( MSHPIndex ).CoolingVolFlowRatio( Iter ) = double( Iter ) / double( DesignSpecMSHP( MSHPIndex ).NumOfSpeedCooling );
+            MSHPIndex = UnitarySystem(UnitarySysNum).DesignSpecMSHPIndex;
+            if (MSHPIndex > 0) {
+                for (Iter = DesignSpecMSHP(MSHPIndex).NumOfSpeedCooling; Iter >= 1;
+                     --Iter) { // use reverse order since we divide by HeatVolumeFlowRate(max)
+                    if (DesignSpecMSHP(MSHPIndex).CoolingVolFlowRatio(Iter) == AutoSize) {
+                        DesignSpecMSHP(MSHPIndex).CoolingVolFlowRatio(Iter) = double(Iter) / double(DesignSpecMSHP(MSHPIndex).NumOfSpeedCooling);
                     }
                 }
             }
 
-            coilCoolingDXs[ UnitarySystem( UnitarySysNum ).CoolingCoilIndex ].simulate( UnitarySystem( UnitarySysNum ).DehumidificationMode, UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac, UnitarySystem( UnitarySysNum ).CoolingSpeedNum, UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).FanOpMode );
-//            UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NumOfSpeeds;
+            coilCoolingDXs[UnitarySystem(UnitarySysNum).CoolingCoilIndex].simulate(UnitarySystem(UnitarySysNum).DehumidificationMode,
+                                                                                   UnitarySystem(UnitarySysNum).CoolingPartLoadFrac,
+                                                                                   UnitarySystem(UnitarySysNum).CoolingSpeedNum,
+                                                                                   UnitarySystem(UnitarySysNum).CoolingSpeedRatio,
+                                                                                   UnitarySystem(UnitarySysNum).FanOpMode);
+            //            UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex
+            //            ).NumOfSpeeds;
             // mine capacity from Coil:Cooling:DX object
-            auto & newCoil = coilCoolingDXs[ UnitarySystem( UnitarySysNum ).CoolingCoilIndex ];
+            auto &newCoil = coilCoolingDXs[UnitarySystem(UnitarySysNum).CoolingCoilIndex];
             int const magicNominalModeNum = 0;
-            DXCoolCap = newCoil.performance.modes[ magicNominalModeNum ].ratedGrossTotalCap;
+            DXCoolCap = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
             EqSizing.DesCoolingLoad = DXCoolCap;
 
-            for ( Iter = 1; Iter <= UnitarySystem( UnitarySysNum ).NumOfSpeedCooling; ++Iter ) {
-                UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = newCoil.performance.modes[ magicNominalModeNum ].speeds[ Iter - 1 ].evap_air_flow_rate;
-                UnitarySystem( UnitarySysNum ).CoolMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) * StdRhoAir;
+            for (Iter = 1; Iter <= UnitarySystem(UnitarySysNum).NumOfSpeedCooling; ++Iter) {
+                UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
+                    newCoil.performance.modes[magicNominalModeNum].speeds[Iter - 1].evap_air_flow_rate;
+                UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
                 // it seems the ratio should reference the actual flow rates, not the fan flow ???
-                if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate > 0.0 && UnitarySystem( UnitarySysNum ).FanExists ) {
+                if (UnitarySystem(UnitarySysNum).DesignFanVolFlowRate > 0.0 && UnitarySystem(UnitarySysNum).FanExists) {
                     //             UnitarySystem(UnitarySysNum)%CoolVolumeFlowRate(UnitarySystem(UnitarySysNum)%NumOfSpeedCooling)
-                    UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) / UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate;
-                }
-                else {
-                    UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) / UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
+                    UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
+                        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).DesignFanVolFlowRate;
+                } else {
+                    UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
+                        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) /
+                        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(UnitarySystem(UnitarySysNum).NumOfSpeedCooling);
                 }
             }
 
-            UnitarySystem( UnitarySysNum ).IdleVolumeAirRate = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( 1 );
-            UnitarySystem( UnitarySysNum ).IdleMassFlowRate = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
-            UnitarySystem( UnitarySysNum ).IdleSpeedRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
+            UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(1);
+            UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).CoolMassFlowRate(1);
+            UnitarySystem(UnitarySysNum).IdleSpeedRatio = UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(1);
 
         } else if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_MultiSpeedCooling) {
 
@@ -4956,8 +4968,8 @@ namespace HVACUnitarySystem {
                     UnitarySystem(UnitarySysNum).CoolingCoilType_Num = Coil_UserDefined;
                 } else if (UtilityRoutines::SameString(CoolingCoilType, "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
                     UnitarySystem(UnitarySysNum).CoolingCoilType_Num = CoilDX_PackagedThermalStorageCooling;
-                } else if ( SameString( CoolingCoilType, "Coil:Cooling:DX" ) ) { // CoilCoolingDX
-                    UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_Cooling;
+                } else if (UtilityRoutines::SameString(CoolingCoilType, "Coil:Cooling:DX")) { // CoilCoolingDX
+                    UnitarySystem(UnitarySysNum).CoolingCoilType_Num = CoilDX_Cooling;
                 } else {
                     ShowSevereError(CurrentModuleObject + " = " + UnitarySystem(UnitarySysNum).Name);
                     ShowContinueError("Illegal " + cAlphaFields(iCoolingCoilTypeAlphaNum) + " = " + Alphas(iCoolingCoilTypeAlphaNum));
@@ -5130,34 +5142,40 @@ namespace HVACUnitarySystem {
                         SetDXCoolingCoilData(UnitarySystem(UnitarySysNum).CoolingCoilIndex, ErrorsFound, HeatingCoilPLFCurveIndex);
                     }
 
-                } else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_Cooling ) {
-//                    // call CoilCoolingDX constructor
-                    coilCoolingDXs.emplace_back( CoolingCoilName );
-                    UnitarySystem( UnitarySysNum ).CoolingCoilIndex = (int)coilCoolingDXs.size() - 1;
+                } else if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_Cooling) {
+                    //                    // call CoilCoolingDX constructor
+                    coilCoolingDXs.emplace_back(CoolingCoilName);
+                    UnitarySystem(UnitarySysNum).CoolingCoilIndex = (int)coilCoolingDXs.size() - 1;
 
                     // mine data from coil object
-                    auto & newCoil = coilCoolingDXs[UnitarySystem( UnitarySysNum ).CoolingCoilIndex];
+                    auto &newCoil = coilCoolingDXs[UnitarySystem(UnitarySysNum).CoolingCoilIndex];
                     int const magicNominalModeNum = 0;
-                    UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
-                    UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = newCoil.performance.modes[ magicNominalModeNum ].ratedEvapAirFlowRate;
-                    UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
+                    UnitarySystem(UnitarySysNum).DesignCoolingCapacity = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
+                    UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow = newCoil.performance.modes[magicNominalModeNum].ratedEvapAirFlowRate;
+                    UnitarySystem(UnitarySysNum).CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
                     CoolingCoilInletNode = newCoil.evapInletNodeIndex;
                     CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
-                    UnitarySystem( UnitarySysNum ).CondenserNodeNum = newCoil.condInletNodeIndex;
-                    UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = (int) newCoil.performance.modes[0].speeds.size();
-                    UnitarySystem( UnitarySysNum ).MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
+                    UnitarySystem(UnitarySysNum).CondenserNodeNum = newCoil.condInletNodeIndex;
+                    UnitarySystem(UnitarySysNum).NumOfSpeedCooling = (int)newCoil.performance.modes[0].speeds.size();
+                    UnitarySystem(UnitarySysNum).MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
 
                     // Push heating coil PLF curve index to DX coil
-//                    if ( HeatingCoilPLFCurveIndex > 0 ) {
-//                        SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound, HeatingCoilPLFCurveIndex );
-//                    }
+                    //                    if ( HeatingCoilPLFCurveIndex > 0 ) {
+                    //                        SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound,
+                    //                        HeatingCoilPLFCurveIndex );
+                    //                    }
 
                     // set variable speed coil flag as necessary
-                    UnitarySystem( UnitarySysNum ).VarSpeedCoolingCoil = true;
+                    UnitarySystem(UnitarySysNum).VarSpeedCoolingCoil = true;
 
-                    if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-                        if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-                            UnitarySystem( UnitarySysNum ).HeatPump = true;
+                    if (UnitarySystem(UnitarySysNum).HeatCoilExists) {
+                        if (UnitarySystem(UnitarySysNum).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed ||
+                            UnitarySystem(UnitarySysNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit ||
+                            UnitarySystem(UnitarySysNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHP ||
+                            UnitarySystem(UnitarySysNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple ||
+                            UnitarySystem(UnitarySysNum).HeatingCoilType_Num == CoilDX_MultiSpeedHeating ||
+                            UnitarySystem(UnitarySysNum).HeatingCoilType_Num == CoilDX_HeatingEmpirical) {
+                            UnitarySystem(UnitarySysNum).HeatPump = true;
                         }
                     }
 
@@ -9927,12 +9945,12 @@ namespace HVACUnitarySystem {
                           CoilCoolHeatRat);
                 UnitarySystem(UnitarySysNum).CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
 
-            } else if ( SELECT_CASE_var == CoilDX_Cooling ) { // CoilCoolingDX
-    
-                if ( CoolingLoad ) {
-                    if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 ) {
+            } else if (SELECT_CASE_var == CoilDX_Cooling) { // CoilCoolingDX
+
+                if (CoolingLoad) {
+                    if (UnitarySystem(UnitarySysNum).CoolingSpeedNum > 1) {
                         CoilPLR = 1.0;
-                        UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = PartLoadRatio;
+                        UnitarySystem(UnitarySysNum).CoolingSpeedRatio = PartLoadRatio;
                     } else {
                         CoilPLR = PartLoadRatio;
                         //                UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0; // isn't this handled somewhere else?
@@ -9940,11 +9958,15 @@ namespace HVACUnitarySystem {
                 } else {
                     CoilPLR = 0.0;
                 }
-                coilCoolingDXs[UnitarySystem( UnitarySysNum ).CoolingCoilIndex].simulate( UnitarySystem( UnitarySysNum ).DehumidificationMode, CoilPLR, UnitarySystem( UnitarySysNum ).CoolingSpeedNum, UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).FanOpMode );
-                if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 ) {
-                    UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = 1.0;
+                coilCoolingDXs[UnitarySystem(UnitarySysNum).CoolingCoilIndex].simulate(UnitarySystem(UnitarySysNum).DehumidificationMode,
+                                                                                       CoilPLR,
+                                                                                       UnitarySystem(UnitarySysNum).CoolingSpeedNum,
+                                                                                       UnitarySystem(UnitarySysNum).CoolingSpeedRatio,
+                                                                                       UnitarySystem(UnitarySysNum).FanOpMode);
+                if (UnitarySystem(UnitarySysNum).CoolingSpeedNum > 1) {
+                    UnitarySystem(UnitarySysNum).CoolCompPartLoadRatio = 1.0;
                 } else {
-                    UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
+                    UnitarySystem(UnitarySysNum).CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
                 }
 
             } else if ((SELECT_CASE_var == CoilDX_CoolingHXAssisted) ||
@@ -16131,4 +16153,3 @@ namespace HVACUnitarySystem {
 } // namespace HVACUnitarySystem
 
 } // namespace EnergyPlus
-

@@ -70,7 +70,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
     } );
 
     bool ok = !process_idf( idf_objects, false );
-    CoilCoolingDXCurveFitSpeed thisSpeed("Speed1Name", nullptr);
+    CoilCoolingDXCurveFitSpeed thisSpeed("Speed1Name");
 
 }
 

@@ -56,4 +56,3 @@ int main(int argc, const char *argv[])
     ProcessArgs(argc, argv);
     EnergyPlusPgm();
 }
-

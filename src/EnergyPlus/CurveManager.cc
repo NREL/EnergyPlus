@@ -6063,55 +6063,54 @@ namespace CurveManager {
         return IsCurveOutputTypeValid;
     }
 
-    int
-    GetCurveTypeNum( int const & CurveIndex )
+    int GetCurveTypeNum(int const &CurveIndex)
     {
         int GetCurveTypeNum;
-        std::string stringCurveType = GetCurveType( CurveIndex );
+        std::string stringCurveType = GetCurveType(CurveIndex);
 
-        if ( stringCurveType == "BICUBIC" ) {
+        if (stringCurveType == "BICUBIC") {
             GetCurveTypeNum = CurveManager::BiCubic;
-        } else if ( stringCurveType == "BILINEAR" ) {
+        } else if (stringCurveType == "BILINEAR") {
             GetCurveTypeNum = CurveManager::BiLinear;
-        } else if ( stringCurveType == "BIQUADRATIC" ) {
+        } else if (stringCurveType == "BIQUADRATIC") {
             GetCurveTypeNum = CurveManager::BiQuadratic;
-        } else if ( stringCurveType == "CUBIC" ) {
+        } else if (stringCurveType == "CUBIC") {
             GetCurveTypeNum = CurveManager::Cubic;
-        } else if ( stringCurveType == "LINEAR" ) {
+        } else if (stringCurveType == "LINEAR") {
             GetCurveTypeNum = CurveManager::Linear;
-        } else if ( stringCurveType == "QUADRATIC" ) {
+        } else if (stringCurveType == "QUADRATIC") {
             GetCurveTypeNum = CurveManager::Quadratic;
-        } else if ( stringCurveType == "QUADRATICLINEAR" ) {
+        } else if (stringCurveType == "QUADRATICLINEAR") {
             GetCurveTypeNum = CurveManager::QuadraticLinear;
-        } else if ( stringCurveType == "TRIQUADRATIC" ) {
+        } else if (stringCurveType == "TRIQUADRATIC") {
             GetCurveTypeNum = CurveManager::TriQuadratic;
-        } else if ( stringCurveType == "EXPONENT" ) {
+        } else if (stringCurveType == "EXPONENT") {
             GetCurveTypeNum = CurveManager::Exponent;
-        } else if ( stringCurveType == "QUARTIC" ) {
+        } else if (stringCurveType == "QUARTIC") {
             GetCurveTypeNum = CurveManager::Quartic;
-        } else if ( stringCurveType == "FUNCPRESSDROP" ) {
+        } else if (stringCurveType == "FUNCPRESSDROP") {
             GetCurveTypeNum = CurveManager::FuncPressDrop;
-        } else if ( stringCurveType == "MULTIVARIABLELOOKUP" ) {
+        } else if (stringCurveType == "MULTIVARIABLELOOKUP") {
             GetCurveTypeNum = CurveManager::MultiVariableLookup;
-        } else if ( stringCurveType == "FANPRESSURERISE" ) {
+        } else if (stringCurveType == "FANPRESSURERISE") {
             GetCurveTypeNum = CurveManager::FanPressureRise;
-        } else if ( stringCurveType == "EXPONENTIALSKEWNORMAL" ) {
+        } else if (stringCurveType == "EXPONENTIALSKEWNORMAL") {
             GetCurveTypeNum = CurveManager::ExponentialSkewNormal;
-        } else if ( stringCurveType == "SIGMOID" ) {
+        } else if (stringCurveType == "SIGMOID") {
             GetCurveTypeNum = CurveManager::Sigmoid;
-        } else if ( stringCurveType == "RECTANGULARHYPERBOLA1" ) {
+        } else if (stringCurveType == "RECTANGULARHYPERBOLA1") {
             GetCurveTypeNum = CurveManager::RectangularHyperbola1;
-        } else if ( stringCurveType == "RECTANGULARHYPERBOLA2" ) {
+        } else if (stringCurveType == "RECTANGULARHYPERBOLA2") {
             GetCurveTypeNum = CurveManager::RectangularHyperbola2;
-        } else if ( stringCurveType == "EXPONENTIALDECAY" ) {
+        } else if (stringCurveType == "EXPONENTIALDECAY") {
             GetCurveTypeNum = CurveManager::ExponentialDecay;
-        } else if ( stringCurveType == "DOUBLEEXPONENTIALDECAY" ) {
+        } else if (stringCurveType == "DOUBLEEXPONENTIALDECAY") {
             GetCurveTypeNum = CurveManager::DoubleExponentialDecay;
-        } else if ( stringCurveType == "QUADLINEAR" ) {
+        } else if (stringCurveType == "QUADLINEAR") {
             GetCurveTypeNum = CurveManager::QuadLinear;
-        } else if ( stringCurveType == "CUBICLINEAR" ) {
+        } else if (stringCurveType == "CUBICLINEAR") {
             GetCurveTypeNum = CurveManager::CubicLinear;
-        } else if ( stringCurveType == "CHILLERPARTLOADWITHLIFT" ) {
+        } else if (stringCurveType == "CHILLERPARTLOADWITHLIFT") {
             GetCurveTypeNum = CurveManager::ChillerPartLoadWithLift;
         }
 
@@ -6200,9 +6199,9 @@ namespace CurveManager {
                     GetCurveType = "DOUBLEEXPONENTIALDECAY";
                 } else if (SELECT_CASE_var == ChillerPartLoadWithLift) {
                     GetCurveType = "CHILLERPARTLOADWITHLIFT";
-                } else if ( SELECT_CASE_var == FuncPressDrop ) {
+                } else if (SELECT_CASE_var == FuncPressDrop) {
                     GetCurveType = "FUNCPRESSDROP";
-                } else if ( SELECT_CASE_var == MultiVariableLookup ) {
+                } else if (SELECT_CASE_var == MultiVariableLookup) {
                     GetCurveType = "MULTIVARIABLELOOKUP";
                 }
             }

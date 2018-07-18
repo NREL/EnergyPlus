@@ -240,8 +240,8 @@ namespace DataHVACGlobals {
     int const CoilVRF_FluidTCtrl_Cooling(33);
     int const CoilVRF_FluidTCtrl_Heating(34);
 
-    int const CoilDX_Cooling( 35 );
-    
+    int const CoilDX_Cooling(35);
+
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
                                         "Coil:Heating:DX:SingleSpeed",
@@ -712,4 +712,3 @@ namespace DataHVACGlobals {
 } // namespace DataHVACGlobals
 
 } // namespace EnergyPlus
-
