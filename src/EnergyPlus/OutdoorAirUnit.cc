@@ -1101,6 +1101,7 @@ namespace OutdoorAirUnit {
         using DataSizing::AutoSize;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using WaterCoils::SimulateWaterCoilComponents;
+        auto &GetSteamCoilMaxFlowRate(SteamCoils::GetCoilMaxWaterFlowRate);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1280,10 +1281,11 @@ namespace OutdoorAirUnit {
                     }
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum == TypeOf_CoilSteamAirHeating) {
                         // DSU deal with steam mass flow rate , currenlty just like hot water  DSU?
-                        rho = GetDensityGlycol(PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
-                                               60.0,
-                                               PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
-                                               RoutineName);
+                        OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow = GetSteamCoilMaxFlowRate(
+                            OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentType, OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName, errFlag);
+                        Real64 TempSteamIn = 100.0;
+                        int SteamIndex = 0;
+                        Real64 rho = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MinVolWaterFlow;
                         InitComponentNodes(OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
