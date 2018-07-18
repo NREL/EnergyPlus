@@ -20,17 +20,30 @@ This object can be configured with a water, steam, electric or gas reheat coil. 
 \caption{Schematic of AirTerminal:SingleDuct:ConstantVolume:Reheat Unit \protect \label{fig:schematic-of-airterminal-singleduct}}
 \end{figure}
 
+
+\subsection{Constant Volume Single Duct No Reheat Air Terminal}\label{constant-volume-single-duct-no-reheat-air-terminal}
+
+The input object AirTerminal:SingleDuct:ConstantVolume:NoReheat is used to pass conditioned or treated central supply air directly into a zone without any reheat. This terminal air equipment allows to supply central system air directly to a zone without any zone level control or tempering. The supply air temperature is controlled by the central system to meet the load in a controlled zone. This object is configured for use with a constant volume central air system, unitary system or furnace and variable supply air temperature. 
+
+This unit allows the program to know what zone this branch of the air system is attached to, and has input fields for availability schedule, air inlet and outlet nodes, an input field for the maximum air flow rate, and other two optional input fields. The air inlet node should be the same as one of the \emph{AirLoopHVAC:ZoneSplitter} or \emph{AirLoopHVAC:SupplyPlenum} component outlet nodes. The air outlet node name should be same as zone air inlet node name and the air distribution unit air outlet node name. The last two optional input fields: \textit{Design Specification Outdoor Air Object Name}, and \textit{Per Person Ventilation Rate Mode} are used to compute the outdoor air requirement of an air terminal unit and the air terminal mass flow rate is set to the value calculated using these two input fields. 
+
+\begin{figure}[hbtp] % fig 154
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/SingleDuctConstantVolumeNoReheatAT.png}
+\caption{Schematic of AirTerminal:SingleDuct:ConstantVolume:NoReheat Unit \protect \label{fig:schematic-of-airterminal-singleduct}}
+\end{figure}
+
 \subsection{Variable Air Volume Single Duct Reheat and No Reheat Air Terminals}\label{variable-air-volume-single-duct-reheat-and-no-reheat-air-terminals}
 
 The VAV Single Duct Reheat and No Reheat terminal units (objects AirTerminal:SingleDuct:VAV:Reheat and AirTerminal:SingleDuct:VAV:NoReheat) provide models for single duct variable-air-volume (VAV) systems that control zone temperature primarily by varying the quantity of supply air rather than by varying the supply air temperature. The supply air temperature must be low enough to meet the cooling load in the zone having the greatest load when the zone terminal device is wide open. For zones with a smaller cooling load, the terminal device damper reduces the flow to match the zone setpoint.. If the lower flow limit on the terminal device is reached and the load is not matched, the inlet air temperature can be moderated if the terminal device has a reheat coil. In that case both the quantity of air and its temperature entering the zone are varied to meet the load. For air terminals using reheat coils, the maximum flow during reheat may be limited. Limiting the maximum flow during reheat occurs only when cooling is required (when any valid air loop cooling coil is active) and the terminal unit must reheat the air. Optional user inputs may also be used to control the amount of outdoor air entering the zone.
 
-\begin{figure}[hbtp] % fig 154
+\begin{figure}[hbtp] % fig 155
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2789.png}
 \caption{Schematic of AirTerminal:SingleDuct:VAV:NoReheat Unit \protect \label{fig:schematic-of-airterminal-singleduct-vav}}
 \end{figure}
 
-\begin{figure}[hbtp] % fig 155
+\begin{figure}[hbtp] % fig 156
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2790.png}
 \caption{Schematic of AirTerminal:SingleDuct:VAV:Reheat Unit \protect \label{fig:schematic-of-airterminal-singleduct-vav-001}}
@@ -64,13 +77,13 @@ The no reheat version of the single duct VAV heat and cool terminal unit contain
 
 Both units are simulated to provide an air flow rate sufficient to satisfy the thermostat request. The air flow rate is a function of the terminal unit's inlet air temperature and the load sensed by the thermostat. The output of the models are simply the damper position required to satisfy the zone's thermal load. Other information regarding terminal unit performance may be viewed using node report variables and heating coil report variables.
 
-\begin{figure}[hbtp] % fig 156
+\begin{figure}[hbtp] % fig 157
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2791.png}
 \caption{Schematic of AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat Unit \protect \label{fig:schematic-of-airterminal-singleduct-vav-002}}
 \end{figure}
 
-\begin{figure}[hbtp] % fig 157
+\begin{figure}[hbtp] % fig 158
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2792.png}
 \caption{Schematic of AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat Unit \protect \label{fig:schematic-of-airterminal-singleduct-vav-003}}

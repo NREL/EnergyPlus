@@ -16,8 +16,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6°C
-!                          Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
+! Design Days:             Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6Â°C
+!                          Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6Â°C MWB=23Â°C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7.
 !
@@ -104,9 +104,9 @@
 !                                 purposes only. The coefficients in these objects are the same as the default
 !                                 for Tower Model Types "YorkCalc" and "CoolTools CrossFlow", respectively.
 ! Setpoint:                  SetpointManager:CondenserEnteringReset:Ideal
-!                                 The “ideal” chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint
+!                                 The Â°idealÂ° chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint
 !                                 at a given timestep. This requires resimulating HVAC systems at each timestep until finding
-!                                 an “optimal” condenser water entering setpoint (OptSetpoint) which gives the minimum total chiller,
+!                                 an Â°optimalÂ° condenser water entering setpoint (OptSetpoint) which gives the minimum total chiller,
 !                                 cooling tower, chilled water pump and condenser water pump power consumption.
 !                                 The OptSetpoint falls between realistic minimum and maximum boundaries, which are set by the user.
 !                                 The minimum boundary is determined based on the minimum lift (user input)
@@ -124,7 +124,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Building,                !- Name
@@ -231,7 +231,7 @@
     -6.00,                   !- Time Zone {hr}
     205.00;                  !- Elevation {m}
 
- ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6°C
+ ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6Â°C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
@@ -261,7 +261,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6Â°C MWB=23Â°C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name

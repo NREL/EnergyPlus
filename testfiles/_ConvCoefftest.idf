@@ -10,7 +10,7 @@
 ! Modified: Conforms with Beta 4 input
 ! 2 design days to facilitate reverse DD testing.
 
-  Version,8.9;
+  Version,9.0;
 
   Site:Location,
     ATLANTA,                 !- Name
@@ -29,7 +29,7 @@
 ! Following Design Days used for Reverse DD testing.
  ! TAMPA_FL_USA Annual Heating Design Conditions Wind Speed=3.1m/s Wind Dir=10
  ! Coldest Month=January
- ! TAMPA_FL_USA Annual Heating 99%, MaxDB=4.8°C
+ ! TAMPA_FL_USA Annual Heating 99%, MaxDB=4.8Â°C
 
   SizingPeriod:DesignDay,
     TAMPA Ann Htg 99% Condns DB,  !- Name
@@ -61,7 +61,7 @@
 
  ! TAMPA Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=270
  ! Hottest Month=July
- ! TAMPA_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=33°C MWB=25.3°C
+ ! TAMPA_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=33Â°C MWB=25.3Â°C
 
   SizingPeriod:DesignDay,
     TAMPA Ann Clg 1% Condns DB=>MWB,  !- Name

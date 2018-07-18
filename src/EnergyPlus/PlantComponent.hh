@@ -48,28 +48,43 @@
 #ifndef PLANTCOMPONENT_HH_INCLUDED
 #define PLANTCOMPONENT_HH_INCLUDED
 
+#include <DataGlobals.hh>
+
 namespace EnergyPlus {
 
-	// Forward Declarations
-	struct PlantLocation;
+// Forward Declarations
+struct PlantLocation;
 
-	class PlantComponent {
+class PlantComponent
+{
 
-		public:
-			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) = 0;
+public:
+    virtual void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) = 0;
 
-			virtual void getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & EP_UNUSED(MaxLoad), Real64 & EP_UNUSED(MinLoad), Real64 & EP_UNUSED(OptLoad) ) {}
+    virtual void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                     Real64 &EP_UNUSED(MaxLoad),
+                                     Real64 &EP_UNUSED(MinLoad),
+                                     Real64 &EP_UNUSED(OptLoad))
+    {
+    }
 
-			virtual void getDesignTemperatures( Real64 & EP_UNUSED(TempDesCondIn), Real64 & EP_UNUSED(TempDesEvapOut) ) {}
+    virtual void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut))
+    {
+    }
 
-			virtual void getSizingFactor( Real64 & EP_UNUSED(SizFac) ) {}
+    virtual void getSizingFactor(Real64 &EP_UNUSED(SizFac))
+    {
+    }
 
-			virtual void onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) {}
+    virtual void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+    }
 
-		~PlantComponent() {}
+    ~PlantComponent()
+    {
+    }
+};
 
-	};
-
-}
+} // namespace EnergyPlus
 
 #endif

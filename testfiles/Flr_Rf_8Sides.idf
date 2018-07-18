@@ -8,8 +8,8 @@
 !
 ! Location:                Denver, CO
 !
-! Design Days:             Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20캜
-!                          Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1캜 MWB=15.9캜
+! Design Days:             Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20째C
+!                          Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1째C MWB=15.9째C
 !
 ! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
 !
@@ -89,7 +89,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,4;
 
@@ -138,7 +138,7 @@
 
  ! Denver Stapleton Intl Arpt CO USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
  ! Coldest Month=December
- ! Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20캜
+ ! Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20째C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt Ann Htg 99.6% Condns DB,  !- Name
@@ -170,7 +170,7 @@
 
  ! Denver Stapleton Intl Arpt Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
  ! Hottest Month=July
- ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1캜 MWB=15.9캜
+ ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1째C MWB=15.9째C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt Ann Clg .4% Condns DB=>MWB,  !- Name

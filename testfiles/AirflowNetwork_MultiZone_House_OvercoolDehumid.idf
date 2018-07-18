@@ -8,7 +8,7 @@
 ! Highlights:              This example file demonstrates zone air high relative humidity control using
 !                          TemperatureAndHumidity thermostat object. This control option reduces (Overcools)
 !                          the zone air cooling setpoint temperature to enhance zone air dehumidification.
-!                          Also this file does the basic test of an air distribution system in a residetial home.
+!                          Also this file does the basic test of an air distribution system in a residential home.
 !                          It provides forced ventilation during system on period and natural ventilation via
 !                          SIMPLE airflow model during system off period.
 !
@@ -18,8 +18,8 @@
 !
 ! Location:                Miami Intl Ap,FL,USA,TMY3,722020
 !
-! Design Days:             Miami Intl Ap_FL_USA Annual Heating 99%, MaxDB=10.9캜
-!                          Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6캜 MWB=25.3캜
+! Design Days:             Miami Intl Ap_FL_USA Annual Heating 99%, MaxDB=10.9째C
+!                          Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, Miami, Fl, WMO=722020
 !
@@ -112,7 +112,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -167,7 +167,7 @@
     -5.00,                   !- Time Zone {hr}
     11.00;                   !- Elevation {m}
 
- ! Miami Intl Ap_FL_USA Annual Heating 99%, MaxDB=10.9캜
+ ! Miami Intl Ap_FL_USA Annual Heating 99%, MaxDB=10.9째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99% Condns DB,  !- Name
@@ -197,7 +197,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6캜 MWB=25.3캜
+ ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -2300,7 +2300,7 @@
 
   Output:Variable,*,Cooling Coil Electric Power,Timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,Timestep;
+  Output:Variable,*,Heating Coil Heating Rate,Timestep;
 
   Output:Variable,*,Heating Coil Gas Rate,Timestep;
 

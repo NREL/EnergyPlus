@@ -15,8 +15,8 @@
 !
 ! Location:                Windsor CAN
 !
-! Design Days:             Windsor CAN Annual Heating 99%, MaxDB=-13.7캜
-!                          Windsor CAN Annual Cooling (DB=>MWB) 1%, MaxDB=30.3캜 MWB=22.2캜
+! Design Days:             Windsor CAN Annual Heating 99%, MaxDB=-13.7째C
+!                          Windsor CAN Annual Cooling (DB=>MWB) 1%, MaxDB=30.3째C MWB=22.2째C
 !
 ! Run Period (Weather File): Full Annual Simulation, Windsor Ontario Canada (2 years, actual weather)
 !
@@ -89,7 +89,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,4;
 
@@ -145,10 +145,10 @@
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Windsor_ON_CAN Extreme Annual Wind Speeds, 1%=11.4m/s, 2.5%=10m/s, 5%=8.9m/s
- ! Windsor_ON_CAN Extreme Annual Temperatures, Max Drybulb=-19.5캜 Min Drybulb=34.5캜
+ ! Windsor_ON_CAN Extreme Annual Temperatures, Max Drybulb=-19.5째C Min Drybulb=34.5째C
  ! Windsor_ON_CAN Annual Heating Design Conditions Wind Speed=5m/s Wind Dir=240
  ! Coldest Month=JAN
- ! Windsor_ON_CAN Annual Heating 99%, MaxDB=-13.7캜
+ ! Windsor_ON_CAN Annual Heating 99%, MaxDB=-13.7째C
 
   SizingPeriod:DesignDay,
     Windsor Ann Htg 99% Condns DB,  !- Name
@@ -180,7 +180,7 @@
 
  ! Windsor Annual Cooling Design Conditions Wind Speed=5.4m/s Wind Dir=230
  ! Hottest Month=JUL
- ! Windsor_ON_CAN Annual Cooling (DB=>MWB) 1%, MaxDB=30.3캜 MWB=22.2캜
+ ! Windsor_ON_CAN Annual Cooling (DB=>MWB) 1%, MaxDB=30.3째C MWB=22.2째C
 
   SizingPeriod:DesignDay,
     Windsor Ann Clg 1% Condns DB=>MWB,  !- Name

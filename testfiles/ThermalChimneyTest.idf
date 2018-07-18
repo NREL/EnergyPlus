@@ -65,7 +65,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -114,7 +114,7 @@
     1712.00;                 !- Elevation {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
-! CEDAR_CITY_UT_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.9°C MWB=14.8°C
+! CEDAR_CITY_UT_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.9Â°C MWB=14.8Â°C
 
   SizingPeriod:DesignDay,
     CEDAR_CITY Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -144,7 +144,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.00;                    !- Sky Clearness
 
-! CEDAR_CITY_UT_USA Annual Heating 99%, MaxDB=-12.8°C
+! CEDAR_CITY_UT_USA Annual Heating 99%, MaxDB=-12.8Â°C
 
   SizingPeriod:DesignDay,
     CEDAR_CITY Ann Htg 99% Condns DB,  !- Name

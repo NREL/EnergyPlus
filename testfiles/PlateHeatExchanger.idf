@@ -11,8 +11,8 @@
 !
 ! Location:                Tampa, FL
 !
-! Design Days:             TAMPA_FL_USA Annual Heating 99%, MaxDB=4.8캜
-!                          TAMPA_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=33캜 MWB=25.3캜
+! Design Days:             TAMPA_FL_USA Annual Heating 99%, MaxDB=4.8째C
+!                          TAMPA_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=33째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, TAMPA_FL_USA_WMO_722110
 !
@@ -110,7 +110,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,4;
 
@@ -149,7 +149,7 @@
 ! Following Design Days used for Reverse DD testing.
 ! TAMPA_FL_USA Annual Heating Design Conditions Wind Speed=3.1m/s Wind Dir=10
 ! Coldest Month=January
-! TAMPA_FL_USA Annual Heating 99%, MaxDB=4.8캜
+! TAMPA_FL_USA Annual Heating 99%, MaxDB=4.8째C
 
   SizingPeriod:DesignDay,
     TAMPA Ann Htg 99% Condns DB,  !- Name
@@ -181,7 +181,7 @@
 
 ! TAMPA Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=270
 ! Hottest Month=July
-! TAMPA_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=33캜 MWB=25.3캜
+! TAMPA_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=33째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     TAMPA Ann Clg 1% Condns DB=>MWB,  !- Name

@@ -406,7 +406,7 @@
 !
 !
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Exercise 2B,             !- Name
@@ -462,7 +462,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Heating 99%, MaxDB= -18.10°C
+! CHICAGO_IL_USA Heating 99%, MaxDB= -18.10Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Heating 99% Conditions,  !- Name
@@ -492,7 +492,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Cooling (DB=>MWB) 1%, MaxDB=  31.30°C MWB=  22.80°C
+! CHICAGO_IL_USA Cooling (DB=>MWB) 1%, MaxDB=  31.30Â°C MWB=  22.80Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Cooling 1% Conditions DB=>MWB,  !- Name

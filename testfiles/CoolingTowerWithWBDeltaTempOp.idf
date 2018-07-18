@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,6;
 
@@ -162,7 +162,7 @@
 
  ! Using Design Conditions from "United States Climate Design Data 2001 ASHRAE Handbook"
  ! TAMPA_INTL_AIRPORT_FL_USA Extreme Wind Speeds, 1%=   8.40m/s, 2.5%=   7.50m/s, 5%=   6.80m/s
- ! TAMPA_INTL_AIRPORT_FL_USA Extreme Temperatures, Max Drybulb=  34.90°C, Min Drybulb=  -1.80°C
+ ! TAMPA_INTL_AIRPORT_FL_USA Extreme Temperatures, Max Drybulb=  34.90Â°C, Min Drybulb=  -1.80Â°C
  ! TAMPA_INTL_AIRPORT_FL_USA Heating Design Conditions Wind Speed=   3.50 Wind Dir=  20.00
  ! TAMPA_INTL_AIRPORT_FL_USA Heating 99.6%, MaxDB=   2.20
 

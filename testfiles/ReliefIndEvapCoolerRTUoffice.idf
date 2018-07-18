@@ -33,7 +33,7 @@
 !         The relief air that would have been dumped outside is fed into the secondary side of the
 !         indirect evaporative cooler.  Systems are set to Night Cycle during setup/setback.
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,6;
 
@@ -69,7 +69,7 @@
 
   ! PHOENIX_AZ_USA Annual Heating Design Conditions Wind Speed=2m/s Wind Dir=120
   ! Coldest Month=December
-  ! PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9°C
+  ! PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9Â°C
 
   SizingPeriod:DesignDay,
     PHOENIX Ann Htg 99.6% Condns DB,  !- Name
@@ -101,7 +101,7 @@
 
   ! PHOENIX Annual Cooling Design Conditions Wind Speed=4.1m/s Wind Dir=270
   ! Hottest Month=July
-  ! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4°C MWB=21.1°C
+  ! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4Â°C MWB=21.1Â°C
 
   SizingPeriod:DesignDay,
     PHOENIX Ann Clg .4% Condns DB=>MWB,  !- Name

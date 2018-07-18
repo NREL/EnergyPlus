@@ -55,24 +55,22 @@ namespace EnergyPlus {
 
 namespace PlantLoopEquip {
 
-	// Data
-	// SUBROUTINE SPECIFICATION
+    // Data
+    // SUBROUTINE SPECIFICATION
 
-	// Functions
+    // Functions
 
-	void
-	SimPlantEquip(
-		int const LoopNum, // loop counter
-		int const LoopSideNum, // loop counter
-		int const BranchNum,
-		int const Num,
-		bool const FirstHVACIteration, // TRUE if First iteration of simulation
-		bool & InitLoopEquip,
-		bool const GetCompSizFac // Tells component routine to return the component sizing fraction
-	);
+    void SimPlantEquip(int const LoopNum,     // loop counter
+                       int const LoopSideNum, // loop counter
+                       int const BranchNum,
+                       int const Num,
+                       bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                       bool &InitLoopEquip,
+                       bool const GetCompSizFac // Tells component routine to return the component sizing fraction
+    );
 
-} // PlantLoopEquip
+} // namespace PlantLoopEquip
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

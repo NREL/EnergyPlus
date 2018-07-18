@@ -39,7 +39,7 @@
 !        above the econo limit temperature.
 !        The third design day is very hot and all cooling is by the DX unit.
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     NONE,                    !- Name
@@ -1408,13 +1408,11 @@
 
   Output:Variable,*,Cooling Coil Electric Power,hourly;
 
-  Output:Variable,*,Heating Coil Total Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Heating Coil Electric Power,hourly;
 
   Output:Variable,*,Heating Coil Defrost Electric Power,hourly;
-
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
 
   Output:Variable,*,Heating Coil Gas Rate,hourly;
 

@@ -12,8 +12,8 @@
 !
 ! Location:                San Francisco, CA, USA
 !
-! Design Days:             SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4캜
-!                          SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6캜 MWB=16.6캜
+! Design Days:             SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4째C
+!                          SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6째C MWB=16.6째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Building,                !- Name
@@ -208,7 +208,7 @@
     3,                       !- Minimum Plant Iterations
     9;                       !- Maximum Plant Iterations
 
-! SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4캜
+! SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4째C
 
   SizingPeriod:DesignDay,
     SAN_FRANCISCO Ann Htg 99% Condns DB,  !- Name
@@ -238,7 +238,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6캜 MWB=16.6캜
+! SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6째C MWB=16.6째C
 
   SizingPeriod:DesignDay,
     SAN_FRANCISCO Ann Clg 1% Condns DB=>MWB,  !- Name

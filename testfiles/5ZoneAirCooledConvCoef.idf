@@ -16,8 +16,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846, Standard DST period is used.
 !
@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Building,                !- Name
@@ -216,10 +216,10 @@
 
 ! Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
 ! CHICAGO_IL_USA Extreme Annual Wind Speeds, 1%=11.2m/s, 2.5%=9.9m/s, 5%=8.7m/s
-! CHICAGO_IL_USA Extreme Annual Temperatures, Max Drybulb=35.7캜 Min Drybulb=-24.2캜
+! CHICAGO_IL_USA Extreme Annual Temperatures, Max Drybulb=35.7째C Min Drybulb=-24.2째C
 ! CHICAGO_IL_USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
 ! Coldest Month=January
-! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3캜
+! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99% Condns DB,  !- Name
@@ -251,7 +251,7 @@
 
 ! CHICAGO Annual Cooling Design Conditions Wind Speed=5.3m/s Wind Dir=230
 ! Hottest Month=July
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5캜 MWB=23캜
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5째C MWB=23째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name

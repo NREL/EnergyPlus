@@ -64,7 +64,6 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
-
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::MixedAir;
@@ -75,287 +74,286 @@ using namespace EnergyPlus::WaterCoils;
 
 namespace EnergyPlus {
 
+TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
+{
+    std::string const idf_objects = delimited_string({
+        " Version,8.3;",
+        " Coil:Cooling:Water,",
+        "	Chilled Water Coil,	!- Name",
+        "	AvailSched,			!- Availability Schedule Name",
+        "	autosize,			!- Design Water Flow Rate { m3 / s }",
+        "	autosize,			!- Design Air Flow Rate { m3 / s }",
+        "	autosize,			!- Design Inlet Water Temperature { C }",
+        "	autosize,			!- Design Inlet Air Temperature { C }",
+        "	autosize,			!- Design Outlet Air Temperature { C }",
+        "	autosize,			!- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	autosize,			!- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Water Inlet Node,	!- Water Inlet Node Name",
+        "	Water Outlet Node,  !- Water Outlet Node Name",
+        "	Air Inlet Node,		!- Air Inlet Node Name",
+        "	Air Outlet Node,	!- Air Outlet Node Name",
+        "	SimpleAnalysis,		!- Type of Analysis",
+        "	CrossFlow;          !- Heat Exchanger Configuration",
+        " Controller:WaterCoil,",
+        "	CW Coil Controller, !- Name",
+        "	HumidityRatio,		!- Control Variable",
+        "	Reverse,			!- Action",
+        "	FLOW,				!- Actuator Variable",
+        "	Air Outlet Node,	!- Sensor Node Name",
+        "	Water Inlet Node,	!- Actuator Node Name",
+        "	autosize,			!- Controller Convergence Tolerance { deltaC }",
+        "	autosize,			!- Maximum Actuated Flow { m3 / s }",
+        "	0.0;				!- Minimum Actuated Flow { m3 / s }",
+        " SetpointManager:Scheduled,",
+        "	HumRatSPManager,	!- Name",
+        "	HumidityRatio,		!- Control Variable",
+        "	HumRatioSched,		!- Schedule Name",
+        "	Air Outlet Node;	!- Setpoint Node or NodeList Name",
+        " Schedule:Compact,",
+        "   HumRatioSched,		!- Name",
+        "	Any Number,			!- Schedule Type Limits Name",
+        "	Through: 12/31,		!- Field 1",
+        "	For: AllDays,		!- Field 2",
+        "	Until: 24:00, 0.015; !- Field 3",
+        " Schedule:Compact,",
+        "   AvailSched,			!- Name",
+        "	Fraction,			!- Schedule Type Limits Name",
+        "	Through: 12/31,		!- Field 1",
+        "	For: AllDays,		!- Field 2",
+        "	Until: 24:00, 1.0;  !- Field 3",
+        " AirLoopHVAC:ControllerList,",
+        "	CW Coil Controller, !- Name",
+        "	Controller:WaterCoil, !- Controller 1 Object Type",
+        "	CW Coil Controller; !- Controller 1 Name",
+    });
 
-	TEST_F( EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType ) {
-		std::string const idf_objects = delimited_string( {
-		" Version,8.3;",
-		" Coil:Cooling:Water,",
-		"	Chilled Water Coil,	!- Name",
-		"	AvailSched,			!- Availability Schedule Name",
-		"	autosize,			!- Design Water Flow Rate { m3 / s }",
-		"	autosize,			!- Design Air Flow Rate { m3 / s }",
-		"	autosize,			!- Design Inlet Water Temperature { C }",
-		"	autosize,			!- Design Inlet Air Temperature { C }",
-		"	autosize,			!- Design Outlet Air Temperature { C }",
-		"	autosize,			!- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-		"	autosize,			!- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-		"	Water Inlet Node,	!- Water Inlet Node Name",
-		"	Water Outlet Node,  !- Water Outlet Node Name",
-		"	Air Inlet Node,		!- Air Inlet Node Name",
-		"	Air Outlet Node,	!- Air Outlet Node Name",
-		"	SimpleAnalysis,		!- Type of Analysis",
-		"	CrossFlow;          !- Heat Exchanger Configuration",
-		" Controller:WaterCoil,",
-		"	CW Coil Controller, !- Name",
-		"	HumidityRatio,		!- Control Variable",
-		"	Reverse,			!- Action",
-		"	FLOW,				!- Actuator Variable",
-		"	Air Outlet Node,	!- Sensor Node Name",
-		"	Water Inlet Node,	!- Actuator Node Name",
-		"	autosize,			!- Controller Convergence Tolerance { deltaC }",
-		"	autosize,			!- Maximum Actuated Flow { m3 / s }",
-		"	0.0;				!- Minimum Actuated Flow { m3 / s }",
-		" SetpointManager:Scheduled,",
-		"	HumRatSPManager,	!- Name",
-		"	HumidityRatio,		!- Control Variable",
-		"	HumRatioSched,		!- Schedule Name",
-		"	Air Outlet Node;	!- Setpoint Node or NodeList Name",
-		" Schedule:Compact,",
-		"   HumRatioSched,		!- Name",
-		"	Any Number,			!- Schedule Type Limits Name",
-		"	Through: 12/31,		!- Field 1",
-		"	For: AllDays,		!- Field 2",
-		"	Until: 24:00, 0.015; !- Field 3",
-		" Schedule:Compact,",
-		"   AvailSched,			!- Name",
-		"	Fraction,			!- Schedule Type Limits Name",
-		"	Through: 12/31,		!- Field 1",
-		"	For: AllDays,		!- Field 2",
-		"	Until: 24:00, 1.0;  !- Field 3",
-		" AirLoopHVAC:ControllerList,",
-		"	CW Coil Controller, !- Name",
-		"	Controller:WaterCoil, !- Controller 1 Object Type",
-		"	CW Coil Controller; !- Controller 1 Name",
-		});
+    ASSERT_TRUE(process_idf(idf_objects));
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+    GetSetPointManagerInputs();
+    // check specified control variable type is "HumidityRatio"
+    ASSERT_EQ(iCtrlVarType_HumRat, AllSetPtMgr(1).CtrlTypeMode);
 
-		GetSetPointManagerInputs();
-		// check specified control variable type is "HumidityRatio"
-		ASSERT_EQ( iCtrlVarType_HumRat, AllSetPtMgr( 1 ).CtrlTypeMode );
+    GetControllerInput();
+    // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
+    ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
 
-		GetControllerInput();
-		// check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
-		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 1 ).CtrlTypeMode );
-
-		// ControllerProps always expects the control variable type to be "HumididtyRatio"
-		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
-		ASSERT_EQ( iCtrlVarType_HumRat, ControllerProps( 1 ).HumRatCntrlType );
-	
-	}
-
-	TEST_F( EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType ) {
-		std::string const idf_objects = delimited_string( {
-
-			" Coil:Cooling:Water,",
-			"	Chilled Water Coil,	!- Name",
-			"	AvailSched,			!- Availability Schedule Name",
-			"	0.01,				!- Design Water Flow Rate { m3 / s }",
-			"	1.0,				!- Design Air Flow Rate { m3 / s }",
-			"	7.2,				!- Design Inlet Water Temperature { C }",
-			"	32.0,				!- Design Inlet Air Temperature { C }",
-			"	12.0,				!- Design Outlet Air Temperature { C }",
-			"	0.01,				!- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-			"	0.07,				!- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-			"	Water Inlet Node,	!- Water Inlet Node Name",
-			"	Water Outlet Node,  !- Water Outlet Node Name",
-			"	Air Inlet Node,		!- Air Inlet Node Name",
-			"	Air Outlet Node,	!- Air Outlet Node Name",
-			"	SimpleAnalysis,		!- Type of Analysis",
-			"	CrossFlow;          !- Heat Exchanger Configuration",
-			" Controller:WaterCoil,",
-			"	CW Coil Controller, !- Name",
-			"	TemperatureAndHumidityRatio,		!- Control Variable",
-			"	Reverse,			!- Action",
-			"	FLOW,				!- Actuator Variable",
-			"	Air Outlet Node,	!- Sensor Node Name",
-			"	Water Inlet Node,	!- Actuator Node Name",
-			"	0.001,				!- Controller Convergence Tolerance { deltaC }",
-			"	0.01,				!- Maximum Actuated Flow { m3 / s }",
-			"	0.0;				!- Minimum Actuated Flow { m3 / s }",
-			" SetpointManager:Scheduled,",
-			"	HumRatSPManager,	!- Name",
-			"	MaximumHumidityRatio,  !- Control Variable",
-			"	HumRatioSched,		!- Schedule Name",
-			"	Air Outlet Node;	!- Setpoint Node or NodeList Name",
-			" Schedule:Compact,",
-			"   HumRatioSched,		!- Name",
-			"	Any Number,			!- Schedule Type Limits Name",
-			"	Through: 12/31,		!- Field 1",
-			"	For: AllDays,		!- Field 2",
-			"	Until: 24:00, 0.015; !- Field 3",
-			" Schedule:Compact,",
-			"   AvailSched,			!- Name",
-			"	Fraction,			!- Schedule Type Limits Name",
-			"	Through: 12/31,		!- Field 1",
-			"	For: AllDays,		!- Field 2",
-			"	Until: 24:00, 1.0;  !- Field 3",
-			" AirLoopHVAC:ControllerList,",
-			"	CW Coil Controller, !- Name",
-			"	Controller:WaterCoil, !- Controller 1 Object Type",
-			"	CW Coil Controller; !- Controller 1 Name",
-		} );
-
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
-		GetSetPointManagerInputs();
-		// check specified control variable type is "HumidityRatio"
-		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 1 ).CtrlTypeMode );
-
-		GetControllerInput();
-		// check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
-		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 1 ).CtrlTypeMode );
-
-		// ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
-		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
-		ASSERT_EQ( iCtrlVarType_MaxHumRat, ControllerProps( 1 ).HumRatCntrlType );
-
-		// test index for air loop controllers
-		// before controllers are simulated, AirLoopControllerIndex = 0
-		ASSERT_EQ( 0, ControllerProps( 1 ).AirLoopControllerIndex );
-
-		OutputReportPredefined::SetPredefinedTables();
-		DataHVACGlobals::NumPrimaryAirSys = 1;
-		DataAirLoop::PriAirSysAvailMgr.allocate( 1 );
-		DataAirLoop::AirLoopControlInfo.allocate( 1 );
-		DataAirLoop::AirToZoneNodeInfo.allocate( 1 );
-		DataAirLoop::AirToZoneNodeInfo( 1 ).NumSupplyNodes = 1;
-		DataAirLoop::AirToZoneNodeInfo( 1 ).AirLoopSupplyNodeNum.allocate( 1 );
-		DataAirLoop::AirToZoneNodeInfo( 1 ).AirLoopSupplyNodeNum( 1 ) = 1;
-		DataAirLoop::AirToZoneNodeInfo( 1 ).ZoneEquipSupplyNodeNum.allocate( 1 );
-		DataAirLoop::AirToZoneNodeInfo( 1 ).ZoneEquipSupplyNodeNum( 1 ) = 4;
-		DataConvergParams::AirLoopConvergence.allocate( 1 );
-		DataConvergParams::AirLoopConvergence( 1 ).HVACMassFlowNotConverged.allocate( 2 );
-		DataConvergParams::AirLoopConvergence( 1 ).HVACHumRatNotConverged.allocate( 2 );
-		DataConvergParams::AirLoopConvergence( 1 ).HVACTempNotConverged.allocate( 2 );
-		DataConvergParams::AirLoopConvergence( 1 ).HVACEnergyNotConverged.allocate( 2 );
-		DataConvergParams::AirLoopConvergence( 1 ).HVACEnthalpyNotConverged.allocate( 2 );
-		DataConvergParams::AirLoopConvergence( 1 ).HVACPressureNotConverged.allocate( 2 );
-		DataAirSystems::PrimaryAirSystem.allocate( 1 );
-		DataAirSystems::PrimaryAirSystem( 1 ).NumBranches = 1;
-		DataAirSystems::PrimaryAirSystem( 1 ).NumControllers = 1;
-		DataAirSystems::PrimaryAirSystem( 1 ).ControllerIndex.allocate( 1 );
-		DataAirSystems::PrimaryAirSystem( 1 ).ControllerIndex( 1 ) = 0;
-		DataAirSystems::PrimaryAirSystem( 1 ).ControllerName.allocate( 1 );
-		DataAirSystems::PrimaryAirSystem( 1 ).ControllerName( 1 ) = "CW COIL CONTROLLER";
-		DataAirSystems::PrimaryAirSystem( 1 ).ControlConverged.allocate( 1 );
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch.allocate( 1 );
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).NodeNumIn = 4;
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).NodeNumOut = 1;
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).TotalNodes = 1;
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).TotalComponents = 1;
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).NodeNum.allocate( 1 );
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).NodeNum( 1 ) = 1;
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp.allocate( 1 );
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "CHILLED WATER COIL";
-		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).CompType_Num = 5; // WaterCoil_Cooling
-		DataPlant::PlantLoop.allocate( 1 );
-		DataPlant::TotNumLoops = 1;
-		DataPlant::PlantLoop( 1 ).LoopSide.allocate( 2 );
-		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).TotalBranches = 1;
-		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
-		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 1;
-		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
-		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = 39;
-		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
-		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 3;
-		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "CHILLED WATER COIL";
-		bool SimZoneEquipment( false );
-		SimAirServingZones::SimAirLoops( true, SimZoneEquipment );
-
-		// after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
-		ASSERT_EQ( 1, DataAirSystems::PrimaryAirSystem( 1 ).NumControllers );
-		ASSERT_EQ( 1, DataAirSystems::PrimaryAirSystem( 1 ).ControllerIndex( 1 ) );
-		ASSERT_EQ( 1, ControllerProps( 1 ).AirLoopControllerIndex );
-
-	}
-
-	TEST_F( EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest ) {
-		std::string const idf_objects = delimited_string( {
-		"  Version,8.6;",
-
-		"  Coil:Cooling:Water,",
-		"    Main Cooling Coil 1,     !- Name",
-		"    CoolingCoilAvailSched,   !- Availability Schedule Name",
-		"    autosize,                !- Design Water Flow Rate {m3/s}",
-		"    autosize,                !- Design Air Flow Rate {m3/s}",
-		"    autosize,                !- Design Inlet Water Temperature {C}",
-		"    autosize,                !- Design Inlet Air Temperature {C}",
-		"    autosize,                !- Design Outlet Air Temperature {C}",
-		"    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
-		"    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
-		"    CCoil Water Inlet Node,  !- Water Inlet Node Name",
-		"    CCoil Water Outlet Node, !- Water Outlet Node Name",
-		"    Mixed Air Node 1,        !- Air Inlet Node Name",
-		"    CCoil Air Outlet Node,   !- Air Outlet Node Name",
-		"    SimpleAnalysis,          !- Type of Analysis",
-		"    CrossFlow;               !- Heat Exchanger Configuration",
-
-		"  Schedule:Compact,",
-		"   CoolingCoilAvailSched,	  !- Name",
-		"	Fraction,			      !- Schedule Type Limits Name",
-		"	Through: 12/31,		      !- Field 1",
-		"	For: AllDays,		      !- Field 2",
-		"	Until: 24:00, 1.0;        !- Field 3",
-
-		"  Controller:WaterCoil,",
-		"    Cooling Coil Contoller,  !- Name",
-		"    HumidityRatio,           !- Control Variable",
-		"    Reverse,                 !- Action",
-		"    FLOW,                    !- Actuator Variable",
-		"    CCoil Air Outlet Node,   !- Sensor Node Name",
-		"    CCoil Water Inlet Node,  !- Actuator Node Name",
-		"    autosize,                !- Controller Convergence Tolerance {deltaC}",
-		"    autosize,                !- Maximum Actuated Flow {m3/s}",
-		"    0.0;                     !- Minimum Actuated Flow {m3/s}",
-
-		"  SetpointManager:Scheduled,",
-		"    CCoil Temp Setpoint Mgr, !- Name",
-		"    Temperature,             !- Control Variable",
-		"    Always 16,               !- Schedule Name",
-		"    CCoil Air Outlet Node;   !- Setpoint Node or NodeList Name",
-
-		"  Schedule:Compact,",
-		"    Always 16,               !- Name",
-		"    Temperature,             !- Schedule Type Limits Name",
-		"    Through: 12/31,          !- Field 1",
-		"    For: AllDays,            !- Field 2",
-		"    Until: 24:00,16;         !- Field 3",
-
-		"  SetpointManager:Scheduled,",
-		"    CCoil Hum Setpoint Mgr,  !- Name",
-		"    MaximumHumidityRatio,    !- Control Variable",
-		"    HumSetPt,                !- Schedule Name",
-		"    CCoil Air Outlet Node;   !- Setpoint Node or NodeList Name",
-
-		"  Schedule:Compact,",
-		"    HumSetPt,                !- Name",
-		"    AnyNumber,               !- Schedule Type Limits Name",
-		"    Through: 12/31,          !- Field 1",
-		"    For: AllDays,            !- Field 2",
-		"    Until: 24:00, 0.009;     !- Field 3",
-
-		"  AirLoopHVAC:ControllerList,",
-		"	CW Coil Controller,       !- Name",
-		"	Controller:WaterCoil,     !- Controller 1 Object Type",
-		"	Cooling Coil Contoller;   !- Controller 1 Name",
-		});
-
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
-		GetSetPointManagerInputs();
-		// There are two setpoint managers and are schedule type 	
-		ASSERT_EQ( 2, NumSchSetPtMgrs ); // 2 schedule set point managers
-		ASSERT_EQ( 2, NumAllSetPtMgrs );  // 2 all set point managers
-		// check specified control variable types 	
-		ASSERT_EQ( iTemperature, AllSetPtMgr( 1 ).CtrlTypeMode ); // is "Temperature"
-		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 2 ).CtrlTypeMode ); // is "MaximumHumidityRatio"
-
-		GetControllerInput();
-		// check ControllerProps control variable is set to "MaximumHumidityRatio"
-		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
-		ASSERT_EQ( iCtrlVarType_MaxHumRat, ControllerProps( 1 ).HumRatCntrlType ); // MaximumHumidityRatio
-			
-	}
-
+    // ControllerProps always expects the control variable type to be "HumididtyRatio"
+    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(ControllerProps(1).SensedNode);
+    ASSERT_EQ(iCtrlVarType_HumRat, ControllerProps(1).HumRatCntrlType);
 }
+
+TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
+{
+    std::string const idf_objects = delimited_string({
+
+        " Coil:Cooling:Water,",
+        "	Chilled Water Coil,	!- Name",
+        "	AvailSched,			!- Availability Schedule Name",
+        "	0.01,				!- Design Water Flow Rate { m3 / s }",
+        "	1.0,				!- Design Air Flow Rate { m3 / s }",
+        "	7.2,				!- Design Inlet Water Temperature { C }",
+        "	32.0,				!- Design Inlet Air Temperature { C }",
+        "	12.0,				!- Design Outlet Air Temperature { C }",
+        "	0.01,				!- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	0.07,				!- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "	Water Inlet Node,	!- Water Inlet Node Name",
+        "	Water Outlet Node,  !- Water Outlet Node Name",
+        "	Air Inlet Node,		!- Air Inlet Node Name",
+        "	Air Outlet Node,	!- Air Outlet Node Name",
+        "	SimpleAnalysis,		!- Type of Analysis",
+        "	CrossFlow;          !- Heat Exchanger Configuration",
+        " Controller:WaterCoil,",
+        "	CW Coil Controller, !- Name",
+        "	TemperatureAndHumidityRatio,		!- Control Variable",
+        "	Reverse,			!- Action",
+        "	FLOW,				!- Actuator Variable",
+        "	Air Outlet Node,	!- Sensor Node Name",
+        "	Water Inlet Node,	!- Actuator Node Name",
+        "	0.001,				!- Controller Convergence Tolerance { deltaC }",
+        "	0.01,				!- Maximum Actuated Flow { m3 / s }",
+        "	0.0;				!- Minimum Actuated Flow { m3 / s }",
+        " SetpointManager:Scheduled,",
+        "	HumRatSPManager,	!- Name",
+        "	MaximumHumidityRatio,  !- Control Variable",
+        "	HumRatioSched,		!- Schedule Name",
+        "	Air Outlet Node;	!- Setpoint Node or NodeList Name",
+        " Schedule:Compact,",
+        "   HumRatioSched,		!- Name",
+        "	Any Number,			!- Schedule Type Limits Name",
+        "	Through: 12/31,		!- Field 1",
+        "	For: AllDays,		!- Field 2",
+        "	Until: 24:00, 0.015; !- Field 3",
+        " Schedule:Compact,",
+        "   AvailSched,			!- Name",
+        "	Fraction,			!- Schedule Type Limits Name",
+        "	Through: 12/31,		!- Field 1",
+        "	For: AllDays,		!- Field 2",
+        "	Until: 24:00, 1.0;  !- Field 3",
+        " AirLoopHVAC:ControllerList,",
+        "	CW Coil Controller, !- Name",
+        "	Controller:WaterCoil, !- Controller 1 Object Type",
+        "	CW Coil Controller; !- Controller 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetSetPointManagerInputs();
+    // check specified control variable type is "HumidityRatio"
+    ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
+
+    GetControllerInput();
+    // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
+    ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
+
+    // ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
+    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(ControllerProps(1).SensedNode);
+    ASSERT_EQ(iCtrlVarType_MaxHumRat, ControllerProps(1).HumRatCntrlType);
+
+    // test index for air loop controllers
+    // before controllers are simulated, AirLoopControllerIndex = 0
+    ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
+
+    OutputReportPredefined::SetPredefinedTables();
+    DataHVACGlobals::NumPrimaryAirSys = 1;
+    DataAirLoop::PriAirSysAvailMgr.allocate(1);
+    DataAirLoop::AirLoopControlInfo.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo(1).NumSupplyNodes = 1;
+    DataAirLoop::AirToZoneNodeInfo(1).AirLoopSupplyNodeNum.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo(1).AirLoopSupplyNodeNum(1) = 1;
+    DataAirLoop::AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
+    DataConvergParams::AirLoopConvergence.allocate(1);
+    DataConvergParams::AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
+    DataAirSystems::PrimaryAirSystem(1).NumControllers = 1;
+    DataAirSystems::PrimaryAirSystem(1).ControllerIndex.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).ControllerIndex(1) = 0;
+    DataAirSystems::PrimaryAirSystem(1).ControllerName.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).ControllerName(1) = "CW COIL CONTROLLER";
+    DataAirSystems::PrimaryAirSystem(1).ControlConverged.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumIn = 4;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumOut = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalNodes = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum(1) = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).CompType_Num = 5; // WaterCoil_Cooling
+    DataPlant::PlantLoop.allocate(1);
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    bool SimZoneEquipment(false);
+    SimAirServingZones::SimAirLoops(true, SimZoneEquipment);
+
+    // after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
+    ASSERT_EQ(1, DataAirSystems::PrimaryAirSystem(1).NumControllers);
+    ASSERT_EQ(1, DataAirSystems::PrimaryAirSystem(1).ControllerIndex(1));
+    ASSERT_EQ(1, ControllerProps(1).AirLoopControllerIndex);
+}
+
+TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
+{
+    std::string const idf_objects = delimited_string({
+        "  Version,8.6;",
+
+        "  Coil:Cooling:Water,",
+        "    Main Cooling Coil 1,     !- Name",
+        "    CoolingCoilAvailSched,   !- Availability Schedule Name",
+        "    autosize,                !- Design Water Flow Rate {m3/s}",
+        "    autosize,                !- Design Air Flow Rate {m3/s}",
+        "    autosize,                !- Design Inlet Water Temperature {C}",
+        "    autosize,                !- Design Inlet Air Temperature {C}",
+        "    autosize,                !- Design Outlet Air Temperature {C}",
+        "    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+        "    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+        "    CCoil Water Inlet Node,  !- Water Inlet Node Name",
+        "    CCoil Water Outlet Node, !- Water Outlet Node Name",
+        "    Mixed Air Node 1,        !- Air Inlet Node Name",
+        "    CCoil Air Outlet Node,   !- Air Outlet Node Name",
+        "    SimpleAnalysis,          !- Type of Analysis",
+        "    CrossFlow;               !- Heat Exchanger Configuration",
+
+        "  Schedule:Compact,",
+        "   CoolingCoilAvailSched,	  !- Name",
+        "	Fraction,			      !- Schedule Type Limits Name",
+        "	Through: 12/31,		      !- Field 1",
+        "	For: AllDays,		      !- Field 2",
+        "	Until: 24:00, 1.0;        !- Field 3",
+
+        "  Controller:WaterCoil,",
+        "    Cooling Coil Contoller,  !- Name",
+        "    HumidityRatio,           !- Control Variable",
+        "    Reverse,                 !- Action",
+        "    FLOW,                    !- Actuator Variable",
+        "    CCoil Air Outlet Node,   !- Sensor Node Name",
+        "    CCoil Water Inlet Node,  !- Actuator Node Name",
+        "    autosize,                !- Controller Convergence Tolerance {deltaC}",
+        "    autosize,                !- Maximum Actuated Flow {m3/s}",
+        "    0.0;                     !- Minimum Actuated Flow {m3/s}",
+
+        "  SetpointManager:Scheduled,",
+        "    CCoil Temp Setpoint Mgr, !- Name",
+        "    Temperature,             !- Control Variable",
+        "    Always 16,               !- Schedule Name",
+        "    CCoil Air Outlet Node;   !- Setpoint Node or NodeList Name",
+
+        "  Schedule:Compact,",
+        "    Always 16,               !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,16;         !- Field 3",
+
+        "  SetpointManager:Scheduled,",
+        "    CCoil Hum Setpoint Mgr,  !- Name",
+        "    MaximumHumidityRatio,    !- Control Variable",
+        "    HumSetPt,                !- Schedule Name",
+        "    CCoil Air Outlet Node;   !- Setpoint Node or NodeList Name",
+
+        "  Schedule:Compact,",
+        "    HumSetPt,                !- Name",
+        "    AnyNumber,               !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00, 0.009;     !- Field 3",
+
+        "  AirLoopHVAC:ControllerList,",
+        "	CW Coil Controller,       !- Name",
+        "	Controller:WaterCoil,     !- Controller 1 Object Type",
+        "	Cooling Coil Contoller;   !- Controller 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetSetPointManagerInputs();
+    // There are two setpoint managers and are schedule type
+    ASSERT_EQ(2, NumSchSetPtMgrs); // 2 schedule set point managers
+    ASSERT_EQ(2, NumAllSetPtMgrs); // 2 all set point managers
+    // check specified control variable types
+    ASSERT_EQ(iTemperature, AllSetPtMgr(1).CtrlTypeMode);           // is "Temperature"
+    ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(2).CtrlTypeMode); // is "MaximumHumidityRatio"
+
+    GetControllerInput();
+    // check ControllerProps control variable is set to "MaximumHumidityRatio"
+    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(ControllerProps(1).SensedNode);
+    ASSERT_EQ(iCtrlVarType_MaxHumRat, ControllerProps(1).HumRatCntrlType); // MaximumHumidityRatio
+}
+
+} // namespace EnergyPlus

@@ -15,8 +15,8 @@
 !
 ! Location:                Miami, FL
 !
-! Design Days:             Miami Intl Ap_FL_USA Annual Heating 99%, MaxDB=10.9캜
-!                          Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6캜 MWB=25.3캜
+! Design Days:             Miami Intl Ap_FL_USA Annual Heating 99%, MaxDB=10.9째C
+!                          Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_FL_Miami.Intl.AP.722020_TMY3.epw
 !
@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     NONE,                    !- Name
@@ -161,7 +161,7 @@
     -5.00,                   !- Time Zone {hr}
     11.00;                   !- Elevation {m}
 
- ! Miami Intl Ap_FL_USA Annual Heating 99%, MaxDB=10.9캜
+ ! Miami Intl Ap_FL_USA Annual Heating 99%, MaxDB=10.9째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99% Condns DB,  !- Name
@@ -191,7 +191,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6캜 MWB=25.3캜
+ ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name

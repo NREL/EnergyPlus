@@ -12,8 +12,8 @@
 !
 ! Location:                Fresno, CA
 !
-! Design Days:             FRESNO_CA_USA Annual Heating 99% Design Conditions DB, MaxDB= 0.5캜
-!                          FRESNO_CA_USA Annual Cooling 1% Design Conditions, MaxDB=  38.3캜 MCWB=  21.2캜
+! Design Days:             FRESNO_CA_USA Annual Heating 99% Design Conditions DB, MaxDB= 0.5째C
+!                          FRESNO_CA_USA Annual Cooling 1% Design Conditions, MaxDB=  38.3째C MCWB=  21.2째C
 !
 ! Run Period (Weather File): 8/10 - 8/18  FRESNO_CA_USA TMY2-93193
 !
@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Building,                !- Name
@@ -146,7 +146,7 @@
     -8.00,                   !- Time Zone {hr}
     100.00;                  !- Elevation {m}
 
-! FRESNO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=38.3캜 MWB=21.2캜
+! FRESNO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=38.3째C MWB=21.2째C
 
   SizingPeriod:DesignDay,
     FRESNO Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -176,7 +176,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.00;                    !- Sky Clearness
 
-! FRESNO_CA_USA Annual Heating 99%, MaxDB=0.5캜
+! FRESNO_CA_USA Annual Heating 99%, MaxDB=0.5째C
 
   SizingPeriod:DesignDay,
     FRESNO Ann Htg 99% Condns DB,  !- Name

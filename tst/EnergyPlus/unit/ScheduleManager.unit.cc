@@ -52,543 +52,598 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ScheduleManager;
 using namespace ObjexxFCL;
 
-
-
-TEST_F( EnergyPlusFixture, ScheduleManager_isMinuteMultipleOfTimestep )
+TEST_F(EnergyPlusFixture, ScheduleManager_isMinuteMultipleOfTimestep)
 {
-	// EnergyPlus can accept 1,  2, 3,   4,  5,  6, 10, 12, 15, 20, 30, 60 timesteps per hour which correspond to
-	//                      60, 30, 20, 15, 12, 10,  5,  5,  4,  3,  2,  1 minutes per timestep
-	EXPECT_TRUE( isMinuteMultipleOfTimestep( 0, 15 ) );
-	EXPECT_TRUE( isMinuteMultipleOfTimestep( 15, 15 ) );
-	EXPECT_TRUE( isMinuteMultipleOfTimestep( 30, 15 ) );
-	EXPECT_TRUE( isMinuteMultipleOfTimestep( 45, 15 ) );
+    // EnergyPlus can accept 1,  2, 3,   4,  5,  6, 10, 12, 15, 20, 30, 60 timesteps per hour which correspond to
+    //                      60, 30, 20, 15, 12, 10,  5,  5,  4,  3,  2,  1 minutes per timestep
+    EXPECT_TRUE(isMinuteMultipleOfTimestep(0, 15));
+    EXPECT_TRUE(isMinuteMultipleOfTimestep(15, 15));
+    EXPECT_TRUE(isMinuteMultipleOfTimestep(30, 15));
+    EXPECT_TRUE(isMinuteMultipleOfTimestep(45, 15));
 
-	EXPECT_FALSE( isMinuteMultipleOfTimestep( 22, 15 ) );
-	EXPECT_FALSE( isMinuteMultipleOfTimestep( 53, 15 ) );
+    EXPECT_FALSE(isMinuteMultipleOfTimestep(22, 15));
+    EXPECT_FALSE(isMinuteMultipleOfTimestep(53, 15));
 
-	EXPECT_TRUE( isMinuteMultipleOfTimestep( 0, 12 ) );
-	EXPECT_TRUE( isMinuteMultipleOfTimestep( 12, 12 ) );
-	EXPECT_TRUE( isMinuteMultipleOfTimestep( 24, 12 ) );
-	EXPECT_TRUE( isMinuteMultipleOfTimestep( 36, 12 ) );
-	EXPECT_TRUE( isMinuteMultipleOfTimestep( 48, 12 ) );
+    EXPECT_TRUE(isMinuteMultipleOfTimestep(0, 12));
+    EXPECT_TRUE(isMinuteMultipleOfTimestep(12, 12));
+    EXPECT_TRUE(isMinuteMultipleOfTimestep(24, 12));
+    EXPECT_TRUE(isMinuteMultipleOfTimestep(36, 12));
+    EXPECT_TRUE(isMinuteMultipleOfTimestep(48, 12));
 
-	EXPECT_FALSE( isMinuteMultipleOfTimestep( 22, 12 ) );
-	EXPECT_FALSE( isMinuteMultipleOfTimestep( 53, 12 ) );
+    EXPECT_FALSE(isMinuteMultipleOfTimestep(22, 12));
+    EXPECT_FALSE(isMinuteMultipleOfTimestep(53, 12));
 }
 
-
-TEST_F( EnergyPlusFixture, ScheduleAnnualFullLoadHours_test )
+TEST_F(EnergyPlusFixture, ScheduleAnnualFullLoadHours_test)
 {
-	// J.Glazer - August 2017
+    // J.Glazer - August 2017
 
-	std::string const idf_objects = delimited_string( {
-		"Version,8.9;",
-		" ",
-		"ScheduleTypeLimits,",
-		"  Any Number;              !- Name",
-		" ",
-		"Schedule:Compact,",
-		" OnSched,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 1.0;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" OffSched,                 !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 0.0;        !- Field 3",
-		" ",
-		"Schedule:Compact,",
-		" JanOnSched,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 1/31,            !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 1.0,        !- Field 26",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 0.0;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" HalfOnSched,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 12:00, 1.0,        !- Field 26",
-		" Until: 24:00, 0.0;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" HalfOnSched2,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 12:00, 0.75,        !- Field 26",
-		" Until: 24:00, 0.25;        !- Field 26",
-		" ",
-	} );
+    std::string const idf_objects = delimited_string({
+        "Version,9.0;",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Any Number;              !- Name",
+        " ",
+        "Schedule:Compact,",
+        " OnSched,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 1.0;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " OffSched,                 !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 0.0;        !- Field 3",
+        " ",
+        "Schedule:Compact,",
+        " JanOnSched,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 1/31,            !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 1.0,        !- Field 26",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 0.0;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " HalfOnSched,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 12:00, 1.0,        !- Field 26",
+        " Until: 24:00, 0.0;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " HalfOnSched2,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 12:00, 0.75,        !- Field 26",
+        " Until: 24:00, 0.25;        !- Field 26",
+        " ",
+    });
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	DataGlobals::NumOfTimeStepInHour = 4;
-	DataGlobals::MinutesPerTimeStep = 15;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 15;
 
-	int onSchedIndex = GetScheduleIndex("ONSCHED");
-	EXPECT_EQ( 8760., ScheduleAnnualFullLoadHours( onSchedIndex, 1, false ) ); 
+    int onSchedIndex = GetScheduleIndex("ONSCHED");
+    EXPECT_EQ(8760., ScheduleAnnualFullLoadHours(onSchedIndex, 1, false));
 
-	int offSchedIndex = GetScheduleIndex( "OFFSCHED" );
-	EXPECT_EQ( 0., ScheduleAnnualFullLoadHours( offSchedIndex, 1, false ) );
+    int offSchedIndex = GetScheduleIndex("OFFSCHED");
+    EXPECT_EQ(0., ScheduleAnnualFullLoadHours(offSchedIndex, 1, false));
 
-	int janOnSchedIndex = GetScheduleIndex( "JANONSCHED" );
-	EXPECT_EQ( 744., ScheduleAnnualFullLoadHours( janOnSchedIndex, 1, false ) );
+    int janOnSchedIndex = GetScheduleIndex("JANONSCHED");
+    EXPECT_EQ(744., ScheduleAnnualFullLoadHours(janOnSchedIndex, 1, false));
 
-	int halfOnSchedIndex = GetScheduleIndex( "HALFONSCHED" );
-	EXPECT_EQ( 4380., ScheduleAnnualFullLoadHours( halfOnSchedIndex, 1, false ) );
+    int halfOnSchedIndex = GetScheduleIndex("HALFONSCHED");
+    EXPECT_EQ(4380., ScheduleAnnualFullLoadHours(halfOnSchedIndex, 1, false));
 
-	int halfOnSched2Index = GetScheduleIndex( "HALFONSCHED2" );
-	EXPECT_EQ( 4380., ScheduleAnnualFullLoadHours( halfOnSched2Index, 1, false ) );
-
+    int halfOnSched2Index = GetScheduleIndex("HALFONSCHED2");
+    EXPECT_EQ(4380., ScheduleAnnualFullLoadHours(halfOnSched2Index, 1, false));
 }
 
-TEST_F( EnergyPlusFixture, ScheduleAverageHoursPerWeek_test )
+TEST_F(EnergyPlusFixture, ScheduleAverageHoursPerWeek_test)
 {
-	// J.Glazer - August 2017
+    // J.Glazer - August 2017
 
-	std::string const idf_objects = delimited_string( {
-		"Version,8.9;",
-		" ",
-		"ScheduleTypeLimits,",
-		"  Any Number;              !- Name",
-		" ",
-		"Schedule:Compact,",
-		" OnSched,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 1.0;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" OffSched,                 !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 0.0;        !- Field 3",
-		" ",
-		"Schedule:Compact,",
-		" JanOnSched,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 1/31,            !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 1.0,        !- Field 26",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 0.0;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" HalfOnSched,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 12:00, 1.0,        !- Field 26",
-		" Until: 24:00, 0.0;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" HalfOnSched2,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 12:00, 0.75,        !- Field 26",
-		" Until: 24:00, 0.25;        !- Field 26",
-		" ",
-	} );
+    std::string const idf_objects = delimited_string({
+        "Version,9.0;",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Any Number;              !- Name",
+        " ",
+        "Schedule:Compact,",
+        " OnSched,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 1.0;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " OffSched,                 !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 0.0;        !- Field 3",
+        " ",
+        "Schedule:Compact,",
+        " JanOnSched,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 1/31,            !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 1.0,        !- Field 26",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 0.0;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " HalfOnSched,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 12:00, 1.0,        !- Field 26",
+        " Until: 24:00, 0.0;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " HalfOnSched2,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 12:00, 0.75,        !- Field 26",
+        " Until: 24:00, 0.25;        !- Field 26",
+        " ",
+    });
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	DataGlobals::NumOfTimeStepInHour = 4;
-	DataGlobals::MinutesPerTimeStep = 15;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 15;
 
-	int onSchedIndex = GetScheduleIndex( "ONSCHED" );
-	EXPECT_EQ( 168., ScheduleAverageHoursPerWeek( onSchedIndex, 1, false ) );
+    int onSchedIndex = GetScheduleIndex("ONSCHED");
+    EXPECT_EQ(168., ScheduleAverageHoursPerWeek(onSchedIndex, 1, false));
 
-	int offSchedIndex = GetScheduleIndex( "OFFSCHED" );
-	EXPECT_EQ( 0., ScheduleAverageHoursPerWeek( offSchedIndex, 1, false ) );
+    int offSchedIndex = GetScheduleIndex("OFFSCHED");
+    EXPECT_EQ(0., ScheduleAverageHoursPerWeek(offSchedIndex, 1, false));
 
-	int janOnSchedIndex = GetScheduleIndex( "JANONSCHED" );
-	EXPECT_NEAR( 14.3, ScheduleAverageHoursPerWeek( janOnSchedIndex, 1, false ), 0.1 );
+    int janOnSchedIndex = GetScheduleIndex("JANONSCHED");
+    EXPECT_NEAR(14.3, ScheduleAverageHoursPerWeek(janOnSchedIndex, 1, false), 0.1);
 
-	int halfOnSchedIndex = GetScheduleIndex( "HALFONSCHED" );
-	EXPECT_EQ( 84., ScheduleAverageHoursPerWeek( halfOnSchedIndex, 1, false ) );
+    int halfOnSchedIndex = GetScheduleIndex("HALFONSCHED");
+    EXPECT_EQ(84., ScheduleAverageHoursPerWeek(halfOnSchedIndex, 1, false));
 
-	int halfOnSched2Index = GetScheduleIndex( "HALFONSCHED2" );
-	EXPECT_EQ( 84., ScheduleAverageHoursPerWeek( halfOnSched2Index, 1, false ) );
-
+    int halfOnSched2Index = GetScheduleIndex("HALFONSCHED2");
+    EXPECT_EQ(84., ScheduleAverageHoursPerWeek(halfOnSched2Index, 1, false));
 }
 
-TEST_F( EnergyPlusFixture, ScheduleHoursGT1perc_test )
+TEST_F(EnergyPlusFixture, ScheduleHoursGT1perc_test)
 {
-	// J.Glazer - August 2017
+    // J.Glazer - August 2017
 
-	std::string const idf_objects = delimited_string( {
-		"Version,8.9;",
-		" ",
-		"ScheduleTypeLimits,",
-		"  Any Number;              !- Name",
-		" ",
-		"Schedule:Compact,",
-		" OnSched,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 1.0;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" OffSched,                 !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 0.0;        !- Field 3",
-		" ",
-		"Schedule:Compact,",
-		" JanOnSched,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 1/31,            !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 1.0,        !- Field 26",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 0.0;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" HalfOnSched,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 12:00, 1.0,        !- Field 26",
-		" Until: 24:00, 0.0;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" HalfOnSched2,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 12:00, 0.75,        !- Field 26",
-		" Until: 24:00, 0.25;        !- Field 26",
-		" ",
-		"Schedule:Compact,",
-		" HalfOnSched3,                  !- Name",
-		" Any Number,               !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 12:00, 0.2,        !- Field 26",
-		" Until: 24:00, 0.0;        !- Field 26",
-		" ",
-	} );
+    std::string const idf_objects = delimited_string({
+        "Version,9.0;",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Any Number;              !- Name",
+        " ",
+        "Schedule:Compact,",
+        " OnSched,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 1.0;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " OffSched,                 !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 0.0;        !- Field 3",
+        " ",
+        "Schedule:Compact,",
+        " JanOnSched,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 1/31,            !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 1.0,        !- Field 26",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 0.0;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " HalfOnSched,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 12:00, 1.0,        !- Field 26",
+        " Until: 24:00, 0.0;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " HalfOnSched2,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 12:00, 0.75,        !- Field 26",
+        " Until: 24:00, 0.25;        !- Field 26",
+        " ",
+        "Schedule:Compact,",
+        " HalfOnSched3,                  !- Name",
+        " Any Number,               !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 12:00, 0.2,        !- Field 26",
+        " Until: 24:00, 0.0;        !- Field 26",
+        " ",
+    });
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	DataGlobals::NumOfTimeStepInHour = 4;
-	DataGlobals::MinutesPerTimeStep = 15;
-	DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 15;
+    DataGlobals::TimeStepZone = 0.25;
 
-	int onSchedIndex = GetScheduleIndex( "ONSCHED" );
-	EXPECT_EQ( 8760., ScheduleHoursGT1perc( onSchedIndex, 1, false ) );
+    int onSchedIndex = GetScheduleIndex("ONSCHED");
+    EXPECT_EQ(8760., ScheduleHoursGT1perc(onSchedIndex, 1, false));
 
-	int offSchedIndex = GetScheduleIndex( "OFFSCHED" );
-	EXPECT_EQ( 0., ScheduleHoursGT1perc( offSchedIndex, 1, false ) );
+    int offSchedIndex = GetScheduleIndex("OFFSCHED");
+    EXPECT_EQ(0., ScheduleHoursGT1perc(offSchedIndex, 1, false));
 
-	int janOnSchedIndex = GetScheduleIndex( "JANONSCHED" );
-	EXPECT_EQ( 744., ScheduleHoursGT1perc( janOnSchedIndex, 1, false ) );
+    int janOnSchedIndex = GetScheduleIndex("JANONSCHED");
+    EXPECT_EQ(744., ScheduleHoursGT1perc(janOnSchedIndex, 1, false));
 
-	int halfOnSchedIndex = GetScheduleIndex( "HALFONSCHED" );
-	EXPECT_EQ( 4380., ScheduleHoursGT1perc( halfOnSchedIndex, 1, false ) );
+    int halfOnSchedIndex = GetScheduleIndex("HALFONSCHED");
+    EXPECT_EQ(4380., ScheduleHoursGT1perc(halfOnSchedIndex, 1, false));
 
-	int halfOnSched2Index = GetScheduleIndex( "HALFONSCHED2" );
-	EXPECT_EQ( 8760., ScheduleHoursGT1perc( halfOnSched2Index, 1, false ) );
+    int halfOnSched2Index = GetScheduleIndex("HALFONSCHED2");
+    EXPECT_EQ(8760., ScheduleHoursGT1perc(halfOnSched2Index, 1, false));
 
-	int halfOnSched3Index = GetScheduleIndex( "HALFONSCHED3" );
-	EXPECT_EQ( 4380., ScheduleHoursGT1perc( halfOnSched3Index, 1, false ) );
-
+    int halfOnSched3Index = GetScheduleIndex("HALFONSCHED3");
+    EXPECT_EQ(4380., ScheduleHoursGT1perc(halfOnSched3Index, 1, false));
 }
 
-TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp )
+TEST_F(EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp)
 {
-	// J.Glazer - September 2017
+    // J.Glazer - September 2017
 
-	std::string const idf_objects = delimited_string( {
-		"Schedule:Year,",
-		"  SchYr_A,   !- Name",
-		"  AnyNumber, !- Schedule Type Limits Name",
-		"  SchWk_A1,  !- Schedule:Week Name 1",
-		"  1,         !- Start Month 1",
-		"  1,         !- Start Day 1",
-		"  12,        !- End Month 1",
-		"  31;        !- End Day 1",
-		"",
-		"Schedule:Week:Daily,",
-		"  SchWk_A1,  !- Name",
-		"  SchDy_A1a,  !- Sunday Schedule:Day Name",
-		"  SchDy_A1a,  !- Monday Schedule:Day Name",
-		"  SchDy_A1a,  !- Tuesday Schedule:Day Name",
-		"  SchDy_A1a,  !- Wednesday Schedule:Day Name",
-		"  SchDy_A1a,  !- Thursday Schedule:Day Name",
-		"  SchDy_A1a,  !- Friday Schedule:Day Name",
-		"  SchDy_A1a,  !- Saturday Schedule:Day Name",
-		"  SchDy_A1a,  !- Holiday Schedule:Day Name",
-		"  SchDy_A1a,  !- SummerDesignDay Schedule:Day Name",
-		"  SchDy_A1a,  !- WinterDesignDay Schedule:Day Name",
-		"  SchDy_A1a,  !- CustomDay1 Schedule:Day Name",
-		"  SchDy_A1a;  !- CustomDay2 Schedule:Day Name",
-		"  ",
-		"Schedule:Day:Interval,",
-		"  SchDy_A1a,  !- Name",
-		"  AnyNumber,  !- Schedule Type Limits Name",
-		"  Linear,     !- Interpolate to Timestep",
-		"  07:00,      !- Time 1",
-		"  0.001,      !- Value Until Time 1",
-		"  08:00,      !- Time 2",
-		"  100.001,    !- Value Until Time 2",
-		"  10:00,      !- Time 4",
-		"  300.001,    !- Value Until Time 4",
-		"  14:00,      !- Time 8",
-		"  700.001,    !- Value Until Time 8",
-		"  15:00,      !- Time 9",
-		"  600.001,    !- Value Until Time 9",
-		"  19:00,      !- Time 13",
-		"  200.001,    !- Value Until Time 13",
-		"  24:00,      !- Time 14",
-		"  0.001;      !- Value Until Time 14",
-		"", } );
+    std::string const idf_objects = delimited_string({
+        "Schedule:Year,",
+        "  SchYr_A,   !- Name",
+        "  AnyNumber, !- Schedule Type Limits Name",
+        "  SchWk_A1,  !- Schedule:Week Name 1",
+        "  1,         !- Start Month 1",
+        "  1,         !- Start Day 1",
+        "  12,        !- End Month 1",
+        "  31;        !- End Day 1",
+        "",
+        "Schedule:Week:Daily,",
+        "  SchWk_A1,  !- Name",
+        "  SchDy_A1a,  !- Sunday Schedule:Day Name",
+        "  SchDy_A1a,  !- Monday Schedule:Day Name",
+        "  SchDy_A1a,  !- Tuesday Schedule:Day Name",
+        "  SchDy_A1a,  !- Wednesday Schedule:Day Name",
+        "  SchDy_A1a,  !- Thursday Schedule:Day Name",
+        "  SchDy_A1a,  !- Friday Schedule:Day Name",
+        "  SchDy_A1a,  !- Saturday Schedule:Day Name",
+        "  SchDy_A1a,  !- Holiday Schedule:Day Name",
+        "  SchDy_A1a,  !- SummerDesignDay Schedule:Day Name",
+        "  SchDy_A1a,  !- WinterDesignDay Schedule:Day Name",
+        "  SchDy_A1a,  !- CustomDay1 Schedule:Day Name",
+        "  SchDy_A1a;  !- CustomDay2 Schedule:Day Name",
+        "  ",
+        "Schedule:Day:Interval,",
+        "  SchDy_A1a,  !- Name",
+        "  AnyNumber,  !- Schedule Type Limits Name",
+        "  Linear,     !- Interpolate to Timestep",
+        "  07:00,      !- Time 1",
+        "  0.001,      !- Value Until Time 1",
+        "  08:00,      !- Time 2",
+        "  100.001,    !- Value Until Time 2",
+        "  10:00,      !- Time 4",
+        "  300.001,    !- Value Until Time 4",
+        "  14:00,      !- Time 8",
+        "  700.001,    !- Value Until Time 8",
+        "  15:00,      !- Time 9",
+        "  600.001,    !- Value Until Time 9",
+        "  19:00,      !- Time 13",
+        "  200.001,    !- Value Until Time 13",
+        "  24:00,      !- Time 14",
+        "  0.001;      !- Value Until Time 14",
+        "",
+    });
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	DataGlobals::NumOfTimeStepInHour = 4;
-	DataGlobals::MinutesPerTimeStep = 15;
-	DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 15;
+    DataGlobals::TimeStepZone = 0.25;
 
-	DataEnvironment::Month = 1;
-	DataEnvironment::DayOfMonth = 1;
-	DataGlobals::HourOfDay = 1;
-	DataGlobals::TimeStep = 1;
-	DataEnvironment::DSTIndicator = 0;
-	DataEnvironment::DayOfWeek = 2;
-	DataEnvironment::HolidayIndex = 0;
-	DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 1;
+    DataGlobals::HourOfDay = 1;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
+    int ASchedIndex = GetScheduleIndex("SCHYR_A"); // interpolate Linear
+    EXPECT_NEAR(0.001, LookUpScheduleValue(ASchedIndex, 7, 4), 0.000001);
 
-	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate Linear
-	EXPECT_NEAR( 0.001, LookUpScheduleValue( ASchedIndex, 7, 4 ), 0.000001 ); 
+    // interpolate over one hour
 
-	// interpolate over one hour
+    EXPECT_NEAR(25.001, LookUpScheduleValue(ASchedIndex, 8, 1), 0.000001);
+    EXPECT_NEAR(50.001, LookUpScheduleValue(ASchedIndex, 8, 2), 0.000001);
+    EXPECT_NEAR(75.001, LookUpScheduleValue(ASchedIndex, 8, 3), 0.000001);
+    EXPECT_NEAR(100.001, LookUpScheduleValue(ASchedIndex, 8, 4), 0.000001);
 
-	EXPECT_NEAR( 25.001, LookUpScheduleValue( ASchedIndex, 8, 1 ), 0.000001 ); 
-	EXPECT_NEAR( 50.001, LookUpScheduleValue( ASchedIndex, 8, 2 ), 0.000001 );
-	EXPECT_NEAR( 75.001, LookUpScheduleValue( ASchedIndex, 8, 3 ), 0.000001 );
-	EXPECT_NEAR( 100.001, LookUpScheduleValue( ASchedIndex, 8, 4 ), 0.000001 );
+    // interpolate over two hours
 
-	// interpolate over two hours
+    EXPECT_NEAR(125.001, LookUpScheduleValue(ASchedIndex, 9, 1), 0.000001);
+    EXPECT_NEAR(150.001, LookUpScheduleValue(ASchedIndex, 9, 2), 0.000001);
+    EXPECT_NEAR(175.001, LookUpScheduleValue(ASchedIndex, 9, 3), 0.000001);
+    EXPECT_NEAR(200.001, LookUpScheduleValue(ASchedIndex, 9, 4), 0.000001);
 
-	EXPECT_NEAR( 125.001, LookUpScheduleValue( ASchedIndex, 9, 1 ), 0.000001 ); 
-	EXPECT_NEAR( 150.001, LookUpScheduleValue( ASchedIndex, 9, 2 ), 0.000001 );
-	EXPECT_NEAR( 175.001, LookUpScheduleValue( ASchedIndex, 9, 3 ), 0.000001 );
-	EXPECT_NEAR( 200.001, LookUpScheduleValue( ASchedIndex, 9, 4 ), 0.000001 );
+    EXPECT_NEAR(225.001, LookUpScheduleValue(ASchedIndex, 10, 1), 0.000001);
+    EXPECT_NEAR(250.001, LookUpScheduleValue(ASchedIndex, 10, 2), 0.000001);
+    EXPECT_NEAR(275.001, LookUpScheduleValue(ASchedIndex, 10, 3), 0.000001);
+    EXPECT_NEAR(300.001, LookUpScheduleValue(ASchedIndex, 10, 4), 0.000001);
 
-	EXPECT_NEAR( 225.001, LookUpScheduleValue( ASchedIndex, 10, 1 ), 0.000001 ); 
-	EXPECT_NEAR( 250.001, LookUpScheduleValue( ASchedIndex, 10, 2 ), 0.000001 );
-	EXPECT_NEAR( 275.001, LookUpScheduleValue( ASchedIndex, 10, 3 ), 0.000001 );
-	EXPECT_NEAR( 300.001, LookUpScheduleValue( ASchedIndex, 10, 4 ), 0.000001 );
+    // interpolate over four hours
 
-	// interpolate over four hours
+    EXPECT_NEAR(325.001, LookUpScheduleValue(ASchedIndex, 11, 1), 0.000001);
+    EXPECT_NEAR(350.001, LookUpScheduleValue(ASchedIndex, 11, 2), 0.000001);
+    EXPECT_NEAR(375.001, LookUpScheduleValue(ASchedIndex, 11, 3), 0.000001);
+    EXPECT_NEAR(400.001, LookUpScheduleValue(ASchedIndex, 11, 4), 0.000001);
 
-	EXPECT_NEAR( 325.001, LookUpScheduleValue( ASchedIndex, 11, 1 ), 0.000001 );
-	EXPECT_NEAR( 350.001, LookUpScheduleValue( ASchedIndex, 11, 2 ), 0.000001 );
-	EXPECT_NEAR( 375.001, LookUpScheduleValue( ASchedIndex, 11, 3 ), 0.000001 );
-	EXPECT_NEAR( 400.001, LookUpScheduleValue( ASchedIndex, 11, 4 ), 0.000001 );
+    EXPECT_NEAR(525.001, LookUpScheduleValue(ASchedIndex, 13, 1), 0.000001);
+    EXPECT_NEAR(550.001, LookUpScheduleValue(ASchedIndex, 13, 2), 0.000001);
+    EXPECT_NEAR(575.001, LookUpScheduleValue(ASchedIndex, 13, 3), 0.000001);
+    EXPECT_NEAR(600.001, LookUpScheduleValue(ASchedIndex, 13, 4), 0.000001);
 
-	EXPECT_NEAR( 525.001, LookUpScheduleValue( ASchedIndex, 13, 1 ), 0.000001 );
-	EXPECT_NEAR( 550.001, LookUpScheduleValue( ASchedIndex, 13, 2 ), 0.000001 );
-	EXPECT_NEAR( 575.001, LookUpScheduleValue( ASchedIndex, 13, 3 ), 0.000001 );
-	EXPECT_NEAR( 600.001, LookUpScheduleValue( ASchedIndex, 13, 4 ), 0.000001 );
+    // interpolate over one hour - decreasing
 
-	// interpolate over one hour - decreasing
+    EXPECT_NEAR(675.001, LookUpScheduleValue(ASchedIndex, 15, 1), 0.000001);
+    EXPECT_NEAR(650.001, LookUpScheduleValue(ASchedIndex, 15, 2), 0.000001);
+    EXPECT_NEAR(625.001, LookUpScheduleValue(ASchedIndex, 15, 3), 0.000001);
+    EXPECT_NEAR(600.001, LookUpScheduleValue(ASchedIndex, 15, 4), 0.000001);
 
-	EXPECT_NEAR( 675.001, LookUpScheduleValue( ASchedIndex, 15, 1 ), 0.000001 );
-	EXPECT_NEAR( 650.001, LookUpScheduleValue( ASchedIndex, 15, 2 ), 0.000001 );
-	EXPECT_NEAR( 625.001, LookUpScheduleValue( ASchedIndex, 15, 3 ), 0.000001 );
-	EXPECT_NEAR( 600.001, LookUpScheduleValue( ASchedIndex, 15, 4 ), 0.000001 );
+    // interpolate over four hours - decreasing
 
-	// interpolate over four hours - decreasing
+    EXPECT_NEAR(375.001, LookUpScheduleValue(ASchedIndex, 18, 1), 0.000001);
+    EXPECT_NEAR(350.001, LookUpScheduleValue(ASchedIndex, 18, 2), 0.000001);
+    EXPECT_NEAR(325.001, LookUpScheduleValue(ASchedIndex, 18, 3), 0.000001);
+    EXPECT_NEAR(300.001, LookUpScheduleValue(ASchedIndex, 18, 4), 0.000001);
 
-	EXPECT_NEAR( 375.001, LookUpScheduleValue( ASchedIndex, 18, 1 ), 0.000001 );
-	EXPECT_NEAR( 350.001, LookUpScheduleValue( ASchedIndex, 18, 2 ), 0.000001 );
-	EXPECT_NEAR( 325.001, LookUpScheduleValue( ASchedIndex, 18, 3 ), 0.000001 );
-	EXPECT_NEAR( 300.001, LookUpScheduleValue( ASchedIndex, 18, 4 ), 0.000001 );
-
-	EXPECT_NEAR( 275.001, LookUpScheduleValue( ASchedIndex, 19, 1 ), 0.000001 );
-	EXPECT_NEAR( 250.001, LookUpScheduleValue( ASchedIndex, 19, 2 ), 0.000001 );
-	EXPECT_NEAR( 225.001, LookUpScheduleValue( ASchedIndex, 19, 3 ), 0.000001 );
-	EXPECT_NEAR( 200.001, LookUpScheduleValue( ASchedIndex, 19, 4 ), 0.000001 );
-
+    EXPECT_NEAR(275.001, LookUpScheduleValue(ASchedIndex, 19, 1), 0.000001);
+    EXPECT_NEAR(250.001, LookUpScheduleValue(ASchedIndex, 19, 2), 0.000001);
+    EXPECT_NEAR(225.001, LookUpScheduleValue(ASchedIndex, 19, 3), 0.000001);
+    EXPECT_NEAR(200.001, LookUpScheduleValue(ASchedIndex, 19, 4), 0.000001);
 }
 
-TEST_F( EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp )
+TEST_F(EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp)
 {
-	// J.Glazer - September 2017
+    // J.Glazer - September 2017
 
-	std::string const idf_objects = delimited_string( {
-		"Schedule:Year,",
-		"  SchYr_A,   !- Name",
-		"  AnyNumber, !- Schedule Type Limits Name",
-		"  SchWk_A1,  !- Schedule:Week Name 1",
-		"  1,         !- Start Month 1",
-		"  1,         !- Start Day 1",
-		"  12,        !- End Month 1",
-		"  31;        !- End Day 1",
-		"",
-		"Schedule:Week:Daily,",
-		"  SchWk_A1,  !- Name",
-		"  SchDy_A1a,  !- Sunday Schedule:Day Name",
-		"  SchDy_A1a,  !- Monday Schedule:Day Name",
-		"  SchDy_A1a,  !- Tuesday Schedule:Day Name",
-		"  SchDy_A1a,  !- Wednesday Schedule:Day Name",
-		"  SchDy_A1a,  !- Thursday Schedule:Day Name",
-		"  SchDy_A1a,  !- Friday Schedule:Day Name",
-		"  SchDy_A1a,  !- Saturday Schedule:Day Name",
-		"  SchDy_A1a,  !- Holiday Schedule:Day Name",
-		"  SchDy_A1a,  !- SummerDesignDay Schedule:Day Name",
-		"  SchDy_A1a,  !- WinterDesignDay Schedule:Day Name",
-		"  SchDy_A1a,  !- CustomDay1 Schedule:Day Name",
-		"  SchDy_A1a;  !- CustomDay2 Schedule:Day Name",
-		"  ",
-		"Schedule:Day:Interval,",
-		"  SchDy_A1a,  !- Name",
-		"  AnyNumber,  !- Schedule Type Limits Name",
-		"  Linear,     !- Interpolate to Timestep",
-		"  07:00,      !- Time 1",
-		"  0.001,      !- Value Until Time 1",
-		"  07:30,      !- Time 2",
-		"  50.001,    !- Value Until Time 2",
-		"  08:00,      !- Time 4",
-		"  100.001,    !- Value Until Time 2",
-		"  24:00,      !- Time 14",
-		"  0.001;      !- Value Until Time 14",
-		"", } );
+    std::string const idf_objects = delimited_string({
+        "Schedule:Year,",
+        "  SchYr_A,   !- Name",
+        "  AnyNumber, !- Schedule Type Limits Name",
+        "  SchWk_A1,  !- Schedule:Week Name 1",
+        "  1,         !- Start Month 1",
+        "  1,         !- Start Day 1",
+        "  12,        !- End Month 1",
+        "  31;        !- End Day 1",
+        "",
+        "Schedule:Week:Daily,",
+        "  SchWk_A1,  !- Name",
+        "  SchDy_A1a,  !- Sunday Schedule:Day Name",
+        "  SchDy_A1a,  !- Monday Schedule:Day Name",
+        "  SchDy_A1a,  !- Tuesday Schedule:Day Name",
+        "  SchDy_A1a,  !- Wednesday Schedule:Day Name",
+        "  SchDy_A1a,  !- Thursday Schedule:Day Name",
+        "  SchDy_A1a,  !- Friday Schedule:Day Name",
+        "  SchDy_A1a,  !- Saturday Schedule:Day Name",
+        "  SchDy_A1a,  !- Holiday Schedule:Day Name",
+        "  SchDy_A1a,  !- SummerDesignDay Schedule:Day Name",
+        "  SchDy_A1a,  !- WinterDesignDay Schedule:Day Name",
+        "  SchDy_A1a,  !- CustomDay1 Schedule:Day Name",
+        "  SchDy_A1a;  !- CustomDay2 Schedule:Day Name",
+        "  ",
+        "Schedule:Day:Interval,",
+        "  SchDy_A1a,  !- Name",
+        "  AnyNumber,  !- Schedule Type Limits Name",
+        "  Linear,     !- Interpolate to Timestep",
+        "  07:00,      !- Time 1",
+        "  0.001,      !- Value Until Time 1",
+        "  07:30,      !- Time 2",
+        "  50.001,    !- Value Until Time 2",
+        "  08:00,      !- Time 4",
+        "  100.001,    !- Value Until Time 2",
+        "  24:00,      !- Time 14",
+        "  0.001;      !- Value Until Time 14",
+        "",
+    });
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	DataGlobals::NumOfTimeStepInHour = 4;
-	DataGlobals::MinutesPerTimeStep = 15;
-	DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 15;
+    DataGlobals::TimeStepZone = 0.25;
 
-	DataEnvironment::Month = 1;
-	DataEnvironment::DayOfMonth = 1;
-	DataGlobals::HourOfDay = 1;
-	DataGlobals::TimeStep = 1;
-	DataEnvironment::DSTIndicator = 0;
-	DataEnvironment::DayOfWeek = 2;
-	DataEnvironment::HolidayIndex = 0;
-	DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 1;
+    DataGlobals::HourOfDay = 1;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
+    int ASchedIndex = GetScheduleIndex("SCHYR_A"); // interpolate Linear
+    EXPECT_NEAR(0.001, LookUpScheduleValue(ASchedIndex, 7, 4), 0.000001);
 
-	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate Linear
-	EXPECT_NEAR( 0.001, LookUpScheduleValue( ASchedIndex, 7, 4 ), 0.000001 );
+    // interpolate over first half hour
 
-	// interpolate over first half hour
+    EXPECT_NEAR(25.001, LookUpScheduleValue(ASchedIndex, 8, 1), 0.000001);
+    EXPECT_NEAR(50.001, LookUpScheduleValue(ASchedIndex, 8, 2), 0.000001);
 
-	EXPECT_NEAR( 25.001, LookUpScheduleValue( ASchedIndex, 8, 1 ), 0.000001 );
-	EXPECT_NEAR( 50.001, LookUpScheduleValue( ASchedIndex, 8, 2 ), 0.000001 );
+    // interpolate over second half hour
 
-	// interpolate over second half hour
-
-	EXPECT_NEAR( 75.001, LookUpScheduleValue( ASchedIndex, 8, 3 ), 0.000001 );
-	EXPECT_NEAR( 100.001, LookUpScheduleValue( ASchedIndex, 8, 4 ), 0.000001 );
-
-
+    EXPECT_NEAR(75.001, LookUpScheduleValue(ASchedIndex, 8, 3), 0.000001);
+    EXPECT_NEAR(100.001, LookUpScheduleValue(ASchedIndex, 8, 4), 0.000001);
 }
 
-TEST_F( EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep )
+TEST_F(EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep)
 {
-	// J.Glazer - September 2017
+    // J.Glazer - September 2017
 
-	std::string const idf_objects = delimited_string( {
-		"Schedule:Year,",
-		"  SchYr_A,   !- Name",
-		"  AnyNumber, !- Schedule Type Limits Name",
-		"  SchWk_A1,  !- Schedule:Week Name 1",
-		"  1,         !- Start Month 1",
-		"  1,         !- Start Day 1",
-		"  12,        !- End Month 1",
-		"  31;        !- End Day 1",
-		"",
-		"Schedule:Week:Daily,",
-		"  SchWk_A1,  !- Name",
-		"  SchDy_A1a,  !- Sunday Schedule:Day Name",
-		"  SchDy_A1a,  !- Monday Schedule:Day Name",
-		"  SchDy_A1a,  !- Tuesday Schedule:Day Name",
-		"  SchDy_A1a,  !- Wednesday Schedule:Day Name",
-		"  SchDy_A1a,  !- Thursday Schedule:Day Name",
-		"  SchDy_A1a,  !- Friday Schedule:Day Name",
-		"  SchDy_A1a,  !- Saturday Schedule:Day Name",
-		"  SchDy_A1a,  !- Holiday Schedule:Day Name",
-		"  SchDy_A1a,  !- SummerDesignDay Schedule:Day Name",
-		"  SchDy_A1a,  !- WinterDesignDay Schedule:Day Name",
-		"  SchDy_A1a,  !- CustomDay1 Schedule:Day Name",
-		"  SchDy_A1a;  !- CustomDay2 Schedule:Day Name",
-		"  ",
-		"Schedule:Day:Interval,",
-		"  SchDy_A1a,  !- Name",
-		"  AnyNumber,  !- Schedule Type Limits Name",
-		"  Linear,     !- Interpolate to Timestep",
-		"  07:00,      !- Time 1",
-		"  0.0,        !- Value Until Time 1",
-		"  07:20,      !- Time 2",
-		"  33.33333333,!- Value Until Time 2",
-		"  08:00,      !- Time 4",
-		"  100.0,      !- Value Until Time 2",
-		"  24:00,      !- Time 14",
-		"  0.0;        !- Value Until Time 14",
-		"", } );
+    std::string const idf_objects = delimited_string({
+        "Schedule:Year,",
+        "  SchYr_A,   !- Name",
+        "  AnyNumber, !- Schedule Type Limits Name",
+        "  SchWk_A1,  !- Schedule:Week Name 1",
+        "  1,         !- Start Month 1",
+        "  1,         !- Start Day 1",
+        "  12,        !- End Month 1",
+        "  31;        !- End Day 1",
+        "",
+        "Schedule:Week:Daily,",
+        "  SchWk_A1,  !- Name",
+        "  SchDy_A1a,  !- Sunday Schedule:Day Name",
+        "  SchDy_A1a,  !- Monday Schedule:Day Name",
+        "  SchDy_A1a,  !- Tuesday Schedule:Day Name",
+        "  SchDy_A1a,  !- Wednesday Schedule:Day Name",
+        "  SchDy_A1a,  !- Thursday Schedule:Day Name",
+        "  SchDy_A1a,  !- Friday Schedule:Day Name",
+        "  SchDy_A1a,  !- Saturday Schedule:Day Name",
+        "  SchDy_A1a,  !- Holiday Schedule:Day Name",
+        "  SchDy_A1a,  !- SummerDesignDay Schedule:Day Name",
+        "  SchDy_A1a,  !- WinterDesignDay Schedule:Day Name",
+        "  SchDy_A1a,  !- CustomDay1 Schedule:Day Name",
+        "  SchDy_A1a;  !- CustomDay2 Schedule:Day Name",
+        "  ",
+        "Schedule:Day:Interval,",
+        "  SchDy_A1a,  !- Name",
+        "  AnyNumber,  !- Schedule Type Limits Name",
+        "  Linear,     !- Interpolate to Timestep",
+        "  07:00,      !- Time 1",
+        "  0.0,        !- Value Until Time 1",
+        "  07:20,      !- Time 2",
+        "  33.33333333,!- Value Until Time 2",
+        "  08:00,      !- Time 4",
+        "  100.0,      !- Value Until Time 2",
+        "  24:00,      !- Time 14",
+        "  0.0;        !- Value Until Time 14",
+        "",
+    });
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	DataGlobals::NumOfTimeStepInHour = 4;
-	DataGlobals::MinutesPerTimeStep = 15;
-	DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 15;
+    DataGlobals::TimeStepZone = 0.25;
 
-	DataEnvironment::Month = 1;
-	DataEnvironment::DayOfMonth = 1;
-	DataGlobals::HourOfDay = 1;
-	DataGlobals::TimeStep = 1;
-	DataEnvironment::DSTIndicator = 0;
-	DataEnvironment::DayOfWeek = 2;
-	DataEnvironment::HolidayIndex = 0;
-	DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 1;
+    DataGlobals::HourOfDay = 1;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
+    int ASchedIndex = GetScheduleIndex("SCHYR_A"); // interpolate Linear
+    EXPECT_NEAR(0.0, LookUpScheduleValue(ASchedIndex, 7, 4), 0.000001);
 
-	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate Linear
-	EXPECT_NEAR( 0.0, LookUpScheduleValue( ASchedIndex, 7, 4 ), 0.000001 );
+    // interpolate over first half hour
 
-	// interpolate over first half hour
+    EXPECT_NEAR(25.0, LookUpScheduleValue(ASchedIndex, 8, 1), 0.000001);
+    EXPECT_NEAR(50.0, LookUpScheduleValue(ASchedIndex, 8, 2), 0.000001);
 
-	EXPECT_NEAR( 25.0, LookUpScheduleValue( ASchedIndex, 8, 1 ), 0.000001 );
-	EXPECT_NEAR( 50.0, LookUpScheduleValue( ASchedIndex, 8, 2 ), 0.000001 );
+    // interpolate over second half hour
 
-	// interpolate over second half hour
-
-	EXPECT_NEAR( 75.0, LookUpScheduleValue( ASchedIndex, 8, 3 ), 0.000001 );
-	EXPECT_NEAR( 100.0, LookUpScheduleValue( ASchedIndex, 8, 4 ), 0.000001 );
-
-
+    EXPECT_NEAR(75.0, LookUpScheduleValue(ASchedIndex, 8, 3), 0.000001);
+    EXPECT_NEAR(100.0, LookUpScheduleValue(ASchedIndex, 8, 4), 0.000001);
 }
 
+TEST_F(EnergyPlusFixture, ScheduleYearMaxItems)
+{
+    std::string const idf_objects = delimited_string({
+        "Schedule:Year,",
+        "  SchYr_A,   !- Name",
+        "  AnyNumber, !- Schedule Type Limits Name",
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31;"
+        "",
+    });
 
+    ASSERT_FALSE(process_idf(idf_objects, false));
 
+    EXPECT_TRUE(compare_err_stream(delimited_string({"   ** Severe  ** <root>[Schedule:Year][SchYr_A][schedule_weeks] - Array should contain no more than 53 elements."})));
+
+}

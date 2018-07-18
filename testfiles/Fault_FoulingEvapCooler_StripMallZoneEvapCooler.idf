@@ -53,7 +53,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 10
 
-  Version,8.9;
+  Version,9.0;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -235,7 +235,7 @@
     -7.00,                   !- Time Zone {hr}
     1634;                    !- Elevation {m}
 
-! BOULDER_CO_USA Annual Heating 99.6%, MaxDB=-18.6°C
+! BOULDER_CO_USA Annual Heating 99.6%, MaxDB=-18.6Â°C
 
   SizingPeriod:DesignDay,
     BOULDER Ann Htg 99.6% Condns DB,  !- Name
@@ -265,7 +265,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! BOULDER_CO_USA Annual Cooling (WB=>MDB) .4%, MDB=27.4°C WB=18.6°C
+! BOULDER_CO_USA Annual Cooling (WB=>MDB) .4%, MDB=27.4Â°C WB=18.6Â°C
 
   SizingPeriod:DesignDay,
     BOULDER Ann Clg .4% Condns WB=>MDB,  !- Name

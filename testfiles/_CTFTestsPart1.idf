@@ -17,7 +17,7 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,4;
 
@@ -66,7 +66,7 @@
 
  ! Denver Stapleton Intl Arpt CO USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
  ! Coldest Month=December
- ! Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20캜
+ ! Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20째C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt Ann Htg 99.6% Condns DB,  !- Name
@@ -98,7 +98,7 @@
 
  ! Denver Stapleton Intl Arpt Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
  ! Hottest Month=July
- ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1캜 MWB=15.9캜
+ ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1째C MWB=15.9째C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt No Solar Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -130,7 +130,7 @@
 
  ! Denver Stapleton Intl Arpt Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
  ! Hottest Month=July
- ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1캜 MWB=15.9캜
+ ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1째C MWB=15.9째C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt Ann Clg .4% Condns DB=>MWB,  !- Name

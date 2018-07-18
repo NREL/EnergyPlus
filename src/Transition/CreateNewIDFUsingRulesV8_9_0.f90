@@ -603,6 +603,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    END IF
                  END DO
 
+             CASE('ELECTRICEQUIPMENT:ITE:AIRCOOLED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:2)=InArgs(1:2)
+                 OutArgs(3) = 'FlowFromSystem'
+                 OutArgs(4:CurArgs+1)=InArgs(3:CurArgs)
+                 CurArgs = CurArgs + 1
+
              CASE('SCHEDULE:DAY:INTERVAL')
                  ObjectName='Schedule:Day:Interval'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
