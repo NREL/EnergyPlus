@@ -4,7 +4,7 @@
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataSizing.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 
@@ -22,7 +22,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(
 }
 
 CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::string name_to_find) {
-    int numModes = InputProcessor::GetNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
+    int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
         // error
     }
@@ -31,9 +31,9 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         int NumAlphas; // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        InputProcessor::GetObjectItem(CoilCoolingDXCurveFitOperatingMode::object_name, modeNum, cAlphaArgs, NumAlphas,
+        inputProcessor->getObjectItem(CoilCoolingDXCurveFitOperatingMode::object_name, modeNum, cAlphaArgs, NumAlphas,
                                       rNumericArgs, NumNumbers, IOStatus);
-        if (!InputProcessor::SameString(name_to_find, cAlphaArgs(1))) {
+        if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
         found_it = true;

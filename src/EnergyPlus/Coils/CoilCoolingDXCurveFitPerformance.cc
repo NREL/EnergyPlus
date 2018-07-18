@@ -1,7 +1,8 @@
 #include <Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <Coils/PsychStruct.hh>
 #include <DataIPShortCuts.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -17,7 +18,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(
 }
 
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string name_to_find) {
-    int numPerformances = InputProcessor::GetNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
+    int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
         // error
     }
@@ -26,9 +27,9 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
         int NumAlphas; // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        InputProcessor::GetObjectItem(CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas,
+        inputProcessor->getObjectItem(CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas,
                                       rNumericArgs, NumNumbers, IOStatus);
-        if (!InputProcessor::SameString(name_to_find, cAlphaArgs(1))) {
+        if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
         found_it = true;

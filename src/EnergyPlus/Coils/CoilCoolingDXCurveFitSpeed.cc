@@ -8,7 +8,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <DXCoils.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 
@@ -103,7 +103,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
     DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 {
-    int numModes = InputProcessor::GetNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
+    int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
     if (numModes <= 0) {
         // error
     }
@@ -112,9 +112,9 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
         int NumAlphas; // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        InputProcessor::GetObjectItem(CoilCoolingDXCurveFitSpeed::object_name, modeNum, cAlphaArgs, NumAlphas,
+        inputProcessor->getObjectItem(CoilCoolingDXCurveFitSpeed::object_name, modeNum, cAlphaArgs, NumAlphas,
                                       rNumericArgs, NumNumbers, IOStatus);
-        if (!InputProcessor::SameString(name_to_find, cAlphaArgs(1))) {
+        if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
         found_it = true;

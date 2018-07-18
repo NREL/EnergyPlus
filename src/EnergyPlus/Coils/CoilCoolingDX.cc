@@ -6,7 +6,7 @@
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -55,7 +55,7 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
 }
 
 CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
-    int numCoolingCoilDXs = InputProcessor::GetNumObjectsFound(CoilCoolingDX::object_name);
+    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(CoilCoolingDX::object_name);
     if (numCoolingCoilDXs <= 0) {
         // error
     }
@@ -64,9 +64,9 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
         int NumAlphas; // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        InputProcessor::GetObjectItem(CoilCoolingDX::object_name, coilNum, cAlphaArgs, NumAlphas, rNumericArgs,
+        inputProcessor->getObjectItem(CoilCoolingDX::object_name, coilNum, cAlphaArgs, NumAlphas, rNumericArgs,
                                       NumNumbers, IOStatus);
-        if (!InputProcessor::SameString(name_to_find, cAlphaArgs(1))) {
+        if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
         found_it = true;
