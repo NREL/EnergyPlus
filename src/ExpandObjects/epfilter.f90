@@ -24748,7 +24748,7 @@ DO iZone = 1, numCompactPTAC
     CALL AddToObjStr('Design Specification Outdoor Air Object Name','',.TRUE.)
   ENDIF
   !ZoneHVAC:PackagedTerminalAirConditioner ~ line 61
-  IF (isDedOutAirNameBlank) THEN
+  IF (.NOT. isDedOutAirNameBlank) THEN
     CALL WriteComment('Set PTAC outdoor air to zero, because zone is served by dedicated outdoor air system (DOAS)')
   END IF
   CALL CreateNewObj('ZoneHVAC:PackagedTerminalAirConditioner')

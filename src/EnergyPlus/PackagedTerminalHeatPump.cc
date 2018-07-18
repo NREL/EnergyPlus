@@ -8857,8 +8857,6 @@ namespace PackagedTerminalHeatPump {
 
         SensOutput = 0.0;
         LatOutput = 0.0;
-        //		CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, coolingPLR, heatingPLR, OnOffAirFlowRat, SensOutput,
-        // LatOutput, HXUnitOn, _, _, 1.0 );
         CalcPTUnit(UnitarySysNum, FirstHVACIteration, PartLoadRatio, SensOutput, QZnReq, OnOffAirFlowRat, SupHeaterLoad, HXUnitOn);
 
         if (LoadIsTarget) {
@@ -8877,6 +8875,88 @@ namespace PackagedTerminalHeatPump {
         return Residuum;
     }
 
+    Real64 CalcPTUnitAirAndWaterFlowResidual(Real64 const PartLoadRatio, // water and air part load ratio
+                                             Array1<Real64> const &Par   // Function parameters
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Richard Raustad, FSEC
+        //       DATE WRITTEN   December 2015
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // To calculate the part-load ratio for the FCU with varying water flow rate
+
+        // METHODOLOGY EMPLOYED:
+        // Use SolveRoot to CALL this Function to converge on a solution
+
+        // Return value
+        Real64 Residuum; // Result (forces solution to be within tolerance)
+
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        //   Parameter description example:
+        //       Par(1)  = REAL(FanCoilNum,r64) ! Index to fan coil unit
+        //       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
+        //       Par(3)  = REAL(ControlledZoneNum,r64)     ! zone index
+        //       Par(4)  = QZnReq               ! zone load [W]
+        //       Par(5)  = WaterControlNode     ! CW or HW control node number
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        bool FirstHVACIteration; // FirstHVACIteration flag
+        Real64 QUnitOut;         // delivered capacity [W]
+
+        // Convert parameters to usable variables
+        int UnitarySystemNum = int(Par(1));
+        if (Par(2) == 1.0) {
+            FirstHVACIteration = true;
+        } else {
+            FirstHVACIteration = false;
+        }
+        int ControlledZoneNum = int(Par(3));
+        Real64 QZnReq = Par(4);
+        int WaterControlNode = int(Par(5));
+        Real64 OnOffAirFlowRat = Par(6);
+        Real64 MinAirFlow = Par(7);
+        Real64 MinWaterFlow = 0.0;
+        Real64 coolingPLR = 0.0;
+        Real64 heatingPLR = 0.0;
+        Real64 lowSpeedRatio = Par(11);
+        Real64 maxAirFlow = Par(14);
+        bool coolingLoad = false;
+        if (Par(15) == 1.0) coolingLoad = true;
+        bool HXUnitOn = false;
+        if (Par(18) == 1.0) HXUnitOn = true;
+
+        // set air flow rate
+        Node(PTUnit(UnitarySystemNum).AirInNode).MassFlowRate = MinAirFlow + (PartLoadRatio * (maxAirFlow - MinAirFlow));
+        PTUnit(UnitarySystemNum).FanPartLoadRatio =
+            max(0.0, ((Node(PTUnit(UnitarySystemNum).AirInNode).MassFlowRate - (maxAirFlow * lowSpeedRatio)) / ((1.0 - lowSpeedRatio) * maxAirFlow)));
+        // set water flow rate
+        if (WaterControlNode > 0 && WaterControlNode == PTUnit(UnitarySystemNum).CoolCoilFluidInletNode) {
+            Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PartLoadRatio * (PTUnit(UnitarySystemNum).MaxCoolCoilFluidFlow - MinWaterFlow));
+        } else if (WaterControlNode > 0 && WaterControlNode == PTUnit(UnitarySystemNum).HeatCoilFluidInletNode) {
+            Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PartLoadRatio * (PTUnit(UnitarySystemNum).MaxHeatCoilFluidFlow - MinWaterFlow));
+        } else if (coolingLoad) {
+            coolingPLR = PartLoadRatio;
+            // PTUnit( UnitarySysNum ).CoolingPartLoadFrac = coolingPLR;
+        } else { // must be non-water coil with heating load
+            heatingPLR = PartLoadRatio;
+            // PTUnit( UnitarySysNum ).HeatingPartLoadFrac = heatingPLR;
+        }
+        CalcPTUnit(UnitarySystemNum, FirstHVACIteration, PartLoadRatio, QUnitOut, QZnReq, OnOffAirFlowRat, SupHeaterLoad, HXUnitOn);
+
+        // Calculate residual based on output magnitude
+        if (std::abs(QZnReq) <= 100.0) {
+            Residuum = (QUnitOut - QZnReq) / 100.0;
+        } else {
+            Residuum = (QUnitOut - QZnReq) / QZnReq;
+        }
+
+        return Residuum;
+    }
 } // namespace PackagedTerminalHeatPump
 
 } // namespace EnergyPlus
