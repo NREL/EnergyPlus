@@ -482,12 +482,14 @@ For no temperature difference OR a vertical surface the following correlation is
 
 \begin{equation}
 h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}
+\label{eq:HcVertical}
 \end{equation}
 
 For ($\Delta$T \textless{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textgreater{} 0.0 AND an downward facing surface) an enhanced convection correlation is used:
 
 \begin{equation}
 h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}
+\label{eq:HcEnhanced}
 \end{equation}
 
 where $\Sigma$ is the surface tilt angle.
@@ -496,6 +498,7 @@ For ($\Delta$T \textgreater{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T 
 
 \begin{equation}
 h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}
+\label{eq:HcReduced}
 \end{equation}
 
 where $\Sigma$ is the surface tilt angle.
@@ -594,7 +597,7 @@ The DOE-2 convection model is a combination of the MoWiTT and BLAST Detailed con
 {h_{c,glass}} = \sqrt {h_n^2 + {{\left[ {aV_z^b} \right]}^2}}
 \end{equation}
 
-h\(_{n}\) is calculated using Equation or Equation .~ Constants a and b are given in Table~\ref{table:mowitt-coefficients-yazdanian-and-klems-1994}.
+h\(_{n}\) is calculated using Equation ~\ref{eq:HcVertical}, ~\ref{eq:HcEnhanced} or ~\ref{eq:HcReduced} .~ Constants a and b are given in Table~\ref{table:mowitt-coefficients-yazdanian-and-klems-1994}.
 
 For less smooth surfaces, the convection coefficient is modified according to the equation
 
