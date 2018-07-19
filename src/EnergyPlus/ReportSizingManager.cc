@@ -1294,6 +1294,7 @@ namespace ReportSizingManager {
                         CoilInHumRat = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
                         DesCoilLoad = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow *
                                       (PsyHFnTdbW(CoilInTemp, CoilInHumRat) - PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
+                        CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT; // Temporary fix by Gu on 7/19/18
                         if (DesCoilLoad >= SmallLoad) {
                             AutosizeDes = DesCoilLoad / (CoilDesWaterDeltaT * Cp * rho);
                         } else {
