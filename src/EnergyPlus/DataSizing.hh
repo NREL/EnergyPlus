@@ -228,6 +228,7 @@ namespace DataSizing {
     extern bool TermUnitPIU;                          // TRUE if a powered induction terminal unit
     extern bool TermUnitIU;                           // TRUE if an unpowered induction terminal unit
     extern bool ZoneEqFanCoil;                        // TRUE if a 4 pipe fan coil unit is being simulated
+    extern bool ZoneEqOutdoorAirUnit;                 // TRUE if an OutdoorAirUnit is being simulated
     extern bool ZoneEqUnitHeater;                     // TRUE if a unit heater is being simulated
     extern bool ZoneEqUnitVent;                       // TRUE if a unit ventilator is being simulated
     extern bool ZoneEqVentedSlab;                     // TRUE if a ventilated slab is being simulated
