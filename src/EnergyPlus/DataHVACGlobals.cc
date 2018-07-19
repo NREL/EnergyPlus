@@ -313,7 +313,8 @@ namespace DataHVACGlobals {
                                             "",
                                             "",
                                             "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl",
-                                            ""});
+                                            "",
+					    "Coil:Cooling:DX"});
 
     Array1D_string const cHeatingCoilTypes(NumAllCoilTypes,
                                            {"",
@@ -349,7 +350,8 @@ namespace DataHVACGlobals {
                                             "Coil:Heating:DX:VariableSpeed",
                                             "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
                                             "",
-                                            "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"});
+                                            "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
+					    ""});
 
     // Water to air HP coil types
     int const WatertoAir_Simple(1);
