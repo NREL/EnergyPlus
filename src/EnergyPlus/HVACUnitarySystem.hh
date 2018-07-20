@@ -186,7 +186,6 @@ namespace HVACUnitarySystem {
         int ZoneSequenceCoolingNum;       // Index to cooling sequence/priority for this zone
         int ZoneSequenceHeatingNum;       // Index to heating sequence/priority for this zone
         int ZoneInletNode;                // Zone inlet node number in the controlled zone
-        Real64 ControlZoneMassFlowFrac;   // Fraction of flow to control zone
         bool Humidistat;                  // Set to True if dehumidification control mode is set to
         int CondenserNodeNum;             // index to condenser air inlet node
         int DehumidControlType_Num;       // Set to Dehumid Control None, CoolReheat or MultiMode
@@ -228,8 +227,6 @@ namespace HVACUnitarySystem {
         Real64 DesignHeatingCapacity;    // heating coil capacity (W)
         Real64 HeatingSizingRatio;       // ratio of heating coil to cooling coil size
         bool DXHeatingCoil;              // specifies if heating coil is DX
-        int HeatCoilInletNodeNum;        // Heating coil air inlet node number
-        int HeatCoilOutletNodeNum;       // Heating coil air outlet node number
         int HeatingCoilPLFCurveIndex;    // PLF curve index (not used yet?)
         int HeatingCoilAvailSchPtr;      // heating coil availability schedule index
         bool HeatCoilExists;             // True if a heating coil is specified in the unitary system
@@ -440,13 +437,10 @@ namespace HVACUnitarySystem {
         Array1D<int> iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
 
         // connect ZoneHVAC to DOAS
-        bool ATMixerExists;      // True if there is an ATMixer
         std::string ATMixerName; // name of air terminal mixer
         int ATMixerIndex;        // index to the air terminal mixer
-        int ATMixerType;         // 1 = inlet side mixer, 2 = supply side mixer
         int ATMixerPriNode;      // primary inlet air node number for the air terminal mixer
         int ATMixerSecNode;      // secondary air inlet node number for the air terminal mixer
-        int ATMixerOutNode;      // outlet air node number for the air terminal mixer
 
         // Fault model of coil SAT sensor
         bool FaultyCoilSATFlag;     // True if the coil has SAT sensor fault
@@ -488,6 +482,12 @@ namespace HVACUnitarySystem {
         int HeatCoilCompNum;             // Comp num of the heating coil in the plant loop
         int HeatCoilFluidInletNode;      // Heating coil fluid inlet node
         int HeatCoilFluidOutletNodeNum;  // Heating coil fluid outlet node number (from Plant Loop data)
+        int HeatCoilInletNodeNum;        // Heating coil air inlet node number
+        int HeatCoilOutletNodeNum;       // Heating coil air outlet node number
+        bool ATMixerExists;              // True if there is an ATMixer
+        int ATMixerType;                 // 1 = inlet side mixer, 2 = supply side mixer
+        int ATMixerOutNode;              // outlet air node number for the air terminal mixer
+        Real64 ControlZoneMassFlowFrac;  // Fraction of flow to control zone
 
         // Default Constructor
         UnitarySystemData()

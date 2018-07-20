@@ -1695,6 +1695,11 @@ namespace HVACStandAloneERV {
                 }
             }
         }
+        // Reset zone equipment sizing data
+        ZoneEqSizing(CurZoneEqNum).AirVolFlow = 0.0;
+        ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0;
+        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = false;
+        ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
     }
 
     void CalcStandAloneERV(int const StandAloneERVNum,    // Unit index in ERV data structure

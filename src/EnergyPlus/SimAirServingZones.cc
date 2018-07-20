@@ -3480,11 +3480,21 @@ namespace SimAirServingZones {
                 for (int branchNum = 1; branchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++branchNum) {
                     for (int compNum = 1; compNum <= PrimaryAirSystem(AirLoopNum).Branch(branchNum).TotalComponents; ++compNum) {
                         if (CompName == PrimaryAirSystem(AirLoopNum).Branch(branchNum).Comp(compNum).Name) {
-                            auto &sim_component(PrimaryAirSystem(AirLoopNum).Branch(branchNum).Comp(compNum));
                             int OAUnitNum = 0;
                             Real64 OAUCoilOutTemp = 0.0;
                             bool ZoneEquipFlag = false;
-                            sim_component.compPointer->simulate(CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, ZoneEquipFlag);
+                            PrimaryAirSystem(AirLoopNum)
+                                .Branch(branchNum)
+                                .Comp(compNum)
+                                .compPointer->simulate(CompName,
+                                                       FirstHVACIteration,
+                                                       AirLoopNum,
+                                                       CompIndex,
+                                                       HeatingActive,
+                                                       CoolingActive,
+                                                       OAUnitNum,
+                                                       OAUCoilOutTemp,
+                                                       ZoneEquipFlag);
                             foundComp = true;
                             break;
                         }
