@@ -1443,8 +1443,8 @@ namespace CurveManager {
                 PerfCurve(CurveNum).CurveMin = Numbers(7);
                 PerfCurve(CurveNum).CurveMinPresent = true;
             }
-            if (NumNumbers > 7 && !lNumericFieldBlanks(9)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(9);
+            if (NumNumbers > 7 && !lNumericFieldBlanks(8)) {
+                PerfCurve(CurveNum).CurveMax = Numbers(8);
                 PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
