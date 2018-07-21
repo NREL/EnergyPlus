@@ -165,6 +165,9 @@ namespace SteamCoils {
         NumSteamCoils = 0;
         GetSteamCoilsInputFlag = true;
         SteamCoil.deallocate();
+        MySizeFlag.deallocate();
+        CoilWarningOnceFlag.deallocate();
+        CheckEquipName.deallocate();
     }
 
     void SimulateSteamCoilComponents(std::string const &CompName,

@@ -644,13 +644,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     FinalZoneSizing.allocate(1);
     FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.5;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.5;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
-    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 5.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
-    FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
 
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 30.0, 0.0);
 
@@ -660,11 +655,6 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(CurZoneEqNum).DesCoolDens;
 
     OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
-
-    FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 50.0;
-    FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.0050;
-    FinalZoneSizing(CurZoneEqNum).DesHeatDens = DataEnvironment::StdRhoAir;
-    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * FinalZoneSizing(CurZoneEqNum).DesHeatDens;
 
     BeginEnvrnFlag = true;
     bool FirstHVACIteration(true);
@@ -916,7 +906,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     SteamCoil(1).CompNum = 1;
 
     PlantLoop(1).Name = "SteamLoop";
-    PlantLoop(1).FluidIndex = 0; // FindRefrigerant( "Steam" );
+    PlantLoop(1).FluidIndex = 0;
     PlantLoop(1).FluidName = "STEAM";
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = SteamCoil(1).Name;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = TypeOf_CoilSteamAirHeating;
@@ -956,22 +946,11 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
 
     FinalZoneSizing.allocate(1);
     FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.5;
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.5;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 5.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
-    FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
 
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 5.0, 0.0);
-
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 12.8;
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0080;
-    FinalZoneSizing(CurZoneEqNum).DesCoolDens = DataEnvironment::StdRhoAir;
-    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(CurZoneEqNum).DesCoolDens;
-
     OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
 
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 50.0;
@@ -994,12 +973,11 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     Real64 CpAirAvg = PsyCpAirFnWTdb(DesCoilOutHumRat, 0.5 * (DesCoilInTemp + DesCoilOutTemp));
     Real64 DesSteamCoilLoad = DesAirMassFlow * CpAirAvg * (DesCoilOutTemp - DesCoilInTemp);
 
-    DataGlobals::SteamInitConvTemp;
     // do steam flow rate sizing calculation
-    Real64 EnthSteamIn = GetSatEnthalpyRefrig("STEAM", SteamInitConvTemp, 1.0, SteamCoil(1).FluidIndex, "");
-    Real64 EnthSteamOut = GetSatEnthalpyRefrig("STEAM", SteamInitConvTemp, 0.0, SteamCoil(1).FluidIndex, "");
-    Real64 SteamDensity = GetSatDensityRefrig("STEAM", SteamInitConvTemp, 1.0, SteamCoil(1).FluidIndex, "");
-    Real64 CpOfCondensate = GetSatSpecificHeatRefrig("STEAM", SteamInitConvTemp, 0.0, SteamCoil(1).FluidIndex, "");
+    Real64 EnthSteamIn = GetSatEnthalpyRefrig("STEAM", DataGlobals::SteamInitConvTemp, 1.0, SteamCoil(1).FluidIndex, "");
+    Real64 EnthSteamOut = GetSatEnthalpyRefrig("STEAM", DataGlobals::SteamInitConvTemp, 0.0, SteamCoil(1).FluidIndex, "");
+    Real64 SteamDensity = GetSatDensityRefrig("STEAM", DataGlobals::SteamInitConvTemp, 1.0, SteamCoil(1).FluidIndex, "");
+    Real64 CpOfCondensate = GetSatSpecificHeatRefrig("STEAM", DataGlobals::SteamInitConvTemp, 0.0, SteamCoil(1).FluidIndex, "");
     Real64 LatentHeatChange = EnthSteamIn - EnthSteamOut;
     Real64 DesMaxSteamVolFlowRate = DesSteamCoilLoad / (SteamDensity * (LatentHeatChange + SteamCoil(1).DegOfSubcooling * CpOfCondensate));
 
