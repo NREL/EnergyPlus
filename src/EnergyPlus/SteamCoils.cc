@@ -160,6 +160,12 @@ namespace SteamCoils {
     // MODULE SUBROUTINES:
 
     // Functions
+    void clear_state()
+    {
+        NumSteamCoils = 0;
+        GetSteamCoilsInputFlag = true;
+        SteamCoil.deallocate();
+    }
 
     void SimulateSteamCoilComponents(std::string const &CompName,
                                      bool const FirstHVACIteration,

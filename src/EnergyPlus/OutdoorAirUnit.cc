@@ -753,6 +753,7 @@ namespace OutdoorAirUnit {
                                     GetCoilSteamOutletNode(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType,
                                                            OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                                            ErrorsFound);
+
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).MaxVolWaterFlow =
                                     GetCoilMaxSteamFlowRate(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex, ErrorsFound);
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).MinVolWaterFlow = 0.0;

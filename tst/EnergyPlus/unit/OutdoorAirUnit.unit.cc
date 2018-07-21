@@ -57,12 +57,18 @@
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
+#include <DataHeatBalFanSys.hh>
 #include <DataHeatBalance.hh>
 #include <DataLoopNode.hh>
 #include <DataSizing.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/WaterCoils.hh>
 #include <Fans.hh>
+#include <FluidProperties.hh>
+#include <General.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
@@ -73,15 +79,22 @@ using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHVACGlobals;
+using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataZoneEquipment;
+using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutdoorAirUnit;
 using namespace OutputReportPredefined;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
+using namespace EnergyPlus::SteamCoils;
+using namespace EnergyPlus::WaterCoils;
+using namespace EnergyPlus::FluidProperties;
 
 namespace EnergyPlus {
 
@@ -328,8 +341,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     DataLoopNode::Node(EAFanInletNode).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
 
     SetPredefinedTables();
-    SimOutdoorAirUnit("ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided,
-                      ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimOutdoorAirUnit(
+        "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA, OutAirUnit(OAUnitNum).OutAirVolFlow);
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA * StdRhoAir, OutAirUnit(OAUnitNum).OutAirMassFlow);
@@ -357,5 +370,641 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Version,",
+        "    9.0;                     !- Version Identifier",
+
+        "Zone,",
+        "    Thermal Zone 1,          !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    10,                      !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    ,                        !- Type",
+        "    ,                        !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    300,                     !- Volume {m3}",
+        "    100;                     !- Floor Area {m2}",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "    Thermal Zone 1,          !- Zone Name",
+        "    Thermal Zone 1 Equipment List,  !- Zone Conditioning Equipment List Name",
+        "    Thermal Zone 1 Inlet Node List,  !- Zone Air Inlet Node or NodeList Name",
+        "    Thermal Zone 1 Exhaust Node List,  !- Zone Air Exhaust Node or NodeList Name",
+        "    Node 1,                  !- Zone Air Node Name",
+        "    Thermal Zone 1 Return Air Node;  !- Zone Return Air Node or NodeList Name",
+
+        "NodeList,",
+        "    Thermal Zone 1 Inlet Node List,  !- Name",
+        "    Node 5;                  !- Node 1 Name",
+
+        "NodeList,",
+        "    Thermal Zone 1 Exhaust Node List,  !- Name",
+        "    Node 4;                  !- Node 1 Name",
+
+        "OutdoorAir:Node,",
+        "    Model Outdoor Air Node;  !- Name",
+
+        "OutdoorAir:NodeList,",
+        "    OAUnit OA Node;          !- Node or NodeList Name 1",
+
+        "	Schedule:Constant,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	FRACTION, !- Schedule Type",
+        "	1;        !- TimeStep Value",
+
+        "	ScheduleTypeLimits,",
+        "	Fraction, !- Name",
+        "	0.0, !- Lower Limit Value",
+        "	1.0, !- Upper Limit Value",
+        "	CONTINUOUS;              !- Numeric Type",
+
+        "Schedule:Compact,",
+        "    OAULoCtrlTemp,           !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    10;                      !- Field 4",
+
+        "Schedule:Compact,",
+        "    OAUHiCtrlTemp,           !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    15;                      !- Field 4",
+
+        "ScheduleTypeLimits,",
+        "    Temperature,             !- Name",
+        "    -60,                     !- Lower Limit Value",
+        "    200,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "ZoneHVAC:EquipmentList,",
+        "    Thermal Zone 1 Equipment List,  !- Name",
+        "    ,                        !- Load Distribution Scheme",
+        "    ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type",
+        "    OAUnit Zone 1,           !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "ZoneHVAC:OutdoorAirUnit,",
+        "    OAUnit Zone 1,           !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Thermal Zone 1,          !- Zone Name",
+        "    Autosize,                !- Outdoor Air Flow Rate {m3/s}",
+        "    FanAndCoilAvailSched,    !- Outdoor Air Schedule Name",
+        "    OAU Supply Fan,          !- Supply Fan Name",
+        "    BlowThrough,             !- Supply Fan Placement",
+        "    Zone 1 OAU ExhFan,       !- Exhaust Fan Name",
+        "    Autosize,                !- Exhaust Air Flow Rate {m3/s}",
+        "    FanAndCoilAvailSched,    !- Exhaust Air Schedule Name",
+        "    TemperatureControl,      !- Unit Control Type",
+        "    OAUHiCtrlTemp,           !- High Air Control Temperature Schedule Name",
+        "    OAULoCtrlTemp,           !- Low Air Control Temperature Schedule Name",
+        "    OAUnit OA Node,          !- Outdoor Air Node Name",
+        "    Node 5,                  !- AirOutlet Node Name",
+        "    OAUnit OA Node,          !- AirInlet Node Name",
+        "    OAUnit Fan Outlet Node,  !- Supply FanOutlet Node Name",
+        "    OAUnitZone1EQLIST;       !- Outdoor Air Unit List Name",
+
+        "ZoneHVAC:OutdoorAirUnit:EquipmentList,",
+        "    OAUnitZone1EQLIST,       !- Name",
+        "    Coil:Cooling:Water,      !- Component 2 Object Type",
+        "    OAU Water Cooling Coil;  !- Component 2 Name",
+
+        "Fan:SystemModel,",
+        "    Zone 1 OAU ExhFan,       !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Node 4,                  !- Air Inlet Node Name",
+        "    ZoneOAU Relief Node,     !- Air Outlet Node Name",
+        "    Autosize,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    75.0,                    !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.50,                    !- Fan Total Efficiency",
+        "    ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,                        !- Night Ventilation Mode Pressure Rise",
+        "    ,                        !- Night Ventilation Mode Flow Fraction",
+        "    ,                        !- Motor Loss Zone Name",
+        "    ,                        !- Motor Loss Radiative Fraction ",
+        "    ,                        !- End-Use Subcategory",
+        "    1,                       !- Number of Speeds",
+        "    1.0,                     !- Speed 1 Flow Fraction",
+        "    1.0;                     !- Speed 1 Electric Power Fraction",
+
+        "Fan:SystemModel,",
+        "    OAU Supply Fan,          !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    OAUnit OA Node,          !- Air Inlet Node Name",
+        "    OAUnit Fan Outlet Node,  !- Air Outlet Node Name",
+        "    Autosize,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    75.0,                    !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.50,                    !- Fan Total Efficiency",
+        "    ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,                        !- Night Ventilation Mode Pressure Rise",
+        "    ,                        !- Night Ventilation Mode Flow Fraction",
+        "    ,                        !- Motor Loss Zone Name",
+        "    ,                        !- Motor Loss Radiative Fraction ",
+        "    ,                        !- End-Use Subcategory",
+        "    1,                       !- Number of Speeds",
+        "    1.0,                     !- Speed 1 Flow Fraction",
+        "    1.0;                     !- Speed 1 Electric Power Fraction",
+
+        "Coil:Cooling:Water,",
+        "    OAU Water Cooling Coil,  !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Autosize,                !- Design Water Flow Rate {m3/s}",
+        "    Autosize,                !- Design Air Flow Rate {m3/s}",
+        "    Autosize,                !- Design Inlet Water Temperature {C}",
+        "    Autosize,                !- Design Inlet Air Temperature {C}",
+        "    Autosize,                !- Design Outlet Air Temperature {C}",
+        "    Autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+        "    Autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+        "    Node 11,                 !- Water Inlet Node Name",
+        "    Node 27,                 !- Water Outlet Node Name",
+        "    Heating Coil Outlet Node,!- Air Inlet Node Name",
+        "    Node 5,                  !- Air Outlet Node Name",
+        "    SimpleAnalysis,          !- Type of Analysis",
+        "    CrossFlow;               !- Heat Exchanger Configuration",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataGlobals::TimeStep = 1;
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    DataGlobals::DoingSizing = true;
+
+    InitializePsychRoutines();
+
+    bool ErrorsFound(false);
+    GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
+
+    GetZoneEquipmentData1();
+    ProcessScheduleInput();
+    ScheduleInputProcessed = true;
+    Fans::GetFanInput();
+
+    GetOutdoorAirUnitInputs();
+
+    int OAUnitNum(1);
+    EXPECT_EQ("OAU SUPPLY FAN", OutAirUnit(OAUnitNum).SFanName);
+    EXPECT_EQ("ZONE 1 OAU EXHFAN", OutAirUnit(OAUnitNum).ExtFanName);
+    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, OutAirUnit(OAUnitNum).SFanType);
+    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, OutAirUnit(OAUnitNum).ExtFanType);
+
+    EXPECT_EQ(1, OutAirUnit(OAUnitNum).NumComponents);
+    EXPECT_EQ(OutdoorAirUnit::WaterCoil_Cooling, OutAirUnit(OAUnitNum).OAEquip(1).ComponentType_Num);
+    EXPECT_EQ(TypeOf_CoilWaterCooling, OutAirUnit(OAUnitNum).OAEquip(1).CoilPlantTypeOfNum);
+
+    TotNumLoops = 1;
+    PlantLoop.allocate(TotNumLoops);
+    DataSizing::NumPltSizInput = 1;
+    PlantSizData.allocate(DataSizing::NumPltSizInput);
+
+    for (int l = 1; l <= TotNumLoops; ++l) {
+        auto &loop(PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+
+    WaterCoil(1).WaterLoopNum = 1;
+    WaterCoil(1).WaterLoopSide = 1;
+    WaterCoil(1).WaterLoopBranchNum = 1;
+    WaterCoil(1).WaterLoopCompNum = 1;
+
+    PlantLoop(1).Name = "ChilledWaterLoop";
+    PlantLoop(1).FluidIndex = 1;
+    PlantLoop(1).FluidName = "WATER";
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = WaterCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = TypeOf_CoilWaterCooling;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoil(1).WaterInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = WaterCoil(1).WaterOutletNodeNum;
+
+    PlantSizData(1).PlantLoopName = "ChilledWaterLoop";
+    PlantSizData(1).ExitTemp = 6.7;
+    PlantSizData(1).DeltaT = 5.0;
+    PlantSizData(1).LoopType = DataSizing::CoolingLoop;
+
+    MyUAAndFlowCalcFlag.allocate(1);
+    MyUAAndFlowCalcFlag(1) = true;
+    MyUAAndFlowCalcFlag(1) = true;
+
+    DataGlobals::HourOfDay = 15;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::Month = 7;
+    DataEnvironment::DayOfMonth = 21;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::JulianDay(Month, DayOfMonth, HourOfDay);
+
+    UpdateScheduleValues();
+
+    ZoneEqSizing.allocate(1);
+    CurDeadBandOrSetback.allocate(1);
+    CurDeadBandOrSetback(1) = false;
+    TempControlType.allocate(1);
+    TempControlType(1) = 4;
+
+    ZoneSizingRunDone = true;
+    DataSizing::CurZoneEqNum = 1;
+    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+
+    FinalZoneSizing.allocate(1);
+    FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
+    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.5;
+    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.5;
+    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
+    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 5.0;
+    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
+    FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
+    FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
+
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 30.0, 0.0);
+
+    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 12.8;
+    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0080;
+    FinalZoneSizing(CurZoneEqNum).DesCoolDens = DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(CurZoneEqNum).DesCoolDens;
+
+    OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
+
+    FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 50.0;
+    FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.0050;
+    FinalZoneSizing(CurZoneEqNum).DesHeatDens = DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * FinalZoneSizing(CurZoneEqNum).DesHeatDens;
+
+    BeginEnvrnFlag = true;
+    bool FirstHVACIteration(true);
+    int ZoneNum(1);
+
+    InitOutdoorAirUnit(OAUnitNum, ZoneNum, FirstHVACIteration);
+    EXPECT_EQ(WaterCoil(1).MaxWaterVolFlowRate, OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
+
+    // do water flow rate sizing calculation
+    Real64 DesAirMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow;
+    Real64 EnthalpyAirIn = PsyHFnTdbW(FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp, FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat);
+    Real64 EnthalpyAirOut = PsyHFnTdbW(FinalZoneSizing(CurZoneEqNum).CoolDesTemp, FinalZoneSizing(CurZoneEqNum).CoolDesHumRat);
+
+    Real64 DesWaterCoolingCoilLoad = DesAirMassFlow * (EnthalpyAirIn - EnthalpyAirOut);
+    Real64 CoilDesWaterDeltaT = PlantSizData(1).DeltaT;
+    Real64 Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, " ");
+    Real64 rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, " ");
+    Real64 DesCoolingCoilWaterVolFlowRate = DesWaterCoolingCoilLoad / (CoilDesWaterDeltaT * Cp * rho);
+    // check water coil water flow rate calc
+    EXPECT_EQ(DesWaterCoolingCoilLoad, WaterCoil(1).DesWaterCoolingCoilRate);
+    EXPECT_EQ(DesCoolingCoilWaterVolFlowRate, WaterCoil(1).MaxWaterVolFlowRate);
+}
+
+TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Version,",
+        "    9.0;                     !- Version Identifier",
+
+        "Zone,",
+        "    Thermal Zone 1,          !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    10,                      !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    ,                        !- Type",
+        "    ,                        !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    300,                     !- Volume {m3}",
+        "    100;                     !- Floor Area {m2}",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "    Thermal Zone 1,          !- Zone Name",
+        "    Thermal Zone 1 Equipment List,  !- Zone Conditioning Equipment List Name",
+        "    Thermal Zone 1 Inlet Node List,  !- Zone Air Inlet Node or NodeList Name",
+        "    Thermal Zone 1 Exhaust Node List,  !- Zone Air Exhaust Node or NodeList Name",
+        "    Node 1,                  !- Zone Air Node Name",
+        "    Thermal Zone 1 Return Air Node;  !- Zone Return Air Node or NodeList Name",
+
+        "NodeList,",
+        "    Thermal Zone 1 Inlet Node List,  !- Name",
+        "    Node 5;                  !- Node 1 Name",
+
+        "NodeList,",
+        "    Thermal Zone 1 Exhaust Node List,  !- Name",
+        "    Node 4;                  !- Node 1 Name",
+
+        "OutdoorAir:Node,",
+        "    Model Outdoor Air Node;  !- Name",
+
+        "OutdoorAir:NodeList,",
+        "    OAUnit OA Node;          !- Node or NodeList Name 1",
+
+        "	Schedule:Constant,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	FRACTION, !- Schedule Type",
+        "	1;        !- TimeStep Value",
+
+        "	ScheduleTypeLimits,",
+        "	Fraction, !- Name",
+        "	0.0, !- Lower Limit Value",
+        "	1.0, !- Upper Limit Value",
+        "	CONTINUOUS;              !- Numeric Type",
+
+        "Schedule:Compact,",
+        "    OAULoCtrlTemp,           !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    10;                      !- Field 4",
+
+        "Schedule:Compact,",
+        "    OAUHiCtrlTemp,           !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    15;                      !- Field 4",
+
+        "ScheduleTypeLimits,",
+        "    Temperature,             !- Name",
+        "    -60,                     !- Lower Limit Value",
+        "    200,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "ZoneHVAC:EquipmentList,",
+        "    Thermal Zone 1 Equipment List,  !- Name",
+        "    ,                        !- Load Distribution Scheme",
+        "    ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type",
+        "    OAUnit Zone 1,           !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "ZoneHVAC:OutdoorAirUnit,",
+        "    OAUnit Zone 1,           !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Thermal Zone 1,          !- Zone Name",
+        "    Autosize,                !- Outdoor Air Flow Rate {m3/s}",
+        "    FanAndCoilAvailSched,    !- Outdoor Air Schedule Name",
+        "    OAU Supply Fan,          !- Supply Fan Name",
+        "    BlowThrough,             !- Supply Fan Placement",
+        "    Zone 1 OAU ExhFan,       !- Exhaust Fan Name",
+        "    Autosize,                !- Exhaust Air Flow Rate {m3/s}",
+        "    FanAndCoilAvailSched,    !- Exhaust Air Schedule Name",
+        "    TemperatureControl,      !- Unit Control Type",
+        "    OAUHiCtrlTemp,           !- High Air Control Temperature Schedule Name",
+        "    OAULoCtrlTemp,           !- Low Air Control Temperature Schedule Name",
+        "    OAUnit OA Node,          !- Outdoor Air Node Name",
+        "    Node 5,                  !- AirOutlet Node Name",
+        "    OAUnit OA Node,          !- AirInlet Node Name",
+        "    OAUnit Fan Outlet Node,  !- Supply FanOutlet Node Name",
+        "    OAUnitZone1EQLIST;       !- Outdoor Air Unit List Name",
+
+        "ZoneHVAC:OutdoorAirUnit:EquipmentList,",
+        "    OAUnitZone1EQLIST,       !- Name",
+        "    Coil:Heating:Steam,      !- Component 1 Object Type",
+        "    OAU Steam Heating Coil;  !- Component 1 Name",
+
+        "Fan:SystemModel,",
+        "    Zone 1 OAU ExhFan,       !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Node 4,                  !- Air Inlet Node Name",
+        "    ZoneOAU Relief Node,     !- Air Outlet Node Name",
+        "    Autosize,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    75.0,                    !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.50,                    !- Fan Total Efficiency",
+        "    ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,                        !- Night Ventilation Mode Pressure Rise",
+        "    ,                        !- Night Ventilation Mode Flow Fraction",
+        "    ,                        !- Motor Loss Zone Name",
+        "    ,                        !- Motor Loss Radiative Fraction ",
+        "    ,                        !- End-Use Subcategory",
+        "    1,                       !- Number of Speeds",
+        "    1.0,                     !- Speed 1 Flow Fraction",
+        "    1.0;                     !- Speed 1 Electric Power Fraction",
+
+        "Fan:SystemModel,",
+        "    OAU Supply Fan,          !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    OAUnit OA Node,          !- Air Inlet Node Name",
+        "    OAUnit Fan Outlet Node,  !- Air Outlet Node Name",
+        "    Autosize,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "    75.0,                    !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.50,                    !- Fan Total Efficiency",
+        "    ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,                        !- Night Ventilation Mode Pressure Rise",
+        "    ,                        !- Night Ventilation Mode Flow Fraction",
+        "    ,                        !- Motor Loss Zone Name",
+        "    ,                        !- Motor Loss Radiative Fraction ",
+        "    ,                        !- End-Use Subcategory",
+        "    1,                       !- Number of Speeds",
+        "    1.0,                     !- Speed 1 Flow Fraction",
+        "    1.0;                     !- Speed 1 Electric Power Fraction",
+
+        "Coil:Heating:Steam,",
+        "     OAU Steam Heating Coil, !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Autosize,                !- Maximum Steam Flow Rate {m3/s}",
+        "    5.0,                     !- Degree of SubCooling {C}",
+        "    15.0,                    !- Degree of Loop SubCooling {C}",
+        "    Node 21,                 !- Water Inlet Node Name",
+        "    Node 26,                 !- Water Outlet Node Name",
+        "    OAUnit Fan Outlet Node,  !- Air Inlet Node Name",
+        "    Heating Coil Outlet Node,!- Air Outlet Node Name",
+        "    ZoneLoadControl;         !- Coil Control Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::StdRhoAir = 1.20;
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataGlobals::TimeStep = 1;
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    DataGlobals::DoingSizing = true;
+
+    InitializePsychRoutines();
+
+    bool ErrorsFound(false);
+    GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
+
+    GetZoneEquipmentData1();
+    ProcessScheduleInput();
+    ScheduleInputProcessed = true;
+    Fans::GetFanInput();
+
+    GetOutdoorAirUnitInputs();
+
+    int OAUnitNum(1);
+    EXPECT_EQ("OAU SUPPLY FAN", OutAirUnit(OAUnitNum).SFanName);
+    EXPECT_EQ("ZONE 1 OAU EXHFAN", OutAirUnit(OAUnitNum).ExtFanName);
+    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, OutAirUnit(OAUnitNum).SFanType);
+    EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, OutAirUnit(OAUnitNum).ExtFanType);
+
+    EXPECT_EQ(1, OutAirUnit(OAUnitNum).NumComponents);
+    EXPECT_EQ(OutdoorAirUnit::SteamCoil_AirHeat, OutAirUnit(OAUnitNum).OAEquip(1).ComponentType_Num);
+    EXPECT_EQ(TypeOf_CoilSteamAirHeating, OutAirUnit(OAUnitNum).OAEquip(1).CoilPlantTypeOfNum);
+
+    TotNumLoops = 1;
+    PlantLoop.allocate(TotNumLoops);
+    DataSizing::NumPltSizInput = 1;
+    PlantSizData.allocate(DataSizing::NumPltSizInput);
+
+    for (int l = 1; l <= TotNumLoops; ++l) {
+        auto &loop(PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+
+    SteamCoil(1).LoopNum = 1;
+    SteamCoil(1).LoopSide = 1;
+    SteamCoil(1).BranchNum = 1;
+    SteamCoil(1).CompNum = 1;
+
+    PlantLoop(1).Name = "SteamLoop";
+    PlantLoop(1).FluidIndex = 0; // FindRefrigerant( "Steam" );
+    PlantLoop(1).FluidName = "STEAM";
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = SteamCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = TypeOf_CoilSteamAirHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = SteamCoil(1).SteamInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = SteamCoil(1).SteamOutletNodeNum;
+
+    PlantSizData(1).PlantLoopName = "SteamLoop";
+    PlantSizData(1).ExitTemp = 100.0;
+    PlantSizData(1).DeltaT = 5.0;
+    PlantSizData(1).LoopType = DataSizing::SteamLoop;
+
+    MyUAAndFlowCalcFlag.allocate(2);
+    MyUAAndFlowCalcFlag(1) = true;
+    MyUAAndFlowCalcFlag(2) = true;
+
+    DataGlobals::HourOfDay = 15;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 21;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::JulianDay(Month, DayOfMonth, HourOfDay);
+
+    UpdateScheduleValues();
+
+    ZoneEqSizing.allocate(1);
+    CurDeadBandOrSetback.allocate(1);
+    CurDeadBandOrSetback(1) = false;
+    TempControlType.allocate(1);
+    TempControlType(1) = 4;
+
+    ZoneSizingRunDone = true;
+    DataSizing::CurZoneEqNum = 1;
+    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+
+    FinalZoneSizing.allocate(1);
+    FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
+    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.5;
+    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.5;
+    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
+    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 5.0;
+    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
+    FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
+    FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
+
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 5.0, 0.0);
+
+    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 12.8;
+    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0080;
+    FinalZoneSizing(CurZoneEqNum).DesCoolDens = DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(CurZoneEqNum).DesCoolDens;
+
+    OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
+
+    FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 50.0;
+    FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.0050;
+    FinalZoneSizing(CurZoneEqNum).DesHeatDens = DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * FinalZoneSizing(CurZoneEqNum).DesHeatDens;
+
+    BeginEnvrnFlag = true;
+    bool FirstHVACIteration(true);
+    int ZoneNum(1);
+
+    InitOutdoorAirUnit(OAUnitNum, ZoneNum, FirstHVACIteration);
+    EXPECT_EQ(SteamCoil(1).MaxSteamVolFlowRate, OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
+
+    Real64 DesCoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
+    Real64 DesCoilOutTemp = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
+    Real64 DesCoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
+    Real64 DesAirMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
+    // DesVolFlow = DesMassFlow / RhoAirStd;
+    Real64 CpAirAvg = PsyCpAirFnWTdb(DesCoilOutHumRat, 0.5 * (DesCoilInTemp + DesCoilOutTemp));
+    Real64 DesSteamCoilLoad = DesAirMassFlow * CpAirAvg * (DesCoilOutTemp - DesCoilInTemp);
+
+    DataGlobals::SteamInitConvTemp;
+    // do steam flow rate sizing calculation
+    Real64 EnthSteamIn = GetSatEnthalpyRefrig("STEAM", SteamInitConvTemp, 1.0, SteamCoil(1).FluidIndex, "");
+    Real64 EnthSteamOut = GetSatEnthalpyRefrig("STEAM", SteamInitConvTemp, 0.0, SteamCoil(1).FluidIndex, "");
+    Real64 SteamDensity = GetSatDensityRefrig("STEAM", SteamInitConvTemp, 1.0, SteamCoil(1).FluidIndex, "");
+    Real64 CpOfCondensate = GetSatSpecificHeatRefrig("STEAM", SteamInitConvTemp, 0.0, SteamCoil(1).FluidIndex, "");
+    Real64 LatentHeatChange = EnthSteamIn - EnthSteamOut;
+    Real64 DesMaxSteamVolFlowRate = DesSteamCoilLoad / (SteamDensity * (LatentHeatChange + SteamCoil(1).DegOfSubcooling * CpOfCondensate));
+
+    // check water coil water flow rate calc
+    EXPECT_EQ(DesSteamCoilLoad, SteamCoil(1).DesCoilCapacity);
+    EXPECT_EQ(DesMaxSteamVolFlowRate, SteamCoil(1).MaxSteamVolFlowRate);
 }
 } // namespace EnergyPlus

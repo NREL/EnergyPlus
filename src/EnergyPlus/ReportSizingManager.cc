@@ -1279,11 +1279,7 @@ namespace ReportSizingManager {
                         }
                     }
                 } else if (SizingType == CoolingWaterflowSizing) {
-                    if (ZoneEqOutdoorAirUnit > 0) {
-                        CoilDesWaterDeltaT = 0.5 * DataWaterCoilSizCoolDeltaT;
-                    } else {
-                        CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
-                    }
+                    CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
                     Cp = GetSpecificHeatGlycol(
                         PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     rho = GetDensityGlycol(
