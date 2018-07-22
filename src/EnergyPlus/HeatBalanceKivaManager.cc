@@ -769,6 +769,13 @@ namespace HeatBalanceKivaManager {
                             }
                         }
 
+                        if (perimeter == 0.0) {
+                            ErrorsFound = true;
+                            ShowSevereError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\".");
+                            ShowContinueError("   Wall Surface=\"" + Surfaces(wl).Name + "\", does not have any vertices that are");
+                            ShowContinueError("   coplanar with the corresponding Floor Surface=\"" + Surfaces(surfNum).Name + "\".");
+                        }
+
                         Real64 surfHeight = Surfaces(wl).get_average_height();
                         // round to avoid numerical precision differences
                         surfHeight = std::round((surfHeight)*1000.0) / 1000.0;
