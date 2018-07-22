@@ -1625,8 +1625,10 @@ namespace VentilatedSlab {
                 // Only initialize these if a cooling coil is actually present
                 if ((VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                     (VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
-                    rho = GetDensityGlycol(
-                        PlantLoop(VentSlab(Item).CWLoopNum).FluidName, CWInitConvTemp, PlantLoop(VentSlab(Item).CWLoopNum).FluidIndex, RoutineName);
+                    rho = GetDensityGlycol(PlantLoop(VentSlab(Item).CWLoopNum).FluidName,
+                                           DataGlobals::CWInitConvTemp,
+                                           PlantLoop(VentSlab(Item).CWLoopNum).FluidIndex,
+                                           RoutineName);
                     VentSlab(Item).MaxColdWaterFlow = rho * VentSlab(Item).MaxVolColdWaterFlow;
                     VentSlab(Item).MinColdWaterFlow = rho * VentSlab(Item).MinVolColdWaterFlow;
                     InitComponentNodes(VentSlab(Item).MinColdWaterFlow,

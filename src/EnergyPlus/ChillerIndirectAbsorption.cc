@@ -1071,7 +1071,7 @@ namespace ChillerIndirectAbsorption {
                 if (IndirectAbsorber(ChillNum).GenHeatSourceType == NodeType_Water) {
 
                     rho = GetDensityGlycol(PlantLoop(IndirectAbsorber(ChillNum).GenLoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
+                                           DataGlobals::HWInitConvTemp,
                                            PlantLoop(IndirectAbsorber(ChillNum).GenLoopNum).FluidIndex,
                                            RoutineName);
                     IndirectAbsorber(ChillNum).GenMassFlowRateMax = rho * IndirectAbsorber(ChillNum).GeneratorVolFlowRate;
@@ -1732,7 +1732,7 @@ namespace ChillerIndirectAbsorption {
                 IndirectAbsorber(ChillNum).GeneratorDeltaTemp = max(0.5, PlantSizData(PltSizHeatingNum).DeltaT);
             } else if (IndirectAbsorber(ChillNum).GenHeatSourceType == NodeType_Water) {
                 rho = GetDensityGlycol(PlantLoop(IndirectAbsorber(ChillNum).GenLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(IndirectAbsorber(ChillNum).GenLoopNum).FluidIndex,
                                        RoutineName);
                 CpWater = GetSpecificHeatGlycol(PlantLoop(IndirectAbsorber(ChillNum).GenLoopNum).FluidName,
