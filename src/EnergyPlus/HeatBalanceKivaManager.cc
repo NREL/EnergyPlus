@@ -765,7 +765,7 @@ namespace HeatBalanceKivaManager {
                             int p2 = i == coplanarPoints.size() - 1 ? coplanarPoints[0] : coplanarPoints[i + 1]; // next coplanar point
 
                             if (p2 == pC) { // if next coplanar point is the next consecutive point
-                                perimeter += distance(v[p], v[p2]);
+                                perimeter += distance(v(p), v(p2));
                             }
                         }
 
