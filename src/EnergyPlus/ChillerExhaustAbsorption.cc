@@ -1006,7 +1006,7 @@ namespace ChillerExhaustAbsorption {
 
             if (ExhaustAbsorber(ChillNum).HWLoopNum > 0) {
                 rho = GetDensityGlycol(PlantLoop(ExhaustAbsorber(ChillNum).HWLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(ExhaustAbsorber(ChillNum).HWLoopNum).FluidIndex,
                                        RoutineName);
             } else {
