@@ -10989,6 +10989,7 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace Vectors;
+        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -11006,20 +11007,100 @@ namespace SurfaceGeometry {
         int I;        // Loop Control
         Real64 Gamma; // Intermediate Result
         Real64 DotSelfX23;
+        Real64 DotSelf1;
+        Real64 DotSelf2;
+        Real64 DotSelf3;
         static std::string ErrLineOut; // Character string for producing error messages
+        bool colinear;
+        Real64 maxLen;
+        Real64 AddLen;
 
         // Object Data
         Vector x21;
         Vector x23;
+        Array1D<Vector> OldVertex;
 
         // Determine Components of the Coordinate Translation Vector.
 
         x21 = Surface(SurfNum).Vertex(2) - Surface(SurfNum).Vertex(1);
         x23 = Surface(SurfNum).Vertex(2) - Surface(SurfNum).Vertex(3);
+        DotSelfX23 = std::sqrt(magnitude_squared(x23));
+        colinear = false;
+        // Test collinearity
+        if (DotSelfX23 <= .1e-6) {
+            int iSize = int(Surface(SurfNum).Vertex.size());
+            OldVertex.allocate(iSize);
+            int i;
+            int j;
+            OldVertex = Surface(SurfNum).Vertex;
+            // remove duplicated points
+            for (i = 1; i <= iSize - 1; ++i) {
+                DotSelf1 = std::sqrt(magnitude_squared(OldVertex(i + 1) - OldVertex(i)));
+                if (DotSelf1 <= .1e-6) {
+                    colinear = true;
+                    for (j = i + 1; j <= iSize - 1; ++j) {
+                        OldVertex(j) = OldVertex(j + 1);
+                    }
+                    OldVertex(iSize) = 0.0;
+                    iSize = iSize - 1;
+                    i = i - 1;
+                }
+            }
+            // remove colinear points
+            if (iSize > Surface(SurfNum).Sides) {
+                for (i = 1; i <= iSize - 2; ++i) {
+                    DotSelf1 = std::sqrt(magnitude_squared(OldVertex(i + 1) - OldVertex(i)));
+                    DotSelf2 = std::sqrt(magnitude_squared(OldVertex(i + 2) - OldVertex(i)));
+                    DotSelf3 = std::sqrt(magnitude_squared(OldVertex(i + 2) - OldVertex(i + 1)));
+                    maxLen = max(DotSelf1, DotSelf2, DotSelf3);
+                    int maxIndex = 0;
+                    if (DotSelf1 == maxLen) {
+                        AddLen = DotSelf2 + DotSelf3;
+                        maxIndex = 1;
+                    }
+                    if (DotSelf2 == maxLen) {
+                        AddLen = DotSelf1 + DotSelf3;
+                        maxIndex = 2;
+                    }
+                    if (DotSelf3 == maxLen) {
+                        AddLen = DotSelf1 + DotSelf2;
+                        maxIndex = 3;
+                    }
+                    if (std::abs(maxLen - AddLen) <= .1e-6) {
+                        colinear = true;
+                        if (maxIndex == 2) {
+                            OldVertex(i + 1) = OldVertex(i + 2);
+                        }
+                        if (maxIndex == 3) {
+                            OldVertex(i) = OldVertex(i + 1);
+                            OldVertex(i + 1) = OldVertex(i + 2);
+                        }
+                        for (j = i + 2; j <= iSize - 1; ++j) {
+                            OldVertex(j) = OldVertex(j + 1);
+                        }
+                        OldVertex(iSize) = 0.0;
+                        iSize = iSize - 1;
+                        i = i - 1;
+                        if (iSize == Surface(SurfNum).Sides) break;
+                    }
+                }
+            }
+            // Resize Vertex
+            if (iSize == Surface(SurfNum).Sides && colinear) {
+                Surface(SurfNum).Vertex.deallocate();
+                Surface(SurfNum).Vertex.allocate(iSize);
+                for (i = 1; i <= iSize; ++i) {
+                    Surface(SurfNum).Vertex(i) = OldVertex(i);
+                } 
+            }
+            OldVertex.deallocate();
+            x21 = Surface(SurfNum).Vertex(2) - Surface(SurfNum).Vertex(1);
+            x23 = Surface(SurfNum).Vertex(2) - Surface(SurfNum).Vertex(3);
+            ShowWarningError("CalcCoordinateTransformation: surface=\"" + Surface(SurfNum).Name + "\": The vertex points has been reprocessed as Sides = " + RoundSigDigits(Surface(SurfNum).Sides));
+        }
 
-        DotSelfX23 = magnitude_squared(x23);
 
-        if (std::abs(DotSelfX23) <= .1e-6) {
+        if (DotSelfX23 <= .1e-6 && !colinear) {
             ShowSevereError("CalcCoordinateTransformation: Invalid dot product, surface=\"" + Surface(SurfNum).Name + "\":");
             for (I = 1; I <= Surface(SurfNum).Sides; ++I) {
                 auto const &point(Surface(SurfNum).Vertex(I));
