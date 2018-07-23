@@ -2245,10 +2245,13 @@ namespace HVACUnitarySystem {
                     SizingMethod = CoolingCapacitySizing;
                     DataFlowUsedForSizing = TempSize;
                     TempSize = AutoSize;
-                    if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ||
-                        UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ||
-                        UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed ||
-                        UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
+                    if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_Cooling) {
+                        DataTotCapCurveIndex = coilCoolingDXs[UnitarySystem(UnitarySysNum).CoolingCoilIndex].getDXCoilCapFTCurveIndex();
+                        DataIsDXCoil = true;
+                    } else if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ||
+                               UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ||
+                               UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed ||
+                               UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
                         DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex(UnitarySystem(UnitarySysNum).CoolingCoilIndex, ErrFound);
                         DataIsDXCoil = true;
                     }
@@ -2279,10 +2282,13 @@ namespace HVACUnitarySystem {
                 SizingMethod = CoolingCapacitySizing;
                 DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                 TempSize = AutoSize;
-                if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ||
-                    UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ||
-                    UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed ||
-                    UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
+                if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_Cooling) {
+                    DataTotCapCurveIndex = coilCoolingDXs[UnitarySystem(UnitarySysNum).CoolingCoilIndex].getDXCoilCapFTCurveIndex();
+                    DataIsDXCoil = true;
+                } else if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ||
+                           UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ||
+                           UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed ||
+                           UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
                     DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex(UnitarySystem(UnitarySysNum).CoolingCoilIndex, ErrFound);
                     DataIsDXCoil = true;
                 }
@@ -2623,6 +2629,7 @@ namespace HVACUnitarySystem {
                     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio.allocate(UnitarySystem(UnitarySysNum).NumOfSpeedCooling);
             }
 
+            // it feels like we are jamming the rectangular DXCoil into an oval box here
             MSHPIndex = UnitarySystem(UnitarySysNum).DesignSpecMSHPIndex;
             if (MSHPIndex > 0) {
                 for (Iter = DesignSpecMSHP(MSHPIndex).NumOfSpeedCooling; Iter >= 1;
@@ -2643,7 +2650,7 @@ namespace HVACUnitarySystem {
             // mine capacity from Coil:Cooling:DX object
             auto &newCoil = coilCoolingDXs[UnitarySystem(UnitarySysNum).CoolingCoilIndex];
             int const magicNominalModeNum = 0;
-            DXCoolCap = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
+            DXCoolCap = newCoil.getRatedGrossTotalCapacity(magicNominalModeNum); 
             EqSizing.DesCoolingLoad = DXCoolCap;
 
             for (Iter = 1; Iter <= UnitarySystem(UnitarySysNum).NumOfSpeedCooling; ++Iter) {

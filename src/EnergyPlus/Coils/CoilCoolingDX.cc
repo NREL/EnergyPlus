@@ -184,3 +184,29 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
     this->elecCoolingPower = myPerformance.powerUse;
     this->elecCoolingConsumption = myPerformance.powerUse * reportingConstant;
 }
+
+int CoilCoolingDX::getDXCoilCapFTCurveIndex() {
+    auto & performance = this->performance;
+    if (performance.modes.size() > 1u) {
+        assert(false); // need to implement this
+    } else {
+        auto & mode = performance.modes[0];
+        if (mode.speeds.size()) {
+            auto & firstSpeed = mode.speeds[0];
+            return firstSpeed.indexCapFT;
+        }
+        return -1;
+    }
+}
+
+Real64 CoilCoolingDX::getRatedGrossTotalCapacity(int modeIndex) {
+    try {
+        return this->performance.modes[modeIndex].ratedGrossTotalCap;
+    } catch (std::exception ex) {
+        ShowFatalError("Coil:Cooling:DX structure not initialized during call to getRatedGrossTotalCapacity");
+        assert(false); // shut up compiler
+    }
+}
+
+
+

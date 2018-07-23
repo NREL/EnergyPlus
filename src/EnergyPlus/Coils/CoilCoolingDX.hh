@@ -63,6 +63,10 @@ public:
     Real64 elecCoolingPower;
     Real64 elecCoolingConsumption;
     Real64 coolingCoilRuntimeFraction;
+
+    int getDXCoilCapFTCurveIndex();
+
+    Real64 getRatedGrossTotalCapacity(int modeIndex); 
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
