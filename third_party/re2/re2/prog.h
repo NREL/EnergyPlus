@@ -10,6 +10,7 @@
 // expression symbolically.
 
 #include <stdint.h>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -254,13 +255,24 @@ class Prog {
   // SearchDFA fills matches with the match IDs of the final matching state.
   bool SearchDFA(const StringPiece& text, const StringPiece& context,
                  Anchor anchor, MatchKind kind, StringPiece* match0,
-                 bool* failed, std::vector<int>* matches);
+                 bool* failed, SparseSet* matches);
 
-  // Build the entire DFA for the given match kind.  FOR TESTING ONLY.
+  // The callback issued after building each DFA state with BuildEntireDFA().
+  // If next is null, then the memory budget has been exhausted and building
+  // will halt. Otherwise, the state has been built and next points to an array
+  // of bytemap_range()+1 slots holding the next states as per the bytemap and
+  // kByteEndText. The number of the state is implied by the callback sequence:
+  // the first callback is for state 0, the second callback is for state 1, ...
+  // match indicates whether the state is a matching state.
+  using DFAStateCallback = std::function<void(const int* next, bool match)>;
+
+  // Build the entire DFA for the given match kind.
   // Usually the DFA is built out incrementally, as needed, which
-  // avoids lots of unnecessary work.  This function is useful only
-  // for testing purposes.  Returns number of states.
-  int BuildEntireDFA(MatchKind kind);
+  // avoids lots of unnecessary work.
+  // If cb is not empty, it receives one callback per state built.
+  // Returns the number of states built.
+  // FOR TESTING OR EXPERIMENTAL PURPOSES ONLY.
+  int BuildEntireDFA(MatchKind kind, const DFAStateCallback& cb);
 
   // Controls whether the DFA should bail out early if the NFA would be faster.
   // FOR TESTING ONLY.
@@ -324,24 +336,35 @@ class Prog {
   void Fanout(SparseArray<int>* fanout);
 
   // Compiles a collection of regexps to Prog.  Each regexp will have
-  // its own Match instruction recording the index in the vector.
-  static Prog* CompileSet(const RE2::Options& options, RE2::Anchor anchor,
-                          Regexp* re);
+  // its own Match instruction recording the index in the output vector.
+  static Prog* CompileSet(Regexp* re, RE2::Anchor anchor, int64_t max_mem);
 
   // Flattens the Prog from "tree" form to "list" form. This is an in-place
   // operation in the sense that the old instructions are lost.
   void Flatten();
 
-  // Marks the "roots" in the Prog: the outs of kInstByteRange, kInstCapture
-  // and kInstEmptyWidth instructions.
-  void MarkRoots(SparseArray<int>* rootmap, SparseSet* q,
-                 std::vector<int>* stk);
+  // Walks the Prog; the "successor roots" or predecessors of the reachable
+  // instructions are marked in rootmap or predmap/predvec, respectively.
+  // reachable and stk are preallocated scratch structures.
+  void MarkSuccessors(SparseArray<int>* rootmap,
+                      SparseArray<int>* predmap,
+                      std::vector<std::vector<int>>* predvec,
+                      SparseSet* reachable, std::vector<int>* stk);
 
-  // Emits one "list" via "tree" traversal from the given "root" instruction.
-  // The new instructions are appended to the given vector.
+  // Walks the Prog from the given "root" instruction; the "dominator root"
+  // of the reachable instructions (if such exists) is marked in rootmap.
+  // reachable and stk are preallocated scratch structures.
+  void MarkDominator(int root, SparseArray<int>* rootmap,
+                     SparseArray<int>* predmap,
+                     std::vector<std::vector<int>>* predvec,
+                     SparseSet* reachable, std::vector<int>* stk);
+
+  // Walks the Prog from the given "root" instruction; the reachable
+  // instructions are emitted in "list" form and appended to flat.
+  // reachable and stk are preallocated scratch structures.
   void EmitList(int root, SparseArray<int>* rootmap,
-                std::vector<Inst>* flat, SparseSet* q,
-                std::vector<int>* stk);
+                std::vector<Inst>* flat,
+                SparseSet* reachable, std::vector<int>* stk);
 
  private:
   friend class Compiler;

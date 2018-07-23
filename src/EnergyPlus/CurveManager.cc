@@ -557,8 +557,17 @@ namespace CurveManager {
         // Loop over biquadratic curves and load data
         CurrentModuleObject = "Curve:Biquadratic";
         for (CurveIndex = 1; CurveIndex <= NumBiQuad; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
 
@@ -618,8 +627,17 @@ namespace CurveManager {
         // Loop over ChillerPartLoadWithLift curves and load data //zrp_Aug2014
         CurrentModuleObject = "Curve:ChillerPartLoadWithLift";
         for (CurveIndex = 1; CurveIndex <= NumChillerPartLoadWithLift; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -682,8 +700,17 @@ namespace CurveManager {
         // Loop over cubic curves and load data
         CurrentModuleObject = "Curve:Cubic";
         for (CurveIndex = 1; CurveIndex <= NumCubic; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ++CurveNum;
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -726,8 +753,17 @@ namespace CurveManager {
         // Loop over quadrinomial curves and load data
         CurrentModuleObject = "Curve:Quartic";
         for (CurveIndex = 1; CurveIndex <= NumQuartic; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -771,8 +807,17 @@ namespace CurveManager {
         // Loop over quadratic curves and load data
         CurrentModuleObject = "Curve:Quadratic";
         for (CurveIndex = 1; CurveIndex <= NumQuad; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -814,8 +859,17 @@ namespace CurveManager {
         // Loop over quadratic-linear curves and load data
         CurrentModuleObject = "Curve:QuadraticLinear";
         for (CurveIndex = 1; CurveIndex <= NumQuadLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -873,8 +927,17 @@ namespace CurveManager {
         // Loop over cubic-linear curves and load data
         CurrentModuleObject = "Curve:CubicLinear";
         for (CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -932,8 +995,17 @@ namespace CurveManager {
         // Loop over linear curves and load data
         CurrentModuleObject = "Curve:Linear";
         for (CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -974,8 +1046,17 @@ namespace CurveManager {
         // Loop over bicubic curves and load data
         CurrentModuleObject = "Curve:Bicubic";
         for (CurveIndex = 1; CurveIndex <= NumBicubic; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1037,8 +1118,17 @@ namespace CurveManager {
         // Loop over Triquadratic curves and load data
         CurrentModuleObject = "Curve:Triquadratic";
         for (CurveIndex = 1; CurveIndex <= NumTriQuad; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1133,8 +1223,17 @@ namespace CurveManager {
         // Loop over quad linear curves and load data
         CurrentModuleObject = "Curve:QuadLinear";
         for (CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1218,8 +1317,17 @@ namespace CurveManager {
         // Loop over Exponent curves and load data
         CurrentModuleObject = "Curve:Exponent";
         for (CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1254,8 +1362,17 @@ namespace CurveManager {
         // cpw22Aug2010 Loop over Fan Pressure Rise curves and load data - udated 15Sep2010 for unit types
         CurrentModuleObject = "Curve:FanPressureRise";
         for (CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1298,8 +1415,17 @@ namespace CurveManager {
         // cpw22Aug2010 Loop over Exponential Skew Normal curves and load data
         CurrentModuleObject = "Curve:ExponentialSkewNormal";
         for (CurveIndex = 1; CurveIndex <= NumExpSkewNorm; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1317,8 +1443,8 @@ namespace CurveManager {
                 PerfCurve(CurveNum).CurveMin = Numbers(7);
                 PerfCurve(CurveNum).CurveMinPresent = true;
             }
-            if (NumNumbers > 7 && !lNumericFieldBlanks(9)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(9);
+            if (NumNumbers > 7 && !lNumericFieldBlanks(8)) {
+                PerfCurve(CurveNum).CurveMax = Numbers(8);
                 PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
@@ -1344,8 +1470,17 @@ namespace CurveManager {
         // cpw22Aug2010 Loop over Sigmoid curves and load data
         CurrentModuleObject = "Curve:Sigmoid";
         for (CurveIndex = 1; CurveIndex <= NumSigmoid; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1391,8 +1526,17 @@ namespace CurveManager {
         // cpw22Aug2010 Loop over Rectangular Hyperbola Type 1 curves and load data
         CurrentModuleObject = "Curve:RectangularHyperbola1";
         for (CurveIndex = 1; CurveIndex <= NumRectHyper1; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1436,8 +1580,17 @@ namespace CurveManager {
         // cpw22Aug2010 Loop over Rectangular Hyperbola Type 2 curves and load data
         CurrentModuleObject = "Curve:RectangularHyperbola2";
         for (CurveIndex = 1; CurveIndex <= NumRectHyper2; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1481,8 +1634,17 @@ namespace CurveManager {
         // cpw22Aug2010 Loop over Exponential Decay curves and load data
         CurrentModuleObject = "Curve:ExponentialDecay";
         for (CurveIndex = 1; CurveIndex <= NumExpDecay; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1526,8 +1688,17 @@ namespace CurveManager {
         // ykt July,2011 Loop over DoubleExponential Decay curves and load data
         CurrentModuleObject = "Curve:DoubleExponentialDecay";
         for (CurveIndex = 1; CurveIndex <= NumDoubleExpDecay; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
@@ -1574,8 +1745,17 @@ namespace CurveManager {
         // Loop over one variable tables and load data
         CurrentModuleObject = "Table:OneIndependentVariable";
         for (CurveIndex = 1; CurveIndex <= NumOneVarTab; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ++CurveNum;
             ++TableNum;
             NumTableEntries = (NumNumbers - 5) / 2;
@@ -1803,8 +1983,17 @@ namespace CurveManager {
                                 " object per simulation is required when using the AirflowNetwork model.");
                 ErrorsFound = true;
             } else if (numOfCPArray == 1) {
-                inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                              cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              1,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              _,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 std::string wpcName = Alphas(1); // Name of CP array
                 int numWindDir = NumNumbers;
@@ -1839,8 +2028,17 @@ namespace CurveManager {
                 // Now that we have the directions, we can read the tables themselves
                 CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
                 for (int index = 1; index <= NumWPCValTab; ++index) {
-                    inputProcessor->getObjectItem(CurrentModuleObject, index, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                                  _, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(CurrentModuleObject,
+                                                  index,
+                                                  Alphas,
+                                                  NumAlphas,
+                                                  Numbers,
+                                                  NumNumbers,
+                                                  IOStatus,
+                                                  lNumericFieldBlanks,
+                                                  _,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     ++CurveNum;
                     ++TableNum;
                     NumTableEntries = NumNumbers;
@@ -2176,8 +2374,17 @@ namespace CurveManager {
         // Loop over two variable tables and load data
         CurrentModuleObject = "Table:TwoIndependentVariables";
         for (CurveIndex = 1; CurveIndex <= NumTwoVarTab; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ++CurveNum;
             ++TableNum;
             if (lAlphaFieldBlanks(7)) {
@@ -2567,8 +2774,8 @@ namespace CurveManager {
             TableLookup(TableNum).NumX2Vars = size(PerfCurveTableData(TableNum).X2);
             TableLookup(TableNum).X1Var.allocate(TableLookup(TableNum).NumX1Vars);
             TableLookup(TableNum).X2Var.allocate(TableLookup(TableNum).NumX2Vars);
-            TableLookup(TableNum).TableLookupZData.allocate(1, 1, 1, 1, size(PerfCurveTableData(TableNum).Y(_, 1)),
-                                                            size(PerfCurveTableData(TableNum).Y(1, _)));
+            TableLookup(TableNum).TableLookupZData.allocate(
+                1, 1, 1, 1, size(PerfCurveTableData(TableNum).Y(_, 1)), size(PerfCurveTableData(TableNum).Y(1, _)));
             TableLookup(TableNum).X1Var = PerfCurveTableData(TableNum).X1;
             TableLookup(TableNum).X2Var = PerfCurveTableData(TableNum).X2;
             TableLookup(TableNum).TableLookupZData(1, 1, 1, 1, _, _) = PerfCurveTableData(TableNum).Y(_, _);
@@ -2578,8 +2785,17 @@ namespace CurveManager {
         CurrentModuleObject = "Table:MultiVariableLookup";
         TableNum = NumTables;
         for (CurveIndex = 1; CurveIndex <= NumMultVarLookup; ++CurveIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             ++TableNum;
@@ -2947,115 +3163,255 @@ namespace CurveManager {
                     {
                         auto const SELECT_CASE_var1(TableLookup(PerfCurve(CurveIndex).TableIndex).NumIndependentVars);
                         if (SELECT_CASE_var1 == 1) { //- 1 independent variable
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1, "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput1,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
                         } else if (SELECT_CASE_var1 == 2) { //- 2 independent variables
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2, "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput1,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput2,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
                         } else if (SELECT_CASE_var1 == 3) { //- 3 independent variables
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3, "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput1,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput2,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput3,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
                         } else if (SELECT_CASE_var1 == 4) { //- 4 independent variables
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 4 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput4, "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput1,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput2,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput3,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 4 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput4,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
                         } else if (SELECT_CASE_var1 == 5) { //- 5 independent variables
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 4 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput4, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 5 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput5, "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput1,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput2,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput3,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 4 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput4,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 5 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput5,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
                         } else {
                         }
                     }
                 } else if (SELECT_CASE_var == CurveType_TableOneIV) {
                     // CurrentModuleObject='Table:OneIndependentVariable'
-                    SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve(CurveIndex).CurveInput1,
-                                        "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                    SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                        OutputProcessor::Unit::None,
+                                        PerfCurve(CurveIndex).CurveInput1,
+                                        "HVAC",
+                                        "Average",
+                                        PerfCurve(CurveIndex).Name);
                 } else if (SELECT_CASE_var == CurveType_TableTwoIV) {
                     // CurrentModuleObject='Table:TwoIndependentVariables'
-                    SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve(CurveIndex).CurveInput1,
-                                        "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                    SetupOutputVariable("Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PerfCurve(CurveIndex).CurveInput2,
-                                        "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                    SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                        OutputProcessor::Unit::None,
+                                        PerfCurve(CurveIndex).CurveInput1,
+                                        "HVAC",
+                                        "Average",
+                                        PerfCurve(CurveIndex).Name);
+                    SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                                        OutputProcessor::Unit::None,
+                                        PerfCurve(CurveIndex).CurveInput2,
+                                        "HVAC",
+                                        "Average",
+                                        PerfCurve(CurveIndex).Name);
                 } else {
                     {
                         auto const SELECT_CASE_var1(PerfCurve(CurveIndex).CurveType);
                         if ((SELECT_CASE_var1 == Linear) || (SELECT_CASE_var1 == Quadratic) || (SELECT_CASE_var1 == Cubic) ||
                             (SELECT_CASE_var1 == Quartic) || (SELECT_CASE_var1 == Exponent) || (SELECT_CASE_var1 == FuncPressDrop)) {
                             // CurrentModuleObject='Curve:Linear/Quadratic/Cubic/Quartic/Exponent/Functional:PressureDrop'
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1, "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput1,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
                         } else if ((SELECT_CASE_var1 == BiQuadratic) || (SELECT_CASE_var1 == QuadraticLinear) || (SELECT_CASE_var1 == BiCubic) ||
                                    (SELECT_CASE_var1 == CubicLinear)) {
                             // CurrentModuleObject='Curve:BiQuadratic/QuadraticLinear/BiCubic/CubicLinear'
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2, "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput1,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput2,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
                         } else if ((SELECT_CASE_var1 == TriQuadratic) || (SELECT_CASE_var1 == ChillerPartLoadWithLift)) {
                             // CurrentModuleObject='Curve:TriQuadratic'
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3, "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput1,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput2,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput3,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
                         } else if (SELECT_CASE_var1 == QuadLinear) {
                             // CurrentModuleObject='Curve:QuadLinear'
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3, "HVAC", "Average", PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 4 Value", OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput4, "HVAC", "Average", PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput1,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput2,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput3,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
+                            SetupOutputVariable("Performance Curve Input Variable 4 Value",
+                                                OutputProcessor::Unit::None,
+                                                PerfCurve(CurveIndex).CurveInput4,
+                                                "HVAC",
+                                                "Average",
+                                                PerfCurve(CurveIndex).Name);
                         }
                     }
                 }
             }
             // set the output up last so it shows up after the input in the csv file
-            SetupOutputVariable("Performance Curve Output Value", OutputProcessor::Unit::None, PerfCurve(CurveIndex).CurveOutput, "HVAC", "Average",
+            SetupOutputVariable("Performance Curve Output Value",
+                                OutputProcessor::Unit::None,
+                                PerfCurve(CurveIndex).CurveOutput,
+                                "HVAC",
+                                "Average",
                                 PerfCurve(CurveIndex).Name);
         }
 
         for (CurveIndex = 1; CurveIndex <= NumPressureCurves; ++CurveIndex) {
-            SetupOutputVariable("Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PressureCurve(CurveIndex).CurveInput1,
-                                "HVAC", "Average", PressureCurve(CurveIndex).Name);
-            SetupOutputVariable("Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PressureCurve(CurveIndex).CurveInput2,
-                                "HVAC", "Average", PressureCurve(CurveIndex).Name);
-            SetupOutputVariable("Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None, PressureCurve(CurveIndex).CurveInput3,
-                                "HVAC", "Average", PressureCurve(CurveIndex).Name);
-            SetupOutputVariable("Performance Curve Output Value", OutputProcessor::Unit::None, PressureCurve(CurveIndex).CurveOutput, "HVAC",
-                                "Average", PressureCurve(CurveIndex).Name);
+            SetupOutputVariable("Performance Curve Input Variable 1 Value",
+                                OutputProcessor::Unit::None,
+                                PressureCurve(CurveIndex).CurveInput1,
+                                "HVAC",
+                                "Average",
+                                PressureCurve(CurveIndex).Name);
+            SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                                OutputProcessor::Unit::None,
+                                PressureCurve(CurveIndex).CurveInput2,
+                                "HVAC",
+                                "Average",
+                                PressureCurve(CurveIndex).Name);
+            SetupOutputVariable("Performance Curve Input Variable 3 Value",
+                                OutputProcessor::Unit::None,
+                                PressureCurve(CurveIndex).CurveInput3,
+                                "HVAC",
+                                "Average",
+                                PressureCurve(CurveIndex).Name);
+            SetupOutputVariable("Performance Curve Output Value",
+                                OutputProcessor::Unit::None,
+                                PressureCurve(CurveIndex).CurveOutput,
+                                "HVAC",
+                                "Average",
+                                PressureCurve(CurveIndex).Name);
         }
 
         if (AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= NumCurves; ++CurveIndex) {
-                SetupEMSActuator("Curve", PerfCurve(CurveIndex).Name, "Curve Result", "[unknown]", PerfCurve(CurveIndex).EMSOverrideOn,
+                SetupEMSActuator("Curve",
+                                 PerfCurve(CurveIndex).Name,
+                                 "Curve Result",
+                                 "[unknown]",
+                                 PerfCurve(CurveIndex).EMSOverrideOn,
                                  PerfCurve(CurveIndex).EMSOverrideCurveValue);
             } // All performance curves
         }
         if (AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= NumPressureCurves; ++CurveIndex) {
-                SetupEMSActuator("Curve", PressureCurve(CurveIndex).Name, "Curve Result", "[unknown]", PressureCurve(CurveIndex).EMSOverrideOn,
+                SetupEMSActuator("Curve",
+                                 PressureCurve(CurveIndex).Name,
+                                 "Curve Result",
+                                 "[unknown]",
+                                 PressureCurve(CurveIndex).EMSOverrideOn,
                                  PressureCurve(CurveIndex).EMSOverrideCurveValue);
             } // All pressure curves
         }
@@ -3093,8 +3449,8 @@ namespace CurveManager {
         using DataGlobals::OutputFileInits;
         using DataSystemVariables::CheckForActualFileName;
         using DataSystemVariables::GoodIOStatValue;
-        using DataSystemVariables::TempFullFileName;
         using DataSystemVariables::iUnicode_end;
+        using DataSystemVariables::TempFullFileName;
         using General::RoundSigDigits;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3633,21 +3989,31 @@ namespace CurveManager {
                                         break;
                                     }
                                 }
-                                TableLookup(TableNum).TableLookupZData.allocate(TableLookup(TableNum).NumX6Vars, TableLookup(TableNum).NumX5Vars,
-                                                                                TableLookup(TableNum).NumX4Vars, TableLookup(TableNum).NumX3Vars,
-                                                                                TableLookup(TableNum).NumX2Vars, TableLookup(TableNum).NumX1Vars);
+                                TableLookup(TableNum).TableLookupZData.allocate(TableLookup(TableNum).NumX6Vars,
+                                                                                TableLookup(TableNum).NumX5Vars,
+                                                                                TableLookup(TableNum).NumX4Vars,
+                                                                                TableLookup(TableNum).NumX3Vars,
+                                                                                TableLookup(TableNum).NumX2Vars,
+                                                                                TableLookup(TableNum).NumX1Vars);
                             } else {
-                                TableLookup(TableNum).TableLookupZData.allocate(1, TableLookup(TableNum).NumX5Vars, TableLookup(TableNum).NumX4Vars,
-                                                                                TableLookup(TableNum).NumX3Vars, TableLookup(TableNum).NumX2Vars,
+                                TableLookup(TableNum).TableLookupZData.allocate(1,
+                                                                                TableLookup(TableNum).NumX5Vars,
+                                                                                TableLookup(TableNum).NumX4Vars,
+                                                                                TableLookup(TableNum).NumX3Vars,
+                                                                                TableLookup(TableNum).NumX2Vars,
                                                                                 TableLookup(TableNum).NumX1Vars);
                             }
                         } else {
-                            TableLookup(TableNum).TableLookupZData.allocate(1, 1, TableLookup(TableNum).NumX4Vars, TableLookup(TableNum).NumX3Vars,
-                                                                            TableLookup(TableNum).NumX2Vars, TableLookup(TableNum).NumX1Vars);
+                            TableLookup(TableNum).TableLookupZData.allocate(1,
+                                                                            1,
+                                                                            TableLookup(TableNum).NumX4Vars,
+                                                                            TableLookup(TableNum).NumX3Vars,
+                                                                            TableLookup(TableNum).NumX2Vars,
+                                                                            TableLookup(TableNum).NumX1Vars);
                         }
                     } else {
-                        TableLookup(TableNum).TableLookupZData.allocate(1, 1, 1, TableLookup(TableNum).NumX3Vars, TableLookup(TableNum).NumX2Vars,
-                                                                        TableLookup(TableNum).NumX1Vars);
+                        TableLookup(TableNum).TableLookupZData.allocate(
+                            1, 1, 1, TableLookup(TableNum).NumX3Vars, TableLookup(TableNum).NumX2Vars, TableLookup(TableNum).NumX1Vars);
                     }
                 } else {
                     TableLookup(TableNum).TableLookupZData.allocate(1, 1, 1, 1, TableLookup(TableNum).NumX2Vars, TableLookup(TableNum).NumX1Vars);
@@ -4636,7 +5002,9 @@ namespace CurveManager {
                 }
                 ShowRecurringWarningErrorAtEnd(cCurveTypes(PerfCurve(CurveIndex).ObjectType) + " \"" + PerfCurve(CurveIndex).Name +
                                                    "\": Insufficient number of independent variables warning continues...",
-                                               PerfCurve(CurveIndex).NumIVLowErrorIndex, 1.0, 1.0);
+                                               PerfCurve(CurveIndex).NumIVLowErrorIndex,
+                                               1.0,
+                                               1.0);
             }
             V2 = 0.0;
         }
@@ -4660,7 +5028,9 @@ namespace CurveManager {
                 }
                 ShowRecurringWarningErrorAtEnd(cCurveTypes(PerfCurve(CurveIndex).ObjectType) + " \"" + PerfCurve(CurveIndex).Name +
                                                    "\": Insufficient number of independent variables warning continues...",
-                                               PerfCurve(CurveIndex).NumIVLowErrorIndex, 2.0, 2.0);
+                                               PerfCurve(CurveIndex).NumIVLowErrorIndex,
+                                               2.0,
+                                               2.0);
             }
             V3 = 0.0;
         }
@@ -4684,7 +5054,9 @@ namespace CurveManager {
                 }
                 ShowRecurringWarningErrorAtEnd(cCurveTypes(PerfCurve(CurveIndex).ObjectType) + " \"" + PerfCurve(CurveIndex).Name +
                                                    "\": Insufficient number of independent variables warning continues...",
-                                               PerfCurve(CurveIndex).NumIVLowErrorIndex, 3.0, 3.0);
+                                               PerfCurve(CurveIndex).NumIVLowErrorIndex,
+                                               3.0,
+                                               3.0);
             }
             V4 = 0.0;
         }
@@ -4708,7 +5080,9 @@ namespace CurveManager {
                 }
                 ShowRecurringWarningErrorAtEnd(cCurveTypes(PerfCurve(CurveIndex).ObjectType) + " \"" + PerfCurve(CurveIndex).Name +
                                                    "\": Insufficient number of independent variables warning continues...",
-                                               PerfCurve(CurveIndex).NumIVLowErrorIndex, 4.0, 4.0);
+                                               PerfCurve(CurveIndex).NumIVLowErrorIndex,
+                                               4.0,
+                                               4.0);
             }
             V5 = 0.0;
         }
@@ -4722,7 +5096,9 @@ namespace CurveManager {
                 }
                 ShowRecurringWarningErrorAtEnd(cCurveTypes(PerfCurve(CurveIndex).ObjectType) + " \"" + PerfCurve(CurveIndex).Name +
                                                    "\": Excess number of independent variables warning continues...",
-                                               PerfCurve(CurveIndex).NumIVHighErrorIndex, 6.0, 6.0);
+                                               PerfCurve(CurveIndex).NumIVHighErrorIndex,
+                                               6.0,
+                                               6.0);
             }
         } else {
             if (TableLookup(TableIndex).NumIndependentVars > 5) {
@@ -4732,7 +5108,9 @@ namespace CurveManager {
                 }
                 ShowRecurringWarningErrorAtEnd(cCurveTypes(PerfCurve(CurveIndex).ObjectType) + " \"" + PerfCurve(CurveIndex).Name +
                                                    "\": Insufficient number of independent variables warning continues...",
-                                               PerfCurve(CurveIndex).NumIVLowErrorIndex, 5.0, 5.0);
+                                               PerfCurve(CurveIndex).NumIVLowErrorIndex,
+                                               5.0,
+                                               5.0);
             }
             V6 = 0.0;
         }
@@ -4835,8 +5213,8 @@ namespace CurveManager {
                 for (IV5 = 1; IV5 <= NV5; ++IV5) {
                     for (IV4 = 1; IV4 <= NV4; ++IV4) {
                         for (IV3 = 1; IV3 <= NV3; ++IV3) {
-                            THREEDVALS(IV5, IV4, IV3) = DLAG(V1, V2, VALSX, VALSY, TableLookup(TableIndex).TableLookupZData(1, IV5, IV4, IV3, _, _),
-                                                             NX, NY, NUMPT, IEXTX, IEXTY);
+                            THREEDVALS(IV5, IV4, IV3) = DLAG(
+                                V1, V2, VALSX, VALSY, TableLookup(TableIndex).TableLookupZData(1, IV5, IV4, IV3, _, _), NX, NY, NUMPT, IEXTX, IEXTY);
                         }
                     }
                 }
@@ -4882,9 +5260,16 @@ namespace CurveManager {
                     for (IV5 = 1; IV5 <= NV5; ++IV5) {
                         for (IV4 = 1; IV4 <= NV4; ++IV4) {
                             for (IV3 = 1; IV3 <= NV3; ++IV3) {
-                                FOURDVALS(IV6, IV5, IV4, IV3) =
-                                    DLAG(V1, V2, VALSX, VALSY, TableLookup(TableIndex).TableLookupZData(IV6, IV5, IV4, IV3, _, _), NX, NY, NUMPT,
-                                         IEXTX, IEXTY);
+                                FOURDVALS(IV6, IV5, IV4, IV3) = DLAG(V1,
+                                                                     V2,
+                                                                     VALSX,
+                                                                     VALSY,
+                                                                     TableLookup(TableIndex).TableLookupZData(IV6, IV5, IV4, IV3, _, _),
+                                                                     NX,
+                                                                     NY,
+                                                                     NUMPT,
+                                                                     IEXTX,
+                                                                     IEXTY);
                             }
                         }
                     }
@@ -6057,8 +6442,17 @@ namespace CurveManager {
         NumPressure = inputProcessor->getNumObjectsFound(CurveObjectName);
         PressureCurve.allocate(NumPressure);
         for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
-            inputProcessor->getObjectItem(CurveObjectName, CurveNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurveObjectName,
+                                          CurveNum,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
             PressureCurve(CurveNum).Name = Alphas(1);
             PressureCurve(CurveNum).EquivDiameter = Numbers(1);
@@ -6675,8 +7069,8 @@ namespace CurveManager {
             TableLookup(Tables(TableNum)).X1Var.allocate(TableLookup(Tables(TableNum)).NumX1Vars);
             TableLookup(Tables(TableNum)).X2Var.allocate(TableLookup(Tables(TableNum)).NumX2Vars);
             TableLookup(Tables(TableNum))
-                .TableLookupZData.allocate(1, 1, 1, 1, size(PerfCurveTableData(Tables(TableNum)).Y(_, 1)),
-                                           size(PerfCurveTableData(Tables(TableNum)).Y(1, _)));
+                .TableLookupZData.allocate(
+                    1, 1, 1, 1, size(PerfCurveTableData(Tables(TableNum)).Y(_, 1)), size(PerfCurveTableData(Tables(TableNum)).Y(1, _)));
             TableLookup(Tables(TableNum)).X1Var = PerfCurveTableData(Tables(TableNum)).X1;
             TableLookup(Tables(TableNum)).X2Var = PerfCurveTableData(Tables(TableNum)).X2;
             TableLookup(Tables(TableNum)).TableLookupZData(1, 1, 1, 1, _, _) = PerfCurveTableData(Tables(TableNum)).Y(_, _);
@@ -6859,7 +7253,11 @@ namespace CurveManager {
                 TableLookup(PerfCurve(TableNum).TableIndex).X1Var.allocate(TableLookup(PerfCurve(TableNum).TableIndex).NumX1Vars);
                 TableLookup(PerfCurve(TableNum).TableIndex).X2Var.allocate(TableLookup(PerfCurve(TableNum).TableIndex).NumX2Vars);
                 TableLookup(PerfCurve(TableNum).TableIndex)
-                    .TableLookupZData.allocate(1, 1, 1, 1, size(PerfCurveTableData(PerfCurve(TableNum).TableIndex).Y(_, 1)),
+                    .TableLookupZData.allocate(1,
+                                               1,
+                                               1,
+                                               1,
+                                               size(PerfCurveTableData(PerfCurve(TableNum).TableIndex).Y(_, 1)),
                                                size(PerfCurveTableData(PerfCurve(TableNum).TableIndex).Y(1, _)));
                 TableLookup(PerfCurve(TableNum).TableIndex).X1Var = PerfCurveTableData(PerfCurve(TableNum).TableIndex).X1;
                 TableLookup(PerfCurve(TableNum).TableIndex).X2Var = PerfCurveTableData(PerfCurve(TableNum).TableIndex).X2;

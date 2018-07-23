@@ -100,8 +100,12 @@ namespace DataHVACControllers {
     int const iFirstMode(iModeWrongAction); // First operating mode in range
     int const iLastMode(iModeMaxActive);    // Last operating mode in range
     Array1D_string const ControllerModeTypes({-2, 4},
-                                             {"Wrong action mode", "No controller mode", "Off controller mode", "Inactive controller mode",
-                                              "Active unconstrained controller mode", "Active min-constrained controller mode",
+                                             {"Wrong action mode",
+                                              "No controller mode",
+                                              "Off controller mode",
+                                              "Inactive controller mode",
+                                              "Active unconstrained controller mode",
+                                              "Active min-constrained controller mode",
                                               "Active max-constrained controller mode"});
 
     // Controller operation used in module HVACControllers

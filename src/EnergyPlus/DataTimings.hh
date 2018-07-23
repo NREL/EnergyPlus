@@ -151,6 +151,6 @@ namespace DataTimings {
 
 } // namespace DataTimings
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

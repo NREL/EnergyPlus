@@ -1140,15 +1140,33 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_EQ(LowTempRadiantSystem::HydronicSystem, RadSysTypes(RadSysNum).SystemType);
 
     ErrorsFound = false;
-    PlantUtilities::ScanPlantLoopsForObject(HydrRadSys(RadSysNum).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys(RadSysNum).HWLoopNum,
-                                            HydrRadSys(RadSysNum).HWLoopSide, HydrRadSys(RadSysNum).HWBranchNum, HydrRadSys(RadSysNum).HWCompNum, _,
-                                            _, _, HydrRadSys(RadSysNum).HotWaterInNode, _, ErrorsFound);
+    PlantUtilities::ScanPlantLoopsForObject(HydrRadSys(RadSysNum).Name,
+                                            TypeOf_LowTempRadiant_VarFlow,
+                                            HydrRadSys(RadSysNum).HWLoopNum,
+                                            HydrRadSys(RadSysNum).HWLoopSide,
+                                            HydrRadSys(RadSysNum).HWBranchNum,
+                                            HydrRadSys(RadSysNum).HWCompNum,
+                                            _,
+                                            _,
+                                            _,
+                                            HydrRadSys(RadSysNum).HotWaterInNode,
+                                            _,
+                                            ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    PlantUtilities::ScanPlantLoopsForObject(HydrRadSys(RadSysNum).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys(RadSysNum).CWLoopNum,
-                                            HydrRadSys(RadSysNum).CWLoopSide, HydrRadSys(RadSysNum).CWBranchNum, HydrRadSys(RadSysNum).CWCompNum, _,
-                                            _, _, HydrRadSys(RadSysNum).ColdWaterInNode, _, ErrorsFound);
+    PlantUtilities::ScanPlantLoopsForObject(HydrRadSys(RadSysNum).Name,
+                                            TypeOf_LowTempRadiant_VarFlow,
+                                            HydrRadSys(RadSysNum).CWLoopNum,
+                                            HydrRadSys(RadSysNum).CWLoopSide,
+                                            HydrRadSys(RadSysNum).CWBranchNum,
+                                            HydrRadSys(RadSysNum).CWCompNum,
+                                            _,
+                                            _,
+                                            _,
+                                            HydrRadSys(RadSysNum).ColdWaterInNode,
+                                            _,
+                                            ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataSizing::CurZoneEqNum = 1;
@@ -1166,15 +1184,23 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     FinalZoneSizing(DataSizing::CurZoneEqNum).NonAirSysDesCoolLoad = 10000.0;
     CoolingCapacity = FinalZoneSizing(DataSizing::CurZoneEqNum).NonAirSysDesCoolLoad * HydrRadSys(RadSysNum).ScaledCoolingCapacity;
     // hot water flow rate sizing calculation
-    Density = GetDensityGlycol(PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName, 60.0, PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
+    Density = GetDensityGlycol(PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
+                               60.0,
+                               PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                "AutosizeLowTempRadiantVariableFlowTest");
-    Cp = GetSpecificHeatGlycol(PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName, 60.0, PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
+    Cp = GetSpecificHeatGlycol(PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
+                               60.0,
+                               PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                "AutosizeLowTempRadiantVariableFlowTest");
     HotWaterFlowRate = HeatingCapacity / (PlantSizData(1).DeltaT * Cp * Density);
     // chilled water flow rate sizing calculation
-    Density = GetDensityGlycol(PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName, 5.0, PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
+    Density = GetDensityGlycol(PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName,
+                               5.05,
+                               PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                "AutosizeLowTempRadiantVariableFlowTest");
-    Cp = GetSpecificHeatGlycol(PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName, 5.0, PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
+    Cp = GetSpecificHeatGlycol(PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName,
+                               5.05,
+                               PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                "AutosizeLowTempRadiantVariableFlowTest");
     ChilledWaterFlowRate = CoolingCapacity / (PlantSizData(2).DeltaT * Cp * Density);
     // tuble length sizing calculation
@@ -1695,4 +1721,148 @@ TEST_F(LowTempRadiantSystemTest, SizeRadSysTubeLengthTest)
     RadSysNum = 1;
     FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
     EXPECT_NEAR(FuncCalc, 60.0, 0.1);
+}
+TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
+{
+
+    Real64 Density;
+    Real64 Cp;
+
+    SystemType = ConstantFlowSystem;
+    CFloRadSys(RadSysNum).Name = "LowTempConstantFlow";
+    CFloRadSys(RadSysNum).ZonePtr = 1;
+    HydronicRadiantSysNumericFields(RadSysNum).FieldNames(2) = "Rated Flow Rate";
+    HydronicRadiantSysNumericFields(RadSysNum).FieldNames(3) = "Total length of pipe embedded in surface";
+
+    CFloRadSys(RadSysNum).HotWaterInNode = 1;
+    CFloRadSys(RadSysNum).HotWaterOutNode = 2;
+    CFloRadSys(RadSysNum).HWLoopNum = 1;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = CFloRadSys(RadSysNum).HotWaterInNode;
+
+    CFloRadSys(RadSysNum).ColdWaterInNode = 3;
+    CFloRadSys(RadSysNum).ColdWaterOutNode = 4;
+    CFloRadSys(RadSysNum).CWLoopNum = 2;
+    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = CFloRadSys(RadSysNum).ColdWaterInNode;
+
+    CFloRadSys(RadSysNum).SurfacePtr.allocate(1);
+    CFloRadSys(RadSysNum).SurfacePtr(1) = 1;
+    Surface.allocate(1);
+    Surface(1).Construction = 1;
+    Surface(1).Area = 150.0;
+    Construct.allocate(1);
+    Construct(1).ThicknessPerpend = 0.075;
+
+    // Hydronic - Hot water volume flow rate autosize
+    CFloRadSys(RadSysNum).ColdWaterInNode = 0;
+    CFloRadSys(RadSysNum).ColdWaterOutNode = 0;
+    CFloRadSys(RadSysNum).WaterVolFlowMax = AutoSize;
+    FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad = 1000.0;
+    FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad = 1000.0;
+
+    // hot water volume flow rate sizing calculation
+    Density = GetDensityGlycol(PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidName,
+                               60.0,
+                               PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
+                               "LowTempRadConFlowSystemAutoSizeTempTest");
+    Cp = GetSpecificHeatGlycol(PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidName,
+                               60.0,
+                               PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
+                               "LowTempRadConFlowSystemAutoSizeTempTest");
+    Real64 HeatingLoad = FinalZoneSizing(1).NonAirSysDesHeatLoad;
+    Real64 DesHotWaterVolFlowRate = HeatingLoad / (PlantSizData(1).DeltaT * Density * Cp);
+
+    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    // check hot water design flow rate calculated here and autosized flow are identical
+    EXPECT_DOUBLE_EQ(DesHotWaterVolFlowRate, CFloRadSys(RadSysNum).WaterVolFlowMax);
+
+    // Hydronic - cold water volume flow rate autosize
+    CFloRadSys(RadSysNum).HotWaterInNode = 0;
+    CFloRadSys(RadSysNum).HotWaterOutNode = 0;
+    CFloRadSys(RadSysNum).ColdWaterInNode = 3;
+    CFloRadSys(RadSysNum).ColdWaterOutNode = 4;
+    CFloRadSys(RadSysNum).WaterVolFlowMax = AutoSize;
+
+    // chilled water volume flow rate sizing calculation
+    Density = GetDensityGlycol(PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
+                               5.05,
+                               PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
+                               "LowTempRadConFlowSystemAutoSizeTempTest");
+    Cp = GetSpecificHeatGlycol(PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
+                               5.05,
+                               PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
+                               "LowTempRadConFlowSystemAutoSizeTempTest");
+    Real64 CoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
+    Real64 DesChilledWaterVolFlowRate = CoolingLoad / (PlantSizData(2).DeltaT * Density * Cp);
+
+    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    // check chilled water design flow rate calculated here and autosized flow are identical
+    EXPECT_DOUBLE_EQ(DesChilledWaterVolFlowRate, CFloRadSys(RadSysNum).WaterVolFlowMax);
+}
+
+TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
+{
+    int RadSysNum;
+    int RadSysType;
+    Real64 Temperature;
+    Real64 WaterMassFlow;
+    Real64 FlowFraction;
+    Real64 NumCircs;
+    Real64 TubeLength;
+    Real64 TubeDiameter;
+    Real64 HXEffectFuncResult;
+    int GlycolIndex = 0;
+
+    // Set values of items that will stay constant for all calls to HX Effectiveness function
+    RadSysNum = 1;
+    WaterMassFlow = 0.1;
+    FlowFraction = 1.0;
+    NumCircs = 1;
+    TubeLength = 10.0;
+    TubeDiameter = 0.05;
+    PlantLoop(1).FluidName = "WATER";
+
+    // Test 1: Heating for Hydronic System
+    HXEffectFuncResult = 0.0;
+    OperatingMode = HeatingMode;
+    RadSysType = HydronicSystem;
+    Temperature = 10.0;
+    HydrRadSys(RadSysNum).HWLoopNum = 1;
+    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
+                                                WaterMassFlow, FlowFraction, NumCircs,
+                                                TubeLength, TubeDiameter, GlycolIndex);
+    EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
+    
+    // Test 2: Cooling for Hydronic System
+    HXEffectFuncResult = 0.0;
+    OperatingMode = CoolingMode;
+    RadSysType = HydronicSystem;
+    Temperature = 10.0;
+    HydrRadSys(RadSysNum).CWLoopNum = 1;
+    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
+                                                WaterMassFlow, FlowFraction, NumCircs,
+                                                TubeLength, TubeDiameter, GlycolIndex);
+    EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
+    
+    // Test 3: Heating for Constant Flow System
+    HXEffectFuncResult = 0.0;
+    OperatingMode = HeatingMode;
+    RadSysType = ConstantFlowSystem;
+    Temperature = 10.0;
+    CFloRadSys(RadSysNum).HWLoopNum = 1;
+    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
+                                                WaterMassFlow, FlowFraction, NumCircs,
+                                                TubeLength, TubeDiameter, GlycolIndex);
+    EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
+    
+    // Test 4: Cooling for Constant Flow System
+    HXEffectFuncResult = 0.0;
+    OperatingMode = CoolingMode;
+    RadSysType = ConstantFlowSystem;
+    Temperature = 10.0;
+    CFloRadSys(RadSysNum).CWLoopNum = 1;
+    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
+                                                WaterMassFlow, FlowFraction, NumCircs,
+                                                TubeLength, TubeDiameter, GlycolIndex);
+    EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
+
 }

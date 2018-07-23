@@ -110,8 +110,11 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
         }
         std::shared_ptr<std::ofstream> errorStream =
             std::make_shared<std::ofstream>(DataStringGlobals::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc);
-        return std::unique_ptr<SQLite>(new SQLite(errorStream, DataStringGlobals::outputSqlFileName, DataStringGlobals::outputSqliteErrFileName,
-                                                  writeOutputToSQLite, writeTabularDataToSQLite));
+        return std::unique_ptr<SQLite>(new SQLite(errorStream,
+                                                  DataStringGlobals::outputSqlFileName,
+                                                  DataStringGlobals::outputSqliteErrFileName,
+                                                  writeOutputToSQLite,
+                                                  writeTabularDataToSQLite));
     } catch (const std::runtime_error &error) {
         ShowFatalError(error.what());
         return nullptr;
@@ -132,8 +135,10 @@ void CreateSQLiteZoneExtendedOutput()
         }
         for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules;
              ++scheduleNumber) {
-            sqlite->addScheduleData(scheduleNumber, ScheduleManager::GetScheduleName(scheduleNumber),
-                                    ScheduleManager::GetScheduleType(scheduleNumber), ScheduleManager::GetScheduleMinValue(scheduleNumber),
+            sqlite->addScheduleData(scheduleNumber,
+                                    ScheduleManager::GetScheduleName(scheduleNumber),
+                                    ScheduleManager::GetScheduleType(scheduleNumber),
+                                    ScheduleManager::GetScheduleMinValue(scheduleNumber),
                                     ScheduleManager::GetScheduleMaxValue(scheduleNumber));
         }
         for (int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {

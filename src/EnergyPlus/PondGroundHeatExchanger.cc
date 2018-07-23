@@ -245,8 +245,8 @@ namespace PondGroundHeatExchanger {
         for (Item = 1; Item <= NumOfPondGHEs; ++Item) {
 
             // get the input data
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(
+                cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
 
             PondGHE(Item).WaterIndex = FindGlycol(fluidNameWater);
 
@@ -255,8 +255,8 @@ namespace PondGroundHeatExchanger {
 
             // get inlet node data
             PondGHE(Item).InletNode = cAlphaArgs(2);
-            PondGHE(Item).InletNodeNum = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                           NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            PondGHE(Item).InletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             if (PondGHE(Item).InletNodeNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -265,8 +265,8 @@ namespace PondGroundHeatExchanger {
 
             // get outlet node data
             PondGHE(Item).OutletNode = cAlphaArgs(3);
-            PondGHE(Item).OutletNodeNum = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                            NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            PondGHE(Item).OutletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             if (PondGHE(Item).OutletNodeNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -357,18 +357,26 @@ namespace PondGroundHeatExchanger {
 
         // Set up the output variables
         for (Item = 1; Item <= NumOfPondGHEs; ++Item) {
-            SetupOutputVariable("Pond Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, PondGHE(Item).HeatTransferRate, "Plant",
-                                "Average", PondGHE(Item).Name);
-            SetupOutputVariable("Pond Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, PondGHE(Item).Energy, "Plant", "Sum",
+            SetupOutputVariable("Pond Heat Exchanger Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                PondGHE(Item).HeatTransferRate,
+                                "Plant",
+                                "Average",
                                 PondGHE(Item).Name);
-            SetupOutputVariable("Pond Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, PondGHE(Item).MassFlowRate, "Plant", "Average",
+            SetupOutputVariable(
+                "Pond Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, PondGHE(Item).Energy, "Plant", "Sum", PondGHE(Item).Name);
+            SetupOutputVariable("Pond Heat Exchanger Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                PondGHE(Item).MassFlowRate,
+                                "Plant",
+                                "Average",
                                 PondGHE(Item).Name);
-            SetupOutputVariable("Pond Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, PondGHE(Item).InletTemp, "Plant", "Average",
-                                PondGHE(Item).Name);
-            SetupOutputVariable("Pond Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, PondGHE(Item).OutletTemp, "Plant", "Average",
-                                PondGHE(Item).Name);
-            SetupOutputVariable("Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, PondGHE(Item).PondTemp, "Plant", "Average",
-                                PondGHE(Item).Name);
+            SetupOutputVariable(
+                "Pond Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, PondGHE(Item).InletTemp, "Plant", "Average", PondGHE(Item).Name);
+            SetupOutputVariable(
+                "Pond Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, PondGHE(Item).OutletTemp, "Plant", "Average", PondGHE(Item).Name);
+            SetupOutputVariable(
+                "Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, PondGHE(Item).PondTemp, "Plant", "Average", PondGHE(Item).Name);
         }
 
         if (!GroundTemp_DeepObjInput) {
@@ -457,8 +465,8 @@ namespace PondGroundHeatExchanger {
         if (this->MyFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(this->Name, TypeOf_GrndHtExchgPond, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _,
-                                    _, errFlag);
+            ScanPlantLoopsForObject(
+                this->Name, TypeOf_GrndHtExchgPond, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag);
             if (errFlag) {
                 ShowFatalError("InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
             }
@@ -466,8 +474,14 @@ namespace PondGroundHeatExchanger {
             Cp = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, constant_zero, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
             this->DesignMassFlowRate = Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
             this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
-            InitComponentNodes(0.0, this->DesignMassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum,
-                               this->BranchNum, this->CompNum);
+            InitComponentNodes(0.0,
+                               this->DesignMassFlowRate,
+                               this->InletNodeNum,
+                               this->OutletNodeNum,
+                               this->LoopNum,
+                               this->LoopSideNum,
+                               this->BranchNum,
+                               this->CompNum);
             RegisterPlantCompDesignFlow(this->InletNodeNum, this->DesignMassFlowRate / rho);
 
             this->MyFlag = false;
@@ -564,7 +578,9 @@ namespace PondGroundHeatExchanger {
 
         PondMass = this->Depth * this->Area * GetDensityGlycol(fluidNameWater, max(PondTemp, constant_zero), this->WaterIndex, RoutineName);
 
-        SpecificHeat = GetSpecificHeatGlycol(fluidNameWater, max(PondTemp, constant_zero), this->WaterIndex,
+        SpecificHeat = GetSpecificHeatGlycol(fluidNameWater,
+                                             max(PondTemp, constant_zero),
+                                             this->WaterIndex,
                                              RoutineName); // DSU bug fix here, was using working fluid index
 
         Flux = this->CalcTotalFLux(PondTemp);
@@ -993,8 +1009,13 @@ namespace PondGroundHeatExchanger {
                                    RoundSigDigits(PondTemperature, 2) + "] C");
                 ShowContinueErrorTimeStamp("");
             }
-            ShowRecurringWarningErrorAtEnd("GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen", this->FrozenErrIndex, PondTemperature,
-                                           PondTemperature, _, "[C]", "[C]");
+            ShowRecurringWarningErrorAtEnd("GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen",
+                                           this->FrozenErrIndex,
+                                           PondTemperature,
+                                           PondTemperature,
+                                           _,
+                                           "[C]",
+                                           "[C]");
             if (this->ConsecutiveFrozen >= NumOfTimeStepInHour * 30) {
                 ShowFatalError("GroundHeatExchanger:Pond=\"" + this->Name + "\" has been frozen for 30 consecutive hours.  Program terminates.");
             }
