@@ -85,6 +85,8 @@ configure_file (
 set(kiva_src Algorithms.cpp
              Algorithms.hpp
              BoundaryConditions.hpp
+             Cell.cpp
+             Cell.hpp
              Domain.cpp
              Domain.hpp
              Errors.cpp

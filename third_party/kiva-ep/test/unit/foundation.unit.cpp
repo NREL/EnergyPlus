@@ -4,14 +4,20 @@
 #include "fixtures/bestest-fixture.hpp"
 #include "fixtures/typical-fixture.hpp"
 
+#include "Errors.hpp"
+
 using namespace Kiva;
 
-TEST_F( BESTESTFixture, GC10a)
-{
-  fnd.wallTopBoundary = Foundation::WTB_LINEAR_DT;
-  fnd.wallTopInteriorTemperature = 303.15;
-  fnd.wallTopExteriorTemperature = 283.15;
 
+std::string dbl_to_string(double dbl) {
+  std::ostringstream strs;
+  strs << dbl;
+  std::string str = strs.str();
+  return str;
+};
+
+TEST_F( GC10aFixture, GC10a)
+{
   double analyticalQ = 2432.597;
   //double trnsysQ = 2427;
   //double fluentQ = 2425;
@@ -142,6 +148,57 @@ TEST_F( TypicalFixture, Slab)
   EXPECT_NEAR(1.0, 1.0, 1.0);
 }*/
 
+TEST_F( GC10aFixture, calculateADI)
+{
+  fnd.numericalScheme = Foundation::NS_ADI;
+  bool fullyear = false;
+//  fullyear = true;
+  if (fullyear) {
+    double surface_avg = calculate(8760);
+    Kiva::showMessage(MSG_INFO, dbl_to_string(surface_avg));
+    EXPECT_NEAR(surface_avg, 2888.473, 0.01);
+  } else {
+    double surface_avg = calculate();
+    Kiva::showMessage(MSG_INFO, dbl_to_string(surface_avg));
+    EXPECT_NEAR(surface_avg, 2607.32, 0.01);
+  }
+}
+
+TEST_F( GC10aFixture, calculateImplicit)
+{
+  fnd.numericalScheme = Foundation::NS_IMPLICIT;
+
+  double surface_avg = calculate();
+  Kiva::showMessage(MSG_INFO, dbl_to_string(surface_avg));
+  EXPECT_NEAR(surface_avg, 2601.25, 0.01);
+}
+
+TEST_F( GC10aFixture, calculateCrankN)
+{
+  fnd.numericalScheme = Foundation::NS_CRANK_NICOLSON;
+
+  double surface_avg = calculate();
+  Kiva::showMessage(MSG_INFO, dbl_to_string(surface_avg));
+  EXPECT_NEAR(surface_avg, 2600.87, 0.01);
+}
+
+TEST_F( GC10aFixture, calculateADE)
+{
+  fnd.numericalScheme = Foundation::NS_ADE;
+
+  double surface_avg = calculate();
+  Kiva::showMessage(MSG_INFO, dbl_to_string(surface_avg));
+  EXPECT_NEAR(surface_avg, 2615.19, 0.01);
+}
+
+TEST_F( GC10aFixture, GC10a_calculateSteadyState)
+{
+  fnd.numericalScheme = Foundation::NS_STEADY_STATE;
+
+  double surface_avg = calculate();
+  Kiva::showMessage(MSG_INFO, dbl_to_string(surface_avg));
+  EXPECT_NEAR(surface_avg, 3107.57, 0.01);
+}
 
 // Google Test main
 int

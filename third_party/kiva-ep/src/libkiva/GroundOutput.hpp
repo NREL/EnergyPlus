@@ -15,8 +15,9 @@ public:
   enum OutputType
   {
     OT_FLUX,
-    OT_TEMP,
-    OT_EFF_TEMP,
+    OT_TEMP,      // Temperature that satisfies heat transfer equation (Qavg = havg * (Tin - Tthis))
+    OT_AVG_TEMP,  // Actual average temperature of the surface (the sign of (Tin - Tthis) may not agree with sign of Qavg)
+    OT_EFF_TEMP,  // Effective temperature used as a boundary condition on the other side of floor/wall constructions (if Kiva is used as a pre-processor)
     OT_RATE,
     OT_CONV
   };
