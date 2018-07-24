@@ -1123,7 +1123,6 @@ namespace HeatBalanceKivaManager {
         gp.createFrame(std::to_string(DataEnvironment::Month) + "/" + std::to_string(DataEnvironment::DayOfMonth) + " " +
                        std::to_string(DataGlobals::HourOfDay) + ":00");
 
-#endif
 
 #ifndef NDEBUG
 
@@ -1163,6 +1162,8 @@ namespace HeatBalanceKivaManager {
         plotNum++;
 
 #endif
+#endif
+
     }
 
     Real64 KivaManager::getValue(int surfNum, Kiva::GroundOutput::OutputType oT)
