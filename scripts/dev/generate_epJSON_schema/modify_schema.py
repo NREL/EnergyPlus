@@ -113,7 +113,8 @@ extension_renaming = {
     'SurfaceProperty:ExposedFoundationPerimeter': 'surfaces',
     'SurfaceProperty:SurroundingSurfaces': 'surfaces',
     'ZoneHVAC:HybridUnitaryHVAC': 'modes',
-    'ShadowCalculation': 'shading_zone_groups'
+    'ShadowCalculation': 'shading_zone_groups',
+    'Schedule:Year': 'schedule_weeks'
 }
 remaining_objects = [
     'Site:SpectrumData',
@@ -206,6 +207,11 @@ def change_utility_cost(schema):
 
 
 def add_explicit_extensible_bounds(schema):
+    # Schedule:Year
+    loc = schema['properties']['Schedule:Year']['patternProperties']['.*']['properties']['schedule_weeks']
+    loc['minItems'] = 1
+    loc['maxItems'] = 53
+
     # EnergyManagementSystem:Program
     loc = schema['properties']['EnergyManagementSystem:Program']['patternProperties']['.*']
     if 'required' in loc and 'lines' not in loc['required']:

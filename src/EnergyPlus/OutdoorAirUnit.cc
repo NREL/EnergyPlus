@@ -1245,7 +1245,7 @@ namespace OutdoorAirUnit {
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow = GetWaterCoilMaxFlowRate(
                             OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentType, OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName, errFlag);
                         rho = GetDensityGlycol(PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
-                                               5.0,
+                                               DataGlobals::CWInitConvTemp,
                                                PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
@@ -1264,7 +1264,7 @@ namespace OutdoorAirUnit {
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow = GetWaterCoilMaxFlowRate(
                             OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentType, OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName, errFlag);
                         rho = GetDensityGlycol(PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
-                                               HWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
@@ -1299,7 +1299,7 @@ namespace OutdoorAirUnit {
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow = GetWaterCoilMaxFlowRate(
                             OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentType, OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName, errFlag);
                         rho = GetDensityGlycol(PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
-                                               60.0,
+                                               DataGlobals::CWInitConvTemp,
                                                PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;

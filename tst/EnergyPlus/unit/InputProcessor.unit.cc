@@ -324,6 +324,80 @@ TEST_F(InputProcessorFixture, parse_empty_fields)
     }
 }
 
+TEST_F(InputProcessorFixture, parse_two_RunPeriod)
+{
+    std::string const idf(delimited_string({
+        "  RunPeriod,",
+        "    ,                        !- Name",
+        "    1,                       !- Begin Month",
+        "    1,                       !- Begin Day of Month",
+        "    1,                       !- End Month",
+        "    31,                      !- End Day of Month",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+        "",
+        "  RunPeriod,",
+        "    ,                        !- Name",
+        "    7,                       !- Begin Month",
+        "    1,                       !- Begin Day of Month",
+        "    7,                       !- End Month",
+        "    31,                      !- End Day of Month",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+    }));
+
+    json expected = {
+      {"RunPeriod", {
+        {"RunPeriod 1", {
+          {"apply_weekend_holiday_rule", "No"},
+          {"begin_day_of_month", 1},
+          {"begin_month", 1},
+          {"day_of_week_for_start_day", "Tuesday"},
+          {"end_day_of_month", 31},
+          {"end_month", 1},
+          {"use_weather_file_daylight_saving_period", "Yes"},
+          {"use_weather_file_holidays_and_special_days", "Yes"},
+          {"use_weather_file_rain_indicators", "Yes"},
+          {"use_weather_file_snow_indicators", "Yes"}
+        }},
+        {"RunPeriod 2", {
+          {"apply_weekend_holiday_rule", "No"},
+          {"begin_day_of_month", 1},
+          {"begin_month", 7},
+          {"day_of_week_for_start_day", "Tuesday"},
+          {"end_day_of_month", 31},
+          {"end_month", 7},
+          {"use_weather_file_daylight_saving_period", "Yes"},
+          {"use_weather_file_holidays_and_special_days", "Yes"},
+          {"use_weather_file_rain_indicators", "Yes"},
+          {"use_weather_file_snow_indicators", "Yes"}
+        }}
+      }}
+    };
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+    json tmp;
+    for (auto it = expected.begin(); it != expected.end(); ++it) {
+        ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+        for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+            ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+            for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+                ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+            }
+        }
+    }
+}
+
 TEST_F(InputProcessorFixture, parse_idf_and_validate_two_non_extensible_objects)
 {
     std::string const idf(delimited_string({
