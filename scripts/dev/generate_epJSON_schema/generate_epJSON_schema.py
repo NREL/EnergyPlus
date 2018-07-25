@@ -17,6 +17,7 @@ modify_schema.change_special_cased_enums(data.schema)
 modify_schema.change_special_cased_name_fields(data.schema)
 modify_schema.change_extensions_name(data.schema)
 modify_schema.change_89_release_issues(data.schema)
+modify_schema.add_explicit_extensible_bounds(data.schema)
 
 with open(source_dir_path + '/idd/Energy+.schema.epJSON.in', 'w') as f2:
     f2.write(json.dumps(data.schema, indent=4))

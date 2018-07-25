@@ -132,6 +132,8 @@ namespace ZoneTempPredictorCorrector {
 
     // Number of zone with staged controlled objects
     extern int NumStageCtrZone;
+    // Number of zone with onoff thermostat
+    extern int NumOnOffCtrZone;
 
     extern Array1D<Real64> ZoneSetPointLast;
     extern Array1D<Real64> TempIndZnLd;
@@ -236,7 +238,7 @@ namespace ZoneTempPredictorCorrector {
 
     void CalculateAdaptiveComfortSetPointSchl(Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
-    void CalcPredictedSystemLoad(int const ZoneNum, Real64 RAFNFrac, bool const ShortenTimeStepSys);
+    void CalcPredictedSystemLoad(int const ZoneNum, Real64 RAFNFrac);
 
     void CalcPredictedHumidityRatio(int const ZoneNum, Real64 RAFNFrac);
 

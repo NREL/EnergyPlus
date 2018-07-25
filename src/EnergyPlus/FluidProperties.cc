@@ -328,36 +328,36 @@ namespace FluidProperties {
                                                                                0.6791, 0.0,    0.0,    0.0,    0.0,    0.0}); // in W/mK
 
         // Ethylene Glycol Data: Specific Heat in J/(kg-k)
-        static Array2D<Real64> const DefaultEthGlyCpData(DefaultNumGlyTemps, DefaultNumGlyConcs,
-                                                         std::bind(DefaultEthGlyCpData_initializer, _1, DefaultWaterCpData));
+        static Array2D<Real64> const DefaultEthGlyCpData(
+            DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultEthGlyCpData_initializer, _1, DefaultWaterCpData));
 
         // Ethylene Glycol Data: Viscosity in mPa-s
-        static Array2D<Real64> const DefaultEthGlyViscData(DefaultNumGlyTemps, DefaultNumGlyConcs,
-                                                           std::bind(DefaultEthGlyViscData_initializer, _1, DefaultWaterViscData));
+        static Array2D<Real64> const DefaultEthGlyViscData(
+            DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultEthGlyViscData_initializer, _1, DefaultWaterViscData));
 
         // Ethylene Glycol Data: Density in kg/m3
-        static Array2D<Real64> const DefaultEthGlyRhoData(DefaultNumGlyTemps, DefaultNumGlyConcs,
-                                                          std::bind(DefaultEthGlyRhoData_initializer, _1, DefaultWaterRhoData));
+        static Array2D<Real64> const DefaultEthGlyRhoData(
+            DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultEthGlyRhoData_initializer, _1, DefaultWaterRhoData));
 
         // Ethylene Glycol Data: Conductivity in W/(m-K)
-        static Array2D<Real64> const DefaultEthGlyCondData(DefaultNumGlyTemps, DefaultNumGlyConcs,
-                                                           std::bind(DefaultEthGlyCondData_initializer, _1, DefaultWaterCondData));
+        static Array2D<Real64> const DefaultEthGlyCondData(
+            DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultEthGlyCondData_initializer, _1, DefaultWaterCondData));
 
         // Propylene Glycol Data: Specific Heat in J/(kg-k)
-        static Array2D<Real64> const DefaultPropGlyCpData(DefaultNumGlyTemps, DefaultNumGlyConcs,
-                                                          std::bind(DefaultPropGlyCpData_initializer, _1, DefaultWaterCpData));
+        static Array2D<Real64> const DefaultPropGlyCpData(
+            DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultPropGlyCpData_initializer, _1, DefaultWaterCpData));
 
         // Propylene Glycol Data: Viscosity in mPa-s
-        static Array2D<Real64> const DefaultPropGlyViscData(DefaultNumGlyTemps, DefaultNumGlyConcs,
-                                                            std::bind(DefaultPropGlyViscData_initializer, _1, DefaultWaterViscData));
+        static Array2D<Real64> const DefaultPropGlyViscData(
+            DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultPropGlyViscData_initializer, _1, DefaultWaterViscData));
 
         // Propylene Glycol Data: Density in kg/m3
-        static Array2D<Real64> const DefaultPropGlyRhoData(DefaultNumGlyTemps, DefaultNumGlyConcs,
-                                                           std::bind(DefaultPropGlyRhoData_initializer, _1, DefaultWaterRhoData));
+        static Array2D<Real64> const DefaultPropGlyRhoData(
+            DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultPropGlyRhoData_initializer, _1, DefaultWaterRhoData));
 
         // Propylene Glycol Data: Conductivity in W/(m-K)
-        static Array2D<Real64> const DefaultPropGlyCondData(DefaultNumGlyTemps, DefaultNumGlyConcs,
-                                                            std::bind(DefaultPropGlyCondData_initializer, _1, DefaultWaterCondData));
+        static Array2D<Real64> const DefaultPropGlyCondData(
+            DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultPropGlyCondData_initializer, _1, DefaultWaterCondData));
 
         // Steam Refrigerant Data
         static Array1D<Real64> const DefaultSteamTemps(
@@ -586,8 +586,17 @@ namespace FluidProperties {
         // so that the main derived types can be allocated
         FluidNum = 0;
         for (Loop = 1; Loop <= NumOfOptionalInput; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound)) continue;
             ++FluidNum;
             FluidNames(FluidNum).Name = Alphas(1);
@@ -683,8 +692,17 @@ namespace FluidProperties {
 
         for (Loop = 1; Loop <= NumOfFluidTempArrays; ++Loop) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FluidTemps(Loop).Name = Alphas(1);
             FluidTemps(Loop).NumOfTemps = NumNumbers;
@@ -721,8 +739,17 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Pressure)) &&
                     (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
@@ -784,8 +811,17 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Enthalpy)) &&
                     (UtilityRoutines::SameString(Alphas(3), Fluid))) {
@@ -845,8 +881,17 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Enthalpy)) &&
                     (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
@@ -910,8 +955,17 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), SpecificHeat)) &&
                     (UtilityRoutines::SameString(Alphas(3), Fluid))) {
@@ -971,8 +1025,17 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), SpecificHeat)) &&
                     (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
@@ -1036,8 +1099,17 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density)) &&
                     (UtilityRoutines::SameString(Alphas(3), Fluid))) {
@@ -1097,8 +1169,17 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density)) &&
                     (UtilityRoutines::SameString(Alphas(3), GasFluid))) {
@@ -1186,8 +1267,17 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (UtilityRoutines::SameString(Alphas(3), Fluid)) {
                     if (!UtilityRoutines::SameString(Alphas(2), Enthalpy) && !UtilityRoutines::SameString(Alphas(2), SpecificHeat) &&
                         !UtilityRoutines::SameString(Alphas(2), Density)) {
@@ -1237,8 +1327,17 @@ namespace FluidProperties {
             FirstSHMatch = true;
             NumOfPressPts = 0;
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Enthalpy))) {
                     ++NumOfPressPts;
@@ -1288,8 +1387,17 @@ namespace FluidProperties {
             NumOfPressPts = 0;
             PressurePtr.allocate(NumOfSHFluidPropArrays);
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Enthalpy))) {
                     ++NumOfPressPts;
@@ -1321,8 +1429,17 @@ namespace FluidProperties {
             }
 
             for (InData = 1; InData <= NumOfPressPts; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject, PressurePtr(InData).InPtr, Alphas, NumAlphas, Numbers, NumNumbers, Status,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              PressurePtr(InData).InPtr,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 RefrigData(Loop).SHPress(InData) = Numbers(1);
                 // a little error trapping
                 if (InData > 1) {
@@ -1356,8 +1473,17 @@ namespace FluidProperties {
             NumOfPressPts = 0;
             PressurePtr.allocate(NumOfSHFluidPropArrays);
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if ((UtilityRoutines::SameString(Alphas(1), RefrigData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density))) {
                     ++NumOfPressPts;
                     if (Numbers(1) <= 0.0) {
@@ -1388,8 +1514,17 @@ namespace FluidProperties {
             }
 
             for (InData = 1; InData <= NumOfPressPts; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject, PressurePtr(InData).InPtr, Alphas, NumAlphas, Numbers, NumNumbers, Status,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              PressurePtr(InData).InPtr,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (std::abs(Numbers(1) - RefrigData(Loop).SHPress(InData)) > PressToler) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
                     ShowContinueError("All superheated data for the same refrigerant must use the same pressure data");
@@ -1416,8 +1551,17 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Superheated";
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (!UtilityRoutines::SameString(Alphas(2), Enthalpy) && !UtilityRoutines::SameString(Alphas(2), Density)) {
                     if (iTemp == 0) {
                         ShowWarningError(RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
@@ -1462,8 +1606,17 @@ namespace FluidProperties {
             NumOfConcPts = 0;
             GlyRawData(Loop).CpDataPresent = false;
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for specific heat are consistant
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if ((UtilityRoutines::SameString(Alphas(1), GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), SpecificHeat))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
@@ -1506,8 +1659,17 @@ namespace FluidProperties {
                 CurrentModuleObject = "FluidProperties:Concentration";
                 NumOfConcPts = 0;
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                                  lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(CurrentModuleObject,
+                                                  InData,
+                                                  Alphas,
+                                                  NumAlphas,
+                                                  Numbers,
+                                                  NumNumbers,
+                                                  Status,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     if ((UtilityRoutines::SameString(Alphas(1), GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), SpecificHeat))) {
                         ++NumOfConcPts;
                         GlyRawData(Loop).CpConcs(NumOfConcPts) = Numbers(1);
@@ -1544,8 +1706,17 @@ namespace FluidProperties {
             GlyRawData(Loop).RhoDataPresent = false;
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for density are consistant
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if ((UtilityRoutines::SameString(Alphas(1), GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
@@ -1588,8 +1759,17 @@ namespace FluidProperties {
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                                  lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(CurrentModuleObject,
+                                                  InData,
+                                                  Alphas,
+                                                  NumAlphas,
+                                                  Numbers,
+                                                  NumNumbers,
+                                                  Status,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     if ((UtilityRoutines::SameString(Alphas(1), GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Density))) {
                         ++NumOfConcPts;
                         GlyRawData(Loop).RhoConcs(NumOfConcPts) = Numbers(1);
@@ -1626,8 +1806,17 @@ namespace FluidProperties {
             GlyRawData(Loop).CondDataPresent = false;
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for conductivity are consistant
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if ((UtilityRoutines::SameString(Alphas(1), GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Conductivity))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
@@ -1670,8 +1859,17 @@ namespace FluidProperties {
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                                  lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(CurrentModuleObject,
+                                                  InData,
+                                                  Alphas,
+                                                  NumAlphas,
+                                                  Numbers,
+                                                  NumNumbers,
+                                                  Status,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     if ((UtilityRoutines::SameString(Alphas(1), GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Conductivity))) {
                         ++NumOfConcPts;
                         GlyRawData(Loop).CondConcs(NumOfConcPts) = Numbers(1);
@@ -1708,8 +1906,17 @@ namespace FluidProperties {
             GlyRawData(Loop).ViscDataPresent = false;
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for viscosity are consistant
-                inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              InData,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              Status,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if ((UtilityRoutines::SameString(Alphas(1), GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Viscosity))) {
                     ++NumOfConcPts;
                     if (FirstSHMatch) {
@@ -1752,8 +1959,17 @@ namespace FluidProperties {
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    inputProcessor->getObjectItem(CurrentModuleObject, InData, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                                  lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(CurrentModuleObject,
+                                                  InData,
+                                                  Alphas,
+                                                  NumAlphas,
+                                                  Numbers,
+                                                  NumNumbers,
+                                                  Status,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     if ((UtilityRoutines::SameString(Alphas(1), GlyRawData(Loop).Name)) && (UtilityRoutines::SameString(Alphas(2), Viscosity))) {
                         ++NumOfConcPts;
                         GlyRawData(Loop).ViscConcs(NumOfConcPts) = Numbers(1);
@@ -1852,8 +2068,17 @@ namespace FluidProperties {
         NumOfGlyConcs = 1; // Water is always available, everything else must be specified
 
         for (Loop = 1; Loop <= NumOfOptionalInput; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound)) {
                 continue;
             }
@@ -1935,23 +2160,55 @@ namespace FluidProperties {
                 GlycolData(Loop).ViscTemps = DefaultGlycolTemps;
 
                 if (GlycolData(Loop).GlycolIndex == EthyleneGlycolIndex) {
-                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs, DefaultNumGlyTemps, DefaultGlycolConcs, DefaultEthGlyCpData,
-                                                 GlycolData(Loop).Concentration, GlycolData(Loop).CpValues);
-                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs, DefaultNumGlyTemps, DefaultGlycolConcs, DefaultEthGlyRhoData,
-                                                 GlycolData(Loop).Concentration, GlycolData(Loop).RhoValues);
-                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs, DefaultNumGlyTemps, DefaultGlycolConcs, DefaultEthGlyCondData,
-                                                 GlycolData(Loop).Concentration, GlycolData(Loop).CondValues);
-                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs, DefaultNumGlyTemps, DefaultGlycolConcs, DefaultEthGlyViscData,
-                                                 GlycolData(Loop).Concentration, GlycolData(Loop).ViscValues);
+                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs,
+                                                 DefaultNumGlyTemps,
+                                                 DefaultGlycolConcs,
+                                                 DefaultEthGlyCpData,
+                                                 GlycolData(Loop).Concentration,
+                                                 GlycolData(Loop).CpValues);
+                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs,
+                                                 DefaultNumGlyTemps,
+                                                 DefaultGlycolConcs,
+                                                 DefaultEthGlyRhoData,
+                                                 GlycolData(Loop).Concentration,
+                                                 GlycolData(Loop).RhoValues);
+                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs,
+                                                 DefaultNumGlyTemps,
+                                                 DefaultGlycolConcs,
+                                                 DefaultEthGlyCondData,
+                                                 GlycolData(Loop).Concentration,
+                                                 GlycolData(Loop).CondValues);
+                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs,
+                                                 DefaultNumGlyTemps,
+                                                 DefaultGlycolConcs,
+                                                 DefaultEthGlyViscData,
+                                                 GlycolData(Loop).Concentration,
+                                                 GlycolData(Loop).ViscValues);
                 } else { // == PropyleneGlycolIndex
-                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs, DefaultNumGlyTemps, DefaultGlycolConcs, DefaultPropGlyCpData,
-                                                 GlycolData(Loop).Concentration, GlycolData(Loop).CpValues);
-                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs, DefaultNumGlyTemps, DefaultGlycolConcs, DefaultPropGlyRhoData,
-                                                 GlycolData(Loop).Concentration, GlycolData(Loop).RhoValues);
-                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs, DefaultNumGlyTemps, DefaultGlycolConcs, DefaultPropGlyCondData,
-                                                 GlycolData(Loop).Concentration, GlycolData(Loop).CondValues);
-                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs, DefaultNumGlyTemps, DefaultGlycolConcs, DefaultPropGlyViscData,
-                                                 GlycolData(Loop).Concentration, GlycolData(Loop).ViscValues);
+                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs,
+                                                 DefaultNumGlyTemps,
+                                                 DefaultGlycolConcs,
+                                                 DefaultPropGlyCpData,
+                                                 GlycolData(Loop).Concentration,
+                                                 GlycolData(Loop).CpValues);
+                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs,
+                                                 DefaultNumGlyTemps,
+                                                 DefaultGlycolConcs,
+                                                 DefaultPropGlyRhoData,
+                                                 GlycolData(Loop).Concentration,
+                                                 GlycolData(Loop).RhoValues);
+                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs,
+                                                 DefaultNumGlyTemps,
+                                                 DefaultGlycolConcs,
+                                                 DefaultPropGlyCondData,
+                                                 GlycolData(Loop).Concentration,
+                                                 GlycolData(Loop).CondValues);
+                    InterpDefValuesForGlycolConc(DefaultNumGlyConcs,
+                                                 DefaultNumGlyTemps,
+                                                 DefaultGlycolConcs,
+                                                 DefaultPropGlyViscData,
+                                                 GlycolData(Loop).Concentration,
+                                                 GlycolData(Loop).ViscValues);
                 }
 
             } else { // User-defined fluid
@@ -1965,8 +2222,12 @@ namespace FluidProperties {
                     GlycolData(Loop).CpTemps.allocate(GlycolData(Loop).NumCpTempPts);
                     GlycolData(Loop).CpValues.allocate(GlycolData(Loop).NumCpTempPts);
                     GlycolData(Loop).CpTemps = GlyRawData(Index).CpTemps;
-                    InterpValuesForGlycolConc(GlyRawData(Index).NumCpConcPts, GlyRawData(Index).NumCpTempPts, GlyRawData(Index).CpConcs,
-                                              GlyRawData(Index).CpValues, GlycolData(Loop).Concentration, GlycolData(Loop).CpValues);
+                    InterpValuesForGlycolConc(GlyRawData(Index).NumCpConcPts,
+                                              GlyRawData(Index).NumCpTempPts,
+                                              GlyRawData(Index).CpConcs,
+                                              GlyRawData(Index).CpValues,
+                                              GlycolData(Loop).Concentration,
+                                              GlycolData(Loop).CpValues);
                 } else {
                     ShowSevereError(RoutineName + "Specific heat data not entered for a " + CurrentModuleObject);
                     ShowContinueError("ALL data must be entered for user-defined glycols");
@@ -1982,8 +2243,12 @@ namespace FluidProperties {
                     GlycolData(Loop).RhoTemps.allocate(GlycolData(Loop).NumRhoTempPts);
                     GlycolData(Loop).RhoValues.allocate(GlycolData(Loop).NumRhoTempPts);
                     GlycolData(Loop).RhoTemps = GlyRawData(Index).RhoTemps;
-                    InterpValuesForGlycolConc(GlyRawData(Index).NumRhoConcPts, GlyRawData(Index).NumRhoTempPts, GlyRawData(Index).RhoConcs,
-                                              GlyRawData(Index).RhoValues, GlycolData(Loop).Concentration, GlycolData(Loop).RhoValues);
+                    InterpValuesForGlycolConc(GlyRawData(Index).NumRhoConcPts,
+                                              GlyRawData(Index).NumRhoTempPts,
+                                              GlyRawData(Index).RhoConcs,
+                                              GlyRawData(Index).RhoValues,
+                                              GlycolData(Loop).Concentration,
+                                              GlycolData(Loop).RhoValues);
                 } else {
                     ShowSevereError(RoutineName + "Density data not entered for a " + CurrentModuleObject);
                     ShowContinueError("ALL data must be entered for user-defined glycols");
@@ -1999,8 +2264,12 @@ namespace FluidProperties {
                     GlycolData(Loop).CondTemps.allocate(GlycolData(Loop).NumCondTempPts);
                     GlycolData(Loop).CondValues.allocate(GlycolData(Loop).NumCondTempPts);
                     GlycolData(Loop).CondTemps = GlyRawData(Index).CondTemps;
-                    InterpValuesForGlycolConc(GlyRawData(Index).NumCondConcPts, GlyRawData(Index).NumCondTempPts, GlyRawData(Index).CondConcs,
-                                              GlyRawData(Index).CondValues, GlycolData(Loop).Concentration, GlycolData(Loop).CondValues);
+                    InterpValuesForGlycolConc(GlyRawData(Index).NumCondConcPts,
+                                              GlyRawData(Index).NumCondTempPts,
+                                              GlyRawData(Index).CondConcs,
+                                              GlyRawData(Index).CondValues,
+                                              GlycolData(Loop).Concentration,
+                                              GlycolData(Loop).CondValues);
                 } else {
                     ShowSevereError(RoutineName + "Conductivity data not entered for a " + CurrentModuleObject);
                     ShowContinueError("ALL data must be entered for user-defined glycols");
@@ -2016,8 +2285,12 @@ namespace FluidProperties {
                     GlycolData(Loop).ViscTemps.allocate(GlycolData(Loop).NumViscTempPts);
                     GlycolData(Loop).ViscValues.allocate(GlycolData(Loop).NumViscTempPts);
                     GlycolData(Loop).ViscTemps = GlyRawData(Index).ViscTemps;
-                    InterpValuesForGlycolConc(GlyRawData(Index).NumViscConcPts, GlyRawData(Index).NumViscTempPts, GlyRawData(Index).ViscConcs,
-                                              GlyRawData(Index).ViscValues, GlycolData(Loop).Concentration, GlycolData(Loop).ViscValues);
+                    InterpValuesForGlycolConc(GlyRawData(Index).NumViscConcPts,
+                                              GlyRawData(Index).NumViscTempPts,
+                                              GlyRawData(Index).ViscConcs,
+                                              GlyRawData(Index).ViscValues,
+                                              GlycolData(Loop).Concentration,
+                                              GlycolData(Loop).ViscValues);
                 } else {
                     ShowSevereError(RoutineName + "Viscosity data not entered for a " + CurrentModuleObject);
                     ShowContinueError("ALL data must be entered for user-defined glycols");
@@ -6306,7 +6579,12 @@ namespace FluidProperties {
             }
             ShowRecurringSevereErrorAtEnd(RoutineName + "Saturation temperature is out of range for refrigerant [" +
                                               RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
-                                          RefrigErrorTracking(RefrigNum).SatTempErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                          RefrigErrorTracking(RefrigNum).SatTempErrIndex,
+                                          Temperature,
+                                          Temperature,
+                                          _,
+                                          "{C}",
+                                          "{C}");
         }
 
         return ReturnValue;
@@ -6422,7 +6700,12 @@ namespace FluidProperties {
             }
             ShowRecurringSevereErrorAtEnd(RoutineName + "Saturation pressure is out of range for refrigerant [" +
                                               RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
-                                          RefrigErrorTracking(RefrigNum).SatPressErrIndex, Pressure, Pressure, _, "{Pa}", "{Pa}");
+                                          RefrigErrorTracking(RefrigNum).SatPressErrIndex,
+                                          Pressure,
+                                          Pressure,
+                                          _,
+                                          "{Pa}",
+                                          "{Pa}");
         }
         return ReturnValue;
     }
@@ -6505,8 +6788,8 @@ namespace FluidProperties {
         auto const &refrig(RefrigData(RefrigNum));
 
         // Apply linear interpolation function
-        return GetInterpolatedSatProp(Temperature, refrig.HTemps, refrig.HfValues, refrig.HfgValues, Quality, CalledFrom, refrig.HfLowTempIndex,
-                                      refrig.HfHighTempIndex);
+        return GetInterpolatedSatProp(
+            Temperature, refrig.HTemps, refrig.HfValues, refrig.HfgValues, Quality, CalledFrom, refrig.HfLowTempIndex, refrig.HfHighTempIndex);
     }
 
     //*****************************************************************************
@@ -6654,7 +6937,12 @@ namespace FluidProperties {
             }
             ShowRecurringSevereErrorAtEnd(RoutineName + "Saturation temperature is out of range for refrigerant [" +
                                               RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
-                                          RefrigErrorTracking(RefrigNum).SatTempDensityErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                          RefrigErrorTracking(RefrigNum).SatTempDensityErrIndex,
+                                          Temperature,
+                                          Temperature,
+                                          _,
+                                          "{C}",
+                                          "{C}");
         }
         return ReturnValue;
     }
@@ -6740,8 +7028,8 @@ namespace FluidProperties {
         auto const &refrig(RefrigData(RefrigNum));
 
         // Apply linear interpolation function
-        ReturnValue = GetInterpolatedSatProp(Temperature, refrig.CpTemps, refrig.CpfValues, refrig.CpfgValues, Quality, CalledFrom,
-                                             refrig.CpfLowTempIndex, refrig.CpfHighTempIndex);
+        ReturnValue = GetInterpolatedSatProp(
+            Temperature, refrig.CpTemps, refrig.CpfValues, refrig.CpfgValues, Quality, CalledFrom, refrig.CpfLowTempIndex, refrig.CpfHighTempIndex);
 
         return ReturnValue;
     }
@@ -6944,7 +7232,12 @@ namespace FluidProperties {
                 }
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
-                                               RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
             return ReturnValue;
         }
@@ -6963,7 +7256,11 @@ namespace FluidProperties {
                 if (CurTempRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant enthalpy: values capped **",
-                                                   RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrIndex, Temperature, Temperature, _, "{C}",
+                                                   RefrigErrorTracking(RefrigNum).SatSupEnthalpyTempErrIndex,
+                                                   Temperature,
+                                                   Temperature,
+                                                   _,
+                                                   "{C}",
                                                    "{C}");
                 }
 
@@ -6978,7 +7275,12 @@ namespace FluidProperties {
                 if (CurPresRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant enthalpy: values capped **",
-                                                   RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrIndex, Pressure, Pressure, _, "{Pa}", "{Pa}");
+                                                   RefrigErrorTracking(RefrigNum).SatSupEnthalpyPresErrIndex,
+                                                   Pressure,
+                                                   Pressure,
+                                                   _,
+                                                   "{Pa}",
+                                                   "{Pa}");
                 }
             } // end error checking
         }
@@ -7237,7 +7539,12 @@ namespace FluidProperties {
                 if (CurSatErrCount > 0) {
                     ShowRecurringSevereErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                       "] saturated at the given enthalpy and temperature **",
-                                                  RefrigErrorTracking(RefrigNum).SatSupPressureErrIndex, ReturnValue, ReturnValue, _, "{Pa}", "{Pa}");
+                                                  RefrigErrorTracking(RefrigNum).SatSupPressureErrIndex,
+                                                  ReturnValue,
+                                                  ReturnValue,
+                                                  _,
+                                                  "{Pa}",
+                                                  "{Pa}");
                 }
 
                 // send temp range error if flagged
@@ -7251,7 +7558,11 @@ namespace FluidProperties {
                 if (CurTempRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant pressure: values capped **",
-                                                   RefrigErrorTracking(RefrigNum).SatSupPressureTempErrIndex, Temperature, Temperature, _, "{C}",
+                                                   RefrigErrorTracking(RefrigNum).SatSupPressureTempErrIndex,
+                                                   Temperature,
+                                                   Temperature,
+                                                   _,
+                                                   "{C}",
                                                    "{C}");
                 }
 
@@ -7266,7 +7577,12 @@ namespace FluidProperties {
                 if (CurEnthalpyRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant pressure: values capped **",
-                                                   RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrIndex, Enthalpy, Enthalpy, _, "{J}", "{J}");
+                                                   RefrigErrorTracking(RefrigNum).SatSupPressureEnthErrIndex,
+                                                   Enthalpy,
+                                                   Enthalpy,
+                                                   _,
+                                                   "{J}",
+                                                   "{J}");
                 }
             } // end error checking
         }
@@ -7658,7 +7974,12 @@ namespace FluidProperties {
             if (SatErrCount > 0) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
-                                               RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
             return saturated_density;
         }
@@ -7677,7 +7998,11 @@ namespace FluidProperties {
                 if (CurTempRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Temperature is out of range for superheated refrigerant density: values capped **",
-                                                   RefrigErrorTracking(RefrigNum).SatSupDensityTempErrIndex, Temperature, Temperature, _, "{C}",
+                                                   RefrigErrorTracking(RefrigNum).SatSupDensityTempErrIndex,
+                                                   Temperature,
+                                                   Temperature,
+                                                   _,
+                                                   "{C}",
                                                    "{C}");
                 }
 
@@ -7692,7 +8017,12 @@ namespace FluidProperties {
                 if (CurPresRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                        "] Pressure is out of range for superheated refrigerant density: values capped **",
-                                                   RefrigErrorTracking(RefrigNum).SatSupDensityPresErrIndex, Pressure, Pressure, _, "{Pa}", "{Pa}");
+                                                   RefrigErrorTracking(RefrigNum).SatSupDensityPresErrIndex,
+                                                   Pressure,
+                                                   Pressure,
+                                                   _,
+                                                   "{Pa}",
+                                                   "{Pa}");
                 }
             } // end error checking
         }
@@ -7790,7 +8120,12 @@ namespace FluidProperties {
                 }
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too low) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
-                                               GlycolErrorTracking(GlycolIndex).SpecHeatLowErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               GlycolErrorTracking(GlycolIndex).SpecHeatLowErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
             return glycol_data.CpValues(glycol_data.CpLowTempIndex);
         } else if (Temperature > glycol_data.CpHighTempValue) { // Temperature too high
@@ -7804,7 +8139,12 @@ namespace FluidProperties {
                 }
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too high) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
-                                               GlycolErrorTracking(GlycolIndex).SpecHeatHighErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               GlycolErrorTracking(GlycolIndex).SpecHeatHighErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
             return glycol_data.CpValues(glycol_data.CpHighTempIndex);
         } else { // Temperature somewhere between the lowest and highest value
@@ -7911,8 +8251,8 @@ namespace FluidProperties {
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!GlycolData(GlycolIndex).RhoDataPresent) {
-            ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).RhoDataPresent, Glycol, "GetDensityGlycol", "density",
-                                    CalledFrom);
+            ReportFatalGlycolErrors(
+                NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).RhoDataPresent, Glycol, "GetDensityGlycol", "density", CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -7927,8 +8267,11 @@ namespace FluidProperties {
             // bracket is temp > low, <= high (for interpolation
             for (Loop = GlycolData(GlycolIndex).RhoLowTempIndex + 1; Loop <= GlycolData(GlycolIndex).RhoHighTempIndex; ++Loop) {
                 if (Temperature > GlycolData(GlycolIndex).RhoTemps(Loop)) continue;
-                ReturnValue = GetInterpValue(Temperature, GlycolData(GlycolIndex).RhoTemps(Loop - 1), GlycolData(GlycolIndex).RhoTemps(Loop),
-                                             GlycolData(GlycolIndex).RhoValues(Loop - 1), GlycolData(GlycolIndex).RhoValues(Loop));
+                ReturnValue = GetInterpValue(Temperature,
+                                             GlycolData(GlycolIndex).RhoTemps(Loop - 1),
+                                             GlycolData(GlycolIndex).RhoTemps(Loop),
+                                             GlycolData(GlycolIndex).RhoValues(Loop - 1),
+                                             GlycolData(GlycolIndex).RhoValues(Loop));
                 break; // DO loop
             }
         }
@@ -7957,7 +8300,12 @@ namespace FluidProperties {
             if (LowErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] density **",
-                                               GlycolErrorTracking(GlycolIndex).DensityLowErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               GlycolErrorTracking(GlycolIndex).DensityLowErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
 
             if ((HighErrorThisTime) && (HighTempLimitErr <= GlycolErrorLimitTest)) {
@@ -7971,7 +8319,12 @@ namespace FluidProperties {
             if (HighErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] density **",
-                                               GlycolErrorTracking(GlycolIndex).DensityHighErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               GlycolErrorTracking(GlycolIndex).DensityHighErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
         }
 
@@ -8060,8 +8413,8 @@ namespace FluidProperties {
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!GlycolData(GlycolIndex).CondDataPresent) {
-            ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).CondDataPresent, Glycol, "GetConductivityGlycol", "conductivity",
-                                    CalledFrom);
+            ReportFatalGlycolErrors(
+                NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).CondDataPresent, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -8076,8 +8429,11 @@ namespace FluidProperties {
             // bracket is temp > low, <= high (for interpolation
             for (Loop = GlycolData(GlycolIndex).CondLowTempIndex + 1; Loop <= GlycolData(GlycolIndex).CondHighTempIndex; ++Loop) {
                 if (Temperature > GlycolData(GlycolIndex).CondTemps(Loop)) continue;
-                ReturnValue = GetInterpValue(Temperature, GlycolData(GlycolIndex).CondTemps(Loop - 1), GlycolData(GlycolIndex).CondTemps(Loop),
-                                             GlycolData(GlycolIndex).CondValues(Loop - 1), GlycolData(GlycolIndex).CondValues(Loop));
+                ReturnValue = GetInterpValue(Temperature,
+                                             GlycolData(GlycolIndex).CondTemps(Loop - 1),
+                                             GlycolData(GlycolIndex).CondTemps(Loop),
+                                             GlycolData(GlycolIndex).CondValues(Loop - 1),
+                                             GlycolData(GlycolIndex).CondValues(Loop));
                 break; // DO loop
             }
         }
@@ -8107,7 +8463,12 @@ namespace FluidProperties {
             if (LowErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] conductivity **",
-                                               GlycolErrorTracking(GlycolIndex).ConductivityLowErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               GlycolErrorTracking(GlycolIndex).ConductivityLowErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
 
             if ((HighErrorThisTime) && (HighTempLimitErr <= GlycolErrorLimitTest)) {
@@ -8121,7 +8482,12 @@ namespace FluidProperties {
             if (HighErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] conductivity **",
-                                               GlycolErrorTracking(GlycolIndex).ConductivityHighErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               GlycolErrorTracking(GlycolIndex).ConductivityHighErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
         }
 
@@ -8210,8 +8576,8 @@ namespace FluidProperties {
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!GlycolData(GlycolIndex).ViscDataPresent) {
-            ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).ViscDataPresent, Glycol, "GetViscosityGlycol", "viscosity",
-                                    CalledFrom);
+            ReportFatalGlycolErrors(
+                NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).ViscDataPresent, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -8226,8 +8592,11 @@ namespace FluidProperties {
             // bracket is temp > low, <= high (for interpolation
             for (Loop = GlycolData(GlycolIndex).ViscLowTempIndex + 1; Loop <= GlycolData(GlycolIndex).ViscHighTempIndex; ++Loop) {
                 if (Temperature > GlycolData(GlycolIndex).ViscTemps(Loop)) continue;
-                ReturnValue = GetInterpValue(Temperature, GlycolData(GlycolIndex).ViscTemps(Loop - 1), GlycolData(GlycolIndex).ViscTemps(Loop),
-                                             GlycolData(GlycolIndex).ViscValues(Loop - 1), GlycolData(GlycolIndex).ViscValues(Loop));
+                ReturnValue = GetInterpValue(Temperature,
+                                             GlycolData(GlycolIndex).ViscTemps(Loop - 1),
+                                             GlycolData(GlycolIndex).ViscTemps(Loop),
+                                             GlycolData(GlycolIndex).ViscValues(Loop - 1),
+                                             GlycolData(GlycolIndex).ViscValues(Loop));
                 break; // DO loop
             }
         }
@@ -8257,7 +8626,12 @@ namespace FluidProperties {
             if (LowErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] viscosity **",
-                                               GlycolErrorTracking(GlycolIndex).ViscosityLowErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               GlycolErrorTracking(GlycolIndex).ViscosityLowErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
 
             if ((HighErrorThisTime) && (HighTempLimitErr <= GlycolErrorLimitTest)) {
@@ -8271,7 +8645,12 @@ namespace FluidProperties {
             if (HighErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
                                                    "] viscosity **",
-                                               GlycolErrorTracking(GlycolIndex).ViscosityHighErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               GlycolErrorTracking(GlycolIndex).ViscosityHighErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
         }
 
@@ -8373,7 +8752,12 @@ namespace FluidProperties {
             // Temperature supplied is out of bounds--produce an error message...
             if (!WarmupFlag)
                 ShowRecurringWarningErrorAtEnd("GetQualityRefrig: ** Temperature for requested quality is below the range of data supplied **",
-                                               TempLoRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               TempLoRangeErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
 
         } else if (HiTempIndex > refrig.NumHPoints) {
             SatLiqEnthalpy = refrig.HfValues(refrig.HfHighTempIndex);
@@ -8381,7 +8765,12 @@ namespace FluidProperties {
             // Temperature supplied is out of bounds--produce an error message...
             if (!WarmupFlag)
                 ShowRecurringWarningErrorAtEnd("GetQualityRefrig: ** Temperature requested quality is above the range of data supplied **",
-                                               TempHiRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               TempHiRangeErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
 
         } else { // in normal range work out interpolated liq and gas enthalpies
             TempInterpRatio = (Temperature - refrig.HTemps(LoTempIndex)) / (refrig.HTemps(HiTempIndex) - refrig.HTemps(LoTempIndex));
@@ -8488,7 +8877,8 @@ namespace FluidProperties {
         }
 
         // Check to see if this glycol shows up in the glycol data
-        Found = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(Glycol), GlycolData,
+        Found = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(Glycol),
+                                                GlycolData,
                                                 NumOfGlycols); // GlycolData is allocated to NumOfGlyConcs
 
         if (Found > 0) {
@@ -8759,7 +9149,12 @@ namespace FluidProperties {
                 ShowContinueError("Returned saturated property value = " + RoundSigDigits(ReturnValue, 3));
             } else {
                 ShowRecurringWarningErrorAtEnd("GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error",
-                                               TempRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}");
+                                               TempRangeErrIndex,
+                                               Temperature,
+                                               Temperature,
+                                               _,
+                                               "{C}",
+                                               "{C}");
             }
         }
 
