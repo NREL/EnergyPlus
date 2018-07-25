@@ -10516,10 +10516,11 @@ namespace WeatherManager {
                 OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
                 OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
             } else {
-                // ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exit.");
-                // ShowContinueError("Weather file: " + DataStringGlobals::inputWeatherFileName + ".");
-                // ShowContinueError("Stat file: " + DataStringGlobals::inStatFileName + ".");
-                // ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
+                ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exit.");
+                ShowContinueError("Weather file: " + DataStringGlobals::inputWeatherFileName + ".");
+                ShowContinueError("Stat file: " + DataStringGlobals::inStatFileName + ".");
+                ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
+                ShowContinueError("Instead default value of Water Mains Monthly Temperature will be used.");
             }
         }
     }
