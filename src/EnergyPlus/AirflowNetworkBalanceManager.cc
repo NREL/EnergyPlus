@@ -2435,16 +2435,23 @@ namespace AirflowNetworkBalanceManager {
             flags.ADVANCE("No");
             gio::write(OutputFileInits, fmtA, flags) << "AirflowNetwork Model:Wind Direction, ";
         }
-        std::vector<Real64> dirs = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330};
-        for (i = 0; i < 11; ++i) {
-            StringOut = RoundSigDigits(dirs[i], 1);
+
+        int numWinDirs = 11;
+        Real64 angleDelta = 30.0;
+        if (AirflowNetworkNumOfSingleSideZones > 0) {
+            numWinDirs = 35;
+            angleDelta = 10.0;
+        }
+
+        for (i = 0; i < numWinDirs; ++i) {
+            StringOut = RoundSigDigits(i*angleDelta, 1);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
                 gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
         }
-        StringOut = RoundSigDigits(dirs[11], 1);
+        StringOut = RoundSigDigits(numWinDirs*angleDelta, 1);
         gio::write(OutputFileInits, fmtA) << StringOut;
 
         {
@@ -2453,13 +2460,6 @@ namespace AirflowNetworkBalanceManager {
             gio::write(OutputFileInits, fmtA, flags) << "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, ";
         }
         gio::write(OutputFileInits, fmtA) << "Wind Pressure Coefficients #1 to n (dimensionless)";
-
-        int numWinDirs = 11;
-        Real64 angleDelta = 30.0;
-        if (AirflowNetworkNumOfSingleSideZones > 0) {
-            numWinDirs = 35;
-            angleDelta = 10.0;
-        }
 
         // The old version used to write info with single-sided natural ventilation specific labeling, this version no longer does that.
         std::set<int> curves;
