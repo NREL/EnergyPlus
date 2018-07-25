@@ -949,7 +949,7 @@ namespace ChillerAbsorption {
 
                 if (BLASTAbsorber(ChillNum).GenHeatSourceType == NodeType_Water) {
                     rho = GetDensityGlycol(PlantLoop(BLASTAbsorber(ChillNum).GenLoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
+                                           DataGlobals::HWInitConvTemp,
                                            PlantLoop(BLASTAbsorber(ChillNum).GenLoopNum).FluidIndex,
                                            RoutineName);
 
@@ -1571,11 +1571,11 @@ namespace ChillerAbsorption {
             } else if (BLASTAbsorber(ChillNum).GenHeatSourceType == NodeType_Water) {
                 if (PlantFirstSizesOkayToFinalize) {
                     Cp = GetSpecificHeatGlycol(PlantLoop(BLASTAbsorber(ChillNum).GenLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(BLASTAbsorber(ChillNum).GenLoopNum).FluidIndex,
                                                RoutineName);
                     rho = GetDensityGlycol(PlantLoop(BLASTAbsorber(ChillNum).GenLoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
+                                           DataGlobals::HWInitConvTemp,
                                            PlantLoop(BLASTAbsorber(ChillNum).GenLoopNum).FluidIndex,
                                            RoutineName);
 

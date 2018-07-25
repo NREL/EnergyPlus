@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <DataAirLoop.hh>
+#include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -2746,6 +2747,17 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     SysSizInput(1).HeatSupTemp = 28.93;
     SysSizInput(1).HeatSupHumRat = 0.04;
 
+    SysSizInput(1).PrecoolTemp = 13.37;
+    SysSizInput(1).PrecoolHumRat = 0.08;
+    SysSizInput(1).PreheatTemp = 26.93;
+    SysSizInput(1).PreheatHumRat = 0.03;
+
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).CentralCoolCoilExists = true;
+    DataAirSystems::PrimaryAirSystem(1).CentralHeatCoilExists = true;
+    DataAirSystems::PrimaryAirSystem(1).NumOAHeatCoils = 1;
+    DataAirSystems::PrimaryAirSystem(1).NumOACoolCoils = 1;
+
     int ATMixerIndex = 1;
     int ControlledZoneNum = 1;
     CurZoneEqNum = 1;
@@ -2757,4 +2769,14 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, SysSizInput(1).CoolSupHumRat);
     EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, SysSizInput(1).HeatSupTemp);
     EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, SysSizInput(1).HeatSupHumRat);
+
+    DataAirSystems::PrimaryAirSystem(1).CentralCoolCoilExists = false;
+    DataAirSystems::PrimaryAirSystem(1).CentralHeatCoilExists = false;
+    // set ATMixer properties used for sizing
+    SingleDuct::setATMixerSizingProperties(ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, SysSizInput(1).PrecoolTemp);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, SysSizInput(1).PrecoolHumRat);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, SysSizInput(1).PreheatTemp);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, SysSizInput(1).PreheatHumRat);
 }

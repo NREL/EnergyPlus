@@ -15973,7 +15973,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
-        if (unitConvIndex == 0) {
+        if (unitConvIndex == 0 || SIvalue == -999.0 || SIvalue == -99999.0) { // don't convert unknown data to IP
             ConvertIP = SIvalue;
         } else if ((unitConvIndex > 0) && (unitConvIndex <= UnitConvSize)) {
             ConvertIP = (SIvalue * UnitConv(unitConvIndex).mult) + UnitConv(unitConvIndex).offset;

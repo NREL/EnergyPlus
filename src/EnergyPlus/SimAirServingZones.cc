@@ -1516,7 +1516,6 @@ namespace SimAirServingZones {
         int SupFanIndex;
         int RetFanIndex;
         bool FoundOASys;
-        bool FoundCentralHeatCoil;
         static int TUInNode(0); // inlet node number of a terminal unit
         static Real64 MassFlowSetToler;
         static Array1D_int CtrlZoneNumsCool;
@@ -2092,16 +2091,33 @@ namespace SimAirServingZones {
             }
             // Check whether there are Central Heating Coils in the Primary Air System
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-                FoundCentralHeatCoil = false;
+                bool FoundCentralHeatCoil = false;
                 for (BranchNum = 1; !FoundCentralHeatCoil && BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
                     for (CompNum = 1; !FoundCentralHeatCoil && CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                         CompTypeNum = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
-                        if (CompTypeNum == WaterCoil_SimpleHeat || CompTypeNum == Coil_ElectricHeat || CompTypeNum == Coil_GasHeat) {
+                        if (CompTypeNum == WaterCoil_SimpleHeat || CompTypeNum == Coil_ElectricHeat || CompTypeNum == Coil_GasHeat ||
+                            CompTypeNum == SteamCoil_AirHeat || CompTypeNum == Coil_DeSuperHeat || CompTypeNum == DXHeatPumpSystem ||
+                            CompTypeNum == Furnace_UnitarySys) {
                             FoundCentralHeatCoil = true;
                         }
                     } // end of component loop
                 }     // end of Branch loop
                 PrimaryAirSystem(AirLoopNum).CentralHeatCoilExists = FoundCentralHeatCoil;
+            } // end of AirLoop loop
+
+            // Check whether there are Central Cooling Coils in the Primary Air System
+            for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+                bool FoundCentralCoolCoil = false;
+                for (BranchNum = 1; !FoundCentralCoolCoil && BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
+                    for (CompNum = 1; !FoundCentralCoolCoil && CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                        CompTypeNum = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
+                        if (CompTypeNum == WaterCoil_SimpleCool || CompTypeNum == WaterCoil_Cooling || CompTypeNum == WaterCoil_DetailedCool ||
+                            CompTypeNum == WaterCoil_CoolingHXAsst || CompTypeNum == DXCoil_CoolingHXAsst || CompTypeNum == DXSystem) {
+                            FoundCentralCoolCoil = true;
+                        }
+                    } // end of component loop
+                }     // end of Branch loop
+                PrimaryAirSystem(AirLoopNum).CentralCoolCoilExists = FoundCentralCoolCoil;
             } // end of AirLoop loop
 
         } // one time flag
@@ -6369,12 +6385,8 @@ namespace SimAirServingZones {
                         int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
                         // save the system cooling supply air temp
                         TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInTempTU = CalcSysSizing(AirLoopNum).CoolSupTemp;
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInTempTU =
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInTempTU;
                         // save the system cooling supply air hum rat
                         TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInHumRatTU = CalcSysSizing(AirLoopNum).CoolSupHumRat;
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInHumRatTU =
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInHumRatTU;
                         if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolMassFlow <= 0.0) continue;
                         Real64 coolMassFlow = TermUnitFinalZoneSizing(TermUnitSizingIndex)
                                                   .DesCoolMassFlow; // already scaled for term unit sizing in UpdateTermUnitFinalZoneSizing
@@ -6436,8 +6448,6 @@ namespace SimAirServingZones {
                             TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInTempTU = CalcSysSizing(AirLoopNum).HeatSupTemp;
                             // save the system heating supply air hum rat
                             TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInHumRatTU = CalcSysSizing(AirLoopNum).HeatSupHumRat;
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInHumRatTU =
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInHumRatTU;
                             if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatMassFlow <= 0.0) continue;
                             Real64 heatMassFlow = TermUnitFinalZoneSizing(TermUnitSizingIndex)
                                                       .DesHeatMassFlow; // already scaled for term unit sizing in UpdateTermUnitFinalZoneSizing

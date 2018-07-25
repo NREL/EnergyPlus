@@ -221,6 +221,7 @@ namespace DataAirSystems {
         int NumInletBranches;
         Array1D_int InletBranchNum; // branch number of system inlets
         bool CentralHeatCoilExists; // true if there are central heating coils
+        bool CentralCoolCoilExists; // true if there are central cooling coils
         bool OASysExists;           // true if there is an Outside Air Sys
         bool isAllOA;               // true if there is no return path and the main branch inlet is an outdoor air node
         int OASysInletNodeNum;      // node number of return air inlet to OA sys
@@ -248,9 +249,9 @@ namespace DataAirSystems {
         // Default Constructor
         DefinePrimaryAirSystem()
             : DesignVolFlowRate(0.0), DesignReturnFlowFraction(1.0), NumControllers(0), NumBranches(0), NumOutletBranches(0), OutletBranchNum(3, 0),
-              NumInletBranches(0), InletBranchNum(3, 0), CentralHeatCoilExists(true), OASysExists(false), isAllOA(false), OASysInletNodeNum(0),
-              OASysOutletNodeNum(0), OAMixOAInNodeNum(0), RABExists(false), RABMixInNode(0), SupMixInNode(0), MixOutNode(0), RABSplitOutNode(0),
-              OtherSplitOutNode(0), NumOACoolCoils(0), NumOAHeatCoils(0), NumOAHXs(0), SizeAirloopCoil(true),
+              NumInletBranches(0), InletBranchNum(3, 0), CentralHeatCoilExists(true), CentralCoolCoilExists(true), OASysExists(false), isAllOA(false),
+              OASysInletNodeNum(0), OASysOutletNodeNum(0), OAMixOAInNodeNum(0), RABExists(false), RABMixInNode(0), SupMixInNode(0), MixOutNode(0),
+              RABSplitOutNode(0), OtherSplitOutNode(0), NumOACoolCoils(0), NumOAHeatCoils(0), NumOAHXs(0), SizeAirloopCoil(true),
               supFanModelTypeEnum(fanModelTypeNotYetSet), SupFanNum(0), supFanVecIndex(-1), retFanModelTypeEnum(fanModelTypeNotYetSet), RetFanNum(0),
               retFanVecIndex(-1), FanDesCoolLoad(0.0)
         {

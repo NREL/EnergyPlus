@@ -2106,7 +2106,7 @@ namespace SingleDuct {
 
             if (Sys(SysNum).HWLoopNum > 0 && Sys(SysNum).ReheatComp_Num != HCoilType_SteamAirHeating) { // protect early calls before plant is setup
                 rho = GetDensityGlycol(PlantLoop(Sys(SysNum).HWLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(Sys(SysNum).HWLoopNum).FluidIndex,
                                        RoutineName);
             } else {
@@ -6027,12 +6027,33 @@ namespace SingleDuct {
             if (sysSizIndex == 0) sysSizIndex = 1; // use first when none applicable
             // set ATMixer outlet air conditions in ZoneEqSizing array
             ZoneEqSizing(curZoneEqNum).ATMixerVolFlow = SingleDuct::SysATMixer(inletATMixerIndex).DesignPrimaryAirVolRate;
-            // This needs work.
             // If air loop has coils use SA conditions (below), else if OA sys has coils then precool conditions, else OA conditions
-            ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = SysSizInput(sysSizIndex).CoolSupTemp;
-            ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = SysSizInput(sysSizIndex).CoolSupHumRat;
-            ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = SysSizInput(sysSizIndex).HeatSupTemp;
-            ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = SysSizInput(sysSizIndex).HeatSupHumRat;
+            if (DataAirSystems::PrimaryAirSystem(airLoopIndex).CentralHeatCoilExists) {
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = SysSizInput(sysSizIndex).HeatSupTemp;
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = SysSizInput(sysSizIndex).HeatSupHumRat;
+            } else if (DataAirSystems::PrimaryAirSystem(airLoopIndex).NumOAHeatCoils > 0) {
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = SysSizInput(sysSizIndex).PreheatTemp;
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = SysSizInput(sysSizIndex).PreheatHumRat;
+            } else {
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = FinalZoneSizing(curZoneEqNum).HeatOutTemp;
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = FinalZoneSizing(curZoneEqNum).HeatOutHumRat;
+            }
+
+            if (DataAirSystems::PrimaryAirSystem(airLoopIndex).CentralCoolCoilExists) {
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = SysSizInput(sysSizIndex).CoolSupTemp;
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = SysSizInput(sysSizIndex).CoolSupHumRat;
+            } else if (DataAirSystems::PrimaryAirSystem(airLoopIndex).NumOACoolCoils > 0) {
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = SysSizInput(sysSizIndex).PrecoolTemp;
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = SysSizInput(sysSizIndex).PrecoolHumRat;
+            } else {
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = FinalZoneSizing(curZoneEqNum).CoolOutTemp;
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = FinalZoneSizing(curZoneEqNum).CoolOutHumRat;
+            }
+
+        } else {
+            // warn user that system sizing is needed to size coils when AT Mixer is used ?
+            // if there were a message here then this function should only be called when CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
+            // is true
         }
     }
 
