@@ -2996,8 +2996,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
         "	, !- Number of Vertices",
         "	251.4600375, 3.5052, 0, !- X, Y, Z Vertex 1 {m}",
         "	251.4600375, 0, 0, !- X, Y, Z Vertex 2 {m}",
-        "	253.9571375, 0, 0, !- X, Y, Z Vertex 3 {m}",
-        "	248.5215375, 0, 0, !- X, Y, Z Vertex 4 {m}",
+        "	249.9571375, 0, 0, !- X, Y, Z Vertex 3 {m}",
+        "	248.5215375, 1.0, 0, !- X, Y, Z Vertex 4 {m}",
         "	248.5215375, 3.5052, 0;                 !- X, Y, Z Vertex 5 {m}",
 
         "BuildingSurface:Detailed,",
@@ -3046,8 +3046,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     EXPECT_EQ(2, SurfNum);
     std::string const error_string = delimited_string({
         "   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", invalid Construction Name=\"TYPICAL\".",
-        "   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", After CheckConvexity, mismatch between Sides (4) and size of Vertex (5).",
-        "   **   ~~~   ** CheckConvexity is used to verify the convexity of a surface and detect collinear points.",
         "   ** Severe  ** BuildingSurface:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", invalid Construction Name=\"TYPICAL\".",
         "   ** Severe  ** RoofCeiling:Detailed=\"016W88_WATERMETER - FLOOR : A\", Vertex size mismatch between base surface :016W88_WATERMETER - FLOOR : A and outside boundary surface: 006W27_RESTROOMS - ROOFCEILING : A",
         "   **   ~~~   ** The vertex sizes are 5 for base surface and 4 for outside boundary surface. Please check inputs.",
@@ -3058,7 +3056,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
 
 }
 
-TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationTest)
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
 {
 
     // Test a multiple vertex surfaces in ProcessSurfaceVertices and CalcCoordinateTransformation for #6384
@@ -3073,10 +3071,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationTest)
     SurfaceTmp(1).Vertex.allocate(7);
     SurfaceTmp(2).Vertex.allocate(9);
 
-    bool ErrorsFound(false);
     int ThisSurf(0);
 
-    // Surface 1 - Rectangle
+    // Surface 1 - Rectangle with 7 points
     ThisSurf = 1;
     Surface(ThisSurf).Azimuth = 0.0;
     Surface(ThisSurf).Tilt = 180.0;
@@ -3114,15 +3111,13 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationTest)
     SurfaceTmp(ThisSurf) = Surface(ThisSurf);
     CheckConvexity(ThisSurf, SurfaceTmp(ThisSurf).Sides);
     Surface(ThisSurf) = SurfaceTmp(ThisSurf);
-    ProcessSurfaceVertices(ThisSurf, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(4, Surface(ThisSurf).Sides);
     EXPECT_EQ(10.0, Surface(ThisSurf).Vertex(2).x);
     EXPECT_EQ(6.0, Surface(ThisSurf).Vertex(2).y);
     EXPECT_EQ(15.0, Surface(ThisSurf).Vertex(3).x);
     EXPECT_EQ(6.0, Surface(ThisSurf).Vertex(3).y);
 
-    // Surface 2 - Isosceles Trapezoid
+    // Surface 2 - Rectangle with 9 points
     ThisSurf = 2;
     Surface(ThisSurf).Azimuth = 0.0;
     Surface(ThisSurf).Tilt = 0.0;
@@ -3168,7 +3163,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationTest)
     SurfaceTmp(ThisSurf) = Surface(ThisSurf);
     CheckConvexity(ThisSurf, SurfaceTmp(ThisSurf).Sides);
     Surface(ThisSurf) = SurfaceTmp(ThisSurf);
-    ProcessSurfaceVertices(ThisSurf, ErrorsFound);
     EXPECT_EQ(4, Surface(ThisSurf).Sides);
     EXPECT_EQ(10.0, Surface(ThisSurf).Vertex(2).x);
     EXPECT_EQ(8.0, Surface(ThisSurf).Vertex(2).y);
