@@ -48,6 +48,15 @@ SET( SRC
   ChillerIndirectAbsorption.hh
   ChillerReformulatedEIR.cc
   ChillerReformulatedEIR.hh
+  Coils/CoilCoolingDX.cc
+  Coils/CoilCoolingDX.hh
+  Coils/CoilCoolingDXCurveFitPerformance.cc
+  Coils/CoilCoolingDXCurveFitPerformance.hh
+  Coils/CoilCoolingDXCurveFitOperatingMode.cc
+  Coils/CoilCoolingDXCurveFitOperatingMode.hh
+  Coils/CoilCoolingDXCurveFitSpeed.cc
+  Coils/CoilCoolingDXCurveFitSpeed.hh
+  Coils/PsychStruct.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc

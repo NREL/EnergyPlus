@@ -136,7 +136,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
   ! for Schedule:Compact from 8.8 to 8.9
   CHARACTER(len=MaxNameLength) ::  UpperInArg=blank
-
+  
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -378,7 +378,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1) = sVersionNum
                 nodiff=.false.
 
-    ! changes for this version
+    ! changes for this version - 8.8 --> 8.9
 
              CASE('ZONEHVAC:EQUIPMENTLIST')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -530,6 +530,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                       OutArgs(Arg) = "Interpolate:Average"
                     ENDIF
                  ENDDO
+
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

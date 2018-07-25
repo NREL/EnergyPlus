@@ -216,7 +216,7 @@ namespace DataHVACGlobals {
     extern int const Coil_HeatingWaterToAirHPSimple;
     extern int const CoilVRF_Cooling;
     extern int const CoilVRF_Heating;
-
+    extern int const CoilDX_Cooling;
     extern int const Coil_UserDefined;
     extern int const CoilDX_PackagedThermalStorageCooling;
 
