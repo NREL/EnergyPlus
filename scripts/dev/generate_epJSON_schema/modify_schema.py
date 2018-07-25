@@ -212,6 +212,13 @@ def add_explicit_extensible_bounds(schema):
     loc['minItems'] = 1
     loc['maxItems'] = 53
 
+    # EnergyManagementSystem:Program
+    loc = schema['properties']['EnergyManagementSystem:Program']['patternProperties']['.*']
+    if 'required' in loc and 'lines' not in loc['required']:
+        loc['required'].append('lines')
+    if 'required' not in loc:
+        loc['required'] = ['lines']
+    loc['properties']['lines']['minItems'] = 1
 
 
 def change_special_cased_name_fields(schema):
