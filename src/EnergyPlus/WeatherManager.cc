@@ -4967,6 +4967,7 @@ namespace WeatherManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DayCorrection(Pi * 2.0 / 366.0);
+
         static Array1D<Real64> const SineSolDeclCoef(
             9, {0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096}); // Fitted coefficients
                                                                                                                                 // of Fourier series |

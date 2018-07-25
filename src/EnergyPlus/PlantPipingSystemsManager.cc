@@ -246,8 +246,8 @@ namespace PlantPipingSystemsManager {
         using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
-        using DataHVACGlobals::SysTimeElapsed;
         using DataHeatBalFanSys::ZTAV;
+        using DataHVACGlobals::SysTimeElapsed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitAndSimGroundDomain");
@@ -532,7 +532,8 @@ namespace PlantPipingSystemsManager {
 
             // validate circuit-segment name-to-index references
             for (ThisCircuitPipeSegmentCounter = PipingSystemCircuits(CircuitCtr).PipeSegmentNames.l1();
-                 ThisCircuitPipeSegmentCounter <= PipingSystemCircuits(CircuitCtr).PipeSegmentNames.u1(); ++ThisCircuitPipeSegmentCounter) {
+                 ThisCircuitPipeSegmentCounter <= PipingSystemCircuits(CircuitCtr).PipeSegmentNames.u1();
+                 ++ThisCircuitPipeSegmentCounter) {
 
                 ThisSegmentName = PipingSystemCircuits(CircuitCtr).PipeSegmentNames(ThisCircuitPipeSegmentCounter);
                 ThisSegmentIndex = UtilityRoutines::FindItemInList(ThisSegmentName, PipingSystemSegments);
@@ -568,7 +569,8 @@ namespace PlantPipingSystemsManager {
             for (CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                 CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndeces(CircuitCtr);
                 for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1(); ++PipeCtr) {
+                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+                     ++PipeCtr) {
                     ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndeces(PipeCtr);
                     PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y =
                         PipingSystemDomains(DomainNum).Extents.Ymax - PipingSystemSegments(ThisSegmentIndex).PipeLocation.Y;
@@ -580,7 +582,8 @@ namespace PlantPipingSystemsManager {
                 for (CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                     CircuitIndex = PipingSystemDomains(DomainNum).CircuitIndeces(CircuitCtr);
                     for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                         PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1(); ++PipeCtr) {
+                         PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+                         ++PipeCtr) {
                         ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndeces(PipeCtr);
                         PipingSystemSegments(ThisSegmentIndex).PipeLocation.X += PipingSystemDomains(DomainNum).BasementZone.Width;
                     } // segment loop
@@ -595,7 +598,8 @@ namespace PlantPipingSystemsManager {
 
                 // check to make sure it isn't outside the domain
                 for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1(); ++PipeCtr) {
+                     PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+                     ++PipeCtr) {
                     ThisSegmentIndex = PipingSystemCircuits(CircuitCtr).PipeSegmentIndeces(PipeCtr);
                     if ((PipingSystemSegments(ThisSegmentIndex).PipeLocation.X > PipingSystemDomains(DomainNum).Extents.Xmax) ||
                         (PipingSystemSegments(ThisSegmentIndex).PipeLocation.X < 0.0) ||
@@ -648,8 +652,17 @@ namespace PlantPipingSystemsManager {
         for (HorizontalCtr = 1; HorizontalCtr <= NumHorizontalTrenches; ++HorizontalCtr) {
 
             // Set up all the inputs for this domain object
-            inputProcessor->getObjectItem(ObjName_HorizTrench, HorizontalCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(ObjName_HorizTrench,
+                                          HorizontalCtr,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             NumPipesInThisHorizontal = rNumericArgs(3);
 
@@ -691,8 +704,17 @@ namespace PlantPipingSystemsManager {
         for (DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum) {
 
             // Set up all the inputs for this domain object
-            inputProcessor->getObjectItem(ObjName_ug_GeneralDomain, DomainNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(ObjName_ug_GeneralDomain,
+                                          DomainNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             // Get the name, validate
             PipingSystemDomains(DomainNum).Name = cAlphaArgs(1);
@@ -721,8 +743,13 @@ namespace PlantPipingSystemsManager {
                         PipingSystemDomains(DomainNum).Mesh.X.GeometricSeriesCoefficient = 1.0;
                     }
                 } else {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2),
-                                                          "Use a choice from the available mesh type keys.", ErrorsFound);
+                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                          ObjName_ug_GeneralDomain,
+                                                          cAlphaArgs(1),
+                                                          cAlphaFieldNames(2),
+                                                          cAlphaArgs(2),
+                                                          "Use a choice from the available mesh type keys.",
+                                                          ErrorsFound);
                 }
             }
 
@@ -745,8 +772,13 @@ namespace PlantPipingSystemsManager {
                         PipingSystemDomains(DomainNum).Mesh.Y.GeometricSeriesCoefficient = 1.0;
                     }
                 } else {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3),
-                                                          "Use a choice from the available mesh type keys.", ErrorsFound);
+                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                          ObjName_ug_GeneralDomain,
+                                                          cAlphaArgs(1),
+                                                          cAlphaFieldNames(3),
+                                                          cAlphaArgs(3),
+                                                          "Use a choice from the available mesh type keys.",
+                                                          ErrorsFound);
                 }
             }
 
@@ -769,8 +801,13 @@ namespace PlantPipingSystemsManager {
                         PipingSystemDomains(DomainNum).Mesh.Z.GeometricSeriesCoefficient = 1.0;
                     }
                 } else {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4),
-                                                          "Use a choice from the available mesh type keys.", ErrorsFound);
+                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                          ObjName_ug_GeneralDomain,
+                                                          cAlphaArgs(1),
+                                                          cAlphaFieldNames(4),
+                                                          cAlphaArgs(4),
+                                                          "Use a choice from the available mesh type keys.",
+                                                          ErrorsFound);
                 }
             }
 
@@ -789,8 +826,13 @@ namespace PlantPipingSystemsManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "NO")) {
                 PipingSystemDomains(DomainNum).HasBasement = false;
             } else {
-                IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cAlphaFieldNames(7), cAlphaArgs(7),
-                                                      "Must enter either yes or no.", ErrorsFound);
+                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                      ObjName_ug_GeneralDomain,
+                                                      cAlphaArgs(1),
+                                                      cAlphaFieldNames(7),
+                                                      cAlphaArgs(7),
+                                                      "Must enter either yes or no.",
+                                                      ErrorsFound);
             }
 
             // more work to do if there is a basement
@@ -808,15 +850,25 @@ namespace PlantPipingSystemsManager {
                 CurIndex = 15;
                 PipingSystemDomains(DomainNum).BasementZone.Width = rNumericArgs(CurIndex);
                 if (PipingSystemDomains(DomainNum).BasementZone.Width <= 0.0) {
-                    IssueSevereInputFieldErrorRealEntry(RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cNumericFieldNames(CurIndex),
-                                                        rNumericArgs(CurIndex), "Basement width must be a positive nonzero value.", ErrorsFound);
+                    IssueSevereInputFieldErrorRealEntry(RoutineName,
+                                                        ObjName_ug_GeneralDomain,
+                                                        cAlphaArgs(1),
+                                                        cNumericFieldNames(CurIndex),
+                                                        rNumericArgs(CurIndex),
+                                                        "Basement width must be a positive nonzero value.",
+                                                        ErrorsFound);
                 }
 
                 CurIndex = 16;
                 PipingSystemDomains(DomainNum).BasementZone.Depth = rNumericArgs(CurIndex);
                 if (PipingSystemDomains(DomainNum).BasementZone.Depth <= 0.0) {
-                    IssueSevereInputFieldErrorRealEntry(RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cNumericFieldNames(CurIndex),
-                                                        rNumericArgs(CurIndex), "Basement depth must be a positive nonzero value.", ErrorsFound);
+                    IssueSevereInputFieldErrorRealEntry(RoutineName,
+                                                        ObjName_ug_GeneralDomain,
+                                                        cAlphaArgs(1),
+                                                        cNumericFieldNames(CurIndex),
+                                                        rNumericArgs(CurIndex),
+                                                        "Basement depth must be a positive nonzero value.",
+                                                        ErrorsFound);
                 }
 
                 // check for dimension shift
@@ -826,8 +878,13 @@ namespace PlantPipingSystemsManager {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(CurIndex), "NO")) {
                     PipingSystemDomains(DomainNum).BasementZone.ShiftPipesByWidth = false;
                 } else {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex), "Must enter either yes or no.", ErrorsFound);
+                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                          ObjName_ug_GeneralDomain,
+                                                          cAlphaArgs(1),
+                                                          cAlphaFieldNames(CurIndex),
+                                                          cAlphaArgs(CurIndex),
+                                                          "Must enter either yes or no.",
+                                                          ErrorsFound);
                 }
 
                 // get boundary condition model names and indices --error check
@@ -836,14 +893,22 @@ namespace PlantPipingSystemsManager {
                 PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex =
                     UtilityRoutines::FindItemInList(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMName, OSCM);
                 if (PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex <= 0) {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex), "Could not match with an Other Side Conditions Model input object.",
+                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                          ObjName_ug_GeneralDomain,
+                                                          cAlphaArgs(1),
+                                                          cAlphaFieldNames(CurIndex),
+                                                          cAlphaArgs(CurIndex),
+                                                          "Could not match with an Other Side Conditions Model input object.",
                                                           ErrorsFound);
                 } else {
                     NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex);
                     if (NumSurfacesWithThisOSCM <= 0) {
                         IssueSevereInputFieldErrorStringEntry(
-                            RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex),
+                            RoutineName,
+                            ObjName_ug_GeneralDomain,
+                            cAlphaArgs(1),
+                            cAlphaFieldNames(CurIndex),
+                            cAlphaArgs(CurIndex),
                             "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                             ErrorsFound);
                     } else {
@@ -858,14 +923,22 @@ namespace PlantPipingSystemsManager {
                 PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex =
                     UtilityRoutines::FindItemInList(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMName, OSCM);
                 if (PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex <= 0) {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex), "Could not match with an Other Side Conditions Model input object.",
+                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                          ObjName_ug_GeneralDomain,
+                                                          cAlphaArgs(1),
+                                                          cAlphaFieldNames(CurIndex),
+                                                          cAlphaArgs(CurIndex),
+                                                          "Could not match with an Other Side Conditions Model input object.",
                                                           ErrorsFound);
                 } else {
                     NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex);
                     if (NumSurfacesWithThisOSCM <= 0) {
                         IssueSevereInputFieldErrorStringEntry(
-                            RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex),
+                            RoutineName,
+                            ObjName_ug_GeneralDomain,
+                            cAlphaArgs(1),
+                            cAlphaFieldNames(CurIndex),
+                            cAlphaArgs(CurIndex),
                             "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                             ErrorsFound);
                     } else {
@@ -976,13 +1049,22 @@ namespace PlantPipingSystemsManager {
             ++DomainCtr;
 
             // Read all the inputs for this domain object
-            inputProcessor->getObjectItem(ObjName_ZoneCoupled_Slab, ZoneCoupledDomainCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(ObjName_ZoneCoupled_Slab,
+                                          ZoneCoupledDomainCtr,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             // Get the name, validate
             Domain(ZoneCoupledDomainCtr).ObjName = cAlphaArgs(1);
-            GlobalNames::VerifyUniqueInterObjectName(GroundDomainUniqueNames, cAlphaArgs(1), ObjName_ZoneCoupled_Slab, cAlphaFieldNames(1),
-                                                     ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(
+                GroundDomainUniqueNames, cAlphaArgs(1), ObjName_ZoneCoupled_Slab, cAlphaFieldNames(1), ErrorsFound);
 
             // Read in the rest of the inputs into the local type for clarity during transition
             Domain(ZoneCoupledDomainCtr).OSCMName = cAlphaArgs(4);
@@ -1143,14 +1225,23 @@ namespace PlantPipingSystemsManager {
             // get boundary condition model names and indices -- error check
             PipingSystemDomains(DomainCtr).ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(Domain(ZoneCoupledDomainCtr).OSCMName, OSCM);
             if (PipingSystemDomains(DomainCtr).ZoneCoupledOSCMIndex <= 0) {
-                IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4),
-                                                      "Could not match with an Other Side Conditions Model input object.", ErrorsFound);
+                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                      ObjName_ZoneCoupled_Slab,
+                                                      cAlphaArgs(1),
+                                                      cAlphaFieldNames(4),
+                                                      cAlphaArgs(4),
+                                                      "Could not match with an Other Side Conditions Model input object.",
+                                                      ErrorsFound);
                 ErrorsFound = true;
             } else {
                 NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainCtr).ZoneCoupledOSCMIndex);
                 if (NumSurfacesWithThisOSCM <= 0) {
                     IssueSevereInputFieldErrorStringEntry(
-                        RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4),
+                        RoutineName,
+                        ObjName_ZoneCoupled_Slab,
+                        cAlphaArgs(1),
+                        cAlphaFieldNames(4),
+                        cAlphaArgs(4),
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                     ErrorsFound = true;
@@ -1307,13 +1398,22 @@ namespace PlantPipingSystemsManager {
             ++DomainNum;
 
             // Read all the inputs for this domain object
-            inputProcessor->getObjectItem(ObjName_ZoneCoupled_Basement, BasementCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(ObjName_ZoneCoupled_Basement,
+                                          BasementCtr,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             // Get the name, validate
             Domain(BasementCtr).ObjName = cAlphaArgs(1);
-            GlobalNames::VerifyUniqueInterObjectName(GroundDomainUniqueNames, cAlphaArgs(1), ObjName_ZoneCoupled_Basement, cAlphaFieldNames(1),
-                                                     ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(
+                GroundDomainUniqueNames, cAlphaArgs(1), ObjName_ZoneCoupled_Basement, cAlphaFieldNames(1), ErrorsFound);
 
             // Read in the some of the inputs into the local type for clarity during transition
             Domain(BasementCtr).Depth = rNumericArgs(1);
@@ -1357,14 +1457,22 @@ namespace PlantPipingSystemsManager {
             PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex =
                 UtilityRoutines::FindItemInList(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMName, OSCM);
             if (PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex <= 0) {
-                IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs(1), cAlphaFieldNames(CurIndex),
-                                                      cAlphaArgs(CurIndex), "Could not match with an Other Side Conditions Model input object.",
+                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                      ObjName_ZoneCoupled_Basement,
+                                                      cAlphaArgs(1),
+                                                      cAlphaFieldNames(CurIndex),
+                                                      cAlphaArgs(CurIndex),
+                                                      "Could not match with an Other Side Conditions Model input object.",
                                                       ErrorsFound);
             } else {
                 NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainNum).BasementZone.FloorBoundaryOSCMIndex);
                 if (NumSurfacesWithThisOSCM <= 0) {
                     IssueSevereInputFieldErrorStringEntry(
-                        RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex),
+                        RoutineName,
+                        ObjName_ZoneCoupled_Basement,
+                        cAlphaArgs(1),
+                        cAlphaFieldNames(CurIndex),
+                        cAlphaArgs(CurIndex),
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                 } else {
@@ -1383,15 +1491,23 @@ namespace PlantPipingSystemsManager {
             PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex =
                 UtilityRoutines::FindItemInList(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMName, OSCM);
             if (PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex <= 0) {
-                IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs(1), cAlphaFieldNames(CurIndex),
-                                                      cAlphaArgs(CurIndex), "Could not match with an Other Side Conditions Model input object.",
+                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                      ObjName_ZoneCoupled_Basement,
+                                                      cAlphaArgs(1),
+                                                      cAlphaFieldNames(CurIndex),
+                                                      cAlphaArgs(CurIndex),
+                                                      "Could not match with an Other Side Conditions Model input object.",
                                                       ErrorsFound);
                 ErrorsFound = true;
             } else {
                 NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainNum).BasementZone.WallBoundaryOSCMIndex);
                 if (NumSurfacesWithThisOSCM <= 0) {
                     IssueSevereInputFieldErrorStringEntry(
-                        RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex),
+                        RoutineName,
+                        ObjName_ZoneCoupled_Basement,
+                        cAlphaArgs(1),
+                        cAlphaFieldNames(CurIndex),
+                        cAlphaArgs(CurIndex),
                         "Entry matched an Other Side Conditions Model, but no surfaces were found to be using this Other Side Conditions Model.",
                         ErrorsFound);
                     ErrorsFound = true;
@@ -1616,8 +1732,17 @@ namespace PlantPipingSystemsManager {
         for (PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter) {
 
             // Read all the inputs for this pipe circuit
-            inputProcessor->getObjectItem(ObjName_Circuit, PipeCircuitCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(ObjName_Circuit,
+                                          PipeCircuitCounter,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             // Get the name, validate
             PipingSystemCircuits(PipeCircuitCounter).Name = cAlphaArgs(1);
@@ -1633,8 +1758,13 @@ namespace PlantPipingSystemsManager {
             PipingSystemCircuits(PipeCircuitCounter).PipeSize.OuterDia = rNumericArgs(5);
             if (PipingSystemCircuits(PipeCircuitCounter).PipeSize.InnerDia >= PipingSystemCircuits(PipeCircuitCounter).PipeSize.OuterDia) {
                 CurIndex = 5;
-                IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex),
-                                                      "Outer diameter must be greater than inner diameter.", ErrorsFound);
+                IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                      ObjName_Circuit,
+                                                      cAlphaArgs(1),
+                                                      cAlphaFieldNames(CurIndex),
+                                                      cAlphaArgs(CurIndex),
+                                                      "Outer diameter must be greater than inner diameter.",
+                                                      ErrorsFound);
             }
 
             // Read design flow rate, validated positive by IP
@@ -1642,20 +1772,20 @@ namespace PlantPipingSystemsManager {
 
             // Read inlet and outlet node names and validate them
             PipingSystemCircuits(PipeCircuitCounter).InletNodeName = cAlphaArgs(2);
-            PipingSystemCircuits(PipeCircuitCounter).InletNodeNum = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, ObjName_Circuit, cAlphaArgs(1),
-                                                                                      NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            PipingSystemCircuits(PipeCircuitCounter).InletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(2), ErrorsFound, ObjName_Circuit, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             if (PipingSystemCircuits(PipeCircuitCounter).InletNodeNum == 0) {
                 CurIndex = 2;
-                IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex),
-                                                      "Bad node name.", ErrorsFound);
+                IssueSevereInputFieldErrorStringEntry(
+                    RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
             }
             PipingSystemCircuits(PipeCircuitCounter).OutletNodeName = cAlphaArgs(3);
             PipingSystemCircuits(PipeCircuitCounter).OutletNodeNum = GetOnlySingleNode(
                 cAlphaArgs(3), ErrorsFound, ObjName_Circuit, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             if (PipingSystemCircuits(PipeCircuitCounter).OutletNodeNum == 0) {
                 CurIndex = 3;
-                IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex),
-                                                      "Bad node name.", ErrorsFound);
+                IssueSevereInputFieldErrorStringEntry(
+                    RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex), cAlphaArgs(CurIndex), "Bad node name.", ErrorsFound);
             }
             TestCompSet(ObjName_Circuit, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Piping System Circuit Nodes");
 
@@ -1678,8 +1808,12 @@ namespace PlantPipingSystemsManager {
             for (ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 CurIndex = ThisCircuitPipeSegmentCounter + NumAlphasBeforeSegmentOne;
                 if (lAlphaFieldBlanks(CurIndex)) {
-                    IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_Circuit, cAlphaArgs(1), cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex), "Expected a pipe segment name, check pipe segment count input field.",
+                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                          ObjName_Circuit,
+                                                          cAlphaArgs(1),
+                                                          cAlphaFieldNames(CurIndex),
+                                                          cAlphaArgs(CurIndex),
+                                                          "Expected a pipe segment name, check pipe segment count input field.",
                                                           ErrorsFound);
                 }
                 PipingSystemCircuits(PipeCircuitCounter).PipeSegmentNames(ThisCircuitPipeSegmentCounter) = cAlphaArgs(CurIndex);
@@ -1714,8 +1848,17 @@ namespace PlantPipingSystemsManager {
         for (SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr) {
 
             // Read all inputs for this pipe segment
-            inputProcessor->getObjectItem(ObjName_Segment, SegmentCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(ObjName_Segment,
+                                          SegmentCtr,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             // Get the name, validate
             PipingSystemSegments(SegmentCtr).Name = cAlphaArgs(1);
@@ -1735,8 +1878,12 @@ namespace PlantPipingSystemsManager {
                     PipingSystemSegments(SegmentCtr).FlowDirection = SegmentFlow::DecreasingZ;
                 } else {
                     CurIndex = 2;
-                    IssueSevereInputFieldErrorStringEntry(RoutineName, ObjName_Segment, cAlphaArgs(1), cAlphaFieldNames(CurIndex),
-                                                          cAlphaArgs(CurIndex), "Invalid flow direction, use one of the available keys.",
+                    IssueSevereInputFieldErrorStringEntry(RoutineName,
+                                                          ObjName_Segment,
+                                                          cAlphaArgs(1),
+                                                          cAlphaFieldNames(CurIndex),
+                                                          cAlphaArgs(CurIndex),
+                                                          "Invalid flow direction, use one of the available keys.",
                                                           ErrorsFound);
                 }
             }
@@ -1832,8 +1979,17 @@ namespace PlantPipingSystemsManager {
             ++CircuitCtr;
 
             // Read all inputs for this pipe segment
-            inputProcessor->getObjectItem(ObjName_HorizTrench, HorizontalGHXCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(ObjName_HorizTrench,
+                                          HorizontalGHXCtr,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             // Get the name, validate
             HGHX(HorizontalGHXCtr).ObjName = cAlphaArgs(1);
@@ -1922,25 +2078,38 @@ namespace PlantPipingSystemsManager {
 
             // Read inlet and outlet node names and validate them
             PipingSystemCircuits(CircuitCtr).InletNodeName = HGHX(HorizontalGHXCtr).InletNodeName;
-            PipingSystemCircuits(CircuitCtr).InletNodeNum =
-                GetOnlySingleNode(PipingSystemCircuits(CircuitCtr).InletNodeName, ErrorsFound, ObjName_HorizTrench, HGHX(HorizontalGHXCtr).ObjName,
-                                  NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            PipingSystemCircuits(CircuitCtr).InletNodeNum = GetOnlySingleNode(PipingSystemCircuits(CircuitCtr).InletNodeName,
+                                                                              ErrorsFound,
+                                                                              ObjName_HorizTrench,
+                                                                              HGHX(HorizontalGHXCtr).ObjName,
+                                                                              NodeType_Water,
+                                                                              NodeConnectionType_Inlet,
+                                                                              1,
+                                                                              ObjectIsNotParent);
             if (PipingSystemCircuits(CircuitCtr).InletNodeNum == 0) {
                 CurIndex = 2;
                 // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                 //                                cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
             }
             PipingSystemCircuits(CircuitCtr).OutletNodeName = HGHX(HorizontalGHXCtr).OutletNodeName;
-            PipingSystemCircuits(CircuitCtr).OutletNodeNum =
-                GetOnlySingleNode(PipingSystemCircuits(CircuitCtr).OutletNodeName, ErrorsFound, ObjName_HorizTrench, HGHX(HorizontalGHXCtr).ObjName,
-                                  NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            PipingSystemCircuits(CircuitCtr).OutletNodeNum = GetOnlySingleNode(PipingSystemCircuits(CircuitCtr).OutletNodeName,
+                                                                               ErrorsFound,
+                                                                               ObjName_HorizTrench,
+                                                                               HGHX(HorizontalGHXCtr).ObjName,
+                                                                               NodeType_Water,
+                                                                               NodeConnectionType_Outlet,
+                                                                               1,
+                                                                               ObjectIsNotParent);
             if (PipingSystemCircuits(CircuitCtr).OutletNodeNum == 0) {
                 CurIndex = 3;
                 // CALL IssueSevereInputFieldErrorStringEntry( RoutineName, ObjName_Circuit, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                 //                                cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
             }
-            TestCompSet(ObjName_HorizTrench, HGHX(HorizontalGHXCtr).ObjName, PipingSystemCircuits(CircuitCtr).InletNodeName,
-                        PipingSystemCircuits(CircuitCtr).OutletNodeName, "Piping System Circuit Nodes");
+            TestCompSet(ObjName_HorizTrench,
+                        HGHX(HorizontalGHXCtr).ObjName,
+                        PipingSystemCircuits(CircuitCtr).InletNodeName,
+                        PipingSystemCircuits(CircuitCtr).OutletNodeName,
+                        "Piping System Circuit Nodes");
 
             // Convergence tolerance values, validated by IP
             PipingSystemCircuits(CircuitCtr).Convergence_CurrentToPrevIteration = 0.001;
@@ -1995,13 +2164,25 @@ namespace PlantPipingSystemsManager {
 
             if (!PipingSystemSegments(SegmentCtr).IsActuallyPartOfAHorizontalTrench) {
 
-                SetupOutputVariable("Pipe Segment Inlet Temperature", OutputProcessor::Unit::C, PipingSystemSegments(SegmentCtr).InletTemperature,
-                                    "Plant", "Average", PipingSystemSegments(SegmentCtr).Name);
-                SetupOutputVariable("Pipe Segment Outlet Temperature", OutputProcessor::Unit::C, PipingSystemSegments(SegmentCtr).OutletTemperature,
-                                    "Plant", "Average", PipingSystemSegments(SegmentCtr).Name);
+                SetupOutputVariable("Pipe Segment Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PipingSystemSegments(SegmentCtr).InletTemperature,
+                                    "Plant",
+                                    "Average",
+                                    PipingSystemSegments(SegmentCtr).Name);
+                SetupOutputVariable("Pipe Segment Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PipingSystemSegments(SegmentCtr).OutletTemperature,
+                                    "Plant",
+                                    "Average",
+                                    PipingSystemSegments(SegmentCtr).Name);
 
-                SetupOutputVariable("Pipe Segment Fluid Heat Transfer Rate", OutputProcessor::Unit::W, PipingSystemSegments(SegmentCtr).FluidHeatLoss,
-                                    "Plant", "Average", PipingSystemSegments(SegmentCtr).Name);
+                SetupOutputVariable("Pipe Segment Fluid Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    PipingSystemSegments(SegmentCtr).FluidHeatLoss,
+                                    "Plant",
+                                    "Average",
+                                    PipingSystemSegments(SegmentCtr).Name);
             }
         }
 
@@ -2009,36 +2190,60 @@ namespace PlantPipingSystemsManager {
 
             if (!PipingSystemCircuits(PipeCircuitCounter).IsActuallyPartOfAHorizontalTrench) {
 
-                SetupOutputVariable("Pipe Circuit Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                    PipingSystemCircuits(PipeCircuitCounter).CurCircuitFlowRate, "Plant", "Average",
+                SetupOutputVariable("Pipe Circuit Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    PipingSystemCircuits(PipeCircuitCounter).CurCircuitFlowRate,
+                                    "Plant",
+                                    "Average",
                                     PipingSystemCircuits(PipeCircuitCounter).Name);
 
-                SetupOutputVariable("Pipe Circuit Inlet Temperature", OutputProcessor::Unit::C,
-                                    PipingSystemCircuits(PipeCircuitCounter).InletTemperature, "Plant", "Average",
+                SetupOutputVariable("Pipe Circuit Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PipingSystemCircuits(PipeCircuitCounter).InletTemperature,
+                                    "Plant",
+                                    "Average",
                                     PipingSystemCircuits(PipeCircuitCounter).Name);
-                SetupOutputVariable("Pipe Circuit Outlet Temperature", OutputProcessor::Unit::C,
-                                    PipingSystemCircuits(PipeCircuitCounter).OutletTemperature, "Plant", "Average",
+                SetupOutputVariable("Pipe Circuit Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PipingSystemCircuits(PipeCircuitCounter).OutletTemperature,
+                                    "Plant",
+                                    "Average",
                                     PipingSystemCircuits(PipeCircuitCounter).Name);
 
-                SetupOutputVariable("Pipe Circuit Fluid Heat Transfer Rate", OutputProcessor::Unit::W,
-                                    PipingSystemCircuits(PipeCircuitCounter).FluidHeatLoss, "Plant", "Average",
+                SetupOutputVariable("Pipe Circuit Fluid Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    PipingSystemCircuits(PipeCircuitCounter).FluidHeatLoss,
+                                    "Plant",
+                                    "Average",
                                     PipingSystemCircuits(PipeCircuitCounter).Name);
 
             } else { // it is a horizontal trench
 
-                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                    PipingSystemCircuits(PipeCircuitCounter).CurCircuitFlowRate, "Plant", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    PipingSystemCircuits(PipeCircuitCounter).CurCircuitFlowRate,
+                                    "Plant",
+                                    "Average",
                                     PipingSystemCircuits(PipeCircuitCounter).Name);
 
-                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C,
-                                    PipingSystemCircuits(PipeCircuitCounter).InletTemperature, "Plant", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PipingSystemCircuits(PipeCircuitCounter).InletTemperature,
+                                    "Plant",
+                                    "Average",
                                     PipingSystemCircuits(PipeCircuitCounter).Name);
-                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C,
-                                    PipingSystemCircuits(PipeCircuitCounter).OutletTemperature, "Plant", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PipingSystemCircuits(PipeCircuitCounter).OutletTemperature,
+                                    "Plant",
+                                    "Average",
                                     PipingSystemCircuits(PipeCircuitCounter).Name);
 
-                SetupOutputVariable("Ground Heat Exchanger Fluid Heat Transfer Rate", OutputProcessor::Unit::W,
-                                    PipingSystemCircuits(PipeCircuitCounter).FluidHeatLoss, "Plant", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Fluid Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    PipingSystemCircuits(PipeCircuitCounter).FluidHeatLoss,
+                                    "Plant",
+                                    "Average",
                                     PipingSystemCircuits(PipeCircuitCounter).Name);
             }
         }
@@ -2055,21 +2260,45 @@ namespace PlantPipingSystemsManager {
 
         if (PipingSystemDomains(DomainNum).HasZoneCoupledSlab) {
             // Zone-coupled slab outputs
-            SetupOutputVariable("GroundDomain Slab Zone Coupled Surface Heat Flux", OutputProcessor::Unit::W_m2,
-                                PipingSystemDomains(DomainNum).HeatFlux, "Zone", "Average", PipingSystemDomains(DomainNum).Name);
-            SetupOutputVariable("GroundDomain Slab Zone Coupled Surface Temperature", OutputProcessor::Unit::C,
-                                PipingSystemDomains(DomainNum).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains(DomainNum).Name);
+            SetupOutputVariable("GroundDomain Slab Zone Coupled Surface Heat Flux",
+                                OutputProcessor::Unit::W_m2,
+                                PipingSystemDomains(DomainNum).HeatFlux,
+                                "Zone",
+                                "Average",
+                                PipingSystemDomains(DomainNum).Name);
+            SetupOutputVariable("GroundDomain Slab Zone Coupled Surface Temperature",
+                                OutputProcessor::Unit::C,
+                                PipingSystemDomains(DomainNum).ZoneCoupledSurfaceTemp,
+                                "Zone",
+                                "Average",
+                                PipingSystemDomains(DomainNum).Name);
         } else if (PipingSystemDomains(DomainNum).HasZoneCoupledBasement) {
             // Zone-coupled basement wall outputs
-            SetupOutputVariable("GroundDomain Basement Wall Interface Heat Flux", OutputProcessor::Unit::W_m2,
-                                PipingSystemDomains(DomainNum).WallHeatFlux, "Zone", "Average", PipingSystemDomains(DomainNum).Name);
-            SetupOutputVariable("GroundDomain Basement Wall Interface Temperature", OutputProcessor::Unit::C,
-                                PipingSystemDomains(DomainNum).BasementWallTemp, "Zone", "Average", PipingSystemDomains(DomainNum).Name);
+            SetupOutputVariable("GroundDomain Basement Wall Interface Heat Flux",
+                                OutputProcessor::Unit::W_m2,
+                                PipingSystemDomains(DomainNum).WallHeatFlux,
+                                "Zone",
+                                "Average",
+                                PipingSystemDomains(DomainNum).Name);
+            SetupOutputVariable("GroundDomain Basement Wall Interface Temperature",
+                                OutputProcessor::Unit::C,
+                                PipingSystemDomains(DomainNum).BasementWallTemp,
+                                "Zone",
+                                "Average",
+                                PipingSystemDomains(DomainNum).Name);
             // Zone-coupled basement floor outputs
-            SetupOutputVariable("GroundDomain Basement Floor Interface Heat Flux", OutputProcessor::Unit::W_m2,
-                                PipingSystemDomains(DomainNum).FloorHeatFlux, "Zone", "Average", PipingSystemDomains(DomainNum).Name);
-            SetupOutputVariable("GroundDomain Basement Floor Interface Temperature", OutputProcessor::Unit::C,
-                                PipingSystemDomains(DomainNum).BasementFloorTemp, "Zone", "Average", PipingSystemDomains(DomainNum).Name);
+            SetupOutputVariable("GroundDomain Basement Floor Interface Heat Flux",
+                                OutputProcessor::Unit::W_m2,
+                                PipingSystemDomains(DomainNum).FloorHeatFlux,
+                                "Zone",
+                                "Average",
+                                PipingSystemDomains(DomainNum).Name);
+            SetupOutputVariable("GroundDomain Basement Floor Interface Temperature",
+                                OutputProcessor::Unit::C,
+                                PipingSystemDomains(DomainNum).BasementFloorTemp,
+                                "Zone",
+                                "Average",
+                                PipingSystemDomains(DomainNum).Name);
         }
     }
 
@@ -2099,15 +2328,27 @@ namespace PlantPipingSystemsManager {
             }
 
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(thisCircuit.Name, TypeToLookFor, thisCircuit.LoopNum, thisCircuit.LoopSideNum,
-                                                    thisCircuit.BranchNum, thisCircuit.CompNum, _, _, _, _, _, errFlag);
+            PlantUtilities::ScanPlantLoopsForObject(thisCircuit.Name,
+                                                    TypeToLookFor,
+                                                    thisCircuit.LoopNum,
+                                                    thisCircuit.LoopSideNum,
+                                                    thisCircuit.BranchNum,
+                                                    thisCircuit.CompNum,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    errFlag);
             if (errFlag) {
                 ShowFatalError("PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s).");
             }
 
             // Once we find ourselves on the plant loop, we can do other things
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName, DataGlobals::InitConvTemp,
-                                                           DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex, RoutineName);
+            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(thisCircuit.LoopNum).FluidName,
+                                                           DataGlobals::InitConvTemp,
+                                                           DataPlant::PlantLoop(thisCircuit.LoopNum).FluidIndex,
+                                                           RoutineName);
             thisCircuit.DesignMassFlowRate = thisCircuit.DesignVolumeFlowRate * rho;
             thisCircuit.NeedToFindOnPlantLoop = false;
         }
@@ -2169,8 +2410,13 @@ namespace PlantPipingSystemsManager {
 
         // request design, set component flow will decide what to give us based on restrictions and flow lock status
         thisCircuit.CurCircuitFlowRate = thisCircuit.DesignMassFlowRate;
-        PlantUtilities::SetComponentFlowRate(thisCircuit.CurCircuitFlowRate, InletNodeNum, OutletNodeNum, thisCircuit.LoopNum,
-                                             thisCircuit.LoopSideNum, thisCircuit.BranchNum, thisCircuit.CompNum);
+        PlantUtilities::SetComponentFlowRate(thisCircuit.CurCircuitFlowRate,
+                                             InletNodeNum,
+                                             OutletNodeNum,
+                                             thisCircuit.LoopNum,
+                                             thisCircuit.LoopSideNum,
+                                             thisCircuit.BranchNum,
+                                             thisCircuit.CompNum);
     }
 
     void UpdatePipingSystems(int const DomainNum, int const CircuitNum)
@@ -2690,29 +2936,95 @@ namespace PlantPipingSystemsManager {
         //'***** LAYOUT MESH REGIONS *****'
         // Zone-coupled slab  models
         if (this->HasZoneCoupledBasement) {
-            this->createRegionList(XRegions, XPartitionRegions, this->Extents.Xmax, RegionType::XDirection, XPartitionsExist, _, _, this->XIndex,
-                                   this->XWallIndex, this->InsulationXIndex);
-
-            this->createRegionList(YRegions, YPartitionRegions, this->Extents.Ymax, RegionType::YDirection, YPartitionsExist, _, _, _, _, _,
-                                   this->YIndex, this->YFloorIndex, this->InsulationYIndex);
-
-            this->createRegionList(ZRegions, ZPartitionRegions, this->Extents.Zmax, RegionType::ZDirection, ZPartitionsExist, _, _, _, _, _, _, _, _,
-                                   this->ZIndex, this->ZWallIndex, this->InsulationZIndex);
-        } else if (this->HasZoneCoupledSlab) {
-            this->createRegionList(XRegions, XPartitionRegions, this->Extents.Xmax, RegionType::XDirection, XPartitionsExist, _, _, this->XIndex, _,
+            this->createRegionList(XRegions,
+                                   XPartitionRegions,
+                                   this->Extents.Xmax,
+                                   RegionType::XDirection,
+                                   XPartitionsExist,
+                                   _,
+                                   _,
+                                   this->XIndex,
+                                   this->XWallIndex,
                                    this->InsulationXIndex);
 
-            this->createRegionList(YRegions, YPartitionRegions, this->Extents.Ymax, RegionType::YDirection, YPartitionsExist, _, _, _, _, _,
-                                   this->YIndex, _, this->InsulationYIndex);
+            this->createRegionList(YRegions,
+                                   YPartitionRegions,
+                                   this->Extents.Ymax,
+                                   RegionType::YDirection,
+                                   YPartitionsExist,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   this->YIndex,
+                                   this->YFloorIndex,
+                                   this->InsulationYIndex);
 
-            this->createRegionList(ZRegions, ZPartitionRegions, this->Extents.Zmax, RegionType::ZDirection, ZPartitionsExist, _, _, _, _, _, _, _, _,
-                                   this->ZIndex, _, this->InsulationZIndex);
+            this->createRegionList(ZRegions,
+                                   ZPartitionRegions,
+                                   this->Extents.Zmax,
+                                   RegionType::ZDirection,
+                                   ZPartitionsExist,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   this->ZIndex,
+                                   this->ZWallIndex,
+                                   this->InsulationZIndex);
+        } else if (this->HasZoneCoupledSlab) {
+            this->createRegionList(XRegions,
+                                   XPartitionRegions,
+                                   this->Extents.Xmax,
+                                   RegionType::XDirection,
+                                   XPartitionsExist,
+                                   _,
+                                   _,
+                                   this->XIndex,
+                                   _,
+                                   this->InsulationXIndex);
+
+            this->createRegionList(YRegions,
+                                   YPartitionRegions,
+                                   this->Extents.Ymax,
+                                   RegionType::YDirection,
+                                   YPartitionsExist,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   this->YIndex,
+                                   _,
+                                   this->InsulationYIndex);
+
+            this->createRegionList(ZRegions,
+                                   ZPartitionRegions,
+                                   this->Extents.Zmax,
+                                   RegionType::ZDirection,
+                                   ZPartitionsExist,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   _,
+                                   this->ZIndex,
+                                   _,
+                                   this->InsulationZIndex);
         } else {
-            this->createRegionList(XRegions, XPartitionRegions, this->Extents.Xmax, RegionType::XDirection, XPartitionsExist,
-                                   this->BasementZone.BasementWallXIndex);
+            this->createRegionList(
+                XRegions, XPartitionRegions, this->Extents.Xmax, RegionType::XDirection, XPartitionsExist, this->BasementZone.BasementWallXIndex);
 
-            this->createRegionList(YRegions, YPartitionRegions, this->Extents.Ymax, RegionType::YDirection, YPartitionsExist, _,
-                                   this->BasementZone.BasementFloorYIndex);
+            this->createRegionList(
+                YRegions, YPartitionRegions, this->Extents.Ymax, RegionType::YDirection, YPartitionsExist, _, this->BasementZone.BasementFloorYIndex);
 
             this->createRegionList(ZRegions, ZPartitionRegions, this->Extents.Zmax, RegionType::ZDirection, ZPartitionsExist);
         }
@@ -2794,7 +3106,8 @@ namespace PlantPipingSystemsManager {
             PipeCellWidth += 2 * PipingSystemCircuits(CircuitIndex).RadialMeshThickness;
 
             for (PipeCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                 PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1(); ++PipeCtr) {
+                 PipeCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+                 ++PipeCtr) {
 
                 ThisSegment = PipingSystemSegments(PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces(PipeCtr));
                 if (!allocated(this->Partitions.X)) {
@@ -3770,7 +4083,8 @@ namespace PlantPipingSystemsManager {
                         FoundOnCircuitIndex = this->CircuitIndeces(CircuitCtr);
                         for (int PipeCounter = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndeces.l1(),
                                  NumSegments = PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndeces.u1();
-                             PipeCounter <= NumSegments; ++PipeCounter) {
+                             PipeCounter <= NumSegments;
+                             ++PipeCounter) {
 
                             PipeSegmentInfo const &ThisSegment =
                                 PipingSystemSegments(PipingSystemCircuits(FoundOnCircuitIndex).PipeSegmentIndeces(PipeCounter));
@@ -3830,8 +4144,14 @@ namespace PlantPipingSystemsManager {
 
                     if (PipeIndex != -1) {
                         cell.PipeIndex = PipeIndex;
-                        CartesianPipeCellInformation::ctor(cell.PipeCellData, cell.X_max - cell.X_min, PipeSizing, NumRadialCells, cell.depth(),
-                                                           InsulationThickness, RadialMeshThickness, HasInsulation);
+                        CartesianPipeCellInformation::ctor(cell.PipeCellData,
+                                                           cell.X_max - cell.X_min,
+                                                           PipeSizing,
+                                                           NumRadialCells,
+                                                           cell.depth(),
+                                                           InsulationThickness,
+                                                           RadialMeshThickness,
+                                                           HasInsulation);
                     }
 
                 } //'z
@@ -3894,8 +4214,13 @@ namespace PlantPipingSystemsManager {
                             ThisAdiabaticMultiplier = 2.0;
                             ThisAdiabaticMultiplierMirror = 0.0;
                         }
-                        this->addNeighborInformation(X, Y, Z, Direction::PositiveX, CellRightCentroidX - ThisCellCentroidX,
-                                                     CellRightLeftWallX - ThisCellCentroidX, CellRightCentroidX - CellRightLeftWallX,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::PositiveX,
+                                                     CellRightCentroidX - ThisCellCentroidX,
+                                                     CellRightLeftWallX - ThisCellCentroidX,
+                                                     CellRightCentroidX - CellRightLeftWallX,
                                                      ThisAdiabaticMultiplier);
                         this->addNeighborInformation(X, Y, Z, Direction::NegativeX, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else if (X == this->x_max_index) {
@@ -3907,8 +4232,13 @@ namespace PlantPipingSystemsManager {
                         }
                         CellLeftCentroidX = cells(X - 1, Y, Z).Centroid.X;
                         CellLeftRightWallX = cells(X - 1, Y, Z).X_max;
-                        this->addNeighborInformation(X, Y, Z, Direction::NegativeX, ThisCellCentroidX - CellLeftCentroidX,
-                                                     ThisCellCentroidX - CellLeftRightWallX, CellLeftRightWallX - CellLeftCentroidX,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::NegativeX,
+                                                     ThisCellCentroidX - CellLeftCentroidX,
+                                                     ThisCellCentroidX - CellLeftRightWallX,
+                                                     CellLeftRightWallX - CellLeftCentroidX,
                                                      ThisAdiabaticMultiplier);
                         this->addNeighborInformation(X, Y, Z, Direction::PositiveX, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else {
@@ -3916,11 +4246,21 @@ namespace PlantPipingSystemsManager {
                         LeftCellRightWallX = cells(X - 1, Y, Z).X_max;
                         RightCellCentroidX = cells(X + 1, Y, Z).Centroid.X;
                         RightCellLeftWallX = cells(X + 1, Y, Z).X_min;
-                        this->addNeighborInformation(X, Y, Z, Direction::NegativeX, ThisCellCentroidX - LeftCellCentroidX,
-                                                     ThisCellCentroidX - LeftCellRightWallX, LeftCellRightWallX - LeftCellCentroidX,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::NegativeX,
+                                                     ThisCellCentroidX - LeftCellCentroidX,
+                                                     ThisCellCentroidX - LeftCellRightWallX,
+                                                     LeftCellRightWallX - LeftCellCentroidX,
                                                      ThisAdiabaticMultiplier);
-                        this->addNeighborInformation(X, Y, Z, Direction::PositiveX, RightCellCentroidX - ThisCellCentroidX,
-                                                     RightCellLeftWallX - ThisCellCentroidX, RightCellCentroidX - RightCellLeftWallX,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::PositiveX,
+                                                     RightCellCentroidX - ThisCellCentroidX,
+                                                     RightCellLeftWallX - ThisCellCentroidX,
+                                                     RightCellCentroidX - RightCellLeftWallX,
                                                      ThisAdiabaticMultiplier);
                     }
 
@@ -3934,8 +4274,13 @@ namespace PlantPipingSystemsManager {
                         UpperCellLowerWallY = cells(X, Y + 1, Z).Y_min;
                         // on the Y=0 face, the only adiabatic cases are:
                         //   1) NONE
-                        this->addNeighborInformation(X, Y, Z, Direction::PositiveY, UpperCellCentroidY - ThisCellCentroidY,
-                                                     UpperCellLowerWallY - ThisCellCentroidY, UpperCellCentroidY - UpperCellLowerWallY,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::PositiveY,
+                                                     UpperCellCentroidY - ThisCellCentroidY,
+                                                     UpperCellLowerWallY - ThisCellCentroidY,
+                                                     UpperCellCentroidY - UpperCellLowerWallY,
                                                      ThisAdiabaticMultiplier);
                         this->addNeighborInformation(X, Y, Z, Direction::NegativeY, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else if (Y == this->y_max_index) {
@@ -3943,8 +4288,13 @@ namespace PlantPipingSystemsManager {
                         LowerCellUpperWallY = cells(X, Y - 1, Z).Y_max;
                         // on the Y=YMAX face, the only adiabatic cases are:
                         //   1) NONE
-                        this->addNeighborInformation(X, Y, Z, Direction::NegativeY, ThisCellCentroidY - LowerCellCentroidY,
-                                                     ThisCellCentroidY - LowerCellUpperWallY, LowerCellUpperWallY - LowerCellCentroidY,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::NegativeY,
+                                                     ThisCellCentroidY - LowerCellCentroidY,
+                                                     ThisCellCentroidY - LowerCellUpperWallY,
+                                                     LowerCellUpperWallY - LowerCellCentroidY,
                                                      ThisAdiabaticMultiplier);
                         this->addNeighborInformation(X, Y, Z, Direction::PositiveY, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else {
@@ -3952,11 +4302,21 @@ namespace PlantPipingSystemsManager {
                         LowerCellCentroidY = cells(X, Y - 1, Z).Centroid.Y;
                         UpperCellLowerWallY = cells(X, Y + 1, Z).Y_min;
                         LowerCellUpperWallY = cells(X, Y - 1, Z).Y_max;
-                        this->addNeighborInformation(X, Y, Z, Direction::NegativeY, ThisCellCentroidY - LowerCellCentroidY,
-                                                     ThisCellCentroidY - LowerCellUpperWallY, LowerCellUpperWallY - LowerCellCentroidY,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::NegativeY,
+                                                     ThisCellCentroidY - LowerCellCentroidY,
+                                                     ThisCellCentroidY - LowerCellUpperWallY,
+                                                     LowerCellUpperWallY - LowerCellCentroidY,
                                                      ThisAdiabaticMultiplier);
-                        this->addNeighborInformation(X, Y, Z, Direction::PositiveY, UpperCellCentroidY - ThisCellCentroidY,
-                                                     UpperCellLowerWallY - ThisCellCentroidY, UpperCellCentroidY - UpperCellLowerWallY,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::PositiveY,
+                                                     UpperCellCentroidY - ThisCellCentroidY,
+                                                     UpperCellLowerWallY - ThisCellCentroidY,
+                                                     UpperCellCentroidY - UpperCellLowerWallY,
                                                      ThisAdiabaticMultiplier);
                     }
 
@@ -3975,8 +4335,13 @@ namespace PlantPipingSystemsManager {
                             ThisAdiabaticMultiplier = 2.0;
                             ThisAdiabaticMultiplierMirror = 0.0;
                         }
-                        this->addNeighborInformation(X, Y, Z, Direction::PositiveZ, UpperZCellCentroidZ - ThisCellCentroidZ,
-                                                     UpperZCellLowerWallZ - ThisCellCentroidZ, UpperZCellCentroidZ - UpperZCellLowerWallZ,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::PositiveZ,
+                                                     UpperZCellCentroidZ - ThisCellCentroidZ,
+                                                     UpperZCellLowerWallZ - ThisCellCentroidZ,
+                                                     UpperZCellCentroidZ - UpperZCellLowerWallZ,
                                                      ThisAdiabaticMultiplier);
                         this->addNeighborInformation(X, Y, Z, Direction::NegativeZ, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else if (Z == this->z_max_index) {
@@ -3988,8 +4353,13 @@ namespace PlantPipingSystemsManager {
                         ThisAdiabaticMultiplier = 2.0;
                         ThisAdiabaticMultiplierMirror = 0.0;
                         //}
-                        this->addNeighborInformation(X, Y, Z, Direction::NegativeZ, ThisCellCentroidZ - LowerZCellCentroidZ,
-                                                     ThisCellCentroidZ - LowerZCellUpperWallZ, LowerZCellUpperWallZ - LowerZCellCentroidZ,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::NegativeZ,
+                                                     ThisCellCentroidZ - LowerZCellCentroidZ,
+                                                     ThisCellCentroidZ - LowerZCellUpperWallZ,
+                                                     LowerZCellUpperWallZ - LowerZCellCentroidZ,
                                                      ThisAdiabaticMultiplier);
                         this->addNeighborInformation(X, Y, Z, Direction::PositiveZ, 0.0, 0.0, 0.0, ThisAdiabaticMultiplierMirror);
                     } else {
@@ -3997,11 +4367,21 @@ namespace PlantPipingSystemsManager {
                         UpperZCellCentroidZ = cells(X, Y, Z + 1).Centroid.Z;
                         UpperZCellLowerWallZ = cells(X, Y, Z + 1).Z_min;
                         LowerZCellUpperWallZ = cells(X, Y, Z - 1).Z_max;
-                        this->addNeighborInformation(X, Y, Z, Direction::NegativeZ, ThisCellCentroidZ - LowerZCellCentroidZ,
-                                                     ThisCellCentroidZ - LowerZCellUpperWallZ, LowerZCellUpperWallZ - LowerZCellCentroidZ,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::NegativeZ,
+                                                     ThisCellCentroidZ - LowerZCellCentroidZ,
+                                                     ThisCellCentroidZ - LowerZCellUpperWallZ,
+                                                     LowerZCellUpperWallZ - LowerZCellCentroidZ,
                                                      ThisAdiabaticMultiplier);
-                        this->addNeighborInformation(X, Y, Z, Direction::PositiveZ, UpperZCellCentroidZ - ThisCellCentroidZ,
-                                                     UpperZCellLowerWallZ - ThisCellCentroidZ, UpperZCellCentroidZ - UpperZCellLowerWallZ,
+                        this->addNeighborInformation(X,
+                                                     Y,
+                                                     Z,
+                                                     Direction::PositiveZ,
+                                                     UpperZCellCentroidZ - ThisCellCentroidZ,
+                                                     UpperZCellLowerWallZ - ThisCellCentroidZ,
+                                                     UpperZCellCentroidZ - UpperZCellLowerWallZ,
                                                      ThisAdiabaticMultiplier);
                     }
                 }
@@ -4062,7 +4442,8 @@ namespace PlantPipingSystemsManager {
             bool CircuitInletCellSet = false;
 
             for (int SegmentCtr = PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.l1();
-                 SegmentCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1(); ++SegmentCtr) {
+                 SegmentCtr <= PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces.u1();
+                 ++SegmentCtr) {
 
                 auto &Segment = PipingSystemSegments(PipingSystemCircuits(CircuitIndex).PipeSegmentIndeces(SegmentCtr));
                 switch (Segment.FlowDirection) {
@@ -5248,7 +5629,10 @@ namespace PlantPipingSystemsManager {
                     //'we don't have the first cell so just normal simulation
                     if (Zindex == EndingZ) {
                         // simulate current cell using upstream as entering conditions
-                        PerformPipeCellSimulation(DomainNum, CircuitNum, cells(PipeX, PipeY, Zindex), FlowRate,
+                        PerformPipeCellSimulation(DomainNum,
+                                                  CircuitNum,
+                                                  cells(PipeX, PipeY, Zindex),
+                                                  FlowRate,
                                                   cells(PipeX, PipeY, Zindex - Increment).PipeCellData.Fluid.Temperature);
                         // store this outlet condition to be passed to the next segment
                         CircuitCrossTemp = cells(PipeX, PipeY, Zindex).PipeCellData.Fluid.Temperature;
@@ -5257,7 +5641,10 @@ namespace PlantPipingSystemsManager {
                         PerformPipeCellSimulation(DomainNum, CircuitNum, cells(PipeX, PipeY, Zindex), FlowRate, CircuitCrossTemp);
                     } else {
                         // we are in an interior node, so just get the upstream cell and use the main simulation
-                        PerformPipeCellSimulation(DomainNum, CircuitNum, cells(PipeX, PipeY, Zindex), FlowRate,
+                        PerformPipeCellSimulation(DomainNum,
+                                                  CircuitNum,
+                                                  cells(PipeX, PipeY, Zindex),
+                                                  FlowRate,
                                                   cells(PipeX, PipeY, Zindex - Increment).PipeCellData.Fluid.Temperature);
                     }
                 }
@@ -5837,7 +6224,8 @@ namespace PlantPipingSystemsManager {
                 PipingSystemCircuits(CircuitNum).ListOfCircuitPoints.allocate({0, TotalSegments - 1});
 
                 for (int SegIndex = PipingSystemCircuits(CircuitNum).PipeSegmentIndeces.l1();
-                     SegIndex <= PipingSystemCircuits(CircuitNum).PipeSegmentIndeces.u1(); ++SegIndex) {
+                     SegIndex <= PipingSystemCircuits(CircuitNum).PipeSegmentIndeces.u1();
+                     ++SegIndex) {
 
                     //'set simulation flow direction
                     int StartingZ = 0;
@@ -5942,16 +6330,20 @@ namespace PlantPipingSystemsManager {
             // but need to verify the value of inlet temperature during warm up, etc.
             FluidCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName,
                                                              PipingSystemCircuits(CircuitNum).InletTemperature,
-                                                             DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex, RoutineName);
+                                                             DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex,
+                                                             RoutineName);
             FluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName,
                                                              PipingSystemCircuits(CircuitNum).InletTemperature,
-                                                             DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex, RoutineName);
-            FluidConductivity = FluidProperties::GetConductivityGlycol(
-                DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName, PipingSystemCircuits(CircuitNum).InletTemperature,
-                DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex, RoutineName);
-            FluidViscosity = FluidProperties::GetViscosityGlycol(
-                DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName, PipingSystemCircuits(CircuitNum).InletTemperature,
-                DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex, RoutineName);
+                                                             DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex,
+                                                             RoutineName);
+            FluidConductivity = FluidProperties::GetConductivityGlycol(DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName,
+                                                                       PipingSystemCircuits(CircuitNum).InletTemperature,
+                                                                       DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex,
+                                                                       RoutineName);
+            FluidViscosity = FluidProperties::GetViscosityGlycol(DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidName,
+                                                                 PipingSystemCircuits(CircuitNum).InletTemperature,
+                                                                 DataPlant::PlantLoop(PipingSystemCircuits(CircuitNum).LoopNum).FluidIndex,
+                                                                 RoutineName);
 
             // Doesn't anyone care about poor Ludwig Prandtl?
             FluidPrandtl = 3.0;

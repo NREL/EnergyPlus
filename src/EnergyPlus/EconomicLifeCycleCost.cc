@@ -392,8 +392,17 @@ namespace EconomicLifeCycleCost {
             LCCparamPresent = false;
         } else if (NumObj == 1) {
             LCCparamPresent = true;
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          AlphaArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -650,8 +659,17 @@ namespace EconomicLifeCycleCost {
         numRecurringCosts = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         RecurringCosts.allocate(numRecurringCosts);
         for (iInObj = 1; iInObj <= numRecurringCosts; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          AlphaArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -846,8 +864,17 @@ namespace EconomicLifeCycleCost {
             NonrecurringCost.allocate(numNonrecurringCost);
         }
         for (iInObj = 1; iInObj <= numNonrecurringCost; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          AlphaArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -981,8 +1008,17 @@ namespace EconomicLifeCycleCost {
         }
         if (numUsePriceEscalation > 0) {
             for (iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj) {
-                inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              iInObj,
+                                              AlphaArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 // check to make sure none of the values are another life cycle cost object
                 for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                     if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -1126,8 +1162,17 @@ namespace EconomicLifeCycleCost {
         }
         if (numUseAdjustment > 0) {
             for (iInObj = 1; iInObj <= numUseAdjustment; ++iInObj) {
-                inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              iInObj,
+                                              AlphaArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 // check to make sure none of the values are another life cycle cost object
                 for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                     if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -2034,12 +2079,12 @@ namespace EconomicLifeCycleCost {
         // na
 
         // Using/Aliasing
+        using OutputReportTabular::displayLifeCycleCostReport;
         using OutputReportTabular::IntToStr;
         using OutputReportTabular::RealToStr;
         using OutputReportTabular::WriteReportHeaders;
         using OutputReportTabular::WriteSubtitle;
         using OutputReportTabular::WriteTable;
-        using OutputReportTabular::displayLifeCycleCostReport;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2157,8 +2202,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Life-Cycle Cost Parameters");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Life-Cycle Cost Parameters");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2191,8 +2236,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Use Price Escalation");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Use Price Escalation");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2224,8 +2269,8 @@ namespace EconomicLifeCycleCost {
                 WriteSubtitle("Use Adjustment");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                           "Use Adjustment");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();
@@ -2261,7 +2306,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2288,7 +2337,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Energy and Water Cost Cash Flows (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Energy and Water Cost Cash Flows (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2316,7 +2369,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Capital Cash Flow by Category (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Capital Cash Flow by Category (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2357,7 +2414,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Operating Cash Flow by Category (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Operating Cash Flow by Category (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2402,8 +2463,8 @@ namespace EconomicLifeCycleCost {
                 WriteSubtitle("DEBUG ONLY - Monthly Cash Flows");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                           "DEBUG ONLY - Monthly Cash Flows");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();
@@ -2431,8 +2492,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Monthly Total Cash Flow (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Monthly Total Cash Flow (Without Escalation)");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2515,7 +2576,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
             }
             columnHead.deallocate();
@@ -2567,8 +2632,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Present Value by Category");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Present Value by Category");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2598,8 +2663,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Present Value by Year");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Present Value by Year");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2636,8 +2701,8 @@ namespace EconomicLifeCycleCost {
                 WriteSubtitle("After Tax Estimate");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                           "After Tax Estimate");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();

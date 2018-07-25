@@ -227,8 +227,8 @@ namespace PlantPressureSystem {
                         loop.HasPressureComponents = true;
 
                         // Setup output variable
-                        SetupOutputVariable("Plant Branch Pressure Difference", OutputProcessor::Unit::Pa, branch.PressureDrop, "Plant", "Average",
-                                            branch.Name);
+                        SetupOutputVariable(
+                            "Plant Branch Pressure Difference", OutputProcessor::Unit::Pa, branch.PressureDrop, "Plant", "Average", branch.Name);
                     }
                 }
 
@@ -236,13 +236,21 @@ namespace PlantPressureSystem {
                 if (loop_side.HasPressureComponents) {
                     if (LoopSideNum == DemandSide) {
 
-                        SetupOutputVariable("Plant Demand Side Loop Pressure Difference", OutputProcessor::Unit::Pa, loop_side.PressureDrop, "Plant",
-                                            "Average", loop.Name);
+                        SetupOutputVariable("Plant Demand Side Loop Pressure Difference",
+                                            OutputProcessor::Unit::Pa,
+                                            loop_side.PressureDrop,
+                                            "Plant",
+                                            "Average",
+                                            loop.Name);
 
                     } else if (LoopSideNum == SupplySide) {
 
-                        SetupOutputVariable("Plant Supply Side Loop Pressure Difference", OutputProcessor::Unit::Pa, loop_side.PressureDrop, "Plant",
-                                            "Average", loop.Name);
+                        SetupOutputVariable("Plant Supply Side Loop Pressure Difference",
+                                            OutputProcessor::Unit::Pa,
+                                            loop_side.PressureDrop,
+                                            "Plant",
+                                            "Average",
+                                            loop.Name);
                     }
                 }
             }
@@ -546,8 +554,8 @@ namespace PlantPressureSystem {
                 ParallelBranchCounter = 0;
                 for (BranchNum = NumBranches - 1; BranchNum >= 2; --BranchNum) { // Working backward (not necessary, but consistent)
                     ++ParallelBranchCounter;
-                    DistributePressureOnBranch(LoopNum, LoopSideNum, BranchNum, ParallelBranchPressureDrops(ParallelBranchCounter),
-                                               FoundAPumpOnBranch);
+                    DistributePressureOnBranch(
+                        LoopNum, LoopSideNum, BranchNum, ParallelBranchPressureDrops(ParallelBranchCounter), FoundAPumpOnBranch);
                     // Store the branch inlet pressure so we can pass it properly across the splitter
                     ParallelBranchInletPressures(ParallelBranchCounter) =
                         Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn).Press;

@@ -20,7 +20,7 @@
 ! File developed for Interprogram Comparative Test Case 301
 !
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Test Harness for MicroCogen,  !- Name

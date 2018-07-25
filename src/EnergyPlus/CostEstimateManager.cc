@@ -292,12 +292,12 @@ namespace CostEstimateManager {
         // Calculates the Cost Estimate based on inputs.
 
         // Using/Aliasing
-        using DXCoils::DXCoil;
         using DataHeatBalance::Construct;
         using DataHeatBalance::Zone;
-        using DataPhotovoltaics::PVarray;
         using DataPhotovoltaics::iSimplePVModel;
+        using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
+        using DXCoils::DXCoil;
         using PlantChillers::ElectricChiller;
         using PlantChillers::ElectricChillerSpecs;
         using namespace DataDaylighting;
@@ -567,15 +567,15 @@ namespace CostEstimateManager {
         // Calculates the Cost Estimate based on inputs.
 
         // Using/Aliasing
-        using DXCoils::DXCoil;
-        using DXCoils::NumDXCoils;
         using DataHeatBalance::Construct;
         using DataHeatBalance::Lights;
         using DataHeatBalance::Zone;
-        using DataPhotovoltaics::PVarray;
         using DataPhotovoltaics::iSimplePVModel;
+        using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
+        using DXCoils::DXCoil;
+        using DXCoils::NumDXCoils;
         using PlantChillers::ElectricChiller;
         using PlantChillers::ElectricChillerSpecs;
         using namespace DataDaylighting;
