@@ -3639,6 +3639,12 @@ namespace MixedAir {
                 MixedAirTempAtMinOAFlow = Node(this->RetNode).Temp;
             }
             this->MixedAirTempAtMinOAFlow = MixedAirTempAtMinOAFlow;
+
+            if (this->MixMassFlow > 0) {
+                // calc outdoor air minimum fraction based on actual mixed air flow
+                Real64 OutAirMinFracTemp = curAirLoopFlow.MinOutAir / this->MixMassFlow;
+                OutAirMinFrac = OutAirMinFracTemp;
+            }
         }
 
         // Economizer
