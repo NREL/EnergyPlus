@@ -2337,15 +2337,15 @@ namespace WeatherManager {
             // this is done only once
             if (DoWeathSim || DoDesDaySim) {
                 if (WaterMainsTempsMethod != 0) {
-                    if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod) {
-                        if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
+                    if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod || WaterMainsTempsMethod == CorrelationMethod) {
+                        if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod && !OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                             OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp();
                         }
+                        // reports to eio file
+                        ReportWaterMainsTempParameters();
                     }
                 }
             }
-            // reports to eio file
-            ReportWaterMainsTempParameters();
             WaterMainsParameterReport = false;
         }
     }
@@ -8298,7 +8298,6 @@ namespace WeatherManager {
                 }
             } else if (UtilityRoutines::SameString(AlphArray(1), "CorrelationFromWeatherFile")) {
                 WaterMainsTempsMethod = CorrelationFromWeatherFileMethod;
-                // OADryBulbAverage.OADryBulbWeatherDataProcessed = false;
             } else {
                 ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + '=' + AlphArray(1));
                 ErrorsFound = true;

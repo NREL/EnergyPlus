@@ -118,8 +118,6 @@ namespace WeatherManager {
 
     extern bool Debugout;
 
-    extern Real64 CalcWaterMainsTempCurrent; // current water main temperature from correlation
-
     // DERIVED TYPE DEFINITIONS:
 
     // INTERFACE BLOCK SPECIFICATIONS:
