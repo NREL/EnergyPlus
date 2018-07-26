@@ -258,8 +258,17 @@ namespace ElectricBaseboardRadiator {
 
         for (BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          BaseboardNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             ElecBaseboardNumericFields(BaseboardNum).FieldNames.allocate(NumNumbers);
             ElecBaseboardNumericFields(BaseboardNum).FieldNames = "";
@@ -468,24 +477,66 @@ namespace ElectricBaseboardRadiator {
 
             // Setup Report variables for the Electric Baseboards
             // CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Electric'
-            SetupOutputVariable("Baseboard Total Heating Rate", OutputProcessor::Unit::W, ElecBaseboard(BaseboardNum).TotPower, "System", "Average",
+            SetupOutputVariable("Baseboard Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ElecBaseboard(BaseboardNum).TotPower,
+                                "System",
+                                "Average",
                                 ElecBaseboard(BaseboardNum).EquipName);
 
-            SetupOutputVariable("Baseboard Convective Heating Rate", OutputProcessor::Unit::W, ElecBaseboard(BaseboardNum).ConvPower, "System",
-                                "Average", ElecBaseboard(BaseboardNum).EquipName);
-            SetupOutputVariable("Baseboard Radiant Heating Rate", OutputProcessor::Unit::W, ElecBaseboard(BaseboardNum).RadPower, "System", "Average",
+            SetupOutputVariable("Baseboard Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ElecBaseboard(BaseboardNum).ConvPower,
+                                "System",
+                                "Average",
+                                ElecBaseboard(BaseboardNum).EquipName);
+            SetupOutputVariable("Baseboard Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ElecBaseboard(BaseboardNum).RadPower,
+                                "System",
+                                "Average",
                                 ElecBaseboard(BaseboardNum).EquipName);
 
-            SetupOutputVariable("Baseboard Electric Energy", OutputProcessor::Unit::J, ElecBaseboard(BaseboardNum).ElecUseLoad, "System", "Sum",
-                                ElecBaseboard(BaseboardNum).EquipName, _, "Electric", "HEATING", _, "System");
-            SetupOutputVariable("Baseboard Electric Power", OutputProcessor::Unit::W, ElecBaseboard(BaseboardNum).ElecUseRate, "System", "Average",
+            SetupOutputVariable("Baseboard Electric Energy",
+                                OutputProcessor::Unit::J,
+                                ElecBaseboard(BaseboardNum).ElecUseLoad,
+                                "System",
+                                "Sum",
+                                ElecBaseboard(BaseboardNum).EquipName,
+                                _,
+                                "Electric",
+                                "HEATING",
+                                _,
+                                "System");
+            SetupOutputVariable("Baseboard Electric Power",
+                                OutputProcessor::Unit::W,
+                                ElecBaseboard(BaseboardNum).ElecUseRate,
+                                "System",
+                                "Average",
                                 ElecBaseboard(BaseboardNum).EquipName);
-            SetupOutputVariable("Baseboard Total Heating Energy", OutputProcessor::Unit::J, ElecBaseboard(BaseboardNum).TotEnergy, "System", "Sum",
-                                ElecBaseboard(BaseboardNum).EquipName, _, "ENERGYTRANSFER", "BASEBOARD", _, "System");
+            SetupOutputVariable("Baseboard Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ElecBaseboard(BaseboardNum).TotEnergy,
+                                "System",
+                                "Sum",
+                                ElecBaseboard(BaseboardNum).EquipName,
+                                _,
+                                "ENERGYTRANSFER",
+                                "BASEBOARD",
+                                _,
+                                "System");
 
-            SetupOutputVariable("Baseboard Convective Heating Energy", OutputProcessor::Unit::J, ElecBaseboard(BaseboardNum).ConvEnergy, "System",
-                                "Sum", ElecBaseboard(BaseboardNum).EquipName);
-            SetupOutputVariable("Baseboard Radiant Heating Energy", OutputProcessor::Unit::J, ElecBaseboard(BaseboardNum).RadEnergy, "System", "Sum",
+            SetupOutputVariable("Baseboard Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ElecBaseboard(BaseboardNum).ConvEnergy,
+                                "System",
+                                "Sum",
+                                ElecBaseboard(BaseboardNum).EquipName);
+            SetupOutputVariable("Baseboard Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ElecBaseboard(BaseboardNum).RadEnergy,
+                                "System",
+                                "Sum",
                                 ElecBaseboard(BaseboardNum).EquipName);
         }
     }
@@ -613,8 +664,8 @@ namespace ElectricBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using DataHeatBalance::Zone;
+        using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;
@@ -794,12 +845,17 @@ namespace ElectricBaseboardRadiator {
                               (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);
                     if (LoadMet < 0.0) {
                         // LoadMet is still less than zero so shut everything down
-                        UpdateElectricBaseboardOff(LoadMet, QBBCap, RadHeat, QBBElecRadSource(BaseboardNum), ElecBaseboard(BaseboardNum).ElecUseRate,
-                                                   AirOutletTemp, AirInletTemp);
+                        UpdateElectricBaseboardOff(LoadMet,
+                                                   QBBCap,
+                                                   RadHeat,
+                                                   QBBElecRadSource(BaseboardNum),
+                                                   ElecBaseboard(BaseboardNum).ElecUseRate,
+                                                   AirOutletTemp,
+                                                   AirInletTemp);
                     } else {
                         // Corrected LoadMet is now positive so use this and move forward with system operating
-                        UpdateElectricBaseboardOn(AirOutletTemp, ElecBaseboard(BaseboardNum).ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir,
-                                                  Effic);
+                        UpdateElectricBaseboardOn(
+                            AirOutletTemp, ElecBaseboard(BaseboardNum).ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic);
                     }
                 } else {
 
@@ -814,8 +870,8 @@ namespace ElectricBaseboardRadiator {
 
         } else { // If there is an off condition the BB does nothing.
 
-            UpdateElectricBaseboardOff(LoadMet, QBBCap, RadHeat, QBBElecRadSource(BaseboardNum), ElecBaseboard(BaseboardNum).ElecUseRate,
-                                       AirOutletTemp, AirInletTemp);
+            UpdateElectricBaseboardOff(
+                LoadMet, QBBCap, RadHeat, QBBElecRadSource(BaseboardNum), ElecBaseboard(BaseboardNum).ElecUseRate, AirOutletTemp, AirInletTemp);
         }
 
         // Assign calculated ones

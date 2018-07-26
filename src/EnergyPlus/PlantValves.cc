@@ -227,22 +227,22 @@ namespace PlantValves {
             //  <process, noting errors>
             TemperValve(Item).Name = Alphas(1);
             // Get Plant Inlet Node
-            TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water,
-                                                                  NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(
+                Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             // Get Plant Outlet Node
-            TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water,
-                                                                   NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             // Get Stream 2 Source Node
-            TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water,
-                                                                    NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             // Get Mixed water Setpoint
-            TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water,
-                                                                     NodeConnectionType_SetPoint, 1, ObjectIsNotParent);
+            TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent);
 
             // Get Pump outlet
-            TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water,
-                                                                       NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(
+                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
 
             // Note most checks on user input are made in second pass thru init routine
 
@@ -251,7 +251,11 @@ namespace PlantValves {
 
         for (Item = 1; Item <= NumTemperingValves; ++Item) {
 
-            SetupOutputVariable("Tempering Valve Flow Fraction", OutputProcessor::Unit::None, TemperValve(Item).FlowDivFract, "System", "Average",
+            SetupOutputVariable("Tempering Valve Flow Fraction",
+                                OutputProcessor::Unit::None,
+                                TemperValve(Item).FlowDivFract,
+                                "System",
+                                "Average",
                                 TemperValve(Item).Name);
         }
 
@@ -319,9 +323,18 @@ namespace PlantValves {
                         // Search thru PlantLoop Data Structure to check some things.
                         // Locate the component on the plant loops for later usage
                         errFlag = false;
-                        ScanPlantLoopsForObject(TemperValve(CompNum).Name, TypeOf_ValveTempering, TemperValve(CompNum).LoopNum,
-                                                TemperValve(CompNum).LoopSideNum, TemperValve(CompNum).BranchNum, TemperValve(CompNum).CompNum, _, _,
-                                                _, _, _, errFlag);
+                        ScanPlantLoopsForObject(TemperValve(CompNum).Name,
+                                                TypeOf_ValveTempering,
+                                                TemperValve(CompNum).LoopNum,
+                                                TemperValve(CompNum).LoopSideNum,
+                                                TemperValve(CompNum).BranchNum,
+                                                TemperValve(CompNum).CompNum,
+                                                _,
+                                                _,
+                                                _,
+                                                _,
+                                                _,
+                                                errFlag);
 
                         if (errFlag) {
                             ShowFatalError("InitPlantValves: Program terminated due to previous condition(s).");
@@ -472,9 +485,14 @@ namespace PlantValves {
 
                     if ((InletNode > 0) && (OutletNode > 0)) {
                         //   Node(InletNode)%Temp = 0.0
-                        InitComponentNodes(0.0, Node(PumpOutNode).MassFlowRateMax, TemperValve(CompNum).PltInletNodeNum,
-                                           TemperValve(CompNum).PltOutletNodeNum, TemperValve(CompNum).LoopNum, TemperValve(CompNum).LoopSideNum,
-                                           TemperValve(CompNum).BranchNum, TemperValve(CompNum).CompNum);
+                        InitComponentNodes(0.0,
+                                           Node(PumpOutNode).MassFlowRateMax,
+                                           TemperValve(CompNum).PltInletNodeNum,
+                                           TemperValve(CompNum).PltOutletNodeNum,
+                                           TemperValve(CompNum).LoopNum,
+                                           TemperValve(CompNum).LoopSideNum,
+                                           TemperValve(CompNum).BranchNum,
+                                           TemperValve(CompNum).CompNum);
                     }
                     TemperValve(CompNum).Init = false;
                 }
@@ -636,8 +654,12 @@ namespace PlantValves {
                 mdot = TemperValve(CompNum).MixedMassFlowRate * TemperValve(CompNum).FlowDivFract;
 
                 if (TemperValve(CompNum).LoopNum > 0) {
-                    SetComponentFlowRate(mdot, TemperValve(CompNum).PltInletNodeNum, TemperValve(CompNum).PltOutletNodeNum,
-                                         TemperValve(CompNum).LoopNum, TemperValve(CompNum).LoopSideNum, TemperValve(CompNum).BranchNum,
+                    SetComponentFlowRate(mdot,
+                                         TemperValve(CompNum).PltInletNodeNum,
+                                         TemperValve(CompNum).PltOutletNodeNum,
+                                         TemperValve(CompNum).LoopNum,
+                                         TemperValve(CompNum).LoopSideNum,
+                                         TemperValve(CompNum).BranchNum,
                                          TemperValve(CompNum).CompNum);
 
                     TemperValve(CompNum).DivertedFlowRate = mdot;

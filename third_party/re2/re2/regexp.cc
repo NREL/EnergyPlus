@@ -190,31 +190,45 @@ Regexp* Regexp::HaveMatch(int match_id, ParseFlags flags) {
   return re;
 }
 
-Regexp* Regexp::Plus(Regexp* sub, ParseFlags flags) {
-  if (sub->op() == kRegexpPlus && sub->parse_flags() == flags)
+Regexp* Regexp::StarPlusOrQuest(RegexpOp op, Regexp* sub, ParseFlags flags) {
+  // Squash **, ++ and ??.
+  if (op == sub->op() && flags == sub->parse_flags())
     return sub;
-  Regexp* re = new Regexp(kRegexpPlus, flags);
+
+  // Squash *+, *?, +*, +?, ?* and ?+. They all squash to *, so because
+  // op is Star/Plus/Quest, we just have to check that sub->op() is too.
+  if ((sub->op() == kRegexpStar ||
+       sub->op() == kRegexpPlus ||
+       sub->op() == kRegexpQuest) &&
+      flags == sub->parse_flags()) {
+    // If sub is Star, no need to rewrite it.
+    if (sub->op() == kRegexpStar)
+      return sub;
+
+    // Rewrite sub to Star.
+    Regexp* re = new Regexp(kRegexpStar, flags);
+    re->AllocSub(1);
+    re->sub()[0] = sub->sub()[0]->Incref();
+    sub->Decref();  // We didn't consume the reference after all.
+    return re;
+  }
+
+  Regexp* re = new Regexp(op, flags);
   re->AllocSub(1);
   re->sub()[0] = sub;
   return re;
+}
+
+Regexp* Regexp::Plus(Regexp* sub, ParseFlags flags) {
+  return StarPlusOrQuest(kRegexpPlus, sub, flags);
 }
 
 Regexp* Regexp::Star(Regexp* sub, ParseFlags flags) {
-  if (sub->op() == kRegexpStar && sub->parse_flags() == flags)
-    return sub;
-  Regexp* re = new Regexp(kRegexpStar, flags);
-  re->AllocSub(1);
-  re->sub()[0] = sub;
-  return re;
+  return StarPlusOrQuest(kRegexpStar, sub, flags);
 }
 
 Regexp* Regexp::Quest(Regexp* sub, ParseFlags flags) {
-  if (sub->op() == kRegexpQuest && sub->parse_flags() == flags)
-    return sub;
-  Regexp* re = new Regexp(kRegexpQuest, flags);
-  re->AllocSub(1);
-  re->sub()[0] = sub;
-  return re;
+  return StarPlusOrQuest(kRegexpQuest, sub, flags);
 }
 
 Regexp* Regexp::ConcatOrAlternate(RegexpOp op, Regexp** sub, int nsub,
@@ -639,7 +653,7 @@ std::map<int, string>* Regexp::CaptureNames() {
 // with a fixed string prefix.  If so, returns the prefix and
 // the regexp that remains after the prefix.  The prefix might
 // be ASCII case-insensitive.
-bool Regexp::RequiredPrefix(string *prefix, bool *foldcase, Regexp** suffix) {
+bool Regexp::RequiredPrefix(string* prefix, bool* foldcase, Regexp** suffix) {
   // No need for a walker: the regexp must be of the form
   // 1. some number of ^ anchors
   // 2. a literal char or string

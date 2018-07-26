@@ -110,14 +110,38 @@ namespace DataSurfaceColors {
                                                                                                                  // Sensor 2
 
     Array1D_string const colorkeys(NumColors,
-                                   {"Text", "Walls", "Windows", "GlassDoors", "Doors", "Roofs", "Floors", "DetachedBuildingShades",
-                                    "DetachedFixedShades", "AttachedBuildingShades", "Photovoltaics", "TubularDaylightDomes",
-                                    "TubularDaylightDiffusers", "DaylightReferencePoint1", "DaylightReferencePoint2"});
+                                   {"Text",
+                                    "Walls",
+                                    "Windows",
+                                    "GlassDoors",
+                                    "Doors",
+                                    "Roofs",
+                                    "Floors",
+                                    "DetachedBuildingShades",
+                                    "DetachedFixedShades",
+                                    "AttachedBuildingShades",
+                                    "Photovoltaics",
+                                    "TubularDaylightDomes",
+                                    "TubularDaylightDiffusers",
+                                    "DaylightReferencePoint1",
+                                    "DaylightReferencePoint2"});
 
     Array1D_int const colorkeyptr(NumColors,
-                                  {ColorNo_Text, ColorNo_Wall, ColorNo_Window, ColorNo_GlassDoor, ColorNo_Door, ColorNo_Floor, ColorNo_Roof,
-                                   ColorNo_ShdDetBldg, ColorNo_ShdDetFix, ColorNo_ShdAtt, ColorNo_PV, ColorNo_TDDDome, ColorNo_TDDDiffuser,
-                                   ColorNo_DaylSensor1, ColorNo_DaylSensor2});
+                                  {ColorNo_Text,
+                                   ColorNo_Wall,
+                                   ColorNo_Window,
+                                   ColorNo_GlassDoor,
+                                   ColorNo_Door,
+                                   ColorNo_Floor,
+                                   ColorNo_Roof,
+                                   ColorNo_ShdDetBldg,
+                                   ColorNo_ShdDetFix,
+                                   ColorNo_ShdAtt,
+                                   ColorNo_PV,
+                                   ColorNo_TDDDome,
+                                   ColorNo_TDDDiffuser,
+                                   ColorNo_DaylSensor1,
+                                   ColorNo_DaylSensor2});
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -219,8 +243,17 @@ namespace DataSurfaceColors {
             cAlphas({1, NumAlphas}) = "";
             rNumerics({1, numNumbers}) = 0.0;
 
-            inputProcessor->getObjectItem(CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          numptr,
+                                          cAlphas,
+                                          NumAlphas,
+                                          rNumerics,
+                                          numNumbers,
+                                          status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             for (numargs = 1; numargs <= numNumbers; ++numargs) {
                 numptr = rNumerics(numargs); // set to integer
                 if (lNumericBlanks(numargs)) {

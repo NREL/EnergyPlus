@@ -335,8 +335,17 @@ namespace TranspiredCollector {
         SplitterNameOK.dimension(NumUTSCSplitter, false);
 
         for (Item = 1; Item <= NumUTSC; ++Item) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Item,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             // first handle alphas
             UTSC(Item).Name = Alphas(1);
@@ -354,8 +363,8 @@ namespace TranspiredCollector {
                 NumbersSplit = 0.0;
                 AlphasSplit = "";
                 for (ItemSplit = 1; ItemSplit <= NumUTSCSplitter; ++ItemSplit) {
-                    inputProcessor->getObjectItem(CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit,
-                                                  IOStatusSplit);
+                    inputProcessor->getObjectItem(
+                        CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit);
                     if (!(UtilityRoutines::SameString(AlphasSplit(1), Alphas(1)))) continue;
                     SplitterNameOK(ItemSplit) = true;
                     UTSC(Item).NumOASysAttached = std::floor(NumAlphasSplit / 4.0);
@@ -374,21 +383,45 @@ namespace TranspiredCollector {
                     UTSC(Item).ZoneNode = 0;
                     for (NumOASys = 1; NumOASys <= UTSC(Item).NumOASysAttached; ++NumOASys) {
                         ACountBase = (NumOASys - 1) * 4 + 2;
-                        UTSC(Item).InletNode(NumOASys) = GetOnlySingleNode(AlphasSplit(ACountBase), ErrorsFound, CurrentModuleObject, AlphasSplit(1),
-                                                                           NodeType_Air, NodeConnectionType_Inlet, NumOASys, ObjectIsNotParent);
+                        UTSC(Item).InletNode(NumOASys) = GetOnlySingleNode(AlphasSplit(ACountBase),
+                                                                           ErrorsFound,
+                                                                           CurrentModuleObject,
+                                                                           AlphasSplit(1),
+                                                                           NodeType_Air,
+                                                                           NodeConnectionType_Inlet,
+                                                                           NumOASys,
+                                                                           ObjectIsNotParent);
 
-                        UTSC(Item).OutletNode(NumOASys) =
-                            GetOnlySingleNode(AlphasSplit(ACountBase + 1), ErrorsFound, CurrentModuleObject, AlphasSplit(1), NodeType_Air,
-                                              NodeConnectionType_Outlet, NumOASys, ObjectIsNotParent);
-                        TestCompSet(CurrentModuleObject, AlphasSplit(1), AlphasSplit(ACountBase), AlphasSplit(ACountBase + 1),
+                        UTSC(Item).OutletNode(NumOASys) = GetOnlySingleNode(AlphasSplit(ACountBase + 1),
+                                                                            ErrorsFound,
+                                                                            CurrentModuleObject,
+                                                                            AlphasSplit(1),
+                                                                            NodeType_Air,
+                                                                            NodeConnectionType_Outlet,
+                                                                            NumOASys,
+                                                                            ObjectIsNotParent);
+                        TestCompSet(CurrentModuleObject,
+                                    AlphasSplit(1),
+                                    AlphasSplit(ACountBase),
+                                    AlphasSplit(ACountBase + 1),
                                     "Transpired Collector Air Nodes"); // appears that test fails by design??
-                        UTSC(Item).ControlNode(NumOASys) =
-                            GetOnlySingleNode(AlphasSplit(ACountBase + 2), ErrorsFound, CurrentModuleObject, AlphasSplit(1), NodeType_Air,
-                                              NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                        UTSC(Item).ControlNode(NumOASys) = GetOnlySingleNode(AlphasSplit(ACountBase + 2),
+                                                                             ErrorsFound,
+                                                                             CurrentModuleObject,
+                                                                             AlphasSplit(1),
+                                                                             NodeType_Air,
+                                                                             NodeConnectionType_Sensor,
+                                                                             1,
+                                                                             ObjectIsNotParent);
 
-                        UTSC(Item).ZoneNode(NumOASys) =
-                            GetOnlySingleNode(AlphasSplit(ACountBase + 3), ErrorsFound, CurrentModuleObject, AlphasSplit(1), NodeType_Air,
-                                              NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                        UTSC(Item).ZoneNode(NumOASys) = GetOnlySingleNode(AlphasSplit(ACountBase + 3),
+                                                                          ErrorsFound,
+                                                                          CurrentModuleObject,
+                                                                          AlphasSplit(1),
+                                                                          NodeType_Air,
+                                                                          NodeConnectionType_Sensor,
+                                                                          1,
+                                                                          ObjectIsNotParent);
 
                     } // Each OA System in a Multisystem
                       // DEALLOCATE(AlphasSplit)
@@ -425,16 +458,16 @@ namespace TranspiredCollector {
                 UTSC(Item).ZoneNode.allocate(1);
                 UTSC(Item).ZoneNode(1) = 0;
 
-                UTSC(Item).InletNode(1) = GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                            NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-                UTSC(Item).OutletNode(1) = GetOnlySingleNode(Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                             NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                UTSC(Item).InletNode(1) = GetOnlySingleNode(
+                    Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                UTSC(Item).OutletNode(1) = GetOnlySingleNode(
+                    Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
                 TestCompSet(CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Transpired Collector Air Nodes");
 
-                UTSC(Item).ControlNode(1) = GetOnlySingleNode(Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                              NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-                UTSC(Item).ZoneNode(1) = GetOnlySingleNode(Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                           NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                UTSC(Item).ControlNode(1) = GetOnlySingleNode(
+                    Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                UTSC(Item).ZoneNode(1) = GetOnlySingleNode(
+                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             } // no splitter
 
             UTSC(Item).FreeHeatSetPointSchedPtr = GetScheduleIndex(Alphas(8));
@@ -621,35 +654,64 @@ namespace TranspiredCollector {
             tempHdeltaNPL = std::sin(TiltRads) * UTSC(Item).Height / 4.0;
             UTSC(Item).HdeltaNPL = max(tempHdeltaNPL, UTSC(Item).PlenGapThick);
 
-            SetupOutputVariable("Solar Collector Heat Exchanger Effectiveness", OutputProcessor::Unit::None, UTSC(Item).HXeff, "System", "Average",
+            SetupOutputVariable(
+                "Solar Collector Heat Exchanger Effectiveness", OutputProcessor::Unit::None, UTSC(Item).HXeff, "System", "Average", UTSC(Item).Name);
+            SetupOutputVariable(
+                "Solar Collector Leaving Air Temperature", OutputProcessor::Unit::C, UTSC(Item).TairHX, "System", "Average", UTSC(Item).Name);
+            SetupOutputVariable("Solar Collector Outside Face Suction Velocity",
+                                OutputProcessor::Unit::m_s,
+                                UTSC(Item).Vsuction,
+                                "System",
+                                "Average",
                                 UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Leaving Air Temperature", OutputProcessor::Unit::C, UTSC(Item).TairHX, "System", "Average",
-                                UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Outside Face Suction Velocity", OutputProcessor::Unit::m_s, UTSC(Item).Vsuction, "System", "Average",
-                                UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Surface Temperature", OutputProcessor::Unit::C, UTSC(Item).Tcoll, "System", "Average",
-                                UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Plenum Air Temperature", OutputProcessor::Unit::C, UTSC(Item).Tplen, "System", "Average",
-                                UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Sensible Heating Rate", OutputProcessor::Unit::W, UTSC(Item).SensHeatingRate, "System", "Average",
-                                UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Sensible Heating Energy", OutputProcessor::Unit::J, UTSC(Item).SensHeatingEnergy, "System", "Sum",
-                                UTSC(Item).Name, _, "SolarAir", "HeatProduced", _, "System");
+            SetupOutputVariable(
+                "Solar Collector Surface Temperature", OutputProcessor::Unit::C, UTSC(Item).Tcoll, "System", "Average", UTSC(Item).Name);
+            SetupOutputVariable(
+                "Solar Collector Plenum Air Temperature", OutputProcessor::Unit::C, UTSC(Item).Tplen, "System", "Average", UTSC(Item).Name);
+            SetupOutputVariable(
+                "Solar Collector Sensible Heating Rate", OutputProcessor::Unit::W, UTSC(Item).SensHeatingRate, "System", "Average", UTSC(Item).Name);
+            SetupOutputVariable("Solar Collector Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                UTSC(Item).SensHeatingEnergy,
+                                "System",
+                                "Sum",
+                                UTSC(Item).Name,
+                                _,
+                                "SolarAir",
+                                "HeatProduced",
+                                _,
+                                "System");
 
-            SetupOutputVariable("Solar Collector Natural Ventilation Air Change Rate", OutputProcessor::Unit::ach, UTSC(Item).PassiveACH, "System",
-                                "Average", UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC(Item).PassiveMdotVent,
-                                "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Wind Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC(Item).PassiveMdotWind,
-                                "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Buoyancy Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                UTSC(Item).PassiveMdotTherm, "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Incident Solar Radiation", OutputProcessor::Unit::W_m2, UTSC(Item).Isc, "System", "Average",
+            SetupOutputVariable("Solar Collector Natural Ventilation Air Change Rate",
+                                OutputProcessor::Unit::ach,
+                                UTSC(Item).PassiveACH,
+                                "System",
+                                "Average",
                                 UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector System Efficiency", OutputProcessor::Unit::None, UTSC(Item).UTSCEfficiency, "System", "Average",
+            SetupOutputVariable("Solar Collector Natural Ventilation Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                UTSC(Item).PassiveMdotVent,
+                                "System",
+                                "Average",
                                 UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Surface Efficiency", OutputProcessor::Unit::None, UTSC(Item).UTSCCollEff, "System", "Average",
+            SetupOutputVariable("Solar Collector Wind Natural Ventilation Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                UTSC(Item).PassiveMdotWind,
+                                "System",
+                                "Average",
                                 UTSC(Item).Name);
+            SetupOutputVariable("Solar Collector Buoyancy Natural Ventilation Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                UTSC(Item).PassiveMdotTherm,
+                                "System",
+                                "Average",
+                                UTSC(Item).Name);
+            SetupOutputVariable(
+                "Solar Collector Incident Solar Radiation", OutputProcessor::Unit::W_m2, UTSC(Item).Isc, "System", "Average", UTSC(Item).Name);
+            SetupOutputVariable(
+                "Solar Collector System Efficiency", OutputProcessor::Unit::None, UTSC(Item).UTSCEfficiency, "System", "Average", UTSC(Item).Name);
+            SetupOutputVariable(
+                "Solar Collector Surface Efficiency", OutputProcessor::Unit::None, UTSC(Item).UTSCCollEff, "System", "Average", UTSC(Item).Name);
         }
 
         for (ItemSplit = 1; ItemSplit <= NumUTSCSplitter; ++ItemSplit) {
@@ -832,8 +894,8 @@ namespace TranspiredCollector {
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::SkyTemp;
-        using DataHVACGlobals::TimeStepSys;
         using DataHeatBalSurface::TH;
+        using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using General::RoundSigDigits;
@@ -968,7 +1030,12 @@ namespace TranspiredCollector {
                 ShowContinueError("Occasional suction velocity messages are not unexpected when simulating actual conditions");
             }
             ShowRecurringWarningErrorAtEnd("Solar Collector:Unglazed Transpired=\"" + UTSC(UTSCNum).Name + "\", Suction velocity is outside of range",
-                                           UTSC(UTSCNum).VsucErrIndex, Vsuction, Vsuction, _, "[m/s]", "[m/s]");
+                                           UTSC(UTSCNum).VsucErrIndex,
+                                           Vsuction,
+                                           Vsuction,
+                                           _,
+                                           "[m/s]",
+                                           "[m/s]");
         }
 
         HcPlen = 5.62 + 3.92 * Vplen;
@@ -1008,8 +1075,8 @@ namespace TranspiredCollector {
             HMovInsul = 0.0;
             HExt = 0.0;
             LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-            InitExteriorConvectionCoeff(SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf),
-                                        HAirARR(ThisSurf));
+            InitExteriorConvectionCoeff(
+                SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
             AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
             TsoK = TH(1, 1, SurfPtr) + KelvinConv;
@@ -1018,7 +1085,8 @@ namespace TranspiredCollector {
         }
         //		AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
         auto Area(array_sub(
-            Surface, &SurfaceData::Area,
+            Surface,
+            &SurfaceData::Area,
             UTSC(UTSCNum).SurfPtrs)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
         AreaSum = sum(Area);
         // now figure area-weighted averages from underlying surfaces.
@@ -1222,10 +1290,26 @@ namespace TranspiredCollector {
 
         // all the work is done in this routine located in GeneralRoutines.cc
 
-        CalcPassiveExteriorBaffleGap(UTSC(UTSCNum).SurfPtrs, holeArea, UTSC(UTSCNum).Cv, UTSC(UTSCNum).Cd, UTSC(UTSCNum).HdeltaNPL,
-                                     UTSC(UTSCNum).SolAbsorp, UTSC(UTSCNum).LWEmitt, UTSC(UTSCNum).Tilt, AspRat, UTSC(UTSCNum).PlenGapThick,
-                                     UTSC(UTSCNum).CollRoughness, UTSC(UTSCNum).QdotSource, TmpTscoll, TmpTaPlen, HcPlen, HrPlen, Isc, MdotVent,
-                                     VdotWind, VdotThermal);
+        CalcPassiveExteriorBaffleGap(UTSC(UTSCNum).SurfPtrs,
+                                     holeArea,
+                                     UTSC(UTSCNum).Cv,
+                                     UTSC(UTSCNum).Cd,
+                                     UTSC(UTSCNum).HdeltaNPL,
+                                     UTSC(UTSCNum).SolAbsorp,
+                                     UTSC(UTSCNum).LWEmitt,
+                                     UTSC(UTSCNum).Tilt,
+                                     AspRat,
+                                     UTSC(UTSCNum).PlenGapThick,
+                                     UTSC(UTSCNum).CollRoughness,
+                                     UTSC(UTSCNum).QdotSource,
+                                     TmpTscoll,
+                                     TmpTaPlen,
+                                     HcPlen,
+                                     HrPlen,
+                                     Isc,
+                                     MdotVent,
+                                     VdotWind,
+                                     VdotThermal);
 
         // now fill results into derived types
         UTSC(UTSCNum).Isc = Isc;

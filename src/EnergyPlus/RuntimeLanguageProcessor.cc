@@ -232,10 +232,10 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using DataEnvironment::CurEnvirNum;
-        using DataEnvironment::DSTIndicator;
         using DataEnvironment::DayOfMonth;
         using DataEnvironment::DayOfWeek;
         using DataEnvironment::DayOfYear;
+        using DataEnvironment::DSTIndicator;
         using DataEnvironment::HolidayIndex;
         using DataEnvironment::IsRain;
         using DataEnvironment::Month;
@@ -2339,7 +2339,9 @@ namespace RuntimeLanguageProcessor {
                         ReturnValue = SetErlValueNumber(double(SeedIntARR(1))); // just return first number pass as seed
                         SeedIntARR.deallocate();
                     } else if (SELECT_CASE_var == FuncRhoAirFnPbTdbW) {
-                        ReturnValue = SetErlValueNumber(PsyRhoAirFnPbTdbW(Operand(1).Number, Operand(2).Number, Operand(3).Number,
+                        ReturnValue = SetErlValueNumber(PsyRhoAirFnPbTdbW(Operand(1).Number,
+                                                                          Operand(2).Number,
+                                                                          Operand(3).Number,
                                                                           EMSBuiltInFunction)); // result =>   density of moist air (kg/m3) | pressure
                                                                                                 // (Pa) | drybulb (C) | Humidity ratio (kg water
                                                                                                 // vapor/kg dry air) | called from
@@ -2360,11 +2362,14 @@ namespace RuntimeLanguageProcessor {
                                                                                                                // vapor/kg dry air) | drybulb (C)
                     } else if (SELECT_CASE_var == FuncTdpFnTdbTwbPb) {
                         ReturnValue = SetErlValueNumber(PsyTdpFnTdbTwbPb(
-                            Operand(1).Number, Operand(2).Number, Operand(3).Number,
+                            Operand(1).Number,
+                            Operand(2).Number,
+                            Operand(3).Number,
                             EMSBuiltInFunction)); // result =>   dew-point temperature {C} | drybulb (C) | wetbulb (C) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncTdpFnWPb) {
                         ReturnValue = SetErlValueNumber(PsyTdpFnWPb(
-                            Operand(1).Number, Operand(2).Number,
+                            Operand(1).Number,
+                            Operand(2).Number,
                             EMSBuiltInFunction)); // result =>  dew-point temperature {C} | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncHFnTdbW) {
                         ReturnValue = SetErlValueNumber(
@@ -2372,7 +2377,9 @@ namespace RuntimeLanguageProcessor {
                                        Operand(2).Number)); // result =>  enthalpy (J/kg) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air)
                     } else if (SELECT_CASE_var == FuncHFnTdbRhPb) {
                         ReturnValue = SetErlValueNumber(PsyHFnTdbRhPb(
-                            Operand(1).Number, Operand(2).Number, Operand(3).Number,
+                            Operand(1).Number,
+                            Operand(2).Number,
+                            Operand(3).Number,
                             EMSBuiltInFunction)); // result =>  enthalpy (J/kg) | drybulb (C) | relative humidity value (0.0 - 1.0) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncTdbFnHW) {
                         ReturnValue = SetErlValueNumber(PsyTdbFnHW(
@@ -2380,7 +2387,8 @@ namespace RuntimeLanguageProcessor {
                             Operand(2).Number)); // result =>  dry-bulb temperature {C} | enthalpy (J/kg) | Humidity ratio (kg water vapor/kg dry air)
                     } else if (SELECT_CASE_var == FuncRhovFnTdbRh) {
                         ReturnValue = SetErlValueNumber(PsyRhovFnTdbRh(
-                            Operand(1).Number, Operand(2).Number,
+                            Operand(1).Number,
+                            Operand(2).Number,
                             EMSBuiltInFunction)); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
                     } else if (SELECT_CASE_var == FuncRhovFnTdbRhLBnd0C) {
                         ReturnValue = SetErlValueNumber(PsyRhovFnTdbRhLBnd0C(
@@ -2393,41 +2401,55 @@ namespace RuntimeLanguageProcessor {
                                                                                                        // vapor/kg dry air) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncRhFnTdbRhov) {
                         ReturnValue = SetErlValueNumber(PsyRhFnTdbRhov(
-                            Operand(1).Number, Operand(2).Number,
+                            Operand(1).Number,
+                            Operand(2).Number,
                             EMSBuiltInFunction)); // result => relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
                     } else if (SELECT_CASE_var == FuncRhFnTdbRhovLBnd0C) {
                         ReturnValue = SetErlValueNumber(PsyRhFnTdbRhovLBnd0C(
-                            Operand(1).Number, Operand(2).Number,
+                            Operand(1).Number,
+                            Operand(2).Number,
                             EMSBuiltInFunction)); // relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
                     } else if (SELECT_CASE_var == FuncRhFnTdbWPb) {
-                        ReturnValue = SetErlValueNumber(PsyRhFnTdbWPb(Operand(1).Number, Operand(2).Number, Operand(3).Number,
+                        ReturnValue = SetErlValueNumber(PsyRhFnTdbWPb(Operand(1).Number,
+                                                                      Operand(2).Number,
+                                                                      Operand(3).Number,
                                                                       EMSBuiltInFunction)); // result =>  relative humidity value (0.0-1.0) | drybulb
                                                                                             // (C) | Humidity ratio (kg water vapor/kg dry air) |
                                                                                             // pressure (Pa)
                     } else if (SELECT_CASE_var == FuncTwbFnTdbWPb) {
-                        ReturnValue = SetErlValueNumber(PsyTwbFnTdbWPb(Operand(1).Number, Operand(2).Number, Operand(3).Number,
+                        ReturnValue = SetErlValueNumber(PsyTwbFnTdbWPb(Operand(1).Number,
+                                                                       Operand(2).Number,
+                                                                       Operand(3).Number,
                                                                        EMSBuiltInFunction)); // result=> Temperature Wet-Bulb {C} | drybulb (C) |
                                                                                              // Humidity ratio (kg water vapor/kg dry air) | pressure
                                                                                              // (Pa)
                     } else if (SELECT_CASE_var == FuncVFnTdbWPb) {
-                        ReturnValue = SetErlValueNumber(PsyVFnTdbWPb(Operand(1).Number, Operand(2).Number, Operand(3).Number,
+                        ReturnValue = SetErlValueNumber(PsyVFnTdbWPb(Operand(1).Number,
+                                                                     Operand(2).Number,
+                                                                     Operand(3).Number,
                                                                      EMSBuiltInFunction)); // result=> specific volume {m3/kg} | drybulb (C) |
                                                                                            // Humidity ratio (kg water vapor/kg dry air) | pressure
                                                                                            // (Pa)
                     } else if (SELECT_CASE_var == FuncWFnTdpPb) {
                         ReturnValue = SetErlValueNumber(PsyWFnTdpPb(
-                            Operand(1).Number, Operand(2).Number,
+                            Operand(1).Number,
+                            Operand(2).Number,
                             EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) | dew point temperature (C) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncWFnTdbH) {
                         ReturnValue = SetErlValueNumber(
-                            PsyWFnTdbH(Operand(1).Number, Operand(2).Number,
+                            PsyWFnTdbH(Operand(1).Number,
+                                       Operand(2).Number,
                                        EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | enthalpy (J/kg)
                     } else if (SELECT_CASE_var == FuncWFnTdbTwbPb) {
-                        ReturnValue = SetErlValueNumber(PsyWFnTdbTwbPb(Operand(1).Number, Operand(2).Number, Operand(3).Number,
+                        ReturnValue = SetErlValueNumber(PsyWFnTdbTwbPb(Operand(1).Number,
+                                                                       Operand(2).Number,
+                                                                       Operand(3).Number,
                                                                        EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) |
                                                                                              // drybulb (C) | wet-bulb temperature {C} | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncWFnTdbRhPb) {
-                        ReturnValue = SetErlValueNumber(PsyWFnTdbRhPb(Operand(1).Number, Operand(2).Number, Operand(3).Number,
+                        ReturnValue = SetErlValueNumber(PsyWFnTdbRhPb(Operand(1).Number,
+                                                                      Operand(2).Number,
+                                                                      Operand(3).Number,
                                                                       EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) |
                                                                                             // drybulb (C) | relative humidity value (0.0-1.0) |
                                                                                             // pressure (Pa)
@@ -2436,7 +2458,8 @@ namespace RuntimeLanguageProcessor {
                             PsyPsatFnTemp(Operand(1).Number, EMSBuiltInFunction)); // result=> saturation pressure {Pascals} | drybulb (C)
                     } else if (SELECT_CASE_var == FuncTsatFnHPb) {
                         ReturnValue = SetErlValueNumber(
-                            PsyTsatFnHPb(Operand(1).Number, Operand(2).Number,
+                            PsyTsatFnHPb(Operand(1).Number,
+                                         Operand(2).Number,
                                          EMSBuiltInFunction)); // result=> saturation temperature {C} | enthalpy {J/kg} | pressure (Pa)
                                                                //      CASE (FuncTsatFnPb)
                                                                //        ReturnValue = NumberValue( &   ! result=> saturation temperature {C}
@@ -2631,26 +2654,35 @@ namespace RuntimeLanguageProcessor {
                                                                                                                  // independent | 4th independent |
                                                                                                                  // 5th independent
                         } else if (Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number), Operand(2).Number,
+                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                                                                       Operand(2).Number,
                                                                        Operand(3).Number)); // curve index | X value | Y value, 2nd independent | Z
                                                                                             // Value, 3rd independent | 4th independent | 5th
                                                                                             // independent
                         } else if (Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number,
+                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                                                                       Operand(2).Number,
+                                                                       Operand(3).Number,
                                                                        Operand(4).Number)); // curve index | X value | Y value, 2nd independent | Z
                                                                                             // Value, 3rd independent | 4th independent | 5th
                                                                                             // independent
                         } else if (Operand(6).Type == 0) {
                             ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number,
+                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                                                             Operand(2).Number,
+                                                             Operand(3).Number,
+                                                             Operand(4).Number,
                                                              Operand(5).Number)); // curve index | X value | Y value, 2nd independent | Z Value, 3rd
                                                                                   // independent | 4th independent | 5th independent
                         } else {
-                            ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number), Operand(2).Number, Operand(3).Number, Operand(4).Number,
-                                                             Operand(5).Number, Operand(6).Number)); // curve index | X value | Y value, 2nd
-                                                                                                     // independent | Z Value, 3rd independent | 4th
-                                                                                                     // independent | 5th independent
+                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                                                                       Operand(2).Number,
+                                                                       Operand(3).Number,
+                                                                       Operand(4).Number,
+                                                                       Operand(5).Number,
+                                                                       Operand(6).Number)); // curve index | X value | Y value, 2nd
+                                                                                            // independent | Z Value, 3rd independent | 4th
+                                                                                            // independent | 5th independent
                         }
 
                     } else {
@@ -2767,6 +2799,10 @@ namespace RuntimeLanguageProcessor {
             inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
+            cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
+            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            MaxNumNumbers = max(MaxNumNumbers, NumNums);
+            MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:Variable";
             inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
@@ -2828,19 +2864,45 @@ namespace RuntimeLanguageProcessor {
                     // name of the module object, and add an offset for the variable number
                     // This is done in the following IF/THEN section.
                     if (GlobalNum <= NumUserGlobalVariables) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                      lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                      GlobalNum,
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNums,
+                                                      IOStat,
+                                                      lNumericFieldBlanks,
+                                                      lAlphaFieldBlanks,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
                     } else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:Variable";
-                        inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas, rNumericArgs,
-                                                      NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                      GlobalNum - NumUserGlobalVariables,
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNums,
+                                                      IOStat,
+                                                      lNumericFieldBlanks,
+                                                      lAlphaFieldBlanks,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
                     } else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables &&
                                GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
                                                 NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-                        inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
-                                                      cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                                      cAlphaFieldNames, cNumericFieldNames);
+                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                      GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNums,
+                                                      IOStat,
+                                                      lNumericFieldBlanks,
+                                                      lAlphaFieldBlanks,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
 
                     } else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
                                                NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables &&
@@ -2851,8 +2913,15 @@ namespace RuntimeLanguageProcessor {
                         inputProcessor->getObjectItem(cCurrentModuleObject,
                                                       GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables -
                                                           NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
-                                                      cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                                      cAlphaFieldNames, cNumericFieldNames);
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNums,
+                                                      IOStat,
+                                                      lNumericFieldBlanks,
+                                                      lAlphaFieldBlanks,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
                     }
 
                     // loop over each alpha and register variable named as global Erl variable
@@ -2861,8 +2930,8 @@ namespace RuntimeLanguageProcessor {
                             if (ErlVarLoop == 1) {
                                 // Only validate first field of object ExternalInterface:FunctionalMockupUnitImport:To:Variable.
                                 // This object is allowed to contain fields that do not need to be valid EMS fields (e.g. path to the FMU).
-                                ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag,
-                                                        ErrorsFound);
+                                ValidateEMSVariableName(
+                                    cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
                             }
                         } else {
                             ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
@@ -2898,8 +2967,17 @@ namespace RuntimeLanguageProcessor {
             if (NumEMSCurveIndices > 0) {
                 CurveIndexVariableNums.dimension(NumEMSCurveIndices, 0);
                 for (loop = 1; loop <= NumEMSCurveIndices; ++loop) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                  lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  loop,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
 
                     // check if variable name is unique and well formed
                     ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
@@ -2948,8 +3026,17 @@ namespace RuntimeLanguageProcessor {
             if (NumEMSConstructionIndices > 0) {
                 ConstructionIndexVariableNums.dimension(NumEMSConstructionIndices, 0);
                 for (loop = 1; loop <= NumEMSConstructionIndices; ++loop) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                  lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  loop,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
 
                     // check if variable name is unique and well formed
                     ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
@@ -3003,10 +3090,19 @@ namespace RuntimeLanguageProcessor {
             if (NumErlPrograms > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:Program";
                 for (StackNum = 1; StackNum <= NumErlPrograms; ++StackNum) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                  lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-                    GlobalNames::VerifyUniqueInterObjectName(ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  StackNum,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
+                    GlobalNames::VerifyUniqueInterObjectName(
+                        ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     ValidateEMSProgramName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Programs", errFlag, ErrorsFound);
                     if (!errFlag) {
@@ -3025,10 +3121,19 @@ namespace RuntimeLanguageProcessor {
             if (NumErlSubroutines > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
                 for (StackNum = NumErlPrograms + 1; StackNum <= NumErlStacks; ++StackNum) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, StackNum - NumErlPrograms, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
-                                                  IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-                    GlobalNames::VerifyUniqueInterObjectName(ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  StackNum - NumErlPrograms,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
+                    GlobalNames::VerifyUniqueInterObjectName(
+                        ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     ValidateEMSProgramName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Subroutines", errFlag, ErrorsFound);
                     if (!errFlag) {
@@ -3048,8 +3153,17 @@ namespace RuntimeLanguageProcessor {
             if (NumErlTrendVariables > 0) {
                 TrendVariable.allocate(NumErlTrendVariables);
                 for (TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, TrendNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                  lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  TrendNum,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
                     UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                     ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
@@ -3131,10 +3245,19 @@ namespace RuntimeLanguageProcessor {
             if (NumEMSOutputVariables > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
                 for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables; ++RuntimeReportVarNum) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject, RuntimeReportVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                  lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-                    GlobalNames::VerifyUniqueInterObjectName(RuntimeReportVarUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  RuntimeReportVarNum,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
+                    GlobalNames::VerifyUniqueInterObjectName(
+                        RuntimeReportVarUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     lbracket = index(cAlphaArgs(1), '[');
                     if (lbracket == std::string::npos) {
@@ -3263,8 +3386,22 @@ namespace RuntimeLanguageProcessor {
                     if (curUnit != OutputProcessor::Unit::unknown) {
                         SetupOutputVariable(cAlphaArgs(1), curUnit, RuntimeReportVar(RuntimeReportVarNum).Value, FreqString, VarTypeString, "EMS");
                     } else {
-                        SetupOutputVariable(cAlphaArgs(1), OutputProcessor::Unit::customEMS, RuntimeReportVar(RuntimeReportVarNum).Value, FreqString,
-                                            VarTypeString, "EMS", _, _, _, _, _, _, _, _, _, UnitsB);
+                        SetupOutputVariable(cAlphaArgs(1),
+                                            OutputProcessor::Unit::customEMS,
+                                            RuntimeReportVar(RuntimeReportVarNum).Value,
+                                            FreqString,
+                                            VarTypeString,
+                                            "EMS",
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            UnitsB);
                     }
                     // Last field is index key, no indexing here so mimic weather output data
 
@@ -3275,11 +3412,20 @@ namespace RuntimeLanguageProcessor {
                 cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
                 for (loop = 1; loop <= NumEMSMeteredOutputVariables; ++loop) {
                     RuntimeReportVarNum = NumEMSOutputVariables + loop;
-                    inputProcessor->getObjectItem(cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                  lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  loop,
+                                                  cAlphaArgs,
+                                                  NumAlphas,
+                                                  rNumericArgs,
+                                                  NumNums,
+                                                  IOStat,
+                                                  lNumericFieldBlanks,
+                                                  lAlphaFieldBlanks,
+                                                  cAlphaFieldNames,
+                                                  cNumericFieldNames);
 
-                    GlobalNames::VerifyUniqueInterObjectName(RuntimeReportVarUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                             ErrorsFound);
+                    GlobalNames::VerifyUniqueInterObjectName(
+                        RuntimeReportVarUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     lbracket = index(cAlphaArgs(1), '[');
                     if (lbracket == std::string::npos) {
@@ -3535,11 +3681,29 @@ namespace RuntimeLanguageProcessor {
                     if (!lAlphaFieldBlanks(8)) {
                         EndUseSubCatString = cAlphaArgs(8);
 
-                        SetupOutputVariable(cAlphaArgs(1), curUnit, RuntimeReportVar(RuntimeReportVarNum).Value, FreqString, VarTypeString, "EMS", _,
-                                            ResourceTypeString, EndUseTypeString, EndUseSubCatString, GroupTypeString);
+                        SetupOutputVariable(cAlphaArgs(1),
+                                            curUnit,
+                                            RuntimeReportVar(RuntimeReportVarNum).Value,
+                                            FreqString,
+                                            VarTypeString,
+                                            "EMS",
+                                            _,
+                                            ResourceTypeString,
+                                            EndUseTypeString,
+                                            EndUseSubCatString,
+                                            GroupTypeString);
                     } else { // no subcat
-                        SetupOutputVariable(cAlphaArgs(1), curUnit, RuntimeReportVar(RuntimeReportVarNum).Value, FreqString, VarTypeString, "EMS", _,
-                                            ResourceTypeString, EndUseTypeString, _, GroupTypeString);
+                        SetupOutputVariable(cAlphaArgs(1),
+                                            curUnit,
+                                            RuntimeReportVar(RuntimeReportVarNum).Value,
+                                            FreqString,
+                                            VarTypeString,
+                                            "EMS",
+                                            _,
+                                            ResourceTypeString,
+                                            EndUseTypeString,
+                                            _,
+                                            GroupTypeString);
                     }
                 }
             } // NumEMSMeteredOutputVariables > 0

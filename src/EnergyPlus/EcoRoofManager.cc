@@ -100,9 +100,9 @@ namespace EcoRoofManager {
     using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataHeatBalance;
+    using DataWater::Irrigation;
     using DataWater::IrrSchedDesign;
     using DataWater::IrrSmartSched;
-    using DataWater::Irrigation;
     using DataWater::RainFall;
     using DataWater::RainSchedDesign;
     // Use statements for access to subroutines in other modules
@@ -323,8 +323,15 @@ namespace EcoRoofManager {
         HMovInsul = 0.0;
 
         if (Surface(SurfNum).ExtWind) {
-            InitExteriorConvectionCoeff(SurfNum, HMovInsul, RoughSurf, AbsThermSurf, TH(1, 1, SurfNum), HcExtSurf(SurfNum), HSkyExtSurf(SurfNum),
-                                        HGrdExtSurf(SurfNum), HAirExtSurf(SurfNum));
+            InitExteriorConvectionCoeff(SurfNum,
+                                        HMovInsul,
+                                        RoughSurf,
+                                        AbsThermSurf,
+                                        TH(1, 1, SurfNum),
+                                        HcExtSurf(SurfNum),
+                                        HSkyExtSurf(SurfNum),
+                                        HGrdExtSurf(SurfNum),
+                                        HAirExtSurf(SurfNum));
         }
 
         RS = BeamSolarRad + AnisoSkyMult(SurfNum) * DifSolarRad;
@@ -371,23 +378,23 @@ namespace EcoRoofManager {
             SetupOutputVariable("Green Roof Vegetation Temperature", OutputProcessor::Unit::C, Tf, "Zone", "State", "Environment");
             SetupOutputVariable("Green Roof Soil Root Moisture Ratio", OutputProcessor::Unit::None, MeanRootMoisture, "Zone", "State", "Environment");
             SetupOutputVariable("Green Roof Soil Near Surface Moisture Ratio", OutputProcessor::Unit::None, Moisture, "Zone", "State", "Environment");
-            SetupOutputVariable("Green Roof Soil Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensibleg, "Zone", "State",
-                                "Environment");
-            SetupOutputVariable("Green Roof Vegetation Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensiblef, "Zone", "State",
-                                "Environment");
+            SetupOutputVariable(
+                "Green Roof Soil Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensibleg, "Zone", "State", "Environment");
+            SetupOutputVariable(
+                "Green Roof Vegetation Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensiblef, "Zone", "State", "Environment");
             SetupOutputVariable("Green Roof Vegetation Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxf, "Zone", "State", "Environment");
             SetupOutputVariable("Green Roof Soil Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxg, "Zone", "State", "Environment");
-            SetupOutputVariable("Green Roof Vegetation Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lf, "Zone", "State",
-                                "Environment");
-            SetupOutputVariable("Green Roof Soil Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lg, "Zone", "State",
-                                "Environment");
+            SetupOutputVariable(
+                "Green Roof Vegetation Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lf, "Zone", "State", "Environment");
+            SetupOutputVariable(
+                "Green Roof Soil Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lg, "Zone", "State", "Environment");
 
             SetupOutputVariable("Green Roof Cumulative Precipitation Depth", OutputProcessor::Unit::m, CumPrecip, "Zone", "Sum", "Environment");
             SetupOutputVariable("Green Roof Cumulative Irrigation Depth", OutputProcessor::Unit::m, CumIrrigation, "Zone", "Sum", "Environment");
             SetupOutputVariable("Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, CumRunoff, "Zone", "Sum", "Environment");
             SetupOutputVariable("Green Roof Cumulative Evapotranspiration Depth", OutputProcessor::Unit::m, CumET, "Zone", "Sum", "Environment");
-            SetupOutputVariable("Green Roof Current Precipitation Depth", OutputProcessor::Unit::m, CurrentPrecipitation, "Zone", "Sum",
-                                "Environment");
+            SetupOutputVariable(
+                "Green Roof Current Precipitation Depth", OutputProcessor::Unit::m, CurrentPrecipitation, "Zone", "Sum", "Environment");
             SetupOutputVariable("Green Roof Current Irrigation Depth", OutputProcessor::Unit::m, CurrentIrrigation, "Zone", "Sum", "Environment");
             SetupOutputVariable("Green Roof Current Runoff Depth", OutputProcessor::Unit::m, CurrentRunoff, "Zone", "Sum", "Environment");
             SetupOutputVariable("Green Roof Current Evapotranspiration Depth", OutputProcessor::Unit::m, CurrentET, "Zone", "Sum", "Environment");
@@ -431,8 +438,8 @@ namespace EcoRoofManager {
 
         // If current surface is = FirstEcoSurf then for this time step we need to update the soil moisture
         if (SurfNum == FirstEcoSurf) {
-            UpdateSoilProps(Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf,
-                            Qsoil);
+            UpdateSoilProps(
+                Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
 
             Ta = OutDryBulbTempAt(Surface(SurfNum).Centroid.z); // temperature outdoor - Surface is dry, use normal correlation
             Tg = Tgold;
@@ -961,8 +968,10 @@ namespace EcoRoofManager {
                     ShowContinueError("Value is set to 0.0001 and simulation continues.");
                     ShowContinueError("You may wish to increase the number of timesteps to attempt to alleviate the problem.");
                 }
-                ShowRecurringWarningErrorAtEnd("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues", ErrIndex,
-                                               RelativeSoilSaturationTop, RelativeSoilSaturationTop);
+                ShowRecurringWarningErrorAtEnd("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues",
+                                               ErrIndex,
+                                               RelativeSoilSaturationTop,
+                                               RelativeSoilSaturationTop);
                 RelativeSoilSaturationTop = 0.0001;
             }
             SoilHydroConductivityTop = SoilConductivitySaturation * std::pow(RelativeSoilSaturationTop, lambda) *
