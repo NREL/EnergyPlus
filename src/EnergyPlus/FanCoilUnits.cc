@@ -2174,7 +2174,7 @@ namespace FanCoilUnits {
         Real64 Relax;
         Real64 DelPLR;
         Real64 mdot;
-        Real64 Low_mdot;
+        // Real64 Low_mdot;
         Real64 QSensUnitOutNoATM;     // unit output not including air added by supply side air terminal mixer
         int SolFlag;                  // return flag from RegulaFalsi for sensible load
         Array1D<Real64> Par(10);      // parameters passed to RegulaFalsi function
@@ -2184,7 +2184,7 @@ namespace FanCoilUnits {
         Real64 RhoAir;                // density of air [kg/m3]
         Real64 MinSAMassFlowRate;     // minimum supply air mass flow rate [kg/s]
         Real64 MaxSAMassFlowRate;     // maximum supply air mass flow rate [kg/s]
-        Real64 FCOutletTempOn;        // ASHRAE outlet air temperature when coil is on [C]
+        // Real64 FCOutletTempOn;        // ASHRAE outlet air temperature when coil is on [C]
         Real64 HWFlow;                // hot water mass flow rate solution [kg/s]		Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
         Real64 MdotLockH;             // saved value of locked chilled water mass flow rate [kg/s]
         Real64 MdotLockC;             // saved value of locked hot water mass flow rate [kg/s]

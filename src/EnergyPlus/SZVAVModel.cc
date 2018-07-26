@@ -774,7 +774,7 @@ namespace SZVAVModel {
                 if (coilFluidInletNode > 0) DataLoopNode::Node(coilFluidInletNode).MassFlowRate = lowWaterMdot;
                 PackagedTerminalHeatPump::CalcPTUnit(
                     SysIndex, FirstHVACIteration, 0.0, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
-                if (CoolingLoad && TempSensOutput > ZoneLoad || HeatingLoad && TempSensOutput < ZoneLoad) {
+                if ((CoolingLoad && (TempSensOutput > ZoneLoad)) || (HeatingLoad && (TempSensOutput < ZoneLoad))) {
                     // can unit get there with max water flow?
                     if (coilFluidInletNode > 0) DataLoopNode::Node(coilFluidInletNode).MassFlowRate = maxCoilFluidFlow;
                     PackagedTerminalHeatPump::CalcPTUnit(
@@ -786,7 +786,7 @@ namespace SZVAVModel {
                             maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilLoopNum, coilLoopSide, coilBranchNum, coilCompNum);
                     Par(10) = maxCoilFluidFlow; // max water flow rate
 
-                    if (CoolingLoad && TempSensOutput < ZoneLoad || HeatingLoad && TempSensOutput > ZoneLoad) {
+                    if ((CoolingLoad && (TempSensOutput < ZoneLoad)) || (HeatingLoad && (TempSensOutput > ZoneLoad))) {
                         Par(9) = lowWaterMdot; // minCoilFluidFlow - low fan speed water flow rate > 0 if SAT limited
                         Par(12) = AirMassFlow; // sets air flow rate used when iterating on coil capacity
                         Par(13) = 0.0;         // other than 0 means to iterate on SA temperature
@@ -949,7 +949,7 @@ namespace SZVAVModel {
                         bool const &HeatingLoad,
                         Real64 const &ZoneLoad,
                         Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
+                        bool const &EP_UNUSED(HXUnitOn),
                         int const &AirLoopNum,
                         Real64 &PartLoadRatio,
                         int const &CompressorONFlag)
@@ -1059,7 +1059,7 @@ namespace SZVAVModel {
         Real64 ZoneHumRat = DataLoopNode::Node(SZVAVModel.NodeNumOfControlledZone).HumRat;
         // initialize flow variables to 0
         Real64 lowWaterMdot = 0.0;
-        Real64 SupHeaterLoad = 0.0;
+        // Real64 SupHeaterLoad = 0.0;
 
         // model attempts to control air flow rate and coil capacity in specific operating regions:
         // Region 1 (R1) - minimum air flow rate at modulated coil capacity (up to min/max temperature limits)
@@ -1190,7 +1190,7 @@ namespace SZVAVModel {
                 // does unit have capacity less than load at this air flow rate
                 if (coilFluidInletNode > 0) DataLoopNode::Node(coilFluidInletNode).MassFlowRate = lowWaterMdot;
                 FanCoilUnits::Calc4PipeFanCoil(SysIndex, SZVAVModel.ControlZoneNum, FirstHVACIteration, TempSensOutput, 0.0);
-                if (CoolingLoad && TempSensOutput > ZoneLoad || HeatingLoad && TempSensOutput < ZoneLoad) {
+                if ((CoolingLoad && (TempSensOutput > ZoneLoad)) || (HeatingLoad && (TempSensOutput < ZoneLoad))) {
                     // can unit get there with max water flow?
                     if (coilFluidInletNode > 0) DataLoopNode::Node(coilFluidInletNode).MassFlowRate = maxCoilFluidFlow;
                     FanCoilUnits::Calc4PipeFanCoil(SysIndex, SZVAVModel.ControlZoneNum, FirstHVACIteration, TempSensOutput, 1.0);
@@ -1201,7 +1201,7 @@ namespace SZVAVModel {
                             maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilLoopNum, coilLoopSide, coilBranchNum, coilCompNum);
                     Par(10) = maxCoilFluidFlow; // max water flow rate
 
-                    if (CoolingLoad && TempSensOutput < ZoneLoad || HeatingLoad && TempSensOutput > ZoneLoad) {
+                    if ((CoolingLoad && (TempSensOutput < ZoneLoad)) || (HeatingLoad && (TempSensOutput > ZoneLoad))) {
                         Par(9) = lowWaterMdot; // minCoilFluidFlow - low fan speed water flow rate > 0 if SAT limited
                         Par(12) = AirMassFlow; // sets air flow rate used when iterating on coil capacity
                         Par(13) = 0.0;         // other than 0 means to iterate on SA temperature

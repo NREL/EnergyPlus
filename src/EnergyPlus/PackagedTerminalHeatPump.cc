@@ -8915,7 +8915,7 @@ namespace PackagedTerminalHeatPump {
         } else {
             FirstHVACIteration = false;
         }
-        int ControlledZoneNum = int(Par(3));
+        // int ControlledZoneNum = int(Par(3));
         Real64 QZnReq = Par(4);
         int WaterControlNode = int(Par(5));
         Real64 OnOffAirFlowRat = Par(6);

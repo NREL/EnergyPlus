@@ -263,16 +263,16 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     DataLoopNode::Node(1).Temp = 24.0;
     DataLoopNode::Node(1).HumRat = 0.011;
     DataLoopNode::Node(1).Enthalpy = 52120.0;
-    bool ErrorsFound = false;
+    // bool ErrorsFound = false;
     // set zone condition
-    int ZoneNode = NodeInputManager::GetOnlySingleNode("ZoneNode",
-                                                       ErrorsFound,
-                                                       "PTUnit",
-                                                       "PTUnit",
-                                                       DataLoopNode::NodeType_Air,
-                                                       DataLoopNode::NodeConnectionType_Inlet,
-                                                       1,
-                                                       DataLoopNode::ObjectIsNotParent);
+    //int ZoneNode = NodeInputManager::GetOnlySingleNode("ZoneNode",
+    //                                                   ErrorsFound,
+    //                                                   "PTUnit",
+    //                                                   "PTUnit",
+    //                                                   DataLoopNode::NodeType_Air,
+    //                                                   DataLoopNode::NodeConnectionType_Inlet,
+    //                                                   1,
+    //                                                   DataLoopNode::ObjectIsNotParent);
 
     DataLoopNode::Node(5).Temp = 24.0;
     DataLoopNode::Node(5).HumRat = 0.011;
