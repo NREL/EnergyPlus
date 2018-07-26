@@ -14,7 +14,7 @@ std::string dbl_to_string(double dbl) {
   strs << dbl;
   std::string str = strs.str();
   return str;
-};
+}
 
 TEST_F( GC10aFixture, GC10a)
 {

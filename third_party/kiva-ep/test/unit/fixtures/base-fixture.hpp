@@ -39,7 +39,7 @@ protected:
   }
 
   std::shared_ptr<Ground> ground;
-  std::map<Surface::SurfaceType, std::vector<GroundOutput::OutputType>> outputMap;
+  std::vector<Surface::SurfaceType> outputMap;
   BoundaryConditions bcs;
   Foundation fnd;
   double dbt[24]{2.8, 2.4, 2.2, 2.2, 2.2, 2.4, 2.8, 3.2, 3.7, 4.2, 4.7, 5.2,

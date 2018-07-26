@@ -9,6 +9,7 @@ namespace Kiva {
 class BoundaryConditions {
 public:
   double indoorTemp;
+  double indoorRadiantTemp;
   double outdoorTemp;
   double localWindSpeed;
   double solarAzimuth;
@@ -21,6 +22,7 @@ public:
 
   BoundaryConditions() :
     indoorTemp(293.15),
+    indoorRadiantTemp(293.15),
     outdoorTemp(273.15),
     localWindSpeed(0.0),
     solarAzimuth(3.14),

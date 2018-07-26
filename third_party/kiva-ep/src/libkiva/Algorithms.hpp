@@ -43,7 +43,7 @@ double getEffectiveExteriorViewFactor(double eSky,
 
 double getSimpleInteriorIRCoeff(double eSurf,
                             double Tsurf,
-                            double Tamb);
+                            double Trad);
 
 }
 

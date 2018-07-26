@@ -19,10 +19,11 @@ public:
     OT_AVG_TEMP,  // Actual average temperature of the surface (the sign of (Tin - Tthis) may not agree with sign of Qavg)
     OT_EFF_TEMP,  // Effective temperature used as a boundary condition on the other side of floor/wall constructions (if Kiva is used as a pre-processor)
     OT_RATE,
-    OT_CONV
+    OT_CONV,
+    OT_RAD
   };
 
-  typedef std::map<Surface::SurfaceType, std::vector<OutputType>> OutputMap;
+  typedef std::vector<Surface::SurfaceType> OutputMap;
 
   GroundOutput(OutputMap oM) : outputMap(oM)
   {};

@@ -93,7 +93,7 @@ namespace HeatBalanceKivaManager {
     }
 
     KivaInstanceMap::KivaInstanceMap(Kiva::Foundation &foundation,
-                                     std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> oM,
+                                     std::vector<Kiva::Surface::SurfaceType> oM,
                                      int floorSurface,
                                      std::vector<int> wallSurfaces,
                                      int zoneNum,
@@ -331,11 +331,14 @@ namespace HeatBalanceKivaManager {
             break;
         }
         }
+        bcs.indoorRadiantTemp = bcs.indoorTemp;
+
     }
 
     void KivaInstanceMap::setBoundaryConditions()
     {
         bcs.indoorTemp = DataHeatBalFanSys::MAT(zoneNum) + DataGlobals::KelvinConv;
+        bcs.indoorRadiantTemp = bcs.indoorTemp;
         bcs.outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobals::KelvinConv;
         bcs.localWindSpeed = DataEnvironment::WindSpeedAt(ground.foundation.surfaceRoughness);
         bcs.solarAzimuth = std::atan2(DataEnvironment::SOLCOS(1), DataEnvironment::SOLCOS(2));
@@ -942,18 +945,16 @@ namespace HeatBalanceKivaManager {
                     foundationInstances[inst] = fnd;
 
                     // create output map for ground instance. Calculate average temperature, flux, and convection for each surface
-                    std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> outputMap;
+                    std::vector<Kiva::Surface::SurfaceType> outputMap;
 
-                    outputMap[Kiva::Surface::ST_SLAB_CORE] = {Kiva::GroundOutput::OT_FLUX, Kiva::GroundOutput::OT_TEMP, Kiva::GroundOutput::OT_CONV};
+                    outputMap.push_back(Kiva::Surface::ST_SLAB_CORE);
 
                     if (fnd.hasPerimeterSurface) {
-                        outputMap[Kiva::Surface::ST_SLAB_PERIM] = {
-                            Kiva::GroundOutput::OT_FLUX, Kiva::GroundOutput::OT_TEMP, Kiva::GroundOutput::OT_CONV};
+                        outputMap.push_back(Kiva::Surface::ST_SLAB_PERIM);
                     }
 
                     if (fnd.foundationDepth > 0.0) {
-                        outputMap[Kiva::Surface::ST_WALL_INT] = {
-                            Kiva::GroundOutput::OT_FLUX, Kiva::GroundOutput::OT_TEMP, Kiva::GroundOutput::OT_CONV};
+                        outputMap.push_back(Kiva::Surface::ST_WALL_INT);
                     }
 
                     // point surface to associated ground intance(s)

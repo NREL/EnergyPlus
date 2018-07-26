@@ -446,7 +446,7 @@ void ExteriorAirCell::calcCellADI(std::size_t /*dim*/, const double &/*timestep*
                                   double &A, double (&)[2], double &bVal)
 {
   doOutdoorTemp(bcs, A, bVal);
-};
+}
 
 
 void ExteriorAirCell::calcCellMatrix(Foundation::NumericalScheme, const double &/*timestep*/,
@@ -508,7 +508,7 @@ void InteriorAirCell::calcCellADI(std::size_t /*dim*/, const double &/*timestep*
                                   double &A, double (&)[2], double &bVal)
 {
   doIndoorTemp(bcs, A, bVal);
-};
+}
 
 std::vector<double> InteriorAirCell::calculateHeatFlux(int /*ndims*/, double &/*TNew*/,
                                                        std::size_t /*nX*/, std::size_t /*nY*/, std::size_t /*nZ*/,
@@ -665,7 +665,7 @@ double BoundaryCell::calcCellExplicit(double /*timestep*/, const Foundation &fou
       return bcs.outdoorTemp;
     case Surface::INTERIOR_FLUX:
       return ifCellExplicit(dim, dir, foundation, bcs);
-    case Surface::EXTERIOR_FLUX:
+    default: // case Surface::EXTERIOR_FLUX:
       return efCellExplicit(dim, dir, foundation, bcs);
   }
 }
@@ -841,6 +841,21 @@ std::vector<double> BoundaryCell::calculateHeatFlux(int ndims, double &TNew,
   return Qflux;
 }
 
+#define INTFLUX_PREFACE \
+double Tair = bcs.indoorTemp; \
+double Trad = bcs.indoorRadiantTemp; \
+double hc = foundation.getConvectionCoeff(*told_ptr, Tair,0.0,0.00208,false,surfacePtr->tilt); \
+double hr = getSimpleInteriorIRCoeff(surfacePtr->emissivity, *told_ptr,Trad);
+
+#define EXTFLUX_PREFACE \
+double Tair = bcs.outdoorTemp; \
+double v = bcs.localWindSpeed; \
+double eSky = bcs.skyEmissivity; \
+double tilt = surfacePtr->tilt; \
+double F = getEffectiveExteriorViewFactor(eSky,tilt); \
+double hc = foundation.getConvectionCoeff(*told_ptr,Tair,v,foundation.surfaceRoughness,true,tilt); \
+double hr = getExteriorIRCoeff(surfacePtr->emissivity,*told_ptr,Tair,eSky,tilt);
+
 void BoundaryCell::zfCellADI(const int &dim, const int &sdim, const int &sign,
                              double &A, double &Alt, double &bVal)
 {
@@ -858,11 +873,8 @@ void BoundaryCell::ifCellADI(const int &dim, const int &sdim, const int &dir,
                              const Foundation &foundation, const BoundaryConditions &bcs,
                              double &A, double &Alt, double &bVal)
 {
-  double Tair = bcs.indoorTemp;
-  double hc = foundation.getConvectionCoeff(*told_ptr,
-                                            Tair,0.0,0.00208,false,surfacePtr->tilt);
-  double hr = getSimpleInteriorIRCoeff(surfacePtr->emissivity,
-                                       *told_ptr,Tair);
+  INTFLUX_PREFACE
+
   int sign = (dir==0)? -1 : 1;
 
   A = kcoeff[sdim][dir]/dist[sdim][dir] + (hc + hr);
@@ -879,13 +891,8 @@ void BoundaryCell::efCellADI(const int &dim, const int &sdim, const int &dir,
                              const Foundation &foundation, const BoundaryConditions &bcs,
                              double &A, double &Alt, double &bVal)
 {
-  double Tair = bcs.outdoorTemp;
-  double v = bcs.localWindSpeed;
-  double eSky = bcs.skyEmissivity;
-  double tilt = surfacePtr->tilt;
-  double F = getEffectiveExteriorViewFactor(eSky,tilt);
-  double hc = foundation.getConvectionCoeff(*told_ptr,Tair,v,foundation.surfaceRoughness,true,tilt);
-  double hr = getExteriorIRCoeff(surfacePtr->emissivity,*told_ptr,Tair,eSky,tilt);
+  EXTFLUX_PREFACE
+
   int sign = (dir==0)? -1 : 1;
 
   A = kcoeff[sdim][dir]/dist[sdim][dir] + (hc + hr);
@@ -909,11 +916,7 @@ void BoundaryCell::ifCellMatrix(const int &dim, const int &dir,
                                 const Foundation &foundation, const BoundaryConditions &bcs,
                                 double &A, double &Alt, double &bVal)
 {
-  double Tair = bcs.indoorTemp;
-  double hc = foundation.getConvectionCoeff(*told_ptr,
-                                            Tair,0.0,0.00208,false,surfacePtr->tilt);
-  double hr = getSimpleInteriorIRCoeff(surfacePtr->emissivity,
-                                       *told_ptr,Tair);
+  INTFLUX_PREFACE
 
   A = kcoeff[dim][dir] / dist[dim][dir] + (hc + hr);
   Alt = -kcoeff[dim][dir] / dist[dim][dir];
@@ -924,13 +927,7 @@ void BoundaryCell::efCellMatrix(const int &dim, const int &dir,
                                 const Foundation &foundation, const BoundaryConditions &bcs,
                                 double &A, double &Alt, double &bVal)
 {
-  double Tair = bcs.outdoorTemp;
-  double v = bcs.localWindSpeed;
-  double eSky = bcs.skyEmissivity;
-  double tilt = surfacePtr->tilt;
-  double F = getEffectiveExteriorViewFactor(eSky,tilt);
-  double hc = foundation.getConvectionCoeff(*told_ptr,Tair,v,foundation.surfaceRoughness,true,tilt);
-  double hr = getExteriorIRCoeff(surfacePtr->emissivity,*told_ptr,Tair,eSky,tilt);
+  EXTFLUX_PREFACE
 
   A = kcoeff[dim][dir] / dist[dim][dir] + (hc + hr);
   Alt = -kcoeff[dim][dir] / dist[dim][dir];
@@ -949,11 +946,8 @@ void BoundaryCell::ifCellADEUp(const int &dim, const int &dir,
                                const Foundation &foundation, const BoundaryConditions &bcs,
                                double &U)
 {
-  double Tair = bcs.indoorTemp;
-  double hc = foundation.getConvectionCoeff(*told_ptr,
-                                            Tair,0.0,0.00208,false,surfacePtr->tilt);
-  double hr = getSimpleInteriorIRCoeff(surfacePtr->emissivity,
-                                       *told_ptr,Tair);
+  INTFLUX_PREFACE
+
   double bit;
   if (dir == 1) {
     bit = *(told_ptr + stepsize[dim]);
@@ -967,13 +961,7 @@ void BoundaryCell::ifCellADEUp(const int &dim, const int &dir,
 void BoundaryCell::efCellADEUp(const int &dim, const int &dir,
                                const Foundation &foundation, const BoundaryConditions &bcs,
                                double &U) {
-  double Tair = bcs.outdoorTemp;
-  double v = bcs.localWindSpeed;
-  double eSky = bcs.skyEmissivity;
-  double tilt = surfacePtr->tilt;
-  double F = getEffectiveExteriorViewFactor(eSky, tilt);
-  double hc = foundation.getConvectionCoeff(*told_ptr, Tair, v, foundation.surfaceRoughness, true, tilt);
-  double hr = getExteriorIRCoeff(surfacePtr->emissivity, *told_ptr, Tair, eSky, tilt);
+  EXTFLUX_PREFACE
 
   double bit;
   if (dir == 1) {
@@ -997,11 +985,8 @@ void BoundaryCell::ifCellADEDown(const int &dim, const int &dir,
                                const Foundation &foundation, const BoundaryConditions &bcs,
                                double &V)
 {
-  double Tair = bcs.indoorTemp;
-  double hc = foundation.getConvectionCoeff(*told_ptr,
-                                            Tair,0.0,0.00208,false,surfacePtr->tilt);
-  double hr = getSimpleInteriorIRCoeff(surfacePtr->emissivity,
-                                       *told_ptr,Tair);
+  INTFLUX_PREFACE
+
   double bit;
   if (dir == 1) {
     bit = *(&V + stepsize[dim]);
@@ -1015,13 +1000,7 @@ void BoundaryCell::ifCellADEDown(const int &dim, const int &dir,
 void BoundaryCell::efCellADEDown(const int &dim, const int &dir,
                                const Foundation &foundation, const BoundaryConditions &bcs,
                                double &V) {
-  double Tair = bcs.outdoorTemp;
-  double v = bcs.localWindSpeed;
-  double eSky = bcs.skyEmissivity;
-  double tilt = surfacePtr->tilt;
-  double F = getEffectiveExteriorViewFactor(eSky, tilt);
-  double hc = foundation.getConvectionCoeff(*told_ptr, Tair, v, foundation.surfaceRoughness, true, tilt);
-  double hr = getExteriorIRCoeff(surfacePtr->emissivity, *told_ptr, Tair, eSky, tilt);
+  EXTFLUX_PREFACE
 
   double bit;
   if (dir == 1) {
@@ -1041,11 +1020,8 @@ double BoundaryCell::zfCellExplicit(const std::size_t &dim, const std::size_t &d
 double BoundaryCell::ifCellExplicit(const std::size_t &dim, const std::size_t &dir,
                                     const Foundation &foundation, const BoundaryConditions &bcs)
 {
-  double Tair = bcs.indoorTemp;
-  double hc = foundation.getConvectionCoeff(*told_ptr,
-                                            Tair,0.0,0.00208,false,surfacePtr->tilt);
-  double hr = getSimpleInteriorIRCoeff(surfacePtr->emissivity,
-                                       *told_ptr,Tair);
+  INTFLUX_PREFACE
+
   int sign = (dir == 0)? -1 : 1;
 
   return (kcoeff[dim][dir] * *(told_ptr + sign*stepsize[dim])/dist[dim][dir] +
@@ -1055,13 +1031,7 @@ double BoundaryCell::ifCellExplicit(const std::size_t &dim, const std::size_t &d
 double BoundaryCell::efCellExplicit(const std::size_t &dim, const std::size_t &dir,
                                     const Foundation &foundation, const BoundaryConditions &bcs)
 {
-  double Tair = bcs.outdoorTemp;
-  double v = bcs.localWindSpeed;
-  double eSky = bcs.skyEmissivity;
-  double tilt = surfacePtr->tilt;
-  double F = getEffectiveExteriorViewFactor(eSky,tilt);
-  double hc = foundation.getConvectionCoeff(*told_ptr,Tair,v,foundation.surfaceRoughness,true,tilt);
-  double hr = getExteriorIRCoeff(surfacePtr->emissivity,*told_ptr,Tair,eSky,tilt);
+  EXTFLUX_PREFACE
 
   return (kcoeff[dim][dir] * *(told_ptr + stepsize[dim])/dist[dim][dir] +
           (hc + hr*pow(F,0.25))*Tair + heatGain)/(kcoeff[dim][dir]/dist[dim][dir] + (hc + hr));
@@ -1070,7 +1040,7 @@ double BoundaryCell::efCellExplicit(const std::size_t &dim, const std::size_t &d
 
 
 
-  ZeroThicknessCell::ZeroThicknessCell(const std::size_t &index, const CellType cellType,
+ZeroThicknessCell::ZeroThicknessCell(const std::size_t &index, const CellType cellType,
                                  const std::size_t &i, const std::size_t &j, const std::size_t &k,
                                  std::size_t *stepsize,
                                  const Foundation &foundation, Surface *surfacePtr, Block *blockPtr,

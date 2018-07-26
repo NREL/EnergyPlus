@@ -103,9 +103,9 @@ double getEffectiveExteriorViewFactor(double eSky, double tilt)
 
 }
 
-double getSimpleInteriorIRCoeff(double eSurf, double Tsurf, double Tamb)
+double getSimpleInteriorIRCoeff(double eSurf, double Tsurf, double Trad)
 {
-  return eSurf*SIGMA*(Tamb*Tamb+Tsurf*Tsurf)*(Tamb + Tsurf);
+  return eSurf*SIGMA*(Trad*Trad+Tsurf*Tsurf)*(Trad + Tsurf);
 }
 
 }

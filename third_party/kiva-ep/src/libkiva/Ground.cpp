@@ -254,7 +254,7 @@ void Ground::setValuesADI(const std::size_t & index, const double &A,
     a2[index] = A;
     a3[index] = Alt[1];
     b_[index] = bVal;
-};
+}
 
 void Ground::solveLinearSystem()
 {
@@ -372,9 +372,7 @@ double Ground::getSurfaceArea(Surface::SurfaceType surfaceType)
 }
 
 void Ground::calculateSurfaceAverages(){
-  for (auto output : groundOutput.outputMap) {
-    Surface::SurfaceType surface = output.first;
-    std::vector<GroundOutput::OutputType> outTypes = output.second;
+  for (auto surface : groundOutput.outputMap) {
 
     double constructionRValue = 0.0;
     double surfaceArea = foundation.surfaceAreas[surface];
@@ -389,12 +387,14 @@ void Ground::calculateSurfaceAverages(){
       constructionRValue = foundation.wall.totalResistance();
     }
 
-    double totalHeatTransferRate = 0.0;
+    double totalQ = 0.0;
+    double totalQc = 0.0, totalQr = 0.0;
     double TA = 0;
-    double HA = 0.0;
+    double hA = 0.0, hcA = 0.0, hrA = 0.0;
     double totalArea = 0.0;
 
     double& Tair = bcs.indoorTemp;
+    double& Trad = bcs.indoorRadiantTemp;
 
     if (foundation.hasSurface[surface]) {
       // Find surface(s)
@@ -413,16 +413,28 @@ void Ground::calculateSurfaceAverages(){
           for (auto index : foundation.surfaces[s].indices)
           {
             auto this_cell = domain.cell[index];
-            double h = getConvectionCoeff(TNew[index],Tair,0.0,0.00208,false,tilt)
-                 + getSimpleInteriorIRCoeff(this_cell->surfacePtr->emissivity,
-                     TNew[index],Tair);
+            double hc = getConvectionCoeff(TNew[index],Tair,0.0,0.00208,false,tilt);
+            double hr = getSimpleInteriorIRCoeff(this_cell->surfacePtr->emissivity,TNew[index],Trad);
 
             double& A = this_cell->area;
 
+            double Ahc = A*hc;
+            double Ahr = A*hr;
+
+            double Qc = Ahc*(Tair - TNew[index]);
+            double Qr = Ahr*(Trad - TNew[index]);
+
             totalArea += A;
-            totalHeatTransferRate += h*A*(Tair - TNew[index]);
+
+            hcA += Ahc;
+            hrA += Ahr;
+            hA += Ahc + Ahr;
+
+            totalQc += Qc;
+            totalQr += Qr;
+            totalQ += Qc + Qr;
+
             TA += TNew[index]*A;
-            HA += h*A;
 
             #ifdef PRNTSURF
               output <<
@@ -444,16 +456,19 @@ void Ground::calculateSurfaceAverages(){
     }
 
     if (totalArea > 0.0) {
-      double Tavg = Tair - totalHeatTransferRate/HA;
-      double hAvg = HA/totalArea;
+      double Tavg = Tair - totalQc/hcA;
+      double hcAvg = hcA/totalArea;
+      double hrAvg = hrA/totalArea;
+      double hAvg = hA/totalArea;
 
       groundOutput.outputValues[{surface,GroundOutput::OT_TEMP}] = Tavg;
       groundOutput.outputValues[{surface,GroundOutput::OT_AVG_TEMP}] = TA/totalArea;
-      groundOutput.outputValues[{surface,GroundOutput::OT_FLUX}] = totalHeatTransferRate/totalArea;
-      groundOutput.outputValues[{surface,GroundOutput::OT_RATE}] = totalHeatTransferRate/totalArea*surfaceArea;
-      groundOutput.outputValues[{surface,GroundOutput::OT_CONV}] = hAvg;
+      groundOutput.outputValues[{surface,GroundOutput::OT_FLUX}] = totalQ/totalArea;
+      groundOutput.outputValues[{surface,GroundOutput::OT_RATE}] = totalQ/totalArea*surfaceArea;
+      groundOutput.outputValues[{surface,GroundOutput::OT_CONV}] = hcAvg;
+      groundOutput.outputValues[{surface,GroundOutput::OT_RAD}] = hrAvg;
 
-      groundOutput.outputValues[{surface,GroundOutput::OT_EFF_TEMP}] = Tair - (totalHeatTransferRate/totalArea)*(constructionRValue+1/hAvg) - 273.15;
+      groundOutput.outputValues[{surface,GroundOutput::OT_EFF_TEMP}] = Tair - (totalQ/totalArea)*(constructionRValue+1/hAvg) - 273.15;
     }
     else {
       groundOutput.outputValues[{surface,GroundOutput::OT_TEMP}] = Tair;
@@ -461,6 +476,7 @@ void Ground::calculateSurfaceAverages(){
       groundOutput.outputValues[{surface,GroundOutput::OT_FLUX}] = 0.0;
       groundOutput.outputValues[{surface,GroundOutput::OT_RATE}] = 0.0;
       groundOutput.outputValues[{surface,GroundOutput::OT_CONV}] = 0.0;
+      groundOutput.outputValues[{surface,GroundOutput::OT_RAD}] = 0.0;
 
       groundOutput.outputValues[{surface,GroundOutput::OT_EFF_TEMP}] = Tair - 273.15;
     }
@@ -480,6 +496,7 @@ void Ground::calculateBoundaryLayer()
   preBCs.localWindSpeed = 0;
   preBCs.outdoorTemp = 273.15;
   preBCs.indoorTemp = 293.15;
+  preBCs.indoorRadiantTemp = 293.15;
   fd.coordinateSystem = Foundation::CS_CARTESIAN;
   fd.numberOfDimensions = 2;
   fd.reductionStrategy = Foundation::RS_AP;

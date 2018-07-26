@@ -92,13 +92,13 @@ namespace HeatBalanceKivaManager {
     {
     public:
         KivaInstanceMap(Kiva::Foundation &foundation,
-                        std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> oM,
+                        std::vector<Kiva::Surface::SurfaceType> oM,
                         int floorSurface,
                         std::vector<int> wallSurfaces,
                         int zoneNum,
                         Real64 weightedPerimeter,
                         int constructionNum);
-        std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> outputMap;
+        std::vector<Kiva::Surface::SurfaceType> outputMap;
         Kiva::Ground ground;
         int floorSurface;
         std::vector<int> wallSurfaces;
