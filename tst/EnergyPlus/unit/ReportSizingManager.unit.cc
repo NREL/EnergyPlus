@@ -587,27 +587,29 @@ TEST_F(EnergyPlusFixture, setOAFracForZoneEqSizing_Test)
     Real64 massFlowRate = DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow;
     Real64 oaFrac_Test = massFlowRate / DesMassFlow;
 
+    ZoneEqSizingData &zoneEqSizing = DataSizing::ZoneEqSizing(1);
+
     // ATMixer flow rate = 0 so oaFrac depends on ZoneEqSizing.OAVolFlow
-    oaFrac = setOAFracForZoneEqSizing(DesMassFlow);
+    oaFrac = setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.11;
+    zoneEqSizing.ATMixerVolFlow = 0.11;
 
     oaFrac = 0.0;
-    massFlowRate = DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow;
+    massFlowRate = DataEnvironment::StdRhoAir * zoneEqSizing.ATMixerVolFlow;
     oaFrac_Test = massFlowRate / DesMassFlow;
 
     // ATMixer flow rate > 0 so oaFrac depends on ZoneEqSizing.ATMixerVolFlow
-    oaFrac = setOAFracForZoneEqSizing(DesMassFlow);
+    oaFrac = setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 
     DesMassFlow = 0.0;
     oaFrac = 1.0;
     oaFrac_Test = 0.0;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 1.0;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 1.0;
+    zoneEqSizing.OAVolFlow = 1.0;
+    zoneEqSizing.ATMixerVolFlow = 1.0;
     // DesMassFlow = 0 so oaFrac = 0 regardless of OAVolFlow or ATMixerVolFlow
-    oaFrac = setOAFracForZoneEqSizing(DesMassFlow);
+    oaFrac = setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 }
 

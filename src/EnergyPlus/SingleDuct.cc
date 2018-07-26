@@ -6015,8 +6015,17 @@ namespace SingleDuct {
         }
     }
 
-    void setATMixerSizingProperties(int const &inletATMixerIndex, int const &controlledZoneNum, int const &curZoneEqNum)
+    void setATMixerSizingProperties(int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
+                                    int const &controlledZoneNum, // controlled zone number
+                                    int const &curZoneEqNum       // current zone equipment being simulated
+    )
     {
+        if (inletATMixerIndex == 0) return;
+        if (controlledZoneNum == 0) return;
+        if (curZoneEqNum == 0) return;
+        if (SingleDuct::SysATMixer(inletATMixerIndex).MixerType != DataHVACGlobals::ATMixer_InletSide) return;
+
+        // proceed to set ATMixer properties used for sizing coils
         int airLoopIndex = // find air loop associated with ATMixer
             DataZoneEquipment::ZoneEquipConfig(controlledZoneNum).InletNodeAirLoopNum(SingleDuct::SysATMixer(inletATMixerIndex).CtrlZoneInNodeIndex);
         bool SizingDesRunThisAirSys = false;                               // Sizing:System object found flag
@@ -6029,25 +6038,63 @@ namespace SingleDuct {
             ZoneEqSizing(curZoneEqNum).ATMixerVolFlow = SingleDuct::SysATMixer(inletATMixerIndex).DesignPrimaryAirVolRate;
             // If air loop has coils use SA conditions (below), else if OA sys has coils then precool conditions, else OA conditions
             if (DataAirSystems::PrimaryAirSystem(airLoopIndex).CentralHeatCoilExists) {
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = SysSizInput(sysSizIndex).HeatSupTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = SysSizInput(sysSizIndex).HeatSupHumRat;
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = FinalSysSizing(airLoopIndex).HeatSupTemp;
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = FinalSysSizing(airLoopIndex).HeatSupHumRat;
             } else if (DataAirSystems::PrimaryAirSystem(airLoopIndex).NumOAHeatCoils > 0) {
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = SysSizInput(sysSizIndex).PreheatTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = SysSizInput(sysSizIndex).PreheatHumRat;
+                if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) {
+                    ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = FinalSysSizing(airLoopIndex).PreheatTemp;
+                    ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = FinalSysSizing(airLoopIndex).PreheatHumRat;
+                } else {
+                    Real64 OutAirFrac = ZoneEqSizing(curZoneEqNum).ATMixerVolFlow / FinalSysSizing(airLoopIndex).DesMainVolFlow;
+                    OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+                    Real64 CoilInHumRatForSizing =
+                        OutAirFrac * FinalSysSizing(airLoopIndex).PreheatHumRat + (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).HeatRetHumRat;
+                    Real64 CoilInEnthalpyForSizing = OutAirFrac * Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).PreheatTemp,
+                                                                                             FinalSysSizing(airLoopIndex).PreheatHumRat) +
+                                                     (1 - OutAirFrac) * Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).HeatRetTemp,
+                                                                                                   FinalSysSizing(airLoopIndex).HeatRetHumRat);
+                    Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
+                    ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = CoilInTempForSizing;
+                    ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = CoilInHumRatForSizing;
+                }
             } else {
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = FinalZoneSizing(curZoneEqNum).HeatOutTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = FinalZoneSizing(curZoneEqNum).HeatOutHumRat;
+                Real64 OutAirFrac = 1.0;
+                if (FinalSysSizing(airLoopIndex).DesMainVolFlow > 0.0)
+                    OutAirFrac = FinalSysSizing(airLoopIndex).DesOutAirVolFlow / FinalSysSizing(airLoopIndex).DesMainVolFlow;
+                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat =
+                    OutAirFrac * FinalSysSizing(airLoopIndex).HeatOutHumRat + (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).HeatRetHumRat;
+                ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb =
+                    OutAirFrac * FinalSysSizing(airLoopIndex).HeatOutTemp + (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).HeatRetTemp;
             }
 
             if (DataAirSystems::PrimaryAirSystem(airLoopIndex).CentralCoolCoilExists) {
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = SysSizInput(sysSizIndex).CoolSupTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = SysSizInput(sysSizIndex).CoolSupHumRat;
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = FinalSysSizing(airLoopIndex).CoolSupTemp;
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = FinalSysSizing(airLoopIndex).CoolSupHumRat;
             } else if (DataAirSystems::PrimaryAirSystem(airLoopIndex).NumOACoolCoils > 0) {
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = SysSizInput(sysSizIndex).PrecoolTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = SysSizInput(sysSizIndex).PrecoolHumRat;
+                if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) {
+                    ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = FinalSysSizing(airLoopIndex).PrecoolTemp;
+                    ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = FinalSysSizing(airLoopIndex).PrecoolHumRat;
+                } else {
+                    Real64 OutAirFrac = ZoneEqSizing(curZoneEqNum).ATMixerVolFlow / FinalSysSizing(airLoopIndex).DesMainVolFlow;
+                    OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+                    Real64 CoilInHumRatForSizing =
+                        OutAirFrac * FinalSysSizing(airLoopIndex).PrecoolHumRat + (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).RetHumRatAtCoolPeak;
+                    Real64 CoilInEnthalpyForSizing = OutAirFrac * Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).PrecoolTemp,
+                                                                                             FinalSysSizing(airLoopIndex).PrecoolHumRat) +
+                                                     (1 - OutAirFrac) * Psychrometrics::PsyHFnTdbW(FinalSysSizing(airLoopIndex).RetTempAtCoolPeak,
+                                                                                                   FinalSysSizing(airLoopIndex).RetHumRatAtCoolPeak);
+                    Real64 CoilInTempForSizing = Psychrometrics::PsyTdbFnHW(CoilInEnthalpyForSizing, CoilInHumRatForSizing);
+                    ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = CoilInTempForSizing;
+                    ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = CoilInHumRatForSizing;
+                }
             } else {
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = FinalZoneSizing(curZoneEqNum).CoolOutTemp;
-                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = FinalZoneSizing(curZoneEqNum).CoolOutHumRat;
+                Real64 OutAirFrac = ZoneEqSizing(curZoneEqNum).ATMixerVolFlow / FinalSysSizing(airLoopIndex).DesMainVolFlow;
+                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb =
+                    OutAirFrac * FinalSysSizing(airLoopIndex).OutTempAtCoolPeak + (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).RetTempAtCoolPeak;
+                ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = OutAirFrac * FinalSysSizing(airLoopIndex).OutHumRatAtCoolPeak +
+                                                                  (1 - OutAirFrac) * FinalSysSizing(airLoopIndex).RetHumRatAtCoolPeak;
             }
 
         } else {

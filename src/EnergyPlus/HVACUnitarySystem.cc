@@ -2162,13 +2162,6 @@ namespace HVACUnitarySystem {
             select_EqSizing = &UnitarySysEqSizing(CurSysNum);
         } else if (CurZoneEqNum > 0) {
             select_EqSizing = &ZoneEqSizing(CurZoneEqNum);
-            if (UnitarySystem(UnitarySysNum).ATMixerExists) { // set up ATMixer conditions for use in component sizing
-                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0;   // Equipment OA flow should always be 0 when ATMixer is used
-                SingleDuct::setATMixerSizingProperties(
-                    UnitarySystem(UnitarySysNum).ATMixerIndex, UnitarySystem(UnitarySysNum).ControlZoneNum, CurZoneEqNum);
-            } else {
-
-            }
         } else {
             assert(false);
         }
@@ -2187,6 +2180,7 @@ namespace HVACUnitarySystem {
         EqSizing.HeatingCapacity = false;
         EqSizing.DesCoolingLoad = 0.0;
         EqSizing.DesHeatingLoad = 0.0;
+        EqSizing.OAVolFlow = 0.0; // UnitarySys doesn't have OA
 
         bool anyEMSRan;
         ManageEMS(emsCallFromUnitarySystemSizing, anyEMSRan); // calling point
@@ -2220,6 +2214,11 @@ namespace HVACUnitarySystem {
                 PrimaryAirSystem(CurSysNum).SupFanNum = UnitarySystem(UnitarySysNum).FanIndex;
                 PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
             }
+        }
+
+        if (UnitarySystem(UnitarySysNum).ATMixerExists && CurZoneEqNum > 0) { // set up ATMixer conditions for scalable capacity sizing
+            SingleDuct::setATMixerSizingProperties(
+                UnitarySystem(UnitarySysNum).ATMixerIndex, UnitarySystem(UnitarySysNum).ControlZoneNum, CurZoneEqNum);
         }
 
         // STEP 1: find the autosized cooling air flow rate and capacity
@@ -2555,6 +2554,11 @@ namespace HVACUnitarySystem {
         if (UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow > 0.0) {
             UnitarySystem(UnitarySysNum).LowSpeedHeatFanRatio =
                 UnitarySystem(UnitarySysNum).MaxNoCoolHeatAirVolFlow / UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow;
+        }
+
+        if (UnitarySystem(UnitarySysNum).ATMixerExists && CurZoneEqNum > 0) { // set up ATMixer conditions for use in component sizing
+            SingleDuct::setATMixerSizingProperties(
+                UnitarySystem(UnitarySysNum).ATMixerIndex, UnitarySystem(UnitarySysNum).ControlZoneNum, CurZoneEqNum);
         }
 
         // initialize multi-speed coils

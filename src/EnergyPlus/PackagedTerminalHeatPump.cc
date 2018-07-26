@@ -4848,10 +4848,6 @@ namespace PackagedTerminalHeatPump {
         DataZoneNumber = PTUnit(PTUnitNum).ZonePtr;
 
         if (CurZoneEqNum > 0) {
-            if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for use in component sizing
-                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
-                SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
-            }
             if (PTUnit(PTUnitNum).HVACSizingIndex > 0) {
                 // initialize OA flow for sizing other inputs (e.g., capacity)
                 if (PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
@@ -4861,6 +4857,11 @@ namespace PackagedTerminalHeatPump {
                 }
                 if (PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
                     ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                }
+
+                if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for scalable capacity sizing
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                    SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
                 }
 
                 zoneHVACIndex = PTUnit(PTUnitNum).HVACSizingIndex;
@@ -5134,6 +5135,11 @@ namespace PackagedTerminalHeatPump {
                 DataConstantUsedForSizing = 0.0;
                 DataFractionUsedForSizing = 0.0;
             }
+        }
+
+        if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for use in component sizing
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+            SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
         }
 
         if (PTUnit(PTUnitNum).MaxCoolAirVolFlow > 0.0) {
