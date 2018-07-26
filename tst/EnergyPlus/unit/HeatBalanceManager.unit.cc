@@ -757,7 +757,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,8.9;",
+        delimited_string({"  Version,9.0;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -1235,7 +1235,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
     // Test eio output for HVACSystemRootFindingAlgorithm
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1269,7 +1269,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     // Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",

@@ -108,7 +108,7 @@ set( test_src
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
   OASystemHWPreheatCoil.unit.cc
-  OutdoorAirUnit.unit.cc
+#  OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReports.unit.cc

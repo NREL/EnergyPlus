@@ -2799,6 +2799,10 @@ namespace RuntimeLanguageProcessor {
             inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
+            cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
+            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            MaxNumNumbers = max(MaxNumNumbers, NumNums);
+            MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:Variable";
             inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
