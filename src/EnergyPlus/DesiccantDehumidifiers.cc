@@ -1789,7 +1789,7 @@ namespace DesiccantDehumidifiers {
                         GetCoilMaxWaterFlowRate("Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
                     if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
                         FluidDensity = GetDensityGlycol(PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                                                        DataGlobals::HWInitConvTemp,
                                                         PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
                                                         initCBVAV);
                         DesicDehum(DesicDehumNum).MaxCoilFluidFlow *= FluidDensity;
@@ -1912,7 +1912,7 @@ namespace DesiccantDehumidifiers {
                                 }
                                 if (CoilMaxVolFlowRate != AutoSize) {
                                     FluidDensity = GetDensityGlycol(PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                                    DataGlobals::CWInitConvTemp,
+                                                                    DataGlobals::HWInitConvTemp,
                                                                     PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
                                                                     RoutineName);
                                     DesicDehum(DesicDehumNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
