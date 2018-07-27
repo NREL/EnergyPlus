@@ -20,7 +20,7 @@ protected:
     tempLayer.thickness = 0.10;
     tempLayer.material = concrete;
 
-    fnd.slab.emissivity = 0.8;
+    fnd.slab.interior.emissivity = 0.8;
     fnd.slab.layers.push_back(tempLayer);
 
 
@@ -31,9 +31,10 @@ protected:
 
     fnd.wall.heightAboveGrade = 0.1;
     fnd.wall.depthBelowSlab = 0.2;
-    fnd.wall.interiorEmissivity = 0.8;
-    fnd.wall.exteriorEmissivity = 0.8;
-    fnd.wall.exteriorAbsorptivity = 0.8;
+    fnd.wall.interior.emissivity = 0.8;
+    fnd.wall.exterior.emissivity = 0.8;
+    fnd.wall.interior.absorptivity = 0.8;
+    fnd.wall.exterior.absorptivity = 0.8;
 
     fnd.foundationDepth = 0.0;
     fnd.numericalScheme = Foundation::NS_ADI;

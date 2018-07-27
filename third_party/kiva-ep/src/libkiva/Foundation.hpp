@@ -43,13 +43,28 @@ public:
 
 };
 
+class SurfaceProperties {
+public:
+  SurfaceProperties()
+      : emissivity(0.8),
+        absorptivity(0.8),
+        roughness(0.00208)
+  {}
+  SurfaceProperties(double e, double a, double r)
+      : emissivity(e),
+        absorptivity(a),
+        roughness(r)
+  {}
+  double emissivity, absorptivity, roughness;
+};
+
 class LIBKIVA_EXPORT Wall
 {
 public:
 
-  double interiorEmissivity;
-  double exteriorEmissivity;
-  double exteriorAbsorptivity;
+  SurfaceProperties interior;
+  SurfaceProperties exterior;
+
   double heightAboveGrade;  // [m]
   double depthBelowSlab;  // [m]
   std::vector <Layer> layers;
@@ -62,7 +77,7 @@ class LIBKIVA_EXPORT Slab
 {
 public:
 
-  double emissivity;
+  SurfaceProperties interior;
   std::vector <Layer> layers;
 
   double totalWidth();
@@ -126,7 +141,7 @@ public:
   Polygon polygon;
   double xMin, xMax, yMin, yMax, zMin, zMax;
   SurfaceType type;
-  double emissivity, absorptivity, temperature;
+  SurfaceProperties *propPtr;
 
   enum BoundaryConditionType
   {
@@ -154,6 +169,8 @@ public:
   std::vector<std::size_t> indices;
 
   double area, tilt;
+
+  double temperature;
 
   void setSquarePolygon();
   void calcTilt();
@@ -202,6 +219,7 @@ public:
   double orientation;  // [radians] from north
 
   double deepGroundTemperature;  // [K]
+
   enum DeepGroundBoundary
   {
     DGB_AUTO,
@@ -222,9 +240,8 @@ public:
   WallTopBoundary wallTopBoundary;
 
   Material soil;
-  double soilAbsorptivity;  // [frac]
-  double soilEmissivity;  // [frac]
-  double surfaceRoughness;  // [m]
+
+  SurfaceProperties grade;
 
   // Geometry
   enum CoordinateSystem
@@ -274,7 +291,6 @@ public:
 
   // Meshing
   Mesh mesh;
-
 
   // Simulation Control
   enum NumericalScheme

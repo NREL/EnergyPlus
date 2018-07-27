@@ -163,11 +163,11 @@ namespace HeatBalanceKivaManager {
         }
 
         // Use simple radiative model for initialization
-        ground.foundation.slab.emissivity = DataHeatBalance::Construct(DataSurfaces::Surface(floorSurface).Construction).InsideAbsorpThermal;
+        ground.foundation.slab.interior.emissivity = DataHeatBalance::Construct(DataSurfaces::Surface(floorSurface).Construction).InsideAbsorpThermal;
         if (constructionNum > 0) {
-            ground.foundation.wall.interiorEmissivity = DataHeatBalance::Construct(constructionNum).InsideAbsorpThermal;
+            ground.foundation.wall.interior.emissivity = DataHeatBalance::Construct(constructionNum).InsideAbsorpThermal;
         } else {
-            ground.foundation.wall.interiorEmissivity = 0.9;
+            ground.foundation.wall.interior.emissivity = 0.9;
         }
 
         // Initialize with steady state before accelerated timestepping
@@ -194,8 +194,8 @@ namespace HeatBalanceKivaManager {
         ground.foundation.numericalScheme = Kiva::Foundation::NS_ADI;
 
         // Reset emissivity to use EnergyPlus's IR model
-        ground.foundation.slab.emissivity = 0.0;
-        ground.foundation.wall.interiorEmissivity = 0.0;
+        ground.foundation.slab.interior.emissivity = 0.0;
+        ground.foundation.wall.interior.emissivity = 0.0;
     }
 
     void KivaInstanceMap::setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
@@ -222,7 +222,7 @@ namespace HeatBalanceKivaManager {
 
         bcs.localWindSpeed = (kivaWeather.windSpeed[index] * weightNow + kivaWeather.windSpeed[indexPrev] * (1.0 - weightNow)) *
                              DataEnvironment::WeatherFileWindModCoeff *
-                             std::pow(ground.foundation.surfaceRoughness / DataEnvironment::SiteWindBLHeight, DataEnvironment::SiteWindExp);
+                             std::pow(ground.foundation.grade.roughness / DataEnvironment::SiteWindBLHeight, DataEnvironment::SiteWindExp);
         bcs.skyEmissivity = kivaWeather.skyEmissivity[index] * weightNow + kivaWeather.skyEmissivity[indexPrev] * (1.0 - weightNow);
         bcs.solarAzimuth = 3.14;
         bcs.solarAltitude = 0.0;
@@ -340,7 +340,7 @@ namespace HeatBalanceKivaManager {
         bcs.indoorTemp = DataHeatBalFanSys::MAT(zoneNum) + DataGlobals::KelvinConv;
         bcs.indoorRadiantTemp = bcs.indoorTemp;
         bcs.outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobals::KelvinConv;
-        bcs.localWindSpeed = DataEnvironment::WindSpeedAt(ground.foundation.surfaceRoughness);
+        bcs.localWindSpeed = DataEnvironment::WindSpeedAt(ground.foundation.grade.roughness);
         bcs.solarAzimuth = std::atan2(DataEnvironment::SOLCOS(1), DataEnvironment::SOLCOS(2));
         bcs.solarAltitude = DataGlobals::PiOvr2 - std::acos(DataEnvironment::SOLCOS(3));
         bcs.directNormalFlux = DataEnvironment::BeamSolarRad;
@@ -857,6 +857,7 @@ namespace HeatBalanceKivaManager {
 
                             fnd.wall.layers.push_back(tempLayer);
                         }
+                      fnd.wall.interior.emissivity = 0.0; // Long wave included in rad BC. Constructs( surface.Construction ).InsideAbsorpThermal;
                     }
 
                     // Set slab construction
@@ -879,7 +880,7 @@ namespace HeatBalanceKivaManager {
                         fnd.slab.layers.push_back(tempLayer);
                     }
 
-                    fnd.slab.emissivity = 0.0; // Long wave included in rad BC. Constructs( surface.Construction ).InsideAbsorpThermal;
+                    fnd.slab.interior.emissivity = 0.0; // Long wave included in rad BC. Constructs( surface.Construction ).InsideAbsorpThermal;
 
                     fnd.foundationDepth = wallHeight;
 
@@ -1216,9 +1217,9 @@ namespace HeatBalanceKivaManager {
 
         // From settings
         defFnd.soil = Kiva::Material(settings.soilK, settings.soilRho, settings.soilCp);
-        defFnd.soilAbsorptivity = settings.groundSolarAbs;
-        defFnd.soilEmissivity = settings.groundThermalAbs;
-        defFnd.surfaceRoughness = settings.groundRoughness;
+        defFnd.grade.absorptivity = settings.groundSolarAbs;
+        defFnd.grade.emissivity = settings.groundThermalAbs;
+        defFnd.grade.roughness = settings.groundRoughness;
         defFnd.farFieldWidth = settings.farFieldWidth;
 
         Real64 waterTableDepth = 0.1022 * DataEnvironment::Elevation;
@@ -1254,9 +1255,9 @@ namespace HeatBalanceKivaManager {
 
         defFnd.wall.layers.push_back(defaultFoundationWall);
 
-        defFnd.wall.interiorEmissivity = 0.9;
-        defFnd.wall.exteriorEmissivity = 0.9;
-        defFnd.wall.exteriorAbsorptivity = 0.9;
+        defFnd.wall.interior.emissivity = 0.9;
+        defFnd.wall.exterior.emissivity = 0.9;
+        defFnd.wall.exterior.absorptivity = 0.9;
 
         defFnd.wall.depthBelowSlab = 0.0;
 

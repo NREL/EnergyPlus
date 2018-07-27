@@ -357,13 +357,10 @@ double Ground::getSurfaceArea(Surface::SurfaceType surfaceType)
   double totalArea = 0;
 
   // Find surface(s)
-  for (size_t s = 0; s < foundation.surfaces.size(); s++)
+  for (auto surface : foundation.surfaces)
   {
-    if (foundation.surfaces[s].type == surfaceType)
+    if (surface.type == surfaceType)
     {
-      Surface surface;
-      surface = foundation.surfaces[s];
-
       totalArea += surface.area;
     }
   }
@@ -413,8 +410,8 @@ void Ground::calculateSurfaceAverages(){
           for (auto index : foundation.surfaces[s].indices)
           {
             auto this_cell = domain.cell[index];
-            double hc = getConvectionCoeff(TNew[index],Tair,0.0,0.00208,false,tilt);
-            double hr = getSimpleInteriorIRCoeff(this_cell->surfacePtr->emissivity,TNew[index],Trad);
+            double hc = getConvectionCoeff(TNew[index],Tair,0.0,this_cell->surfacePtr->propPtr->roughness,false,tilt);
+            double hr = getSimpleInteriorIRCoeff(this_cell->surfacePtr->propPtr->emissivity,TNew[index],Trad);
 
             double& A = this_cell->area;
 
@@ -826,12 +823,12 @@ void Ground::setSolarBoundaryConditions()
 
       double Fsky = (1.0 + cos(tilt))/2.0;
       double Fg = 1.0 - Fsky;
-      double rho_g = 1.0 - foundation.soilAbsorptivity;
+      double rho_g = 1.0 - foundation.grade.absorptivity;
 
       for (auto index: foundation.surfaces[s].indices)
       {
         auto this_cell = domain.cell[index];
-        double alpha = this_cell->surfacePtr->absorptivity;
+        double alpha = this_cell->surfacePtr->propPtr->absorptivity;
 
         if (qGH > 0.0)
         {

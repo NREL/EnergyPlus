@@ -844,8 +844,8 @@ std::vector<double> BoundaryCell::calculateHeatFlux(int ndims, double &TNew,
 #define INTFLUX_PREFACE \
 double Tair = bcs.indoorTemp; \
 double Trad = bcs.indoorRadiantTemp; \
-double hc = foundation.getConvectionCoeff(*told_ptr, Tair,0.0,0.00208,false,surfacePtr->tilt); \
-double hr = getSimpleInteriorIRCoeff(surfacePtr->emissivity, *told_ptr,Trad);
+double hc = foundation.getConvectionCoeff(*told_ptr, Tair,0.0,surfacePtr->propPtr->roughness,false,surfacePtr->tilt); \
+double hr = getSimpleInteriorIRCoeff(surfacePtr->propPtr->emissivity, *told_ptr,Trad);
 
 #define EXTFLUX_PREFACE \
 double Tair = bcs.outdoorTemp; \
@@ -853,8 +853,8 @@ double v = bcs.localWindSpeed; \
 double eSky = bcs.skyEmissivity; \
 double tilt = surfacePtr->tilt; \
 double F = getEffectiveExteriorViewFactor(eSky,tilt); \
-double hc = foundation.getConvectionCoeff(*told_ptr,Tair,v,foundation.surfaceRoughness,true,tilt); \
-double hr = getExteriorIRCoeff(surfacePtr->emissivity,*told_ptr,Tair,eSky,tilt);
+double hc = foundation.getConvectionCoeff(*told_ptr,Tair,v,surfacePtr->propPtr->roughness,true,tilt); \
+double hr = getExteriorIRCoeff(surfacePtr->propPtr->emissivity,*told_ptr,Tair,eSky,tilt);
 
 void BoundaryCell::zfCellADI(const int &dim, const int &sdim, const int &sign,
                              double &A, double &Alt, double &bVal)

@@ -23,11 +23,11 @@ protected:
       fnd.deepGroundTemperature = 283.15;
 
       fnd.soil = soil;
-      fnd.soilAbsorptivity = 0.0;
-      fnd.soilEmissivity = 0.0;
+      fnd.grade.absorptivity = 0.0;
+      fnd.grade.emissivity = 0.0;
 
       fnd.hasSlab = false;
-      fnd.slab.emissivity = 0.0;
+      fnd.slab.interior.emissivity = 0.0;
 
       fnd.polygon.outer().push_back(Point(-length/2.0,-width/2.0));
       fnd.polygon.outer().push_back(Point(-length/2.0,width/2.0));
@@ -42,9 +42,10 @@ protected:
 
       fnd.wall.heightAboveGrade = 0.0;
       fnd.wall.depthBelowSlab = 0.0;
-      fnd.wall.interiorEmissivity = 0.0;
-      fnd.wall.exteriorEmissivity = 0.0;
-      fnd.wall.exteriorAbsorptivity = 0.0;
+      fnd.wall.interior.emissivity = 0.0;
+      fnd.wall.exterior.emissivity = 0.0;
+      fnd.wall.interior.absorptivity = 0.0;
+      fnd.wall.exterior.absorptivity = 0.0;
 
       fnd.convectionCalculationMethod = Foundation::CCM_CONSTANT_COEFFICIENT;
       fnd.interiorConvectiveCoefficient = 99999;
