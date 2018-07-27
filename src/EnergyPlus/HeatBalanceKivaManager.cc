@@ -162,14 +162,6 @@ namespace HeatBalanceKivaManager {
             accDate = accDate + 365 + WeatherManager::LeapYearAdd;
         }
 
-        // Use simple radiative model for initialization
-        ground.foundation.slab.interior.emissivity = DataHeatBalance::Construct(DataSurfaces::Surface(floorSurface).Construction).InsideAbsorpThermal;
-        if (constructionNum > 0) {
-            ground.foundation.wall.interior.emissivity = DataHeatBalance::Construct(constructionNum).InsideAbsorpThermal;
-        } else {
-            ground.foundation.wall.interior.emissivity = 0.9;
-        }
-
         // Initialize with steady state before accelerated timestepping
         ground.foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
         setInitialBoundaryConditions(kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
@@ -192,10 +184,6 @@ namespace HeatBalanceKivaManager {
 
         ground.calculateSurfaceAverages();
         ground.foundation.numericalScheme = Kiva::Foundation::NS_ADI;
-
-        // Reset emissivity to use EnergyPlus's IR model
-        ground.foundation.slab.interior.emissivity = 0.0;
-        ground.foundation.wall.interior.emissivity = 0.0;
     }
 
     void KivaInstanceMap::setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
@@ -338,7 +326,7 @@ namespace HeatBalanceKivaManager {
     void KivaInstanceMap::setBoundaryConditions()
     {
         bcs.indoorTemp = DataHeatBalFanSys::MAT(zoneNum) + DataGlobals::KelvinConv;
-        bcs.indoorRadiantTemp = bcs.indoorTemp;
+        bcs.indoorRadiantTemp = DataHeatBalance::MRT(zoneNum) + DataGlobals::KelvinConv; // TODO Calculate based on other temperatures or just use MRT
         bcs.outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobals::KelvinConv;
         bcs.localWindSpeed = DataEnvironment::WindSpeedAt(ground.foundation.grade.roughness);
         bcs.solarAzimuth = std::atan2(DataEnvironment::SOLCOS(1), DataEnvironment::SOLCOS(2));
@@ -347,18 +335,23 @@ namespace HeatBalanceKivaManager {
         bcs.diffuseHorizontalFlux = DataEnvironment::DifSolarRad;
         bcs.skyEmissivity = pow4(DataEnvironment::SkyTempKelvin) / pow4(bcs.outdoorTemp);
 
-        bcs.slabAbsRadiation = DataHeatBalSurface::NetLWRadToSurf(floorSurface) + DataHeatBalSurface::QRadSWInAbs(floorSurface) +
-                               DataHeatBalFanSys::QHTRadSysSurf(floorSurface) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
-                               DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
-                               DataHeatBalFanSys::QElecBaseboardSurf(floorSurface) + DataHeatBalance::QRadThermInAbs(floorSurface);
+        bcs.slabAbsRadiation =
+            DataHeatBalSurface::QRadSWInAbs(floorSurface) + // solar
+            DataHeatBalance::QRadThermInAbs(floorSurface) + // internal gains
+            DataHeatBalFanSys::QHTRadSysSurf(floorSurface) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
+            DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
+            DataHeatBalFanSys::QElecBaseboardSurf(floorSurface); // HVAC
 
         // Calculate area weighted average for walls
         Real64 QAtotal = 0.0;
         Real64 Atotal = 0.0;
         for (auto &wl : wallSurfaces) {
-            Real64 Q = DataHeatBalSurface::NetLWRadToSurf(wl) + DataHeatBalSurface::QRadSWInAbs(wl) + DataHeatBalFanSys::QHTRadSysSurf(wl) +
-                       DataHeatBalFanSys::QHWBaseboardSurf(wl) + DataHeatBalFanSys::QCoolingPanelSurf(wl) +
-                       DataHeatBalFanSys::QSteamBaseboardSurf(wl) + DataHeatBalFanSys::QElecBaseboardSurf(wl) + DataHeatBalance::QRadThermInAbs(wl);
+            Real64 Q =
+                DataHeatBalSurface::QRadSWInAbs(wl) + // solar
+                DataHeatBalance::QRadThermInAbs(wl) + // internal gains
+                DataHeatBalFanSys::QHTRadSysSurf(wl) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
+                DataHeatBalFanSys::QCoolingPanelSurf(wl) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
+                DataHeatBalFanSys::QElecBaseboardSurf(wl); // HVAC
 
             Real64 &A = DataSurfaces::Surface(wl).Area;
 
@@ -836,7 +829,10 @@ namespace HeatBalanceKivaManager {
 
                             fnd.wall.layers.push_back(tempLayer);
                         }
-                      fnd.wall.interior.emissivity = 0.0; // Long wave included in rad BC. Constructs( surface.Construction ).InsideAbsorpThermal;
+                      fnd.wall.interior.emissivity = Constructs(constructionNum).InsideAbsorpThermal;
+                      fnd.wall.interior.absorptivity = Constructs(constructionNum).InsideAbsorpSolar;
+                      fnd.wall.exterior.emissivity = Constructs(constructionNum).OutsideAbsorpThermal;
+                      fnd.wall.exterior.absorptivity = Constructs(constructionNum).OutsideAbsorpSolar;
                     }
 
                     // Set slab construction
@@ -859,7 +855,8 @@ namespace HeatBalanceKivaManager {
                         fnd.slab.layers.push_back(tempLayer);
                     }
 
-                    fnd.slab.interior.emissivity = 0.0; // Long wave included in rad BC. Constructs( surface.Construction ).InsideAbsorpThermal;
+                    fnd.slab.interior.emissivity = Constructs(surface.Construction).InsideAbsorpThermal;
+                    fnd.slab.interior.absorptivity = Constructs(surface.Construction).InsideAbsorpSolar;
 
                     fnd.foundationDepth = wallHeight;
 
@@ -1231,6 +1228,7 @@ namespace HeatBalanceKivaManager {
         defFnd.wall.layers.push_back(defaultFoundationWall);
 
         defFnd.wall.interior.emissivity = 0.9;
+        defFnd.wall.interior.absorptivity = 0.9;
         defFnd.wall.exterior.emissivity = 0.9;
         defFnd.wall.exterior.absorptivity = 0.9;
 

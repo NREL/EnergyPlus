@@ -6076,7 +6076,7 @@ namespace HeatBalanceSurfaceManager {
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
                 for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
-                    //TempSurfIn(kivaSurf.first) = kivaSurf.second.Tavg;
+                    TempSurfIn(kivaSurf.first) = kivaSurf.second.Tavg;
                 }
             }
 
