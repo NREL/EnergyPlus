@@ -49,9 +49,9 @@
 
 #include <DataBSDFWindow.hh>
 #include <DataHeatBalance.hh>
+#include <UtilityRoutines.hh>
 #include <WindowComplexManager.hh>
 #include <WindowManager.hh>
-#include <UtilityRoutines.hh>
 
 #include <WCEMultiLayerOptics.hpp>
 
@@ -279,9 +279,8 @@ namespace WindowManager {
 
     CWindowConstructionsSimplified &CWindowConstructionsSimplified::instance()
     {
-        if(p_inst == nullptr) {
-	        p_inst =
-	        		std::unique_ptr<CWindowConstructionsSimplified>(new CWindowConstructionsSimplified());
+        if (p_inst == nullptr) {
+            p_inst = std::unique_ptr<CWindowConstructionsSimplified>(new CWindowConstructionsSimplified());
         }
         return *p_inst;
     }
@@ -292,14 +291,15 @@ namespace WindowManager {
         m_Layers[WavelengthRange::Visible] = Layers_Map();
     }
 
-    void CWindowConstructionsSimplified::pushLayer(WavelengthRange const t_Range, int const t_ConstrNum, std::shared_ptr<CScatteringLayer> const &t_Layer)
+    void
+    CWindowConstructionsSimplified::pushLayer(WavelengthRange const t_Range, int const t_ConstrNum, std::shared_ptr<CScatteringLayer> const &t_Layer)
     {
-        Layers_Map & aMap = m_Layers.at(t_Range);
+        Layers_Map &aMap = m_Layers.at(t_Range);
         const auto it = aMap.find(t_ConstrNum);
         if (it == aMap.end()) {
             aMap[t_ConstrNum] = IGU_Layers();
         }
-        aMap.at(t_ConstrNum).push_back( t_Layer );        
+        aMap.at(t_ConstrNum).push_back(t_Layer);
     }
 
     std::shared_ptr<CMultiLayerScattered> CWindowConstructionsSimplified::getEquivalentLayer(WavelengthRange const t_Range, int const t_ConstrNum)
@@ -322,7 +322,8 @@ namespace WindowManager {
         return m_Equivalent.at(std::make_pair(t_Range, t_ConstrNum));
     }
 
-    void CWindowConstructionsSimplified::clearState() {
+    void CWindowConstructionsSimplified::clearState()
+    {
         p_inst = nullptr;
     }
 
@@ -332,7 +333,7 @@ namespace WindowManager {
         auto it = aMap.find(t_ConstrNum);
         if (it == aMap.end()) {
             ShowFatalError("Incorrect construction selection.");
-            //throw std::runtime_error("Incorrect construction selection.");
+            // throw std::runtime_error("Incorrect construction selection.");
         }
         return aMap.at(t_ConstrNum);
     }
