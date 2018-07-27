@@ -1,11 +1,16 @@
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/FMI2/ )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
+INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR} )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../EnergyPlus/public )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../EnergyPlus )
 
-configure_file( Test/config.hpp.in test-config.hpp )
+configure_file( Test/config.h.in "${CMAKE_BINARY_DIR}/test-config.h.in2" )
+#file(GENERATE OUTPUT output-file
+#     <INPUT input-file|CONTENT content>
+#     [CONDITION expression])
+
+file(GENERATE OUTPUT test-config.h INPUT "${CMAKE_BINARY_DIR}/test-config.h.in2")
 
 set(src
   EPFMI.hpp
@@ -21,6 +26,8 @@ set(src
 add_library( epfmi SHARED ${src} )
 
 target_link_libraries( epfmi energypluslib )
+
+add_executable( libfmi_test Test/EPFMI_DLL_TEST.c )
 
 set(test_src
   Test/EPFMI_Test.cpp

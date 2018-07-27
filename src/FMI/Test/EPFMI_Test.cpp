@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "../EPFMI.hpp"
-#include "test-config.hpp"
+#include "test-config.h"
 #include "../EnergyPlus/DataEnvironment.hh"
 
 
@@ -39,7 +39,8 @@ const unsigned int outputValueReferences[] = {
 
   double tStart = 0.0;
   bool stopTimeDefined = true;
-  double tEnd = 60 * 60 * 24 * 30;
+  //double tEnd = 60 * 60 * 24 * 30 * 6;
+  double tEnd = 60 * 60 * 24;
 
   result = setupExperiment(tStart, stopTimeDefined, nullptr);
 
@@ -52,6 +53,8 @@ const unsigned int outputValueReferences[] = {
   double atticTemp = 21.0;
   double inputs[] = {atticTemp, 21.0};
   const unsigned int inputRefs[] = {0, 1};
+
+  result = setVariables(inputRefs, inputs, 2, nullptr);
 
   double lastTime = tStart;
 

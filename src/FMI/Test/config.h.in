@@ -1,4 +1,6 @@
 
-const char * input = "${CMAKE_SOURCE_DIR}/testfiles/RefBldgSmallOfficeNew2004_Chicago.idf";
+const char * input = "${CMAKE_SOURCE_DIR}/src/FMI/Test/RefBldgSmallOfficeNew2004_Chicago.idf";
 const char * weather = "${CMAKE_SOURCE_DIR}/weather/USA_IL_Chicago-OHare_TMY2.epw";
 const char * idd = "${CMAKE_BINARY_DIR}/Products/Energy+.idd";
+const char * fmulib = "$<TARGET_FILE:epfmi>";
+
