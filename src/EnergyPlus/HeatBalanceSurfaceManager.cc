@@ -6075,15 +6075,15 @@ namespace HeatBalanceSurfaceManager {
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.radiantTemps) {
-                    //TempSurfIn(kivaSurf.first) = kivaSurf.second;
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
+                    //TempSurfIn(kivaSurf.first) = kivaSurf.second.Tavg;
                 }
             }
 
             CalcInteriorRadExchange(TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
             if (any_eq(HeatTransferAlgosUsed, HeatTransferModel_Kiva)) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.radiantTemps) {
+                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceResults) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
             }
@@ -6369,7 +6369,9 @@ namespace HeatBalanceSurfaceManager {
 
                             } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
                                 // Read Kiva results for each surface
-                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.getTemp(SurfNum);
+                                TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].T;
+                                OpaqSurfInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].q;
+                                OpaqSurfInsFaceConduction(SurfNum) = OpaqSurfInsFaceConductionFlux(SurfNum) * DataSurfaces::Surface(SurfNum).Area;
 
                                 TH11 = 0.0;
                             }

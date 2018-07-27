@@ -371,27 +371,6 @@ namespace HeatBalanceKivaManager {
         }
     }
 
-    void KivaInstanceMap::reportKivaSurfaces()
-    {
-        // Calculate inside face values
-        Real64 const qFloor = -(bcs.slabAbsRadiation + DataHeatBalance::HConvIn(floorSurface) *
-                                                           (DataHeatBalFanSys::MAT(zoneNum) - DataHeatBalSurface::TempSurfIn(floorSurface)));
-
-        DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(floorSurface) = qFloor;
-        DataHeatBalSurface::OpaqSurfInsFaceConduction(floorSurface) = qFloor * DataSurfaces::Surface(floorSurface).Area;
-
-        for (auto &wl : wallSurfaces) {
-            Real64 Qrad = DataHeatBalSurface::NetLWRadToSurf(wl) + DataHeatBalSurface::QRadSWInAbs(wl) + DataHeatBalFanSys::QHTRadSysSurf(wl) +
-                          DataHeatBalFanSys::QHWBaseboardSurf(wl) + DataHeatBalFanSys::QSteamBaseboardSurf(wl) +
-                          DataHeatBalFanSys::QElecBaseboardSurf(wl) + DataHeatBalance::QRadThermInAbs(wl);
-
-            Real64 const qWall = -(Qrad + DataHeatBalance::HConvIn(wl) * (DataHeatBalFanSys::MAT(zoneNum) - DataHeatBalSurface::TempSurfIn(wl)));
-
-            DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(wl) = qWall;
-            DataHeatBalSurface::OpaqSurfInsFaceConduction(wl) = qWall * DataSurfaces::Surface(wl).Area;
-        }
-    }
-
     KivaManager::Settings::Settings()
         : soilK(0.864), soilRho(1510), soilCp(1260), groundSolarAbs(0.9), groundThermalAbs(0.9), groundRoughness(0.9), farFieldWidth(40.0),
           deepGroundBoundary(AUTO), deepGroundDepth(40.0), minCellDim(0.02), maxGrowthCoeff(1.5), timestepType(HOURLY)
@@ -1065,6 +1044,7 @@ namespace HeatBalanceKivaManager {
                 // Start with steady-state solution
                 kv.initGround(kivaWeather);
             }
+            calcKivaSurfaceResults();
         }
     }
 
@@ -1076,11 +1056,12 @@ namespace HeatBalanceKivaManager {
             kv.setBoundaryConditions();
             grnd.calculate(kv.bcs, timestep);
             grnd.calculateSurfaceAverages();
-            kv.reportKivaSurfaces();
             if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && DataGlobals::HourOfDay == 1 && DataGlobals::TimeStep == 1) {
                 kv.plotDomain();
             }
         }
+
+        calcKivaSurfaceResults();
     }
 
     void KivaInstanceMap::plotDomain()
@@ -1168,46 +1149,40 @@ namespace HeatBalanceKivaManager {
 
     }
 
-    Real64 KivaManager::getValue(int surfNum, Kiva::GroundOutput::OutputType oT)
+    void KivaManager::calcKivaSurfaceResults()
     {
-        Real64 h = 0.0;
-        Real64 q = 0.0;
-        Real64 Tavg = 0.0;
-        Real64 Tz = DataHeatBalFanSys::MAT(DataSurfaces::Surface(surfNum).Zone) + DataGlobals::KelvinConv;
-        assert(surfaceMap[surfNum].size() > 0);
-        for (auto &i : surfaceMap[surfNum]) {
-            auto &kI = kivaInstances[i.first];
-            auto &st = i.second;
-            auto &p = kI.weightedPerimeter;
-            auto hi = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_CONV});
-            auto Ts = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_TEMP});
-            auto Ta = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_AVG_TEMP});
+        for (int surfNum = 1; surfNum <=  DataSurfaces::Surface.size(); ++surfNum) {
+            if (DataSurfaces::Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                Real64 hc = 0.0;
+                Real64 qc = 0.0;
+                Real64 qt = 0.0;
+                Real64 Tavg = 0.0;
+                Real64 Tz = DataHeatBalFanSys::MAT(DataSurfaces::Surface(surfNum).Zone) + DataGlobals::KelvinConv;
+                assert(surfaceMap[surfNum].size() > 0);
+                for (auto &i : surfaceMap[surfNum]) {
+                    auto &kI = kivaInstances[i.first];
+                    auto &st = i.second;
+                    auto &p = kI.weightedPerimeter;
+                    auto hci = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_CONV});
+                    auto Ts = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_TEMP});
+                    auto Ta = kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_AVG_TEMP});
+                    auto qi = -kI.ground.getSurfaceAverageValue({st, Kiva::GroundOutput::OT_FLUX});
 
-            q += p * hi * (Tz - Ts);
-            h += p * hi;
-            Tavg += p * Ta;
+                    qc += p * hci * (Tz - Ts);
+                    hc += p * hci;
+                    Tavg += p * Ta;
+                    qt += p * qi;
+                }
+
+                SurfaceResults results;
+                results.h = hc;
+                results.q = qt;
+                results.T = Tz - qc / hc - DataGlobals::KelvinConv;
+                results.Tavg = Tavg - DataGlobals::KelvinConv;
+
+                surfaceResults[surfNum] = results;
+            }
         }
-
-        radiantTemps[surfNum] = Tavg - DataGlobals::KelvinConv;
-
-        if (oT == Kiva::GroundOutput::OT_CONV) {
-            return h;
-        } else { // if (oT == Kiva::GroundOutput::OT_TEMP)
-            return Tz - q / h;
-        }
-    }
-
-    Real64 KivaManager::getTemp(int surfNum)
-    {
-        auto temp = getValue(surfNum, Kiva::GroundOutput::OT_TEMP) - DataGlobals::KelvinConv;
-        return temp;
-    }
-
-    Real64 KivaManager::getConv(int surfNum)
-    {
-        auto conv = getValue(surfNum, Kiva::GroundOutput::OT_CONV);
-        assert(conv >= 0.0);
-        return conv;
     }
 
     void KivaManager::defineDefaultFoundation()

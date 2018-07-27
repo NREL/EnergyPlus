@@ -412,6 +412,7 @@ void Ground::calculateSurfaceAverages(){
             auto this_cell = domain.cell[index];
             double hc = getConvectionCoeff(TNew[index],Tair,0.0,this_cell->surfacePtr->propPtr->roughness,false,tilt);
             double hr = getSimpleInteriorIRCoeff(this_cell->surfacePtr->propPtr->emissivity,TNew[index],Trad);
+            double q = this_cell->heatGain;
 
             double& A = this_cell->area;
 
@@ -429,7 +430,7 @@ void Ground::calculateSurfaceAverages(){
 
             totalQc += Qc;
             totalQr += Qr;
-            totalQ += Qc + Qr;
+            totalQ += Qc + Qr + q*A;
 
             TA += TNew[index]*A;
 

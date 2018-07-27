@@ -108,7 +108,6 @@ namespace HeatBalanceKivaManager {
         void initGround(const KivaWeatherData &kivaWeather);
         void setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions();
-        void reportKivaSurfaces();
         void plotDomain();
         Kiva::BoundaryConditions bcs;
         Real64 weightedPerimeter;
@@ -134,8 +133,7 @@ namespace HeatBalanceKivaManager {
         void defineDefaultFoundation();
         void addDefaultFoundation();
         int findFoundation(std::string const &name);
-        Real64 getTemp(int surfNum);
-        Real64 getConv(int surfNum);
+        void calcKivaSurfaceResults();
 
         KivaWeatherData kivaWeather;
         FoundationKiva defaultFoundation;
@@ -143,7 +141,11 @@ namespace HeatBalanceKivaManager {
         std::vector<KivaInstanceMap> kivaInstances;
         Real64 timestep;
 
-        std::map<int, Real64> radiantTemps; // Surface average temperatures to use in radiant exchange calculations
+        struct SurfaceResults {
+          Real64 h, T, Tavg, q;
+        };
+
+        std::map<int, SurfaceResults> surfaceResults; // Surface average temperatures to use in radiant exchange calculations
 
         struct Settings
         {
@@ -191,7 +193,6 @@ namespace HeatBalanceKivaManager {
         int defaultIndex;
 
     private:
-        Real64 getValue(int surfNum, Kiva::GroundOutput::OutputType oT);
         std::map<int, std::vector<std::pair<int, Kiva::Surface::SurfaceType>>> surfaceMap;
         std::map<int, Kiva::Foundation> foundationInstances;
     };
