@@ -328,29 +328,17 @@ namespace HVACFan {
         // ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
         // AANSI / AMCA Standard 208 - 18: Calculation of the Fan Energy Index, 2018.
 
-        // Using/Aliasing
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 RhoAir;
-        Real64 refFanShaftPower;
-        Real64 refFanTransEff = 1.0;
-        Real64 refFanMotorOutput;
-        Real64 refFanMotorEff;
-        Real64 refFanMotorCtrlEff;
-        Real64 refFanElecPower;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         // Calculate reference fan shaft power 
-        RhoAir = PsyRhoAirFnPbTdbW(DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
-        refFanShaftPower = (designAirVolFlowRate + 0.118) * (deltaPress + 100 * RhoAir / DataEnvironment::StdRhoAir ) / (1000 * 0.66);
+        Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
+        Real64 refFanShaftPower = (designAirVolFlowRate + 0.118) * (deltaPress + 100 * RhoAir / DataEnvironment::StdRhoAir ) / (1000 * 0.66);
 
         // Calculate reference reference fan transmission efficiency
-        refFanTransEff = 0.96 * pow((refFanShaftPower / (refFanShaftPower + 1.64)), 0.05);
+        Real64 refFanTransEff = 0.96 * pow((refFanShaftPower / (refFanShaftPower + 1.64)), 0.05);
 
         // Calculate reference reference fan motor efficiency
-        refFanMotorOutput = refFanShaftPower / refFanTransEff;
+        Real64 refFanMotorOutput = refFanShaftPower / refFanTransEff;
+
+        Real64 refFanMotorEff;
         if (refFanMotorOutput < 185.0) {
             refFanMotorEff = -0.003812 * pow(std::log10(refFanMotorOutput), 4) + 0.025834 * pow(std::log10(refFanMotorOutput), 3)
                 - 0.072577 * pow(std::log10(refFanMotorOutput), 2) + 0.125559 * std::log10(refFanMotorOutput) + 0.850274;
@@ -359,9 +347,9 @@ namespace HVACFan {
         }
 
         // Calculate reference reference fan motor controller  efficiency
-        refFanMotorCtrlEff = 1;
+        Real64 refFanMotorCtrlEff = 1;
 
-        refFanElecPower = refFanShaftPower / (refFanTransEff * refFanMotorEff * refFanMotorCtrlEff);
+        Real64 refFanElecPower = refFanShaftPower / (refFanTransEff * refFanMotorEff * refFanMotorCtrlEff);
 
         m_designPointFEI = refFanElecPower * 1000 / designElecPower;
 
