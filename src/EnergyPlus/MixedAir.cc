@@ -3576,8 +3576,8 @@ namespace MixedAir {
         if (AirLoopNum > 0) {
             auto &curAirLoopFlow(AirLoopFlow(AirLoopNum));
 
-            if (curAirLoopFlow.DesSupply >= SmallAirVolFlow) {
-                OutAirMinFrac = this->MinOAMassFlowRate / curAirLoopFlow.DesSupply;
+            if (this->MixMassFlow > SmallAirVolFlow) {
+                OutAirMinFrac = this->MinOAMassFlowRate / this->MixMassFlow;
             } else {
                 OutAirMinFrac = 0.0;
             }
@@ -3610,7 +3610,11 @@ namespace MixedAir {
                 SysSA = curAirLoopFlow.SupFlow;
             }
             VentilationMechanical(this->VentMechObjectNum).CalcMechVentController(SysSA, MechVentOAMassFlow);
-            MechVentOutsideAirMinFrac = MechVentOAMassFlow / curAirLoopFlow.DesSupply;
+            if (SysSA > SmallAirVolFlow) {
+                MechVentOutsideAirMinFrac = MechVentOAMassFlow / SysSA;
+            } else {
+                MechVentOutsideAirMinFrac = 0.0;
+            }
             if (curAirLoopFlow.FanPLR > 0.0) {
                 MechVentOutsideAirMinFrac *= curAirLoopFlow.FanPLR;
                 MechVentOAMassFlow *= curAirLoopFlow.FanPLR;
@@ -3626,7 +3630,7 @@ namespace MixedAir {
         if (AirLoopNum > 0) {
             auto &curAirLoopFlow(AirLoopFlow(AirLoopNum));
 
-            curAirLoopFlow.MinOutAir = OutAirMinFrac * curAirLoopFlow.DesSupply;
+            curAirLoopFlow.MinOutAir = OutAirMinFrac * this->MixMassFlow;
 
             // calculate mixed air temp at min OA flow rate
             ReliefMassFlowAtMinOA = max(curAirLoopFlow.MinOutAir - this->ExhMassFlow, 0.0);
@@ -3639,12 +3643,6 @@ namespace MixedAir {
                 MixedAirTempAtMinOAFlow = Node(this->RetNode).Temp;
             }
             this->MixedAirTempAtMinOAFlow = MixedAirTempAtMinOAFlow;
-
-            if (this->MixMassFlow > 0) {
-                // calc outdoor air minimum fraction based on actual mixed air flow
-                Real64 OutAirMinFracTemp = curAirLoopFlow.MinOutAir / this->MixMassFlow;
-                OutAirMinFrac = OutAirMinFracTemp;
-            }
         }
 
         // Economizer
