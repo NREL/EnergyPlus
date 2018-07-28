@@ -117,7 +117,6 @@ namespace WaterCoils {
     extern Array1D_int PartWetCoolCoilErrs;   // error counting for detailed coils
     extern bool GetWaterCoilsInputFlag;       // Flag set to make sure you get input once
     extern Array1D_bool CheckEquipName;
-    // extern bool WaterCoilControllerCheckOneTimeFlag; // flg used to check water coil controller
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
