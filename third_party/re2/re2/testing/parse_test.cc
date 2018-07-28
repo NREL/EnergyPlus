@@ -12,7 +12,10 @@
 
 namespace re2 {
 
-static const Regexp::ParseFlags TestZeroFlags = Regexp::ParseFlags(1<<30);
+// In the past, we used 1<<30 here and zeroed the bit later, but that
+// has undefined behaviour, so now we use an internal-only flag because
+// otherwise we would have to introduce a new flag value just for this.
+static const Regexp::ParseFlags TestZeroFlags = Regexp::WasDollar;
 
 struct Test {
   const char* regexp;
@@ -114,6 +117,17 @@ static Test tests[] = {
   { "(ab)*", "star{cap{str{ab}}}" },
   { "ab|cd", "alt{str{ab}str{cd}}" },
   { "a(b|c)d", "cat{lit{a}cap{cc{0x62-0x63}}lit{d}}" },
+
+  // Test squashing of **, ++, ?? et cetera.
+  { "(?:(?:a)*)*", "star{lit{a}}" },
+  { "(?:(?:a)+)+", "plus{lit{a}}" },
+  { "(?:(?:a)?)?", "que{lit{a}}" },
+  { "(?:(?:a)*)+", "star{lit{a}}" },
+  { "(?:(?:a)*)?", "star{lit{a}}" },
+  { "(?:(?:a)+)*", "star{lit{a}}" },
+  { "(?:(?:a)+)?", "star{lit{a}}" },
+  { "(?:(?:a)?)*", "star{lit{a}}" },
+  { "(?:(?:a)?)+", "star{lit{a}}" },
 
   // Test flattening.
   { "(?:a)", "lit{a}" },

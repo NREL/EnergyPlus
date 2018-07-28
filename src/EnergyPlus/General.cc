@@ -186,6 +186,7 @@ namespace General {
 
         X0 = X_0;
         X1 = X_1;
+        XTemp = X0;
         Conv = false;
         StopMaxIte = false;
         Cont = true;
@@ -205,6 +206,9 @@ namespace General {
 
             DY = Y0 - Y1;
             if (std::abs(DY) < SMALL) DY = SMALL;
+            if (std::abs(X1 - X0) < SMALL) {
+                break;
+            }
             // new estimation
             switch (HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
@@ -360,6 +364,7 @@ namespace General {
 
         X0 = X_0;
         X1 = X_1;
+        XTemp = X0;
         Conv = false;
         StopMaxIte = false;
         Cont = true;
@@ -378,6 +383,9 @@ namespace General {
 
             DY = Y0 - Y1;
             if (std::abs(DY) < SMALL) DY = SMALL;
+            if (std::abs(X1 - X0) < SMALL) {
+                break;
+            }
             // new estimation
             if (AlgorithmTypeNum == Bisection) {
                 // Bisection
@@ -503,6 +511,7 @@ namespace General {
 
         X0 = X_0;
         X1 = X_1;
+        XTemp = X0;
         Conv = false;
         StopMaxIte = false;
         Cont = true;
@@ -522,6 +531,9 @@ namespace General {
 
             DY = Y0 - Y1;
             if (std::abs(DY) < SMALL) DY = SMALL;
+            if (std::abs(X1 - X0) < SMALL) {
+                break;
+            }
             // new estimation
             switch (HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
@@ -687,6 +699,7 @@ namespace General {
 
         X0 = X_0;
         X1 = X_1;
+        XTemp = X0;
         Conv = false;
         StopMaxIte = false;
         Cont = true;
@@ -705,6 +718,9 @@ namespace General {
 
             DY = Y0 - Y1;
             if (std::abs(DY) < SMALL) DY = SMALL;
+            if (std::abs(X1 - X0) < SMALL) {
+                break;
+            }
             // new estimation
             if (AlgorithmTypeNum == Bisection) {
                 // Bisection
