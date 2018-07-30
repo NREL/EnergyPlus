@@ -201,6 +201,10 @@ LOGICAL :: iddCanBeRead =.FALSE.
 REAL :: startTime=0.0
 REAL :: endTime=0.0
 
+REAL :: heatingSpds=0.0
+REAL :: coolingSpds=0.0
+REAL :: maxSpd=0.0
+
 !Arrays related to reading the IDD file
 
 TYPE iddObjType
@@ -16073,7 +16077,10 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
     CALL AddToObjStr('Single Mode Operation', 'No')
-    CALL AddToObjStr('No Load Supply Air Flow Rate Ratio', '')
+    READ(FldVal(base + ussHeatCoilNumSpeedOff),*)heatingSpds
+    READ(FldVal(base + ussCoolCoilNumSpeedOff),*)coolingSpds
+    maxSpd = max(heatingSpds, coolingSpds)
+    CALL AddToObjStr('No Load Supply Air Flow Rate Ratio', RealToStr(1.0/maxSpd))
     CALL AddToObjStr('Heating Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Cooling Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Heating Speed 2 Supply Air Flow Ratio', 'autosize')
