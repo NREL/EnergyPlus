@@ -7437,6 +7437,10 @@ namespace WaterThermalTanks {
                                                             LossCoeff,
                                                             Qheat);
 
+                                // if limit NewTankTemp >= MaxTemp
+                                if (TankTemp >= MaxTemp) {
+                                    TimeNeeded = TimeRemaining;
+                                }
                                 NewTankTemp = MaxTemp;
                                 Mode = VentMode;
 
