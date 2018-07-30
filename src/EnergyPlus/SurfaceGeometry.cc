@@ -7100,6 +7100,29 @@ namespace SurfaceGeometry {
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
 
+        // Check HeatTransferAlgorithm for interior surfaces
+        if (NumberOfHeatTransferAlgosUsed > 1) {
+            int ExtSurfNum;
+            for (Item = 1; Item <= TotSurfaces; ++Item) {
+                if (Surface(Item).ExtBoundCond > 0) {
+                    if (Surface(Item).HeatTransferAlgorithm <= 0) continue;
+                    ExtSurfNum = Surface(Item).ExtBoundCond;
+                    if (Surface(Item).HeatTransferAlgorithm != Surface(ExtSurfNum).HeatTransferAlgorithm) {
+                        ShowWarningError("An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in both constructions should be same.");
+                        ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(Item).Name + ", is " + HeatTransferModelNames(Surface(Item).HeatTransferAlgorithm));
+                        ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(ExtSurfNum).Name + ", is " + HeatTransferModelNames(Surface(ExtSurfNum).HeatTransferAlgorithm));
+                        if (Surface(Item).HeatTransferAlgorithm > Surface(ExtSurfNum).HeatTransferAlgorithm) {
+                            ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(ExtSurfNum).Name + ", is assigned to " + HeatTransferModelNames(Surface(Item).HeatTransferAlgorithm) + ". Simulation continues.");
+                            Surface(ExtSurfNum).HeatTransferAlgorithm = Surface(Item).HeatTransferAlgorithm;
+                        } else {
+                            ShowContinueError("The HeatTransferAlgorithm of Surface: " + Surface(Item).Name + ", is assigned to " + HeatTransferModelNames(Surface(ExtSurfNum).HeatTransferAlgorithm) + ". Simulation continues.");
+                            Surface(Item).HeatTransferAlgorithm = Surface(ExtSurfNum).HeatTransferAlgorithm;
+                        }
+                    }
+                }
+            }
+        }
+
         // Assign model type to windows, shading surfaces, and TDDs
         for (Item = 1; Item <= TotSurfaces; ++Item) {
             if (Surface(Item).Class == SurfaceClass_Window || Surface(Item).Class == SurfaceClass_GlassDoor) {

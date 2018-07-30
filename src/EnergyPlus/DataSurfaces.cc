@@ -153,6 +153,18 @@ namespace DataSurfaces {
     int const SurfaceClass_TDD_Dome(17);
     int const SurfaceClass_TDD_Diffuser(18);
 
+    Array1D_string const HeatTransferModelNames(10,
+        { "CTF - ConductionTransferFunction",
+        "EMPD - MoisturePenetrationDepthConductionTransferFunction",
+        "",
+        "",
+        "CondFD - ConductionFiniteDifference",
+        "HAMT - CombinedHeatAndMoistureFiniteElement",
+        "Window - Detailed layer-by-layer",
+        "Window - ComplexFenestration",
+        "Tubular daylighting device",
+        "KivaFoundation - TwoDimensionalFiniteDifference"});
+
     // Parameters to indicate heat transfer model to use for surface
     int const HeatTransferModel_NotSet(-1);
     int const HeatTransferModel_None(0); // shading surfaces for example

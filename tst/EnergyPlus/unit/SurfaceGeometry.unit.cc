@@ -3057,3 +3057,174 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
 }
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "Version,                                                        ",
+        "	8.9;                     !- Version Identifier               ",
+        "	                                                             ",
+        "Material,",
+        "    Gypsum Board,            !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    0.0159,                  !- Thickness {m}",
+        "    0.16,                    !- Conductivity {W/m-K}",
+        "    800,                     !- Density {kg/m3}",
+        "    1090,                    !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Material,",
+        "    InsulationBatt,        !- Name",
+        "    VeryRough,               !- Roughness",
+        "    0.3048,                  !- Thickness {m}",
+        "    0.05,                    !- Conductivity {W/m-K}",
+        "    19,                      !- Density {kg/m3}",
+        "    960,                     !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Material,",
+        "    InfiniteRPCM23C,         !- Name",
+        "    VeryRough,               !- Roughness",
+        "    0.006,                   !- Thickness {m}",
+        "    0.815,                   !- Conductivity {W/m-K}",
+        "    929,                     !- Density {kg/m3}",
+        "    3140,                    !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Construction,",
+        "    Project semi-exposed ceiling,  !- Name",
+        "    InsulationBatt,        !- Outside Layer",
+        "    InfiniteRPCM23C,         !- Layer 2",
+        "    Gypsum Board;            !- Layer 3",
+
+        "Construction,",
+        "    Project semi-exposed ceiling_Rev,  !- Name",
+        "    Gypsum Board,            !- Outside Layer",
+        "    InfiniteRPCM23C,         !- Layer 2",
+        "    InsulationBatt;        !- Layer 3",
+
+        "BuildingSurface:Detailed,",
+        "    DATATELCOM_Ceiling_1_0_0,  !- Name",
+        "    Ceiling,                 !- Surface Type",
+        "    Project semi-exposed ceiling,  !- Construction Name",
+        "    DATATELCOM,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1_Floor_4_0_10000,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    9.64595244,              !- Vertex 1 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 1 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 1 Z-coordinate {m}",
+        "    13.20708687,             !- Vertex 2 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 2 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 2 Z-coordinate {m}",
+        "    13.20708687,             !- Vertex 3 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 3 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 3 Z-coordinate {m}",
+        "    9.64595244,              !- Vertex 4 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
+        "    3.499104;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1_Floor_4_0_10000,  !- Name",
+        "    Floor,                   !- Surface Type",
+        "    Project semi-exposed ceiling_Rev,  !- Construction Name",
+        "    ZONE1,             !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    DATATELCOM_Ceiling_1_0_0,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    13.20708687,             !- Vertex 1 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 1 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 1 Z-coordinate {m}",
+        "    9.64595244,              !- Vertex 2 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 2 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 2 Z-coordinate {m}",
+        "    9.64595244,              !- Vertex 3 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 3 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 3 Z-coordinate {m}",
+        "    13.20708687,             !- Vertex 4 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
+        "    3.499104;                !- Vertex 4 Z-coordinate {m}",
+
+        "SurfaceProperty:HeatTransferAlgorithm:Construction,",
+        "    Ceilings,                !- Name",
+        "    ConductionFiniteDifference,  !- Algorithm",
+        "    Project semi-exposed ceiling;  !- Construction Name",
+
+        "Zone,",
+        "    DATATELCOM,       !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    23.5824,                 !- Volume {m3}",
+        "    6.7395,                  !- Floor Area {m2}",
+        "    TARP;                    !- Zone Inside Convection Algorithm",
+        "Zone,",
+        "    ZONE1,             !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    999.6521,                !- Volume {m3}",
+        "    454.1032,                !- Floor Area {m2}",
+        "    TARP;                    !- Zone Inside Convection Algorithm",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetProjectControlData(ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);          // expect no errors
+
+    GetMaterialData(ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);    // expect no errors
+
+    GetConstructData(ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);     // expect no errors
+
+    GetZoneData(ErrorsFound);  // read zone data
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    CosZoneRelNorth.allocate(2);
+    SinZoneRelNorth.allocate(2);
+
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(2) = CosZoneRelNorth(1);
+    SinZoneRelNorth(2) = SinZoneRelNorth(1);
+    CosBldgRelNorth = 1.0;
+    SinBldgRelNorth = 0.0;
+
+    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
+    EXPECT_FALSE(ErrorsFound);   // expect no errors
+
+    EXPECT_EQ(5, Surface(1).HeatTransferAlgorithm);
+    EXPECT_EQ(5, Surface(2).HeatTransferAlgorithm);
+    std::string const error_string = delimited_string({
+        "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from calculated Zone Floor Area(s).",
+        "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.",
+        "   ** Warning ** An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in both constructions should be same.",
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: DATATELCOM_CEILING_1_0_0, is CondFD - ConductionFiniteDifference",
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is CTF - ConductionTransferFunction",
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is assigned to CondFD - ConductionFiniteDifference. Simulation continues.",
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+    
+}
