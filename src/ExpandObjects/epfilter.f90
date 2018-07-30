@@ -16077,8 +16077,8 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
     CALL AddToObjStr('Single Mode Operation', 'No')
-    READ(FldVal(base + ussHeatCoilNumSpeedOff),*)heatingSpds
-    READ(FldVal(base + ussCoolCoilNumSpeedOff),*)coolingSpds
+    heatingSpds = StringToReal(FldVal(base + ussHeatCoilNumSpeedOff))
+    coolingSpds = StringToReal(FldVal(base + ussCoolCoilNumSpeedOff))
     maxSpd = max(heatingSpds, coolingSpds)
     CALL AddToObjStr('No Load Supply Air Flow Rate Ratio', RealToStr(1.0/maxSpd))
     CALL AddToObjStr('Heating Speed 1 Supply Air Flow Ratio', 'autosize')
