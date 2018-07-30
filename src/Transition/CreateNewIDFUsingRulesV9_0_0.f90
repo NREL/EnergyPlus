@@ -18,6 +18,15 @@ END SUBROUTINE
 
 END MODULE
 
+! INTEGER FUNCTION GetYearFromStartDayString(DayString)
+! 
+!     CHARACTER(len=*), INTENT(IN) :: DayString
+!     GetYearFromStartDayString = 2009
+! 
+! END FUNCTION
+
+
+
 SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgIDFExtension)
 
           ! SUBROUTINE INFORMATION:
@@ -136,6 +145,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
   ! for Schedule:Compact from 8.8 to 8.9
   CHARACTER(len=MaxNameLength) ::  UpperInArg=blank
+
+  ! For run period transitions
+  TYPE FieldFlagAndValue
+    LOGICAL :: wasSet
+    CHARACTER(len=MaxNameLength) :: originalValue
+  END TYPE FieldFlagAndValue
+  TYPE (FieldFlagAndValue) :: RunPeriodStartYear
+  TYPE (FieldFlagAndValue) :: RunPeriodRepeated
+  INTEGER :: YearNumber
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -417,6 +435,36 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with P, insert the rules here
 
               ! If your original object starts with R, insert the rules here
+              CASE('RUNPERIOD')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! spend some time mining out the state of the run period object
+                RunPeriodStartYear%wasSet = .FALSE.
+                IF (CurArgs >= 14) THEN
+                  IF (TRIM(InArgs(14)) .NE. Blank) THEN
+                    RunPeriodStartYear%wasSet = .TRUE.
+                    RunPeriodStartYear%originalValue = InArgs(14)
+                  END IF
+                END IF
+                RunPeriodRepeated%wasSet = .FALSE.
+                IF (CurArgs >= 12) THEN
+                  IF (TRIM(InArgs(12)) .NE. Blank) THEN
+                    RunPeriodRepeated%wasSet = .TRUE.
+                    RunPeriodRepeated%originalValue = InArgs(12)
+                  END IF
+                END IF
+                ! Now start writing some object data out
+                OutArgs(1:3) = InArgs(1:3) ! Name, BeginMonth and BeginDay are the same
+                IF (RunPeriodStartYear%wasSet) THEN
+                  OutArgs(4) = RunPeriodStartYear%originalValue
+                ELSE IF (RunPeriodRepeated%wasSet) THEN
+                  IF (TRIM(InArgs(6)) .NE. Blank) THEN
+                    YearNumber = 2009 !GetYearFromStartDayString(InArgs(6))
+                  ELSE
+                    YearNumber = 2009 ! GetYearFromStartDayString("SUNDAY")
+                  END IF
+                ELSE
+                  OutArgs(4) = Blank
+                END IF
 
               ! If your original object starts with S, insert the rules here
 
