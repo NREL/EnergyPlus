@@ -11042,7 +11042,7 @@ namespace SurfaceGeometry {
 
         DotSelfX23 = magnitude_squared(x23);
 
-        if (std::abs(DotSelfX23) <= .1e-6) {
+        if (DotSelfX23 <= .1e-6) {
             ShowSevereError("CalcCoordinateTransformation: Invalid dot product, surface=\"" + Surface(SurfNum).Name + "\":");
             for (I = 1; I <= Surface(SurfNum).Sides; ++I) {
                 auto const &point(Surface(SurfNum).Vertex(I));
@@ -12691,11 +12691,27 @@ namespace SurfaceGeometry {
             }
             for (J = 1; J <= M; ++J) {
                 Ind = SurfCollinearVerts(J);
-                for (K = Ind; K <= NSides - J; ++K) {
+                if (Ind > NSides) {
+                    Ind = Ind - NSides + M - 1;
+                }
+                for (K = Ind; K <= NSides - 1; ++K) {
                     SurfaceTmp(SurfNum).Vertex(K - J + 1).x = SurfaceTmp(SurfNum).Vertex(K - J + 2).x;
                     SurfaceTmp(SurfNum).Vertex(K - J + 1).y = SurfaceTmp(SurfNum).Vertex(K - J + 2).y;
                     SurfaceTmp(SurfNum).Vertex(K - J + 1).z = SurfaceTmp(SurfNum).Vertex(K - J + 2).z;
                 }
+            }
+            // remove duplicated points and resize Vertex
+            Array1D<Vector> OldVertex;
+            OldVertex.allocate(NSides);
+            OldVertex = SurfaceTmp(SurfNum).Vertex;
+            SurfaceTmp(SurfNum).Vertex.deallocate();
+            SurfaceTmp(SurfNum).Vertex.allocate(NSides - M);
+            for (J = 1; J <= NSides - M; ++J) {
+                SurfaceTmp(SurfNum).Vertex(J) = OldVertex(J);
+            }
+            OldVertex.deallocate();
+            if (DisplayExtraWarnings) {
+                ShowWarningError("CheckConvexity: Surface=\"" + SurfaceTmp(SurfNum).Name + "\": The vertex points has been reprocessed as Sides = " + RoundSigDigits(SurfaceTmp(SurfNum).Sides));
             }
         }
     }
