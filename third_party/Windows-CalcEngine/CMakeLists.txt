@@ -12,11 +12,8 @@ include( cmake/WCECompilerFlags.cmake )
 get_directory_property(hasParent PARENT_DIRECTORY)
 
 if(hasParent)
-  set( BUILD_WCE_TESTING OFF )
+  #set( BUILD_WCE_TESTING OFF )
   set( DOWNLOAD_GTEST OFF )
-  if( BUILD_TESTING STREQUAL ON ) # EnergyPlus testing is ON
-    set( BUILD_WCE_TESTING ON )
-  endif()
 	set( SINGLE_PROJECT ON )
 else()
 	option( BUILD_WCE_TESTING "Build testing targets" ON )
