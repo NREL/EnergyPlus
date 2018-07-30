@@ -16,6 +16,7 @@
 #include "PerforatedCell.hpp"
 #include "WovenCellDescription.hpp"
 #include "WovenCell.hpp"
+#include "PerfectDiffuseCellDescription.hpp"
 
 namespace SingleLayerOptics {
 
@@ -37,14 +38,20 @@ namespace SingleLayerOptics {
 		}
 
 		// Specular cell
-		if ( std::dynamic_pointer_cast< CSpecularCellDescription >( t_Description ) != NULL ) {
+		if ( std::dynamic_pointer_cast< CSpecularCellDescription >( t_Description ) != nullptr ) {
 			std::shared_ptr< CSpecularCell > aCell = std::make_shared< CSpecularCell >( t_Material, t_Description );
 			m_Cell = aCell;
 			m_Layer = std::make_shared< CSpecularBSDFLayer >( aCell, t_BSDF );
 		}
 
+		if (std::dynamic_pointer_cast< CPerfectDiffuseCellDescription >(t_Description) != nullptr) {
+			std::shared_ptr< CUniformDiffuseCell > aCell = std::make_shared< CUniformDiffuseCell >(t_Material, t_Description);
+			m_Cell = aCell;
+			m_Layer = std::make_shared< CUniformDiffuseBSDFLayer >(aCell, t_BSDF);
+		}
+
 		// Venetian cell
-		if ( std::dynamic_pointer_cast< CVenetianCellDescription >( t_Description ) != NULL ) {
+		if ( std::dynamic_pointer_cast< CVenetianCellDescription >( t_Description ) != nullptr ) {
 			if ( t_Method == DistributionMethod::UniformDiffuse ) {
 				std::shared_ptr< CUniformDiffuseCell > aCell = std::make_shared< CVenetianCell >( t_Material, t_Description );
 				m_Cell = aCell;
@@ -58,7 +65,7 @@ namespace SingleLayerOptics {
 		}
 
 		// Perforated cell
-		if ( std::dynamic_pointer_cast< CPerforatedCellDescription >( t_Description ) != NULL ) {
+		if ( std::dynamic_pointer_cast< CPerforatedCellDescription >( t_Description ) != nullptr ) {
 			// Perforated shades do not work with directional diffuse algorithm
 			std::shared_ptr< CUniformDiffuseCell > aCell = std::make_shared< CPerforatedCell >( t_Material, t_Description );
 			m_Cell = aCell;
@@ -66,7 +73,7 @@ namespace SingleLayerOptics {
 		}
 
 		// Woven cell
-		if ( std::dynamic_pointer_cast< CWovenCellDescription >( t_Description ) != NULL ) {
+		if ( std::dynamic_pointer_cast< CWovenCellDescription >( t_Description ) != nullptr ) {
 			// Woven shades do not work with directional diffuse algorithm
 			std::shared_ptr< CUniformDiffuseCell > aCell = std::make_shared< CWovenCell >( t_Material, t_Description );
 			m_Cell = aCell;

@@ -58,26 +58,6 @@
 
 // EnergyPlus Headers
 #include <DataIPShortCuts.hh>
-/*#include <ConvectionCoefficients.hh>
-#include <CurveManager.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataSurfaces.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
-#include <HeatBalanceIntRadExchange.hh>
-#include <HeatBalanceManager.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SolarShading.hh>*/
 #include <HeatBalanceManager.hh>
 #include <WindowManager.hh>
 #include <WindowManagerExteriorData.hh>
@@ -88,14 +68,76 @@
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, WCEReader)
+TEST_F(EnergyPlusFixture, WCEClear)
 {
 
     DataIPShortCuts::lAlphaFieldBlanks = true;
     bool ErrorsFound(false);
 
     std::string const idf_objects =
-        delimited_string({"Version,8.9;",
+        delimited_string({ "Version,9.0;",
+            "WindowsCalculationEngine,",
+            "ExternalWindowsModel;",
+            "WindowMaterial:Glazing,",
+            "Glass_102_LayerAvg,      !- Name",
+            "SpectralAverage,         !- Optical Data Type",
+            ",                        !- Window Glass Spectral Data Set Name",
+            "0.003048,                !- Thickness {m}",
+            "0.833848,                !- Solar Transmittance at Normal Incidence",
+            "7.476376e-002,           !- Front Side Solar Reflectance at Normal Incidence",
+            "7.485449e-002,           !- Back Side Solar Reflectance at Normal Incidence",
+            "0.899260,                !- Visible Transmittance at Normal Incidence",
+            "0.082563,                !- Front Side Visible Reflectance at Normal Incidence",
+            "0.082564,                !- Back Side Visible Reflectance at Normal Incidence",
+            "0.000000,                !- Infrared Transmittance at Normal Incidence",
+            "0.840000,                !- Front Side Infrared Hemispherical Emissivity",
+            "0.840000,                !- Back Side Infrared Hemispherical Emissivity",
+            "1.000000;                !- Conductivity {W/m-K}",
+            "CONSTRUCTION,",
+            "GlzSys_1,                !- Name",
+            "Glass_102_LayerAvg;      !- Outside Layer"
+            });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(ErrorsFound);
+    WindowManager::initWindowModel();
+    WindowManager::InitWindowOpticalCalculations();
+    HeatBalanceManager::InitHeatBalance();
+
+    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
+    auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
+
+    // Transmittance Front
+    const auto Tfront = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front,
+        FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.8239, Tfront, 1e-6);
+
+    // Reflectance Front
+    const auto Rfront = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Front,
+        FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.073578, Rfront, 1e-6);
+
+    // Transmittance Back
+    const auto Tback = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back,
+        FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.8239, Tback, 1e-6);
+
+    // Reflectance Back
+    const auto Rback = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back,
+        FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.073682, Rback, 1e-6);
+}
+
+TEST_F(EnergyPlusFixture, WCEVenetian)
+{
+
+    DataIPShortCuts::lAlphaFieldBlanks = true;
+    bool ErrorsFound(false);
+
+    std::string const idf_objects =
+        delimited_string({"Version,9.0;",
                           "WindowsCalculationEngine,",
                           "ExternalWindowsModel;",
                           "WindowMaterial:Glazing,",
@@ -113,9 +155,6 @@ TEST_F(EnergyPlusFixture, WCEReader)
                           "0.840000,                !- Front Side Infrared Hemispherical Emissivity",
                           "0.840000,                !- Back Side Infrared Hemispherical Emissivity",
                           "1.000000;                !- Conductivity {W/m-K}",
-                          "CONSTRUCTION,",
-                          "GlzSys_1,                !- Name",
-                          "Glass_102_LayerAvg;      !- Outside Layer",
                           "CONSTRUCTION,",
                           "GlzSys_1_withShade,      !- Name",
                           "Glass_102_LayerAvg,      !- Outside Layer",
@@ -166,7 +205,7 @@ TEST_F(EnergyPlusFixture, WCEReader)
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, 
         FenestrationCommon::Scattering::DirectDirect);
-    EXPECT_NEAR(0.8239, Tfront, 1e-6);
+    EXPECT_NEAR(0.047120, Tfront, 1e-6);
 
     // Reflectance Front
     const auto Rfront = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Front,
@@ -176,10 +215,93 @@ TEST_F(EnergyPlusFixture, WCEReader)
     // Transmittance Back
     const auto Tback = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back,
         FenestrationCommon::Scattering::DirectDirect);
-    EXPECT_NEAR(0.8239, Tback, 1e-6);
+    EXPECT_NEAR(0.047120, Tback, 1e-6);
 
     // Reflectance Back
     const auto Rback = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back,
         FenestrationCommon::Scattering::DirectDirect);
-    EXPECT_NEAR(0.073682, Rback, 1e-6);
+    EXPECT_NEAR(0.000241, Rback, 1e-6);
+}
+
+TEST_F(EnergyPlusFixture, WCEShade)
+{
+
+    DataIPShortCuts::lAlphaFieldBlanks = true;
+    bool ErrorsFound(false);
+
+    std::string const idf_objects =
+        delimited_string({ "Version,9.0;",
+            "WindowsCalculationEngine,",
+            "ExternalWindowsModel;",
+            "WindowMaterial:Glazing,",
+            "Glass_102_LayerAvg,      !- Name",
+            "SpectralAverage,         !- Optical Data Type",
+            ",                        !- Window Glass Spectral Data Set Name",
+            "0.003048,                !- Thickness {m}",
+            "0.833848,                !- Solar Transmittance at Normal Incidence",
+            "7.476376e-002,           !- Front Side Solar Reflectance at Normal Incidence",
+            "7.485449e-002,           !- Back Side Solar Reflectance at Normal Incidence",
+            "0.899260,                !- Visible Transmittance at Normal Incidence",
+            "0.082563,                !- Front Side Visible Reflectance at Normal Incidence",
+            "0.082564,                !- Back Side Visible Reflectance at Normal Incidence",
+            "0.000000,                !- Infrared Transmittance at Normal Incidence",
+            "0.840000,                !- Front Side Infrared Hemispherical Emissivity",
+            "0.840000,                !- Back Side Infrared Hemispherical Emissivity",
+            "1.000000;                !- Conductivity {W/m-K}",
+            "CONSTRUCTION,",
+            "GlzSys_1_withShade,      !- Name",
+            "Glass_102_LayerAvg,      !- Outside Layer",
+            "Shade_1;                 !- Layer 2",
+            "WindowMaterial:Shade,",
+            "Shade_1, !- Name",
+            "0.35, !- Solar Transmittance{ dimensionless }",
+            "0.2, !- Solar Reflectance{ dimensionless }",
+            "0.8, !- Visible Transmittance{ dimensionless }",
+            "0.05, !- Visible Reflectance{ dimensionless }",
+            "0.9, !- Infrared Hemispherical Emissivity{ dimensionless }",
+            "0, !- Infrared Transmittance{ dimensionless }",
+            "0.1, !- Thickness{ m }",
+            "1, !- Conductivity{ W / m - K }",
+            "0.016, !- Shade to Glass Distance{ m }",
+            "0.0, !- Top Opening Multiplier",
+            "0.0, !- Bottom Opening Multiplier",
+            "0.0, !- Left - Side Opening Multiplier",
+            "0.0, !- Right - Side Opening Multiplier",
+            "0;                       !- Airflow Permeability{ dimensionless }"
+            });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(ErrorsFound);
+    WindowManager::initWindowModel();
+    WindowManager::InitWindowOpticalCalculations();
+    HeatBalanceManager::InitHeatBalance();
+
+    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
+    auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
+
+    // Transmittance Front
+    const auto Tfront_dir_dir = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front,
+        FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.0, Tfront_dir_dir, 1e-6);
+
+    const auto Tfront_dif = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front,
+        FenestrationCommon::Scattering::DiffuseDiffuse);
+    EXPECT_NEAR(0.267510, Tfront_dif, 1e-6);
+
+    // Reflectance Front
+    const auto Rfront = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Front,
+        FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.073578, Rfront, 1e-6);
+
+    // Transmittance Back
+    const auto Tback = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Back,
+        FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.0, Tback, 1e-6);
+
+    // Reflectance Back
+    const auto Rback = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::R, FenestrationCommon::Side::Back,
+        FenestrationCommon::Scattering::DirectDirect);
+    EXPECT_NEAR(0.0, Rback, 1e-6);
 }
