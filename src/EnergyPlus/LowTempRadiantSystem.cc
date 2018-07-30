@@ -100,7 +100,6 @@ namespace LowTempRadiantSystem {
     //                      Rick Strand July 2003 (added constant flow hydronic system)
     //                      B. Griffith Sept 2010, plant upgrades, generalize fluid properties
     //                      Rick Strand August 2011 (improved condensation handling)
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // The purpose of this module is to simulate low temperature radiant systems.
@@ -219,8 +218,6 @@ namespace LowTempRadiantSystem {
     Array1D_bool MySizeFlagElec;
     Array1D_bool CheckEquipName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
-
     // Object Data
     Array1D<HydronicRadiantSystemData> HydrRadSys;
     Array1D<ConstantFlowRadiantSystemData> CFloRadSys;
@@ -274,14 +271,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
 
         // Using/Aliasing
         using General::TrimSigDigits;
@@ -296,24 +285,6 @@ namespace LowTempRadiantSystem {
             GetLowTempRadiantSystem();
             GetInputFlag = false;
         }
-
-        //          ! Get the radiant system index and type
-        //  RadSysNum = UtilityRoutines::FindItemInList(CompName,HydrRadSys%Name,NumOfHydrLowTempRadSys)
-        //  IF (RadSysNum > 0) THEN  ! Found it and it is a hydronic system
-        //    SystemType = HydronicSystem
-        //  ELSE ! RadSysNum <= 0 so this CompName was not found among the hydronic systems-->check out electric systems
-        //    RadSysNum = UtilityRoutines::FindItemInList(CompName,ElecRadSys%Name,NumOfElecLowTempRadSys)
-        //    IF (RadSysNum > 0) THEN  ! Found it and it is an electric system
-        //      SystemType = ElectricSystem
-        //    ELSE    ! RadSysNum <= 0 so this CompName was not found among the hydronic systems-->check out constant flow systems
-        //      RadSysNum = UtilityRoutines::FindItemInList(CompName,CFloRadSys%Name,NumOfCFloLowTempRadSys)
-        //      IF (RadSysNum > 0) THEN  ! Found it and it is an electric system
-        //        SystemType = ConstantFlowSystem
-        //      ELSE  ! RadSysNum is still <= 0 so this CompName was not found among either radiant system type-->error
-        //        CALL ShowFatalError('SimLowTempRadiantSystem: Radiant System not found = '//TRIM(CompName))
-        //      END IF
-        //    END IF
-        //  END IF
 
         // Find the correct High Temp Radiant System
         if (CompIndex == 0) {
@@ -379,15 +350,11 @@ namespace LowTempRadiantSystem {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
         //       MODIFIED       August 2003 (added constant flow system, made input extensible)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads the input for low temperature radiant systems
         // from the user input file.  This will contain all of the information
         // needed to simulate a low temperature radiant system.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
@@ -409,7 +376,6 @@ namespace LowTempRadiantSystem {
         using namespace DataSurfaceLists;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        //  REAL(r64),        PARAMETER :: FlowFractionTolerance = 0.0001 ! Smallest deviation from unity for the sum of all fractions
         Real64 const MinThrottlingRange(0.5); // Smallest throttling range allowed in degrees Celsius
         static std::string const MeanAirTemperature("MeanAirTemperature");
         static std::string const MeanRadiantTemperature("MeanRadiantTemperature");
@@ -440,21 +406,16 @@ namespace LowTempRadiantSystem {
         int Item;                              // Item to be "gotten"
         int MaxAlphas;                         // Maximum number of alphas for these input keywords
         int MaxNumbers;                        // Maximum number of numbers for these input keywords
-        // unused1208  INTEGER    :: NameConflict ! Used to see if a surface name matches the name of a surface list (not allowed)
         Array1D<Real64> Numbers; // Numeric items for object
         int NumAlphas;           // Number of Alphas for each GetObjectItem call
         int NumArgs;             // Unused variable that is part of a subroutine call
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
-        // unused1208  REAL(r64)  :: SumOfAllFractions   ! Summation of all of the fractions for splitting flow (must sum to 1)
         int SurfListNum; // Index within the SurfList derived type for a surface list name
         int SurfNum;     // DO loop counter for surfaces
-        // unused1208  INTEGER    :: ZoneForSurface  ! Zone number that a particular surface is attached to
         int BaseNum;                 // Temporary number for creating RadiantSystemTypes structure
         Array1D_bool lAlphaBlanks;   // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
-        // FLOW:
-        // Initializations and allocations
         MaxAlphas = 0;
         MaxNumbers = 0;
 
@@ -567,12 +528,6 @@ namespace LowTempRadiantSystem {
                 ShowSevereError(RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
-                //    ELSEIF (Zone(HydrRadSys(Item)%ZonePtr)%Multiplier > 1 .or. Zone(HydrRadSys(Item)%ZonePtr)%ListMultiplier > 1) THEN
-                //      CALL ShowSevereError(RoutineName//'Zone Multiplier or Zone List Multipliers cannot be used (i.e., >1)')
-                //      CALL ShowContinueError('Occurs in '//TRIM(CurrentModuleObject)//' = '//TRIM(Alphas(1)))
-                //      CALL ShowContinueError('Duplicate the zone or make it larger rather than using multipliers.  Zone Referenced='//  &
-                //          TRIM(HydrRadSys(Item)%ZoneName))
-                //      ErrorsFound=.TRUE.
             }
 
             HydrRadSys(Item).SurfListName = Alphas(4);
@@ -917,12 +872,6 @@ namespace LowTempRadiantSystem {
                 ShowSevereError(RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
-                //    ELSEIF (Zone(CFloRadSys(Item)%ZonePtr)%Multiplier > 1 .or. Zone(CFloRadSys(Item)%ZonePtr)%ListMultiplier > 1) THEN
-                //      CALL ShowSevereError(RoutineName//'Zone Multiplier or Zone List Multipliers cannot be used (i.e., >1)')
-                //      CALL ShowContinueError('Occurs in '//TRIM(CurrentModuleObject)//' = '//TRIM(Alphas(1)))
-                //      CALL ShowContinueError('Duplicate the zone or make it larger rather than using multipliers.  Zone Referenced='//  &
-                //          TRIM(CFloRadSys(Item)%ZoneName))
-                //      ErrorsFound=.TRUE.
             }
 
             CFloRadSys(Item).SurfListName = Alphas(4);
@@ -1182,12 +1131,6 @@ namespace LowTempRadiantSystem {
                 ShowSevereError(RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
-                //    ELSEIF (Zone(ElecRadSys(Item)%ZonePtr)%Multiplier > 1 .or. Zone(ElecRadSys(Item)%ZonePtr)%ListMultiplier > 1) THEN
-                //      CALL ShowSevereError(RoutineName//'Zone Multiplier or Zone List Multipliers cannot be used (i.e., >1)')
-                //      CALL ShowContinueError('Occurs in '//TRIM(CurrentModuleObject)//' = '//TRIM(Alphas(1)))
-                //      CALL ShowContinueError('Duplicate the zone or make it larger rather than using multipliers.  Zone Referenced='//  &
-                //          TRIM(ElecRadSys(Item)%ZoneName))
-                //      ErrorsFound=.TRUE.
             }
 
             ElecRadSys(Item).SurfListName = Alphas(4);
@@ -1426,9 +1369,6 @@ namespace LowTempRadiantSystem {
         }
 
         AssignedAsRadiantSurface.deallocate();
-
-        //  DEALLOCATE(SurfList)
-
         Alphas.deallocate();
         Numbers.deallocate();
         cAlphaFields.deallocate();
@@ -1715,15 +1655,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine initializes variables relating to low temperature radiant
-        // systems.
-
-        // METHODOLOGY EMPLOYED:
-        // Simply initializes whatever needs initializing.
 
         // Using/Aliasing
         using DataGlobals::AnyPlantInModel;
@@ -1767,7 +1698,6 @@ namespace LowTempRadiantSystem {
         Real64 mdot; // local fluid mass flow rate
         Real64 rho;  // local fluid density
         bool errFlag;
-        // FLOW:
 
         InitErrorsFound = false;
 
@@ -2331,16 +2261,15 @@ namespace LowTempRadiantSystem {
         //       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
         //                      August 2014 Bereket Nigusse, added scalable sizing
         //                      March 2014 Daeho Kang, add constant flow system autosizing
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing low temperature radiant components for which flow rates
-        // and tube length or max ekectric power have not been specified in the input
+        // and tube length or max electric power have not been specified in the input
 
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the zone sizing arrays and plant sizing data. Maximum electric
         // power is set to the design heat load. Tube length is calculated by rule-of-thumb from
-        // rge surface area.
+        // the surface area.
 
         // Using/Aliasing
         using namespace DataSizing;
@@ -2372,7 +2301,6 @@ namespace LowTempRadiantSystem {
         Real64 rho;
         Real64 Cp;
         bool IsAutoSize(false); // Indicator to autosize
-        // Real64 MaxElecPowerDes( 0.0 ); // Design electric power for reproting
         Real64 WaterVolFlowMaxHeatDes(0.0);  // Design hot water flow for reproting
         Real64 WaterVolFlowMaxHeatUser(0.0); // User hard-sized hot water flow for
         Real64 WaterVolFlowMaxCoolDes(0.0);  // Design chilled water flow for reproting
@@ -3111,8 +3039,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine does all of the stuff that is necessary to simulate
@@ -3137,7 +3063,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        //  USE DataEnvironment,   ONLY : OutDryBulbTemp, OutWetBulbTemp
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
@@ -3146,17 +3071,6 @@ namespace LowTempRadiantSystem {
         using DataHVACGlobals::SmallLoad;
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ActWaterFlow; // actual water flow for heating or cooling [kg/sec]
@@ -3173,8 +3087,6 @@ namespace LowTempRadiantSystem {
         Real64 mdot;         // local temporary for fluid mass flow rate
         bool SysRunning;     // True when system is running
 
-        // FLOW:
-        // initialize local variables
         ControlNode = 0;
         MaxWaterFlow = 0.0;
         ActWaterFlow = 0.0;
@@ -3315,7 +3227,6 @@ namespace LowTempRadiantSystem {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
         //       MODIFIED       Sep 2011 LKL/BG - resimulate only zones needing it for Radiant systems
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves the radiant system based on how much water is (and
@@ -3356,17 +3267,6 @@ namespace LowTempRadiantSystem {
         using General::RoundSigDigits;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CondSurfNum;          // Surface number (in radiant array) of
         int ConstrNum;            // Index for construction number in Construct derived type
@@ -3402,7 +3302,6 @@ namespace LowTempRadiantSystem {
         Real64 Cl;
         // For more info on Ca through Cl, see comments below
 
-        // FLOW:
         // First, apply heat exchanger logic to find the heat source/sink to the system.
         // This involves finding out the heat transfer characteristics of the hydronic
         // loop and then applying the equations derived on pp. 113-118 of the dissertation.
@@ -3834,8 +3733,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine does all of the stuff that is necessary to simulate
@@ -3876,18 +3773,9 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const LowCpFluidValue(100.0); // lowest allowed Cp fluid value (to avoid dividing by zero) [J/kg-K]
         static std::string const RoutineName("CalcLowTempCFloRadiantSystem");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid;         // Specific heat of the fluid in the radiant system
@@ -3912,7 +3800,6 @@ namespace LowTempRadiantSystem {
         int ZoneNum;            // number of zone being served
         Real64 mdot;            // local temporary for water mass flow rate kg/s
 
-        // FLOW:
         // initialize local variables
         ZoneNum = CFloRadSys(RadSysNum).ZonePtr;
         SysRunning = true; // default to running and turn off only if not running
@@ -4390,7 +4277,6 @@ namespace LowTempRadiantSystem {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   August 2003
         //       MODIFIED       Sep 2011 LKL/BG - resimulate only zones needing it for Radiant systems
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves the radiant system based on how much water is (and
@@ -4434,21 +4320,10 @@ namespace LowTempRadiantSystem {
         using General::RoundSigDigits;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // through and figure out more information (i.e., did not know the
-        // inlet temperature directly)
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const TempCheckLimit(0.1); // Maximum allowed temperature difference between outlet temperature calculations
         Real64 const ZeroSystemResp(0.1); // Response below which the system response is really zero
         static std::string const RoutineName("CalcLowTempCFloRadSysComps");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConstrNum;                // Index for construction number in Construct derived type
@@ -4491,11 +4366,10 @@ namespace LowTempRadiantSystem {
         static Array1D<Real64> Ckj; // Coefficients for individual surfaces within a radiant system
         static Array1D<Real64> Cmj;
         static Array1D<Real64> WaterTempOut; // Array of outlet water temperatures for
-        // each surface in the radiant system
+                                             // each surface in the radiant system
 
         static bool FirstTimeFlag(true); // for setting size of Ckj, Cmj, WaterTempOut arrays
 
-        // FLOW:
         // First, apply heat exchanger logic to find the heat source/sink to the system.
         // This involves finding out the heat transfer characteristics of the hydronic
         // loop and then applying the equations derived on pp. 113-118 of the dissertation.
@@ -4916,9 +4790,6 @@ namespace LowTempRadiantSystem {
 
         LoadMet = SumHATsurf(CFloRadSys(RadSysNum).ZonePtr) - ZeroSourceSumHATsurf(CFloRadSys(RadSysNum).ZonePtr);
 
-        //  DEALLOCATE(Ckj)
-        //  DEALLOCATE(Cmj)
-        //  DEALLOCATE(WaterTempOut)
     }
 
     void CalcLowTempElecRadiantSystem(int const RadSysNum, // name of the low temperature radiant system
@@ -4930,7 +4801,6 @@ namespace LowTempRadiantSystem {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
         //       MODIFIED       Sep 2011 LKL/BG - resimulate only zones needing it for Radiant systems
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine does all of the stuff that is necessary to simulate
@@ -4953,8 +4823,6 @@ namespace LowTempRadiantSystem {
         // Seem, J.E. 1986. "Heat Transfer in Buildings", Ph.D. dissertation, University
         //   of Wisconsin-Madison.
 
-        // USE STATEMENTS:
-        //  USE DataEnvironment,   ONLY : OutDryBulbTemp, OutWetBulbTemp
         // Using/Aliasing
         using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
@@ -4963,18 +4831,6 @@ namespace LowTempRadiantSystem {
         using DataHVACGlobals::SmallLoad;
         using namespace DataZoneEnergyDemands;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ControlTemp; // Temperature of the parameter that is controlling the radiant system
@@ -4985,7 +4841,6 @@ namespace LowTempRadiantSystem {
         int SurfNum;        // intermediate variable for surface number in Surface derived type
         int ZoneNum;        // number of zone being served
 
-        // FLOW:
         // initialize local variables
         ZoneNum = ElecRadSys(RadSysNum).ZonePtr;
         HeatFrac = 0.0;
@@ -5070,8 +4925,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine does any updating that needs to be done for low
@@ -5089,9 +4942,6 @@ namespace LowTempRadiantSystem {
         // time step elapsed is different, then we just need to add the new
         // values to the running average.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataGlobals::TimeStepZone;
         using DataHeatBalance::Zone;
@@ -5103,17 +4953,8 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("UpdateLowTempRadiantSystem");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 BypassMassFlow;  // Local bypass for a constant flow radiant system (could have recirculation and/or bypass)
@@ -5128,7 +4969,6 @@ namespace LowTempRadiantSystem {
         Real64 ZoneMult;        // Zone multiplier
         int ZoneNum;            // Zone for this radiant system
 
-        // FLOW:
         {
             auto const SELECT_CASE_var(SystemType);
             if (SELECT_CASE_var == HydronicSystem) {
@@ -5327,33 +5167,16 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   March 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // check for crazy, out of range temperature results for fluid leaving radiant system
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const UpperRangeLimit(500.0);  // high error trigger limit for when model is not working
         Real64 const LowerRangeLimit(-300.0); // Low error trigger limit for when model is not working
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool WarnTooLow(false);
@@ -5461,8 +5284,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   December 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the radiant system "heat exchanger"
@@ -5493,9 +5314,6 @@ namespace LowTempRadiantSystem {
         // Return value
         Real64 CalcRadSysHXEffectTerm;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
         int const NumOfPropDivisions(13);
@@ -5522,12 +5340,6 @@ namespace LowTempRadiantSystem {
             NumOfPropDivisions, {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
         static std::string const RoutineName("CalcRadSysHXEffectTerm");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Index;
         Real64 InterpFrac;
@@ -5540,7 +5352,6 @@ namespace LowTempRadiantSystem {
         Real64 PRactual;
         Real64 Eff; // HX effectiveness
 
-        // FLOW:
         // First find out where we are in the range of temperatures
         Index = 1;
         while (Index <= NumOfPropDivisions) {
@@ -5572,7 +5383,7 @@ namespace LowTempRadiantSystem {
                     auto const SELECT_CASE_var1(OperatingMode);
                     if (SELECT_CASE_var1 == HeatingMode) {
                         CpWater = GetSpecificHeatGlycol(PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                        DataGlobals::HWInitConvTemp,
+                                                        Temperature,
                                                         PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                                         RoutineName);
                     } else if (SELECT_CASE_var1 == CoolingMode) {
@@ -5595,7 +5406,7 @@ namespace LowTempRadiantSystem {
                                                         RoutineName);
                     } else if (SELECT_CASE_var1 == CoolingMode) {
                         CpWater = GetSpecificHeatGlycol(PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                                                        Temperature,
                                                         PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                         RoutineName);
                     } else {
@@ -5644,8 +5455,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // To transfer the average value of the heat source/sink over the entire
@@ -5660,28 +5469,12 @@ namespace LowTempRadiantSystem {
         // see if the system was even on.  If any average term is non-zero, then
         // one or more of the radiant systems was running.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const CloseEnough(0.01); // Some arbitrarily small value to avoid zeros and numbers that are almost the same
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // DO loop counter for surface index
 
-        // FLOW:
         LowTempRadSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
@@ -5718,19 +5511,11 @@ namespace LowTempRadiantSystem {
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
         // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
         // and should be updated accordingly.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using namespace DataSurfaces;
@@ -5740,14 +5525,10 @@ namespace LowTempRadiantSystem {
         // Return value
         Real64 SumHATsurf;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-        // FLOW:
         SumHATsurf = 0.0;
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
@@ -5789,17 +5570,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   November 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine simply produces output for the low temperature radiant system.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using DataGlobals::SecInHour;
@@ -5810,17 +5580,8 @@ namespace LowTempRadiantSystem {
         using DataSurfaces::Surface;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ReportLowTempRadiantSystem");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid;          // Specific heat of the fluid in the radiant system
@@ -5829,7 +5590,6 @@ namespace LowTempRadiantSystem {
         Real64 TotalRadSysPower; // Total source/sink power for the radiant system (sum of all surfaces of the system)
         Real64 ZoneMult;         // Total zone multiplier to apply to the system level variables
 
-        // FLOW:
         TotalRadSysPower = 0.0;
         ZoneMult = 1.0;
 
