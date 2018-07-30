@@ -84,10 +84,18 @@ namespace ReportSizingManager {
     );
 
     Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
-    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac);
-    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac);
-    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac);
-    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac);
+    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
 
 } // namespace ReportSizingManager
 

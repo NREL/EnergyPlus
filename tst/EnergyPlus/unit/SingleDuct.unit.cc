@@ -2791,14 +2791,10 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     SingleDuct::SysATMixer(1).DesignPrimaryAirVolRate /= 2.0;
     SingleDuct::setATMixerSizingProperties(ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
 
-    EXPECT_GT(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).PrecoolTemp);
-    EXPECT_LT(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).RetTempAtCoolPeak);
-    EXPECT_GT(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).PrecoolHumRat);
-    EXPECT_LT(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).RetHumRatAtCoolPeak);
-    EXPECT_GT(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).PreheatTemp);
-    EXPECT_LT(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).HeatRetTemp);
-    EXPECT_GT(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).PreheatHumRat);
-    EXPECT_LT(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).HeatRetHumRat);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).PrecoolTemp, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).PrecoolHumRat, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).PreheatTemp, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).PreheatHumRat, 0.0000001);
 
     DataAirSystems::PrimaryAirSystem(1).NumOAHeatCoils = 0;
     DataAirSystems::PrimaryAirSystem(1).NumOACoolCoils = 0;
@@ -2806,8 +2802,8 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
 
     SingleDuct::setATMixerSizingProperties(ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
 
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).OutTempAtCoolPeak);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).OutHumRatAtCoolPeak);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).HeatOutTemp);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).HeatOutHumRat);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).OutTempAtCoolPeak, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).OutHumRatAtCoolPeak, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).HeatOutTemp, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).HeatOutHumRat, 0.0000001);
 }
