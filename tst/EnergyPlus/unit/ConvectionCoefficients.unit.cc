@@ -55,9 +55,12 @@
 // EnergyPlus Headers
 #include <BaseboardElectric.hh>
 #include <ConvectionCoefficients.hh>
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
+#include <DataLoopNode.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <HeatBalanceManager.hh>
@@ -556,3 +559,59 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClassi
     DynamicIntConvSurfaceClassification(15);
     EXPECT_EQ(DataSurfaces::Surface(15).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 }
+
+TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPedersen)
+{
+
+    int SurfNum;
+    int ConvModelEquationNum;
+    Real64 Hc;
+    Real64 HcExpectedValue;
+
+    SurfNum = 1;
+
+    DataSurfaces::Surface.allocate( 1 );
+    DataHeatBalance::Zone.allocate( 1 );
+    DataLoopNode::Node.allocate( 1 );
+
+    DataSurfaces::Surface( SurfNum ).Zone = 1;
+    DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 1;
+    DataHeatBalance::Zone( 1 ).Multiplier = 1.0;
+    DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
+    DataHeatBalance::Zone( 1 ).Volume = 1.0;
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataLoopNode::Node( 1 ).Temp = 20.0;
+    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0;
+
+    // Test 1: Floor Diffuser Model
+    ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserFloor;
+    Hc = 0.0;
+    HcExpectedValue = 3.955;
+    DataSurfaces::Surface(SurfNum).TAirRef = 0;
+
+    EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
+    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
+    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+
+    // Test 2: Ceiling Diffuser Model
+    ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserCeiling;
+    Hc = 0.0;
+    HcExpectedValue = 6.333;
+    DataSurfaces::Surface(SurfNum).TAirRef = 0;
+
+    EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
+    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
+    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+
+    // Test 3: Ceiling Diffuser Model
+    ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserWalls;
+    Hc = 0.0;
+    HcExpectedValue = 2.220;
+    DataSurfaces::Surface(SurfNum).TAirRef = 0;
+
+    EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
+    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
+    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+
+}
+

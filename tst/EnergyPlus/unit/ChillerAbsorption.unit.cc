@@ -71,7 +71,7 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,8.9;",
+        "  Version,9.0;",
 
         "  Timestep,4;",
 

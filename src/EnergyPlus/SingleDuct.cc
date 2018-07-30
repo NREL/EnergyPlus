@@ -2106,7 +2106,7 @@ namespace SingleDuct {
 
             if (Sys(SysNum).HWLoopNum > 0 && Sys(SysNum).ReheatComp_Num != HCoilType_SteamAirHeating) { // protect early calls before plant is setup
                 rho = GetDensityGlycol(PlantLoop(Sys(SysNum).HWLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(Sys(SysNum).HWLoopNum).FluidIndex,
                                        RoutineName);
             } else {
