@@ -1610,7 +1610,7 @@ namespace OutdoorAirUnit {
             if (OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum == TypeOf_CoilSteamAirHeating) {
                 if (OutAirUnit(OAUnitNum).OAEquip(CompNum).MaxVolWaterFlow == AutoSize) {
                     SimulateSteamCoilComponents(
-                        OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, true, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex, 1.0, 0.0);
+                        OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, true, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex);
                 }
             }
             if (OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum == WaterCoil_CoolingHXAsst) {

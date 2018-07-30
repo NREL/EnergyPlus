@@ -196,6 +196,7 @@ namespace SteamCoils {
         int CoilNum;            // The SteamCoil that you are currently loading input into
         int OpMode;             // fan operating mode
         Real64 PartLoadFrac;    // part-load fraction of heating coil
+        Real64 QCoilReqLocal;   // local required heating load optional
 
         // Obtains and Allocates SteamCoil related parameters from input file
         if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
@@ -238,9 +239,14 @@ namespace SteamCoils {
         } else {
             PartLoadFrac = 1.0;
         }
+        if (present(QCoilReq)) {
+            QCoilReqLocal = QCoilReq;
+        } else {
+            QCoilReqLocal = 0.0;
+        }
 
         if (SteamCoil(CoilNum).SteamCoilType_Num == SteamCoil_AirHeating) {
-            CalcSteamAirCoil(CoilNum, QCoilReq, QCoilActualTemp, OpMode, PartLoadFrac); // Autodesk:OPTIONAL QCoilReq used without PRESENT check
+            CalcSteamAirCoil(CoilNum, QCoilReqLocal, QCoilActualTemp, OpMode, PartLoadFrac); // Autodesk:OPTIONAL QCoilReq used without PRESENT check
             if (present(QCoilActual)) QCoilActual = QCoilActualTemp;
         }
 
