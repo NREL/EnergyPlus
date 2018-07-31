@@ -3151,7 +3151,6 @@
     0.8,                     !- Nominal Thermal Efficiency
     LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable
     BoilerEfficiency,        !- Normalized Boiler Efficiency Curve Name
-    81.,                     !- Design Water Outlet Temperature {C}
     autosize,                !- Design Water Flow Rate {m3/s}
     0.0,                     !- Minimum Part Load Ratio
     1.2,                     !- Maximum Part Load Ratio
