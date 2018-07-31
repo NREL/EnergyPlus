@@ -8355,7 +8355,7 @@ namespace WeatherManager {
                 if (ReportWarningFlag) {
                     ShowWarningError("CalcWaterMainsTemp: Site:WaterMainsTemperature object does not exit.");
                     ShowContinueError("Water Mains Monthly Temperature cannot be calculated.");
-                    ShowContinueError("Instead a fixed default value of 10 C will be used.");
+                    ShowContinueError("Instead a fixed default value of 10.0 C will be used.");
                     ReportWarningFlag = false;
                 }
                 WaterMainsTemp = 10.0; // 50 F
@@ -10524,7 +10524,7 @@ namespace WeatherManager {
                 ShowContinueError("Weather file: " + DataStringGlobals::inputWeatherFileName + ".");
                 ShowContinueError("Stat file: " + DataStringGlobals::inStatFileName + ".");
                 ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
-                ShowContinueError("Instead a fixed default value of 10 C will be used.");
+                ShowContinueError("Instead a fixed default value of 10.0 C will be used.");
             }
         }
     }
