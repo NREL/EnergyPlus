@@ -147,8 +147,6 @@ namespace FaultsManager {
     int const iFault_Fouling_Chiller(115);
     int const iFault_Fouling_EvapCooler(116);
 
-    bool GetFaultsInputFlag(true); // Flag set to make sure you get input once
-
     // Types of faults under Group Operational Faults in IDD
     //  1. Temperature sensor offset (FY14)
     //  2. Humidity sensor offset (FY14)
@@ -2064,7 +2062,6 @@ namespace FaultsManager {
         RunFaultMgrOnceFlag = false;
         ErrorsFound = false;
         AnyFaultsInModel = false;
-        GetFaultsInputFlag = true;
 
         NumFaults = 0;
         NumFaultyEconomizer = 0;

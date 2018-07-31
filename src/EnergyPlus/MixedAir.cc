@@ -1338,7 +1338,6 @@ namespace MixedAir {
         static int ADUNum(0);
         int jZone;
         int i;
-        int j;
 
         // Formats
         static gio::Fmt Format_700("('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
@@ -1356,10 +1355,7 @@ namespace MixedAir {
             GetOAMixerInputFlag = false;
         }
 
-        if (FaultsManager::GetFaultsInputFlag) {
-            FaultsManager::CheckAndReadFaults();
-            FaultsManager::GetFaultsInputFlag = false;
-        }
+        FaultsManager::CheckAndReadFaults();
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
         MaxAlphas = NumAlphas;
@@ -1424,7 +1420,7 @@ namespace MixedAir {
                 //  loop through each fault for each OA controller to determine faulty counts
                 OAController(OutAirNum).EconmizerFaultNum.allocate(OAController(OutAirNum).NumFaultyEconomizer);
                 if (OAController(OutAirNum).NumFaultyEconomizer > 0) {
-                    for (j = 0, i = 1; i <= NumFaultyEconomizer; ++i) {
+                    for (int j = 0, i = 1; i <= NumFaultyEconomizer; ++i) {
                         if (FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
                         if (UtilityRoutines::SameString(OAController(OutAirNum).Name, FaultsEconomizer(i).ControllerName)) {
                             OAController(OutAirNum).EconmizerFaultNum(++j) = i;

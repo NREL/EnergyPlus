@@ -433,9 +433,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
 
     ScheduleManager::ProcessScheduleInput(); // read schedules
 
-    EXPECT_TRUE(FaultsManager::GetFaultsInputFlag);
     MixedAir::GetOAControllerInputs();
-    EXPECT_FALSE(FaultsManager::GetFaultsInputFlag);
 
     // there are two OA controller objects
     EXPECT_EQ(MixedAir::NumOAControllers, 2);
