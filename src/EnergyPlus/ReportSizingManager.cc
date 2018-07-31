@@ -486,8 +486,6 @@ namespace ReportSizingManager {
             }
             bCheckForZero = false;
         } else if (CurZoneEqNum > 0) {
-            DataSizing::ZoneEqSizingData &zoneEqSizing = DataSizing::ZoneEqSizing(CurZoneEqNum);
-            DataSizing::ZoneSizingData &finalZoneSizing = DataSizing::FinalZoneSizing(CurZoneEqNum);
 
             if (!IsAutoSize && !SizingDesRunThisZone && !SizingDesValueFromParent) {
                 HardSizeNoDesRun = true;
@@ -504,6 +502,10 @@ namespace ReportSizingManager {
                     }
                 }
             } else {
+
+                DataSizing::ZoneEqSizingData &zoneEqSizing = DataSizing::ZoneEqSizing(CurZoneEqNum);
+                DataSizing::ZoneSizingData &finalZoneSizing = DataSizing::FinalZoneSizing(CurZoneEqNum);
+
                 if (SizingType == SystemAirflowSizing) {
 
                     {
@@ -1702,7 +1704,7 @@ namespace ReportSizingManager {
                         } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
                         } else {
-                            CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp; // this is mixture of OA and zone air
+                            CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
                         }
                         if ((TermUnitSingDuct || TermUnitPIU) && (CurTermUnitSizingNum > 0)) {
                             CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;

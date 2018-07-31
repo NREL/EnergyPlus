@@ -15920,38 +15920,33 @@ namespace HVACUnitarySystem {
         }
     }
 
-    void GetUnitarySystemOAHeatCoolCoil(std::string const &UnitarySystemName, // Name of Unitary System object
-                                        Optional_bool OACoolingCoil,          // Cooling coil in OA stream
-                                        Optional_bool OAHeatingCoil           // Heating coil in OA stream
+    void GetUnitarySystemHeatCoolCoil(std::string const &UnitarySystemName, // Name of Unitary System object
+                                      bool &CoolingCoil,                    // Cooling coil in system
+                                      bool &HeatingCoil                     // Heating coil in system
     )
     {
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   April 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Determined weather Unitary system in OA stream has heating or cooling coils
-
-        // Locals
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int UnitarySysNum;
+        // Determined weather Unitary system has heating or cooling coils
 
         if (GetInputFlag) { // First time subroutine has been entered
             GetUnitarySystemInput();
             GetInputFlag = false;
         }
 
-        for (UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum) {
+        for (int UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum) {
             if (UtilityRoutines::SameString(UnitarySystemName, UnitarySystem(UnitarySysNum).Name)) {
                 if (UnitarySystem(UnitarySysNum).CoolCoilExists) {
-                    OACoolingCoil = true;
+                    CoolingCoil = true;
                 }
                 if (UnitarySystem(UnitarySysNum).HeatCoilExists || UnitarySystem(UnitarySysNum).SuppCoilExists) {
-                    OAHeatingCoil = true;
+                    HeatingCoil = true;
                 }
+                break;
             }
         }
     }

@@ -184,15 +184,16 @@ namespace SimAirServingZones {
     int const Unglazed_SolarCollector(17);
     int const EvapCooler(18);
     int const UnitarySystem(19);
-    int const Furnace_UnitarySys(20);
-    int const Humidifier(21);
-    int const Duct(22);
-    int const UnitarySystem_BypassVAVSys(23);
-    int const UnitarySystem_MSHeatPump(24);
-    int const Fan_ComponentModel(25); // cpw22Aug2010 (new)
-    int const DXHeatPumpSystem(26);
-    int const CoilUserDefined(27);
-    int const Fan_System_Object(28);
+    int const Furnace_UnitarySys_HeatOnly(20);
+    int const Furnace_UnitarySys_HeatCool(21);
+    int const Humidifier(22);
+    int const Duct(23);
+    int const UnitarySystem_BypassVAVSys(24);
+    int const UnitarySystem_MSHeatPump(25);
+    int const Fan_ComponentModel(26); // cpw22Aug2010 (new)
+    int const DXHeatPumpSystem(27);
+    int const CoilUserDefined(28);
+    int const Fan_System_Object(29);
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -1289,17 +1290,17 @@ namespace SimAirServingZones {
                         } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystem;
                         } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
-                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys;
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatOnly;
                         } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {
-                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys;
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatCool;
                         } else if (componentType == "AIRLOOPHVAC:UNITARYHEATONLY") {
-                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys;
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatOnly;
                         } else if (componentType == "AIRLOOPHVAC:UNITARYHEATCOOL") {
-                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys;
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatCool;
                         } else if (componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR") {
-                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys;
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatCool;
                         } else if (componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR") {
-                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys;
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatCool;
 
                         } else if (componentType == "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystem_BypassVAVSys;
@@ -2097,9 +2098,16 @@ namespace SimAirServingZones {
                         CompTypeNum = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                         if (CompTypeNum == WaterCoil_SimpleHeat || CompTypeNum == Coil_ElectricHeat || CompTypeNum == Coil_GasHeat ||
                             CompTypeNum == SteamCoil_AirHeat || CompTypeNum == Coil_DeSuperHeat || CompTypeNum == DXHeatPumpSystem ||
-                            CompTypeNum == Furnace_UnitarySys || CompTypeNum == UnitarySystem || CompTypeNum == UnitarySystem_BypassVAVSys ||
-                            CompTypeNum == UnitarySystem_MSHeatPump || CompTypeNum == CoilUserDefined) {
+                            CompTypeNum == Furnace_UnitarySys_HeatOnly || CompTypeNum == Furnace_UnitarySys_HeatCool ||
+                            CompTypeNum == UnitarySystem_BypassVAVSys || CompTypeNum == UnitarySystem_MSHeatPump || CompTypeNum == CoilUserDefined) {
                             FoundCentralHeatCoil = true;
+                        } else if (CompTypeNum == UnitarySystem) {
+                            // mine HeatCoilExists from UnitarySystem
+                            std::string CompName = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
+                            bool CoolingCoilExists = false;
+                            bool HeatingCoilExists = false;
+                            HVACUnitarySystem::GetUnitarySystemHeatCoolCoil(CompName, CoolingCoilExists, HeatingCoilExists);
+                            if (HeatingCoilExists) FoundCentralHeatCoil = true;
                         }
                     } // end of component loop
                 }     // end of Branch loop
@@ -2114,9 +2122,16 @@ namespace SimAirServingZones {
                         CompTypeNum = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                         if (CompTypeNum == WaterCoil_SimpleCool || CompTypeNum == WaterCoil_Cooling || CompTypeNum == WaterCoil_DetailedCool ||
                             CompTypeNum == WaterCoil_CoolingHXAsst || CompTypeNum == DXCoil_CoolingHXAsst || CompTypeNum == DXSystem ||
-                            CompTypeNum == UnitarySystem || CompTypeNum == Furnace_UnitarySys || CompTypeNum == UnitarySystem_BypassVAVSys ||
+                            CompTypeNum == Furnace_UnitarySys_HeatCool || CompTypeNum == UnitarySystem_BypassVAVSys ||
                             CompTypeNum == UnitarySystem_MSHeatPump || CompTypeNum == CoilUserDefined) {
                             FoundCentralCoolCoil = true;
+                        } else if (CompTypeNum == UnitarySystem) {
+                            // mine CoolCoilExists from UnitarySystem
+                            std::string CompName = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
+                            bool CoolingCoilExists = false;
+                            bool HeatingCoilExists = false;
+                            HVACUnitarySystem::GetUnitarySystemHeatCoolCoil(CompName, CoolingCoilExists, HeatingCoilExists);
+                            if (CoolingCoilExists) FoundCentralCoolCoil = true;
                         }
                     } // end of component loop
                 }     // end of Branch loop
@@ -3487,7 +3502,8 @@ namespace SimAirServingZones {
             } else if (SELECT_CASE_var == UnitarySystem) { // 'AirLoopHVAC:UnitarySystem'
                 SimUnitarySystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive);
 
-            } else if (SELECT_CASE_var == Furnace_UnitarySys) { // 'AirLoopHVAC:Unitary:Furnace:HeatOnly', 'AirLoopHVAC:Unitary:Furnace:HeatCool',
+            } else if (SELECT_CASE_var == Furnace_UnitarySys_HeatOnly || SELECT_CASE_var == Furnace_UnitarySys_HeatOnly) {
+                // 'AirLoopHVAC:Unitary:Furnace:HeatOnly', 'AirLoopHVAC:Unitary:Furnace:HeatCool',
                 // 'AirLoopHVAC:UnitaryHeatOnly', 'AirLoopHVAC:UnitaryHeatCool'
                 // 'AirLoopHVAC:UnitaryHeatPump:AirToAir', 'AirLoopHVAC:UnitaryHeatPump:WaterToAir'
                 SimFurnace(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
