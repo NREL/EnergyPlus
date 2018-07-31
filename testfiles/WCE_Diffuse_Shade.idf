@@ -586,7 +586,7 @@
     Room102 South Wall,      !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
+    ShdSys_Control,          !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -662,6 +662,10 @@
 
   CONSTRUCTION,
     GlzSys_1,                !- Name
+    Glass_102_LayerAvg;      !- Outside Layer
+    
+  CONSTRUCTION,
+    GlzSys_1_withShade,                !- Name
     Glass_102_LayerAvg,      !- Outside Layer
     Shade_1;
 
@@ -681,3 +685,17 @@
     0.0,                     !- Left-Side Opening Multiplier
     0.0,                     !- Right-Side Opening Multiplier
     0;                       !- Airflow Permeability {dimensionless}
+    
+WindowProperty:ShadingControl,
+    ShdSys_Control,          !- Name
+    InteriorShade,           !- Shading Type
+    GlzSys_1_withShade,      !- Construction with Shading Name
+    AlwaysOn,                !- Shading Control Type
+    ,                        !- Schedule Name
+    0,                       !- Setpoint {W/m2, W or deg C}
+    NO,                      !- Shading Control Is Scheduled
+    NO,                      !- Glare Control Is Active
+    ,                        !- Shading Device Material Name
+    ,          !- Type of Slat Angle Control for Blinds
+    ,                        !- Slat Angle Schedule Name
+    0;                       !- Setpoint 2 {W/m2 or deg C}

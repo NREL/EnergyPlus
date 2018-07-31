@@ -129,7 +129,7 @@ namespace WindowManager {
 
         auto aLayers = aSystem->getSolidLayers();
         auto i = 1;
-        for (auto aLayer : aLayers) {
+        for (const auto & aLayer : aLayers) {
             Real64 aTemp = 0;
             for (auto aSide : EnumSide()) {
                 aTemp = aLayer->getTemperature(aSide);
