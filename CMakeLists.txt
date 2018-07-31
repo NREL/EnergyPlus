@@ -170,6 +170,12 @@ ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
 IF( NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
+if( BUILD_TESTING )
+  ADD_SUBDIRECTORY(third_party/gtest)
+endif()
+
+# Kiva
+INCLUDE(third_party/cmake/kiva.cmake)
 
 execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
 if( ${generate_epJSON_schema_result} MATCHES ".*timeout.*" )
@@ -180,12 +186,13 @@ configure_file( idd/Energy+.schema.epJSON.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
 configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
 configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
+# of course E+ itself
+ADD_SUBDIRECTORY(src/EnergyPlus)
+
 # Include scripts for enabling the testing of 179D compliance
 include(cmake/179DReporting.cmake)
 
-
 if( BUILD_TESTING )
-  ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
 
@@ -203,12 +210,6 @@ if( BUILD_TESTING )
     ADD_SUBDIRECTORY(performance_tests)
   endif()
 endif()
-
-# Kiva
-INCLUDE(third_party/cmake/kiva.cmake)
-
-# of course E+ itself
-ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
