@@ -379,7 +379,7 @@ public: // Properties
 	{
 		std::istream & s( const_cast< std::istream & >( stream_ ) );
 		std::streampos stream_position( s.tellg() );
-		if (stream_position == std::streampos(-1)) return 0;
+		if ( stream_position == std::streampos( -1 ) ) return 0;
 		std::streamoff const pc( stream_position ); // Current position
 		s.seekg( 0, std::ios::beg ); // Beginning of file
 		std::streampos const pb( s.tellg() );
@@ -432,7 +432,7 @@ public: // Methods
 	{
 		stream_.clear();
 		std::streampos current_position( stream_.tellg() );
-		if (current_position == std::streampos(-1)) return true;
+		if ( current_position == std::streampos( -1 ) ) return true;
 		stream_.seekg( 0, std::ios::beg );
 		return true;
 	}
@@ -511,12 +511,10 @@ public: // Properties
 	Size
 	size() const
 	{
-		// don't attempt to calculate size of std::cout or of anything
-		// returning -1 from tellp(); that just closes the stream.
 		std::ostream & s( const_cast< std::ostream & >( stream_ ) );
-		if (&s == &std::cout) return 0;
+		if ( &s == &std::cout ) return 0;
 		std::streampos current_position( s.tellp() );
-		if (current_position == std::streampos(-1)) return 0;
+		if ( current_position == std::streampos( -1 ) ) return 0;
 		std::streamoff const pc( current_position ); // Current position
 		s.seekp( 0, std::ios::beg ); // Beginning of file
 		std::streampos const pb( s.tellp() );
@@ -699,7 +697,7 @@ public: // Methods
 	{
 		stream_.clear();
 		std::streampos current_position( stream_.tellg() );
-		if (current_position == std::streampos(-1)) return true;
+		if ( current_position == std::streampos( -1 ) ) return true;
 		stream_.seekg( 0, std::ios::beg );
 		stream_.seekp( 0, std::ios::beg );
 		return true;
@@ -822,7 +820,7 @@ public: // Methods
 	{
 		stream_.clear();
 		std::streampos current_position( stream_.tellg() );
-		if (current_position == std::streampos(-1)) return true;
+		if ( current_position == std::streampos( -1 ) ) return true;
 		stream_.seekg( 0, std::ios::beg );
 		return true;
 	}
