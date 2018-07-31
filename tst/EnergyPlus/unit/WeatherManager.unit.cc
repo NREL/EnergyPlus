@@ -484,8 +484,9 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
                                                     "Calculation Method{},"
                                                     "Water Mains Temperature Schedule Name{},"
                                                     "Annual Average Outdoor Air Temperature{C},"
-                                                    "Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}",
-                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,,9.99,28.78"});
+                                                    "Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC},"
+                                                    "Fixed Default Water Mains Temperature{C}",
+                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,NA,9.99,28.78,NA"});
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }

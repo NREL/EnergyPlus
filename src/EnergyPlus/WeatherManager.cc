@@ -2335,17 +2335,17 @@ namespace WeatherManager {
 
         if (WaterMainsParameterReport) {
             // this is done only once
-            if (DoWeathSim || DoDesDaySim) {
-                if (WaterMainsTempsMethod != 0) {
-                    if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod || WaterMainsTempsMethod == CorrelationMethod) {
-                        if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod && !OADryBulbAverage.OADryBulbWeatherDataProcessed) {
-                            OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp();
-                        }
-                        // reports to eio file
-                        ReportWaterMainsTempParameters();
-                    }
+            // if (DoWeathSim || DoDesDaySim) {
+            // if (WaterMainsTempsMethod != 0) {
+            if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod) {
+                if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
+                    OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp();
                 }
             }
+            //}
+            //}
+            // reports to eio file
+            ReportWaterMainsTempParameters();
             WaterMainsParameterReport = false;
         }
     }
@@ -8334,6 +8334,7 @@ namespace WeatherManager {
 
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static bool ReportWarningFlag(true); // if true reports warning when Site:WaterMainsTemperature does not exit in the idf
 
         // FLOW:
         {
@@ -8351,8 +8352,12 @@ namespace WeatherManager {
                     WaterMainsTemp = 10.0; // 50 F
                 }
             } else {
-                // we could use CorrelationFromWeatherFileMethod if there is weather file, or else
-                // if there is no weather file for any reason, then we can set to default value here
+                if (ReportWarningFlag) {
+                    ShowWarningError("CalcWaterMainsTemp: Site:WaterMainsTemperature object does not exit.");
+                    ShowContinueError("Water Mains Monthly Temperature cannot be calculated.");
+                    ShowContinueError("Instead a fixed default value of 10 C will be used.");
+                    ReportWarningFlag = false;
+                }
                 WaterMainsTemp = 10.0; // 50 F
             }
         }
@@ -10519,7 +10524,7 @@ namespace WeatherManager {
                 ShowContinueError("Weather file: " + DataStringGlobals::inputWeatherFileName + ".");
                 ShowContinueError("Stat file: " + DataStringGlobals::inStatFileName + ".");
                 ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
-                ShowContinueError("Instead default value of Water Mains Monthly Temperature will be used.");
+                ShowContinueError("Instead a fixed default value of 10 C will be used.");
             }
         }
     }
@@ -10547,7 +10552,8 @@ namespace WeatherManager {
                       ",Calculation Method{}"
                       ",Water Mains Temperature Schedule Name{}"
                       ",Annual Average Outdoor Air Temperature{C}"
-                      ",Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}" +
+                      ",Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}"
+                      ",Fixed Default Water Mains Temperature{C}" +
                           DataStringGlobals::NL;
 
         {
@@ -10555,20 +10561,45 @@ namespace WeatherManager {
             if (SELECT_CASE_var == ScheduleMethod) {
                 *eiostream << "Site Water Mains Temperature Information,";
                 *eiostream << cCalculationMethod(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
-                *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2)
-                           << DataStringGlobals::NL;
+                *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
+                *eiostream << "NA" << DataStringGlobals::NL;
             } else if (SELECT_CASE_var == CorrelationMethod) {
                 *eiostream << "Site Water Mains Temperature Information,";
-                *eiostream << cCalculationMethod(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
-                *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2)
-                           << DataStringGlobals::NL;
+                *eiostream << cCalculationMethod(WaterMainsTempsMethod) << ","
+                           << "NA"
+                           << ",";
+                *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
+                *eiostream << "NA" << DataStringGlobals::NL;
             } else if (SELECT_CASE_var == CorrelationFromWeatherFileMethod) {
                 if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                     *eiostream << "Site Water Mains Temperature Information,";
-                    *eiostream << cCalculationMethod(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
+                    *eiostream << cCalculationMethod(WaterMainsTempsMethod) << ","
+                               << "NA"
+                               << ",";
                     *eiostream << RoundSigDigits(OADryBulbAverage.AnnualAvgOADryBulbTemp, 2) << ","
-                               << RoundSigDigits(OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 2) << DataStringGlobals::NL;
+                               << RoundSigDigits(OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 2) << ","
+                               << "NA" << DataStringGlobals::NL;
+                } else {
+                    *eiostream << "Site Water Mains Temperature Information,";
+                    *eiostream << "FixedDefault"
+                               << ","
+                               << "NA"
+                               << ","
+                               << "NA"
+                               << ","
+                               << "NA"
+                               << "," << RoundSigDigits(10.0, 1) << DataStringGlobals::NL;
                 }
+            } else {
+                *eiostream << "Site Water Mains Temperature Information,";
+                *eiostream << "FixedDefault"
+                           << ","
+                           << "NA"
+                           << ","
+                           << "NA"
+                           << ","
+                           << "NA"
+                           << "," << RoundSigDigits(10.0, 1) << DataStringGlobals::NL;
             }
         }
     }
