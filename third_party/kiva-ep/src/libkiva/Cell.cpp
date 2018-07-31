@@ -39,6 +39,9 @@ void Cell::Assemble(const Foundation &foundation) {
   heatGain = 0.0;
   volume = meshPtr[0].deltas[coords[0]] * meshPtr[1].deltas[coords[1]] * meshPtr[2].deltas[coords[2]];
 
+  iHeatCapacity = 1/(density*specificHeat);
+  iHeatCapacityADI = iHeatCapacity/foundation.numberOfDimensions; // because of each sub-timestep
+
   if (foundation.numberOfDimensions == 2) {
       r = meshPtr[0].centers[coords[0]];
   }
@@ -163,8 +166,7 @@ void Cell::setZeroThicknessCellProperties(std::vector< std::shared_ptr<Cell> > p
 void Cell::calcCellADEUp(double timestep, const Foundation &foundation, const BoundaryConditions &/*bcs*/,
                          double &U)
 {
-  double theta = timestep/
-                 (density*specificHeat);
+  double theta = timestep*iHeatCapacity;
 
   double C[3][2]{{0}};
   gatherCCoeffs(theta, foundation.coordinateSystem == Foundation::CS_CYLINDRICAL, C);
@@ -185,8 +187,7 @@ void Cell::calcCellADEUp(double timestep, const Foundation &foundation, const Bo
 void Cell::calcCellADEDown(double timestep, const Foundation &foundation, const BoundaryConditions &/*bcs*/,
                            double &V)
 {
-  double theta = timestep/
-                 (density*specificHeat);
+  double theta = timestep*iHeatCapacity;
 
   double C[3][2]{{0}};
   gatherCCoeffs(theta, foundation.coordinateSystem == Foundation::CS_CYLINDRICAL, C);
@@ -207,8 +208,7 @@ void Cell::calcCellADEDown(double timestep, const Foundation &foundation, const 
 double Cell::calcCellExplicit(double timestep, const Foundation &foundation,
                               const BoundaryConditions &/*bcs*/)
 {
-  double theta = timestep/
-                 (density*specificHeat);
+  double theta = timestep*iHeatCapacity;
 
   double C[3][2]{{0}};
   gatherCCoeffs(theta, foundation.coordinateSystem == Foundation::CS_CYLINDRICAL, C);
@@ -232,7 +232,7 @@ void Cell::calcCellMatrix(Foundation::NumericalScheme scheme, const double &time
   if (scheme == Foundation::NS_STEADY_STATE) {
     calcCellSteadyState(foundation, A, Alt, bVal);
   } else {
-    double theta = timestep/(density*specificHeat);
+    double theta = timestep*iHeatCapacity;
 
     double f = scheme == Foundation::NS_IMPLICIT? 1.0 : 0.5;
 
@@ -281,8 +281,8 @@ void Cell::calcCellSteadyState(const Foundation &foundation,
 void Cell::calcCellADI(std::size_t dim, const double &timestep,
                        const Foundation &foundation, const BoundaryConditions &/*bcs*/,
                        double &A, double (&Alt)[2], double &bVal) {
-  double theta = timestep / (foundation.numberOfDimensions
-                             *density*specificHeat);
+  double theta = timestep*iHeatCapacityADI;
+
   double Q = heatGain*theta;
 
   if (foundation.numberOfDimensions == 1) {
@@ -843,18 +843,17 @@ std::vector<double> BoundaryCell::calculateHeatFlux(int ndims, double &TNew,
 
 #define INTFLUX_PREFACE \
 double Tair = bcs.indoorTemp; \
-double Trad = bcs.indoorRadiantTemp; \
-double hc = foundation.getConvectionCoeff(*told_ptr, Tair,0.0,surfacePtr->propPtr->roughness,false,surfacePtr->tilt); \
+double Trad = surfacePtr->radiantTemperature; \
+double cosTilt = surfacePtr->cosTilt; \
+double hc = foundation.getConvectionCoeff(*told_ptr, Tair,surfacePtr->hfGlass,surfacePtr->propPtr->roughness,false,cosTilt); \
 double hr = getSimpleInteriorIRCoeff(surfacePtr->propPtr->emissivity, *told_ptr,Trad);
 
 #define EXTFLUX_PREFACE \
 double Tair = bcs.outdoorTemp; \
-double v = bcs.localWindSpeed; \
-double eSky = bcs.skyEmissivity; \
-double tilt = surfacePtr->tilt; \
-double F = getEffectiveExteriorViewFactor(eSky,tilt); \
-double hc = foundation.getConvectionCoeff(*told_ptr,Tair,v,surfacePtr->propPtr->roughness,true,tilt); \
-double hr = getExteriorIRCoeff(surfacePtr->propPtr->emissivity,*told_ptr,Tair,eSky,tilt);
+double cosTilt = surfacePtr->cosTilt; \
+double Fqtr = surfacePtr->effectiveLWViewFactorQtr; \
+double hc = foundation.getConvectionCoeff(*told_ptr,Tair,surfacePtr->hfGlass,surfacePtr->propPtr->roughness,true,cosTilt); \
+double hr = getExteriorIRCoeff(surfacePtr->propPtr->emissivity,*told_ptr,Tair,Fqtr);
 
 void BoundaryCell::zfCellADI(const int &dim, const int &sdim, const int &sign,
                              double &A, double &Alt, double &bVal)
@@ -898,10 +897,10 @@ void BoundaryCell::efCellADI(const int &dim, const int &sdim, const int &dir,
   A = kcoeff[sdim][dir]/dist[sdim][dir] + (hc + hr);
   if (dim == sdim) {
     Alt = -kcoeff[sdim][dir]/dist[sdim][dir];
-    bVal = (hc + hr*pow(F,0.25))*Tair + heatGain;
+    bVal = (hc + hr*Fqtr)*Tair + heatGain;
   } else {
     Alt = 0.0;
-    bVal = *(told_ptr + sign*stepsize[sdim])*kcoeff[sdim][dir]/dist[sdim][dir] + (hc + hr*pow(F,0.25))*Tair + heatGain;
+    bVal = *(told_ptr + sign*stepsize[sdim])*kcoeff[sdim][dir]/dist[sdim][dir] + (hc + hr*Fqtr)*Tair + heatGain;
   }
 }
 
@@ -931,7 +930,7 @@ void BoundaryCell::efCellMatrix(const int &dim, const int &dir,
 
   A = kcoeff[dim][dir] / dist[dim][dir] + (hc + hr);
   Alt = -kcoeff[dim][dir] / dist[dim][dir];
-  bVal = (hc + hr * pow(F, 0.25)) * Tair + heatGain;
+  bVal = (hc + hr * Fqtr) * Tair + heatGain;
 }
 
 void BoundaryCell::zfCellADEUp(const std::size_t &dim, const std::size_t &dir, double &U) {
@@ -970,7 +969,7 @@ void BoundaryCell::efCellADEUp(const int &dim, const int &dir,
     bit = *(&U - stepsize[dim]);
   }
   U = (kcoeff[dim][dir] * bit / dist[dim][dir] +
-       (hc + hr * pow(F, 0.25)) * Tair + heatGain) / (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
+       (hc + hr * Fqtr) * Tair + heatGain) / (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
 void BoundaryCell::zfCellADEDown(const std::size_t &dim, const std::size_t &dir, double &V) {
@@ -1009,7 +1008,7 @@ void BoundaryCell::efCellADEDown(const int &dim, const int &dir,
     bit = *(told_ptr - stepsize[dim]);
   }
   V = (kcoeff[dim][dir] * bit / dist[dim][dir] +
-       (hc + hr * pow(F, 0.25)) * Tair + heatGain) / (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
+       (hc + hr * Fqtr) * Tair + heatGain) / (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
 double BoundaryCell::zfCellExplicit(const std::size_t &dim, const std::size_t &dir) {
@@ -1034,7 +1033,7 @@ double BoundaryCell::efCellExplicit(const std::size_t &dim, const std::size_t &d
   EXTFLUX_PREFACE
 
   return (kcoeff[dim][dir] * *(told_ptr + stepsize[dim])/dist[dim][dir] +
-          (hc + hr*pow(F,0.25))*Tair + heatGain)/(kcoeff[dim][dir]/dist[dim][dir] + (hc + hr));
+          (hc + hr*Fqtr)*Tair + heatGain)/(kcoeff[dim][dir]/dist[dim][dir] + (hc + hr));
 }
 
 

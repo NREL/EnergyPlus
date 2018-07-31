@@ -73,18 +73,18 @@ void solveTDM(const std::vector<double>& a1, const std::vector<double>& a2,
               std::vector<double>& x)
 {
   std::size_t N = b.size();
+  std::size_t i;
 
   a3[0] /= a2[0];
   b[0] /= a2[0];
 
-  for (std::size_t i = 1; i < N; i++)
+  for (i = 1; i < N; ++i)
   {
     a3[i] /= a2[i] - a1[i]*a3[i-1];
     b[i] = (b[i] - a1[i]*b[i-1]) / (a2[i] - a1[i]*a3[i-1]);
   }
-
   x[N-1] = b[N-1];
-  for (std::size_t i = N-2; /* i >= 0 && */ i < N; i--)
+  for (i = N-2; /* i >= 0 && */ i < N; --i)
   {
       x[i] = b[i] - a3[i]*x[i+1];
   }

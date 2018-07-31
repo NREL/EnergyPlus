@@ -5,38 +5,39 @@
 #define ConvectionAlgorithms_HPP
 
 #include <cmath>
+#include <map>
+
 //#include "PixelCounter.hpp"
 
-namespace Kiva {
-// TODO: use defaulting inputs
-double getDOE2ConvectionCoeff(double tilt,
-                          double azimuth,
-                          double windDirection,
-                          double Tsurf,
-                          double Tamb,
-                          double Vair,
-                          double roughness);
+#define MEMOIZE_DECL(NAME) \
+namespace Memo { \
+static std::map<double, double> NAME##_map; \
+double NAME (double x); }
 
-bool isWindward(double tilt, double azimuth, double windDirection);
+
+namespace Kiva {
+
+MEMOIZE_DECL(cos)
+MEMOIZE_DECL(pow025)
+MEMOIZE_DECL(pow089)
+MEMOIZE_DECL(pow0617)
+
+double cbrt_a(double x);
+
+// TODO: use defaulting inputs
+double getDOE2ConvectionCoeff(
+    double Tsurf,
+    double Tamb,
+    double hfGlass,
+    double roughness,
+    double cosTilt);
+
+bool isWindward(double cosTilt, double azimuth, double windDirection);
 
 double getExteriorIRCoeff(double eSurf,
                       double Tsurf,
                       double Tamb,
-                      double eSky,
-                      double tilt);
-
-/*
-double getExteriorSolarGain(double aSurf,
-                        double Idn,
-              double Idiff,
-              double Igh,
-              double orientation,
-              double azimuth,
-              double altitude
-
-
-                );
-*/
+                      double Fqtr);
 
 double getEffectiveExteriorViewFactor(double eSky,
                                   double tilt);

@@ -9,7 +9,6 @@ kiva-ep/src/libgroundplot
 kiva-ep/templates
 kiva-ep/test/bestest
 kiva-ep/test/Rakefile
-kiva-ep/test/CMakeLists.txt
 kiva-ep/vendor/boost-1.61.0/CMakeLists.txt
 kiva-ep/vendor/boost-1.61.0/boost/date_time*
 kiva-ep/vendor/boost-1.61.0/boost/filesystem*

@@ -73,6 +73,7 @@
 #include <HeatBalanceKivaManager.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
+#include <ThermalComfort.cc>  // MRT Weighting
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
@@ -218,8 +219,9 @@ namespace HeatBalanceKivaManager {
         bcs.diffuseHorizontalFlux = 0.0;
         bcs.slabAbsRadiation = 0.0;
         bcs.wallAbsRadiation = 0.0;
+        bcs.deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobals::KelvinConv;
 
-        // Estimate indoor temperature
+      // Estimate indoor temperature
         const Real64 standardTemp = 22;            // degC
         Real64 assumedFloatingTemp = standardTemp; //*0.90 + kivaWeather.dryBulb[index]*0.10; // degC (somewhat arbitrary assumption--not knowing
                                                    // anything else about the building at this point)
@@ -319,21 +321,23 @@ namespace HeatBalanceKivaManager {
             break;
         }
         }
-        bcs.indoorRadiantTemp = bcs.indoorTemp;
+        bcs.slabRadiantTemp = bcs.indoorTemp;
+        bcs.wallRadiantTemp = bcs.indoorTemp;
 
     }
 
     void KivaInstanceMap::setBoundaryConditions()
     {
         bcs.indoorTemp = DataHeatBalFanSys::MAT(zoneNum) + DataGlobals::KelvinConv;
-        bcs.indoorRadiantTemp = DataHeatBalance::MRT(zoneNum) + DataGlobals::KelvinConv; // TODO Calculate based on other temperatures or just use MRT
         bcs.outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobals::KelvinConv;
         bcs.localWindSpeed = DataEnvironment::WindSpeedAt(ground.foundation.grade.roughness);
+        bcs.windDirection = DataEnvironment::WindDir * DataGlobals::DegToRadians;
         bcs.solarAzimuth = std::atan2(DataEnvironment::SOLCOS(1), DataEnvironment::SOLCOS(2));
         bcs.solarAltitude = DataGlobals::PiOvr2 - std::acos(DataEnvironment::SOLCOS(3));
         bcs.directNormalFlux = DataEnvironment::BeamSolarRad;
         bcs.diffuseHorizontalFlux = DataEnvironment::DifSolarRad;
         bcs.skyEmissivity = pow4(DataEnvironment::SkyTempKelvin) / pow4(bcs.outdoorTemp);
+
 
         bcs.slabAbsRadiation =
             DataHeatBalSurface::QRadSWInAbs(floorSurface) + // solar
@@ -342,9 +346,12 @@ namespace HeatBalanceKivaManager {
             DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
             DataHeatBalFanSys::QElecBaseboardSurf(floorSurface); // HVAC
 
+        bcs.slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(zoneNum, floorSurface) + DataGlobals::KelvinConv;
+
         // Calculate area weighted average for walls
         Real64 QAtotal = 0.0;
         Real64 Atotal = 0.0;
+        Real64 TAtotal = 0.0;
         for (auto &wl : wallSurfaces) {
             Real64 Q =
                 DataHeatBalSurface::QRadSWInAbs(wl) + // solar
@@ -355,12 +362,16 @@ namespace HeatBalanceKivaManager {
 
             Real64 &A = DataSurfaces::Surface(wl).Area;
 
+            Real64 T = ThermalComfort::CalcSurfaceWeightedMRT(zoneNum, wl);
+
             QAtotal += Q * A;
+            TAtotal += T * A;
             Atotal += A;
         }
 
         if (Atotal > 0.0) {
             bcs.wallAbsRadiation = QAtotal / Atotal;
+            bcs.wallRadiantTemp = TAtotal / Atotal + DataGlobals::KelvinConv;
         }
     }
 
@@ -1148,7 +1159,7 @@ namespace HeatBalanceKivaManager {
 
     void KivaManager::calcKivaSurfaceResults()
     {
-        for (int surfNum = 1; surfNum <=  DataSurfaces::Surface.size(); ++surfNum) {
+        for (int surfNum = 1; surfNum <=  (int)DataSurfaces::Surface.size(); ++surfNum) {
             if (DataSurfaces::Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 Real64 hc = 0.0;
                 Real64 qc = 0.0;
@@ -1199,8 +1210,7 @@ namespace HeatBalanceKivaManager {
         if (settings.deepGroundBoundary == Settings::AUTO) {
             if (waterTableDepth <= 40.) {
                 defFnd.deepGroundDepth = waterTableDepth;
-                defFnd.deepGroundBoundary = Kiva::Foundation::DGB_CONSTANT_TEMPERATURE;
-                defFnd.deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobals::KelvinConv;
+                defFnd.deepGroundBoundary = Kiva::Foundation::DGB_FIXED_TEMPERATURE;
             } else {
                 defFnd.deepGroundDepth = 40.;
                 defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
@@ -1210,8 +1220,7 @@ namespace HeatBalanceKivaManager {
             defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
         } else /* if (settings.deepGroundBoundary == Settings::GROUNDWATER) */ {
             defFnd.deepGroundDepth = settings.deepGroundDepth;
-            defFnd.deepGroundBoundary = Kiva::Foundation::DGB_CONSTANT_TEMPERATURE;
-            defFnd.deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobals::KelvinConv;
+            defFnd.deepGroundBoundary = Kiva::Foundation::DGB_FIXED_TEMPERATURE;
         }
 
         defFnd.wall.heightAboveGrade = 0.2; // m

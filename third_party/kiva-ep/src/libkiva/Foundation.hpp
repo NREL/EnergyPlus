@@ -168,9 +168,14 @@ public:
 
   std::vector<std::size_t> indices;
 
-  double area, tilt;
+  // Geometry
+  double area, tilt, azimuth, cosTilt;
 
+  // Environment
   double temperature;
+  double radiantTemperature;
+  double hfGlass;  // calculate once per time step to speed up convection calculations
+  double effectiveLWViewFactorQtr;  // F^0.25, calculate once per time step to speed up long wave calculations
 
   void setSquarePolygon();
   void calcTilt();
@@ -218,12 +223,9 @@ public:
   double foundationDepth; // [m] below top of wall
   double orientation;  // [radians] from north
 
-  double deepGroundTemperature;  // [K]
-
   enum DeepGroundBoundary
   {
-    DGB_AUTO,
-    DGB_CONSTANT_TEMPERATURE,
+    DGB_FIXED_TEMPERATURE,
     DGB_ZERO_FLUX
   };
 
@@ -333,8 +335,8 @@ public:
   double netPerimeter;
 
   void createMeshData();
-  double getConvectionCoeff(double Tsurf, double Tamb, double Vair,
-                            double roughness, bool isExterior, double tilt) const;
+  double getConvectionCoeff(double Tsurf, double Tamb, double hForced,
+                            double roughness, bool isExterior, double cosTilt) const;
 };
 
 }

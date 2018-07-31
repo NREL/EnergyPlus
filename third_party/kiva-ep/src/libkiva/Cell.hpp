@@ -45,6 +45,7 @@ namespace Kiva {
     double density;
     double specificHeat;
     double conductivity;
+    double iHeatCapacity, iHeatCapacityADI; // used to minimize operations in caclulation loops
 
     double volume;
     double area, r;

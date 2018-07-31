@@ -86,12 +86,18 @@ void Surface::setSquarePolygon()
 
 void Surface::calcTilt()
 {
-  if (orientation == Surface::Z_POS)
+  if (orientation == Surface::Z_POS) {
     tilt = 0;
-  else if (orientation == Surface::Z_NEG)
+    cosTilt = 1.0;
+  }
+  else if (orientation == Surface::Z_NEG) {
     tilt = PI;
-  else
+    cosTilt = -1.0;
+  }
+  else {
     tilt = PI/2.0;
+    cosTilt = 0.0;
+  }
 }
 
 inline bool compareRanges(RangeType first,  RangeType second)
@@ -795,10 +801,8 @@ void Foundation::createMeshData()
       surface.setSquarePolygon();
       surface.zMin = zMin;
       surface.zMax = zMin;
-      if (deepGroundBoundary == DGB_CONSTANT_TEMPERATURE ||
-        deepGroundBoundary == DGB_AUTO) {
+      if (deepGroundBoundary == DGB_FIXED_TEMPERATURE) {
           surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
-          surface.temperature = deepGroundTemperature;
       } else {
         surface.boundaryConditionType = Surface::ZERO_FLUX;
       }
@@ -1005,10 +1009,8 @@ void Foundation::createMeshData()
       surface.setSquarePolygon();
       surface.zMin = zMin;
       surface.zMax = zMin;
-      if (deepGroundBoundary == DGB_CONSTANT_TEMPERATURE ||
-        deepGroundBoundary == DGB_AUTO) {
+      if (deepGroundBoundary == DGB_FIXED_TEMPERATURE) {
           surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
-          surface.temperature = deepGroundTemperature;
       } else {
         surface.boundaryConditionType = Surface::ZERO_FLUX;
       }
@@ -1664,11 +1666,9 @@ void Foundation::createMeshData()
       surface.setSquarePolygon();
       surface.zMin = zMin;
       surface.zMax = zMin;
-      if (deepGroundBoundary == DGB_CONSTANT_TEMPERATURE ||
-        deepGroundBoundary == DGB_AUTO)
+      if (deepGroundBoundary == DGB_FIXED_TEMPERATURE)
       {
         surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
-        surface.temperature = deepGroundTemperature;
       } else {
         surface.boundaryConditionType = Surface::ZERO_FLUX;
       }
@@ -2272,11 +2272,9 @@ void Foundation::createMeshData()
       surface.setSquarePolygon();
       surface.zMin = zMin;
       surface.zMax = zMin;
-      if (deepGroundBoundary == DGB_CONSTANT_TEMPERATURE ||
-        deepGroundBoundary == DGB_AUTO)
+      if (deepGroundBoundary == DGB_FIXED_TEMPERATURE)
       {
           surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
-          surface.temperature = deepGroundTemperature;
       } else {
         surface.boundaryConditionType = Surface::ZERO_FLUX;
       }
@@ -3039,11 +3037,11 @@ void Foundation::createMeshData()
 
 }
 
-double Foundation::getConvectionCoeff(double Tsurf, double Tamb, double Vair,
-                                  double roughness, bool isExterior, double tilt) const
+double Foundation::getConvectionCoeff(double Tsurf, double Tamb, double hfGlass,
+                                  double roughness, bool isExterior, double cosTilt) const
 {
   if (convectionCalculationMethod == Foundation::CCM_AUTO)
-    return getDOE2ConvectionCoeff(tilt,0.0,0.0,Tsurf,Tamb,Vair,roughness);
+    return getDOE2ConvectionCoeff(Tsurf,Tamb,hfGlass,roughness,cosTilt);
   else //if (foundation.convectionCalculationMethod == Foundation::CCM_CONSTANT_COEFFICIENT)
   {
     if (isExterior)

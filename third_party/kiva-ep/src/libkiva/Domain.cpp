@@ -8,6 +8,7 @@
 
 namespace Kiva {
 
+static const double PI = 4.0*atan(1.0);
 
 Domain::Domain()
 {
@@ -243,13 +244,13 @@ void Domain::setDomain(Foundation &foundation)
                                   foundation.coordinateSystem == Foundation::CS_CYLINDRICAL);
   }
 
-  static std::map<Surface::Orientation, std::pair<int, int> > orientation_map{
-          {Surface::X_POS, {0, 0}},
-          {Surface::X_NEG, {0, 1}},
-          {Surface::Y_POS, {1, 0}},
-          {Surface::Y_NEG, {1, 1}},
-          {Surface::Z_POS, {2, 0}},
-          {Surface::Z_NEG, {2, 1}}
+  static std::map<Surface::Orientation, std::tuple<int, int, double> > orientation_map{
+          {Surface::X_POS, std::make_tuple(0, 0, PI/2 + foundation.orientation)},
+          {Surface::X_NEG, std::make_tuple(0, 1, 3*PI/2 + foundation.orientation)},
+          {Surface::Y_POS, std::make_tuple(1, 0, foundation.orientation)},
+          {Surface::Y_NEG, std::make_tuple(1, 1, PI + foundation.orientation)},
+          {Surface::Z_POS, std::make_tuple(2, 0, 0.0)},
+          {Surface::Z_NEG, std::make_tuple(2, 1, 0.0)}
   };
 
   for (auto &surface: foundation.surfaces)
@@ -260,7 +261,7 @@ void Domain::setDomain(Foundation &foundation)
     {
       surface.area += cell[index]->area;
     }
-    std::tie(surface.orientation_dim, surface.orientation_dir) = orientation_map[surface.orientation];
+    std::tie(surface.orientation_dim, surface.orientation_dir, surface.azimuth) = orientation_map[surface.orientation];
   }
 }
 

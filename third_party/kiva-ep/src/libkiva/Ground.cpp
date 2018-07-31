@@ -183,8 +183,7 @@ void Ground::calculate(BoundaryConditions& boundaryConditions, double ts)
   bcs = boundaryConditions;
   timestep = ts;
   // update boundary conditions
-  setSolarBoundaryConditions();
-  setInteriorRadiationBoundaryConditions();
+  setBoundaryConditions();
 
   // Calculate Temperatures
   switch(foundation.numericalScheme)
@@ -334,24 +333,6 @@ std::vector<double> Ground::getXvalues()
   }
 }
 
-double Ground::getConvectionCoeff(double Tsurf,
-                  double Tamb,
-                  double Vair,
-                    double roughness,
-                  bool isExterior,
-                  double tilt)
-{
-  if (foundation.convectionCalculationMethod == Foundation::CCM_AUTO)
-    return getDOE2ConvectionCoeff(tilt,0.0,0.0,Tsurf,Tamb,Vair,roughness);
-  else //if (foundation.convectionCalculationMethod == Foundation::CCM_CONSTANT_COEFFICIENT)
-  {
-    if (isExterior)
-      return foundation.exteriorConvectiveCoefficient;
-    else
-      return foundation.interiorConvectiveCoefficient;
-  }
-}
-
 double Ground::getSurfaceArea(Surface::SurfaceType surfaceType)
 {
   double totalArea = 0;
@@ -369,18 +350,18 @@ double Ground::getSurfaceArea(Surface::SurfaceType surfaceType)
 }
 
 void Ground::calculateSurfaceAverages(){
-  for (auto surface : groundOutput.outputMap) {
+  for (auto surfaceType : groundOutput.outputMap) {
 
     double constructionRValue = 0.0;
-    double surfaceArea = foundation.surfaceAreas[surface];
+    double surfaceArea = foundation.surfaceAreas[surfaceType];
 
-    if (surface == Surface::ST_SLAB_CORE) {
+    if (surfaceType == Surface::ST_SLAB_CORE) {
       constructionRValue = foundation.slab.totalResistance();
     }
-    else if (surface == Surface::ST_SLAB_PERIM) {
+    else if (surfaceType == Surface::ST_SLAB_PERIM) {
       constructionRValue = foundation.slab.totalResistance();
     }
-    else if (surface == Surface::ST_WALL_INT) {
+    else if (surfaceType == Surface::ST_WALL_INT) {
       constructionRValue = foundation.wall.totalResistance();
     }
 
@@ -391,15 +372,14 @@ void Ground::calculateSurfaceAverages(){
     double totalArea = 0.0;
 
     double& Tair = bcs.indoorTemp;
-    double& Trad = bcs.indoorRadiantTemp;
 
-    if (foundation.hasSurface[surface]) {
+    if (foundation.hasSurface[surfaceType]) {
       // Find surface(s)
-      for (size_t s = 0; s < foundation.surfaces.size(); s++)
+      for (auto &surface : foundation.surfaces)
       {
-        double tilt = foundation.surfaces[s].tilt;
-        if (foundation.surfaces[s].type == surface)
+        if (surface.type == surfaceType)
         {
+          double Trad = surface.radiantTemperature;
 
           #ifdef PRNTSURF
             std::ofstream output;
@@ -407,11 +387,11 @@ void Ground::calculateSurfaceAverages(){
             output  << "x, T, h, q, dx\n";
           #endif
 
-          for (auto index : foundation.surfaces[s].indices)
+          for (auto index : surface.indices)
           {
             auto this_cell = domain.cell[index];
-            double hc = getConvectionCoeff(TNew[index],Tair,0.0,this_cell->surfacePtr->propPtr->roughness,false,tilt);
-            double hr = getSimpleInteriorIRCoeff(this_cell->surfacePtr->propPtr->emissivity,TNew[index],Trad);
+            double hc = foundation.getConvectionCoeff(TNew[index],Tair,surface.hfGlass,surface.propPtr->roughness,false,surface.cosTilt);
+            double hr = getSimpleInteriorIRCoeff(surface.propPtr->emissivity,TNew[index],Trad);
             double q = this_cell->heatGain;
 
             double& A = this_cell->area;
@@ -459,24 +439,24 @@ void Ground::calculateSurfaceAverages(){
       double hrAvg = hrA/totalArea;
       double hAvg = hA/totalArea;
 
-      groundOutput.outputValues[{surface,GroundOutput::OT_TEMP}] = Tavg;
-      groundOutput.outputValues[{surface,GroundOutput::OT_AVG_TEMP}] = TA/totalArea;
-      groundOutput.outputValues[{surface,GroundOutput::OT_FLUX}] = totalQ/totalArea;
-      groundOutput.outputValues[{surface,GroundOutput::OT_RATE}] = totalQ/totalArea*surfaceArea;
-      groundOutput.outputValues[{surface,GroundOutput::OT_CONV}] = hcAvg;
-      groundOutput.outputValues[{surface,GroundOutput::OT_RAD}] = hrAvg;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_TEMP}] = Tavg;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_AVG_TEMP}] = TA/totalArea;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_FLUX}] = totalQ/totalArea;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_RATE}] = totalQ/totalArea*surfaceArea;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_CONV}] = hcAvg;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_RAD}] = hrAvg;
 
-      groundOutput.outputValues[{surface,GroundOutput::OT_EFF_TEMP}] = Tair - (totalQ/totalArea)*(constructionRValue+1/hAvg) - 273.15;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_EFF_TEMP}] = Tair - (totalQ/totalArea)*(constructionRValue+1/hAvg) - 273.15;
     }
     else {
-      groundOutput.outputValues[{surface,GroundOutput::OT_TEMP}] = Tair;
-      groundOutput.outputValues[{surface,GroundOutput::OT_AVG_TEMP}] = Tair;
-      groundOutput.outputValues[{surface,GroundOutput::OT_FLUX}] = 0.0;
-      groundOutput.outputValues[{surface,GroundOutput::OT_RATE}] = 0.0;
-      groundOutput.outputValues[{surface,GroundOutput::OT_CONV}] = 0.0;
-      groundOutput.outputValues[{surface,GroundOutput::OT_RAD}] = 0.0;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_TEMP}] = Tair;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_AVG_TEMP}] = Tair;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_FLUX}] = 0.0;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_RATE}] = 0.0;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_CONV}] = 0.0;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_RAD}] = 0.0;
 
-      groundOutput.outputValues[{surface,GroundOutput::OT_EFF_TEMP}] = Tair - 273.15;
+      groundOutput.outputValues[{surfaceType,GroundOutput::OT_EFF_TEMP}] = Tair - 273.15;
     }
   }
 }
@@ -494,7 +474,8 @@ void Ground::calculateBoundaryLayer()
   preBCs.localWindSpeed = 0;
   preBCs.outdoorTemp = 273.15;
   preBCs.indoorTemp = 293.15;
-  preBCs.indoorRadiantTemp = 293.15;
+  preBCs.slabRadiantTemp = 293.15;
+  preBCs.wallRadiantTemp = 293.15;
   fd.coordinateSystem = Foundation::CS_CARTESIAN;
   fd.numberOfDimensions = 2;
   fd.reductionStrategy = Foundation::RS_AP;
@@ -693,37 +674,34 @@ void Ground::setNewBoundaryGeometry()
 
 }
 
-void Ground::setSolarBoundaryConditions()
+void Ground::setBoundaryConditions()
 {
-  if (foundation.numberOfDimensions == 1) {
-    return;
-  }
-  for (std::size_t s = 0; s < foundation.surfaces.size() ; s++)
+
+  double& azi = bcs.solarAzimuth;
+  double& alt = bcs.solarAltitude;
+  double& qDN = bcs.directNormalFlux;
+  double& qDH = bcs.diffuseHorizontalFlux;
+  double qGH = cos(PI/2 - alt)*qDN + qDH;
+
+  double cosAlt = cos(alt);
+
+  for (auto &surface : foundation.surfaces)
   {
-    if (foundation.surfaces[s].type == Surface::ST_GRADE
-        || foundation.surfaces[s].type == Surface::ST_WALL_EXT)
+    if (surface.type == Surface::ST_GRADE
+        || surface.type == Surface::ST_WALL_EXT)
     {
 
-      double& azi = bcs.solarAzimuth;
-      double& alt = bcs.solarAltitude;
-      double& qDN = bcs.directNormalFlux;
-      double& qDH = bcs.diffuseHorizontalFlux;
-      double qGH = cos(PI/2 - alt)*qDN + qDH;
+      // Short wave
       double pssf;
       double q;
 
       double incidence = 0.0;
-      double aziYPos = foundation.orientation;
-      double aziXPos = PI/2 + foundation.orientation;
-      double aziYNeg = PI + foundation.orientation;
-      double aziXNeg = 3*PI/2 + foundation.orientation;
 
-      double tilt = foundation.surfaces[s].tilt;
-      if (foundation.surfaces[s].orientation == Surface::Z_POS)
+      if (surface.orientation == Surface::Z_POS)
       {
         incidence = cos(PI/2 - alt);
       }
-      else if (foundation.surfaces[s].orientation == Surface::Z_NEG)
+      else if (surface.orientation == Surface::Z_NEG)
       {
         incidence = cos(PI/2 - alt - PI);
       }
@@ -737,48 +715,30 @@ void Ground::setSolarBoundaryConditions()
           // divide by the total radians in the circle (2*PI)
           // = 2*(cos(alt))/(2*PI)
           // = cos(alt)/PI
-          incidence = cos(alt)/PI;
+          incidence = cosAlt/PI;
         }
         else
         {
-          double aziSurf;
-          if (foundation.surfaces[s].orientation == Surface::Y_POS)
-          {
-            aziSurf = aziYPos;
-          }
-          else if (foundation.surfaces[s].orientation == Surface::X_POS)
-          {
-            aziSurf = aziXPos;
-          }
-          else if (foundation.surfaces[s].orientation == Surface::Y_NEG)
-          {
-            aziSurf = aziYNeg;
-          }
-          else //if (foundation.surfaces[s].orientation == Surface::X_NEG)
-          {
-            aziSurf = aziXNeg;
-          }
-
           if (foundation.numberOfDimensions == 3 && !foundation.useSymmetry)
           {
             // incidence = cos(alt)*cos(azi-aziSurf)*sin(tilt)+sin(alt)*cos(tilt)
             // simplifies for tilt = PI/2 to = cos(alt)*cos(azi-aziSurf)
-            incidence = cos(alt)*cos(azi-aziSurf);
+            incidence = cosAlt*cos(azi-surface.azimuth);
           }
           else // if (foundation.coordinateSystem == Foundation::CS_3D_SYMMETRY)
           {
             // if symmetric, use average incidence (one side will be facing the sun,
             // the other won't).
-            if (foundation.surfaces[s].orientation == Surface::Y_POS ||
-                foundation.surfaces[s].orientation == Surface::Y_NEG)
+            if (surface.orientation == Surface::Y_POS ||
+                surface.orientation == Surface::Y_NEG)
             {
               if (foundation.isXSymm)
               {
-                double incidenceYPos = cos(alt)*cos(azi-aziYPos);
+                double incidenceYPos = cos(alt)*cos(azi-foundation.orientation);
                 if (incidenceYPos < 0)
                   incidenceYPos = 0;
 
-                double incidenceYNeg = cos(alt)*cos(azi-aziYNeg);
+                double incidenceYNeg = cos(alt)*cos(azi-(PI + foundation.orientation));
                 if (incidenceYNeg < 0)
                   incidenceYNeg = 0;
 
@@ -787,20 +747,20 @@ void Ground::setSolarBoundaryConditions()
               }
               else
               {
-                incidence = cos(alt)*cos(azi-aziSurf);
+                incidence = cosAlt*cos(azi-surface.azimuth);
               }
             }
 
-            if (foundation.surfaces[s].orientation == Surface::X_POS ||
-                foundation.surfaces[s].orientation == Surface::X_NEG)
+            if (surface.orientation == Surface::X_POS ||
+                surface.orientation == Surface::X_NEG)
             {
               if (foundation.isYSymm)
               {
-                double incidenceXPos = cos(alt)*cos(azi-aziXPos);
+                double incidenceXPos = cosAlt*cos(azi-(PI/2 + foundation.orientation));
                 if (incidenceXPos < 0)
                   incidenceXPos = 0;
 
-                double incidenceXNeg = cos(alt)*cos(azi-aziXNeg);
+                double incidenceXNeg = cosAlt*cos(azi-(3*PI/3 + foundation.orientation));
                 if (incidenceXNeg < 0)
                   incidenceXNeg = 0;
 
@@ -809,7 +769,7 @@ void Ground::setSolarBoundaryConditions()
               }
               else
               {
-                incidence = cos(alt)*cos(azi-aziSurf);
+                incidence = cosAlt*cos(azi-surface.azimuth);
               }
             }
           }
@@ -822,11 +782,11 @@ void Ground::setSolarBoundaryConditions()
       if (incidence < 0)
         incidence = 0;
 
-      double Fsky = (1.0 + cos(tilt))/2.0;
+      double Fsky = (1.0 + surface.cosTilt)/2.0;
       double Fg = 1.0 - Fsky;
       double rho_g = 1.0 - foundation.grade.absorptivity;
 
-      for (auto index: foundation.surfaces[s].indices)
+      for (auto index: surface.indices)
       {
         auto this_cell = domain.cell[index];
         double alpha = this_cell->surfacePtr->propPtr->absorptivity;
@@ -843,28 +803,41 @@ void Ground::setSolarBoundaryConditions()
         this_cell->heatGain = q;
 
       }
-    }
-  }
-}
 
-void Ground::setInteriorRadiationBoundaryConditions()
-{
-  for (std::size_t s = 0; s < foundation.surfaces.size() ; s++)
-  {
-    if (foundation.surfaces[s].type == Surface::ST_SLAB_CORE
-        || foundation.surfaces[s].type == Surface::ST_SLAB_PERIM
-        || foundation.surfaces[s].type == Surface::ST_WALL_INT)
-    {
-      for (auto index: foundation.surfaces[s].indices)
+      // convection
+      if (isWindward(surface.cosTilt, surface.azimuth, bcs.windDirection))
       {
-        auto this_cell = domain.cell[index];
-        if (foundation.surfaces[s].type == Surface::ST_WALL_INT) {
-          this_cell->heatGain = bcs.wallAbsRadiation;
-        }
-        else {
-          this_cell->heatGain = bcs.slabAbsRadiation;
-        }
+        surface.hfGlass = Memo::pow089(3.26*bcs.localWindSpeed);
       }
+      else
+      {
+        surface.hfGlass = Memo::pow0617(3.55*bcs.localWindSpeed);
+      }
+
+      surface.effectiveLWViewFactorQtr = std::sqrt(std::sqrt(getEffectiveExteriorViewFactor(bcs.skyEmissivity, surface.tilt)));
+
+    } else if  (surface.type == Surface::ST_SLAB_CORE
+        || surface.type == Surface::ST_SLAB_PERIM
+        || surface.type == Surface::ST_WALL_INT)
+    {
+      bool isWall = surface.type == Surface::ST_WALL_INT;
+      double absRadiation = isWall
+          ? bcs.wallAbsRadiation
+          : bcs.slabAbsRadiation;
+
+      for (auto index: surface.indices) {
+        auto this_cell = domain.cell[index];
+        this_cell->heatGain = absRadiation;
+      }
+
+      surface.radiantTemperature = isWall
+          ? bcs.wallRadiantTemp
+          : bcs.slabRadiantTemp;
+
+      surface.hfGlass = 0.0;  // Assume no air movement inside
+
+    } else if (surface.type == Surface::ST_DEEP_GROUND) {
+      surface.temperature = bcs.deepGroundTemperature;
     }
   }
 }

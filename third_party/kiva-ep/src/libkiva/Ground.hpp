@@ -104,18 +104,9 @@ private:
   double getxValue(const int i);
   std::vector<double> getXvalues();
 
-  double getConvectionCoeff(double Tsurf,
-                double Tamb,
-                double Vair,
-                double roughness,
-                bool isExterior,
-                double tilt);
-
-
   double getSurfaceArea(Surface::SurfaceType surfaceType);
 
-  void setSolarBoundaryConditions();
-  void setInteriorRadiationBoundaryConditions();
+  void setBoundaryConditions();
 
   std::vector<std::pair<double,double>> boundaryLayer;
 

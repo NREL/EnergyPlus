@@ -19,8 +19,7 @@ protected:
       double length(12.0);
       double width(12.0);
 
-      fnd.deepGroundBoundary = Foundation::DGB_CONSTANT_TEMPERATURE;
-      fnd.deepGroundTemperature = 283.15;
+      fnd.deepGroundBoundary = Foundation::DGB_FIXED_TEMPERATURE;
 
       fnd.soil = soil;
       fnd.grade.absorptivity = 0.0;
@@ -57,8 +56,9 @@ protected:
       bcs.localWindSpeed = 0;
       bcs.outdoorTemp = 283.15;
       bcs.indoorTemp = 303.15;
-      bcs.indoorRadiantTemp = 303.15;
-
+      bcs.slabRadiantTemp = 303.15;
+      bcs.wallRadiantTemp = 303.15;
+      bcs.deepGroundTemperature = 283.15;
 
       outputMap = {Surface::ST_SLAB_CORE};
   };
