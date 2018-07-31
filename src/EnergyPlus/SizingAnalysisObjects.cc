@@ -300,9 +300,9 @@ void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNu
 
 int SizingLoggerFramework::SetupVariableSizingLog(Real64 &rVariable, int stepsInAverage)
 {
-    using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::ksDesignDay;
     using DataGlobals::ksRunPeriodDesign;
+    using DataGlobals::NumOfTimeStepInHour;
     using namespace WeatherManager;
     int VectorLength(0);
     int const HoursPerDay(24);
@@ -381,8 +381,13 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
     }
 
     ZoneTimestepObject tmpztStepStamp( // call constructor
-        DataGlobals::KindOfSim, WeatherManager::Envrn, locDayOfSim, DataGlobals::HourOfDay, DataGlobals::TimeStep,
-        OutputProcessor::TimeValue(ZoneIndex).TimeStep, DataGlobals::NumOfTimeStepInHour);
+        DataGlobals::KindOfSim,
+        WeatherManager::Envrn,
+        locDayOfSim,
+        DataGlobals::HourOfDay,
+        DataGlobals::TimeStep,
+        OutputProcessor::TimeValue(ZoneIndex).TimeStep,
+        DataGlobals::NumOfTimeStepInHour);
 
     return tmpztStepStamp;
 }
@@ -442,10 +447,10 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
 void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCount)
 {
     using DataGlobals::OutputFileInits;
-    using DataSizing::GlobalCoolSizingFactor;
     using DataSizing::GlobalCoolingSizingFactorMode;
-    using DataSizing::GlobalHeatSizingFactor;
+    using DataSizing::GlobalCoolSizingFactor;
     using DataSizing::GlobalHeatingSizingFactorMode;
+    using DataSizing::GlobalHeatSizingFactor;
     using DataSizing::LoopComponentSizingFactorMode;
     using DataSizing::NoSizingFactorMode;
     using DataSizing::PlantSizData;
@@ -590,26 +595,30 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCou
     if (!nullStampProblem) {
         if (!changedByDemand && !CheckTimeStampForNull(newFoundMassFlowRateTimeStamp)) { // bug fix #5665
             if (newFoundMassFlowRateTimeStamp.envrnNum > 0) {                            // protect against invalid index
-                PreDefTableEntry(pdchPlantSizDesDay, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
+                PreDefTableEntry(pdchPlantSizDesDay,
+                                 PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                                  Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title);
             }
-            PreDefTableEntry(pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                             newFoundMassFlowRateTimeStamp.dayOfSim);
-            PreDefTableEntry(pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                             newFoundMassFlowRateTimeStamp.hourOfDay - 1);
-            PreDefTableEntry(pdchPlantSizPkTimeMin, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                             newFoundMassFlowRateTimeStamp.stepStartMinute, 0);
+            PreDefTableEntry(
+                pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.dayOfSim);
+            PreDefTableEntry(
+                pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.hourOfDay - 1);
+            PreDefTableEntry(pdchPlantSizPkTimeMin,
+                             PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
+                             newFoundMassFlowRateTimeStamp.stepStartMinute,
+                             0);
         } else if (changedByDemand && !CheckTimeStampForNull(NewFoundMaxDemandTimeStamp)) { // bug fix #5665
             if (NewFoundMaxDemandTimeStamp.envrnNum > 0) {                                  // protect against invalid index
-                PreDefTableEntry(pdchPlantSizDesDay, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
+                PreDefTableEntry(pdchPlantSizDesDay,
+                                 PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                                  Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title);
             }
-            PreDefTableEntry(pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                             NewFoundMaxDemandTimeStamp.dayOfSim);
-            PreDefTableEntry(pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                             NewFoundMaxDemandTimeStamp.hourOfDay - 1);
-            PreDefTableEntry(pdchPlantSizPkTimeMin, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                             NewFoundMaxDemandTimeStamp.stepStartMinute, 0);
+            PreDefTableEntry(
+                pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.dayOfSim);
+            PreDefTableEntry(
+                pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.hourOfDay - 1);
+            PreDefTableEntry(
+                pdchPlantSizPkTimeMin, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.stepStartMinute, 0);
         }
     }
 }

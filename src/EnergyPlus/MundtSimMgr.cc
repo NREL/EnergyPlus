@@ -372,8 +372,12 @@ namespace MundtSimMgr {
                                 LineNode(NodeNum, MundtZoneIndex).AirNodeName = AirNode(AirNodeNum).Name;
                                 LineNode(NodeNum, MundtZoneIndex).Height = AirNode(AirNodeNum).Height;
                                 LineNode(NodeNum, MundtZoneIndex).SurfMask = AirNode(AirNodeNum).SurfMask;
-                                SetupOutputVariable("Room Air Node Air Temperature", OutputProcessor::Unit::C, LineNode(NodeNum, MundtZoneIndex).Temp,
-                                                    "HVAC", "Average", LineNode(NodeNum, MundtZoneIndex).AirNodeName);
+                                SetupOutputVariable("Room Air Node Air Temperature",
+                                                    OutputProcessor::Unit::C,
+                                                    LineNode(NodeNum, MundtZoneIndex).Temp,
+                                                    "HVAC",
+                                                    "Average",
+                                                    LineNode(NodeNum, MundtZoneIndex).AirNodeName);
 
                                 AirNodeBeginNum = AirNodeNum + 1;
                                 AirNodeFoundFlag = true;
@@ -440,6 +444,8 @@ namespace MundtSimMgr {
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
         using DataGlobals::NumOfZones;
+        using DataHeatBalance::HConvIn;
+        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::MCPI;
         using DataHeatBalFanSys::NonAirSystemResponse;
@@ -448,8 +454,6 @@ namespace MundtSimMgr {
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalSurface::TempSurfIn;
-        using DataHeatBalance::HConvIn;
-        using DataHeatBalance::Zone;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -886,12 +890,12 @@ namespace MundtSimMgr {
         // USE STATEMENTS:
 
         // Using/Aliasing
+        using DataHeatBalance::TempEffBulkAir;
+        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZT;
-        using DataHeatBalance::TempEffBulkAir;
-        using DataHeatBalance::Zone;
         using DataLoopNode::Node;
         using DataRoomAirModel::AirModel;
         using DataRoomAirModel::DirectCoupling;

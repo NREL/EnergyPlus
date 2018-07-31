@@ -644,8 +644,13 @@ void DXFOut(std::string &PolygonAction,
                 }
                 gio::write(unit, Format_717) << ShadeType;
             } else {
-                ntri = Triangulate(Surface(surf).Sides, Surface(surf).Vertex, mytriangles, Surface(surf).Azimuth, Surface(surf).Tilt,
-                                   Surface(surf).Name, Surface(surf).Class);
+                ntri = Triangulate(Surface(surf).Sides,
+                                   Surface(surf).Vertex,
+                                   mytriangles,
+                                   Surface(surf).Azimuth,
+                                   Surface(surf).Tilt,
+                                   Surface(surf).Name,
+                                   Surface(surf).Class);
                 for (svert = 1; svert <= ntri; ++svert) {
                     vv0 = mytriangles(svert).vv0;
                     vv1 = mytriangles(svert).vv1;
@@ -713,8 +718,13 @@ void DXFOut(std::string &PolygonAction,
                     }
                     gio::write(unit, Format_717) << TempZoneName;
                 } else {
-                    ntri = Triangulate(Surface(surf).Sides, Surface(surf).Vertex, mytriangles, Surface(surf).Azimuth, Surface(surf).Tilt,
-                                       Surface(surf).Name, Surface(surf).Class);
+                    ntri = Triangulate(Surface(surf).Sides,
+                                       Surface(surf).Vertex,
+                                       mytriangles,
+                                       Surface(surf).Azimuth,
+                                       Surface(surf).Tilt,
+                                       Surface(surf).Name,
+                                       Surface(surf).Class);
                     for (svert = 1; svert <= ntri; ++svert) {
                         vv0 = mytriangles(svert).vv0;
                         vv1 = mytriangles(svert).vv1;
@@ -762,11 +772,21 @@ void DXFOut(std::string &PolygonAction,
                     gio::write(unit, Format_717) << TempZoneName;
                 } else {
                     if (Surface(surf).Shape == SurfaceShape::RectangularOverhang) {
-                        ntri = Triangulate(Surface(surf).Sides, Surface(surf).Vertex, mytriangles, Surface(surf).Azimuth, Surface(surf).Tilt,
-                                           Surface(surf).Name, SurfaceClass_Overhang);
+                        ntri = Triangulate(Surface(surf).Sides,
+                                           Surface(surf).Vertex,
+                                           mytriangles,
+                                           Surface(surf).Azimuth,
+                                           Surface(surf).Tilt,
+                                           Surface(surf).Name,
+                                           SurfaceClass_Overhang);
                     } else {
-                        ntri = Triangulate(Surface(surf).Sides, Surface(surf).Vertex, mytriangles, Surface(surf).Azimuth, Surface(surf).Tilt,
-                                           Surface(surf).Name, SurfaceClass_Fin);
+                        ntri = Triangulate(Surface(surf).Sides,
+                                           Surface(surf).Vertex,
+                                           mytriangles,
+                                           Surface(surf).Azimuth,
+                                           Surface(surf).Tilt,
+                                           Surface(surf).Name,
+                                           SurfaceClass_Fin);
                     }
                     for (svert = 1; svert <= ntri; ++svert) {
                         vv0 = mytriangles(svert).vv0;
@@ -2511,7 +2531,12 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
             }
             gio::write(unit, Format_805);
         } else { // will be >4 sided polygon with triangulate option
-            ntri = Triangulate(Surface(surf).Sides, Surface(surf).Vertex, mytriangles, Surface(surf).Azimuth, Surface(surf).Tilt, Surface(surf).Name,
+            ntri = Triangulate(Surface(surf).Sides,
+                               Surface(surf).Vertex,
+                               mytriangles,
+                               Surface(surf).Azimuth,
+                               Surface(surf).Tilt,
+                               Surface(surf).Name,
                                Surface(surf).Class);
             for (svert = 1; svert <= ntri; ++svert) {
                 vv0 = mytriangles(svert).vv0;
@@ -2587,8 +2612,13 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
                 }
                 gio::write(unit, Format_805);
             } else { // will be >4 sided polygon with triangulate option
-                ntri = Triangulate(Surface(surf).Sides, Surface(surf).Vertex, mytriangles, Surface(surf).Azimuth, Surface(surf).Tilt,
-                                   Surface(surf).Name, Surface(surf).Class);
+                ntri = Triangulate(Surface(surf).Sides,
+                                   Surface(surf).Vertex,
+                                   mytriangles,
+                                   Surface(surf).Azimuth,
+                                   Surface(surf).Tilt,
+                                   Surface(surf).Name,
+                                   Surface(surf).Class);
                 for (svert = 1; svert <= ntri; ++svert) {
                     vv0 = mytriangles(svert).vv0;
                     gio::write(csidenumber, fmtLD) << vv0 - 1;
@@ -2646,8 +2676,13 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
                 }
                 gio::write(unit, Format_805);
             } else { // will be >4 sided polygon with triangulate option
-                ntri = Triangulate(Surface(surf).Sides, Surface(surf).Vertex, mytriangles, Surface(surf).Azimuth, Surface(surf).Tilt,
-                                   Surface(surf).Name, Surface(surf).Class);
+                ntri = Triangulate(Surface(surf).Sides,
+                                   Surface(surf).Vertex,
+                                   mytriangles,
+                                   Surface(surf).Azimuth,
+                                   Surface(surf).Tilt,
+                                   Surface(surf).Name,
+                                   Surface(surf).Class);
                 for (svert = 1; svert <= ntri; ++svert) {
                     vv0 = mytriangles(svert).vv0;
                     gio::write(csidenumber, fmtLD) << vv0 - 1;

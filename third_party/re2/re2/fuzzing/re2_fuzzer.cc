@@ -20,6 +20,12 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
   if (!re.ok())
     return;
 
+  // Don't waste time fuzzing high-size programs.
+  // (They can cause bug reports due to fuzzer timeouts.)
+  int size = re.ProgramSize();
+  if (size > 9999)
+    return;
+
   // Don't waste time fuzzing high-fanout programs.
   // (They can also cause bug reports due to fuzzer timeouts.)
   std::map<int, int> histogram;
@@ -50,7 +56,21 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
 
 // Entry point for libFuzzer.
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
-  if (size == 0 || size > 1000000)
+  if (size == 0 || size > 1024)
+    return 0;
+
+  // Crudely limit the use of \p and \P.
+  // Otherwise, we will waste time on inputs that have long runs of Unicode
+  // character classes. The fuzzer has shown itself to be easily capable of
+  // generating such patterns that fall within the other limits, but result
+  // in timeouts nonetheless. The marginal cost is high - even more so when
+  // counted repetition is involved - whereas the marginal benefit is zero.
+  int backslash_p = 0;
+  for (size_t i = 0; i < size; i++) {
+    if (data[i] == '\\' && i+1 < size && (data[i+1] == 'p' || data[i+1] == 'P'))
+      backslash_p++;
+  }
+  if (backslash_p > 10)
     return 0;
 
   // The one-at-a-time hash by Bob Jenkins.
@@ -66,6 +86,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   RE2::Options options;
   options.set_log_errors(false);
+  options.set_max_mem(64 << 20);
   options.set_encoding(hash & 1 ? RE2::Options::EncodingLatin1
                                 : RE2::Options::EncodingUTF8);
   options.set_posix_syntax(hash & 2);
@@ -85,16 +106,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   StringPiece pattern(ptr, len);
   StringPiece text(ptr, len);
   Test(pattern, options, text);
-
-  for (int i = 2; i <= 4; i++) {
-    if (len < i)
-      break;
-
-    int frac = len / i;
-    pattern = StringPiece(ptr, frac);
-    text = StringPiece(ptr + frac, len - frac);
-    Test(pattern, options, text);
-  }
 
   return 0;
 }

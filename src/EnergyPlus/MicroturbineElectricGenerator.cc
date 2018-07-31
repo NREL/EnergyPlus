@@ -297,8 +297,17 @@ namespace MicroturbineElectricGenerator {
 
         // LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
         for (GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          GeneratorNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             MTGenerator(GeneratorNum).Name = AlphArray(1);
 
@@ -388,9 +397,9 @@ namespace MicroturbineElectricGenerator {
 
                     if (SELECT_CASE_var == "BIQUADRATIC") {
                         // Check electrical power output at reference combustion inlet temp and elevation
-                        ElectOutFTempElevOutput =
-                            CurveValue(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp,
-                                       MTGenerator(GeneratorNum).RefElevation);
+                        ElectOutFTempElevOutput = CurveValue(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,
+                                                             MTGenerator(GeneratorNum).RefCombustAirInletTemp,
+                                                             MTGenerator(GeneratorNum).RefElevation);
                         if (std::abs(ElectOutFTempElevOutput - 1.0) > 0.1) {
                             ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                             ShowContinueError(cAlphaFieldNames(2) + " = " + AlphArray(2));
@@ -604,15 +613,25 @@ namespace MicroturbineElectricGenerator {
             }
 
             if (!lAlphaFieldBlanks(7)) {
-                MTGenerator(GeneratorNum).HeatRecInletNodeNum =
-                    GetOnlySingleNode(AlphArray(7), ErrorsFound, cCurrentModuleObject, MTGenerator(GeneratorNum).Name, NodeType_Water,
-                                      NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                MTGenerator(GeneratorNum).HeatRecInletNodeNum = GetOnlySingleNode(AlphArray(7),
+                                                                                  ErrorsFound,
+                                                                                  cCurrentModuleObject,
+                                                                                  MTGenerator(GeneratorNum).Name,
+                                                                                  NodeType_Water,
+                                                                                  NodeConnectionType_Inlet,
+                                                                                  1,
+                                                                                  ObjectIsNotParent);
             }
 
             if (!lAlphaFieldBlanks(8)) {
-                MTGenerator(GeneratorNum).HeatRecOutletNodeNum =
-                    GetOnlySingleNode(AlphArray(8), ErrorsFound, cCurrentModuleObject, MTGenerator(GeneratorNum).Name, NodeType_Water,
-                                      NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                MTGenerator(GeneratorNum).HeatRecOutletNodeNum = GetOnlySingleNode(AlphArray(8),
+                                                                                   ErrorsFound,
+                                                                                   cCurrentModuleObject,
+                                                                                   MTGenerator(GeneratorNum).Name,
+                                                                                   NodeType_Water,
+                                                                                   NodeConnectionType_Outlet,
+                                                                                   1,
+                                                                                   ObjectIsNotParent);
             }
 
             if (MTGenerator(GeneratorNum).HeatRecInletNodeNum > 0 && MTGenerator(GeneratorNum).HeatRecOutletNodeNum > 0) {
@@ -713,9 +732,9 @@ namespace MicroturbineElectricGenerator {
 
                         if ((SELECT_CASE_var == "BIQUADRATIC") || (SELECT_CASE_var == "BICUBIC")) {
 
-                            ThermalEffTempElevOutput =
-                                CurveValue(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp,
-                                           MTGenerator(GeneratorNum).RefElevation);
+                            ThermalEffTempElevOutput = CurveValue(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,
+                                                                  MTGenerator(GeneratorNum).RefCombustAirInletTemp,
+                                                                  MTGenerator(GeneratorNum).RefElevation);
 
                             if (std::abs(ThermalEffTempElevOutput - 1.0) > 0.1) {
                                 ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
@@ -1033,76 +1052,175 @@ namespace MicroturbineElectricGenerator {
         }
 
         for (GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum) {
-            SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, MTGeneratorReport(GeneratorNum).PowerGen, "System",
-                                "Average", MTGenerator(GeneratorNum).Name);
+            SetupOutputVariable("Generator Produced Electric Power",
+                                OutputProcessor::Unit::W,
+                                MTGeneratorReport(GeneratorNum).PowerGen,
+                                "System",
+                                "Average",
+                                MTGenerator(GeneratorNum).Name);
 
-            SetupOutputVariable("Generator Produced Electric Energy", OutputProcessor::Unit::J, MTGeneratorReport(GeneratorNum).EnergyGen, "System",
-                                "Sum", MTGenerator(GeneratorNum).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant");
+            SetupOutputVariable("Generator Produced Electric Energy",
+                                OutputProcessor::Unit::J,
+                                MTGeneratorReport(GeneratorNum).EnergyGen,
+                                "System",
+                                "Sum",
+                                MTGenerator(GeneratorNum).Name,
+                                _,
+                                "ElectricityProduced",
+                                "COGENERATION",
+                                _,
+                                "Plant");
 
-            SetupOutputVariable("Generator LHV Basis Electric Efficiency", OutputProcessor::Unit::None,
-                                MTGeneratorReport(GeneratorNum).ElectricEfficiencyLHV, "System", "Average", MTGenerator(GeneratorNum).Name);
+            SetupOutputVariable("Generator LHV Basis Electric Efficiency",
+                                OutputProcessor::Unit::None,
+                                MTGeneratorReport(GeneratorNum).ElectricEfficiencyLHV,
+                                "System",
+                                "Average",
+                                MTGenerator(GeneratorNum).Name);
 
             //    Fuel specific report variables
-            SetupOutputVariable("Generator " + FuelType + " HHV Basis Rate", OutputProcessor::Unit::W,
-                                MTGeneratorReport(GeneratorNum).FuelEnergyUseRateHHV, "System", "Average", MTGenerator(GeneratorNum).Name);
+            SetupOutputVariable("Generator " + FuelType + " HHV Basis Rate",
+                                OutputProcessor::Unit::W,
+                                MTGeneratorReport(GeneratorNum).FuelEnergyUseRateHHV,
+                                "System",
+                                "Average",
+                                MTGenerator(GeneratorNum).Name);
 
-            SetupOutputVariable("Generator " + FuelType + " HHV Basis Energy", OutputProcessor::Unit::J,
-                                MTGeneratorReport(GeneratorNum).FuelEnergyHHV, "System", "Sum", MTGenerator(GeneratorNum).Name, _, FuelType,
-                                "COGENERATION", _, "Plant");
+            SetupOutputVariable("Generator " + FuelType + " HHV Basis Energy",
+                                OutputProcessor::Unit::J,
+                                MTGeneratorReport(GeneratorNum).FuelEnergyHHV,
+                                "System",
+                                "Sum",
+                                MTGenerator(GeneratorNum).Name,
+                                _,
+                                FuelType,
+                                "COGENERATION",
+                                _,
+                                "Plant");
 
-            SetupOutputVariable("Generator " + FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, MTGeneratorReport(GeneratorNum).FuelMdot,
-                                "System", "Average", MTGenerator(GeneratorNum).Name);
+            SetupOutputVariable("Generator " + FuelType + " Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                MTGeneratorReport(GeneratorNum).FuelMdot,
+                                "System",
+                                "Average",
+                                MTGenerator(GeneratorNum).Name);
 
             //    general fuel use report (to match other generators)
-            SetupOutputVariable("Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, MTGeneratorReport(GeneratorNum).FuelEnergyUseRateHHV,
-                                "System", "Average", MTGenerator(GeneratorNum).Name);
+            SetupOutputVariable("Generator Fuel HHV Basis Rate",
+                                OutputProcessor::Unit::W,
+                                MTGeneratorReport(GeneratorNum).FuelEnergyUseRateHHV,
+                                "System",
+                                "Average",
+                                MTGenerator(GeneratorNum).Name);
 
-            SetupOutputVariable("Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, MTGeneratorReport(GeneratorNum).FuelEnergyHHV, "System",
-                                "Sum", MTGenerator(GeneratorNum).Name);
+            SetupOutputVariable("Generator Fuel HHV Basis Energy",
+                                OutputProcessor::Unit::J,
+                                MTGeneratorReport(GeneratorNum).FuelEnergyHHV,
+                                "System",
+                                "Sum",
+                                MTGenerator(GeneratorNum).Name);
 
             //    Heat recovery (to water) report variables
             if (MTGenerator(GeneratorNum).HeatRecActive) {
 
-                SetupOutputVariable("Generator Produced Thermal Rate", OutputProcessor::Unit::W, MTGeneratorReport(GeneratorNum).QHeatRecovered,
-                                    "System", "Average", MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Produced Thermal Rate",
+                                    OutputProcessor::Unit::W,
+                                    MTGeneratorReport(GeneratorNum).QHeatRecovered,
+                                    "System",
+                                    "Average",
+                                    MTGenerator(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Produced Thermal Energy", OutputProcessor::Unit::J, MTGeneratorReport(GeneratorNum).ExhaustEnergyRec,
-                                    "System", "Sum", MTGenerator(GeneratorNum).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant");
+                SetupOutputVariable("Generator Produced Thermal Energy",
+                                    OutputProcessor::Unit::J,
+                                    MTGeneratorReport(GeneratorNum).ExhaustEnergyRec,
+                                    "System",
+                                    "Sum",
+                                    MTGenerator(GeneratorNum).Name,
+                                    _,
+                                    "ENERGYTRANSFER",
+                                    "HEATRECOVERY",
+                                    _,
+                                    "Plant");
 
-                SetupOutputVariable("Generator Thermal Efficiency LHV Basis", OutputProcessor::Unit::None,
-                                    MTGeneratorReport(GeneratorNum).ThermalEfficiencyLHV, "System", "Average", MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Thermal Efficiency LHV Basis",
+                                    OutputProcessor::Unit::None,
+                                    MTGeneratorReport(GeneratorNum).ThermalEfficiencyLHV,
+                                    "System",
+                                    "Average",
+                                    MTGenerator(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C,
-                                    MTGeneratorReport(GeneratorNum).HeatRecInletTemp, "System", "Average", MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    MTGeneratorReport(GeneratorNum).HeatRecInletTemp,
+                                    "System",
+                                    "Average",
+                                    MTGenerator(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C,
-                                    MTGeneratorReport(GeneratorNum).HeatRecOutletTemp, "System", "Average", MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    MTGeneratorReport(GeneratorNum).HeatRecOutletTemp,
+                                    "System",
+                                    "Average",
+                                    MTGenerator(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Heat Recovery Water Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                    MTGeneratorReport(GeneratorNum).HeatRecMdot, "System", "Average", MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Heat Recovery Water Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    MTGeneratorReport(GeneratorNum).HeatRecMdot,
+                                    "System",
+                                    "Average",
+                                    MTGenerator(GeneratorNum).Name);
             }
 
             if (MTGenerator(GeneratorNum).StandbyPower > 0.0) { // Report Standby Power if entered by user
-                SetupOutputVariable("Generator Standby Electric Power", OutputProcessor::Unit::W, MTGeneratorReport(GeneratorNum).StandbyPowerRate,
-                                    "System", "Average", MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Standby Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    MTGeneratorReport(GeneratorNum).StandbyPowerRate,
+                                    "System",
+                                    "Average",
+                                    MTGenerator(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Standby Electric Energy", OutputProcessor::Unit::J, MTGeneratorReport(GeneratorNum).StandbyEnergy,
-                                    "System", "Sum", MTGenerator(GeneratorNum).Name, _, "Electricity", "Cogeneration", _, "Plant");
+                SetupOutputVariable("Generator Standby Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    MTGeneratorReport(GeneratorNum).StandbyEnergy,
+                                    "System",
+                                    "Sum",
+                                    MTGenerator(GeneratorNum).Name,
+                                    _,
+                                    "Electricity",
+                                    "Cogeneration",
+                                    _,
+                                    "Plant");
             }
 
             if (MTGenerator(GeneratorNum).AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
-                SetupOutputVariable("Generator Ancillary Electric Power", OutputProcessor::Unit::W,
-                                    MTGeneratorReport(GeneratorNum).AncillaryPowerRate, "System", "Average", MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Ancillary Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    MTGeneratorReport(GeneratorNum).AncillaryPowerRate,
+                                    "System",
+                                    "Average",
+                                    MTGenerator(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Ancillary Electric Energy", OutputProcessor::Unit::J, MTGeneratorReport(GeneratorNum).AncillaryEnergy,
-                                    "System", "Sum", MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Ancillary Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    MTGeneratorReport(GeneratorNum).AncillaryEnergy,
+                                    "System",
+                                    "Sum",
+                                    MTGenerator(GeneratorNum).Name);
             }
             //   Report combustion air outlet conditions if exhaust air calculations are active
             if (MTGenerator(GeneratorNum).ExhAirCalcsActive) {
-                SetupOutputVariable("Generator Exhaust Air Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                    MTGeneratorReport(GeneratorNum).ExhAirMassFlowRate, "System", "Average", MTGenerator(GeneratorNum).Name);
-                SetupOutputVariable("Generator Exhaust Air Temperature", OutputProcessor::Unit::C, MTGeneratorReport(GeneratorNum).ExhAirTemperature,
-                                    "System", "Average", MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Exhaust Air Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    MTGeneratorReport(GeneratorNum).ExhAirMassFlowRate,
+                                    "System",
+                                    "Average",
+                                    MTGenerator(GeneratorNum).Name);
+                SetupOutputVariable("Generator Exhaust Air Temperature",
+                                    OutputProcessor::Unit::C,
+                                    MTGeneratorReport(GeneratorNum).ExhAirTemperature,
+                                    "System",
+                                    "Average",
+                                    MTGenerator(GeneratorNum).Name);
             }
         }
     }
@@ -1180,8 +1298,17 @@ namespace MicroturbineElectricGenerator {
 
         if (MyPlantScanFlag(GenNum) && allocated(PlantLoop) && MTGenerator(GenNum).HeatRecActive) {
             errFlag = false;
-            ScanPlantLoopsForObject(MTGenerator(GenNum).Name, TypeOf_Generator_MicroTurbine, MTGenerator(GenNum).HRLoopNum,
-                                    MTGenerator(GenNum).HRLoopSideNum, MTGenerator(GenNum).HRBranchNum, MTGenerator(GenNum).HRCompNum, _, _, _, _, _,
+            ScanPlantLoopsForObject(MTGenerator(GenNum).Name,
+                                    TypeOf_Generator_MicroTurbine,
+                                    MTGenerator(GenNum).HRLoopNum,
+                                    MTGenerator(GenNum).HRLoopSideNum,
+                                    MTGenerator(GenNum).HRBranchNum,
+                                    MTGenerator(GenNum).HRCompNum,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
                                     errFlag);
             if (errFlag) {
                 ShowFatalError("InitMTGenerators: Program terminated due to previous condition(s).");
@@ -1196,14 +1323,22 @@ namespace MicroturbineElectricGenerator {
             HeatRecOutletNode = MTGenerator(GenNum).HeatRecOutletNodeNum;
 
             // size mass flow rate
-            rho = GetDensityGlycol(PlantLoop(MTGenerator(GenNum).HRLoopNum).FluidName, DataGlobals::InitConvTemp,
-                                   PlantLoop(MTGenerator(GenNum).HRLoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(PlantLoop(MTGenerator(GenNum).HRLoopNum).FluidName,
+                                   DataGlobals::InitConvTemp,
+                                   PlantLoop(MTGenerator(GenNum).HRLoopNum).FluidIndex,
+                                   RoutineName);
 
             MTGenerator(GenNum).DesignHeatRecMassFlowRate = rho * MTGenerator(GenNum).RefHeatRecVolFlowRate;
             MTGenerator(GenNum).HeatRecMaxMassFlowRate = rho * MTGenerator(GenNum).HeatRecMaxVolFlowRate;
 
-            InitComponentNodes(0.0, MTGenerator(GenNum).HeatRecMaxMassFlowRate, HeatRecInletNode, HeatRecOutletNode, MTGenerator(GenNum).HRLoopNum,
-                               MTGenerator(GenNum).HRLoopSideNum, MTGenerator(GenNum).HRBranchNum, MTGenerator(GenNum).HRCompNum);
+            InitComponentNodes(0.0,
+                               MTGenerator(GenNum).HeatRecMaxMassFlowRate,
+                               HeatRecInletNode,
+                               HeatRecOutletNode,
+                               MTGenerator(GenNum).HRLoopNum,
+                               MTGenerator(GenNum).HRLoopSideNum,
+                               MTGenerator(GenNum).HRBranchNum,
+                               MTGenerator(GenNum).HRCompNum);
 
             MySizeAndNodeInitFlag(GenNum) = false;
 
@@ -1216,8 +1351,14 @@ namespace MicroturbineElectricGenerator {
         // Do the Begin Environment initializations
         if (BeginEnvrnFlag && MyEnvrnFlag(GenNum)) {
             // set the node max and min mass flow rates
-            InitComponentNodes(0.0, MTGenerator(GenNum).HeatRecMaxMassFlowRate, HeatRecInletNode, HeatRecOutletNode, MTGenerator(GenNum).HRLoopNum,
-                               MTGenerator(GenNum).HRLoopSideNum, MTGenerator(GenNum).HRBranchNum, MTGenerator(GenNum).HRCompNum);
+            InitComponentNodes(0.0,
+                               MTGenerator(GenNum).HeatRecMaxMassFlowRate,
+                               HeatRecInletNode,
+                               HeatRecOutletNode,
+                               MTGenerator(GenNum).HRLoopNum,
+                               MTGenerator(GenNum).HRLoopSideNum,
+                               MTGenerator(GenNum).HRBranchNum,
+                               MTGenerator(GenNum).HRCompNum);
 
             Node(HeatRecInletNode).Temp = 20.0; // Set the node temperature, assuming freeze control
             Node(HeatRecOutletNode).Temp = 20.0;
@@ -1250,8 +1391,13 @@ namespace MicroturbineElectricGenerator {
                 DesiredMassFlowRate = MTGenerator(GenNum).DesignHeatRecMassFlowRate;
             }
 
-            SetComponentFlowRate(DesiredMassFlowRate, HeatRecInletNode, HeatRecOutletNode, MTGenerator(GenNum).HRLoopNum,
-                                 MTGenerator(GenNum).HRLoopSideNum, MTGenerator(GenNum).HRBranchNum, MTGenerator(GenNum).HRCompNum);
+            SetComponentFlowRate(DesiredMassFlowRate,
+                                 HeatRecInletNode,
+                                 HeatRecOutletNode,
+                                 MTGenerator(GenNum).HRLoopNum,
+                                 MTGenerator(GenNum).HRLoopSideNum,
+                                 MTGenerator(GenNum).HRBranchNum,
+                                 MTGenerator(GenNum).HRCompNum);
         } else { // not FirstHVACIteration
             if (!RunFlag) {
                 Node(HeatRecInletNode).MassFlowRate = min(constant_zero, Node(HeatRecInletNode).MassFlowRateMaxAvail);
@@ -1262,15 +1408,30 @@ namespace MicroturbineElectricGenerator {
                 if (MTGenerator(GenNum).HeatRecFlowFTempPowCurveNum != 0) {
                     DesiredMassFlowRate = MTGenerator(GenNum).DesignHeatRecMassFlowRate *
                                           CurveValue(MTGenerator(GenNum).HeatRecFlowFTempPowCurveNum, Node(HeatRecInletNode).Temp, MyLoad);
-                    SetComponentFlowRate(DesiredMassFlowRate, HeatRecInletNode, HeatRecOutletNode, MTGenerator(GenNum).HRLoopNum,
-                                         MTGenerator(GenNum).HRLoopSideNum, MTGenerator(GenNum).HRBranchNum, MTGenerator(GenNum).HRCompNum);
+                    SetComponentFlowRate(DesiredMassFlowRate,
+                                         HeatRecInletNode,
+                                         HeatRecOutletNode,
+                                         MTGenerator(GenNum).HRLoopNum,
+                                         MTGenerator(GenNum).HRLoopSideNum,
+                                         MTGenerator(GenNum).HRBranchNum,
+                                         MTGenerator(GenNum).HRCompNum);
                 } else {
-                    SetComponentFlowRate(MTGenerator(GenNum).HeatRecMdot, HeatRecInletNode, HeatRecOutletNode, MTGenerator(GenNum).HRLoopNum,
-                                         MTGenerator(GenNum).HRLoopSideNum, MTGenerator(GenNum).HRBranchNum, MTGenerator(GenNum).HRCompNum);
+                    SetComponentFlowRate(MTGenerator(GenNum).HeatRecMdot,
+                                         HeatRecInletNode,
+                                         HeatRecOutletNode,
+                                         MTGenerator(GenNum).HRLoopNum,
+                                         MTGenerator(GenNum).HRLoopSideNum,
+                                         MTGenerator(GenNum).HRBranchNum,
+                                         MTGenerator(GenNum).HRCompNum);
                 }
             } else if (RunFlag && (!MTGenerator(GenNum).InternalFlowControl)) {
-                SetComponentFlowRate(MTGenerator(GenNum).HeatRecMdot, HeatRecInletNode, HeatRecOutletNode, MTGenerator(GenNum).HRLoopNum,
-                                     MTGenerator(GenNum).HRLoopSideNum, MTGenerator(GenNum).HRBranchNum, MTGenerator(GenNum).HRCompNum);
+                SetComponentFlowRate(MTGenerator(GenNum).HeatRecMdot,
+                                     HeatRecInletNode,
+                                     HeatRecOutletNode,
+                                     MTGenerator(GenNum).HRLoopNum,
+                                     MTGenerator(GenNum).HRLoopSideNum,
+                                     MTGenerator(GenNum).HRBranchNum,
+                                     MTGenerator(GenNum).HRCompNum);
             }
         }
     }
@@ -1312,8 +1473,8 @@ namespace MicroturbineElectricGenerator {
         using FluidProperties::GetSpecificHeatGlycol;
         using General::TrimSigDigits;
         using Psychrometrics::PsyCpAirFnWTdb;
-        using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyHfgAirFnWTdb;
+        using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // Locals
@@ -1409,8 +1570,10 @@ namespace MicroturbineElectricGenerator {
         if (MTGenerator(GeneratorNum).HeatRecActive) {
             HeatRecInNode = MTGenerator(GeneratorNum).HeatRecInletNodeNum;
             HeatRecInTemp = Node(HeatRecInNode).Temp;
-            HeatRecCp = GetSpecificHeatGlycol(PlantLoop(MTGenerator(GeneratorNum).HRLoopNum).FluidName, HeatRecInTemp,
-                                              PlantLoop(MTGenerator(GeneratorNum).HRLoopNum).FluidIndex, RoutineName);
+            HeatRecCp = GetSpecificHeatGlycol(PlantLoop(MTGenerator(GeneratorNum).HRLoopNum).FluidName,
+                                              HeatRecInTemp,
+                                              PlantLoop(MTGenerator(GeneratorNum).HRLoopNum).FluidIndex,
+                                              RoutineName);
             HeatRecMdot = Node(HeatRecInNode).MassFlowRate;
         } else {
             HeatRecInTemp = 0.0;
@@ -1467,7 +1630,9 @@ namespace MicroturbineElectricGenerator {
             }
             ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                                                "\": Electrical Power Modifier curve is less than zero warning continues...",
-                                           MTGenerator(GeneratorNum).PowerFTempElevErrorIndex, PowerFTempElev, PowerFTempElev);
+                                           MTGenerator(GeneratorNum).PowerFTempElevErrorIndex,
+                                           PowerFTempElev,
+                                           PowerFTempElev);
             PowerFTempElev = 0.0;
         }
 
@@ -1516,7 +1681,9 @@ namespace MicroturbineElectricGenerator {
                 ShowRecurringWarningErrorAtEnd(
                     "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                         "\": Electrical Efficiency Modifier (function of temperature) output is less than zero warning continues...",
-                    MTGenerator(GeneratorNum).EffFTempErrorIndex, ElecEfficiencyFTemp, ElecEfficiencyFTemp);
+                    MTGenerator(GeneratorNum).EffFTempErrorIndex,
+                    ElecEfficiencyFTemp,
+                    ElecEfficiencyFTemp);
                 ElecEfficiencyFTemp = 0.0;
             }
 
@@ -1535,7 +1702,9 @@ namespace MicroturbineElectricGenerator {
                 ShowRecurringWarningErrorAtEnd(
                     "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                         "\": Electrical Efficiency Modifier (function of part-load ratio) output is less than zero warning continues...",
-                    MTGenerator(GeneratorNum).EffFPLRErrorIndex, ElecEfficiencyFPLR, ElecEfficiencyFPLR);
+                    MTGenerator(GeneratorNum).EffFPLRErrorIndex,
+                    ElecEfficiencyFPLR,
+                    ElecEfficiencyFPLR);
                 ElecEfficiencyFPLR = 0.0;
             }
 
@@ -1573,7 +1742,9 @@ namespace MicroturbineElectricGenerator {
                     ShowRecurringWarningErrorAtEnd(
                         "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                             "\": Ancillary Power Modifier (function of fuel input) output is less than zero warning continues...",
-                        MTGenerator(GeneratorNum).AnciPowerFMdotFuelErrorIndex, AnciPowerFMdotFuel, AnciPowerFMdotFuel);
+                        MTGenerator(GeneratorNum).AnciPowerFMdotFuelErrorIndex,
+                        AnciPowerFMdotFuel,
+                        AnciPowerFMdotFuel);
                     AnciPowerFMdotFuel = 0.0;
                 }
             } else {
@@ -1634,7 +1805,9 @@ namespace MicroturbineElectricGenerator {
                     }
                     ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                                                        "\": Electrical Power Modifier curve is less than zero warning continues...",
-                                                   MTGenerator(GeneratorNum).ThermEffFTempElevErrorIndex, ThermalEffFTempElev, ThermalEffFTempElev);
+                                                   MTGenerator(GeneratorNum).ThermEffFTempElevErrorIndex,
+                                                   ThermalEffFTempElev,
+                                                   ThermalEffFTempElev);
                     ThermalEffFTempElev = 0.0;
                 }
             } else {
@@ -1658,7 +1831,9 @@ namespace MicroturbineElectricGenerator {
                     ShowRecurringWarningErrorAtEnd(
                         "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                             "\": Heat Recovery Rate Modifier (function of part-load ratio) output is less than zero warning continues...",
-                        MTGenerator(GeneratorNum).HeatRecRateFPLRErrorIndex, HeatRecRateFPLR, HeatRecRateFPLR);
+                        MTGenerator(GeneratorNum).HeatRecRateFPLRErrorIndex,
+                        HeatRecRateFPLR,
+                        HeatRecRateFPLR);
                     HeatRecRateFPLR = 0.0;
                 }
             } else {
@@ -1680,7 +1855,9 @@ namespace MicroturbineElectricGenerator {
                     ShowRecurringWarningErrorAtEnd(
                         "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                             "\": Heat Recovery Rate Modifier (function of inlet water temp) output is less than zero warning continues...",
-                        MTGenerator(GeneratorNum).HeatRecRateFTempErrorIndex, HeatRecRateFTemp, HeatRecRateFTemp);
+                        MTGenerator(GeneratorNum).HeatRecRateFTempErrorIndex,
+                        HeatRecRateFTemp,
+                        HeatRecRateFTemp);
                     HeatRecRateFTemp = 0.0;
                 }
             } else {
@@ -1689,8 +1866,10 @@ namespace MicroturbineElectricGenerator {
 
             //     Calculate heat recovery rate modifier curve output (function of water [volumetric] flow rate)
             if (MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum > 0) {
-                rho = GetDensityGlycol(PlantLoop(MTGenerator(GeneratorNum).HRLoopNum).FluidName, HeatRecInTemp,
-                                       PlantLoop(MTGenerator(GeneratorNum).HRLoopNum).FluidIndex, RoutineName);
+                rho = GetDensityGlycol(PlantLoop(MTGenerator(GeneratorNum).HRLoopNum).FluidName,
+                                       HeatRecInTemp,
+                                       PlantLoop(MTGenerator(GeneratorNum).HRLoopNum).FluidIndex,
+                                       RoutineName);
 
                 HeatRecVolFlowRate = HeatRecMdot / rho;
                 HeatRecRateFFlow = CurveValue(MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum, HeatRecVolFlowRate);
@@ -1705,7 +1884,9 @@ namespace MicroturbineElectricGenerator {
                     ShowRecurringWarningErrorAtEnd(
                         "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                             "\": Heat Recovery Rate Modifier (function of water flow rate) output is less than zero warning continues...",
-                        MTGenerator(GeneratorNum).HeatRecRateFFlowErrorIndex, HeatRecRateFFlow, HeatRecRateFFlow);
+                        MTGenerator(GeneratorNum).HeatRecRateFFlowErrorIndex,
+                        HeatRecRateFFlow,
+                        HeatRecRateFFlow);
                     HeatRecRateFFlow = 0.0;
                 }
             } else {
@@ -1757,7 +1938,9 @@ namespace MicroturbineElectricGenerator {
                 ShowRecurringWarningErrorAtEnd(
                     "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                         "\": Heat recovery water flow rate is below the generators minimum mass flow rate warning continues...",
-                    MTGenerator(GeneratorNum).HRMinFlowErrorIndex, HeatRecMdot, HeatRecMdot);
+                    MTGenerator(GeneratorNum).HRMinFlowErrorIndex,
+                    HeatRecMdot,
+                    HeatRecMdot);
             }
 
             //     Check water mass flow rate against maximum
@@ -1772,7 +1955,9 @@ namespace MicroturbineElectricGenerator {
                 ShowRecurringWarningErrorAtEnd(
                     "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                         "\": Heat recovery water flow rate is above the generators maximum mass flow rate warning continues...",
-                    MTGenerator(GeneratorNum).HRMaxFlowErrorIndex, HeatRecMdot, HeatRecMdot);
+                    MTGenerator(GeneratorNum).HRMaxFlowErrorIndex,
+                    HeatRecMdot,
+                    HeatRecMdot);
             }
 
             //     Set report variables
@@ -1801,7 +1986,9 @@ namespace MicroturbineElectricGenerator {
                     ShowRecurringWarningErrorAtEnd(
                         "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                             "\": Exhaust Air Flow Rate Modifier (function of temperature) output is less than or equal to zero warning continues...",
-                        MTGenerator(GeneratorNum).ExhFlowFTempErrorIndex, ExhFlowFTemp, ExhFlowFTemp);
+                        MTGenerator(GeneratorNum).ExhFlowFTempErrorIndex,
+                        ExhFlowFTemp,
+                        ExhFlowFTemp);
                     ExhFlowFTemp = 0.0;
                 }
             } else {
@@ -1822,7 +2009,9 @@ namespace MicroturbineElectricGenerator {
                     ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                                                        "\": Exhaust Air Flow Rate Modifier (function of part-load ratio) output is less than or "
                                                        "equal to zero warning continues...",
-                                                   MTGenerator(GeneratorNum).ExhFlowFPLRErrorIndex, ExhFlowFPLR, ExhFlowFPLR);
+                                                   MTGenerator(GeneratorNum).ExhFlowFPLRErrorIndex,
+                                                   ExhFlowFPLR,
+                                                   ExhFlowFPLR);
                     ExhFlowFPLR = 0.0;
                 }
             } else {
@@ -1855,7 +2044,9 @@ namespace MicroturbineElectricGenerator {
                     ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                                                        "\": Exhaust Air Temperature Modifier (function of temperature) output is less than or equal "
                                                        "to zero warning continues...",
-                                                   MTGenerator(GeneratorNum).ExhTempFTempErrorIndex, ExhAirTempFTemp, ExhAirTempFTemp);
+                                                   MTGenerator(GeneratorNum).ExhTempFTempErrorIndex,
+                                                   ExhAirTempFTemp,
+                                                   ExhAirTempFTemp);
                     ExhAirTempFTemp = 0.0;
                 }
             } else {
@@ -1876,7 +2067,9 @@ namespace MicroturbineElectricGenerator {
                     ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                                                        "\": Exhaust Air Temperature Modifier (function of part-load ratio) output is less than or "
                                                        "equal to zero warning continues...",
-                                                   MTGenerator(GeneratorNum).ExhTempFPLRErrorIndex, ExhAirTempFPLR, ExhAirTempFPLR);
+                                                   MTGenerator(GeneratorNum).ExhTempFPLRErrorIndex,
+                                                   ExhAirTempFPLR,
+                                                   ExhAirTempFPLR);
                     ExhAirTempFPLR = 0.0;
                 }
             } else {
@@ -1921,7 +2114,8 @@ namespace MicroturbineElectricGenerator {
                 }
                 ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                                                    "\": Exhaust air temperature less than combustion air inlet temperature warning continues...",
-                                               MTGenerator(GeneratorNum).ExhTempLTInletTempIndex, MTGenerator(GeneratorNum).ExhaustAirTemperature,
+                                               MTGenerator(GeneratorNum).ExhTempLTInletTempIndex,
+                                               MTGenerator(GeneratorNum).ExhaustAirTemperature,
                                                MTGenerator(GeneratorNum).ExhaustAirTemperature);
             }
 
@@ -1939,7 +2133,8 @@ namespace MicroturbineElectricGenerator {
                 ShowRecurringWarningErrorAtEnd(
                     "GENERATOR:MICROTURBINE \"" + MTGenerator(GeneratorNum).Name +
                         "\": Exhaust air humidity ratio less than combustion air inlet humidity ratio warning continues...",
-                    MTGenerator(GeneratorNum).ExhHRLTInletHRIndex, MTGenerator(GeneratorNum).ExhaustAirHumRat,
+                    MTGenerator(GeneratorNum).ExhHRLTInletHRIndex,
+                    MTGenerator(GeneratorNum).ExhaustAirHumRat,
                     MTGenerator(GeneratorNum).ExhaustAirHumRat);
             }
 

@@ -233,8 +233,9 @@ namespace PlantCondLoopOperation {
         }
 
         // Return if there are no loop operation schemes available
-        if (!std::any_of(PlantLoop(LoopNum).OpScheme.begin(), PlantLoop(LoopNum).OpScheme.end(),
-                         [](DataPlant::OperationData const &e) { return e.Available; }))
+        if (!std::any_of(PlantLoop(LoopNum).OpScheme.begin(), PlantLoop(LoopNum).OpScheme.end(), [](DataPlant::OperationData const &e) {
+                return e.Available;
+            }))
             return;
 
         // set up references
@@ -437,8 +438,17 @@ namespace PlantCondLoopOperation {
             }
             OpNum = inputProcessor->getObjectItemNum(CurrentModuleObject, PlantOpSchemeName);
             if (OpNum > 0) {
-                inputProcessor->getObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              OpNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 PlantLoop(LoopNum).NumOpSchemes = (NumAlphas - 1) / 3;
                 if (PlantLoop(LoopNum).NumOpSchemes > 0) {
                     PlantLoop(LoopNum).OpScheme.allocate(PlantLoop(LoopNum).NumOpSchemes);
@@ -1037,9 +1047,14 @@ namespace PlantCondLoopOperation {
                     PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists);
                     NumEquipLists = PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists;
                     PlantLoop(LoopNum).OpScheme(SchemeNum).ReferenceNodeName = AlphArray(2);
-                    PlantLoop(LoopNum).OpScheme(SchemeNum).ReferenceNodeNumber =
-                        GetOnlySingleNode(AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Sensor, 1,
-                                          ObjectIsNotParent);
+                    PlantLoop(LoopNum).OpScheme(SchemeNum).ReferenceNodeNumber = GetOnlySingleNode(AlphArray(2),
+                                                                                                   ErrorsFound,
+                                                                                                   CurrentModuleObject,
+                                                                                                   AlphArray(1),
+                                                                                                   NodeType_Water,
+                                                                                                   NodeConnectionType_Sensor,
+                                                                                                   1,
+                                                                                                   ObjectIsNotParent);
                     // For DO Loop below -- Check for lower limit > upper limit.(invalid)
                     for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeLowerLimit = NumArray(ListNum * 2 - 1);
@@ -1127,8 +1142,17 @@ namespace PlantCondLoopOperation {
                     CurrentModuleObject = "PlantEquipmentList";
                     for (Num = 1; Num <= PELists; ++Num) {
                         iIndex = Num;
-                        inputProcessor->getObjectItem(CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                      lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                        inputProcessor->getObjectItem(CurrentModuleObject,
+                                                      Num,
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNums,
+                                                      IOStat,
+                                                      lNumericFieldBlanks,
+                                                      lAlphaFieldBlanks,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
                         EquipListsNameList(iIndex) = cAlphaArgs(1);
                         EquipListsTypeList(iIndex) = LoopType_Plant;
                         EquipListsIndexList(iIndex) = Num;
@@ -1164,8 +1188,17 @@ namespace PlantCondLoopOperation {
                     CurrentModuleObject = "CondenserEquipmentList";
                     for (Num = 1; Num <= CELists; ++Num) {
                         iIndex = Num + PELists;
-                        inputProcessor->getObjectItem(CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                                      lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                        inputProcessor->getObjectItem(CurrentModuleObject,
+                                                      Num,
+                                                      cAlphaArgs,
+                                                      NumAlphas,
+                                                      rNumericArgs,
+                                                      NumNums,
+                                                      IOStat,
+                                                      lNumericFieldBlanks,
+                                                      lAlphaFieldBlanks,
+                                                      cAlphaFieldNames,
+                                                      cNumericFieldNames);
                         EquipListsNameList(iIndex) = cAlphaArgs(1);
                         EquipListsTypeList(iIndex) = LoopType_Condenser;
                         EquipListsIndexList(iIndex) = Num;
@@ -1218,8 +1251,17 @@ namespace PlantCondLoopOperation {
                         CurrentModuleObject = "CondenserEquipmentList";
                     }
                 }
-                inputProcessor->getObjectItem(CurrentModuleObject, EquipListsIndexList(Num), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              EquipListsIndexList(Num),
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).NumComps = (NumAlphas - 1) / 2;
                 if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).NumComps > 0) {
                     PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Comp.allocate(
@@ -1365,13 +1407,24 @@ namespace PlantCondLoopOperation {
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).TypeOf = cAlphaArgs(CompNumA - 3);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name = cAlphaArgs(CompNumA - 2);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeName = cAlphaArgs(CompNumA - 1);
-                        PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeNum =
-                            GetOnlySingleNode(cAlphaArgs(CompNumA - 1), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                              NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                        PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeNum = GetOnlySingleNode(cAlphaArgs(CompNumA - 1),
+                                                                                                                            ErrorsFound,
+                                                                                                                            CurrentModuleObject,
+                                                                                                                            cAlphaArgs(1),
+                                                                                                                            NodeType_Water,
+                                                                                                                            NodeConnectionType_Sensor,
+                                                                                                                            1,
+                                                                                                                            ObjectIsNotParent);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName = cAlphaArgs(CompNumA);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum =
-                            GetOnlySingleNode(cAlphaArgs(CompNumA), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                              NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                            GetOnlySingleNode(cAlphaArgs(CompNumA),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              cAlphaArgs(1),
+                                              NodeType_Water,
+                                              NodeConnectionType_Sensor,
+                                              1,
+                                              ObjectIsNotParent);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate = rNumericArgs(CompNumN);
 
                         if (rNumericArgs(CompNumN) == AutoSize) {
@@ -1385,8 +1438,10 @@ namespace PlantCondLoopOperation {
                                 }
                             }
                             gio::write(EquipNum, fmtLD) << Num;
-                            ReportSizingOutput(CurrentModuleObject, PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
-                                               "Design Water Flow Rate [m3/s] Equipment # " + stripped(EquipNum), CompFlowRate);
+                            ReportSizingOutput(CurrentModuleObject,
+                                               PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
+                                               "Design Water Flow Rate [m3/s] Equipment # " + stripped(EquipNum),
+                                               CompFlowRate);
                         }
 
                         {
@@ -1416,7 +1471,11 @@ namespace PlantCondLoopOperation {
                             // detailed input that is necessary to get thermal energy storage to work from the simpler input.
                             CompOpType = (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum) - 1;
                             if ((CompOpType < 1) || (CompOpType > 2)) CompOpType = 2;
-                            SetUpNewScheduledTESSetPtMgr(OnPeakSchedPtr, ChargeSchedPtr, NonChargCHWTemp, OffPeakCHWTemp, CompOpType,
+                            SetUpNewScheduledTESSetPtMgr(OnPeakSchedPtr,
+                                                         ChargeSchedPtr,
+                                                         NonChargCHWTemp,
+                                                         OffPeakCHWTemp,
+                                                         CompOpType,
                                                          PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum);
                         }
 
@@ -1441,7 +1500,8 @@ namespace PlantCondLoopOperation {
                                         // need call to EMS to check node
                                         NodeEMSSetPointMissing = false;
                                         CheckIfNodeSetPointManagedByEMS(
-                                            PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum, iTemperatureSetPoint,
+                                            PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                            iTemperatureSetPoint,
                                             NodeEMSSetPointMissing);
                                         if (NodeEMSSetPointMissing) {
                                             ShowSevereError("Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
@@ -1479,7 +1539,8 @@ namespace PlantCondLoopOperation {
                                             NodeEMSSetPointMissing = false;
                                             CheckIfNodeSetPointManagedByEMS(
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                                iTemperatureMaxSetPoint, NodeEMSSetPointMissing);
+                                                iTemperatureMaxSetPoint,
+                                                NodeEMSSetPointMissing);
                                             if (NodeEMSSetPointMissing) {
                                                 ShowSevereError("Missing high temperature setpoint for " + CurrentModuleObject + " named " +
                                                                 cAlphaArgs(1));
@@ -1516,10 +1577,12 @@ namespace PlantCondLoopOperation {
                                             NodeEMSSetPointMissing = false;
                                             CheckIfNodeSetPointManagedByEMS(
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                                iTemperatureMinSetPoint, NodeEMSSetPointMissing);
+                                                iTemperatureMinSetPoint,
+                                                NodeEMSSetPointMissing);
                                             CheckIfNodeSetPointManagedByEMS(
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                                iTemperatureMaxSetPoint, NodeEMSSetPointMissing);
+                                                iTemperatureMaxSetPoint,
+                                                NodeEMSSetPointMissing);
                                             if (NodeEMSSetPointMissing) {
                                                 ShowSevereError("Missing low temperature setpoint for " + CurrentModuleObject + " named " +
                                                                 cAlphaArgs(1));
@@ -1558,7 +1621,8 @@ namespace PlantCondLoopOperation {
                                             NodeEMSSetPointMissing = false;
                                             CheckIfNodeSetPointManagedByEMS(
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                                iTemperatureMinSetPoint, NodeEMSSetPointMissing);
+                                                iTemperatureMinSetPoint,
+                                                NodeEMSSetPointMissing);
                                             if (NodeEMSSetPointMissing) {
                                                 ShowSevereError("Missing dual temperature setpoint for " + CurrentModuleObject + " named " +
                                                                 cAlphaArgs(1));
@@ -1639,8 +1703,17 @@ namespace PlantCondLoopOperation {
         if (NumSchemes > 0) {
 
             for (Num = 1; Num <= NumSchemes; ++Num) {
-                inputProcessor->getObjectItem(CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              Num,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (UtilityRoutines::SameString(PlantLoop(LoopNum).OpScheme(SchemeNum).Name, cAlphaArgs(1))) break; // found the correct one
                 if (Num == NumSchemes) {                                                                            // did not find it
                     ShowSevereError(LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
@@ -1664,7 +1737,9 @@ namespace PlantCondLoopOperation {
                         SetupEMSActuator("Plant Equipment Operation",
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name + ':' +
                                              PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name,
-                                         "Distributed Load Rate", "[W]", lDummy,
+                                         "Distributed Load Rate",
+                                         "[W]",
+                                         lDummy,
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSActuatorDispatchedLoadValue);
                         SetupEMSInternalVariable("Component Remaining Current Demand Rate",
                                                  PlantLoop(LoopNum).OpScheme(SchemeNum).Name + ':' +
@@ -1695,7 +1770,9 @@ namespace PlantCondLoopOperation {
                 }
 
                 // setup internal variable for Supply Side Current Demand Rate [W]
-                SetupEMSInternalVariable("Supply Side Current Demand Rate", PlantLoop(LoopNum).OpScheme(SchemeNum).Name, "[W]",
+                SetupEMSInternalVariable("Supply Side Current Demand Rate",
+                                         PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
+                                         "[W]",
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).EMSIntVarLoopDemandRate);
             }
 
@@ -1794,8 +1871,18 @@ namespace PlantCondLoopOperation {
                             auto &this_equip(this_equip_list.Comp(EquipNum));
                             ThisTypeOfNum = UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes);
                             errFlag1 = false;
-                            PlantUtilities::ScanPlantLoopsForObject(this_equip.Name, ThisTypeOfNum, DummyLoopNum, LoopSideNum, BranchNum, CompNum, _,
-                                                                    _, NumSearchResults, _, LoopNum, errFlag1);
+                            PlantUtilities::ScanPlantLoopsForObject(this_equip.Name,
+                                                                    ThisTypeOfNum,
+                                                                    DummyLoopNum,
+                                                                    LoopSideNum,
+                                                                    BranchNum,
+                                                                    CompNum,
+                                                                    _,
+                                                                    _,
+                                                                    NumSearchResults,
+                                                                    _,
+                                                                    LoopNum,
+                                                                    errFlag1);
 
                             if (errFlag1) {
                                 ShowSevereError("InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");
@@ -3204,13 +3291,21 @@ namespace PlantCondLoopOperation {
             ActuatorName = "Supply Side Half Loop";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop(LoopNum).LoopSide(SupplySide).EMSCtrl,
+            SetupEMSActuator(ActuatorName,
+                             UniqueIDName,
+                             ActuatorType,
+                             Units,
+                             PlantLoop(LoopNum).LoopSide(SupplySide).EMSCtrl,
                              PlantLoop(LoopNum).LoopSide(SupplySide).EMSValue);
 
             ActuatorName = "Demand Side Half Loop";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop(LoopNum).LoopSide(DemandSide).EMSCtrl,
+            SetupEMSActuator(ActuatorName,
+                             UniqueIDName,
+                             ActuatorType,
+                             Units,
+                             PlantLoop(LoopNum).LoopSide(DemandSide).EMSCtrl,
                              PlantLoop(LoopNum).LoopSide(DemandSide).EMSValue);
 
             for (LoopSideNum = 1; LoopSideNum <= 2; ++LoopSideNum) {
@@ -3219,14 +3314,20 @@ namespace PlantCondLoopOperation {
                         ActuatorName = "Supply Side Branch";
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(ActuatorName, UniqueIDName, ActuatorType, Units,
+                        SetupEMSActuator(ActuatorName,
+                                         UniqueIDName,
+                                         ActuatorType,
+                                         Units,
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideOn,
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideValue);
                     } else if (LoopSideNum == DemandSide) {
                         ActuatorName = "Demand Side Branch";
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(ActuatorName, UniqueIDName, ActuatorType, Units,
+                        SetupEMSActuator(ActuatorName,
+                                         UniqueIDName,
+                                         ActuatorType,
+                                         Units,
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideOn,
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideValue);
                     }
@@ -3235,7 +3336,10 @@ namespace PlantCondLoopOperation {
                                        ccSimPlantEquipTypes(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_Num);
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(ActuatorName, UniqueIDName, ActuatorType, "[W]",
+                        SetupEMSActuator(ActuatorName,
+                                         UniqueIDName,
+                                         ActuatorType,
+                                         "[W]",
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideOn,
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideValue);
                     }

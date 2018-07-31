@@ -939,8 +939,13 @@ namespace GeneratorDynamicsManager {
 
         // make sure plant can provide, utility call may change flow
         if (MicroCHP(GeneratorNum).CWLoopNum > 0) { // protect early calls
-            SetComponentFlowRate(MdotCW, InletNode, OutletNode, MicroCHP(GeneratorNum).CWLoopNum, MicroCHP(GeneratorNum).CWLoopSideNum,
-                                 MicroCHP(GeneratorNum).CWBranchNum, MicroCHP(GeneratorNum).CWCompNum);
+            SetComponentFlowRate(MdotCW,
+                                 InletNode,
+                                 OutletNode,
+                                 MicroCHP(GeneratorNum).CWLoopNum,
+                                 MicroCHP(GeneratorNum).CWLoopSideNum,
+                                 MicroCHP(GeneratorNum).CWBranchNum,
+                                 MicroCHP(GeneratorNum).CWCompNum);
         }
 
         FuncDetermineCWMdotForInternalFlowControl = MdotCW;
