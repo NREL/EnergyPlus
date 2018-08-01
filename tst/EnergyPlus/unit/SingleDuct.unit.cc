@@ -1993,7 +1993,6 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "    0.8,                     !- Nominal Thermal Efficiency",
         "    LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable",
         "    HeatSys1 Boiler Non-Condensing Boiler Curve, !- Normalized Boiler Efficiency Curve Name",
-        "    82.2000,                 !- Design Water Outlet Temperature{ C }",
         "    AUTOSIZE,                !- Design Water Flow Rate{ m3 / s }",
         "    0.0,                     !- Minimum Part Load Ratio",
         "    1.2,                     !- Maximum Part Load Ratio",
