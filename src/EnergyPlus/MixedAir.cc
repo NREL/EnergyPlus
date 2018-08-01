@@ -3576,8 +3576,8 @@ namespace MixedAir {
         if (AirLoopNum > 0) {
             auto &curAirLoopFlow(AirLoopFlow(AirLoopNum));
 
-            if (this->MixMassFlow > SmallAirVolFlow) {
-                OutAirMinFrac = this->MinOAMassFlowRate / this->MixMassFlow;
+            if (curAirLoopFlow.DesSupply >= SmallAirVolFlow) {
+                OutAirMinFrac = this->MinOAMassFlowRate / curAirLoopFlow.DesSupply;
             } else {
                 OutAirMinFrac = 0.0;
             }
@@ -3610,11 +3610,7 @@ namespace MixedAir {
                 SysSA = curAirLoopFlow.SupFlow;
             }
             VentilationMechanical(this->VentMechObjectNum).CalcMechVentController(SysSA, MechVentOAMassFlow);
-            if (SysSA > SmallAirVolFlow) {
-                MechVentOutsideAirMinFrac = MechVentOAMassFlow / SysSA;
-            } else {
-                MechVentOutsideAirMinFrac = 0.0;
-            }
+            MechVentOutsideAirMinFrac = MechVentOAMassFlow / curAirLoopFlow.DesSupply;
             if (curAirLoopFlow.FanPLR > 0.0) {
                 MechVentOutsideAirMinFrac *= curAirLoopFlow.FanPLR;
                 MechVentOAMassFlow *= curAirLoopFlow.FanPLR;
@@ -3630,7 +3626,7 @@ namespace MixedAir {
         if (AirLoopNum > 0) {
             auto &curAirLoopFlow(AirLoopFlow(AirLoopNum));
 
-            curAirLoopFlow.MinOutAir = OutAirMinFrac * this->MixMassFlow;
+            curAirLoopFlow.MinOutAir = OutAirMinFrac * curAirLoopFlow.DesSupply;
 
             // calculate mixed air temp at min OA flow rate
             ReliefMassFlowAtMinOA = max(curAirLoopFlow.MinOutAir - this->ExhMassFlow, 0.0);
