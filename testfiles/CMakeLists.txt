@@ -110,6 +110,7 @@ ADD_SIMULATION_TEST(IDF_FILE AirEconomizerFaults_RefBldgLargeOfficeNew2004_Chica
 ADD_SIMULATION_TEST(IDF_FILE AirEconomizerWithMaxMinOAFractions.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork3zVent.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork3zVentAutoWPC.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE AirflowNetworkAdvanced_SingleSided_NV.idf EPW_FILE USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetworkOccupantVentilationControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_Attic_Duct.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_MultiZone_House.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -592,6 +593,9 @@ ADD_SIMULATION_TEST(IDF_FILE _SingleZoneTestCondFDTwoDD.idf EPW_FILE USA_IL_Chic
 ADD_SIMULATION_TEST(IDF_FILE _SmallOffice_Dulles.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE _VAVSingleDuctConstFlowBoiler_otherfuel.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE gasAbsorptionChillerHeater.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE WCE_Diffuse_Shade.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE WCE_DoubleClear_BSDF.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE WCE_Interior_VB_-45_deg.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 
 # Additional files in subdirectories
 ADD_SIMULATION_TEST(IDF_FILE AdvancedOutput/ExerciseOutput1.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

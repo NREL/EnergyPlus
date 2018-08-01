@@ -365,8 +365,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUI(UINum).DiffArea = 0.0075;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior", ZoneUCSDUI(UINum).ZoneName,
-                                   "Design effective area of diffuser", ZoneUCSDUI(UINum).DiffArea);
+                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                                   ZoneUCSDUI(UINum).ZoneName,
+                                   "Design effective area of diffuser",
+                                   ZoneUCSDUI(UINum).DiffArea);
             }
             if (ZoneUCSDUI(UINum).DiffAngle == AutoSize) {
                 if (ZoneUCSDUI(UINum).DiffuserType == Swirl) {
@@ -380,8 +382,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUI(UINum).DiffAngle = 28.0;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior", ZoneUCSDUI(UINum).ZoneName,
-                                   "Angle between diffuser slots and the vertical", ZoneUCSDUI(UINum).DiffAngle);
+                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                                   ZoneUCSDUI(UINum).ZoneName,
+                                   "Angle between diffuser slots and the vertical",
+                                   ZoneUCSDUI(UINum).DiffAngle);
             }
             if (ZoneUCSDUI(UINum).TransHeight == AutoSize) {
                 ZoneUCSDUI(UINum).CalcTransHeight = true;
@@ -483,7 +487,9 @@ namespace UFADManager {
                 }
                 ZoneUCSDUI(UINum).PowerPerPlume =
                     (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior", ZoneUCSDUI(UINum).ZoneName, "Power per plume [W]",
+                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                                   ZoneUCSDUI(UINum).ZoneName,
+                                   "Power per plume [W]",
                                    ZoneUCSDUI(UINum).PowerPerPlume);
             }
             if (ZoneUCSDUI(UINum).DiffusersPerZone == AutoSize) {
@@ -492,7 +498,9 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUI(UINum).DiffusersPerZone = 1.0;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior", ZoneUCSDUI(UINum).ZoneName, "Number of diffusers per zone",
+                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                                   ZoneUCSDUI(UINum).ZoneName,
+                                   "Number of diffusers per zone",
                                    ZoneUCSDUI(UINum).DiffusersPerZone);
             }
         }
@@ -533,8 +541,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUE(UINum).DiffArea = 0.0075;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior", ZoneUCSDUE(UINum).ZoneName,
-                                   "Design effective area of diffuser", ZoneUCSDUE(UINum).DiffArea);
+                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                                   ZoneUCSDUE(UINum).ZoneName,
+                                   "Design effective area of diffuser",
+                                   ZoneUCSDUE(UINum).DiffArea);
             }
             if (ZoneUCSDUE(UINum).DiffAngle == AutoSize) {
                 if (ZoneUCSDUE(UINum).DiffuserType == Swirl) {
@@ -548,8 +558,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUE(UINum).DiffAngle = 28.0;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior", ZoneUCSDUE(UINum).ZoneName,
-                                   "Angle between diffuser slots and the vertical", ZoneUCSDUE(UINum).DiffAngle);
+                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                                   ZoneUCSDUE(UINum).ZoneName,
+                                   "Angle between diffuser slots and the vertical",
+                                   ZoneUCSDUE(UINum).DiffAngle);
             }
             if (ZoneUCSDUE(UINum).TransHeight == AutoSize) {
                 ZoneUCSDUE(UINum).CalcTransHeight = true;
@@ -650,7 +662,9 @@ namespace UFADManager {
                 }
                 ZoneUCSDUE(UINum).PowerPerPlume =
                     (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior", ZoneUCSDUE(UINum).ZoneName, "Power per plume [W]",
+                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                                   ZoneUCSDUE(UINum).ZoneName,
+                                   "Power per plume [W]",
                                    ZoneUCSDUE(UINum).PowerPerPlume);
             }
             if (ZoneUCSDUE(UINum).DiffusersPerZone == AutoSize) {
@@ -659,7 +673,9 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUE(UINum).DiffusersPerZone = 1.0;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior", ZoneUCSDUE(UINum).ZoneName, "Number of diffusers per zone",
+                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                                   ZoneUCSDUE(UINum).ZoneName,
+                                   "Number of diffusers per zone",
                                    ZoneUCSDUE(UINum).DiffusersPerZone);
             }
         }
@@ -1045,35 +1061,36 @@ namespace UFADManager {
         int ZoneNodeNum;                 // node number of the HVAC zone node
         static Real64 TempDepCoef(0.0);  // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
         static Real64 TempIndCoef(0.0);  // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Array1D_int IntGainTypesOccupied(29, {IntGainTypeOf_People,
-                                                     IntGainTypeOf_WaterHeaterMixed,
-                                                     IntGainTypeOf_WaterHeaterStratified,
-                                                     IntGainTypeOf_ThermalStorageChilledWaterMixed,
-                                                     IntGainTypeOf_ThermalStorageChilledWaterStratified,
-                                                     IntGainTypeOf_ElectricEquipment,
-                                                     IntGainTypeOf_ElectricEquipmentITEAirCooled,
-                                                     IntGainTypeOf_GasEquipment,
-                                                     IntGainTypeOf_HotWaterEquipment,
-                                                     IntGainTypeOf_SteamEquipment,
-                                                     IntGainTypeOf_OtherEquipment,
-                                                     IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
-                                                     IntGainTypeOf_GeneratorFuelCell,
-                                                     IntGainTypeOf_WaterUseEquipment,
-                                                     IntGainTypeOf_GeneratorMicroCHP,
-                                                     IntGainTypeOf_ElectricLoadCenterTransformer,
-                                                     IntGainTypeOf_ElectricLoadCenterInverterSimple,
-                                                     IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
-                                                     IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
-                                                     IntGainTypeOf_ElectricLoadCenterStorageBattery,
-                                                     IntGainTypeOf_ElectricLoadCenterStorageSimple,
-                                                     IntGainTypeOf_PipeIndoor,
-                                                     IntGainTypeOf_RefrigerationCase,
-                                                     IntGainTypeOf_RefrigerationCompressorRack,
-                                                     IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
-                                                     IntGainTypeOf_RefrigerationSystemSuctionPipe,
-                                                     IntGainTypeOf_RefrigerationSecondaryReceiver,
-                                                     IntGainTypeOf_RefrigerationSecondaryPipe,
-                                                     IntGainTypeOf_RefrigerationWalkIn});
+        static Array1D_int IntGainTypesOccupied(29,
+                                                {IntGainTypeOf_People,
+                                                 IntGainTypeOf_WaterHeaterMixed,
+                                                 IntGainTypeOf_WaterHeaterStratified,
+                                                 IntGainTypeOf_ThermalStorageChilledWaterMixed,
+                                                 IntGainTypeOf_ThermalStorageChilledWaterStratified,
+                                                 IntGainTypeOf_ElectricEquipment,
+                                                 IntGainTypeOf_ElectricEquipmentITEAirCooled,
+                                                 IntGainTypeOf_GasEquipment,
+                                                 IntGainTypeOf_HotWaterEquipment,
+                                                 IntGainTypeOf_SteamEquipment,
+                                                 IntGainTypeOf_OtherEquipment,
+                                                 IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
+                                                 IntGainTypeOf_GeneratorFuelCell,
+                                                 IntGainTypeOf_WaterUseEquipment,
+                                                 IntGainTypeOf_GeneratorMicroCHP,
+                                                 IntGainTypeOf_ElectricLoadCenterTransformer,
+                                                 IntGainTypeOf_ElectricLoadCenterInverterSimple,
+                                                 IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
+                                                 IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageBattery,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageSimple,
+                                                 IntGainTypeOf_PipeIndoor,
+                                                 IntGainTypeOf_RefrigerationCase,
+                                                 IntGainTypeOf_RefrigerationCompressorRack,
+                                                 IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
+                                                 IntGainTypeOf_RefrigerationSystemSuctionPipe,
+                                                 IntGainTypeOf_RefrigerationSecondaryReceiver,
+                                                 IntGainTypeOf_RefrigerationSecondaryPipe,
+                                                 IntGainTypeOf_RefrigerationWalkIn});
 
         static Array1D_int IntGainTypesUpSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
         Real64 RetAirGains;
@@ -1518,35 +1535,36 @@ namespace UFADManager {
         int ZoneNodeNum;                 // node number of the HVAC zone node
         static Real64 TempDepCoef(0.0);  // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
         static Real64 TempIndCoef(0.0);  // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Array1D_int IntGainTypesOccupied(29, {IntGainTypeOf_People,
-                                                     IntGainTypeOf_WaterHeaterMixed,
-                                                     IntGainTypeOf_WaterHeaterStratified,
-                                                     IntGainTypeOf_ThermalStorageChilledWaterMixed,
-                                                     IntGainTypeOf_ThermalStorageChilledWaterStratified,
-                                                     IntGainTypeOf_ElectricEquipment,
-                                                     IntGainTypeOf_ElectricEquipmentITEAirCooled,
-                                                     IntGainTypeOf_GasEquipment,
-                                                     IntGainTypeOf_HotWaterEquipment,
-                                                     IntGainTypeOf_SteamEquipment,
-                                                     IntGainTypeOf_OtherEquipment,
-                                                     IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
-                                                     IntGainTypeOf_GeneratorFuelCell,
-                                                     IntGainTypeOf_WaterUseEquipment,
-                                                     IntGainTypeOf_GeneratorMicroCHP,
-                                                     IntGainTypeOf_ElectricLoadCenterTransformer,
-                                                     IntGainTypeOf_ElectricLoadCenterInverterSimple,
-                                                     IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
-                                                     IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
-                                                     IntGainTypeOf_ElectricLoadCenterStorageBattery,
-                                                     IntGainTypeOf_ElectricLoadCenterStorageSimple,
-                                                     IntGainTypeOf_PipeIndoor,
-                                                     IntGainTypeOf_RefrigerationCase,
-                                                     IntGainTypeOf_RefrigerationCompressorRack,
-                                                     IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
-                                                     IntGainTypeOf_RefrigerationSystemSuctionPipe,
-                                                     IntGainTypeOf_RefrigerationSecondaryReceiver,
-                                                     IntGainTypeOf_RefrigerationSecondaryPipe,
-                                                     IntGainTypeOf_RefrigerationWalkIn});
+        static Array1D_int IntGainTypesOccupied(29,
+                                                {IntGainTypeOf_People,
+                                                 IntGainTypeOf_WaterHeaterMixed,
+                                                 IntGainTypeOf_WaterHeaterStratified,
+                                                 IntGainTypeOf_ThermalStorageChilledWaterMixed,
+                                                 IntGainTypeOf_ThermalStorageChilledWaterStratified,
+                                                 IntGainTypeOf_ElectricEquipment,
+                                                 IntGainTypeOf_ElectricEquipmentITEAirCooled,
+                                                 IntGainTypeOf_GasEquipment,
+                                                 IntGainTypeOf_HotWaterEquipment,
+                                                 IntGainTypeOf_SteamEquipment,
+                                                 IntGainTypeOf_OtherEquipment,
+                                                 IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
+                                                 IntGainTypeOf_GeneratorFuelCell,
+                                                 IntGainTypeOf_WaterUseEquipment,
+                                                 IntGainTypeOf_GeneratorMicroCHP,
+                                                 IntGainTypeOf_ElectricLoadCenterTransformer,
+                                                 IntGainTypeOf_ElectricLoadCenterInverterSimple,
+                                                 IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
+                                                 IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageBattery,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageSimple,
+                                                 IntGainTypeOf_PipeIndoor,
+                                                 IntGainTypeOf_RefrigerationCase,
+                                                 IntGainTypeOf_RefrigerationCompressorRack,
+                                                 IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
+                                                 IntGainTypeOf_RefrigerationSystemSuctionPipe,
+                                                 IntGainTypeOf_RefrigerationSecondaryReceiver,
+                                                 IntGainTypeOf_RefrigerationSecondaryPipe,
+                                                 IntGainTypeOf_RefrigerationWalkIn});
 
         static Array1D_int IntGainTypesUpSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
         Real64 RetAirGains;

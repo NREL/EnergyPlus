@@ -60,9 +60,9 @@ namespace EnergyPlus {
 namespace DXFEarClipping {
 
     // Using/Aliasing
+    using DataVectorTypes::dTriangle;
     using DataVectorTypes::Vector;
     using DataVectorTypes::Vector_2d;
-    using DataVectorTypes::dTriangle;
 
     // Data
 

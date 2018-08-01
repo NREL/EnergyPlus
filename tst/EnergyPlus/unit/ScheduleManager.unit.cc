@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, ScheduleAnnualFullLoadHours_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
@@ -161,7 +161,7 @@ TEST_F(EnergyPlusFixture, ScheduleAverageHoursPerWeek_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
@@ -234,7 +234,7 @@ TEST_F(EnergyPlusFixture, ScheduleHoursGT1perc_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
@@ -577,4 +577,73 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep)
 
     EXPECT_NEAR(75.0, LookUpScheduleValue(ASchedIndex, 8, 3), 0.000001);
     EXPECT_NEAR(100.0, LookUpScheduleValue(ASchedIndex, 8, 4), 0.000001);
+}
+
+TEST_F(EnergyPlusFixture, ScheduleYearMaxItems)
+{
+    std::string const idf_objects = delimited_string({
+        "Schedule:Year,",
+        "  SchYr_A,   !- Name",
+        "  AnyNumber, !- Schedule Type Limits Name",
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31,"
+        "  SchWk_A1,1,1,12,31;"
+        "",
+    });
+
+    ASSERT_FALSE(process_idf(idf_objects, false));
+
+    EXPECT_TRUE(compare_err_stream(delimited_string({"   ** Severe  ** <root>[Schedule:Year][SchYr_A][schedule_weeks] - Array should contain no more than 53 elements."})));
+
 }

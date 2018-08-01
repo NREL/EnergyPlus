@@ -384,8 +384,17 @@ namespace ZonePlenum {
 
             CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
-            inputProcessor->getObjectItem(CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          ZonePlenumNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
             ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName = AlphArray(1);
 
@@ -418,18 +427,28 @@ namespace ZonePlenum {
             }
 
             ZoneRetPlenCond(ZonePlenumNum).ZoneNodeName = AlphArray(3);
-            ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                           NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
+            ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(
+                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
             // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
             Zone(ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
 
-            ZoneRetPlenCond(ZonePlenumNum).OutletNode = GetOnlySingleNode(AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                          NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            ZoneRetPlenCond(ZonePlenumNum).OutletNode = GetOnlySingleNode(
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             InducedNodeListName = AlphArray(5);
             NodeListError = false;
-            GetNodeNums(InducedNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "AirLoopHVAC:ReturnPlenum",
-                        ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName, NodeConnectionType_InducedAir, 1, ObjectIsNotParent, _, cAlphaFields(5));
+            GetNodeNums(InducedNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        "AirLoopHVAC:ReturnPlenum",
+                        ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName,
+                        NodeConnectionType_InducedAir,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFields(5));
 
             if (!NodeListError) {
                 ZoneRetPlenCond(ZonePlenumNum).NumInducedNodes = NumNodes;
@@ -506,9 +525,14 @@ namespace ZonePlenum {
 
             for (NodeNum = 1; NodeNum <= ZoneRetPlenCond(ZonePlenumNum).NumInletNodes; ++NodeNum) {
 
-                ZoneRetPlenCond(ZonePlenumNum).InletNode(NodeNum) =
-                    GetOnlySingleNode(AlphArray(5 + NodeNum), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet,
-                                      1, ObjectIsNotParent);
+                ZoneRetPlenCond(ZonePlenumNum).InletNode(NodeNum) = GetOnlySingleNode(AlphArray(5 + NodeNum),
+                                                                                      ErrorsFound,
+                                                                                      CurrentModuleObject,
+                                                                                      AlphArray(1),
+                                                                                      NodeType_Air,
+                                                                                      NodeConnectionType_Inlet,
+                                                                                      1,
+                                                                                      ObjectIsNotParent);
             }
 
         } // end AirLoopHVAC:ReturnPlenum Loop
@@ -521,8 +545,17 @@ namespace ZonePlenum {
 
             CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
-            inputProcessor->getObjectItem(CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          ZonePlenumNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
             ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName = AlphArray(1);
 
@@ -579,13 +612,13 @@ namespace ZonePlenum {
             //      ENDIF
 
             ZoneSupPlenCond(ZonePlenumNum).ZoneNodeName = AlphArray(3);
-            ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                           NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
+            ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(
+                AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
             // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
             Zone(ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
 
-            ZoneSupPlenCond(ZonePlenumNum).InletNode = GetOnlySingleNode(AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                         NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            ZoneSupPlenCond(ZonePlenumNum).InletNode = GetOnlySingleNode(
+                AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes = NumAlphas - 4;
 
@@ -622,9 +655,14 @@ namespace ZonePlenum {
 
             for (NodeNum = 1; NodeNum <= ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes; ++NodeNum) {
 
-                ZoneSupPlenCond(ZonePlenumNum).OutletNode(NodeNum) =
-                    GetOnlySingleNode(AlphArray(4 + NodeNum), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet,
-                                      1, ObjectIsNotParent);
+                ZoneSupPlenCond(ZonePlenumNum).OutletNode(NodeNum) = GetOnlySingleNode(AlphArray(4 + NodeNum),
+                                                                                       ErrorsFound,
+                                                                                       CurrentModuleObject,
+                                                                                       AlphArray(1),
+                                                                                       NodeType_Air,
+                                                                                       NodeConnectionType_Outlet,
+                                                                                       1,
+                                                                                       ObjectIsNotParent);
             }
 
         } // end AirLoopHVAC:SupplyPlenum Loop

@@ -90,15 +90,15 @@
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              No
-! Purchased Heating:              No
+! Purchased Heating:              Yes
 ! Purchased Chilled Water:        No
-! Purchased Hot Water:            No
-! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
-! Pumps:                          None
+! Purchased Hot Water:            Yes
+! HVAC System:                    AirLoopHVAC:UnitarySystem
+! Coils:                          Coil:Cooling:Water, Coil:Heating:Water
+! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
-! Chillers:                       None
-! Towers:                         None
+! Chillers:                       Chiller:Electric
+! Towers:                         CoolingTower:VariableSpeed
 !
 ! Results:
 ! Standard Reports:               None
@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1456,23 +1456,7 @@
     Mixed Air Node,          !- Air Inlet Node Name
     Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
- !-   ========  ALL OBJECTS IN CLASS: CONTROLLER:WATERCOIL =======
-
-  Controller:WaterCoil,
-    CW Coil Controller,      !- Name
-    Temperature,             !- Control Variable
-    Reverse,                 !- Action
-    FLOW,                    !- Actuator Variable
-    Heating Coil Air Inlet Node,  !- Sensor Node Name
-    CWCoil Water Inlet Node, !- Actuator Node Name
-    autosize,                !- Controller Convergence Tolerance {deltaC}
-    autosize,                !- Maximum Actuated Flow {m3/s}
-    0.0;                     !- Minimum Actuated Flow {m3/s}
-
-  AirLoopHVAC:ControllerList,
-    CW Sys Controllers,      !- Name
-    Controller:WaterCoil,    !- Controller 1 Object Type
-    CW Coil Controller;      !- Controller 1 Name
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:WATER ===========
 
   Coil:Cooling:Water,
     CW Cooling Coil,         !- Name
@@ -1620,7 +1604,7 @@
 
   AirLoopHVAC,
     Chilled Water Coil Sys,  !- Name
-    CW Sys Controllers,      !- Controller List Name
+    ,                        !- Controller List Name
     CW AHU Avail List,       !- Availability Manager List Name
     Autosize,                !- Design Supply Air Flow Rate {m3/s}
     Air Loop Branches,       !- Branch List Name

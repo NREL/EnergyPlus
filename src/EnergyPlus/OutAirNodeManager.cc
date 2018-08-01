@@ -248,16 +248,34 @@ namespace OutAirNodeManager {
             // Loop over all outside air inlet nodes in the input and count them
             CurrentModuleObject = "OutdoorAir:NodeList";
             for (OutAirInletNodeListNum = 1; OutAirInletNodeListNum <= NumOutAirInletNodeLists; ++OutAirInletNodeListNum) {
-                inputProcessor->getObjectItem(CurrentModuleObject, OutAirInletNodeListNum, Alphas, NumAlphas, Numbers, NumNums, IOStat,
-                                              lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              OutAirInletNodeListNum,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
 
                 for (AlphaNum = 1; AlphaNum <= NumAlphas; ++AlphaNum) {
                     ErrInList = false;
                     //  To support HVAC diagram, every outside inlet node must have a unique fluid stream number
                     //  GetNodeNums will increment the value across a node list, the starting value must be incremented
                     //  here across lists and across objects
-                    GetNodeNums(Alphas(AlphaNum), NumNodes, NodeNums, ErrInList, NodeType_Air, CurrentModuleObject, CurrentModuleObject,
-                                NodeConnectionType_OutsideAir, NextFluidStreamNum, ObjectIsNotParent, IncrementFluidStreamYes,
+                    GetNodeNums(Alphas(AlphaNum),
+                                NumNodes,
+                                NodeNums,
+                                ErrInList,
+                                NodeType_Air,
+                                CurrentModuleObject,
+                                CurrentModuleObject,
+                                NodeConnectionType_OutsideAir,
+                                NextFluidStreamNum,
+                                ObjectIsNotParent,
+                                IncrementFluidStreamYes,
                                 cAlphaFields(AlphaNum));
                     NextFluidStreamNum += NumNodes;
                     if (ErrInList) {
@@ -286,15 +304,34 @@ namespace OutAirNodeManager {
             // Loop over all single outside air nodes in the input
             CurrentModuleObject = "OutdoorAir:Node";
             for (OutsideAirNodeSingleNum = 1; OutsideAirNodeSingleNum <= NumOutsideAirNodeSingles; ++OutsideAirNodeSingleNum) {
-                inputProcessor->getObjectItem(CurrentModuleObject, OutsideAirNodeSingleNum, Alphas, NumAlphas, Numbers, NumNums, IOStat,
-                                              lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              OutsideAirNodeSingleNum,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
 
                 ErrInList = false;
                 //  To support HVAC diagram, every outside inlet node must have a unique fluid stream number
                 //  GetNodeNums will increment the value across a node list, the starting value must be incremented
                 //  here across lists and across objects
-                GetNodeNums(Alphas(1), NumNodes, NodeNums, ErrInList, NodeType_Air, CurrentModuleObject, CurrentModuleObject,
-                            NodeConnectionType_OutsideAir, NextFluidStreamNum, ObjectIsNotParent, IncrementFluidStreamYes, cAlphaFields(1));
+                GetNodeNums(Alphas(1),
+                            NumNodes,
+                            NodeNums,
+                            ErrInList,
+                            NodeType_Air,
+                            CurrentModuleObject,
+                            CurrentModuleObject,
+                            NodeConnectionType_OutsideAir,
+                            NextFluidStreamNum,
+                            ObjectIsNotParent,
+                            IncrementFluidStreamYes,
+                            cAlphaFields(1));
                 NextFluidStreamNum += NumNodes;
                 if (ErrInList) {
                     ShowContinueError("Occurred in " + CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
@@ -591,8 +628,17 @@ namespace OutAirNodeManager {
                 OutsideAirNodeList(NumOutsideAirNodes) = NodeNumber;
                 TmpNums = OutsideAirNodeList;
                 // register new node..
-                GetNodeNums(NodeID(NodeNumber), DummyNumber, TmpNums, errFlag, NodeType_Air, "OutdoorAir:Node", "OutdoorAir:Node",
-                            NodeConnectionType_OutsideAir, NumOutsideAirNodes, ObjectIsNotParent, IncrementFluidStreamYes);
+                GetNodeNums(NodeID(NodeNumber),
+                            DummyNumber,
+                            TmpNums,
+                            errFlag,
+                            NodeType_Air,
+                            "OutdoorAir:Node",
+                            "OutdoorAir:Node",
+                            NodeConnectionType_OutsideAir,
+                            NumOutsideAirNodes,
+                            ObjectIsNotParent,
+                            IncrementFluidStreamYes);
                 if (Node(NodeNumber).Height < 0.0) {
                     Node(NodeNumber).OutAirDryBulb = OutDryBulbTemp;
                     Node(NodeNumber).OutAirWetBulb = OutWetBulbTemp;

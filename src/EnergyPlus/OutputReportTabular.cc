@@ -156,9 +156,12 @@ namespace OutputReportTabular {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::DoOutputReporting;
     using DataGlobals::DoWeathSim;
-    using DataGlobals::HVACTSReporting;
     using DataGlobals::HourOfDay;
+    using DataGlobals::HVACTSReporting;
     using DataGlobals::KindOfSim;
+    using DataGlobals::ksDesignDay;
+    using DataGlobals::ksRunPeriodDesign;
+    using DataGlobals::ksRunPeriodWeather;
     using DataGlobals::NumOfZones;
     using DataGlobals::OutputFileDebug;
     using DataGlobals::OutputFileInits;
@@ -167,9 +170,6 @@ namespace OutputReportTabular {
     using DataGlobals::TimeStepZone;
     using DataGlobals::TimeStepZoneSec;
     using DataGlobals::ZoneTSReporting;
-    using DataGlobals::ksDesignDay;
-    using DataGlobals::ksRunPeriodDesign;
-    using DataGlobals::ksRunPeriodWeather;
     using namespace DataGlobalConstants;
     using namespace OutputReportPredefined;
     using namespace DataHeatBalance;
@@ -1144,7 +1144,9 @@ namespace OutputReportTabular {
                 MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar.allocate(KeyCount);
 
                 // fill keys?
-                GetVariableKeys(curVariMeter, TypeVar, MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys,
+                GetVariableKeys(curVariMeter,
+                                TypeVar,
+                                MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys,
                                 MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar);
 
                 // save these values to use later -- noel
@@ -1580,8 +1582,17 @@ namespace OutputReportTabular {
         BinResultsIntervalCount = 0;
         BinResultsTableCount = 0;
         for (iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             OutputTableBinned(iInObj).keyValue = AlphArray(1);
             OutputTableBinned(iInObj).varOrMeter = AlphArray(2);
             // if a schedule has been specified assign
@@ -1620,8 +1631,12 @@ namespace OutputReportTabular {
             if (OutputTableBinned(iInObj).intervalCount > BinResultsIntervalCount) {
                 BinResultsIntervalCount = OutputTableBinned(iInObj).intervalCount;
             }
-            GetVariableKeyCountandType(OutputTableBinned(iInObj).varOrMeter, OutputTableBinned(iInObj).numTables, OutputTableBinned(iInObj).typeOfVar,
-                                       OutputTableBinned(iInObj).avgSum, OutputTableBinned(iInObj).stepType, OutputTableBinned(iInObj).units);
+            GetVariableKeyCountandType(OutputTableBinned(iInObj).varOrMeter,
+                                       OutputTableBinned(iInObj).numTables,
+                                       OutputTableBinned(iInObj).typeOfVar,
+                                       OutputTableBinned(iInObj).avgSum,
+                                       OutputTableBinned(iInObj).stepType,
+                                       OutputTableBinned(iInObj).units);
             if (OutputTableBinned(iInObj).typeOfVar == 0) {
                 ShowWarningError(CurrentModuleObject + ": User specified meter or variable not found: " + OutputTableBinned(iInObj).varOrMeter);
             }
@@ -1770,8 +1785,17 @@ namespace OutputReportTabular {
             del(1) = CharComma; // comma
             unitsStyle = unitsStyleNone;
         } else if (NumTabularStyle == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // ColumnSeparator
             if (UtilityRoutines::SameString(AlphArray(1), "Comma")) {
                 numStyles = 1;
@@ -2871,14 +2895,14 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(32).show) {
             curReport = AddMonthlyReport("ComfortReportSimple55Monthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time", "",
-                                    aggTypeHoursNonZero);
+            AddMonthlyFieldSetInput(
+                curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time", "", aggTypeHoursNonZero);
             AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", aggTypeSumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Winter Clothes Not Comfortable Time", "",
-                                    aggTypeHoursNonZero);
+            AddMonthlyFieldSetInput(
+                curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Winter Clothes Not Comfortable Time", "", aggTypeHoursNonZero);
             AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", aggTypeSumOrAverageHoursShown);
-            AddMonthlyFieldSetInput(curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time", "",
-                                    aggTypeHoursNonZero);
+            AddMonthlyFieldSetInput(
+                curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time", "", aggTypeHoursNonZero);
             AddMonthlyFieldSetInput(curReport, "Zone Mean Air Temperature", "", aggTypeSumOrAverageHoursShown);
         }
         if (namedMonthly(33).show) {
@@ -4799,7 +4823,6 @@ namespace OutputReportTabular {
         using DataDefineEquip::NumAirDistUnits;
         using DataEnvironment::DayOfMonth;
         using DataEnvironment::Month;
-        using DataHVACGlobals::TimeStepSys;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::ZnRpt;
@@ -4809,6 +4832,7 @@ namespace OutputReportTabular {
         using DataHeatBalance::ZoneWinHeatGainRepEnergy;
         using DataHeatBalance::ZoneWinHeatLossRep;
         using DataHeatBalance::ZoneWinHeatLossRepEnergy;
+        using DataHVACGlobals::TimeStepSys;
         using DirectAirManager::DirectAir;
         using DirectAirManager::NumDirectAir;
         using General::DetermineMinuteForReporting;
@@ -5663,8 +5687,8 @@ namespace OutputReportTabular {
                             curNameWithSIUnits = "Elevation (m) " + lineIn.substr(12 + lnPtr + 2);
                             if (unitsStyle == unitsStyleInchPound) {
                                 LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(pdchWthrVal, curNameAndUnits,
-                                                 RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
+                                PreDefTableEntry(
+                                    pdchWthrVal, curNameAndUnits, RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
                             } else {
                                 PreDefTableEntry(pdchWthrVal, curNameWithSIUnits, lineIn.substr(12, lnPtr));
                             }
@@ -5704,26 +5728,30 @@ namespace OutputReportTabular {
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                         LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                        PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
-                                        PreDefTableEntry(pdchWthrVal, "Heating Design Temperature 99% (F)",
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         "Heating Design Temperature 99% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 3))), 1) + degChar);
                                     } else {
-                                        PreDefTableEntry(pdchWthrVal, "Heating Design Temperature 99.6% (C)",
-                                                         GetColumnUsingTabs(lineIn, 2) + degChar);
+                                        PreDefTableEntry(
+                                            pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs(lineIn, 2) + degChar);
                                         PreDefTableEntry(pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs(lineIn, 3) + degChar);
                                     }
                                 } else { // 2005 and 2009 are the same
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                         LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                        PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
-                                        PreDefTableEntry(pdchWthrVal, "Heating Design Temperature 99% (F)",
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         "Heating Design Temperature 99% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
                                     } else {
-                                        PreDefTableEntry(pdchWthrVal, "Heating Design Temperature 99.6% (C)",
-                                                         GetColumnUsingTabs(lineIn, 4) + degChar);
+                                        PreDefTableEntry(
+                                            pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs(lineIn, 4) + degChar);
                                         PreDefTableEntry(pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs(lineIn, 5) + degChar);
                                     }
                                 }
@@ -5738,9 +5766,11 @@ namespace OutputReportTabular {
                                 if (unitsStyle == unitsStyleInchPound) {
                                     curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                     LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                    PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                    PreDefTableEntry(pdchWthrVal,
+                                                     curNameAndUnits,
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
-                                    PreDefTableEntry(pdchWthrVal, "Heating Design Temperature 99% (F)",
+                                    PreDefTableEntry(pdchWthrVal,
+                                                     "Heating Design Temperature 99% (F)",
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
                                 } else {
                                     PreDefTableEntry(pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs(lineIn, col1) + degChar);
@@ -5755,11 +5785,14 @@ namespace OutputReportTabular {
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                         LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                        PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
-                                        PreDefTableEntry(pdchWthrVal, "Cooling Design Temperature 1% (F)",
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         "Cooling Design Temperature 1% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
-                                        PreDefTableEntry(pdchWthrVal, "Cooling Design Temperature 2% (F)",
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         "Cooling Design Temperature 2% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 6))), 1) + degChar);
                                     } else {
                                         PreDefTableEntry(pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs(lineIn, 2) + degChar);
@@ -5770,11 +5803,14 @@ namespace OutputReportTabular {
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                         LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                        PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
-                                        PreDefTableEntry(pdchWthrVal, "Cooling Design Temperature 1% (F)",
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         "Cooling Design Temperature 1% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 7))), 1) + degChar);
-                                        PreDefTableEntry(pdchWthrVal, "Cooling Design Temperature 2% (F)",
+                                        PreDefTableEntry(pdchWthrVal,
+                                                         "Cooling Design Temperature 2% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 9))), 1) + degChar);
                                     } else {
                                         PreDefTableEntry(pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs(lineIn, 5) + degChar);
@@ -5795,11 +5831,14 @@ namespace OutputReportTabular {
                                 if (unitsStyle == unitsStyleInchPound) {
                                     curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                     LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                    PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                    PreDefTableEntry(pdchWthrVal,
+                                                     curNameAndUnits,
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
-                                    PreDefTableEntry(pdchWthrVal, "Cooling Design Temperature 1% (F)",
+                                    PreDefTableEntry(pdchWthrVal,
+                                                     "Cooling Design Temperature 1% (F)",
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
-                                    PreDefTableEntry(pdchWthrVal, "Cooling Design Temperature 2% (F)",
+                                    PreDefTableEntry(pdchWthrVal,
+                                                     "Cooling Design Temperature 2% (F)",
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col3))), 1) + degChar);
                                 } else {
                                     PreDefTableEntry(pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs(lineIn, col1) + degChar);
@@ -5821,12 +5860,13 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
                                 LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                PreDefTableEntry(pdchWthrVal,
+                                                 curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
                                                      degChar);
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "Maximum Dry Bulb Temperature (C)",
-                                                 lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
+                                PreDefTableEntry(
+                                    pdchWthrVal, "Maximum Dry Bulb Temperature (C)", lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
                             }
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Maximum Dry Bulb Temperature", "not found");
@@ -5847,12 +5887,13 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
                                 LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                PreDefTableEntry(pdchWthrVal,
+                                                 curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
                                                      degChar);
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "Minimum Dry Bulb Temperature (C)",
-                                                 lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
+                                PreDefTableEntry(
+                                    pdchWthrVal, "Minimum Dry Bulb Temperature (C)", lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
                             }
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Minimum Dry Bulb Temperature", "not found");
@@ -5873,12 +5914,13 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
                                 LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                PreDefTableEntry(pdchWthrVal,
+                                                 curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
                                                      degChar);
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "Maximum Dew Point Temperature (C)",
-                                                 lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
+                                PreDefTableEntry(
+                                    pdchWthrVal, "Maximum Dew Point Temperature (C)", lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
                             }
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Maximum Dew Point Temperature", "not found");
@@ -5899,12 +5941,13 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
                                 LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(pdchWthrVal, curNameAndUnits,
+                                PreDefTableEntry(pdchWthrVal,
+                                                 curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
                                                      degChar);
                             } else {
-                                PreDefTableEntry(pdchWthrVal, "Minimum Dew Point Temperature (C)",
-                                                 lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
+                                PreDefTableEntry(
+                                    pdchWthrVal, "Minimum Dew Point Temperature (C)", lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
                             }
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Minimum Dew Point Temperature", "not found");
@@ -5921,8 +5964,8 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
                                 LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(pdchWthrVal, curNameAndUnits,
-                                                 RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
+                                PreDefTableEntry(
+                                    pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
                             } else {
                                 PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD);
                             }
@@ -5936,10 +5979,10 @@ namespace OutputReportTabular {
                         if (unitsStyle == unitsStyleInchPound) {
                             curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
                             LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(pdchWthrVal, curNameAndUnits,
-                                             RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                            PreDefTableEntry(pdchLeedGenData, "Heating Degree Days",
-                                             RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                            PreDefTableEntry(
+                                pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                            PreDefTableEntry(
+                                pdchLeedGenData, "Heating Degree Days", RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr(2, 4));
                             PreDefTableEntry(pdchLeedGenData, "Heating Degree Days", lineIn.substr(2, 4));
@@ -5950,8 +5993,8 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
                                 LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(pdchWthrVal, curNameAndUnits,
-                                                 RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAECDD)), 1));
+                                PreDefTableEntry(
+                                    pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAECDD)), 1));
                             } else {
                                 PreDefTableEntry(pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD);
                             }
@@ -5965,10 +6008,10 @@ namespace OutputReportTabular {
                         if (unitsStyle == unitsStyleInchPound) {
                             curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
                             LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(pdchWthrVal, curNameAndUnits,
-                                             RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                            PreDefTableEntry(pdchLeedGenData, "Cooling Degree Days",
-                                             RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                            PreDefTableEntry(
+                                pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                            PreDefTableEntry(
+                                pdchLeedGenData, "Cooling Degree Days", RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr(2, 4));
                             PreDefTableEntry(pdchLeedGenData, "Cooling Degree Days", lineIn.substr(2, 4));
@@ -6138,13 +6181,13 @@ namespace OutputReportTabular {
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::RunPeriodStartDayOfWeek;
         using DataEnvironment::WeatherFileLocationTitle;
-        using DataHVACGlobals::NumPrimaryAirSys;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::Lights;
         using DataHeatBalance::TotLights;
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
+        using DataHVACGlobals::NumPrimaryAirSys;
         using DataOutputs::iNumberOfAutoCalcedFields;
         using DataOutputs::iNumberOfAutoSizedFields;
         using DataOutputs::iNumberOfDefaultedFields;
@@ -6219,8 +6262,8 @@ namespace OutputReportTabular {
             } else {
                 PreDefTableEntry(pdchInLtCond, Lights(iLight).Name, "N");
             }
-            PreDefTableEntry(pdchInLtAvgHrSchd, Lights(iLight).Name,
-                             ScheduleAverageHoursPerWeek(Lights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
+            PreDefTableEntry(
+                pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(Lights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
                 HrsPerWeek = 24 * 7 * Lights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
@@ -6240,7 +6283,8 @@ namespace OutputReportTabular {
         consumptionTotal = 0.0;
         for (iLight = 1; iLight <= NumExteriorLights; ++iLight) {
             if (ExteriorLights(iLight).ControlMode == 1) { // photocell/schedule
-                PreDefTableEntry(pdchExLtAvgHrSchd, ExteriorLights(iLight).Name,
+                PreDefTableEntry(pdchExLtAvgHrSchd,
+                                 ExteriorLights(iLight).Name,
                                  ScheduleAverageHoursPerWeek(ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
             }
             // average operating hours per week
@@ -6265,27 +6309,32 @@ namespace OutputReportTabular {
                 if (Zone(iZone).isNominalOccupied) {
                     // occupants
                     if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
-                        PreDefTableEntry(pdchOaoAvgNumOcc1, Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
-                        PreDefTableEntry(pdchOaoAvgNumOcc2, Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
+                        PreDefTableEntry(
+                            pdchOaoAvgNumOcc1, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
+                        PreDefTableEntry(
+                            pdchOaoAvgNumOcc2, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
                     }
                     // Mechanical ventilation
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(pdchOaoAvgMechVent, Zone(iZone).Name,
+                        PreDefTableEntry(pdchOaoAvgMechVent,
+                                         Zone(iZone).Name,
                                          ZonePreDefRep(iZone).MechVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume *
                                                                                   Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
                                          3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                        PreDefTableEntry(
-                            pdchOaoMinMechVent, Zone(iZone).Name,
-                            ZonePreDefRep(iZone).MechVentVolMin / (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier), 3);
+                        PreDefTableEntry(pdchOaoMinMechVent,
+                                         Zone(iZone).Name,
+                                         ZonePreDefRep(iZone).MechVentVolMin /
+                                             (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
+                                         3);
                     }
                     // infiltration
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(pdchOaoAvgInfil, Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).InfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume), 3);
+                        PreDefTableEntry(pdchOaoAvgInfil,
+                                         Zone(iZone).Name,
+                                         ZonePreDefRep(iZone).InfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
+                                         3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(pdchOaoMinInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolMin / (Zone(iZone).Volume), 3);
@@ -6300,16 +6349,20 @@ namespace OutputReportTabular {
                         }
                     }
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(pdchOaoAvgAFNInfil, Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).AFNInfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume), 3);
+                        PreDefTableEntry(pdchOaoAvgAFNInfil,
+                                         Zone(iZone).Name,
+                                         ZonePreDefRep(iZone).AFNInfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
+                                         3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(pdchOaoMinAFNInfil, Zone(iZone).Name, ZonePreDefRep(iZone).AFNInfilVolMin / (Zone(iZone).Volume), 3);
                     }
                     // simple 'ZoneVentilation'
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(pdchOaoAvgSimpVent, Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).SimpVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume), 3);
+                        PreDefTableEntry(pdchOaoAvgSimpVent,
+                                         Zone(iZone).Name,
+                                         ZonePreDefRep(iZone).SimpVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
+                                         3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(pdchOaoMinSimpVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume), 3);
@@ -6358,10 +6411,10 @@ namespace OutputReportTabular {
             // annual
             // PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
             // PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
-            PreDefTableEntry(pdchSHGSAnHvacHt, Zone(iZone).Name,
-                             (ZonePreDefRep(iZone).SHGSAnHvacHt - ZonePreDefRep(iZone).SHGSAnHvacATUHt) * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnHvacCl, Zone(iZone).Name,
-                             (ZonePreDefRep(iZone).SHGSAnHvacCl - ZonePreDefRep(iZone).SHGSAnHvacATUCl) * convertJtoGJ, 3);
+            PreDefTableEntry(
+                pdchSHGSAnHvacHt, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSAnHvacHt - ZonePreDefRep(iZone).SHGSAnHvacATUHt) * convertJtoGJ, 3);
+            PreDefTableEntry(
+                pdchSHGSAnHvacCl, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSAnHvacCl - ZonePreDefRep(iZone).SHGSAnHvacATUCl) * convertJtoGJ, 3);
             PreDefTableEntry(pdchSHGSAnHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUHt * convertJtoGJ, 3);
             PreDefTableEntry(pdchSHGSAnHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUCl * convertJtoGJ, 3);
             PreDefTableEntry(pdchSHGSAnSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfHt * convertJtoGJ, 3);
@@ -6531,10 +6584,10 @@ namespace OutputReportTabular {
             std::string curSchName = ScheduleManager::Schedule(iSch).Name;
             std::string curSchType = ScheduleManager::GetScheduleType(iSch);
             if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
-                PreDefTableEntry(pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(iSch, StartOfWeek, CurrentYearIsLeapYear),
-                                 0);
-                PreDefTableEntry(pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc(iSch, StartOfWeek, CurrentYearIsLeapYear),
-                                 0);
+                PreDefTableEntry(
+                    pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
+                PreDefTableEntry(
+                    pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc(iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
             }
         }
         // fill the LEED setpoint table
@@ -6914,8 +6967,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("Custom Monthly Report");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, MonthlyInput(iInput).name,
-                                                           MonthlyTables(curTable).keyValue, "Custom Monthly Report");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -7117,8 +7170,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("Time Bin Results");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth, true); // transpose XML tables
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName,
-                                                           BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -7165,8 +7218,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("Statistics");
                 WriteTable(tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName,
-                                                           BinObjVarID(repIndex).namesOfObj, "Statistics");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -7464,13 +7517,12 @@ namespace OutputReportTabular {
             netElecPurchasedSold = gatherElecPurchased - gatherElecSurplusSold;
 
             // water is not included   gatherTotalsBEPS(7)    !water
-            netSiteEnergyUse =
-                netElecPurchasedSold + (gatherTotalsBEPS(2) + gatherTotalsBEPS(3) + gatherTotalsBEPS(4) + gatherTotalsBEPS(5) + gatherTotalsBEPS(6) +
-                                        gatherTotalsBEPS(8) + gatherTotalsBEPS(9) + gatherTotalsBEPS(10) + gatherTotalsBEPS(11) +
-                                        gatherTotalsBEPS(12) + gatherTotalsBEPS(13) + gatherTotalsBEPS(14)) /
-                                           largeConversionFactor; // electricity (already in GJ) | natural gas | district cooling |
-                                                                  // district heating | steam | gasoline | diesel | coal | fuel oil #1 |
-                                                                  // fuel oil #2 | propane | otherfuel1 | otherfuel2
+            netSiteEnergyUse = netElecPurchasedSold + (gatherTotalsBEPS(2) + gatherTotalsBEPS(3) + gatherTotalsBEPS(4) + gatherTotalsBEPS(5) +
+                                                       gatherTotalsBEPS(6) + gatherTotalsBEPS(8) + gatherTotalsBEPS(9) + gatherTotalsBEPS(10) +
+                                                       gatherTotalsBEPS(11) + gatherTotalsBEPS(12) + gatherTotalsBEPS(13) + gatherTotalsBEPS(14)) /
+                                                          largeConversionFactor; // electricity (already in GJ) | natural gas | district cooling |
+                                                                                 // district heating | steam | gasoline | diesel | coal | fuel oil #1
+                                                                                 // | fuel oil #2 | propane | otherfuel1 | otherfuel2
 
             if (efficiencyDistrictCooling == 0) efficiencyDistrictCooling = 1.0;
             if (efficiencyDistrictHeating == 0) efficiencyDistrictHeating = 1.0;
@@ -7637,8 +7689,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("Site and Source Energy");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "Site and Source Energy");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy");
                 }
 
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
@@ -7787,8 +7839,12 @@ namespace OutputReportTabular {
                 WriteSubtitle("Site to Source Energy Conversion Factors");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "Site to Source Energy Conversion Factors");
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "AnnualBuildingUtilityPerformanceSummary",
+                                                           "Entire Facility",
+                                                           "Site to Source Energy Conversion Factors");
                 }
 
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
@@ -7835,8 +7891,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("Building Area");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "Building Area");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
                 }
 
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
@@ -7934,8 +7990,8 @@ namespace OutputReportTabular {
             unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
             //  Energy Use Intensities
             if (buildingGrossFloorArea > 0) {
-                PreDefTableEntry(pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal(colElectricity, 3) / buildingGrossFloorArea,
-                                 2);
+                PreDefTableEntry(
+                    pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal(colElectricity, 3) / buildingGrossFloorArea, 2);
                 PreDefTableEntry(pdchLeedEuiElec, "Space Heating", unconvert * 1000 * useVal(colElectricity, 1) / buildingGrossFloorArea, 2);
                 PreDefTableEntry(pdchLeedEuiElec, "Space Cooling", unconvert * 1000 * useVal(colElectricity, 2) / buildingGrossFloorArea, 2);
                 PreDefTableEntry(pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal(colElectricity, 7) / buildingGrossFloorArea, 2);
@@ -7978,9 +8034,10 @@ namespace OutputReportTabular {
                 PreDefTableEntry(pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useVal(colAdditionalFuel, 15) / buildingGrossFloorArea, 2);
                 PreDefTableEntry(pdchLeedEuiOthr, "Subtotal", unconvert * 1000 * useVal(colAdditionalFuel, 15) / buildingGrossFloorArea, 2);
             }
-            PreDefTableEntry(pdchLeedEusTotal, "Additional",
-                             unconvert * (useVal(colAdditionalFuel, 15) + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)), 2);
-            PreDefTableEntry(pdchLeedEusProc, "Additional",
+            PreDefTableEntry(
+                pdchLeedEusTotal, "Additional", unconvert * (useVal(colAdditionalFuel, 15) + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)), 2);
+            PreDefTableEntry(pdchLeedEusProc,
+                             "Additional",
                              unconvert * (useVal(colAdditionalFuel, 5) + useVal(colAdditionalFuel, 13) + useVal(colPurchCool, 5) +
                                           useVal(colPurchCool, 13) + useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13)),
                              2);
@@ -8019,17 +8076,20 @@ namespace OutputReportTabular {
                 PreDefTableEntry(pdchLeedEupPerc, "Service Water Heating", 100 * leedSiteSrvWatr / leedSiteTotal, 2);
                 PreDefTableEntry(pdchLeedEupPerc, "Receptacle Equipment", 100 * leedSiteRecept / leedSiteTotal, 2);
                 PreDefTableEntry(
-                    pdchLeedEupPerc, "Miscellaneous",
+                    pdchLeedEupPerc,
+                    "Miscellaneous",
                     100 * (leedSiteTotal - (leedSiteIntLite + leedSiteSpHeat + leedSiteSpCool + leedSiteFanInt + leedSiteSrvWatr + leedSiteRecept)) /
                         leedSiteTotal,
                     2);
             }
             // totals across energy source
-            PreDefTableEntry(pdchLeedEusTotal, "Total",
+            PreDefTableEntry(pdchLeedEusTotal,
+                             "Total",
                              unconvert * (useVal(colAdditionalFuel, 15) + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15) +
                                           useVal(colElectricity, 15) + useVal(colGas, 15)),
                              2);
-            PreDefTableEntry(pdchLeedEusProc, "Total",
+            PreDefTableEntry(pdchLeedEusProc,
+                             "Total",
                              unconvert * (useVal(colAdditionalFuel, 5) + useVal(colAdditionalFuel, 13) + useVal(colPurchCool, 5) +
                                           useVal(colPurchCool, 13) + useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13) + useVal(colElectricity, 5) +
                                           useVal(colElectricity, 13) + useVal(colGas, 5) + useVal(colGas, 13)),
@@ -8057,8 +8117,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("End Uses");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "End Uses");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -8190,8 +8250,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("End Uses By Subcategory");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "End Uses By Subcategory");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -8222,12 +8282,14 @@ namespace OutputReportTabular {
                         }
                         // put other
                         if (needOtherRowLEED45(jEndUse)) {
-                            PreDefTableEntry(resource_entry_map(iResource), EndUseCategory(jEndUse).DisplayName + " -- Other",
+                            PreDefTableEntry(resource_entry_map(iResource),
+                                             EndUseCategory(jEndUse).DisplayName + " -- Other",
                                              unconvert * endUseSubOther(iResource, jEndUse));
                             ++i;
                         }
                     } else {
-                        PreDefTableEntry(resource_entry_map(iResource), EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
+                        PreDefTableEntry(resource_entry_map(iResource),
+                                         EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
                                          unconvert * collapsedEndUse(iResource, jEndUse));
                         ++i;
                     }
@@ -8314,8 +8376,12 @@ namespace OutputReportTabular {
                 WriteSubtitle("Utility Use Per Conditioned Floor Area");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "Utility Use Per Conditioned Floor Area");
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "AnnualBuildingUtilityPerformanceSummary",
+                                                           "Entire Facility",
+                                                           "Utility Use Per Conditioned Floor Area");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -8337,8 +8403,12 @@ namespace OutputReportTabular {
                 WriteSubtitle("Utility Use Per Total Floor Area");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "Utility Use Per Total Floor Area");
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "AnnualBuildingUtilityPerformanceSummary",
+                                                           "Entire Facility",
+                                                           "Utility Use Per Total Floor Area");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
@@ -8422,8 +8492,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("Electric Loads Satisfied");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "Electric Loads Satisfied");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -8498,8 +8568,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("On-Site Thermal Sources");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "On-Site Thermal Sources");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -8593,8 +8663,8 @@ namespace OutputReportTabular {
                 WriteSubtitle("Water Source Summary");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "Water Source Summary");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -8632,8 +8702,8 @@ namespace OutputReportTabular {
 
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "Setpoint Not Met Criteria");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
@@ -8668,8 +8738,12 @@ namespace OutputReportTabular {
             if (displayTabularBEPS) {
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility", "Comfort and Setpoint Not Met Summary");
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "AnnualBuildingUtilityPerformanceSummary",
+                                                           "Entire Facility",
+                                                           "Comfort and Setpoint Not Met Summary");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -8899,7 +8973,11 @@ namespace OutputReportTabular {
             WriteSubtitle("Source Energy End Use Components Summary");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "SourceEnergyEndUseComponentsSummary",
+                                                       "Entire Facility",
                                                        "Source Energy End Use Components Summary");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
@@ -8949,7 +9027,11 @@ namespace OutputReportTabular {
             WriteSubtitle("Source Energy End Use Components Per Conditioned Floor Area");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "SourceEnergyEndUseComponentsSummary",
+                                                       "Entire Facility",
                                                        "Source Energy End Use Component Per Conditioned Floor Area");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
@@ -8973,7 +9055,11 @@ namespace OutputReportTabular {
             WriteSubtitle("Source Energy End Use Components Per Total Floor Area");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "SourceEnergyEndUseComponentsSummary",
+                                                       "Entire Facility",
                                                        "Source Energy End Use Components Per Total Floor Area");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
@@ -9331,8 +9417,8 @@ namespace OutputReportTabular {
             WriteSubtitle("End Uses");
             WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility",
-                                                       "End Uses");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -9464,8 +9550,8 @@ namespace OutputReportTabular {
             WriteSubtitle("End Uses By Subcategory");
             WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility",
-                                                       "End Uses By Subcategory");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -9513,12 +9599,13 @@ namespace OutputReportTabular {
                         }
                         // put other
                         if (needOtherRowLEED45(jEndUse)) {
-                            PreDefTableEntry(resource_entry_map(iResource), EndUseCategory(jEndUse).DisplayName + " -- Other",
-                                             endUseSubOther(iResource, jEndUse));
+                            PreDefTableEntry(
+                                resource_entry_map(iResource), EndUseCategory(jEndUse).DisplayName + " -- Other", endUseSubOther(iResource, jEndUse));
                             ++i;
                         }
                     } else {
-                        PreDefTableEntry(resource_entry_map(iResource), EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
+                        PreDefTableEntry(resource_entry_map(iResource),
+                                         EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
                                          collapsedIndEndUse(iResource, jEndUse));
                         ++i;
                     }
@@ -9705,8 +9792,8 @@ namespace OutputReportTabular {
         WriteSubtitle("Construction Cost Estimate Summary");
         WriteTable(tableBody, rowHead, columnHead, columnWidth);
         if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility",
-                                                   "Construction Cost Estimate Summary");
+            sqlite->createSQLiteTabularDataRecords(
+                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
         }
         if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
             ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -9762,8 +9849,8 @@ namespace OutputReportTabular {
         WriteSubtitle("Cost Line Item Details"); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
         WriteTable(tableBody, rowHead, columnHead, columnWidth);
         if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility",
-                                                   "Cost Line Item Details");
+            sqlite->createSQLiteTabularDataRecords(
+                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
         }
         if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
             ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -10039,8 +10126,8 @@ namespace OutputReportTabular {
             WriteSubtitle("General");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility",
-                                                       "General");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -10267,8 +10354,8 @@ namespace OutputReportTabular {
             WriteSubtitle("Window-Wall Ratio");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility",
-                                                       "Window-Wall Ratio");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -10335,8 +10422,8 @@ namespace OutputReportTabular {
             WriteSubtitle("Conditioned Window-Wall Ratio");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility",
-                                                       "Conditioned Window-Wall Ratio");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -10369,8 +10456,8 @@ namespace OutputReportTabular {
             WriteSubtitle("Skylight-Roof Ratio");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility",
-                                                       "Skylight-Roof Ratio");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -10405,7 +10492,11 @@ namespace OutputReportTabular {
                 WriteSubtitle("Hybrid Model: Internal Thermal Mass");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility",
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "InputVerificationandResultsSummary",
+                                                           "Entire Facility",
                                                            "Hybrid Model: Internal Thermal Mass");
                 }
             }
@@ -10620,8 +10711,8 @@ namespace OutputReportTabular {
             WriteSubtitle("Zone Summary");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility",
-                                                       "Zone Summary");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -10933,8 +11024,8 @@ namespace OutputReportTabular {
                         WriteSubtitle(subTable(jSubTable).name);
                         WriteTable(tableBody, rowHead, columnHead, columnWidth, false, subTable(jSubTable).footnote);
                         if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility",
-                                                                   subTable(jSubTable).name);
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
                         }
                         if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                             ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -11140,16 +11231,24 @@ namespace OutputReportTabular {
                 WriteSubtitle(CompSizeTableEntry(foundEntry).typeField);
                 if (CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
                     CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
-                    WriteTable(tableBody, rowHead, columnHead, columnWidth, false,
+                    WriteTable(tableBody,
+                               rowHead,
+                               columnHead,
+                               columnWidth,
+                               false,
                                "User-Specified values were used. Design Size values were used if no User-Specified values were provided. Design Size "
                                "values may be derived from alternate User-Specified values.");
                 } else {
-                    WriteTable(tableBody, rowHead, columnHead, columnWidth, false,
+                    WriteTable(tableBody,
+                               rowHead,
+                               columnHead,
+                               columnWidth,
+                               false,
                                "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
                 }
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility",
-                                                           CompSizeTableEntry(foundEntry).typeField);
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry(foundEntry).typeField);
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
@@ -11286,7 +11385,11 @@ namespace OutputReportTabular {
                 if (iKindRec == recKindSurface) {
                     WriteSubtitle("Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
                     if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility",
+                        sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                               rowHead,
+                                                               columnHead,
+                                                               "SurfaceShadowingSummary",
+                                                               "Entire Facility",
                                                                "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
                     }
                     if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
@@ -11297,7 +11400,11 @@ namespace OutputReportTabular {
                 } else if (iKindRec == recKindSubsurface) {
                     WriteSubtitle("Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                     if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility",
+                        sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                               rowHead,
+                                                               columnHead,
+                                                               "SurfaceShadowingSummary",
+                                                               "Entire Facility",
                                                                "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                     }
                     if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
@@ -11418,8 +11525,8 @@ namespace OutputReportTabular {
                     WriteSubtitle(tableName);
                     WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
                     if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility",
-                                                               tableName);
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
                     }
                 }
             }
@@ -11873,8 +11980,8 @@ namespace OutputReportTabular {
         // na
         // Using/Aliasing
         using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::isPulseZoneSizing;
+        using DataGlobals::NumOfTimeStepInHour;
         using DataSizing::CurOverallSimDay;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
@@ -11952,10 +12059,10 @@ namespace OutputReportTabular {
         using DataAirflowNetwork::AirflowNetworkReportData;
         using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::isPulseZoneSizing;
-        using DataHVACGlobals::TimeStepSys;
+        using DataGlobals::NumOfTimeStepInHour;
         using DataHeatBalance::ZnAirRpt;
+        using DataHVACGlobals::TimeStepSys;
         using DataSizing::CurOverallSimDay;
 
         // Locals
@@ -12245,11 +12352,29 @@ namespace OutputReportTabular {
                     timeCoolMax = CalcFinalZoneSizing(iZone).TimeStepNumAtCoolMax;
                     ZoneCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
 
-                    GetDelaySequences(coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool,
-                                      lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool);
-                    ComputeTableBodyUsingMovingAvg(ZoneCoolCompLoadTables(iZone).cells, ZoneCoolCompLoadTables(iZone).cellUsed, coolDesSelected,
-                                                   timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool,
-                                                   powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq,
+                    GetDelaySequences(coolDesSelected,
+                                      true,
+                                      iZone,
+                                      peopleDelaySeqCool,
+                                      equipDelaySeqCool,
+                                      hvacLossDelaySeqCool,
+                                      powerGenDelaySeqCool,
+                                      lightDelaySeqCool,
+                                      feneSolarDelaySeqCool,
+                                      feneCondInstantSeq,
+                                      surfDelaySeqCool);
+                    ComputeTableBodyUsingMovingAvg(ZoneCoolCompLoadTables(iZone).cells,
+                                                   ZoneCoolCompLoadTables(iZone).cellUsed,
+                                                   coolDesSelected,
+                                                   timeCoolMax,
+                                                   iZone,
+                                                   peopleDelaySeqCool,
+                                                   equipDelaySeqCool,
+                                                   hvacLossDelaySeqCool,
+                                                   powerGenDelaySeqCool,
+                                                   lightDelaySeqCool,
+                                                   feneSolarDelaySeqCool,
+                                                   feneCondInstantSeq,
                                                    surfDelaySeqCool);
                     CollectPeakZoneConditions(ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     // send latent load info to coil summary report
@@ -12260,11 +12385,29 @@ namespace OutputReportTabular {
                     timeHeatMax = CalcFinalZoneSizing(iZone).TimeStepNumAtHeatMax;
                     ZoneHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
 
-                    GetDelaySequences(heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat,
-                                      powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat);
-                    ComputeTableBodyUsingMovingAvg(ZoneHeatCompLoadTables(iZone).cells, ZoneHeatCompLoadTables(iZone).cellUsed, heatDesSelected,
-                                                   timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat,
-                                                   powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq,
+                    GetDelaySequences(heatDesSelected,
+                                      false,
+                                      iZone,
+                                      peopleDelaySeqHeat,
+                                      equipDelaySeqHeat,
+                                      hvacLossDelaySeqHeat,
+                                      powerGenDelaySeqHeat,
+                                      lightDelaySeqHeat,
+                                      feneSolarDelaySeqHeat,
+                                      feneCondInstantSeq,
+                                      surfDelaySeqHeat);
+                    ComputeTableBodyUsingMovingAvg(ZoneHeatCompLoadTables(iZone).cells,
+                                                   ZoneHeatCompLoadTables(iZone).cellUsed,
+                                                   heatDesSelected,
+                                                   timeHeatMax,
+                                                   iZone,
+                                                   peopleDelaySeqHeat,
+                                                   equipDelaySeqHeat,
+                                                   hvacLossDelaySeqHeat,
+                                                   powerGenDelaySeqHeat,
+                                                   lightDelaySeqHeat,
+                                                   feneSolarDelaySeqHeat,
+                                                   feneCondInstantSeq,
                                                    surfDelaySeqHeat);
                     CollectPeakZoneConditions(ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
 
@@ -12361,12 +12504,30 @@ namespace OutputReportTabular {
                         coolDesSelected = AirLoopZonesCoolCompLoadTables(iZone).desDayNum;
                         timeCoolMax = AirLoopZonesCoolCompLoadTables(iZone).timeStepMax;
 
-                        GetDelaySequences(coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool,
-                                          powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool);
-                        ComputeTableBodyUsingMovingAvg(AirLoopZonesCoolCompLoadTables(iZone).cells, AirLoopZonesCoolCompLoadTables(iZone).cellUsed,
-                                                       coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool,
-                                                       hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool,
-                                                       feneCondInstantSeq, surfDelaySeqCool);
+                        GetDelaySequences(coolDesSelected,
+                                          true,
+                                          iZone,
+                                          peopleDelaySeqCool,
+                                          equipDelaySeqCool,
+                                          hvacLossDelaySeqCool,
+                                          powerGenDelaySeqCool,
+                                          lightDelaySeqCool,
+                                          feneSolarDelaySeqCool,
+                                          feneCondInstantSeq,
+                                          surfDelaySeqCool);
+                        ComputeTableBodyUsingMovingAvg(AirLoopZonesCoolCompLoadTables(iZone).cells,
+                                                       AirLoopZonesCoolCompLoadTables(iZone).cellUsed,
+                                                       coolDesSelected,
+                                                       timeCoolMax,
+                                                       iZone,
+                                                       peopleDelaySeqCool,
+                                                       equipDelaySeqCool,
+                                                       hvacLossDelaySeqCool,
+                                                       powerGenDelaySeqCool,
+                                                       lightDelaySeqCool,
+                                                       feneSolarDelaySeqCool,
+                                                       feneCondInstantSeq,
+                                                       surfDelaySeqCool);
                         CollectPeakZoneConditions(AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
                     }
@@ -12378,12 +12539,30 @@ namespace OutputReportTabular {
                         heatDesSelected = AirLoopZonesHeatCompLoadTables(iZone).desDayNum;
                         timeHeatMax = AirLoopZonesHeatCompLoadTables(iZone).timeStepMax;
 
-                        GetDelaySequences(heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat,
-                                          powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat);
-                        ComputeTableBodyUsingMovingAvg(AirLoopZonesHeatCompLoadTables(iZone).cells, AirLoopZonesHeatCompLoadTables(iZone).cellUsed,
-                                                       heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat,
-                                                       hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat,
-                                                       feneCondInstantSeq, surfDelaySeqHeat);
+                        GetDelaySequences(heatDesSelected,
+                                          false,
+                                          iZone,
+                                          peopleDelaySeqHeat,
+                                          equipDelaySeqHeat,
+                                          hvacLossDelaySeqHeat,
+                                          powerGenDelaySeqHeat,
+                                          lightDelaySeqHeat,
+                                          feneSolarDelaySeqHeat,
+                                          feneCondInstantSeq,
+                                          surfDelaySeqHeat);
+                        ComputeTableBodyUsingMovingAvg(AirLoopZonesHeatCompLoadTables(iZone).cells,
+                                                       AirLoopZonesHeatCompLoadTables(iZone).cellUsed,
+                                                       heatDesSelected,
+                                                       timeHeatMax,
+                                                       iZone,
+                                                       peopleDelaySeqHeat,
+                                                       equipDelaySeqHeat,
+                                                       hvacLossDelaySeqHeat,
+                                                       powerGenDelaySeqHeat,
+                                                       lightDelaySeqHeat,
+                                                       feneSolarDelaySeqHeat,
+                                                       feneCondInstantSeq,
+                                                       surfDelaySeqHeat);
                         CollectPeakZoneConditions(AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables(iZone));
                     }
@@ -12439,11 +12618,29 @@ namespace OutputReportTabular {
                     (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
                     FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
                 } else {
-                    GetDelaySequences(coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool,
-                                      lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool);
-                    ComputeTableBodyUsingMovingAvg(FacilityZonesCoolCompLoadTables(iZone).cells, FacilityZonesCoolCompLoadTables(iZone).cellUsed,
-                                                   coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool,
-                                                   powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq,
+                    GetDelaySequences(coolDesSelected,
+                                      true,
+                                      iZone,
+                                      peopleDelaySeqCool,
+                                      equipDelaySeqCool,
+                                      hvacLossDelaySeqCool,
+                                      powerGenDelaySeqCool,
+                                      lightDelaySeqCool,
+                                      feneSolarDelaySeqCool,
+                                      feneCondInstantSeq,
+                                      surfDelaySeqCool);
+                    ComputeTableBodyUsingMovingAvg(FacilityZonesCoolCompLoadTables(iZone).cells,
+                                                   FacilityZonesCoolCompLoadTables(iZone).cellUsed,
+                                                   coolDesSelected,
+                                                   timeCoolMax,
+                                                   iZone,
+                                                   peopleDelaySeqCool,
+                                                   equipDelaySeqCool,
+                                                   hvacLossDelaySeqCool,
+                                                   powerGenDelaySeqCool,
+                                                   lightDelaySeqCool,
+                                                   feneSolarDelaySeqCool,
+                                                   feneCondInstantSeq,
                                                    surfDelaySeqCool);
                     CollectPeakZoneConditions(FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables(iZone));
@@ -12456,11 +12653,29 @@ namespace OutputReportTabular {
                     (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
                     FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
                 } else {
-                    GetDelaySequences(heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat,
-                                      powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat);
-                    ComputeTableBodyUsingMovingAvg(FacilityZonesHeatCompLoadTables(iZone).cells, FacilityZonesHeatCompLoadTables(iZone).cellUsed,
-                                                   heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat,
-                                                   powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq,
+                    GetDelaySequences(heatDesSelected,
+                                      false,
+                                      iZone,
+                                      peopleDelaySeqHeat,
+                                      equipDelaySeqHeat,
+                                      hvacLossDelaySeqHeat,
+                                      powerGenDelaySeqHeat,
+                                      lightDelaySeqHeat,
+                                      feneSolarDelaySeqHeat,
+                                      feneCondInstantSeq,
+                                      surfDelaySeqHeat);
+                    ComputeTableBodyUsingMovingAvg(FacilityZonesHeatCompLoadTables(iZone).cells,
+                                                   FacilityZonesHeatCompLoadTables(iZone).cellUsed,
+                                                   heatDesSelected,
+                                                   timeHeatMax,
+                                                   iZone,
+                                                   peopleDelaySeqHeat,
+                                                   equipDelaySeqHeat,
+                                                   hvacLossDelaySeqHeat,
+                                                   powerGenDelaySeqHeat,
+                                                   lightDelaySeqHeat,
+                                                   feneSolarDelaySeqHeat,
+                                                   feneCondInstantSeq,
                                                    surfDelaySeqHeat);
                     CollectPeakZoneConditions(FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables(iZone));
@@ -12904,7 +13119,8 @@ namespace OutputReportTabular {
                 if (CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) > 0.0) {
                     compLoad.outsideWebBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax),
-                                                             CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax), 101325.0);
+                                                             CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax),
+                                                             101325.0);
                 }
 
                 // Outside Humidity Ratio at Peak
@@ -12915,8 +13131,8 @@ namespace OutputReportTabular {
 
                 // Zone Relative Humdity
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
-                compLoad.zoneRelHum = PsyRhFnTdbWPb(CalcFinalZoneSizing(zoneIndex).CoolZoneTempSeq(timeOfMax),
-                                                    CalcFinalZoneSizing(zoneIndex).CoolZoneHumRatSeq(timeOfMax), 101325.0);
+                compLoad.zoneRelHum = PsyRhFnTdbWPb(
+                    CalcFinalZoneSizing(zoneIndex).CoolZoneTempSeq(timeOfMax), CalcFinalZoneSizing(zoneIndex).CoolZoneHumRatSeq(timeOfMax), 101325.0);
 
                 // Zone Humidity Ratio at Peak
                 compLoad.zoneHumRatio = CalcFinalZoneSizing(zoneIndex).CoolZoneHumRatSeq(timeOfMax);
@@ -12952,7 +13168,8 @@ namespace OutputReportTabular {
                 if (CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) > 0.0) {
                     compLoad.outsideWebBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax),
-                                                             CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax), 101325.0);
+                                                             CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax),
+                                                             101325.0);
                 }
 
                 // Outside Humidity Ratio at Peak
@@ -12963,8 +13180,8 @@ namespace OutputReportTabular {
 
                 // Zone Relative Humdity
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
-                compLoad.zoneRelHum = PsyRhFnTdbWPb(CalcFinalZoneSizing(zoneIndex).HeatZoneTempSeq(timeOfMax),
-                                                    CalcFinalZoneSizing(zoneIndex).HeatZoneHumRatSeq(timeOfMax), 101325.0);
+                compLoad.zoneRelHum = PsyRhFnTdbWPb(
+                    CalcFinalZoneSizing(zoneIndex).HeatZoneTempSeq(timeOfMax), CalcFinalZoneSizing(zoneIndex).HeatZoneHumRatSeq(timeOfMax), 101325.0);
 
                 // Zone Humidity Ratio at Peak
                 compLoad.zoneHumRatio = CalcFinalZoneSizing(zoneIndex).HeatZoneHumRatSeq(timeOfMax);
@@ -13607,8 +13824,8 @@ namespace OutputReportTabular {
                     WriteSubtitle(zonesIncludedName);
                     WriteTable(tableBody, rowHead, columnHead, columnWidth);
                     if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName,
-                                                               zonesIncludedName);
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                     }
                     if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName,
@@ -14994,14 +15211,32 @@ namespace OutputReportTabular {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Array1D<gio::Fmt> formDigits({0, 9}, {"(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)",
-                                                     "(F12.8)", "(F12.9)"}); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) |
-                                                                             // formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) |
-                                                                             // formDigits(8) | formDigits(9)
-        static Array1D<Real64> const maxvalDigits({0, 9}, {9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0,
-                                                           9.0}); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) |
-                                                                  // maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) |
-                                                                  // maxvalDigits(8) | maxvalDigits(9)
+        static Array1D<gio::Fmt> formDigits({0, 9},
+                                            {"(F12.0)",
+                                             "(F12.1)",
+                                             "(F12.2)",
+                                             "(F12.3)",
+                                             "(F12.4)",
+                                             "(F12.5)",
+                                             "(F12.6)",
+                                             "(F12.7)",
+                                             "(F12.8)",
+                                             "(F12.9)"}); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) |
+                                                          // formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) |
+                                                          // formDigits(8) | formDigits(9)
+        static Array1D<Real64> const maxvalDigits({0, 9},
+                                                  {9999999999.0,
+                                                   999999999.0,
+                                                   99999999.0,
+                                                   9999999.0,
+                                                   999999.0,
+                                                   99999.0,
+                                                   9999.0,
+                                                   999.0,
+                                                   99.0,
+                                                   9.0}); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) |
+                                                          // maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) |
+                                                          // maxvalDigits(8) | maxvalDigits(9)
         static gio::Fmt fmtd("(E12.6)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -15905,7 +16140,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
-        if (unitConvIndex == 0) {
+        if (unitConvIndex == 0 || SIvalue == -999.0 || SIvalue == -99999.0) { // don't convert unknown data to IP
             ConvertIP = SIvalue;
         } else if ((unitConvIndex > 0) && (unitConvIndex <= UnitConvSize)) {
             ConvertIP = (SIvalue * UnitConv(unitConvIndex).mult) + UnitConv(unitConvIndex).offset;

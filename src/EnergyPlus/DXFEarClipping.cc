@@ -213,10 +213,10 @@ namespace DXFEarClipping {
         // Use statements:
         // Using/Aliasing
         using DataGlobals::DisplayExtraWarnings;
+        using DataSurfaces::cSurfaceClass;
         using DataSurfaces::SurfaceClass_Floor;
         using DataSurfaces::SurfaceClass_Overhang;
         using DataSurfaces::SurfaceClass_Roof;
-        using DataSurfaces::cSurfaceClass;
         using General::RoundSigDigits;
 
         // Return value

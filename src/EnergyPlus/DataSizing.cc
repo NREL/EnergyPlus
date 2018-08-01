@@ -92,8 +92,14 @@ namespace DataSizing {
     int const OAFlowMax(6);
 
     Array1D_string const cOAFlowMethodTypes(NumOAFlowMethods,
-                                            {"Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum",
-                                             "IndoorAirQualityProcedure", "ProportionalControlBasedonOccupancySchedule",
+                                            {"Flow/Person",
+                                             "Flow/Zone",
+                                             "Flow/Area",
+                                             "AirChanges/Hour",
+                                             "Sum",
+                                             "Maximum",
+                                             "IndoorAirQualityProcedure",
+                                             "ProportionalControlBasedonOccupancySchedule",
                                              "ProportionalControlBasedOnDesignOccupancy"});
 
     // parameters for outside air
@@ -245,6 +251,7 @@ namespace DataSizing {
     bool TermUnitPIU(false);                        // TRUE if a powered induction terminal unit
     bool TermUnitIU(false);                         // TRUE if an unpowered induction terminal unit
     bool ZoneEqFanCoil(false);                      // TRUE if a 4 pipe fan coil unit is being simulated
+    bool ZoneEqOutdoorAirUnit(false);               // TRUE if an OutdoorAirUnit is being simulated
     bool ZoneEqUnitHeater(false);                   // TRUE if a unit heater is being simulated
     bool ZoneEqUnitVent(false);                     // TRUE if a unit ventilator unit is being simulated
     bool ZoneEqVentedSlab(false);                   // TRUE if a ventilated slab is being simulated
@@ -410,6 +417,7 @@ namespace DataSizing {
         TermUnitPIU = false;
         TermUnitIU = false;
         ZoneEqFanCoil = false;
+        ZoneEqOutdoorAirUnit = false;
         ZoneEqUnitHeater = false;
         ZoneEqUnitVent = false;
         ZoneEqVentedSlab = false;
