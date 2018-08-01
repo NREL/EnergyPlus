@@ -73,7 +73,7 @@
 #include <HeatBalanceKivaManager.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
-#include <ThermalComfort.cc>  // MRT Weighting
+#include <ThermalComfort.hh>  // MRT Weighting
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
