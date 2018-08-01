@@ -105,6 +105,7 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -1213,6 +1214,8 @@ namespace HeatBalanceManager {
             AlphaName(1) = "NO";
             AlphaName(3) = "NO";
         }
+
+        WindowManager::initWindowModel();
 
         gio::write(OutputFileInits, Format_728);
         if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
@@ -4508,7 +4511,7 @@ namespace HeatBalanceManager {
 
         CurrentModuleObject = "Construction:WindowDataFile";
         for (Loop = 1; Loop <= TotWindow5Constructs; ++Loop) { // Loop through all Window5 constructions. These constructions come
-            // from the Window5 data file and can be referenced only by windows
+                                                               // from the Window5 data file and can be referenced only by windows
 
             // Get the object names for each construction from the input processor
             inputProcessor->getObjectItem(CurrentModuleObject,
@@ -5210,8 +5213,9 @@ namespace HeatBalanceManager {
 
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
-            InitGlassOpticalCalculations();          // Initialize the window optical properties
-            InitDaylightingDevices();                // Initialize any daylighting devices
+            // InitGlassOpticalCalculations(); // Initialize the window optical properties
+            InitWindowOpticalCalculations();
+            InitDaylightingDevices(); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
         }
