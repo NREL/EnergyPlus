@@ -2335,15 +2335,11 @@ namespace WeatherManager {
 
         if (WaterMainsParameterReport) {
             // this is done only once
-            // if (DoWeathSim || DoDesDaySim) {
-            // if (WaterMainsTempsMethod != 0) {
             if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod) {
                 if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                     OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp();
                 }
             }
-            //}
-            //}
             // reports to eio file
             ReportWaterMainsTempParameters();
             WaterMainsParameterReport = false;
@@ -8353,7 +8349,7 @@ namespace WeatherManager {
                 }
             } else {
                 if (ReportWarningFlag) {
-                    ShowWarningError("CalcWaterMainsTemp: Site:WaterMainsTemperature object does not exit.");
+                    ShowWarningError("CalcWaterMainsTemp: Site:WaterMainsTemperature object does not exist.");
                     ShowContinueError("Water Mains Monthly Temperature cannot be calculated.");
                     ShowContinueError("Instead a fixed default value of 10.0 C will be used.");
                     ReportWarningFlag = false;
@@ -10408,7 +10404,7 @@ namespace WeatherManager {
                 if (readStat != 0) {
                     ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + DataStringGlobals::inStatFileName +
                                     " for input (read).");
-                    ShowContinueError("Water Mains Temperature will be set to a fixed deafult value of 10 C.");
+                    ShowContinueError("Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
                     return;
                 }
                 while (readStat == 0) {
@@ -10457,7 +10453,7 @@ namespace WeatherManager {
                 if (readStat != 0) {
                     ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + DataStringGlobals::inputWeatherFileName +
                                     " for input (read).");
-                    ShowContinueError("Water Mains Temperature will be set to a fixed deafult value of 10 C.");
+                    ShowContinueError("Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
                     return;
                 }
                 for (i = 1; i <= 8; ++i) { // Headers
@@ -10520,7 +10516,7 @@ namespace WeatherManager {
                 OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
                 OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
             } else {
-                ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exit.");
+                ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exist.");
                 ShowContinueError("Weather file: " + DataStringGlobals::inputWeatherFileName + ".");
                 ShowContinueError("Stat file: " + DataStringGlobals::inStatFileName + ".");
                 ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
