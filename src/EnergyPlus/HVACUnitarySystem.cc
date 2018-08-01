@@ -8702,7 +8702,7 @@ namespace HVACUnitarySystem {
                                                                ZoneLoad);
                             }
                         } else if (SolFlag == -2) {
-                            if (UnitarySystem(UnitarySysNum).RegulaFalsIFailedIndex == 0) {
+                            if (UnitarySystem(UnitarySysNum).RegulaFalsiFailedIndex == 0) {
                                 ShowWarningMessage("Coil control failed for " + UnitarySystem(UnitarySysNum).UnitType + ':' +
                                                    UnitarySystem(UnitarySysNum).Name);
                                 ShowContinueError("  sensible part-load ratio determined to be outside the range of 0-1.");
@@ -8712,12 +8712,12 @@ namespace HVACUnitarySystem {
                             ShowRecurringWarningErrorAtEnd(
                                 UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
                                     "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
-                                UnitarySystem(UnitarySysNum).RegulaFalsIFailedIndex,
+                                UnitarySystem(UnitarySysNum).RegulaFalsiFailedIndex,
                                 ZoneLoad,
                                 ZoneLoad);
                         }
                     } else if (SolFlag == -2) {
-                        if (UnitarySystem(UnitarySysNum).RegulaFalsIFailedIndex == 0) {
+                        if (UnitarySystem(UnitarySysNum).RegulaFalsiFailedIndex == 0) {
                             ShowWarningMessage("Coil control failed for " + UnitarySystem(UnitarySysNum).UnitType + ':' +
                                                UnitarySystem(UnitarySysNum).Name);
                             ShowContinueError("  sensible part-load ratio determined to be outside the range of 0-1.");
@@ -8726,7 +8726,7 @@ namespace HVACUnitarySystem {
                         }
                         ShowRecurringWarningErrorAtEnd(UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
                                                            "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
-                                                       UnitarySystem(UnitarySysNum).RegulaFalsIFailedIndex,
+                                                       UnitarySystem(UnitarySysNum).RegulaFalsiFailedIndex,
                                                        ZoneLoad,
                                                        ZoneLoad);
                     }    // IF (SolFlag == -1) THEN
@@ -9027,7 +9027,7 @@ namespace HVACUnitarySystem {
                         MoistureLoad);
                 }
             } else if (SolFlagLat == -2) {
-                if (UnitarySystem(UnitarySysNum).LatRegulaFalsIFailedIndex == 0) {
+                if (UnitarySystem(UnitarySysNum).LatRegulaFalsiFailedIndex == 0) {
                     ShowWarningMessage("Coil control failed for " + UnitarySystem(UnitarySysNum).UnitType + ':' + UnitarySystem(UnitarySysNum).Name);
                     ShowContinueError("  Latent part-load ratio determined to be outside the range of 0-1.");
                     ShowContinueErrorTimeStamp("Latent load to be met = " + TrimSigDigits(MoistureLoad, 2) +
@@ -9035,19 +9035,19 @@ namespace HVACUnitarySystem {
                 }
                 ShowRecurringWarningErrorAtEnd(UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
                                                    "\" - Latent part-load ratio out of range error continues. Latent load statistics:",
-                                               UnitarySystem(UnitarySysNum).LatRegulaFalsIFailedIndex,
+                                               UnitarySystem(UnitarySysNum).LatRegulaFalsiFailedIndex,
                                                MoistureLoad,
                                                MoistureLoad);
             }
         } else if (SolFlagLat == -2) {
-            if (UnitarySystem(UnitarySysNum).LatRegulaFalsIFailedIndex == 0) {
+            if (UnitarySystem(UnitarySysNum).LatRegulaFalsiFailedIndex == 0) {
                 ShowWarningMessage("Coil control failed for " + UnitarySystem(UnitarySysNum).UnitType + ':' + UnitarySystem(UnitarySysNum).Name);
                 ShowContinueError("  Latent part-load ratio determined to be outside the range of 0-1.");
                 ShowContinueErrorTimeStamp("Latent load to be met = " + TrimSigDigits(MoistureLoad, 2) + " (watts), and the simulation continues.");
             }
             ShowRecurringWarningErrorAtEnd(UnitarySystem(UnitarySysNum).UnitType + " \"" + UnitarySystem(UnitarySysNum).Name +
                                                "\" - Latent part-load ratio out of range error continues. Latent load statistics:",
-                                           UnitarySystem(UnitarySysNum).LatRegulaFalsIFailedIndex,
+                                           UnitarySystem(UnitarySysNum).LatRegulaFalsiFailedIndex,
                                            MoistureLoad,
                                            MoistureLoad);
         }
