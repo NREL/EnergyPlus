@@ -566,7 +566,7 @@ namespace HeatBalanceIntRadExchange {
                 if (Surface(SurfNum).HeatTransSurf) ++NumOfZoneSurfaces;
             }
 
-            ZoneViewFactorInformation zoneViewFactorInformation(NumOfZoneSurfaces);
+            ZoneViewFactorInformation zoneViewFactorInformation;
 
             zoneViewFactorInformation.Name = Zone(ZoneNum).Name;
 
@@ -581,7 +581,8 @@ namespace HeatBalanceIntRadExchange {
             zoneViewFactorInformation.Azimuth.dimension(NumOfZoneSurfaces, 0.0);
             zoneViewFactorInformation.Tilt.dimension(NumOfZoneSurfaces, 0.0);
             zoneViewFactorInformation.SurfacePtr.dimension(NumOfZoneSurfaces, 0);
-            zoneViewFactorInformation.surfaceTemp.dimension(NumOfZoneSurfaces, 0);
+
+            zoneViewFactorInformation.NumOfSurfaces = NumOfZoneSurfaces;
 
             // Initialize the surface pointer array
             ZoneSurfNum = 0;
