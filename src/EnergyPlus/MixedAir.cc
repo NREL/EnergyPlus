@@ -4652,7 +4652,9 @@ namespace MixedAir {
                     AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass = true;
                     this->HeatRecoveryBypassStatus = 1;
                 } else if (this->HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum) {
-                    if (OASignal > OutAirMinFrac) {
+                    Real64 OAMassFlowMin = OutAirMinFrac * AirLoopFlow(AirLoopNum).DesSupply;
+                    Real64 OAMassFlowAct = OASignal * this->MixMassFlow;
+                    if (OAMassFlowAct > OAMassFlowMin) {
                         AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass = true;
                         this->HeatRecoveryBypassStatus = 1;
                     }
