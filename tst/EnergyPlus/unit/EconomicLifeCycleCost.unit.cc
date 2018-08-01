@@ -285,3 +285,134 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
     EXPECT_EQ("NOELECTRICUSEADJUSTMENT", UseAdjustment(1).name);
     EXPECT_EQ(1.0, UseAdjustment(1).Adjustment(1));
 }
+
+TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
+{
+
+    std::string const idf_objects = delimited_string({
+        "  LifeCycleCost:Parameters,                                           ",
+        "    TypicalLCC,              !- Name                                  ",
+        "    EndOfYear,               !- Discounting Convention                ",
+        "    ConstantDollar,          !- Inflation Approach                    ",
+        "    0.03,                    !- Real Discount Rate                    ",
+        "    ,                        !- Nominal Discount Rate                 ",
+        "    ,                        !- Inflation                             ",
+        "    January,                 !- Base Date Month                       ",
+        "    2012,                    !- Base Date Year                        ",
+        "    January,                 !- Service Date Month                    ",
+        "    2014,                    !- Service Date Year                     ",
+        "    100,                     !- Length of Study Period in Years       ",
+        "    0,                       !- Tax rate                              ",
+        "    ;                        !- Depreciation Method                   ",
+        "                                                                      ",
+        "  LifeCycleCost:NonrecurringCost,                                     ",
+        "    FanReplacement,          !- Name                                  ",
+        "    OtherCapital,            !- Category                              ",
+        "    12000,                   !- Cost                                  ",
+        "    BasePeriod,              !- Start of Costs                        ",
+        "    13,                      !- Years from Start                      ",
+        "    0;                       !- Months from Start                     ",
+        "                                                                      ",
+        "  LifeCycleCost:RecurringCosts,                                       ",
+        "    AnnualMaint,             !- Name                                  ",
+        "    Maintenance,             !- Category                              ",
+        "    7000,                    !- Cost                                  ",
+        "    ServicePeriod,           !- Start of Costs                        ",
+        "    0,                       !- Years from Start                      ",
+        "    0,                       !- Months from Start                     ",
+        "    1,                       !- Repeat Period Years                   ",
+        "    0,                       !- Repeat Period Months                  ",
+        "    0;                       !- Annual escalation rate                ",
+        "                                                                      ",
+        "  LifeCycleCost:UsePriceEscalation,                                   ",
+        "    MidWest  Commercial-Electricity,  !- Name                         ",
+        "    ElectricityPurchased,    !- Resource                              ",
+        "    2012,                    !- Escalation Start Year                 ",
+        "    January,                 !- Escalation Start Month                ",
+        "    1.007, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 1-10 Escalation ",
+        "    1.008, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 11-20 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 21-30 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 31-40 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 41-50 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 51-60 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 61-70 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 71-80 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 81-90 Escalation ",
+        "    1.007, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.099, 1.100; !- Year 91-100 Escalation ",
+        "                                                                      ",
+        "  LifeCycleCost:UsePriceEscalation,                                   ",
+        "    MidWest  Commercial-Electricity,  !- Name                         ",
+        "    ElectricitySurplusSold,  !- Resource                              ",
+        "    2012,                    !- Escalation Start Year                 ",
+        "    January,                 !- Escalation Start Month                ",
+        "    1.007, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 1-10 Escalation ",
+        "    1.008, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 11-20 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 21-30 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 31-40 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 41-50 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 51-60 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 61-70 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 71-80 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 81-90 Escalation ",
+        "    1.007, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.099, 1.100; !- Year 91-100 Escalation ",
+        "                                                                      ",
+        "  LifeCycleCost:UsePriceEscalation,                                   ",
+        "    MidWest  Commercial-Natural gas,  !- Name                         ",
+        "    NaturalGas,              !- Resource                              ",
+        "    2012,                    !- Escalation Start Year                 ",
+        "    January,                 !- Escalation Start Month                ",
+        "    1.007, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 1-10 Escalation ",
+        "    1.008, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 11-20 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 21-30 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 31-40 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 41-50 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 51-60 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 61-70 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 71-80 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 81-90 Escalation ",
+        "    1.007, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.099, 1.100; !- Year 91-100 Escalation ",
+        "                                                                      ",
+        "  LifeCycleCost:UseAdjustment,                                        ",
+        "    NoElectricUseAdjustment, !- Name                                  ",
+        "    ElectricityPurchased,    !- Resource                              ",
+        "    1.007, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 1-10 Escalation ",
+        "    1.008, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 11-20 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 21-30 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 31-40 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 41-50 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 51-60 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 61-70 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 71-80 Escalation ",
+        "    1.009, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.040, 1.044, !- Year 81-90 Escalation ",
+        "    1.007, 1.014, 1.031, 1.049, 1.050, 1.045, 1.042, 1.041, 1.099, 1.100; !- Year 91-100 Escalation ",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetInputForLifeCycleCost();
+
+    EXPECT_EQ(disConvEndOfYear, discountConvension);
+    EXPECT_EQ(inflAppConstantDollar, inflationApproach);
+    EXPECT_EQ(0.03, realDiscountRate);
+    EXPECT_EQ(1, baseDateMonth);
+    EXPECT_EQ(2012, baseDateYear);
+    EXPECT_EQ(100 * 12, lengthStudyTotalMonths);
+
+    EXPECT_EQ(3, numUsePriceEscalation);
+    EXPECT_EQ("MIDWEST  COMMERCIAL-NATURAL GAS", UsePriceEscalation(3).name);
+    EXPECT_EQ(2012, UsePriceEscalation(3).escalationStartYear);
+    EXPECT_EQ(1.007, UsePriceEscalation(3).Escalation(1));
+    EXPECT_EQ(1.008, UsePriceEscalation(3).Escalation(11));
+    EXPECT_EQ(1.009, UsePriceEscalation(3).Escalation(21));
+    EXPECT_EQ(1.099, UsePriceEscalation(3).Escalation(99));
+    EXPECT_EQ(1.100, UsePriceEscalation(3).Escalation(100));
+
+    EXPECT_EQ(1, numUseAdjustment);
+    EXPECT_EQ("NOELECTRICUSEADJUSTMENT", UseAdjustment(1).name);
+    EXPECT_EQ(1.007, UseAdjustment(1).Adjustment(1));
+    EXPECT_EQ(1.008, UseAdjustment(1).Adjustment(11));
+    EXPECT_EQ(1.009, UseAdjustment(1).Adjustment(21));
+    EXPECT_EQ(1.099, UseAdjustment(1).Adjustment(99));
+    EXPECT_EQ(1.100, UseAdjustment(1).Adjustment(100));
+}
