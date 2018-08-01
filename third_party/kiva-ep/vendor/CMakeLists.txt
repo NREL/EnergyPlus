@@ -1,4 +1,4 @@
-if ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) )
+if ( MSVC AND NOT ( CMAKE_CXX_COMPILER_ID STREQUAL "Intel" ) )
   set(gtest_force_shared_crt ON)
 endif()
 
