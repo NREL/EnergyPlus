@@ -389,12 +389,8 @@ namespace HeatBalanceKivaManager {
     {
     }
 
-    KivaManager::KivaManager() : defaultSet(false), defaultIndex(0)
+    KivaManager::KivaManager() : timestep(3600), defaultSet(false), defaultIndex(0)
     {
-
-        // default
-        defaultSet = false;
-        defaultIndex = 0.0;
     }
 
     KivaManager::~KivaManager()
