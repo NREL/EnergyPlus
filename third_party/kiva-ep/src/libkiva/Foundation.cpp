@@ -1,118 +1,96 @@
-/* Copyright (c) 2012-2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+/* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
+ * See the LICENSE file for additional terms and conditions. */
 
 #include "Foundation.hpp"
 #include "Errors.hpp"
 
 namespace Kiva {
 
-static const double PI = 4.0*atan(1.0);
+static const double PI = 4.0 * atan(1.0);
 
 Material::Material() {}
 
-Material::Material(double k, double rho, double cp) :
-  conductivity(k),
-  density(rho),
-  specificHeat(cp)
-{}
+Material::Material(double k, double rho, double cp)
+    : conductivity(k), density(rho), specificHeat(cp) {}
 
-InputBlock::InputBlock() :
-  x(0.0),
-  z(0.0),
-  width(0.0),
-  depth(0.0)
-{}
+InputBlock::InputBlock() : x(0.0), z(0.0), width(0.0), depth(0.0) {}
 
-double Wall::totalWidth()
-{
+double Wall::totalWidth() {
   double width = 0.0;
 
-  for (size_t n = 0; n < layers.size(); n++) width += layers[n].thickness;
+  for (size_t n = 0; n < layers.size(); n++)
+    width += layers[n].thickness;
 
   return width;
 }
 
-double Wall::totalResistance()
-{
+double Wall::totalResistance() {
   double R = 0.0;
 
-  for (size_t n = 0; n < layers.size(); n++) R += (layers[n].thickness/layers[n].material.conductivity);
+  for (size_t n = 0; n < layers.size(); n++)
+    R += (layers[n].thickness / layers[n].material.conductivity);
 
   return R;
 }
 
-
-double Slab::totalWidth()
-{
+double Slab::totalWidth() {
   double width = 0.0;
 
-  for (size_t n = 0; n < layers.size(); n++) width += layers[n].thickness;
+  for (size_t n = 0; n < layers.size(); n++)
+    width += layers[n].thickness;
 
   return width;
 }
 
-double Slab::totalResistance()
-{
+double Slab::totalResistance() {
   double R = 0.0;
 
-  for (size_t n = 0; n < layers.size(); n++) R += (layers[n].thickness/layers[n].material.conductivity);
+  for (size_t n = 0; n < layers.size(); n++)
+    R += (layers[n].thickness / layers[n].material.conductivity);
 
   return R;
 }
 
-Mesh::Mesh() :
-  minCellDim(0.02),
-  maxNearGrowthCoeff(1.5),
-  maxDepthGrowthCoeff(1.5),
-  maxInteriorGrowthCoeff(1.5),
-  maxExteriorGrowthCoeff(1.5)
-{}
+Mesh::Mesh()
+    : minCellDim(0.02), maxNearGrowthCoeff(1.5), maxDepthGrowthCoeff(1.5),
+      maxInteriorGrowthCoeff(1.5), maxExteriorGrowthCoeff(1.5) {}
 
-void Block::setSquarePolygon()
-{
-  polygon.outer().push_back(Point(xMin,yMin));
-  polygon.outer().push_back(Point(xMin,yMax));
-  polygon.outer().push_back(Point(xMax,yMax));
-  polygon.outer().push_back(Point(xMax,yMin));
+void Block::setSquarePolygon() {
+  polygon.outer().push_back(Point(xMin, yMin));
+  polygon.outer().push_back(Point(xMin, yMax));
+  polygon.outer().push_back(Point(xMax, yMax));
+  polygon.outer().push_back(Point(xMax, yMin));
 }
 
-void Surface::setSquarePolygon()
-{
-  polygon.outer().push_back(Point(xMin,yMin));
-  polygon.outer().push_back(Point(xMin,yMax));
-  polygon.outer().push_back(Point(xMax,yMax));
-  polygon.outer().push_back(Point(xMax,yMin));
+void Surface::setSquarePolygon() {
+  polygon.outer().push_back(Point(xMin, yMin));
+  polygon.outer().push_back(Point(xMin, yMax));
+  polygon.outer().push_back(Point(xMax, yMax));
+  polygon.outer().push_back(Point(xMax, yMin));
 }
 
-void Surface::calcTilt()
-{
+void Surface::calcTilt() {
   if (orientation == Surface::Z_POS) {
     tilt = 0;
     cosTilt = 1.0;
-  }
-  else if (orientation == Surface::Z_NEG) {
+  } else if (orientation == Surface::Z_NEG) {
     tilt = PI;
     cosTilt = -1.0;
-  }
-  else {
-    tilt = PI/2.0;
+  } else {
+    tilt = PI / 2.0;
     cosTilt = 0.0;
   }
 }
 
-inline bool compareRanges(RangeType first,  RangeType second)
-{
+inline bool compareRanges(RangeType first, RangeType second) {
   return (first.range.first < second.range.first);
 }
 
-bool Ranges::isType(double position,RangeType::Type type)
-{
+bool Ranges::isType(double position, RangeType::Type type) {
   // find specific Range
-  for (std::size_t r = 0; r < ranges.size(); r++)
-  {
-    if (isGreaterThan(position,ranges[r].range.first) &&
-      isLessOrEqual(position,ranges[r].range.second))
-    {
+  for (std::size_t r = 0; r < ranges.size(); r++) {
+    if (isGreaterThan(position, ranges[r].range.first) &&
+        isLessOrEqual(position, ranges[r].range.second)) {
       if (ranges[r].type == type)
         return true;
     }
@@ -120,60 +98,37 @@ bool Ranges::isType(double position,RangeType::Type type)
   return false;
 }
 
-Foundation::Foundation() :
-  deepGroundDepth(40.0),
-  farFieldWidth(40.0),
-  foundationDepth(0.0),
-  orientation(0.0),
-  deepGroundBoundary(DGB_ZERO_FLUX),
-  wallTopBoundary(WTB_ZERO_FLUX),
-  soil(Material(1.73,1842,419)),
-  grade(SurfaceProperties(0.9,0.9,0.03)),
-  coordinateSystem(CS_CARTESIAN),
-  numberOfDimensions(2),
-  useSymmetry(true),
-  reductionStrategy(RS_BOUNDARY),
-  exposedFraction(1.0),
-  useDetailedExposedPerimeter(false),
-  buildingHeight(0.0),
-  hasWall(true),
-  hasSlab(true),
-  perimeterSurfaceWidth(0.0),
-  hasPerimeterSurface(false),
-  mesh(Mesh()),
-  numericalScheme(NS_ADI),
-  fADI(0.00001),
-  tolerance(1.0e-6),
-  maxIterations(100000),
-  convectionCalculationMethod(CCM_AUTO)
-{}
+Foundation::Foundation()
+    : deepGroundDepth(40.0), farFieldWidth(40.0), foundationDepth(0.0), orientation(0.0),
+      deepGroundBoundary(DGB_ZERO_FLUX), wallTopBoundary(WTB_ZERO_FLUX),
+      soil(Material(1.73, 1842, 419)), grade(SurfaceProperties(0.9, 0.9, 0.03)),
+      coordinateSystem(CS_CARTESIAN), numberOfDimensions(2), useSymmetry(true),
+      reductionStrategy(RS_BOUNDARY), exposedFraction(1.0), useDetailedExposedPerimeter(false),
+      buildingHeight(0.0), hasWall(true), hasSlab(true), perimeterSurfaceWidth(0.0),
+      hasPerimeterSurface(false), mesh(Mesh()), numericalScheme(NS_ADI), fADI(0.00001),
+      tolerance(1.0e-6), maxIterations(100000), convectionCalculationMethod(CCM_AUTO) {}
 
-void Foundation::createMeshData()
-{
+void Foundation::createMeshData() {
   std::size_t nV = polygon.outer().size();
 
-  for (std::size_t v = 0; v < nV; v++)
-  {
+  for (std::size_t v = 0; v < nV; v++) {
     double thisX = polygon.outer()[v].get<0>();
     double thisY = polygon.outer()[v].get<1>();
     double nextX, nextY;
 
-    if (v < nV -1)
-    {
-      nextX = polygon.outer()[v+1].get<0>();
-      nextY = polygon.outer()[v+1].get<1>();
-    }
-    else
-    {
+    if (v < nV - 1) {
+      nextX = polygon.outer()[v + 1].get<0>();
+      nextY = polygon.outer()[v + 1].get<1>();
+    } else {
       nextX = polygon.outer()[0].get<0>();
       nextY = polygon.outer()[0].get<1>();
     }
 
     Polygon3 poly;
-    poly.outer().push_back(Point3(thisX,thisY,0.0));
-    poly.outer().push_back(Point3(thisX,thisY,buildingHeight));
-    poly.outer().push_back(Point3(nextX,nextY,buildingHeight));
-    poly.outer().push_back(Point3(nextX,nextY,0.0));
+    poly.outer().push_back(Point3(thisX, thisY, 0.0));
+    poly.outer().push_back(Point3(thisX, thisY, buildingHeight));
+    poly.outer().push_back(Point3(nextX, nextY, buildingHeight));
+    poly.outer().push_back(Point3(nextX, nextY, 0.0));
     buildingSurfaces.push_back(poly);
   }
 
@@ -249,15 +204,15 @@ void Foundation::createMeshData()
   double xyWallTopInterior = xyWallInterior;
   double xyWallTopExterior = xyWallExterior;
 
-  for (auto& b : inputBlocks) {
+  for (auto &b : inputBlocks) {
     double bZ1 = zMax - b.z;
     double bX1 = b.x;
     double bZ2 = bZ1 - b.depth;
     double bX2 = bX1 + b.width;
-    double bZmin = std::min(bZ1,bZ2);
-    double bZmax = std::max(bZ1,bZ2);
-    double bXmin = std::min(bX1,bX2);
-    double bXmax = std::max(bX1,bX2);
+    double bZmin = std::min(bZ1, bZ2);
+    double bZmax = std::max(bZ1, bZ2);
+    double bXmin = std::min(bX1, bX2);
+    double bXmax = std::max(bX1, bX2);
 
     if (bZmin < zMin) {
       showMessage(MSG_ERR, "'Material Block' cannot be below the deep ground boundary.");
@@ -266,12 +221,13 @@ void Foundation::createMeshData()
       showMessage(MSG_ERR, "'Material Block' cannot be above the wall top.");
     }
 
-    if (isEqual(bZmax,zMax)) {
-      if (std::abs(b.width) <= wall.totalWidth()/2. || foundationDepth > 0.0) {
-        xyWallTopInterior = std::min(bXmin,xyWallTopInterior);
+    if (isEqual(bZmax, zMax)) {
+      if (std::abs(b.width) <= wall.totalWidth() / 2. || foundationDepth > 0.0) {
+        xyWallTopInterior = std::min(bXmin, xyWallTopInterior);
       }
-      if (std::abs(b.width) <= wall.totalWidth()/2. || (hasWall ? (wall.heightAboveGrade > 0.0) : false)) {
-        xyWallTopExterior = std::max(bXmax,xyWallTopExterior);
+      if (std::abs(b.width) <= wall.totalWidth() / 2. ||
+          (hasWall ? (wall.heightAboveGrade > 0.0) : false)) {
+        xyWallTopExterior = std::max(bXmax, xyWallTopExterior);
       }
     }
 
@@ -279,23 +235,23 @@ void Foundation::createMeshData()
     xyNearMin = std::min(xyNearMin, bXmin);
     xyNearMax = std::max(xyNearMax, bXmax);
 
-    b.box = Box(Point(bXmin,bZmin),Point(bXmax,bZmax));
+    b.box = Box(Point(bXmin, bZmin), Point(bXmax, bZmax));
 
     if (bZmax > zSlab && bXmin < xyWallInterior) {
-      boost::geometry::union_(b.box,intBoxes,intBoxes);
+      boost::geometry::union_(b.box, intBoxes, intBoxes);
     }
     if (bZmax > zGrade && bXmax > xyWallExterior) {
-      boost::geometry::union_(b.box,extBoxes,extBoxes);
+      boost::geometry::union_(b.box, extBoxes, extBoxes);
     }
   }
 
   // Determine interior block surfaces
   if (isLessThan(zSlab, zMax)) {
     // Interior bounding Box
-    Box intBound(Point(xyNearMin - 1.0,zSlab),Point(xyWallInterior,zMax));
+    Box intBound(Point(xyNearMin - 1.0, zSlab), Point(xyWallInterior, zMax));
 
     MultiPolygon diff;
-    boost::geometry::difference(intBound,intBoxes,diff);
+    boost::geometry::difference(intBound, intBoxes, diff);
     if (diff.size() > 1) {
       showMessage(MSG_ERR, "'Material Blocks' cannot create an enclosure.");
     }
@@ -306,13 +262,13 @@ void Foundation::createMeshData()
     int numTops = 0;
 
     std::size_t nVs = diff[0].outer().size();
-    for (std::size_t v = 0; v < nVs; v++ ) {
+    for (std::size_t v = 0; v < nVs; v++) {
 
       std::size_t vNext;
-      if (v == nVs -1) {
+      if (v == nVs - 1) {
         vNext = 0;
       } else {
-        vNext = v+1;
+        vNext = v + 1;
       }
 
       double x1 = diff[0].outer()[v].get<0>();
@@ -320,8 +276,8 @@ void Foundation::createMeshData()
       double z1 = diff[0].outer()[v].get<1>();
       double z2 = diff[0].outer()[vNext].get<1>();
 
-      geom::Direction dOut = getDirectionOut(diff[0],v);
-      geom::Direction dIn = getDirectionIn(diff[0],v);
+      geom::Direction dOut = getDirectionOut(diff[0], v);
+      geom::Direction dIn = getDirectionIn(diff[0], v);
 
       if (dOut == geom::Y_POS && isEqual(x1, xyNearMin - 1.0)) {
         // left boundary
@@ -337,7 +293,7 @@ void Foundation::createMeshData()
       surf.boundaryConditionType = Surface::INTERIOR_FLUX;
 
       // down
-      if (dOut == geom::Y_NEG ) {
+      if (dOut == geom::Y_NEG) {
 
         surf.orientation = Surface::X_NEG;
 
@@ -349,7 +305,7 @@ void Foundation::createMeshData()
         if (isEqual(z1, zMax)) {
           xyWallTopInterior = x1;
         }
-        if (dIn == geom::X_POS ) {
+        if (dIn == geom::X_POS) {
           surf.type = Surface::ST_WALL_INT;
           surf.propPtr = &wall.interior;
         } else {
@@ -363,7 +319,7 @@ void Foundation::createMeshData()
       }
 
       // left
-      if (dOut == geom::X_NEG ) {
+      if (dOut == geom::X_NEG) {
 
         surf.orientation = Surface::Z_POS;
 
@@ -409,7 +365,7 @@ void Foundation::createMeshData()
       }
 
       // up
-      if (dOut == geom::Y_POS ) {
+      if (dOut == geom::Y_POS) {
 
         surf.orientation = Surface::X_POS;
 
@@ -427,7 +383,7 @@ void Foundation::createMeshData()
       }
 
       // right
-      if (dOut == geom::X_POS ) {
+      if (dOut == geom::X_POS) {
 
         surf.orientation = Surface::Z_NEG;
 
@@ -441,7 +397,6 @@ void Foundation::createMeshData()
       }
 
       surf2D.push_back(surf);
-
     }
 
     if (numTops > 1) {
@@ -467,12 +422,12 @@ void Foundation::createMeshData()
   }
 
   // Determine exterior block surfaces
-  if (isLessThan(zGrade,zMax)) {
+  if (isLessThan(zGrade, zMax)) {
     // Exterior bounding Box
-    Box extBound(Point(xyWallExterior,zGrade),Point(xyNearMax + 1.0,zMax));
+    Box extBound(Point(xyWallExterior, zGrade), Point(xyNearMax + 1.0, zMax));
 
     MultiPolygon diff;
-    boost::geometry::difference(extBound,extBoxes,diff);
+    boost::geometry::difference(extBound, extBoxes, diff);
     if (diff.size() > 1) {
       showMessage(MSG_ERR, "'Material Blocks' cannot create an enclosure.");
     }
@@ -483,13 +438,13 @@ void Foundation::createMeshData()
     int numTops = 0;
 
     std::size_t nVs = diff[0].outer().size();
-    for (std::size_t v = 0; v < nVs; v++ ) {
+    for (std::size_t v = 0; v < nVs; v++) {
 
       std::size_t vNext;
-      if (v == nVs -1) {
+      if (v == nVs - 1) {
         vNext = 0;
       } else {
-        vNext = v+1;
+        vNext = v + 1;
       }
 
       double x1 = diff[0].outer()[v].get<0>();
@@ -497,7 +452,7 @@ void Foundation::createMeshData()
       double z1 = diff[0].outer()[v].get<1>();
       double z2 = diff[0].outer()[vNext].get<1>();
 
-      geom::Direction dOut = getDirectionOut(diff[0],v);
+      geom::Direction dOut = getDirectionOut(diff[0], v);
 
       if (dOut == geom::Y_NEG && isEqual(x1, xyNearMax + 1.0)) {
         // right boundary
@@ -518,7 +473,7 @@ void Foundation::createMeshData()
       surf.boundaryConditionType = Surface::EXTERIOR_FLUX;
 
       // down
-      if (dOut == geom::Y_NEG ) {
+      if (dOut == geom::Y_NEG) {
 
         surf.orientation = Surface::X_NEG;
 
@@ -531,13 +486,13 @@ void Foundation::createMeshData()
       }
 
       // left
-      if (dOut == geom::X_NEG ) {
+      if (dOut == geom::X_NEG) {
 
         surf.orientation = Surface::Z_POS;
 
         surf.xMin = x2;
         surf.xMax = x1;
-        surf.type = Surface::ST_GRADE;  // TODO Could be wall (bump out)
+        surf.type = Surface::ST_GRADE; // TODO Could be wall (bump out)
         surf.propPtr = &grade;
 
         surf.zMin = z2;
@@ -545,7 +500,7 @@ void Foundation::createMeshData()
       }
 
       // up
-      if (dOut == geom::Y_POS ) {
+      if (dOut == geom::Y_POS) {
 
         surf.orientation = Surface::X_POS;
 
@@ -557,7 +512,7 @@ void Foundation::createMeshData()
         if (isEqual(z2, zMax)) {
           xyWallTopExterior = x1;
         }
-        if (getDirectionOut(diff[0],vNext) == geom::X_POS) {
+        if (getDirectionOut(diff[0], vNext) == geom::X_POS) {
           surf.type = Surface::ST_WALL_EXT;
           surf.propPtr = &wall.exterior;
         } else {
@@ -567,7 +522,7 @@ void Foundation::createMeshData()
       }
 
       // right
-      if (dOut == geom::X_POS ) {
+      if (dOut == geom::X_POS) {
 
         surf.orientation = Surface::Z_NEG;
 
@@ -581,7 +536,6 @@ void Foundation::createMeshData()
       }
 
       surf2D.push_back(surf);
-
     }
 
     if (numTops > 1) {
@@ -590,9 +544,8 @@ void Foundation::createMeshData()
   }
 
   double zNearDeep = std::min({zGrade, zSlab, zSlabBottom, zWall, zNearMin});
-  double xyNearInt = std::min({xyWallInterior, xyPerimeterSurface,xyNearMin});
+  double xyNearInt = std::min({xyWallInterior, xyPerimeterSurface, xyNearMin});
   double xyNearExt = std::max({xyWallExterior, xyNearMax});
-
 
   // Set depending on N dimensions, coordinate system, and 2D appoximation method
   double xMin, xMax, yMin, yMax;
@@ -614,7 +567,6 @@ void Foundation::createMeshData()
   zNearRange.type = RangeType::NEAR;
 
   zRanges.ranges.push_back(zNearRange);
-
 
   // Set 3D foundation areas (for calculation of total heat transfer rates)
 
@@ -647,16 +599,17 @@ void Foundation::createMeshData()
   surfaceAreas[Surface::ST_WALL_EXT] = 0.0;
 
   // Add surface-by-surface
-  if(isGreaterThan(zMax,0.0))
-  {
-    surfaceAreas[Surface::ST_FAR_FIELD_AIR] += (yMax - yMin)*(zMax - zGrade)*2 + (xMax - xMin)*(zMax - zGrade)*2;
+  if (isGreaterThan(zMax, 0.0)) {
+    surfaceAreas[Surface::ST_FAR_FIELD_AIR] +=
+        (yMax - yMin) * (zMax - zGrade) * 2 + (xMax - xMin) * (zMax - zGrade) * 2;
   }
-  surfaceAreas[Surface::ST_FAR_FIELD] += (yMax - yMin)*(zGrade - zMin)*2 + (xMax - xMin)*(zGrade - zMin)*2;
-  surfaceAreas[Surface::ST_DEEP_GROUND] += (yMax - yMin)*(xMax - xMin);
+  surfaceAreas[Surface::ST_FAR_FIELD] +=
+      (yMax - yMin) * (zGrade - zMin) * 2 + (xMax - xMin) * (zGrade - zMin) * 2;
+  surfaceAreas[Surface::ST_DEEP_GROUND] += (yMax - yMin) * (xMax - xMin);
   surfaceAreas[Surface::ST_SLAB_CORE] += boost::geometry::area(offset(polygon, xySlabNear));
   {
     Polygon poly;
-    boost::geometry::convert(boundingBox,poly);
+    boost::geometry::convert(boundingBox, poly);
     Polygon inner = offset(polygon, xyGradeNear);
 
     Ring ring;
@@ -666,11 +619,11 @@ void Foundation::createMeshData()
 
     surfaceAreas[Surface::ST_GRADE] += boost::geometry::area(poly);
   }
-  surfaceAreas[Surface::ST_TOP_AIR_INT] += boost::geometry::area(offset(polygon, xyWallTopInterior));
-  if(zMax > zGrade)
-  {
+  surfaceAreas[Surface::ST_TOP_AIR_INT] +=
+      boost::geometry::area(offset(polygon, xyWallTopInterior));
+  if (zMax > zGrade) {
     Polygon poly;
-    boost::geometry::convert(boundingBox,poly);
+    boost::geometry::convert(boundingBox, poly);
     Polygon inner = offset(polygon, xyWallTopExterior);
 
     Ring ring;
@@ -680,8 +633,7 @@ void Foundation::createMeshData()
 
     surfaceAreas[Surface::ST_TOP_AIR_EXT] += boost::geometry::area(poly);
   }
-  if(hasWall)
-  {
+  if (hasWall) {
     Polygon poly = offset(polygon, xyWallTopExterior);
 
     Polygon temp;
@@ -696,37 +648,36 @@ void Foundation::createMeshData()
   }
 
   // General surfaces
-  for (auto& s : surf2D) {
+  for (auto &s : surf2D) {
     if (s.orientation == Surface::X_POS || s.orientation == Surface::X_NEG) {
       Polygon poly;
       poly = offset(polygon, s.xMin);
 
-      for (std::size_t v = 0; v < nV; v++)
-      {
+      for (std::size_t v = 0; v < nV; v++) {
         if (useDetailedExposedPerimeter) {
           if (isExposedPerimeter[v]) {
             std::size_t vNext;
-            if (v == nV -1) {
+            if (v == nV - 1) {
               vNext = 0;
             } else {
-              vNext = v+1;
+              vNext = v + 1;
             }
 
             Point a = poly.outer()[v];
             Point b = poly.outer()[vNext];
-            surfaceAreas[s.type] += (s.zMax - s.zMin)*getDistance(a,b);
+            surfaceAreas[s.type] += (s.zMax - s.zMin) * getDistance(a, b);
           }
         } else {
           std::size_t vNext;
-          if (v == nV -1) {
+          if (v == nV - 1) {
             vNext = 0;
           } else {
-            vNext = v+1;
+            vNext = v + 1;
           }
 
           Point a = poly.outer()[v];
           Point b = poly.outer()[vNext];
-          surfaceAreas[s.type] += (s.zMax - s.zMin)*getDistance(a,b);
+          surfaceAreas[s.type] += (s.zMax - s.zMin) * getDistance(a, b);
         }
       }
 
@@ -745,34 +696,33 @@ void Foundation::createMeshData()
     }
   }
 
-  for (auto& s : surfaceAreas) {
+  for (auto &s : surfaceAreas) {
     hasSurface[s.first] = s.second > 0.0;
   }
 
-  double area = boost::geometry::area(polygon);  // [m2] Area of foundation
-  double perimeter = boost::geometry::perimeter(polygon);  // [m] Perimeter of foundation
+  double area = boost::geometry::area(polygon);           // [m2] Area of foundation
+  double perimeter = boost::geometry::perimeter(polygon); // [m] Perimeter of foundation
 
   double interiorPerimeter = 0.0;
 
   if (useDetailedExposedPerimeter) {
-    for (std::size_t v = 0; v < nV; v++)
-    {
+    for (std::size_t v = 0; v < nV; v++) {
       std::size_t vNext;
-      if (v == nV -1) {
+      if (v == nV - 1) {
         vNext = 0;
       } else {
-        vNext = v+1;
+        vNext = v + 1;
       }
 
       Point a = polygon.outer()[v];
       Point b = polygon.outer()[vNext];
 
       if (!isExposedPerimeter[v]) {
-        interiorPerimeter += getDistance(a,b);
+        interiorPerimeter += getDistance(a, b);
       }
     }
   } else {
-    interiorPerimeter = perimeter*(1.0 - exposedFraction);
+    interiorPerimeter = perimeter * (1.0 - exposedFraction);
   }
 
   netArea = area;
@@ -802,7 +752,7 @@ void Foundation::createMeshData()
       surface.zMin = zMin;
       surface.zMax = zMin;
       if (deepGroundBoundary == DGB_FIXED_TEMPERATURE) {
-          surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
+        surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
       } else {
         surface.boundaryConditionType = Surface::ZERO_FLUX;
       }
@@ -827,8 +777,7 @@ void Foundation::createMeshData()
       surfaces.push_back(surface);
     }
 
-    if(foundationDepth > 0.0)
-    {
+    if (foundationDepth > 0.0) {
       // Interior Air Top Surface
       Surface surface;
       surface.type = Surface::ST_TOP_AIR_INT;
@@ -861,13 +810,11 @@ void Foundation::createMeshData()
       blocks.push_back(block);
     }
 
-    if (hasSlab)
-    {
+    if (hasSlab) {
       // Foundation Slab
       double zPosition = zSlabBottom;
 
-      for (size_t n = 0; n < slab.layers.size(); n++)
-      {
+      for (size_t n = 0; n < slab.layers.size(); n++) {
         Block block;
         block.material = slab.layers[n].material;
         block.blockType = Block::SOLID;
@@ -881,38 +828,30 @@ void Foundation::createMeshData()
         blocks.push_back(block);
         zPosition = block.zMax;
       }
-
     }
-
   }
 
-  if (numberOfDimensions == 2 )
-  {
+  if (numberOfDimensions == 2) {
 
     // TODO: 2D
 
     linearAreaMultiplier = 1.0;
 
-    double ap = area/(perimeter - interiorPerimeter);
+    double ap = area / (perimeter - interiorPerimeter);
 
-    if (reductionStrategy == RS_AP)
-    {
+    if (reductionStrategy == RS_AP) {
       twoParameters = false;
-      if (coordinateSystem == CS_CYLINDRICAL)
-      {
-        reductionLength2 = 2.0*ap;
-      }
-      else if (coordinateSystem == CS_CARTESIAN)
-      {
+      if (coordinateSystem == CS_CYLINDRICAL) {
+        reductionLength2 = 2.0 * ap;
+      } else if (coordinateSystem == CS_CARTESIAN) {
         reductionLength2 = ap;
       }
     }
 
-    if (reductionStrategy == RS_RR)
-    {
+    if (reductionStrategy == RS_RR) {
       twoParameters = false;
-      double rrA = (perimeter - sqrt(perimeter*perimeter - 4*PI*area))/PI;
-      double rrB = (perimeter - PI*rrA)*0.5;
+      double rrA = (perimeter - sqrt(perimeter * perimeter - 4 * PI * area)) / PI;
+      double rrB = (perimeter - PI * rrA) * 0.5;
       reductionLength2 = (rrA)*0.5;
       linearAreaMultiplier = rrB;
     }
@@ -925,7 +864,6 @@ void Foundation::createMeshData()
 
     double xRef2 = reductionLength2;
     double xRef1 = reductionLength1;
-
 
     // SURFACES and BLOCKS
 
@@ -949,8 +887,7 @@ void Foundation::createMeshData()
     }
 
     // Interior Air Symmetry Temperature
-    if (!twoParameters)
-    {
+    if (!twoParameters) {
       Surface surface;
       surface.type = Surface::ST_SYMMETRY_AIR;
       surface.xMin = xMin;
@@ -981,7 +918,6 @@ void Foundation::createMeshData()
       surfaces.push_back(surface);
     }
 
-
     // Exterior Air Right Surface
     {
       Surface surface;
@@ -1010,15 +946,13 @@ void Foundation::createMeshData()
       surface.zMin = zMin;
       surface.zMax = zMin;
       if (deepGroundBoundary == DGB_FIXED_TEMPERATURE) {
-          surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
+        surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
       } else {
         surface.boundaryConditionType = Surface::ZERO_FLUX;
       }
       surface.orientation = Surface::Z_NEG;
       surfaces.push_back(surface);
     }
-
-
 
     // Slab
     {
@@ -1058,8 +992,7 @@ void Foundation::createMeshData()
       surface.propPtr = &grade;
       surfaces.push_back(surface);
     }
-    if (twoParameters)
-    {
+    if (twoParameters) {
       Surface surface;
       surface.type = Surface::ST_GRADE;
       surface.xMin = xMin;
@@ -1075,18 +1008,14 @@ void Foundation::createMeshData()
       surfaces.push_back(surface);
     }
 
-    if(foundationDepth > 0.0)
-    {
+    if (foundationDepth > 0.0) {
       // Interior Air Top Surface
       Surface surface;
       surface.type = Surface::ST_TOP_AIR_INT;
-      if (!twoParameters)
-      {
+      if (!twoParameters) {
         surface.xMin = xMin;
         surface.xMax = xRef2 + xyWallTopInterior;
-      }
-      else
-      {
+      } else {
         surface.xMin = xRef1 - xyWallTopInterior;
         surface.xMax = xRef2 + xyWallTopInterior;
       }
@@ -1100,8 +1029,7 @@ void Foundation::createMeshData()
       surfaces.push_back(surface);
     }
 
-    if(zMax > zGrade)
-    {
+    if (zMax > zGrade) {
       {
         // Exterior Air Top Surface
         Surface surface;
@@ -1117,8 +1045,7 @@ void Foundation::createMeshData()
         surface.orientation = Surface::Z_POS;
         surfaces.push_back(surface);
       }
-      if (twoParameters)
-      {
+      if (twoParameters) {
         // Exterior Air Top Surface
         Surface surface;
         surface.type = Surface::ST_TOP_AIR_EXT;
@@ -1133,27 +1060,23 @@ void Foundation::createMeshData()
         surface.orientation = Surface::Z_POS;
         surfaces.push_back(surface);
       }
-
     }
 
-    if (wallTopBoundary == WTB_LINEAR_DT)
-    {
+    if (wallTopBoundary == WTB_LINEAR_DT) {
       // Wall Top
-      if(hasWall)
-      {
+      if (hasWall) {
         double position = 0.0;
-        double& Tin = wallTopInteriorTemperature;
-        double& Tout = wallTopExteriorTemperature;
+        double &Tin = wallTopInteriorTemperature;
+        double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON)/mesh.minCellDim;
-        double temperature = Tin - (1.0/N)/2*Tdiff;
+        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+        double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
-        for (std::size_t n = 1; n <= N; n++)
-        {
+        for (std::size_t n = 1; n <= N; n++) {
           Surface surface;
           surface.type = Surface::ST_WALL_TOP;
           surface.xMin = xRef2 + position;
-          surface.xMax = xRef2 + position + (xyWallTopExterior - xyWallTopInterior)/N;
+          surface.xMax = xRef2 + position + (xyWallTopExterior - xyWallTopInterior) / N;
           surface.yMin = 0.0;
           surface.yMax = 1.0;
           surface.setSquarePolygon();
@@ -1164,24 +1087,21 @@ void Foundation::createMeshData()
           surface.temperature = temperature;
           surfaces.push_back(surface);
 
-          position += (xyWallTopExterior - xyWallTopInterior)/N;
-          temperature -= (1.0/N)*Tdiff;
-
+          position += (xyWallTopExterior - xyWallTopInterior) / N;
+          temperature -= (1.0 / N) * Tdiff;
         }
 
-        if (twoParameters)
-        {
-          double& Tin = wallTopInteriorTemperature;
-          double& Tout = wallTopExteriorTemperature;
+        if (twoParameters) {
+          double &Tin = wallTopInteriorTemperature;
+          double &Tout = wallTopExteriorTemperature;
           double Tdiff = (Tin - Tout);
-          std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON)/mesh.minCellDim;
-          double temperature = Tin - (1.0/N)/2*Tdiff;
+          std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+          double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
-          for (std::size_t n = 1; n <= N; n++)
-          {
+          for (std::size_t n = 1; n <= N; n++) {
             Surface surface;
             surface.type = Surface::ST_WALL_TOP;
-            surface.xMin = xRef1 - position - (xyWallTopExterior - xyWallTopInterior)/N;
+            surface.xMin = xRef1 - position - (xyWallTopExterior - xyWallTopInterior) / N;
             surface.xMax = xRef1 - position;
             surface.yMin = 0.0;
             surface.yMax = 1.0;
@@ -1193,19 +1113,14 @@ void Foundation::createMeshData()
             surface.temperature = temperature;
             surfaces.push_back(surface);
 
-            position += (xyWallTopExterior - xyWallTopInterior)/N;
-            temperature -= (1.0/N)*Tdiff;
-
+            position += (xyWallTopExterior - xyWallTopInterior) / N;
+            temperature -= (1.0 / N) * Tdiff;
           }
-
         }
       }
-    }
-    else
-    {
+    } else {
       // Wall Top
-      if(hasWall)
-      {
+      if (hasWall) {
         {
           Surface surface;
           surface.type = Surface::ST_WALL_TOP;
@@ -1220,8 +1135,7 @@ void Foundation::createMeshData()
           surface.orientation = Surface::Z_POS;
           surfaces.push_back(surface);
         }
-        if (twoParameters)
-        {
+        if (twoParameters) {
           Surface surface;
           surface.type = Surface::ST_WALL_TOP;
           surface.xMin = xRef1 - xyWallTopExterior;
@@ -1238,9 +1152,8 @@ void Foundation::createMeshData()
       }
     }
 
-
     // General surfaces
-    for (auto& s : surf2D) {
+    for (auto &s : surf2D) {
       {
         Surface surface;
         surface.type = s.type;
@@ -1271,15 +1184,13 @@ void Foundation::createMeshData()
         surface.orientation = s.orientation;
         if (s.orientation == Surface::X_POS) {
           surface.orientation = Surface::X_NEG;
-        }
-        else if (s.orientation == Surface::X_NEG) {
+        } else if (s.orientation == Surface::X_NEG) {
           surface.orientation = Surface::X_POS;
         }
         surface.propPtr = s.propPtr;
 
         surfaces.push_back(surface);
       }
-
     }
 
     // BLOCKS
@@ -1289,13 +1200,10 @@ void Foundation::createMeshData()
       Block block;
       block.material = air;
       block.blockType = Block::INTERIOR_AIR;
-      if (twoParameters)
-      {
+      if (twoParameters) {
         block.xMin = xRef1 - xyWallInterior;
         block.xMax = xRef2 + xyWallInterior;
-      }
-      else
-      {
+      } else {
         block.xMin = xMin;
         block.xMax = xRef2 + xyWallInterior;
       }
@@ -1321,8 +1229,7 @@ void Foundation::createMeshData()
       block.zMax = zMax;
       blocks.push_back(block);
     }
-    if (twoParameters)
-    {
+    if (twoParameters) {
       Block block;
       block.material = air;
       block.blockType = Block::EXTERIOR_AIR;
@@ -1336,23 +1243,18 @@ void Foundation::createMeshData()
       blocks.push_back(block);
     }
 
-    if (hasSlab)
-    {
+    if (hasSlab) {
       // Foundation Slab
       double zPosition = zSlabBottom;
 
-      for (size_t n = 0; n < slab.layers.size(); n++)
-      {
+      for (size_t n = 0; n < slab.layers.size(); n++) {
         Block block;
         block.material = slab.layers[n].material;
         block.blockType = Block::SOLID;
-        if (!twoParameters)
-        {
+        if (!twoParameters) {
           block.xMin = xMin;
           block.xMax = xRef2;
-        }
-        else
-        {
+        } else {
           block.xMin = xRef1;
           block.xMax = xRef2;
         }
@@ -1364,17 +1266,14 @@ void Foundation::createMeshData()
         blocks.push_back(block);
         zPosition = block.zMax;
       }
-
     }
 
-    if (hasWall)
-    {
+    if (hasWall) {
       {
         double xPosition = xRef2;
 
         // Foundation Wall
-        for (std::size_t n = wall.layers.size() - 1; n < wall.layers.size() /* && n >= 0 */; n--)
-        {
+        for (std::size_t n = wall.layers.size() - 1; n < wall.layers.size() /* && n >= 0 */; n--) {
           Block block;
           block.material = wall.layers[n].material;
           block.blockType = Block::SOLID;
@@ -1390,13 +1289,11 @@ void Foundation::createMeshData()
         }
       }
 
-      if (twoParameters)
-      {
+      if (twoParameters) {
         double xPosition = xRef1;
 
         // Foundation Wall
-        for (std::size_t n = wall.layers.size() - 1; n < wall.layers.size() /* && n >= 0 */; n--)
-        {
+        for (std::size_t n = wall.layers.size() - 1; n < wall.layers.size() /* && n >= 0 */; n--) {
           Block block;
           block.material = wall.layers[n].material;
           block.blockType = Block::SOLID;
@@ -1414,7 +1311,7 @@ void Foundation::createMeshData()
     }
 
     // General blocks
-    for (auto& b : inputBlocks) {
+    for (auto &b : inputBlocks) {
       Block block;
       block.material = b.material;
       block.blockType = Block::SOLID;
@@ -1444,8 +1341,7 @@ void Foundation::createMeshData()
 
     // Set range types
 
-    if (!twoParameters)
-    {
+    if (!twoParameters) {
       RangeType xInteriorRange;
       xInteriorRange.range.first = xMin;
       xInteriorRange.range.second = xRef2 + xyNearInt;
@@ -1463,9 +1359,7 @@ void Foundation::createMeshData()
       xExteriorRange.range.second = xMax;
       xExteriorRange.type = RangeType::MAX_EXTERIOR;
       xRanges.ranges.push_back(xExteriorRange);
-    }
-    else
-    {
+    } else {
       RangeType xMinExteriorRange;
       xMinExteriorRange.range.first = xMin;
       xMinExteriorRange.range.second = xRef1 - xyNearExt;
@@ -1497,9 +1391,7 @@ void Foundation::createMeshData()
       xRanges.ranges.push_back(xMaxExteriorRange);
     }
 
-  }
-  else if(numberOfDimensions == 3 && !useSymmetry)
-  {
+  } else if (numberOfDimensions == 3 && !useSymmetry) {
 #if defined(KIVA_3D)
     // TODO 3D
     Box boundingBox;
@@ -1517,8 +1409,7 @@ void Foundation::createMeshData()
     xMax = xMaxBB + farFieldWidth;
     yMax = yMaxBB + farFieldWidth;
 
-    if(isGreaterThan(zMax,0.0))
-    {
+    if (isGreaterThan(zMax, 0.0)) {
 
       // Exterior Air Perimeter Surfaces
       {
@@ -1526,15 +1417,15 @@ void Foundation::createMeshData()
           // X Min
           Surface surface;
           surface.type = Surface::ST_FAR_FIELD_AIR;
-          surface.xMin =  xMin;
-          surface.xMax =  xMin;
-          surface.yMin =  yMin;
-          surface.yMax =  yMax;
+          surface.xMin = xMin;
+          surface.xMax = xMin;
+          surface.yMin = yMin;
+          surface.yMax = yMax;
           surface.setSquarePolygon();
-          surface.zMin =  zGrade;
-          surface.zMax =  zMax;
+          surface.zMin = zGrade;
+          surface.zMax = zMax;
           surface.boundaryConditionType = Surface::EXTERIOR_TEMPERATURE;
-          surface.orientation =  Surface::X_NEG;
+          surface.orientation = Surface::X_NEG;
           surfaces.push_back(surface);
         }
 
@@ -1542,15 +1433,15 @@ void Foundation::createMeshData()
           // X Max
           Surface surface;
           surface.type = Surface::ST_FAR_FIELD_AIR;
-          surface.xMin =  xMax;
-          surface.xMax =  xMax;
-          surface.yMin =  yMin;
-          surface.yMax =  yMax;
+          surface.xMin = xMax;
+          surface.xMax = xMax;
+          surface.yMin = yMin;
+          surface.yMax = yMax;
           surface.setSquarePolygon();
-          surface.zMin =  zGrade;
-          surface.zMax =  zMax;
+          surface.zMin = zGrade;
+          surface.zMax = zMax;
           surface.boundaryConditionType = Surface::EXTERIOR_TEMPERATURE;
-          surface.orientation =  Surface::X_POS;
+          surface.orientation = Surface::X_POS;
           surfaces.push_back(surface);
         }
 
@@ -1558,15 +1449,15 @@ void Foundation::createMeshData()
           // Y Min
           Surface surface;
           surface.type = Surface::ST_FAR_FIELD_AIR;
-          surface.xMin =  xMin;
-          surface.xMax =  xMax;
-          surface.yMin =  yMin;
-          surface.yMax =  yMin;
+          surface.xMin = xMin;
+          surface.xMax = xMax;
+          surface.yMin = yMin;
+          surface.yMax = yMin;
           surface.setSquarePolygon();
-          surface.zMin =  zGrade;
-          surface.zMax =  zMax;
+          surface.zMin = zGrade;
+          surface.zMax = zMax;
           surface.boundaryConditionType = Surface::EXTERIOR_TEMPERATURE;
-          surface.orientation =  Surface::Y_NEG;
+          surface.orientation = Surface::Y_NEG;
           surfaces.push_back(surface);
         }
 
@@ -1574,20 +1465,18 @@ void Foundation::createMeshData()
           // Y Max
           Surface surface;
           surface.type = Surface::ST_FAR_FIELD_AIR;
-          surface.xMin =  xMin;
-          surface.xMax =  xMax;
-          surface.yMin =  yMax;
-          surface.yMax =  yMax;
+          surface.xMin = xMin;
+          surface.xMax = xMax;
+          surface.yMin = yMax;
+          surface.yMax = yMax;
           surface.setSquarePolygon();
-          surface.zMin =  zGrade;
-          surface.zMax =  zMax;
+          surface.zMin = zGrade;
+          surface.zMax = zMax;
           surface.boundaryConditionType = Surface::EXTERIOR_TEMPERATURE;
-          surface.orientation =  Surface::Y_POS;
+          surface.orientation = Surface::Y_POS;
           surfaces.push_back(surface);
         }
-
       }
-
     }
 
     // Far Field Surfaces
@@ -1595,15 +1484,15 @@ void Foundation::createMeshData()
       // X Min
       Surface surface;
       surface.type = Surface::ST_FAR_FIELD;
-      surface.xMin =  xMin;
-      surface.xMax =  xMin;
-      surface.yMin =  yMin;
-      surface.yMax =  yMax;
+      surface.xMin = xMin;
+      surface.xMax = xMin;
+      surface.yMin = yMin;
+      surface.yMax = yMax;
       surface.setSquarePolygon();
-      surface.zMin =  zMin;
-      surface.zMax =  zGrade;
+      surface.zMin = zMin;
+      surface.zMax = zGrade;
       surface.boundaryConditionType = Surface::ZERO_FLUX;
-      surface.orientation =  Surface::X_NEG;
+      surface.orientation = Surface::X_NEG;
       surfaces.push_back(surface);
     }
 
@@ -1611,15 +1500,15 @@ void Foundation::createMeshData()
       // X Max
       Surface surface;
       surface.type = Surface::ST_FAR_FIELD;
-      surface.xMin =  xMax;
-      surface.xMax =  xMax;
-      surface.yMin =  yMin;
-      surface.yMax =  yMax;
+      surface.xMin = xMax;
+      surface.xMax = xMax;
+      surface.yMin = yMin;
+      surface.yMax = yMax;
       surface.setSquarePolygon();
-      surface.zMin =  zMin;
-      surface.zMax =  zGrade;
+      surface.zMin = zMin;
+      surface.zMax = zGrade;
       surface.boundaryConditionType = Surface::ZERO_FLUX;
-      surface.orientation =  Surface::X_POS;
+      surface.orientation = Surface::X_POS;
       surfaces.push_back(surface);
     }
 
@@ -1627,15 +1516,15 @@ void Foundation::createMeshData()
       // Y Min
       Surface surface;
       surface.type = Surface::ST_FAR_FIELD;
-      surface.xMin =  xMin;
-      surface.xMax =  xMax;
-      surface.yMin =  yMin;
-      surface.yMax =  yMin;
+      surface.xMin = xMin;
+      surface.xMax = xMax;
+      surface.yMin = yMin;
+      surface.yMax = yMin;
       surface.setSquarePolygon();
-      surface.zMin =  zMin;
-      surface.zMax =  zGrade;
+      surface.zMin = zMin;
+      surface.zMax = zGrade;
       surface.boundaryConditionType = Surface::ZERO_FLUX;
-      surface.orientation =  Surface::Y_NEG;
+      surface.orientation = Surface::Y_NEG;
       surfaces.push_back(surface);
     }
 
@@ -1643,15 +1532,15 @@ void Foundation::createMeshData()
       // Y Max
       Surface surface;
       surface.type = Surface::ST_FAR_FIELD;
-      surface.xMin =  xMin;
-      surface.xMax =  xMax;
-      surface.yMin =  yMax;
-      surface.yMax =  yMax;
+      surface.xMin = xMin;
+      surface.xMax = xMax;
+      surface.yMin = yMax;
+      surface.yMax = yMax;
       surface.setSquarePolygon();
-      surface.zMin =  zMin;
-      surface.zMax =  zGrade;
+      surface.zMin = zMin;
+      surface.zMax = zGrade;
       surface.boundaryConditionType = Surface::ZERO_FLUX;
-      surface.orientation =  Surface::Y_POS;
+      surface.orientation = Surface::Y_POS;
       surfaces.push_back(surface);
     }
 
@@ -1666,8 +1555,7 @@ void Foundation::createMeshData()
       surface.setSquarePolygon();
       surface.zMin = zMin;
       surface.zMax = zMin;
-      if (deepGroundBoundary == DGB_FIXED_TEMPERATURE)
-      {
+      if (deepGroundBoundary == DGB_FIXED_TEMPERATURE) {
         surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
       } else {
         surface.boundaryConditionType = Surface::ZERO_FLUX;
@@ -1717,8 +1605,7 @@ void Foundation::createMeshData()
       surfaces.push_back(surface);
     }
 
-    if(foundationDepth > 0.0)
-    {
+    if (foundationDepth > 0.0) {
       // Interior Air Top Surface
       Polygon poly;
       poly = offset(polygon, xyWallTopInterior);
@@ -1733,8 +1620,7 @@ void Foundation::createMeshData()
       surfaces.push_back(surface);
     }
 
-    if(zMax > zGrade)
-    {
+    if (zMax > zGrade) {
       // Exterior Air Top Surface
       {
         Polygon poly;
@@ -1758,26 +1644,22 @@ void Foundation::createMeshData()
         surface.orientation = Surface::Z_POS;
         surfaces.push_back(surface);
       }
-
     }
 
-    if (wallTopBoundary == WTB_LINEAR_DT)
-    {
+    if (wallTopBoundary == WTB_LINEAR_DT) {
       // Wall Top
-      if(hasWall)
-      {
+      if (hasWall) {
         double position = 0.0;
-        double& Tin = wallTopInteriorTemperature;
-        double& Tout = wallTopExteriorTemperature;
+        double &Tin = wallTopInteriorTemperature;
+        double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON)/mesh.minCellDim;
-        double temperature = Tin - (1.0/N)/2*Tdiff;
+        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+        double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
-        for (std::size_t n = 1; n <= N; n++)
-        {
+        for (std::size_t n = 1; n <= N; n++) {
 
           Polygon poly;
-          poly = offset(polygon, position + (xyWallTopExterior - xyWallTopInterior)/N);
+          poly = offset(polygon, position + (xyWallTopExterior - xyWallTopInterior) / N);
 
           Polygon temp;
           temp = offset(polygon, position);
@@ -1797,16 +1679,13 @@ void Foundation::createMeshData()
           surface.temperature = temperature;
           surfaces.push_back(surface);
 
-          position += (xyWallTopExterior - xyWallTopInterior)/N;
-          temperature -= (1.0/N)*Tdiff;
+          position += (xyWallTopExterior - xyWallTopInterior) / N;
+          temperature -= (1.0 / N) * Tdiff;
         }
       }
-    }
-    else
-    {
+    } else {
       // Wall Top
-      if(hasWall)
-      {
+      if (hasWall) {
         Polygon poly;
         poly = offset(polygon, xyWallTopExterior);
 
@@ -1830,25 +1709,23 @@ void Foundation::createMeshData()
     }
 
     // General surfaces
-    for (auto& s : surf2D) {
+    for (auto &s : surf2D) {
       if (s.orientation == Surface::X_POS || s.orientation == Surface::X_NEG) {
         Polygon poly;
         poly = offset(polygon, s.xMin);
 
-        for (std::size_t v = 0; v < nV; v++)
-        {
+        for (std::size_t v = 0; v < nV; v++) {
           Surface surface;
           surface.type = s.type;
-          surface.xMin = getXmin(poly,v);
-          surface.xMax = getXmax(poly,v);
-          surface.yMin = getYmin(poly,v);
-          surface.yMax = getYmax(poly,v);
+          surface.xMin = getXmin(poly, v);
+          surface.xMax = getXmax(poly, v);
+          surface.yMin = getYmin(poly, v);
+          surface.yMax = getYmax(poly, v);
           surface.setSquarePolygon();
           surface.zMin = s.zMin;
           surface.zMax = s.zMax;
           surface.boundaryConditionType = s.boundaryConditionType;
-          switch (getDirectionOut(poly,v))
-          {
+          switch (getDirectionOut(poly, v)) {
           case geom::Y_POS:
             surface.orientation = Surface::X_POS;
             break;
@@ -1888,21 +1765,16 @@ void Foundation::createMeshData()
         surface.orientation = s.orientation;
         surface.propPtr = s.propPtr;
         surfaces.push_back(surface);
-
       }
     }
 
-
     // BLOCKS
 
-
-    if (hasSlab)
-    {
+    if (hasSlab) {
       // Foundation Slab
       double zPosition = zSlabBottom;
 
-      for (size_t n = 0; n < slab.layers.size(); n++)
-      {
+      for (size_t n = 0; n < slab.layers.size(); n++) {
         Block block;
         block.material = slab.layers[n].material;
         block.blockType = Block::SOLID;
@@ -1928,13 +1800,11 @@ void Foundation::createMeshData()
       blocks.push_back(block);
     }
 
-    if (hasWall)
-    {
+    if (hasWall) {
       double xyPosition = 0.0;
 
       // Foundation Wall
-      for (int n = wall.layers.size() - 1; n >= 0; n--)
-      {
+      for (int n = wall.layers.size() - 1; n >= 0; n--) {
         Polygon poly;
         poly = offset(polygon, xyPosition + wall.layers[n].thickness);
 
@@ -1981,7 +1851,7 @@ void Foundation::createMeshData()
     }
 
     // General blocks
-    for (auto& b : inputBlocks) {
+    for (auto &b : inputBlocks) {
       Polygon poly;
       poly = offset(polygon, b.box.max_corner().get<0>());
 
@@ -2002,55 +1872,44 @@ void Foundation::createMeshData()
       blocks.push_back(block);
     }
 
-
     // Set x and y near ranges
     std::vector<RangeType> xNearRanges;
     std::vector<RangeType> yNearRanges;
 
-    for (std::size_t v = 0; v < nV; v++)
-    {
+    for (std::size_t v = 0; v < nV; v++) {
       double x = polygon.outer()[v].get<0>();
       double y = polygon.outer()[v].get<1>();
 
-      switch (getDirectionOut(polygon,v))
-      {
-      case geom::Y_POS:
-        {
-          RangeType range;
-          range.range.first = x - xyNearExt;
-          range.range.second = x - xyNearInt;
-          range.type = RangeType::NEAR;
-          xNearRanges.push_back(range);
-        }
-        break;
+      switch (getDirectionOut(polygon, v)) {
+      case geom::Y_POS: {
+        RangeType range;
+        range.range.first = x - xyNearExt;
+        range.range.second = x - xyNearInt;
+        range.type = RangeType::NEAR;
+        xNearRanges.push_back(range);
+      } break;
 
-      case geom::Y_NEG:
-        {
-          RangeType range;
-          range.range.first = x + xyNearInt;
-          range.range.second = x + xyNearExt;
-          range.type = RangeType::NEAR;
-          xNearRanges.push_back(range);
-        }
-        break;
-      case geom::X_POS:
-        {
-          RangeType range;
-          range.range.first = y + xyNearInt;
-          range.range.second = y + xyNearExt;
-          range.type = RangeType::NEAR;
-          yNearRanges.push_back(range);
-        }
-        break;
-      case geom::X_NEG:
-        {
-          RangeType range;
-          range.range.first = y - xyNearExt;
-          range.range.second = y - xyNearInt;
-          range.type = RangeType::NEAR;
-          yNearRanges.push_back(range);
-        }
-        break;
+      case geom::Y_NEG: {
+        RangeType range;
+        range.range.first = x + xyNearInt;
+        range.range.second = x + xyNearExt;
+        range.type = RangeType::NEAR;
+        xNearRanges.push_back(range);
+      } break;
+      case geom::X_POS: {
+        RangeType range;
+        range.range.first = y + xyNearInt;
+        range.range.second = y + xyNearExt;
+        range.type = RangeType::NEAR;
+        yNearRanges.push_back(range);
+      } break;
+      case geom::X_NEG: {
+        RangeType range;
+        range.range.first = y - xyNearExt;
+        range.range.second = y - xyNearInt;
+        range.type = RangeType::NEAR;
+        yNearRanges.push_back(range);
+      } break;
       }
     }
 
@@ -2058,12 +1917,10 @@ void Foundation::createMeshData()
     sort(xNearRanges.begin(), xNearRanges.end(), compareRanges);
 
     // Merge overlapping ranges
-    for (std::size_t r = 1; r < xNearRanges.size(); r++)
-    {
-      if (isLessOrEqual(xNearRanges[r].range.first,xNearRanges[r-1].range.second))
-      {
-        xNearRanges[r-1].range.second = xNearRanges[r].range.second;
-        xNearRanges.erase(xNearRanges.begin() + r-1);
+    for (std::size_t r = 1; r < xNearRanges.size(); r++) {
+      if (isLessOrEqual(xNearRanges[r].range.first, xNearRanges[r - 1].range.second)) {
+        xNearRanges[r - 1].range.second = xNearRanges[r].range.second;
+        xNearRanges.erase(xNearRanges.begin() + r - 1);
         r -= 1;
       }
     }
@@ -2074,20 +1931,16 @@ void Foundation::createMeshData()
     xMinExteriorRange.type = RangeType::MIN_EXTERIOR;
     xRanges.ranges.push_back(xMinExteriorRange);
 
-    for (std::size_t r = 0; r < xNearRanges.size(); r++)
-    {
-      if (r == 0)
-      {
+    for (std::size_t r = 0; r < xNearRanges.size(); r++) {
+      if (r == 0) {
         RangeType xNearRange;
         xNearRange.range.first = xNearRanges[r].range.first;
         xNearRange.range.second = xNearRanges[r].range.second;
         xNearRange.type = RangeType::NEAR;
         xRanges.ranges.push_back(xNearRange);
-      }
-      else
-      {
+      } else {
         RangeType xInteriorRange;
-        xInteriorRange.range.first = xNearRanges[r-1].range.second;
+        xInteriorRange.range.first = xNearRanges[r - 1].range.second;
         xInteriorRange.range.second = xNearRanges[r].range.first;
         xInteriorRange.type = RangeType::MID_INTERIOR;
         xRanges.ranges.push_back(xInteriorRange);
@@ -2106,17 +1959,14 @@ void Foundation::createMeshData()
     xMaxExteriorRange.type = RangeType::MAX_EXTERIOR;
     xRanges.ranges.push_back(xMaxExteriorRange);
 
-
     // Set Y range types
     sort(yNearRanges.begin(), yNearRanges.end(), compareRanges);
 
     // Merge overlapping ranges
-    for (std::size_t r = 1; r < yNearRanges.size(); r++)
-    {
-      if (isLessOrEqual(yNearRanges[r].range.first,yNearRanges[r-1].range.second))
-      {
-        yNearRanges[r-1].range.second = yNearRanges[r].range.second;
-        yNearRanges.erase(yNearRanges.begin() + r-1);
+    for (std::size_t r = 1; r < yNearRanges.size(); r++) {
+      if (isLessOrEqual(yNearRanges[r].range.first, yNearRanges[r - 1].range.second)) {
+        yNearRanges[r - 1].range.second = yNearRanges[r].range.second;
+        yNearRanges.erase(yNearRanges.begin() + r - 1);
         r -= 1;
       }
     }
@@ -2127,20 +1977,16 @@ void Foundation::createMeshData()
     yMinExteriorRange.type = RangeType::MIN_EXTERIOR;
     yRanges.ranges.push_back(yMinExteriorRange);
 
-    for (std::size_t r = 0; r < yNearRanges.size(); r++)
-    {
-      if (r == 0)
-      {
+    for (std::size_t r = 0; r < yNearRanges.size(); r++) {
+      if (r == 0) {
         RangeType yNearRange;
         yNearRange.range.first = yNearRanges[r].range.first;
         yNearRange.range.second = yNearRanges[r].range.second;
         yNearRange.type = RangeType::NEAR;
         yRanges.ranges.push_back(yNearRange);
-      }
-      else
-      {
+      } else {
         RangeType yInteriorRange;
-        yInteriorRange.range.first = yNearRanges[r-1].range.second;
+        yInteriorRange.range.first = yNearRanges[r - 1].range.second;
         yInteriorRange.range.second = yNearRanges[r].range.first;
         yInteriorRange.type = RangeType::MID_INTERIOR;
         yRanges.ranges.push_back(yInteriorRange);
@@ -2159,9 +2005,7 @@ void Foundation::createMeshData()
     yMaxExteriorRange.type = RangeType::MAX_EXTERIOR;
     yRanges.ranges.push_back(yMaxExteriorRange);
 
-  }
-  else if(numberOfDimensions == 3 && useSymmetry)
-  {
+  } else if (numberOfDimensions == 3 && useSymmetry) {
     // TODO: 3D Symmetric
     isXSymm = isXSymmetric(polygon);
     isYSymm = isYSymmetric(polygon);
@@ -2194,20 +2038,20 @@ void Foundation::createMeshData()
     xMax = xMaxBB + farFieldWidth;
     yMax = yMaxBB + farFieldWidth;
 
-    Box domainBox(Point(xMin,yMin),Point(xMax,yMax));
+    Box domainBox(Point(xMin, yMin), Point(xMax, yMax));
 
     // Symmetry & Far Field Surfaces
     {
       // X Min
       Surface surface;
       surface.type = Surface::ST_FAR_FIELD;
-      surface.xMin =  xMin;
-      surface.xMax =  xMin;
-      surface.yMin =  yMin;
-      surface.yMax =  yMax;
+      surface.xMin = xMin;
+      surface.xMax = xMin;
+      surface.yMin = yMin;
+      surface.yMax = yMax;
       surface.setSquarePolygon();
-      surface.zMin =  zMin;
-      surface.zMax =  zMax;
+      surface.zMin = zMin;
+      surface.zMax = zMax;
       surface.boundaryConditionType = Surface::ZERO_FLUX;
       surface.orientation = Surface::X_NEG;
       surfaces.push_back(surface);
@@ -2217,13 +2061,13 @@ void Foundation::createMeshData()
       // X Max
       Surface surface;
       surface.type = Surface::ST_FAR_FIELD;
-      surface.xMin =  xMax;
-      surface.xMax =  xMax;
-      surface.yMin =  yMin;
-      surface.yMax =  yMax;
+      surface.xMin = xMax;
+      surface.xMax = xMax;
+      surface.yMin = yMin;
+      surface.yMax = yMax;
       surface.setSquarePolygon();
-      surface.zMin =  zMin;
-      surface.zMax =  zMax;
+      surface.zMin = zMin;
+      surface.zMax = zMax;
       surface.boundaryConditionType = Surface::ZERO_FLUX;
       surface.orientation = Surface::X_POS;
       surfaces.push_back(surface);
@@ -2233,15 +2077,15 @@ void Foundation::createMeshData()
       // Y Min
       Surface surface;
       surface.type = Surface::ST_FAR_FIELD;
-      surface.xMin =  xMin;
-      surface.xMax =  xMax;
-      surface.yMin =  yMin;
-      surface.yMax =  yMin;
+      surface.xMin = xMin;
+      surface.xMax = xMax;
+      surface.yMin = yMin;
+      surface.yMax = yMin;
       surface.setSquarePolygon();
-      surface.zMin =  zMin;
-      surface.zMax =  zMax;
+      surface.zMin = zMin;
+      surface.zMax = zMax;
       surface.boundaryConditionType = Surface::ZERO_FLUX;
-      surface.orientation =  Surface::Y_NEG;
+      surface.orientation = Surface::Y_NEG;
       surfaces.push_back(surface);
     }
 
@@ -2249,15 +2093,15 @@ void Foundation::createMeshData()
       // Y Max
       Surface surface;
       surface.type = Surface::ST_FAR_FIELD;
-      surface.xMin =  xMin;
-      surface.xMax =  xMax;
-      surface.yMin =  yMax;
-      surface.yMax =  yMax;
+      surface.xMin = xMin;
+      surface.xMax = xMax;
+      surface.yMin = yMax;
+      surface.yMax = yMax;
       surface.setSquarePolygon();
-      surface.zMin =  zMin;
-      surface.zMax =  zMax;
+      surface.zMin = zMin;
+      surface.zMax = zMax;
       surface.boundaryConditionType = Surface::ZERO_FLUX;
-      surface.orientation =  Surface::Y_POS;
+      surface.orientation = Surface::Y_POS;
       surfaces.push_back(surface);
     }
 
@@ -2272,9 +2116,8 @@ void Foundation::createMeshData()
       surface.setSquarePolygon();
       surface.zMin = zMin;
       surface.zMax = zMin;
-      if (deepGroundBoundary == DGB_FIXED_TEMPERATURE)
-      {
-          surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
+      if (deepGroundBoundary == DGB_FIXED_TEMPERATURE) {
+        surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
       } else {
         surface.boundaryConditionType = Surface::ZERO_FLUX;
       }
@@ -2287,7 +2130,7 @@ void Foundation::createMeshData()
       Polygon tempPoly;
       tempPoly = offset(polygon, xySlabNear);
       MultiPolygon poly;
-      boost::geometry::intersection(domainBox,tempPoly,poly);
+      boost::geometry::intersection(domainBox, tempPoly, poly);
 
       Surface surface;
       surface.type = Surface::ST_SLAB_CORE;
@@ -2306,7 +2149,7 @@ void Foundation::createMeshData()
       tempPoly = offset(polygon, xyGradeNear);
 
       MultiPolygon poly;
-      boost::geometry::difference(domainBox,tempPoly,poly);
+      boost::geometry::difference(domainBox, tempPoly, poly);
 
       Surface surface;
       surface.type = Surface::ST_GRADE;
@@ -2319,13 +2162,12 @@ void Foundation::createMeshData()
       surfaces.push_back(surface);
     }
 
-    if(foundationDepth > 0.0)
-    {
+    if (foundationDepth > 0.0) {
       // Interior Air Top Surface
       Polygon tempPoly;
       tempPoly = offset(polygon, xyWallTopInterior);
       MultiPolygon poly;
-      boost::geometry::intersection(domainBox,tempPoly,poly);
+      boost::geometry::intersection(domainBox, tempPoly, poly);
 
       Surface surface;
       surface.type = Surface::ST_TOP_AIR_INT;
@@ -2337,14 +2179,13 @@ void Foundation::createMeshData()
       surfaces.push_back(surface);
     }
 
-    if(zMax > zGrade)
-    {
+    if (zMax > zGrade) {
       // Exterior Air Top Surface
       Polygon tempPoly;
       tempPoly = offset(polygon, xyWallTopExterior);
 
       MultiPolygon poly;
-      boost::geometry::difference(domainBox,tempPoly,poly);
+      boost::geometry::difference(domainBox, tempPoly, poly);
 
       Surface surface;
       surface.type = Surface::ST_TOP_AIR_EXT;
@@ -2356,23 +2197,20 @@ void Foundation::createMeshData()
       surfaces.push_back(surface);
     }
 
-    if (wallTopBoundary == WTB_LINEAR_DT)
-    {
+    if (wallTopBoundary == WTB_LINEAR_DT) {
       // Wall Top
-      if(hasWall)
-      {
+      if (hasWall) {
         double position = 0.0;
-        double& Tin = wallTopInteriorTemperature;
-        double& Tout = wallTopExteriorTemperature;
+        double &Tin = wallTopInteriorTemperature;
+        double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON)/mesh.minCellDim;
-        double temperature = Tin - (1.0/N)/2*Tdiff;
+        std::size_t N = (xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim;
+        double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
-        for (std::size_t n = 1; n <= N; n++)
-        {
+        for (std::size_t n = 1; n <= N; n++) {
 
           Polygon tempPoly;
-          tempPoly = offset(polygon, position + (xyWallTopExterior - xyWallTopInterior)/N);
+          tempPoly = offset(polygon, position + (xyWallTopExterior - xyWallTopInterior) / N);
 
           Polygon temp;
           temp = offset(polygon, position);
@@ -2383,7 +2221,7 @@ void Foundation::createMeshData()
           tempPoly.inners().push_back(ring);
 
           MultiPolygon poly;
-          boost::geometry::intersection(domainBox,tempPoly,poly);
+          boost::geometry::intersection(domainBox, tempPoly, poly);
 
           Surface surface;
           surface.type = Surface::ST_WALL_TOP;
@@ -2395,16 +2233,13 @@ void Foundation::createMeshData()
           surface.temperature = temperature;
           surfaces.push_back(surface);
 
-          position += (xyWallTopExterior - xyWallTopInterior)/N;
-          temperature -= (1.0/N)*Tdiff;
+          position += (xyWallTopExterior - xyWallTopInterior) / N;
+          temperature -= (1.0 / N) * Tdiff;
         }
       }
-    }
-    else
-    {
+    } else {
       // Wall Top
-      if(hasWall)
-      {
+      if (hasWall) {
         Polygon tempPoly;
         tempPoly = offset(polygon, xyWallTopExterior);
 
@@ -2417,7 +2252,7 @@ void Foundation::createMeshData()
         tempPoly.inners().push_back(ring);
 
         MultiPolygon poly;
-        boost::geometry::intersection(domainBox,tempPoly,poly);
+        boost::geometry::intersection(domainBox, tempPoly, poly);
 
         Surface surface;
         surface.type = Surface::ST_WALL_TOP;
@@ -2431,32 +2266,29 @@ void Foundation::createMeshData()
     }
 
     // General surfaces
-    for (auto& s : surf2D) {
+    for (auto &s : surf2D) {
       if (s.orientation == Surface::X_POS || s.orientation == Surface::X_NEG) {
         Polygon tempPoly;
         tempPoly = offset(polygon, s.xMin);
         MultiPolygon poly;
-        boost::geometry::intersection(domainBox,tempPoly,poly);
+        boost::geometry::intersection(domainBox, tempPoly, poly);
 
-        for (std::size_t v = 0; v < nV; v++)
-        {
+        for (std::size_t v = 0; v < nV; v++) {
 
-          if (!((isEqual(getXmin(poly[0],v),xMin) && isEqual(getXmax(poly[0],v),xMin)) ||
-              (isEqual(getYmin(poly[0],v),yMin) && isEqual(getYmax(poly[0],v),yMin))))
-          {
+          if (!((isEqual(getXmin(poly[0], v), xMin) && isEqual(getXmax(poly[0], v), xMin)) ||
+                (isEqual(getYmin(poly[0], v), yMin) && isEqual(getYmax(poly[0], v), yMin)))) {
 
             Surface surface;
             surface.type = s.type;
-            surface.xMin = getXmin(poly[0],v);
-            surface.xMax = getXmax(poly[0],v);
-            surface.yMin = getYmin(poly[0],v);
-            surface.yMax = getYmax(poly[0],v);
+            surface.xMin = getXmin(poly[0], v);
+            surface.xMax = getXmax(poly[0], v);
+            surface.yMin = getYmin(poly[0], v);
+            surface.yMax = getYmax(poly[0], v);
             surface.setSquarePolygon();
             surface.zMin = s.zMin;
             surface.zMax = s.zMax;
             surface.boundaryConditionType = s.boundaryConditionType;
-            switch (getDirectionOut(poly[0],v))
-            {
+            switch (getDirectionOut(poly[0], v)) {
             case geom::Y_POS:
               surface.orientation = Surface::X_POS;
               break;
@@ -2489,7 +2321,7 @@ void Foundation::createMeshData()
         tempPoly.inners().push_back(ring);
 
         MultiPolygon poly;
-        boost::geometry::intersection(domainBox,tempPoly,poly);
+        boost::geometry::intersection(domainBox, tempPoly, poly);
 
         poly[0].inners().push_back(ring);
 
@@ -2502,14 +2334,12 @@ void Foundation::createMeshData()
         surface.orientation = s.orientation;
         surface.propPtr = s.propPtr;
         surfaces.push_back(surface);
-
       }
     }
 
     // BLOCKS
 
-    if (hasSlab)
-    {
+    if (hasSlab) {
       // Foundation Slab
       double zPosition = zSlabBottom;
 
@@ -2517,10 +2347,9 @@ void Foundation::createMeshData()
       tempPoly = polygon;
 
       MultiPolygon poly;
-      boost::geometry::intersection(domainBox,tempPoly,poly);
+      boost::geometry::intersection(domainBox, tempPoly, poly);
 
-      for (size_t n = 0; n < slab.layers.size(); n++)
-      {
+      for (size_t n = 0; n < slab.layers.size(); n++) {
         Block block;
         block.material = slab.layers[n].material;
         block.blockType = Block::SOLID;
@@ -2532,14 +2361,13 @@ void Foundation::createMeshData()
       }
     }
 
-
     // Indoor Air
     {
       Polygon tempPoly;
       tempPoly = offset(polygon, xyWallInterior);
 
       MultiPolygon poly;
-      boost::geometry::intersection(domainBox,tempPoly,poly);
+      boost::geometry::intersection(domainBox, tempPoly, poly);
 
       Block block;
       block.material = air;
@@ -2550,13 +2378,11 @@ void Foundation::createMeshData()
       blocks.push_back(block);
     }
 
-    if (hasWall)
-    {
+    if (hasWall) {
       double xyPosition = 0.0;
 
       // Foundation Wall
-      for (int n = wall.layers.size() - 1; n >= 0; n--)
-      {
+      for (int n = wall.layers.size() - 1; n >= 0; n--) {
         Polygon tempPoly;
         tempPoly = offset(polygon, xyPosition + wall.layers[n].thickness);
 
@@ -2569,7 +2395,7 @@ void Foundation::createMeshData()
         tempPoly.inners().push_back(ring);
 
         MultiPolygon poly;
-        boost::geometry::intersection(domainBox,tempPoly,poly);
+        boost::geometry::intersection(domainBox, tempPoly, poly);
 
         Block block;
         block.material = wall.layers[n].material;
@@ -2588,7 +2414,7 @@ void Foundation::createMeshData()
       tempPoly = offset(polygon, xyWallExterior);
 
       MultiPolygon poly;
-      boost::geometry::difference(domainBox,tempPoly,poly);
+      boost::geometry::difference(domainBox, tempPoly, poly);
 
       Block block;
       block.material = air;
@@ -2600,7 +2426,7 @@ void Foundation::createMeshData()
     }
 
     // General blocks
-    for (auto& b : inputBlocks) {
+    for (auto &b : inputBlocks) {
       Polygon tempPoly;
       tempPoly = offset(polygon, b.box.max_corner().get<0>());
 
@@ -2613,7 +2439,7 @@ void Foundation::createMeshData()
       tempPoly.inners().push_back(ring);
 
       MultiPolygon poly;
-      boost::geometry::intersection(domainBox,tempPoly,poly);
+      boost::geometry::intersection(domainBox, tempPoly, poly);
 
       Block block;
       block.material = b.material;
@@ -2628,53 +2454,44 @@ void Foundation::createMeshData()
     std::vector<RangeType> xNearRanges;
     std::vector<RangeType> yNearRanges;
 
-    for (std::size_t v = 0; v < symmetricPoly.outer().size(); v++)
-    {
-      if (!((isEqual(getXmin(symmetricPoly,v),xMin) && isEqual(getXmax(symmetricPoly,v),xMin)) ||
-          (isEqual(getYmin(symmetricPoly,v),yMin) && isEqual(getYmax(symmetricPoly,v),yMin))))
-      {
+    for (std::size_t v = 0; v < symmetricPoly.outer().size(); v++) {
+      if (!((isEqual(getXmin(symmetricPoly, v), xMin) &&
+             isEqual(getXmax(symmetricPoly, v), xMin)) ||
+            (isEqual(getYmin(symmetricPoly, v), yMin) &&
+             isEqual(getYmax(symmetricPoly, v), yMin)))) {
         double x = symmetricPoly.outer()[v].get<0>();
         double y = symmetricPoly.outer()[v].get<1>();
 
-        switch (getDirectionOut(symmetricPoly,v))
-        {
-        case geom::Y_POS:
-          {
-            RangeType range;
-            range.range.first = x - xyNearExt;
-            range.range.second = x - xyNearInt;
-            range.type = RangeType::NEAR;
-            xNearRanges.push_back(range);
-          }
-          break;
+        switch (getDirectionOut(symmetricPoly, v)) {
+        case geom::Y_POS: {
+          RangeType range;
+          range.range.first = x - xyNearExt;
+          range.range.second = x - xyNearInt;
+          range.type = RangeType::NEAR;
+          xNearRanges.push_back(range);
+        } break;
 
-        case geom::Y_NEG:
-          {
-            RangeType range;
-            range.range.first = x + xyNearInt;
-            range.range.second = x + xyNearExt;
-            range.type = RangeType::NEAR;
-            xNearRanges.push_back(range);
-          }
-          break;
-        case geom::X_POS:
-          {
-            RangeType range;
-            range.range.first = y + xyNearInt;
-            range.range.second = y + xyNearExt;
-            range.type = RangeType::NEAR;
-            yNearRanges.push_back(range);
-          }
-          break;
-        case geom::X_NEG:
-          {
-            RangeType range;
-            range.range.first = y - xyNearExt;
-            range.range.second = y - xyNearInt;
-            range.type = RangeType::NEAR;
-            yNearRanges.push_back(range);
-          }
-          break;
+        case geom::Y_NEG: {
+          RangeType range;
+          range.range.first = x + xyNearInt;
+          range.range.second = x + xyNearExt;
+          range.type = RangeType::NEAR;
+          xNearRanges.push_back(range);
+        } break;
+        case geom::X_POS: {
+          RangeType range;
+          range.range.first = y + xyNearInt;
+          range.range.second = y + xyNearExt;
+          range.type = RangeType::NEAR;
+          yNearRanges.push_back(range);
+        } break;
+        case geom::X_NEG: {
+          RangeType range;
+          range.range.first = y - xyNearExt;
+          range.range.second = y - xyNearInt;
+          range.type = RangeType::NEAR;
+          yNearRanges.push_back(range);
+        } break;
         }
       }
     }
@@ -2683,26 +2500,21 @@ void Foundation::createMeshData()
     sort(xNearRanges.begin(), xNearRanges.end(), compareRanges);
 
     // Merge overlapping ranges
-    for (std::size_t r = 1; r < xNearRanges.size(); r++)
-    {
-      if (isLessOrEqual(xNearRanges[r].range.first,xNearRanges[r-1].range.second))
-      {
-        xNearRanges[r-1].range.second = xNearRanges[r].range.second;
-        xNearRanges.erase(xNearRanges.begin() + r-1);
+    for (std::size_t r = 1; r < xNearRanges.size(); r++) {
+      if (isLessOrEqual(xNearRanges[r].range.first, xNearRanges[r - 1].range.second)) {
+        xNearRanges[r - 1].range.second = xNearRanges[r].range.second;
+        xNearRanges.erase(xNearRanges.begin() + r - 1);
         r -= 1;
       }
     }
 
-    if (isXSymm)
-    {
+    if (isXSymm) {
       RangeType xMinInteriorRange;
       xMinInteriorRange.range.first = xMin;
       xMinInteriorRange.range.second = xNearRanges[0].range.first;
       xMinInteriorRange.type = RangeType::MIN_INTERIOR;
       xRanges.ranges.push_back(xMinInteriorRange);
-    }
-    else
-    {
+    } else {
       RangeType xMinExteriorRange;
       xMinExteriorRange.range.first = xMin;
       xMinExteriorRange.range.second = xNearRanges[0].range.first;
@@ -2710,20 +2522,16 @@ void Foundation::createMeshData()
       xRanges.ranges.push_back(xMinExteriorRange);
     }
 
-    for (std::size_t r = 0; r < xNearRanges.size(); r++)
-    {
-      if (r == 0)
-      {
+    for (std::size_t r = 0; r < xNearRanges.size(); r++) {
+      if (r == 0) {
         RangeType xNearRange;
         xNearRange.range.first = xNearRanges[r].range.first;
         xNearRange.range.second = xNearRanges[r].range.second;
         xNearRange.type = RangeType::NEAR;
         xRanges.ranges.push_back(xNearRange);
-      }
-      else
-      {
+      } else {
         RangeType xInteriorRange;
-        xInteriorRange.range.first = xNearRanges[r-1].range.second;
+        xInteriorRange.range.first = xNearRanges[r - 1].range.second;
         xInteriorRange.range.second = xNearRanges[r].range.first;
         xInteriorRange.type = RangeType::MID_INTERIOR;
         xRanges.ranges.push_back(xInteriorRange);
@@ -2742,31 +2550,25 @@ void Foundation::createMeshData()
     xMaxExteriorRange.type = RangeType::MAX_EXTERIOR;
     xRanges.ranges.push_back(xMaxExteriorRange);
 
-
     // Set Y range types
     sort(yNearRanges.begin(), yNearRanges.end(), compareRanges);
 
     // Merge overlapping ranges
-    for (std::size_t r = 1; r < yNearRanges.size(); r++)
-    {
-      if (isLessOrEqual(yNearRanges[r].range.first,yNearRanges[r-1].range.second))
-      {
-        yNearRanges[r-1].range.second = yNearRanges[r].range.second;
-        yNearRanges.erase(yNearRanges.begin() + r-1);
+    for (std::size_t r = 1; r < yNearRanges.size(); r++) {
+      if (isLessOrEqual(yNearRanges[r].range.first, yNearRanges[r - 1].range.second)) {
+        yNearRanges[r - 1].range.second = yNearRanges[r].range.second;
+        yNearRanges.erase(yNearRanges.begin() + r - 1);
         r -= 1;
       }
     }
 
-    if (isYSymm)
-    {
+    if (isYSymm) {
       RangeType yMinInteriorRange;
       yMinInteriorRange.range.first = yMin;
       yMinInteriorRange.range.second = yNearRanges[0].range.first;
       yMinInteriorRange.type = RangeType::MIN_INTERIOR;
       yRanges.ranges.push_back(yMinInteriorRange);
-    }
-    else
-    {
+    } else {
       RangeType yMinExteriorRange;
       yMinExteriorRange.range.first = yMin;
       yMinExteriorRange.range.second = yNearRanges[0].range.first;
@@ -2774,20 +2576,16 @@ void Foundation::createMeshData()
       yRanges.ranges.push_back(yMinExteriorRange);
     }
 
-    for (std::size_t r = 0; r < yNearRanges.size(); r++)
-    {
-      if (r == 0)
-      {
+    for (std::size_t r = 0; r < yNearRanges.size(); r++) {
+      if (r == 0) {
         RangeType yNearRange;
         yNearRange.range.first = yNearRanges[r].range.first;
         yNearRange.range.second = yNearRanges[r].range.second;
         yNearRange.type = RangeType::NEAR;
         yRanges.ranges.push_back(yNearRange);
-      }
-      else
-      {
+      } else {
         RangeType yInteriorRange;
-        yInteriorRange.range.first = yNearRanges[r-1].range.second;
+        yInteriorRange.range.first = yNearRanges[r - 1].range.second;
         yInteriorRange.range.second = yNearRanges[r].range.first;
         yInteriorRange.type = RangeType::MID_INTERIOR;
         yRanges.ranges.push_back(yInteriorRange);
@@ -2819,58 +2617,48 @@ void Foundation::createMeshData()
   std::vector<double> zSurfaces;
 
   // Create points for mesh data
-  for (size_t s = 0; s < surfaces.size(); s++)
-  {
-    for (std::size_t v = 0; v < surfaces[s].polygon.outer().size(); v++)
-    {
+  for (size_t s = 0; s < surfaces.size(); s++) {
+    for (std::size_t v = 0; v < surfaces[s].polygon.outer().size(); v++) {
       // Make sure points are within the domain
-      double pointX = std::max(std::min(surfaces[s].polygon.outer()[v].get<0>(),xMax),xMin);
+      double pointX = std::max(std::min(surfaces[s].polygon.outer()[v].get<0>(), xMax), xMin);
       surfaces[s].polygon.outer()[v].set<0>(pointX);
-      double pointY = std::max(std::min(surfaces[s].polygon.outer()[v].get<1>(),yMax),yMin);
+      double pointY = std::max(std::min(surfaces[s].polygon.outer()[v].get<1>(), yMax), yMin);
       surfaces[s].polygon.outer()[v].set<1>(pointY);
 
       xPoints.push_back(surfaces[s].polygon.outer()[v].get<0>());
       yPoints.push_back(surfaces[s].polygon.outer()[v].get<1>());
     }
-    surfaces[s].zMax = std::max(std::min(surfaces[s].zMax,zMax),zMin);
-    surfaces[s].zMin = std::max(std::min(surfaces[s].zMin,zMax),zMin);
+    surfaces[s].zMax = std::max(std::min(surfaces[s].zMax, zMax), zMin);
+    surfaces[s].zMin = std::max(std::min(surfaces[s].zMin, zMax), zMin);
 
     zPoints.push_back(surfaces[s].zMax);
     zPoints.push_back(surfaces[s].zMin);
 
-    if (surfaces[s].orientation == Surface::X_POS ||
-      surfaces[s].orientation == Surface::X_NEG)
-    {
+    if (surfaces[s].orientation == Surface::X_POS || surfaces[s].orientation == Surface::X_NEG) {
       xSurfaces.push_back(surfaces[s].polygon.outer()[0].get<0>());
-    }
-    else if (surfaces[s].orientation == Surface::Y_POS ||
-         surfaces[s].orientation == Surface::Y_NEG)
-    {
+    } else if (surfaces[s].orientation == Surface::Y_POS ||
+               surfaces[s].orientation == Surface::Y_NEG) {
       ySurfaces.push_back(surfaces[s].polygon.outer()[0].get<1>());
-    }
-    else // if (surfaces[s].orientation == Surface::Z_POS ||
-       //     surfaces[s].orientation == Surface::Z_NEG)
+    } else // if (surfaces[s].orientation == Surface::Z_POS ||
+           //     surfaces[s].orientation == Surface::Z_NEG)
     {
       zSurfaces.push_back(surfaces[s].zMin);
     }
-
   }
 
-  for (size_t b = 0; b < blocks.size(); b++)
-  {
-    for (std::size_t v = 0; v < blocks[b].polygon.outer().size(); v++)
-    {
+  for (size_t b = 0; b < blocks.size(); b++) {
+    for (std::size_t v = 0; v < blocks[b].polygon.outer().size(); v++) {
       // Make sure points are within the domain
-      double pointX = std::max(std::min(blocks[b].polygon.outer()[v].get<0>(),xMax),xMin);
+      double pointX = std::max(std::min(blocks[b].polygon.outer()[v].get<0>(), xMax), xMin);
       blocks[b].polygon.outer()[v].set<0>(pointX);
-      double pointY = std::max(std::min(blocks[b].polygon.outer()[v].get<1>(),yMax),yMin);
+      double pointY = std::max(std::min(blocks[b].polygon.outer()[v].get<1>(), yMax), yMin);
       blocks[b].polygon.outer()[v].set<1>(pointY);
 
       xPoints.push_back(blocks[b].polygon.outer()[v].get<0>());
       yPoints.push_back(blocks[b].polygon.outer()[v].get<1>());
     }
-    blocks[b].zMax = std::max(std::min(blocks[b].zMax,zMax),zMin);
-    blocks[b].zMin = std::max(std::min(blocks[b].zMin,zMax),zMin);
+    blocks[b].zMax = std::max(std::min(blocks[b].zMax, zMax), zMin);
+    blocks[b].zMin = std::max(std::min(blocks[b].zMin, zMax), zMin);
 
     zPoints.push_back(blocks[b].zMax);
     zPoints.push_back(blocks[b].zMin);
@@ -2882,28 +2670,22 @@ void Foundation::createMeshData()
   sort(zPoints.begin(), zPoints.end());
 
   // erase duplicate elements
-  for (size_t i = 1; i < xPoints.size(); i++)
-  {
-    if (isEqual(xPoints[i], xPoints[i-1]))
-    {
+  for (size_t i = 1; i < xPoints.size(); i++) {
+    if (isEqual(xPoints[i], xPoints[i - 1])) {
       xPoints.erase(xPoints.begin() + i);
       i -= 1;
     }
   }
 
-  for (size_t j = 1; j < yPoints.size(); j++)
-  {
-    if (isEqual(yPoints[j], yPoints[j-1]))
-    {
+  for (size_t j = 1; j < yPoints.size(); j++) {
+    if (isEqual(yPoints[j], yPoints[j - 1])) {
       yPoints.erase(yPoints.begin() + j);
       j -= 1;
     }
   }
 
-  for (size_t k = 1; k < zPoints.size(); k++)
-  {
-    if (isEqual(zPoints[k], zPoints[k-1]))
-    {
+  for (size_t k = 1; k < zPoints.size(); k++) {
+    if (isEqual(zPoints[k], zPoints[k - 1])) {
       zPoints.erase(zPoints.begin() + k);
       k -= 1;
     }
@@ -2915,46 +2697,37 @@ void Foundation::createMeshData()
   sort(zSurfaces.begin(), zSurfaces.end());
 
   // erase (approximately) duplicate elements
-  for (size_t i = 1; i < xSurfaces.size(); i++)
-  {
-    if (isEqual(xSurfaces[i], xSurfaces[i-1]))
-    {
+  for (size_t i = 1; i < xSurfaces.size(); i++) {
+    if (isEqual(xSurfaces[i], xSurfaces[i - 1])) {
       xSurfaces.erase(xSurfaces.begin() + i);
       i -= 1;
     }
   }
 
-  for (size_t j = 1; j < ySurfaces.size(); j++)
-  {
-    if (isEqual(ySurfaces[j], ySurfaces[j-1]))
-    {
+  for (size_t j = 1; j < ySurfaces.size(); j++) {
+    if (isEqual(ySurfaces[j], ySurfaces[j - 1])) {
       ySurfaces.erase(ySurfaces.begin() + j);
       j -= 1;
     }
   }
 
-  for (size_t k = 1; k < zSurfaces.size(); k++)
-  {
-    if (isEqual(zSurfaces[k], zSurfaces[k-1]))
-    {
+  for (size_t k = 1; k < zSurfaces.size(); k++) {
+    if (isEqual(zSurfaces[k], zSurfaces[k - 1])) {
       zSurfaces.erase(zSurfaces.begin() + k);
       k -= 1;
     }
   }
 
   // re-add the extra surface elements to create zero-thickness cells
-  for (size_t i = 0; i < xSurfaces.size(); i++)
-  {
+  for (size_t i = 0; i < xSurfaces.size(); i++) {
     xPoints.push_back(xSurfaces[i]);
   }
 
-  for (size_t j = 0; j < ySurfaces.size(); j++)
-  {
+  for (size_t j = 0; j < ySurfaces.size(); j++) {
     yPoints.push_back(ySurfaces[j]);
   }
 
-  for (size_t k = 0; k < zSurfaces.size(); k++)
-  {
+  for (size_t k = 0; k < zSurfaces.size(); k++) {
     zPoints.push_back(zSurfaces[k]);
   }
 
@@ -2962,7 +2735,6 @@ void Foundation::createMeshData()
   sort(xPoints.begin(), xPoints.end());
   sort(yPoints.begin(), yPoints.end());
   sort(zPoints.begin(), zPoints.end());
-
 
   xMeshData.points = xPoints;
   yMeshData.points = yPoints;
@@ -2973,76 +2745,68 @@ void Foundation::createMeshData()
   std::vector<Interval> zIntervals;
 
   // Make sure ranges are within the domain
-  for (size_t r = 0; r < xRanges.ranges.size(); r++)
-  {
-    xRanges.ranges[r].range.first = std::max(std::min(xRanges.ranges[r].range.first,xMax),xMin);
-    xRanges.ranges[r].range.second = std::max(std::min(xRanges.ranges[r].range.second,xMax),xMin);
+  for (size_t r = 0; r < xRanges.ranges.size(); r++) {
+    xRanges.ranges[r].range.first = std::max(std::min(xRanges.ranges[r].range.first, xMax), xMin);
+    xRanges.ranges[r].range.second = std::max(std::min(xRanges.ranges[r].range.second, xMax), xMin);
   }
-  for (size_t r = 0; r < yRanges.ranges.size(); r++)
-  {
-    yRanges.ranges[r].range.first = std::max(std::min(yRanges.ranges[r].range.first,yMax),yMin);
-    yRanges.ranges[r].range.second = std::max(std::min(yRanges.ranges[r].range.second,yMax),yMin);
+  for (size_t r = 0; r < yRanges.ranges.size(); r++) {
+    yRanges.ranges[r].range.first = std::max(std::min(yRanges.ranges[r].range.first, yMax), yMin);
+    yRanges.ranges[r].range.second = std::max(std::min(yRanges.ranges[r].range.second, yMax), yMin);
   }
-  for (size_t r = 0; r < zRanges.ranges.size(); r++)
-  {
-    zRanges.ranges[r].range.first = std::max(std::min(zRanges.ranges[r].range.first,zMax),zMin);
-    zRanges.ranges[r].range.second = std::max(std::min(zRanges.ranges[r].range.second,zMax),zMin);
+  for (size_t r = 0; r < zRanges.ranges.size(); r++) {
+    zRanges.ranges[r].range.first = std::max(std::min(zRanges.ranges[r].range.first, zMax), zMin);
+    zRanges.ranges[r].range.second = std::max(std::min(zRanges.ranges[r].range.second, zMax), zMin);
   }
 
-  for (size_t i = 1; i < xPoints.size(); i++)
-  {
-    if (isEqual(xPoints[i], xPoints[i-1]))
+  for (size_t i = 1; i < xPoints.size(); i++) {
+    if (isEqual(xPoints[i], xPoints[i - 1]))
       xIntervals.push_back(zeroThickness);
-    else if (xRanges.isType(xPoints[i],RangeType::MIN_INTERIOR))
+    else if (xRanges.isType(xPoints[i], RangeType::MIN_INTERIOR))
       xIntervals.push_back(minInterior);
-    else if (xRanges.isType(xPoints[i],RangeType::MID_INTERIOR))
+    else if (xRanges.isType(xPoints[i], RangeType::MID_INTERIOR))
       xIntervals.push_back(midInterior);
-    else if (xRanges.isType(xPoints[i],RangeType::NEAR))
+    else if (xRanges.isType(xPoints[i], RangeType::NEAR))
       xIntervals.push_back(near);
-    else if (xRanges.isType(xPoints[i],RangeType::MIN_EXTERIOR))
+    else if (xRanges.isType(xPoints[i], RangeType::MIN_EXTERIOR))
       xIntervals.push_back(minExterior);
-    else if (xRanges.isType(xPoints[i],RangeType::MAX_EXTERIOR))
+    else if (xRanges.isType(xPoints[i], RangeType::MAX_EXTERIOR))
       xIntervals.push_back(maxExterior);
   }
 
-  for (size_t j = 1; j < yPoints.size(); j++)
-  {
-    if (isEqual(yPoints[j], yPoints[j-1]))
+  for (size_t j = 1; j < yPoints.size(); j++) {
+    if (isEqual(yPoints[j], yPoints[j - 1]))
       yIntervals.push_back(zeroThickness);
-    else if (yRanges.isType(yPoints[j],RangeType::MIN_INTERIOR))
+    else if (yRanges.isType(yPoints[j], RangeType::MIN_INTERIOR))
       yIntervals.push_back(minInterior);
-    else if (yRanges.isType(yPoints[j],RangeType::MID_INTERIOR))
+    else if (yRanges.isType(yPoints[j], RangeType::MID_INTERIOR))
       yIntervals.push_back(midInterior);
-    else if (yRanges.isType(yPoints[j],RangeType::NEAR))
+    else if (yRanges.isType(yPoints[j], RangeType::NEAR))
       yIntervals.push_back(near);
-    else if (yRanges.isType(yPoints[j],RangeType::MIN_EXTERIOR))
+    else if (yRanges.isType(yPoints[j], RangeType::MIN_EXTERIOR))
       yIntervals.push_back(minExterior);
-    else if (yRanges.isType(yPoints[j],RangeType::MAX_EXTERIOR))
+    else if (yRanges.isType(yPoints[j], RangeType::MAX_EXTERIOR))
       yIntervals.push_back(maxExterior);
   }
 
-  for (size_t k = 1; k < zPoints.size(); k++)
-  {
-    if (isEqual(zPoints[k], zPoints[k-1]))
+  for (size_t k = 1; k < zPoints.size(); k++) {
+    if (isEqual(zPoints[k], zPoints[k - 1]))
       zIntervals.push_back(zeroThickness);
-    else if (zRanges.isType(zPoints[k],RangeType::DEEP))
+    else if (zRanges.isType(zPoints[k], RangeType::DEEP))
       zIntervals.push_back(deep);
-    else if (zRanges.isType(zPoints[k],RangeType::NEAR))
+    else if (zRanges.isType(zPoints[k], RangeType::NEAR))
       zIntervals.push_back(near);
   }
 
   xMeshData.intervals = xIntervals;
   yMeshData.intervals = yIntervals;
   zMeshData.intervals = zIntervals;
-
 }
 
-double Foundation::getConvectionCoeff(double Tsurf, double Tamb, double hfGlass,
-                                  double roughness, bool isExterior, double cosTilt) const
-{
+double Foundation::getConvectionCoeff(double Tsurf, double Tamb, double hfGlass, double roughness,
+                                      bool isExterior, double cosTilt) const {
   if (convectionCalculationMethod == Foundation::CCM_AUTO)
-    return getDOE2ConvectionCoeff(Tsurf,Tamb,hfGlass,roughness,cosTilt);
-  else //if (foundation.convectionCalculationMethod == Foundation::CCM_CONSTANT_COEFFICIENT)
+    return getDOE2ConvectionCoeff(Tsurf, Tamb, hfGlass, roughness, cosTilt);
+  else // if (foundation.convectionCalculationMethod == Foundation::CCM_CONSTANT_COEFFICIENT)
   {
     if (isExterior)
       return exteriorConvectiveCoefficient;
@@ -3051,4 +2815,4 @@ double Foundation::getConvectionCoeff(double Tsurf, double Tamb, double hfGlass,
   }
 }
 
-}
+} // namespace Kiva
