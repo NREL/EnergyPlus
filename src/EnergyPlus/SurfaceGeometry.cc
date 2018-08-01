@@ -3894,7 +3894,7 @@ namespace SurfaceGeometry {
 
         if (SurfaceNumAlpha != 6) {
             ShowSevereError(cCurrentModuleObject +
-                            ": Object Definition indicates not = 7 Alpha Objects, Number Indicated=" + TrimSigDigits(SurfaceNumAlpha));
+                            ": Object Definition indicates not = 6 Alpha Objects, Number Indicated=" + TrimSigDigits(SurfaceNumAlpha));
             ErrorsFound = true;
         }
 
