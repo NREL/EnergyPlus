@@ -171,6 +171,7 @@ set( test_src
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  WinCalcEngine.unit.cc
   WindowAC.unit.cc
   WindowEquivalentLayer.unit.cc
   WindowLayerEffectiveMultipliers.unit.cc
