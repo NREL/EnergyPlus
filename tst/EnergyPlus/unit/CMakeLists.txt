@@ -157,6 +157,7 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
+  SZVAVModel.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc

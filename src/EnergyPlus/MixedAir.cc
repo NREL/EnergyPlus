@@ -1355,6 +1355,8 @@ namespace MixedAir {
             GetOAMixerInputFlag = false;
         }
 
+        FaultsManager::CheckAndReadFaults();
+
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
         MaxAlphas = NumAlphas;
         MaxNums = NumNums;
@@ -1407,14 +1409,24 @@ namespace MixedAir {
                                           ErrorsFound);
 
                 // add applicable faults identifier to avoid string comparison at each time step
-                //  loop through each fault for each OA controller
+                //  loop through each fault for each OA controller and determine economizer faultys
                 for (i = 1; i <= NumFaultyEconomizer; ++i) {
                     if (FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
                     if (UtilityRoutines::SameString(OAController(OutAirNum).Name, FaultsEconomizer(i).ControllerName)) {
                         FaultsEconomizer(i).ControllerID = OutAirNum;
+                        ++OAController(OutAirNum).NumFaultyEconomizer;
                     }
                 }
-
+                //  loop through each fault for each OA controller to determine faulty counts
+                OAController(OutAirNum).EconmizerFaultNum.allocate(OAController(OutAirNum).NumFaultyEconomizer);
+                if (OAController(OutAirNum).NumFaultyEconomizer > 0) {
+                    for (int j = 0, i = 1; i <= NumFaultyEconomizer; ++i) {
+                        if (FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
+                        if (UtilityRoutines::SameString(OAController(OutAirNum).Name, FaultsEconomizer(i).ControllerName)) {
+                            OAController(OutAirNum).EconmizerFaultNum(++j) = i;
+                        }
+                    }
+                }
             } // LOOP FOR OutAirNum
 
             if (ErrorsFound) {
@@ -3306,87 +3318,86 @@ namespace MixedAir {
         // Check sensors faults for the air economizer
         iEco = thisOAController.Econo;
         if (AnyFaultsInModel && (iEco > NoEconomizer)) {
-            for (i = 1; i <= NumFaultyEconomizer; ++i) {
-                if ((FaultsEconomizer(i).ControllerTypeEnum == iController_AirEconomizer) && (FaultsEconomizer(i).ControllerID == OAControllerNum)) {
+            int j; // index to economizer faults
+            for (i = 1; i <= thisOAController.NumFaultyEconomizer; ++i) {
+                j = thisOAController.EconmizerFaultNum(i);
+                if (GetCurrentScheduleValue(FaultsEconomizer(j).AvaiSchedPtr) > 0.0) {
+                    rSchVal = 1.0;
+                    if (FaultsEconomizer(j).SeveritySchedPtr > 0) {
+                        rSchVal = GetCurrentScheduleValue(FaultsEconomizer(j).SeveritySchedPtr);
+                    }
+                } else {
+                    // no fault
+                    continue;
+                }
 
-                    if (GetCurrentScheduleValue(FaultsEconomizer(i).AvaiSchedPtr) > 0.0) {
-                        rSchVal = 1.0;
-                        if (FaultsEconomizer(i).SeveritySchedPtr > 0) {
-                            rSchVal = GetCurrentScheduleValue(FaultsEconomizer(i).SeveritySchedPtr);
+                rOffset = rSchVal * FaultsEconomizer(j).Offset;
+
+                if (std::abs(rOffset) < 0.000000001) continue;
+
+                // ECONOMIZER - outdoor air dry-bulb temperature sensor offset
+                {
+                    auto const SELECT_CASE_var(iEco);
+                    if ((SELECT_CASE_var == FixedDryBulb) || (SELECT_CASE_var == DifferentialDryBulb) ||
+                        (SELECT_CASE_var == FixedDewPointAndDryBulb) || (SELECT_CASE_var == ElectronicEnthalpy) ||
+                        (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
+                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir) {
+                            // FaultModel:TemperatureSensorOffset:OutdoorAir
+                            thisOAController.OATemp += rOffset;
+                            thisOAController.InletTemp += rOffset;
                         }
                     } else {
-                        // no fault
-                        continue;
                     }
+                }
 
-                    rOffset = rSchVal * FaultsEconomizer(i).Offset;
-
-                    if (std::abs(rOffset) < 0.000000001) continue;
-
-                    // ECONOMIZER - outdoor air dry-bulb temperature sensor offset
-                    {
-                        auto const SELECT_CASE_var(iEco);
-                        if ((SELECT_CASE_var == FixedDryBulb) || (SELECT_CASE_var == DifferentialDryBulb) ||
-                            (SELECT_CASE_var == FixedDewPointAndDryBulb) || (SELECT_CASE_var == ElectronicEnthalpy) ||
-                            (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
-                            if (FaultsEconomizer(i).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir) {
-                                // FaultModel:TemperatureSensorOffset:OutdoorAir
-                                thisOAController.OATemp += rOffset;
-                                thisOAController.InletTemp += rOffset;
-                            }
-                        } else {
+                // ECONOMIZER - outdoor air humidity ratio sensor offset. really needed ???
+                {
+                    auto const SELECT_CASE_var(iEco);
+                    if ((SELECT_CASE_var == FixedDewPointAndDryBulb) || (SELECT_CASE_var == ElectronicEnthalpy)) {
+                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir) {
+                            // FaultModel:HumiditySensorOffset:OutdoorAir
+                            thisOAController.OAHumRat += rOffset;
+                            thisOAController.InletHumRat += rOffset;
                         }
+                    } else {
                     }
+                }
 
-                    // ECONOMIZER - outdoor air humidity ratio sensor offset. really needed ???
-                    {
-                        auto const SELECT_CASE_var(iEco);
-                        if ((SELECT_CASE_var == FixedDewPointAndDryBulb) || (SELECT_CASE_var == ElectronicEnthalpy)) {
-                            if (FaultsEconomizer(i).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir) {
-                                // FaultModel:HumiditySensorOffset:OutdoorAir
-                                thisOAController.OAHumRat += rOffset;
-                                thisOAController.InletHumRat += rOffset;
-                            }
-                        } else {
+                // ECONOMIZER - outdoor air enthalpy sensor offset
+                {
+                    auto const SELECT_CASE_var(iEco);
+                    if ((SELECT_CASE_var == FixedEnthalpy) || (SELECT_CASE_var == ElectronicEnthalpy) ||
+                        (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
+                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir) {
+                            // FaultModel:EnthalpySensorOffset:OutdoorAir
+                            thisOAController.OAEnth += rOffset;
+                            thisOAController.InletEnth += rOffset;
                         }
+                    } else {
                     }
+                }
 
-                    // ECONOMIZER - outdoor air enthalpy sensor offset
-                    {
-                        auto const SELECT_CASE_var(iEco);
-                        if ((SELECT_CASE_var == FixedEnthalpy) || (SELECT_CASE_var == ElectronicEnthalpy) ||
-                            (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
-                            if (FaultsEconomizer(i).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir) {
-                                // FaultModel:EnthalpySensorOffset:OutdoorAir
-                                thisOAController.OAEnth += rOffset;
-                                thisOAController.InletEnth += rOffset;
-                            }
-                        } else {
+                // ECONOMIZER - return air dry-bulb temperature sensor offset
+                {
+                    auto const SELECT_CASE_var(iEco);
+                    if ((SELECT_CASE_var == DifferentialDryBulb) || (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
+                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir) {
+                            // FaultModel:TemperatureSensorOffset:ReturnAir
+                            thisOAController.RetTemp += rOffset;
                         }
+                    } else {
                     }
+                }
 
-                    // ECONOMIZER - return air dry-bulb temperature sensor offset
-                    {
-                        auto const SELECT_CASE_var(iEco);
-                        if ((SELECT_CASE_var == DifferentialDryBulb) || (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
-                            if (FaultsEconomizer(i).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir) {
-                                // FaultModel:TemperatureSensorOffset:ReturnAir
-                                thisOAController.RetTemp += rOffset;
-                            }
-                        } else {
+                // ECONOMIZER - return air enthalpy sensor offset
+                {
+                    auto const SELECT_CASE_var(iEco);
+                    if ((SELECT_CASE_var == ElectronicEnthalpy) || (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
+                        if (FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir) {
+                            // FaultModel:EnthalpySensorOffset:ReturnAir
+                            thisOAController.RetEnth += rOffset;
                         }
-                    }
-
-                    // ECONOMIZER - return air enthalpy sensor offset
-                    {
-                        auto const SELECT_CASE_var(iEco);
-                        if ((SELECT_CASE_var == ElectronicEnthalpy) || (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
-                            if (FaultsEconomizer(i).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir) {
-                                // FaultModel:EnthalpySensorOffset:ReturnAir
-                                thisOAController.RetEnth += rOffset;
-                            }
-                        } else {
-                        }
+                    } else {
                     }
                 }
             }
@@ -3395,7 +3406,7 @@ namespace MixedAir {
         if (ErrorsFound) {
             ShowFatalError("Error in " + CurrentModuleObjects(CMO_OAController) + "; program terminated");
         }
-    }
+    } // namespace MixedAir
 
     void InitOAMixer(int const OAMixerNum, bool const FirstHVACIteration)
     {
