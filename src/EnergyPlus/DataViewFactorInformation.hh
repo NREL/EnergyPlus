@@ -81,14 +81,13 @@ namespace DataViewFactorInformation {
         Array2D<Real64> ScriptF;    // Hottel's Script F //Tuned Transposed
         Array1D<Real64> Area;       // Surface area
         Array1D<Real64> Emissivity; // Surface emissivity
-        Array1D<Real64> surfaceTemp;
         Array1D<Real64> Azimuth;    // Azimuth angle of the surface (in degrees)
         Array1D<Real64> Tilt;       // Tilt angle of the surface (in degrees)
         Array1D_int SurfacePtr;     // Surface ALLOCATABLE (to Surface derived type)
         Array1D_string Class;       // Class of surface (Wall, Roof, etc.)
 
         // Default Constructor
-        ZoneViewFactorInformation(int const numOfSurfaces) : NumOfSurfaces(numOfSurfaces)
+        ZoneViewFactorInformation() : NumOfSurfaces(0)
         {
         }
     };
