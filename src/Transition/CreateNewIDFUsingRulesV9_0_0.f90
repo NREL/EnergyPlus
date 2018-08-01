@@ -144,8 +144,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   END TYPE FieldFlagAndValue
   TYPE (FieldFlagAndValue) :: RunPeriodStartYear
   TYPE (FieldFlagAndValue) :: RunPeriodRepeated
-  INTEGER :: YearNumber
+  INTEGER :: YearNumber, RepeatedCount
   INTEGER, EXTERNAL :: GetYearFromStartDayString
+  LOGICAL, EXTERNAL :: IsYearNumberALeapYear
+  INTEGER, EXTERNAL :: GetLeapYearFromStartDayString
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -451,7 +453,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   END IF
                 END IF
                 ! Now start writing some object data out
-                OutArgs(1:3) = InArgs(1:3) ! Name, BeginMonth and BeginDay are the same
+                ! Name, BeginMonth and BeginDay are the same
+                OutArgs(1:3) = InArgs(1:3) 
+                ! Start year is weird
                 IF (RunPeriodStartYear%wasSet) THEN
                   OutArgs(4) = RunPeriodStartYear%originalValue
                 ELSE IF (RunPeriodRepeated%wasSet) THEN
@@ -460,9 +464,53 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ELSE
                     YearNumber = GetYearFromStartDayString("SUNDAY")
                   END IF
+                  WRITE(OutArgs(4), *) YearNumber
                 ELSE
                   OutArgs(4) = Blank
                 END IF
+                ! End month and End day or month are the same, just need to shift one field
+                OutArgs(5:6) = InArgs(4:5)
+                ! End year is weird
+                IF (RunPeriodRepeated%wasSet) THEN
+                  ! What if start year turns out to be blank above?
+                  READ(RunPeriodRepeated%originalValue, *) RepeatedCount
+                  YearNumber = YearNumber + RepeatedCount
+                  WRITE(OutArgs(7), *) YearNumber
+                  IF (TRIM(InArgs(4)).EQ."2".AND.TRIM(InArgs(5)).EQ."29") THEN
+                    ! We should have a leap year end year
+                    IF (.NOT.IsYearNumberALeapYear(YearNumber)) THEN
+                      ! Warning about bad end year/end date combination
+                      OutArgs(6) = "28"
+                    END IF
+                  END IF
+                ELSE
+                  OutArgs(7) = Blank
+                END IF
+                ! Start day of week is also weird
+                IF (RunPeriodStartYear%wasSet) THEN
+                  ! Throw warning saying the start of the week has been specified by the year
+                  OutArgs(8) = Blank  ! But why is this field even staying?
+                ELSE
+                  IF (TRIM(InArgs(6))=="USEWEATHERFILE") THEN
+                    ! Throw warning...
+                    OutArgs(8) = "Sunday"
+                  ELSE
+                    ! Copy it over unchanged?
+                    OutArgs(8) = InArgs(6)
+                  END IF
+                END IF
+                ! Remaining fields are mostly straightforward
+                OutArgs(9)  = InArgs(7)  ! Use Weather File Holidays
+                OutArgs(10) = InArgs(8)  ! Use Weather File DST
+                OutArgs(11) = InArgs(9)  ! Apply Weekend Holiday Rule
+                OutArgs(12) = InArgs(10) ! Use Weather File Rain
+                OutArgs(13) = InArgs(11) ! Use Weather File Snow
+                ! InArgs(12): Eliminate number of times to repeat runperiod
+                IF (TRIM(InArgs(13))=="YES") THEN
+                  ! Issue warning about incrementing day of week on repeat...
+                END IF
+                ! InArgs(14): Start year moved to above
+                OutArgs(14) = Blank ! new Treat weather as actual field?
 
               ! If your original object starts with S, insert the rules here
 

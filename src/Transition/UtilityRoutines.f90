@@ -962,9 +962,58 @@ REAL FUNCTION CalculateMuEMPD(a, b, c, d, d_empd, density_matl) RESULT(mu_EMPD)
 
 END FUNCTION
 
-INTEGER FUNCTION GetYearFromStartDayString(DayString)
-    CHARACTER(len=*), INTENT(IN) :: DayString
-    GetYearFromStartDayString = 2009
+INTEGER FUNCTION GetYearFromStartDayString(sDay) RESULT(Year)
+    CHARACTER(len=*), INTENT(IN) :: sDay
+    IF (sDay(1:2).EQ."SU".OR.sDay(1:2).EQ."Su".OR.sDay(1:2).EQ."sU".OR.sDay(1:2).EQ."su") THEN
+      Year = 2017
+    ELSE IF (sDay(1:1).EQ."M".OR.sDay(1:1).EQ."m") THEN
+      Year = 2007
+    ELSE IF (sDay(1:2).EQ."TU".OR.sDay(1:2).EQ."Tu".OR.sDay(1:2).EQ."tU".OR.sDay(1:2).EQ."tu") THEN
+      Year = 2013
+    ELSE IF (sDay(1:1).EQ."W".OR.sDay(1:1).EQ."w") THEN
+      Year = 2014
+    ELSE IF (sDay(1:2).EQ."TH".OR.sDay(1:2).EQ."Th".OR.sDay(1:2).EQ."tH".OR.sDay(1:2).EQ."th") THEN
+      Year = 2015
+    ELSE IF (sDay(1:1).EQ."F".OR.sDay(1:1).EQ."f") THEN
+      Year = 2010
+    ELSE IF (sDay(1:2).EQ."SA".OR.sDay(1:2).EQ."Sa".OR.sDay(1:2).EQ."sA".OR.sDay(1:2).EQ."sa") THEN
+      Year = 2011
+    ELSE
+      Year = 2018
+    END IF
+END FUNCTION
+
+INTEGER FUNCTION GetLeapYearFromStartDayString(sDay) RESULT(Year)
+    CHARACTER(len=*), INTENT(IN) :: sDay
+    IF (sDay(1:2).EQ."SU".OR.sDay(1:2).EQ."Su".OR.sDay(1:2).EQ."sU".OR.sDay(1:2).EQ."su") THEN
+      Year = 2012
+    ELSE IF (sDay(1:1).EQ."M".OR.sDay(1:1).EQ."m") THEN
+      Year = 1996
+    ELSE IF (sDay(1:2).EQ."TU".OR.sDay(1:2).EQ."Tu".OR.sDay(1:2).EQ."tU".OR.sDay(1:2).EQ."tu") THEN
+      Year = 2008
+    ELSE IF (sDay(1:1).EQ."W".OR.sDay(1:1).EQ."w") THEN
+      Year = 1992
+    ELSE IF (sDay(1:2).EQ."TH".OR.sDay(1:2).EQ."Th".OR.sDay(1:2).EQ."tH".OR.sDay(1:2).EQ."th") THEN
+      Year = 2004
+    ELSE IF (sDay(1:1).EQ."F".OR.sDay(1:1).EQ."f") THEN
+      Year = 2016
+    ELSE IF (sDay(1:2).EQ."SA".OR.sDay(1:2).EQ."Sa".OR.sDay(1:2).EQ."sA".OR.sDay(1:2).EQ."sa") THEN
+      Year = 2000
+    ELSE
+      Year = 2016
+    END IF
+END FUNCTION
+
+LOGICAL FUNCTION IsYearNumberALeapYear(YearNumber) RESULT(LeapYear)
+    INTEGER, INTENT(IN) :: YearNumber
+    IF ((YearNumber/4.0) == INT(YearNumber/4.0)) THEN
+      IF ((YearNumber/1000.0) == INT(YearNumber/1000.0)) THEN
+        LeapYear = .TRUE.
+        RETURN
+      END IF
+    END IF
+    LeapYear = .FALSE.
+    RETURN
 END FUNCTION
 
 !     NOTICE
