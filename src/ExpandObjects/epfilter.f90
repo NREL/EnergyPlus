@@ -1500,9 +1500,9 @@ INTEGER,PARAMETER :: gndTempSurfDecOff = 12
 
   ! Boiler:HotWater (for use with HVACTemplate:Plant:Boiler:ObjectReference)
 INTEGER,PARAMETER :: blrhwNameOff = 1
-INTEGER,PARAMETER :: blrhwInletNodeOff = 12
-INTEGER,PARAMETER :: blrhwOutletNodeOff = 13
-INTEGER,PARAMETER :: blrhwLastFieldOff = 18
+INTEGER,PARAMETER :: blrhwInletNodeOff = 11
+INTEGER,PARAMETER :: blrhwOutletNodeOff = 12
+INTEGER,PARAMETER :: blrhwLastFieldOff = 17
 
   ! Chiller:Electric:EIR (for use with HVACTemplate:Plant:Chiller:ObjectReference)
 INTEGER,PARAMETER :: chleirNameOff = 1
@@ -25826,11 +25826,9 @@ DO iBoiler = 1, numCompactBoiler
     IF (isBoilerCondHotWater) THEN
       CALL AddToObjStr('Efficiency Curve Temperature Evaluation Variable', 'EnteringBoiler ')
       CALL AddToObjFld('Normalized Boiler Efficiency Curve Name', base + blrNameOff,' Condensing Boiler Efficiency Curve')
-      CALL AddToObjStr('Design Boiler Water Outlet Temp {C}','75')
     ELSE
       CALL AddToObjStr('Efficiency Curve Temperature Evaluation Variable', 'LeavingBoiler')
       CALL AddToObjFld('Normalized Boiler Efficiency Curve Name', base + blrNameOff,' Efficiency Curve')
-      CALL AddToObjStr('Design Boiler Water Outlet Temp {C}','81')
     END IF
     CALL AddToObjStr('Max Design Boiler Water Flow Rate {m3/s}','autosize')
     CALL AddToObjFld('Minimum Part Load Ratio',base + blrMinPLROff,'')
