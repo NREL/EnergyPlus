@@ -391,6 +391,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with A, insert the rules here
 
               ! If your original object starts with B, insert the rules here
+              CASE('BOILER:HOTWATER')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:6) = InArgs(1:6)
+                OutArgs(7:CurArgs-1) = InArgs(8:CurArgs)
+                CurArgs = CurArgs - 1
+                nodiff = .false.
 
               ! If your original object starts with C, insert the rules here
 
