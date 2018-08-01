@@ -103,7 +103,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -1341,6 +1341,12 @@
 
   AirflowNetwork:MultiZone:Surface,
     Living:South,            !- Surface Name
+    ZoneLeak,                !- Leakage Component Name
+    ,                        !- External Node Name
+    1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+  AirflowNetwork:MultiZone:Surface,
+    Living:West,            !- Surface Name
     ZoneLeak,                !- Leakage Component Name
     ,                        !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}

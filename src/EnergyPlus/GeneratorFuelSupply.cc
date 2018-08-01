@@ -170,8 +170,8 @@ namespace GeneratorFuelSupply {
             FuelSupply.allocate(NumGeneratorFuelSups);
 
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _,
-                                              cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(
+                    cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 FuelSupply(FuelSupNum).Name = AlphArray(1);
@@ -187,8 +187,8 @@ namespace GeneratorFuelSupply {
                 }
 
                 FuelSupply(FuelSupNum).NodeName = AlphArray(3);
-                FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                   NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(
+                    AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
 
                 FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(AlphArray(4));
                 if ((FuelSupply(FuelSupNum).SchedNum == 0) && (FuelSupply(FuelSupNum).FuelTempMode == FuelInTempSchedule)) {

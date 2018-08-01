@@ -297,7 +297,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_polygon_contains_point)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 {
-    std::string const idf_objects = delimited_string({"  Version,8.9;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.0;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -672,7 +672,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 {
-    std::string const idf_objects = delimited_string({"  Version,8.9;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.0;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -1074,7 +1074,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 {
-    std::string const idf_objects = delimited_string({"  Version,8.9;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.0;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",

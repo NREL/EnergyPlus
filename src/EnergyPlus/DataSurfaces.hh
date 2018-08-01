@@ -389,6 +389,10 @@ namespace DataSurfaces {
     extern Array2D<Real64> AWinSurf; // Time step value of factor for beam
     // absorbed in window glass layers
 
+    // Time step value of factor for diffuse absorbed in window layers
+    extern Array2D<Real64> AWinSurfDiffFront;
+    extern Array2D<Real64> AWinSurfDiffBack;
+
     extern Array2D<Real64> AWinCFOverlap; // Time step value of factor for beam
     // absorbed in window glass layers which comes from other windows
     // It happens sometimes that beam enters one window and hits back of
@@ -800,9 +804,25 @@ namespace DataSurfaces {
 
         void SetOutBulbTempAt();
 
+        void SetWindDirAt(Real64 const fac);
+
         void SetWindSpeedAt(Real64 const fac);
 
-        void SetWindDirAt(Real64 const fac);
+        Real64 getInsideAirTemperature(const int t_SurfNum) const;
+
+        static Real64 getInsideIR(const int t_SurfNum);
+
+        Real64 getOutsideAirTemperature(const int t_SurfNum) const;
+
+        Real64 getOutsideIR(const int t_SurfNum) const;
+
+        static Real64 getSWIncident(const int t_SurfNum);
+
+        static Real64 getSWBeamIncident(const int t_SurfNum);
+
+        static Real64 getSWDiffuseIncident(const int t_SurfNum);
+
+        int getTotLayers() const;
 
     private: // Methods
              // Computed Shape Category
@@ -1158,6 +1178,18 @@ namespace DataSurfaces {
             SkySolarInc = 0.0;
             GndSolarInc = 0.0;
         }
+
+        Real64 AbsorptanceFromExteriorFrontSide() const;
+
+        Real64 AbsorptanceFromInteriorFrontSide() const;
+
+        Real64 AbsFrontSide() const;
+
+        Real64 AbsorptanceFromExteriorBackSide() const;
+
+        Real64 AbsorptanceFromInteriorBackSide() const;
+
+        Real64 AbsBackSide() const;
     };
 
     struct FrameDividerProperties
@@ -1302,16 +1334,16 @@ namespace DataSurfaces {
         bool GlareControlIsActive;      // True if shading control to reduce daylight glare is active
         int SlatAngleSchedule;          // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
         int SlatAngleControlForBlinds;  // Takes one of the following values that specifies
-        //  CHARACTER(len=32) :: SlatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
-        //  how slat angle is controled in a blind when ShadingType =
-        //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
-        //  FixedSlatAngle: the slat angle is fixed at the constant value given in the
-        //    associated Material:WindowBlind
-        //  ScheduledSlatAngle: the slat angle in degrees between 1 and 180 is given
-        //    by the schedule with index SlatAngleSchedule
-        //  BlockBeamSolar: if beam solar is incident on the window, and a blind is on the
-        //    window, the slat angle is adjusted to just block beam solar; otherwise the
-        //    slat angle is set to the value given in the associated Material:WindowBlind.
+                                        //  CHARACTER(len=32) :: SlatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
+                                        //  how slat angle is controled in a blind when ShadingType =
+                                        //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
+                                        //  FixedSlatAngle: the slat angle is fixed at the constant value given in the
+                                        //    associated Material:WindowBlind
+                                        //  ScheduledSlatAngle: the slat angle in degrees between 1 and 180 is given
+                                        //    by the schedule with index SlatAngleSchedule
+                                        //  BlockBeamSolar: if beam solar is incident on the window, and a blind is on the
+                                        //    window, the slat angle is adjusted to just block beam solar; otherwise the
+                                        //    slat angle is set to the value given in the associated Material:WindowBlind.
         int DaylightControlIndex; // Pointer to the array of Daylighting Controls
         int MultiSurfaceCtrlType; // Type of control order when multiple surfaces are referenced
         // 0 = not specified
