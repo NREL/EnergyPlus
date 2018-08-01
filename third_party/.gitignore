@@ -26,5 +26,4 @@ kiva-ep/.gitignore
 kiva-ep/.travis.yml
 kiva-ep/appveyor.yml
 kiva-ep/ChangeLog.md
-kiva-ep/LICENSE
 kiva-ep/README.md
