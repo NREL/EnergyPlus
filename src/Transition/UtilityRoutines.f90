@@ -962,6 +962,11 @@ REAL FUNCTION CalculateMuEMPD(a, b, c, d, d_empd, density_matl) RESULT(mu_EMPD)
 
 END FUNCTION
 
+INTEGER FUNCTION GetYearFromStartDayString(DayString)
+    CHARACTER(len=*), INTENT(IN) :: DayString
+    GetYearFromStartDayString = 2009
+END FUNCTION
+
 !     NOTICE
 !
 !     Copyright © 1996-2008 The Board of Trustees of the University of Illinois

@@ -18,15 +18,6 @@ END SUBROUTINE
 
 END MODULE
 
-! INTEGER FUNCTION GetYearFromStartDayString(DayString)
-! 
-!     CHARACTER(len=*), INTENT(IN) :: DayString
-!     GetYearFromStartDayString = 2009
-! 
-! END FUNCTION
-
-
-
 SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgIDFExtension)
 
           ! SUBROUTINE INFORMATION:
@@ -154,6 +145,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   TYPE (FieldFlagAndValue) :: RunPeriodStartYear
   TYPE (FieldFlagAndValue) :: RunPeriodRepeated
   INTEGER :: YearNumber
+  INTEGER, EXTERNAL :: GetYearFromStartDayString
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -458,9 +450,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(4) = RunPeriodStartYear%originalValue
                 ELSE IF (RunPeriodRepeated%wasSet) THEN
                   IF (TRIM(InArgs(6)) .NE. Blank) THEN
-                    YearNumber = 2009 !GetYearFromStartDayString(InArgs(6))
+                    YearNumber = GetYearFromStartDayString(InArgs(6))
                   ELSE
-                    YearNumber = 2009 ! GetYearFromStartDayString("SUNDAY")
+                    YearNumber = GetYearFromStartDayString("SUNDAY")
                   END IF
                 ELSE
                   OutArgs(4) = Blank
