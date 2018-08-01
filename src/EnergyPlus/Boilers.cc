@@ -468,8 +468,6 @@ namespace Boilers {
                     }
                 }
             }
-
-            // Boiler(BoilerNum).TempDesBoilerOut = rNumericArgs(3);
             Boiler(BoilerNum).VolFlowRate = rNumericArgs(3);
             if (Boiler(BoilerNum).VolFlowRate == AutoSize) {
                 Boiler(BoilerNum).VolFlowRateWasAutoSized = true;
