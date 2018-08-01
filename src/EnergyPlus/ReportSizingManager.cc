@@ -1279,6 +1279,7 @@ namespace ReportSizingManager {
                         }
                     }
                 } else if (SizingType == CoolingWaterflowSizing) {
+                    CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
                     Cp = GetSpecificHeatGlycol(
                         PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     rho = GetDensityGlycol(
@@ -1532,9 +1533,9 @@ namespace ReportSizingManager {
                         // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
                         // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
                         // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
-                        // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
-                        // of flow/capacity ratio vs SHR for several actual coils.
+                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
+                        // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
+                        // regression of flow/capacity ratio vs SHR for several actual coils.
                         RatedVolFlowPerRatedTotCap = DataFlowUsedForSizing / DataCapacityUsedForSizing;
                         if (DXCT == RegularDXCoil) {
                             if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
@@ -1611,12 +1612,10 @@ namespace ReportSizingManager {
                                 }
                                 CoilOutTemp = min(CoilInTemp, FinalZoneSizing(CurZoneEqNum).CoolDesTemp);
                                 CoilOutHumRat = min(CoilInHumRat, FinalZoneSizing(CurZoneEqNum).CoolDesHumRat);
-                                TimeStepNumAtMax = FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax;
-                                DDNum = FinalZoneSizing(CurZoneEqNum).CoolDDNum;
-                                if (DDNum > 0 && TimeStepNumAtMax > 0) {
-                                    OutTemp = DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
+                                if (DataCondWaterInletTemp > 0) {
+                                    OutTemp = DataCondWaterInletTemp;
                                 } else {
-                                    OutTemp = 0.0;
+                                    OutTemp = FinalZoneSizing(CurZoneEqNum).OutTempAtCoolPeak;
                                 }
                                 rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine);
                                 CoilInEnth = PsyHFnTdbW(CoilInTemp, CoilInHumRat);
@@ -2510,9 +2509,9 @@ namespace ReportSizingManager {
                         // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
                         // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
                         // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
-                        // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
-                        // of flow/capacity ratio vs SHR for several actual coils.
+                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
+                        // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
+                        // regression of flow/capacity ratio vs SHR for several actual coils.
                         RatedVolFlowPerRatedTotCap = DataFlowUsedForSizing / DataCapacityUsedForSizing;
                         if (DXCT == RegularDXCoil) {
                             if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
@@ -2613,9 +2612,9 @@ namespace ReportSizingManager {
                                                    (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetHumRatAtCoolPeak;
                                 }
                             }
-                            if (DataCondWaterInletTemp > 0) {     // TRANE
-                                OutTemp = DataCondWaterInletTemp; // use condenser water inlet temp if defined // TRANE
-                            } else {                              // TRANE
+                            if (DataCondWaterInletTemp > 0) {
+                                OutTemp = DataCondWaterInletTemp; // water cooled equipment, use condenser water inlet temp if defined
+                            } else {
                                 OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
                             }
                             if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
@@ -3511,8 +3510,8 @@ namespace ReportSizingManager {
     void GetCoilDesFlowT(int SysNum,           // central air system index
                          Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
                          Real64 &DesFlow,      // returned design mass flow [kg/s]
-                         Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
-                         Real64 &DesExitHumRat // returned design coil exit humidity ratio // returned design coil exit temperature [kg/s] //TRANE fix
+                         Real64 &DesExitTemp,  // returned design coil exit temperature [C]
+                         Real64 &DesExitHumRat // returned design coil exit humidity ratio [kg/s]
                                                // coil sizing inconsistency
     )
     {

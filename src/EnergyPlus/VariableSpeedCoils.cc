@@ -4354,9 +4354,13 @@ namespace VariableSpeedCoils {
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
-
-                    TotCapTempModFac =
-                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+                    if (CurrentObjSubfix != ":DX:VARIABLESPEED") {
+                        TotCapTempModFac =
+                            CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+                    } else {
+                        TotCapTempModFac =
+                            CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, OutTemp);
+                    }
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
                     if (MixEnth > SupEnth) {
