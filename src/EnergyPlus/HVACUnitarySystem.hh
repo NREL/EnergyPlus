@@ -415,7 +415,7 @@ namespace HVACUnitarySystem {
         int MSpdCycLatPLRIter;            // used in MultiSpeed calculations
         int MSpdCycLatPLRIterIndex;       // used in MultiSpeed calculations
         int LatMaxIterIndex;              // used in PLR calculations for moisture load
-        int LatRegulaFalsIFailedIndex;    // used in PLR calculations for moisture load
+        int LatRegulaFalsiFailedIndex;    // used in PLR calculations for moisture load
         // EMS variables
         bool DesignFanVolFlowRateEMSOverrideOn;         // If true, then EMS is calling to override autosize fan flow
         bool MaxHeatAirVolFlowEMSOverrideOn;            // If true, then EMS is calling to override autosize fan flow
@@ -458,7 +458,7 @@ namespace HVACUnitarySystem {
         std::string UnitType;            // type of unit
         int MaxIterIndex;                // used in PLR calculations for sensible load
         int NodeNumOfControlledZone;     // Node number of controlled zone
-        int RegulaFalsIFailedIndex;      // used in PLR calculations for sensible load
+        int RegulaFalsiFailedIndex;      // used in PLR calculations for sensible load
         Real64 FanPartLoadRatio;         // Unitary system fan part load ratio
         Real64 CoolCoilWaterFlowRatio;   // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
         Real64 HeatCoilWaterFlowRatio;   // holds ratio of max heat coil water flow rate, may be < 1 when FlowLock is true
@@ -531,7 +531,7 @@ namespace HVACUnitarySystem {
               SuppHeatCoilSensPLRIterIndex(0), SuppHeatCoilSensPLRFail(0), SuppHeatCoilSensPLRFailIndex(0), DXCoilSensPLRIter(0),
               DXCoilSensPLRIterIndex(0), DXCoilSensPLRFail(0), DXCoilSensPLRFailIndex(0), MSpdSensPLRIter(0), MSpdSensPLRIterIndex(0),
               MSpdCycSensPLRIter(0), MSpdCycSensPLRIterIndex(0), MSpdLatPLRIter(0), MSpdLatPLRIterIndex(0), MSpdCycLatPLRIter(0),
-              MSpdCycLatPLRIterIndex(0), LatMaxIterIndex(0), LatRegulaFalsIFailedIndex(0), DesignFanVolFlowRateEMSOverrideOn(false),
+              MSpdCycLatPLRIterIndex(0), LatMaxIterIndex(0), LatRegulaFalsiFailedIndex(0), DesignFanVolFlowRateEMSOverrideOn(false),
               MaxHeatAirVolFlowEMSOverrideOn(false), MaxCoolAirVolFlowEMSOverrideOn(false), MaxNoCoolHeatAirVolFlowEMSOverrideOn(false),
               DesignFanVolFlowRateEMSOverrideValue(0.0), MaxHeatAirVolFlowEMSOverrideValue(0.0), MaxCoolAirVolFlowEMSOverrideValue(0.0),
               MaxNoCoolHeatAirVolFlowEMSOverrideValue(0.0), EMSOverrideSensZoneLoadRequest(false), EMSOverrideMoistZoneLoadRequest(false),
@@ -540,7 +540,7 @@ namespace HVACUnitarySystem {
               ATMixerOutNode(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
 
               // SZVAV variables
-              MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsIFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
+              MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsiFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
               HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
               MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(80.0), LowSpeedCoolFanRatio(0.0),
               LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(AutoSize), MaxHeatCoilFluidFlow(AutoSize), CoolCoilInletNodeNum(0),
