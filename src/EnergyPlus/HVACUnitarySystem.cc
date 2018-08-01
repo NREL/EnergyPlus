@@ -3750,18 +3750,16 @@ namespace HVACUnitarySystem {
                         UnitarySystem(UnitarySysNum).DehumidControlType_Num = DehumidControl_None;
                         UnitarySystem(UnitarySysNum).Humidistat = false;
                     }
-                    if (UnitarySystem(UnitarySysNum).ControlZoneNum == 0) {
-                        if (UnitarySystem(UnitarySysNum).Humidistat && UnitarySystem(UnitarySysNum).ControlType == LoadBased) {
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
-                                if (HumidityControlZone(HStatZoneNum).ActualZoneNum != UnitarySystem(UnitarySysNum).ControlZoneNum) continue;
-                                AirNodeFound = true;
-                            }
-                            if (!AirNodeFound) {
-                                ShowSevereError(CurrentModuleObject + " = " + UnitarySystem(UnitarySysNum).Name);
-                                ShowContinueError("Did not find Air Node (Zone with Humidistat).");
-                                ShowContinueError("specified " + cAlphaFields(iControlZoneAlphaNum) + " = " + Alphas(iControlZoneAlphaNum));
-                                ErrorsFound = true;
-                            }
+                    if (UnitarySystem(UnitarySysNum).Humidistat && UnitarySystem(UnitarySysNum).ControlType == LoadBased) {
+                        for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            if (HumidityControlZone(HStatZoneNum).ActualZoneNum != UnitarySystem(UnitarySysNum).ControlZoneNum) continue;
+                            AirNodeFound = true;
+                        }
+                        if (!AirNodeFound && UnitarySystem(UnitarySysNum).ControlZoneNum > 0) {
+                            ShowSevereError(CurrentModuleObject + " = " + UnitarySystem(UnitarySysNum).Name);
+                            ShowContinueError("Did not find Air Node (Zone with Humidistat).");
+                            ShowContinueError("specified " + cAlphaFields(iControlZoneAlphaNum) + " = " + Alphas(iControlZoneAlphaNum));
+                            ErrorsFound = true;
                         }
                     }
                 } else { // invalid input
@@ -4027,6 +4025,12 @@ namespace HVACUnitarySystem {
                                         if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != UnitarySystem(UnitarySysNum).ControlZoneNum)
                                             continue;
                                         AirNodeFound = true;
+                                    }
+                                    if (!AirNodeFound && UnitarySystem(UnitarySysNum).ControlZoneNum > 0) {
+                                        ShowSevereError(CurrentModuleObject + " = " + UnitarySystem(UnitarySysNum).Name);
+                                        ShowContinueError("Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).");
+                                        ShowContinueError("specified " + cAlphaFields(iControlZoneAlphaNum) + " = " + Alphas(iControlZoneAlphaNum));
+                                        ErrorsFound = true;
                                     }
                                     break;
                                 }
