@@ -3316,12 +3316,6 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptDY) {
-<<<<<<< HEAD
-                WriteReportMeterData(EnergyMeters(Loop).DYRptNum, EnergyMeters(Loop).DYRptNumChr, EnergyMeters(Loop).DYValue,
-                                     ReportingFrequency::Daily, EnergyMeters(Loop).DYMinVal, EnergyMeters(Loop).DYMinValDate,
-                                     EnergyMeters(Loop).DYMaxVal, EnergyMeters(Loop).DYMaxValDate, EnergyMeters(Loop).RptDYFO);
-                ResultsFramework::OutputSchema->DYMeters.pushVariableValue(EnergyMeters(Loop).DYRptNum, EnergyMeters(Loop).DYValue);
-=======
                 WriteReportMeterData(EnergyMeters(Loop).DYRptNum,
                                      EnergyMeters(Loop).DYRptNumChr,
                                      EnergyMeters(Loop).DYValue,
@@ -3331,7 +3325,7 @@ namespace OutputProcessor {
                                      EnergyMeters(Loop).DYMaxVal,
                                      EnergyMeters(Loop).DYMaxValDate,
                                      EnergyMeters(Loop).RptDYFO);
->>>>>>> develop
+                ResultsFramework::OutputSchema->DYMeters.pushVariableValue(EnergyMeters(Loop).DYRptNum, EnergyMeters(Loop).DYValue);
                 EnergyMeters(Loop).DYValue = 0.0;
                 EnergyMeters(Loop).DYMinVal = MinSetValue;
                 EnergyMeters(Loop).DYMaxVal = MaxSetValue;
@@ -3411,12 +3405,6 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptMN) {
-<<<<<<< HEAD
-                WriteReportMeterData(EnergyMeters(Loop).MNRptNum, EnergyMeters(Loop).MNRptNumChr, EnergyMeters(Loop).MNValue,
-                                     ReportingFrequency::Monthly, EnergyMeters(Loop).MNMinVal, EnergyMeters(Loop).MNMinValDate,
-                                     EnergyMeters(Loop).MNMaxVal, EnergyMeters(Loop).MNMaxValDate, EnergyMeters(Loop).RptMNFO);
-                ResultsFramework::OutputSchema->MNMeters.pushVariableValue(EnergyMeters(Loop).MNRptNum, EnergyMeters(Loop).MNValue);
-=======
                 WriteReportMeterData(EnergyMeters(Loop).MNRptNum,
                                      EnergyMeters(Loop).MNRptNumChr,
                                      EnergyMeters(Loop).MNValue,
@@ -3426,7 +3414,7 @@ namespace OutputProcessor {
                                      EnergyMeters(Loop).MNMaxVal,
                                      EnergyMeters(Loop).MNMaxValDate,
                                      EnergyMeters(Loop).RptMNFO);
->>>>>>> develop
+                ResultsFramework::OutputSchema->MNMeters.pushVariableValue(EnergyMeters(Loop).MNRptNum, EnergyMeters(Loop).MNValue);
                 EnergyMeters(Loop).MNValue = 0.0;
                 EnergyMeters(Loop).MNMinVal = MinSetValue;
                 EnergyMeters(Loop).MNMaxVal = MaxSetValue;
@@ -3583,12 +3571,6 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptSM) {
-<<<<<<< HEAD
-                WriteReportMeterData(EnergyMeters(Loop).SMRptNum, EnergyMeters(Loop).SMRptNumChr, EnergyMeters(Loop).SMValue,
-                                     ReportingFrequency::Simulation, EnergyMeters(Loop).SMMinVal, EnergyMeters(Loop).SMMinValDate,
-                                     EnergyMeters(Loop).SMMaxVal, EnergyMeters(Loop).SMMaxValDate, EnergyMeters(Loop).RptSMFO);
-                ResultsFramework::OutputSchema->SMMeters.pushVariableValue(EnergyMeters(Loop).SMRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteReportMeterData(EnergyMeters(Loop).SMRptNum,
                                      EnergyMeters(Loop).SMRptNumChr,
                                      EnergyMeters(Loop).SMValue,
@@ -3598,7 +3580,7 @@ namespace OutputProcessor {
                                      EnergyMeters(Loop).SMMaxVal,
                                      EnergyMeters(Loop).SMMaxValDate,
                                      EnergyMeters(Loop).RptSMFO);
->>>>>>> develop
+                ResultsFramework::OutputSchema->SMMeters.pushVariableValue(EnergyMeters(Loop).SMRptNum, EnergyMeters(Loop).SMValue);
             }
 
             if (EnergyMeters(Loop).RptAccSM) {
@@ -6098,12 +6080,6 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
     using DataGlobals::EndDayFlag;
     using DataGlobals::EndEnvrnFlag;
     using DataGlobals::EndHourFlag;
-<<<<<<< HEAD
-    using DataGlobals::EndHourFlag;
-    using DataGlobals::HourOfDay;
-    using DataGlobals::HourOfDay;
-=======
->>>>>>> develop
     using DataGlobals::eso_stream;
     using DataGlobals::HourOfDay;
     using General::EncodeMonDayHrMin;
