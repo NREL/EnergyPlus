@@ -1,8 +1,8 @@
 // Format Support
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -1026,7 +1026,7 @@ add_token( std::string & token, Tokens & tokens )
 // Add a character token to the list
 inline
 void
-add_token( char const token, Tokens & tokens )
+add_token( char token, Tokens & tokens )
 {
 	tokens.push_back( std::string( 1, token ) );
 }

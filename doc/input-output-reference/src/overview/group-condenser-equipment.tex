@@ -10,7 +10,7 @@ Cooling towers are components that may be assigned to condenser loops. The cooli
 
 The cooling tower seeks to maintain the temperature of the water exiting the cooling tower at (or below) a set point. The set point schedule value is defined by the field ``Condenser Loop Temperature Setpoint Node Name or Reference'' for the CondenserLoop object. The model first checks to determine the impact of ``free convection'', if specified by the user, on the tower exiting water temperature. If the exiting water temperature based on ``free convection'' is at or below the set point, then the tower fan is not turned on. If the exiting water temperature based on ``free convection'' is below the set point, the tower will operate in FluidBypass mode -- portion of the water goes through the tower media and gets cooled while the remaining water flow gets bypassed, two water flows then mix together trying to meet the water setpoint temperature. If the exiting water temperature remains above the set point after ``free convection'' is modeled, then the tower fan is turned on to reduce the exiting water temperature to the set point. If the capacity control is FanCycling, the model assumes that part-load operation is represented by a simple linear interpolation between two steady-state regimes (i.e., tower fan on for the entire simulation timestep and tower fan off for the entire simulation timestep). Cyclic losses are not taken into account. If the capacity control is FluidBypass, the model determines the fraction of water flow to be bypassed while the remaining water goes through the tower cooling media and gets cooled, then the two water flows mix to meet the setpoint temperature. In this case, the fan runs at full speed for the entire timestep.
 
-Cooling towers here are ``wet'' and consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the towers. The last six input fields are optional and provide methods of controlling details of the water consumption calculations. The user can specifiy connections to the rest of the buildings water system by providing the name of a water storage tanks (i.e.~WaterUse:Storage objects).
+Cooling towers here are ``wet'' and consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the towers. The last six input fields are optional and provide methods of controlling details of the water consumption calculations. The user can specify connections to the rest of the buildings water system by providing the name of a water storage tanks (i.e.~WaterUse:Storage objects).
 
 For the operation of multi-cell towers, the first step is to determine the number of cells to operate based on the cell control method -- between the minimum number of cells subject to the maximum water flow rate fraction per cell, and maximum number of cells subject to the minimum water flow rate fraction per cell. If the calculated cells do not meet the loads, additional cells will be operating to help meet the loads. Inside each cell, the existing capacity controls still apply.
 
@@ -181,7 +181,7 @@ This numeric field specifies the allowable smallest fraction of the design water
 
 This numeric field specifies the allowable largest fraction of the design water flow rate. If this field is left blank, the default value is 2.5.
 
-\textbf{\emph{Field: Sizing Factor}}
+\paragraph{Field: Sizing Factor}\label{sizing-factor-01}
 
 This optional numeric field allows the user to specify a sizing factor for this component. The sizing factor is used when the component design inputs are autosized: the autosizing calculations are performed as usual and the results are multiplied by the sizing factor. Sizing factor allows the user to size a component to meet part of the design load while continuing to use the autosizing feature. For this component the inputs that would be altered by the sizing factor are:
 
@@ -198,6 +198,11 @@ This optional numeric field allows the user to specify a sizing factor for this 
 6.~~~~U-Factor Times Area Value at Free Convection Air Flow Rate.
 
 Note that the U-Factor Times Area Value at Design Air Flow Rate is not \emph{multiplied} by the Sizing Factor. Instead the design tower load is multiplied by the sizing factor and the design UA then calculated as usual. The U-Factor Times Area Value at Free Convection Air Flow Rate is set to 10\% of the new design Tower UA.
+
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-01}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the cooling tower will be assigned to the ``General'' end-use subcategory.
+
 
 Three examples of an IDF specification for this object are shown below:
 
@@ -662,6 +667,10 @@ This optional numeric field allows the user to specify a sizing factor for this 
 
 Note that the U-Factor Times Area Value at High Fan Speed is not \emph{multiplied} by the Sizing Factor. Instead the design tower load is multiplied by the sizing factor and the design UA then calculated as usual. The U-Factor Times Area Value at Low Fan Speed is set to a fraction of the full load design UA determined by the field Low Fan Speed U-Factor Times Area Sizing Factor. The U-Factor Times Area Value at Free Convection Air Flow Rate is set to a fraction of the design Tower UA determined by the field Free Convection Air U-Factor Times Area Value Sizing Factor.
 
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-02}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the cooling tower will be assigned to the ``General'' end-use subcategory.
+
 Four examples of an IDF specification for this object are shown below:
 
 \begin{lstlisting}
@@ -1090,6 +1099,10 @@ This numeric field specifies the allowable largest fraction of the design water 
 
 This optional numeric field allows the user to specify a sizing factor for this component. The sizing factor is used when the component design inputs are autosized: the autosizing calculations are performed as usual and the results are multiplied by the sizing factor. Sizing factor allows the user to size a component to meet part of the design load while continuing to use the autosizing feature.
 
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-03}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the cooling tower will be assigned to the ``General'' end-use subcategory.
+
 An example IDF specification follows.
 
 \begin{lstlisting}
@@ -1477,6 +1490,10 @@ This optional numeric field allows the user to specify a sizing factor for this 
 2.~~~~Design Air Flow Rate;
 
 3.~~~~Design Fan Power.
+
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-05}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the cooling tower will be assigned to the ``General'' end-use subcategory.
 
 An example IDF specification for this object is shown below:
 
@@ -2798,24 +2815,28 @@ Loop temperature at the fluid cooler outlet.
 
 Loop mass flow rate through the fluid cooler.
 
-\subsection{GroundHeatExchanger:Vertical}\label{groundheatexchangervertical}
+\subsection{GroundHeatExchanger:System}\label{groundheatexchangersystem}
 
-The EnergyPlus Ground loop heat exchanger is a condenser component. This serves the condenser supply side in addition to the cooling towers and other condensing components. The following figure shows the Ground Heat Exchanger in the simulation environment.
+The EnergyPlus ground loop heat exchanger is a condenser component which serves the condenser supply side in addition to the cooling towers and other condensing components. Figure \ref{fig:schematic-of-energyplus-ground-loop-heat} shows the Ground Heat Exchanger in the simulation environment.
 
-The heat exchanger response is defined by a G-function. This is a non-dimensional function that is used to calculate the response to square heat pulses of different duration. (This function is not the same as `G-factors' referred to in the ASHRAE Applications Handbook). This continuous function is specified by a series of data pairs (LNTTS\emph{i}, GFNC\emph{i}) where,
+The heat exchanger response is defined by a g-function which is a non-dimensional function that is used to calculate the response to square heat pulses of different duration. (This function is not the same as `G-factors' referred to in the ASHRAE Applications Handbook). This continuous function is specified by a series of data pairs (LNTTS\emph{i}, GFNC\emph{i}) where,
 
 \begin{itemize}
 \item
   LNTTS\emph{i} is the non-dimensional time: \emph{ln(T/T\(_{s}\))}
 \item
-  GFNC\emph{i} is the G-function value
+  GFNC\emph{i} is the g-function value
 \end{itemize}
 
-The G-function is different for each borehole field configuration (i.e.~a 4x4 field has a different response than a 80x80 field) and the borehole thermal resistance. It is also dependant on the ratio of borehole spacing to depth. G-function values, for accurate simulation, have to be calculated for each specific heat exchanger design. This can be done using some commercial ground loop heat exchanger design tool and the like. A reference data set, containing examples input data for 1x2, 4x4 and 8x8 configurations and for both standard and thermally enhanced grout, have also been provided. These data are provided as examples only. Custom G-function values may be generated using an external program such as GLHEPro. For more information about the datasets and GLHEPro, see the Auxiliary Programs document section ``G-Function Spreadsheet.''
+The g-function is different for each borehole field configuration (i.e.~a 4 $\times$ 4 field has a different response than a 80 $\times$ 80 field). It is also dependent on the ratio of borehole spacing to depth. g-function values, for accurate simulation, have to be computed for each specific heat exchanger design. The GroundHeatExchanger:System object will accept three different types of input in order to define the g-functions necessary for the ground heat exchanger calculations.
 
-Further details of the implementation of this model can be found in:
+\begin{enumerate}
+    \item Use the GroundHeatExchanger:Vertical:Array object to define a rectangular borehole field. EnergyPlus will compute and cache the g-functions for reuse again in future simulations.
+    \item Use one or more GroundHeatExchanger:Vertical:Single objects to define a vertical borehole field with the boreholes located arbitrarily. EnergyPlus will compute and cache the g-functions for reuse again in future simulations.
+    \item Use a third-party tool, such as GLHEPro, to compute the g-functions and pass them to EnergyPlus using the GroundHeatExchanger:ResponseFactors object.
+\end{enumerate}
 
-Murugappan, A. \emph{Implementing Ground Source Heat Pump and Ground Loop Heat Exchanger Models in the EnergyPlus Simulation Environment}. M.S. Thesis, Oklahoma State University, December 2002.
+A small number of reference datasets containing example input data for 1 $\times$ 2, 4 $\times$ 4 and 8 $\times$ 8 configurations and for both standard and thermally enhanced grout are provided as well.
 
 \begin{figure}[hbtp] % fig 83
 \centering
@@ -2823,7 +2844,7 @@ Murugappan, A. \emph{Implementing Ground Source Heat Pump and Ground Loop Heat E
 \caption{Schematic of EnergyPlus Ground Loop Heat Exchanger \protect \label{fig:schematic-of-energyplus-ground-loop-heat}}
 \end{figure}
 
-The data definition for the ground loop heat exchanger from the Energy+.idd is shown below. The syntax to the specification of Borehole, U-tube and ground are illustrated in the example following.
+Definitions for the input fields are provided below.
 
 \subsubsection{Inputs}\label{inputs-10-002}
 
@@ -2841,19 +2862,15 @@ This alpha field contains the ground heat exchanger outlet node name.
 
 \paragraph{Field: Design Flow Rate}\label{field-design-flow-rate-000}
 
-This numeric field contains the GHE design flow rate in cubic meters per second \{m\(^{3}\)/s\}.
+This numeric field contains the GHE design flow rate in cubic meters per second \{m\(^{3}\)/s\}. The flow rate specified is the total flow rate for the entire borehole field. Flow will be assumed to be evenly distributed across all boreholes.
 
-\paragraph{Field: Number of Bore Holes}\label{field-number-of-bore-holes}
+\paragraph{Field: Type of Undisturbed Ground Temperature Object}\label{field-type-of-undisturbed-ground-temperature-object}
 
-This numeric field contains the number of bore holes in the GHE installation.
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-\paragraph{Field: Bore Hole Length}\label{field-bore-hole-length}
+\paragraph{Field: Name of Undisturbed Ground Temperature Object}\label{field-name-of-undisturbed-ground-temperature-object}
 
-This numeric field contains the length of the borehole in meters \{m\}.
-
-\paragraph{Field: Bore Hole Radius}\label{field-bore-hole-radius}
-
-This numeric field contains the radius of the borehole in meters.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 \paragraph{Field: Ground Thermal Conductivity}\label{field-ground-thermal-conductivity}
 
@@ -2863,118 +2880,158 @@ This numeric field contains the thermal conductivity of the ground in W/m-K.
 
 This numeric field contains the thermal heat capacity of the ground in J/m\(^{3}\)-K.
 
-\paragraph{Field: Ground Temperature}\label{field-ground-temperature}
+\paragraph{Field: GHE:ResponseFactors object name}
 
-This numeric field contains the far field temperature of the ground in °C.
+The unique name of the GroundHeatExchanger:ResponseFactors object used to define the third-party response factors. If present, the GHE:Vertical:Array and GHE:Vertical:Single objects defined will be ignored.
 
-\paragraph{Field: Grout Thermal Conductivity}\label{field-grout-thermal-conductivity}
+\paragraph{Field: GHE:Vertical:Array object name}
 
-This numeric field contains the thermal conductivity of the filler material in W/m-K.
+The unique name of the GroundHeatExchanger:Vertical:Array object used to define a rectangular borehole field. If present, the GHE:Vertical:Single objects will be ignored.
 
-\paragraph{Field: Pipe Thermal Conductivity}\label{field-pipe-thermal-conductivity-000}
+\paragraph{Field: GHE:Vertical:Single names}
 
-This numeric field contains the thermal conductivity of the pipe in W/m-K.
+The unique names of all single, vertical GLHE objects which are used to define and arbitrarily shaped GHE array. This field is exensible.
 
-\paragraph{Field: Pipe Out Diameter}\label{field-pipe-out-diameter}
-
-This numeric field contains the outer diameter of the U-tube (pipe) in meters \{m\}.
-
-\paragraph{Field: U-Tube Distance}\label{field-u-tube-distance}
-
-This numeric field contains the distance between the two legs of the U-tube in meters \{m\}.
-
-\paragraph{Field: Pipe Thickness}\label{field-pipe-thickness-000}
-
-This numeric field contains the outer diameter of the U-tube (pipe) in meters.
-
-\paragraph{Field: Maximum Length of Simulation}\label{field-maximum-length-of-simulation}
-
-This numeric field contains the maximum number of years of simulation to be carried out.
-
-\paragraph{Field: G-Function Reference Ratio}\label{field-g-function-reference-ratio}
-
-The G-Functions may be formulated slightly differently based on the program which generated them. The ``raw'' G-Functions are based on an borehole radius to active length ratio of 0.0005. If the physical ratio is different from this, a correction must be applied. EnergyPlus will apply the correction, based on the reference ratio entered in this field. Therefore, therefore two possible input configurations.
-
-\begin{itemize}
-\item
-  If the G-Functions have not had a correction applied, then the G-Functions are still based on a reference of 0.0005, so use a value of 0.0005 in this field. EnergyPlus will adjust the G-Functions internally to create the properly referenced G-Function.
-\item
-  If the correction has already been applied, then the input G-Functions are based on a reference to the actual (physical) radius/length ratio, so enter the physical radius/length in this field. Entering the actual value will nullify any internal corrections, which will avoid re-basing the G-Function set.
-\end{itemize}
-
-The software GLHEPro has been making this ``pre-correction'' to the data sets since version 3.1 of that software, so this input field should match the actual (physical) radius/length ratio.
-
-\paragraph{Field: Number of Data Pairs of the G Function}\label{field-number-of-data-pairs-of-the-g-function}
-
-The borehole response is defined by a non-dimensional `G-function'. This is specified as a series of data points giving values of non-dimensional time \emph{vs} G-function value (LNTTS1, GFUNC1), (LNTTS2, GFUNC2), (LNTTS3, GFUNC3) \ldots{}\ldots{}.. (LNTTS\emph{n}, GFUNC\emph{n}), This numeric field contains the number of data pairs to be read in (\emph{n}).
-
-\paragraph{Field: G-Function Ln(T/Ts) Value \textless{}x\textgreater{}}\label{field-g-function-lntts-value-x}
-
-This numeric field contains the natural log of time/steady state time: \emph{ln(T/T\(_{s}\))}
-
-\paragraph{Field: G-Function `G' Value \textless{}x\textgreater{}}\label{field-g-function-g-value-x}
-
-This numeric field contains the G-function value of the corresponding LNTTS.
-
-The following is an example input:
+The following is are example inputs corresponding to the input variations allowed which were described previously. The first example uses the GroundHeatExchanger:Vertical:Array object. The g-functions will be generated automatically by EnergyPlus and cached for later use.
 
 \begin{lstlisting}
+  GroundHeatExchanger:System,
+    Vertical GHE 1x4 Std,  !- Name
+    GLHE Inlet,         !- Inlet Node Name
+    GLHE Outlet,        !- Outlet Node Name
+    0.00100944,         !- Design Flow Rate {m3/s}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
+    KATemps,            !- Undisturbed Ground Temperature Model Name
+    2.5,                !- Ground Thermal Conductivity {W/m-K}
+    2.5E+06,            !- Ground Thermal Heat Capacity {J/m3-K}
+    ,                   !- Response Factors Object Name
+    GHE-Array;
 
-GroundHeatExchanger:Vertical,
-  Vertical Ground Heat Exchanger, !- Name
-  GHE Inlet Node,                 !- Inlet Node Name
-  GHE Outlet Node,                !- Outlet Node Name
-  0.00330000,                     !- Design Flow Rate {m3/s}
-  120,                            !- Number of Bore Holes
-  76.2,                           !- Bore Hole Length {m}
-  .635080E-01,                    !- Bore Hole Radius {m}
-  .692626E+00,                    !- Ground Thermal Conductivity {W/m-K}
-  .234700E+07,                    !- Ground Thermal Heat Capacity {J/m3-K}
-  13.375,                         !- Ground Temperature {C}
-  .692626E+00,                    !- Grout Thermal Conductivity {W/m-K}
-  .391312E+00,                    !- Pipe Thermal Conductivity {W/m-K}
-  2.66667E-02,                    !- Pipe Out Diameter {m}
-  2.53977E-02,                    !- U-Tube Distance {m}
-  2.41285E-03,                    !- Pipe Thickness {m}
-  2,                              !- Maximum Length of Simulation
-  0.0005,                         !- G-Function Reference Ratio
-  35,                             !- Number of Data Pairs of the G Function
-  ! The G-function is defined by the following data pairs
-  -15.2996, -0.348322,            ! G-Function Ln(T/Ts) Value 1, G-Function G Value 1
-  -14.201,  0.022208,             ! G-Function Ln(T/Ts) Value 2, G-Function G Value 2
-  -13.2202, 0.412345,             ! G-Function Ln(T/Ts) Value 3, G-Function G Value 3
-  -12.2086, 0.867498,             ! G-Function Ln(T/Ts) Value 4, G-Function G Value 4
-  -11.1888, 1.357839,             ! G-Function Ln(T/Ts) Value 5, G-Function G Value 5
-  -10.1816, 1.852024,             ! G-Function Ln(T/Ts) Value 6, G-Function G Value 6
-  -9.1815,  2.345656,             ! G-Function Ln(T/Ts) Value 7, G-Function G Value 7
-  -8.6809,  2.593958,             ! G-Function Ln(T/Ts) Value 8, G-Function G Value 8
-  -8.5,     2.679,                ! etc, etc.
-  -7.8,     3.023,
-  -7.2,     3.32,
-  -6.5,     3.681,
-  -5.9,     4.071,
-  -5.2,     4.828,
-  -4.5,     6.253,
-  -3.963,   7.894,
-  -3.27,    11.82,
-  -2.864,   15.117,
-  -2.577,   18.006,
-  -2.171,   22.887,
-  -1.884,   26.924,
-  -1.191,   38.004,
-  -0.497,   49.919,
-  -0.274,   53.407,
-  -0.051,   56.632,
-  0.196,    59.825,
-  0.419,    62.349,
-  0.642,    64.524,
-  0.873,    66.412,
-  1.112,    67.993,
-  1.335,    69.162,
-  1.679,    70.476,
-  2.028,    71.361,
-  2.275,    71.79,
-  3.003,    72.511;               !- 35 PAIRS
+  GroundHeatExchanger:Vertical:Properties,
+    GHE-1 Props,        !- Name
+    1,                  !- Depth of Top of Borehole {m}
+    100,                !- Borehole Length {m}
+    0.114,              !- Borehole Diameter {m}
+    0.7443,             !- Grout Thermal Conductivity {W/m-K}
+    3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}
+    0.3895,             !- Pipe Thermal Conductivity {W/m-K}
+    1.77E+06,           !- Pipe Thermal Heat Capacity {J/m3-K}
+    0.03341,            !- Pipe Outer Diameter {m}
+    0.002984,           !- Pipe Thickness {m}
+    0.04913;            !- U-Tube Distance {m}
+
+  GroundHeatExchanger:Vertical:Array,
+    GHE-Array,          !- Name
+    GHE-1 Props,        !- GHE Properties
+    2,                  !- Number of Boreholes in X Direction
+    2,                  !- Number of Boreholes in Y Direction
+    5;                  !- Borehole Spacing {m}
+\end{lstlisting}
+
+The second example uses the GroundHeatExchanger:Vertical:Single object. The g-functions will be generated automatically by EnergyPlus and cached for later use.
+
+\begin{lstlisting}
+  GroundHeatExchanger:System,
+    Vertical GHE 1x4 Std,  !- Name
+    GLHE Inlet,         !- Inlet Node Name
+    GLHE Outlet,        !- Outlet Node Name
+    0.00100944,         !- Design Flow Rate {m3/s}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
+    KATemps,            !- Undisturbed Ground Temperature Model Name
+    2.5,                !- Ground Thermal Conductivity {W/m-K}
+    2.5E+06,            !- Ground Thermal Heat Capacity {J/m3-K}
+    ,                   !- Response Factors Object Name
+    ,                   !- GHE Array Object Name
+    GHE-1,              !- GHE Borehole Definition 1
+    GHE-2,              !- GHE Borehole Definition 2
+    GHE-3,              !- GHE Borehole Definition 3
+    GHE-4;              !- GHE Borehole Definition 4
+
+  GroundHeatExchanger:Vertical:Properties,
+    GHE-1 Props,        !- Name
+    1,                  !- Depth of Top of Borehole {m}
+    100,                !- Borehole Length {m}
+    0.114,              !- Borehole Diameter {m}
+    0.7443,             !- Grout Thermal Conductivity {W/m-K}
+    3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}
+    0.3895,             !- Pipe Thermal Conductivity {W/m-K}
+    1.77E+06,           !- Pipe Thermal Heat Capacity {J/m3-K}
+    0.03341,            !- Pipe Outer Diameter {m}
+    0.002984,           !- Pipe Thickness {m}
+    0.04913;            !- U-Tube Distance {m}
+
+  GroundHeatExchanger:Vertical:Single,
+    GHE-1,              !- Name
+    GHE-1 Props,        !- GHE Properties
+    0,                  !- X Location {m}
+    0;                  !- Y Location {m}
+
+  GroundHeatExchanger:Vertical:Single,
+    GHE-2,              !- Name
+    GHE-1 Props,        !- GHE Properties
+    5,                  !- X Location {m}
+    0;                  !- Y Location {m}
+
+  GroundHeatExchanger:Vertical:Single,
+    GHE-3,              !- Name
+    GHE-1 Props,        !- GHE Properties
+    0,                  !- X Location {m}
+    5;                  !- Y Location {m}
+
+  GroundHeatExchanger:Vertical:Single,
+    GHE-4,              !- Name
+    GHE-1 Props,        !- GHE Properties
+    5,                  !- X Location {m}
+    5;                  !- Y Location {m}
+\end{lstlisting}
+
+The final example uses the ResponseFactors object to provide third-party g-functions.
+
+\begin{lstlisting}
+  GroundHeatExchanger:System,
+    Vertical GHE 1x4 Std,  !- Name
+    GLHE Inlet,         !- Inlet Node Name
+    GLHE Outlet,        !- Outlet Node Name
+    0.00100944,         !- Design Flow Rate {m3/s}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
+    KATemps,            !- Undisturbed Ground Temperature Model Name
+    2.5,                !- Ground Thermal Conductivity {W/m-K}
+    2.5E+06,            !- Ground Thermal Heat Capacity {J/m3-K}
+    GHE-1 g-functions;  !- Response Factors Object Name
+
+  GroundHeatExchanger:Vertical:Properties,
+    GHE-1 Props,        !- Name
+    1,                  !- Depth of Top of Borehole {m}
+    100,                !- Borehole Length {m}
+    0.114,              !- Borehole Diameter {m}
+    0.7443,             !- Grout Thermal Conductivity {W/m-K}
+    3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}
+    0.3895,             !- Pipe Thermal Conductivity {W/m-K}
+    1.77E+06,           !- Pipe Thermal Heat Capacity {J/m3-K}
+    0.03341,            !- Pipe Outer Diameter {m}
+    0.002984,           !- Pipe Thickness {m}
+    0.04913;            !- U-Tube Distance {m}
+
+  GroundHeatExchanger:ResponseFactors,
+    GHE-1 g-functions,       !- Name
+    GHE-1 Props,             !- GHE Properties
+    4,                       !- Number of Boreholes
+    0.00043,                 !- G-Function Reference Ratio {dimensionless}
+    -15.585075,              !- G-Function Ln(T/Ts) Value 1
+    -2.672011,               !- G-Function G Value 1
+    -15.440481,              !- G-Function Ln(T/Ts) Value 2
+    -2.575897,               !- G-Function G Value 2
+    -15.295888,              !- G-Function Ln(T/Ts) Value 3
+    -2.476279,               !- G-Function G Value 3
+    -15.151295,              !- G-Function Ln(T/Ts) Value 4
+    -2.372609,               !- G-Function G Value 4
+    ...,
+    12.365217,               !- G-Function G Value 70
+    1.112000,                !- G-Function Ln(T/Ts) Value 71
+    12.469007,               !- G-Function G Value 71
+    1.335000,                !- G-Function Ln(T/Ts) Value 72
+    12.547123,               !- G-Function G Value 72
+    1.679000;                !- G-Function Ln(T/Ts) Value 73
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-10-000}
@@ -2992,6 +3049,8 @@ GroundHeatExchanger:Vertical,
   HVAC,Average,Ground Heat Exchanger Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Ground Heat Exchanger Average Fluid Temperature {[}C{]}
+\item
+  HVAC,Average,Ground Heat Exchanger Farfield Ground Temperature {[}C{]}
 \end{itemize}
 
 \paragraph{Ground Heat Exchanger Average Borehole Temperature {[}C{]}}\label{ground-heat-exchanger-average-borehole-temperature-c}
@@ -3017,6 +3076,198 @@ This is the mass flow rate of the working fluid through the heat exchanger.
 \paragraph{Ground Heat Exchanger Average Fluid Temperature {[}C{]}}\label{ground-heat-exchanger-average-fluid-temperature-c}
 
 This is the average temperature of the working fluid inside the heat exchanger.
+
+\paragraph{Ground Heat Exchanger Farfield Ground Temperature}
+
+This is the farfield temperature used by the object which is provided by the undisturbed ground temperature object. The temperature is the average of the 5 evenly spaced points between the top of the borehole and the bottom of the borehole.
+
+\subsection{GroundHeatExchanger:Vertical:Properties}\label{groundheatexchangerverticalproperties}
+
+This object defines several borehole parameters.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This alpha field indicates the unique name of the object.
+
+\paragraph{Field: Depth of Top of Borehole}
+
+This numeric field indicates the depth of the top of the borehole below the ground surface, in meters. The depth measured from the ground surface downward is positive.
+
+\paragraph{Field: Borehole Length}
+
+This numeric field indicates the active length of the borehole, referenced from the starting location (potentially below the ground surface), to the end of the borehole, in meters.
+
+\paragraph{Field: Grout Thermal Conductivity}\label{field-grout-thermal-conductivity}
+
+This numeric field contains the thermal conductivity of the filler material in W/m-K.
+
+\paragraph{Field: Grout Thermal Heat Capacity}
+
+This numeric field contains the thermal heat capacity of the grout in J/m\(^{3}\)-K.
+
+\paragraph{Field: Pipe Thermal Conductivity}\label{field-pipe-thermal-conductivity-000}
+
+This numeric field contains the thermal conductivity of the pipe in W/m-K.
+
+\paragraph{Field: Pipe Thermal Heat Capacity}
+
+This numeric field contains the thermal heat capacity of the pipe in J/m\(^{3}\)-K.
+
+\paragraph{Field: Pipe Outer Diameter}\label{field-pipe-out-diameter}
+
+This numeric field contains the outer diameter of the U-tube (pipe) in meters \{m\}.
+
+\paragraph{Field: Pipe Thickness}\label{field-pipe-thickness-000}
+
+This numeric field contains the outer diameter of the U-tube (pipe) in meters.
+
+\paragraph{Field: U-Tube Distance}\label{field-u-tube-distance}
+
+This numeric field contains the distance between the two legs of the U-tube in meters \{m\}. Distance is measured from the u-tube pipe center.
+
+An example object is shown below.
+
+\begin{lstlisting}
+  GroundHeatExchanger:Vertical:Properties,
+    GHE-1 Props,        !- Name
+    1,                  !- Depth of Top of Borehole {m}
+    100,                !- Borehole Length {m}
+    0.114,              !- Borehole Diameter {m}
+    0.7443,             !- Grout Thermal Conductivity {W/m-K}
+    3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}
+    0.3895,             !- Pipe Thermal Conductivity {W/m-K}
+    1.77E+06,           !- Pipe Thermal Heat Capacity {J/m3-K}
+    0.03341,            !- Pipe Outer Diameter {m}
+    0.002984,           !- Pipe Thickness {m}
+    0.04913;            !- U-Tube Distance {m}
+\end{lstlisting}
+
+\subsection{GroundHeatExchanger:Vertical:Array}\label{groundheatexchangerverticalarray}
+
+This object defines the borehole locations for a rectangular array of boreholes.
+
+\paragraph{Field: Name}
+
+This alpha field indicates the unique name of the object.
+
+\paragraph{Field: Properties}
+
+This alpha field indicates the name of the GroundHeatExchanger:Vertical:Properties object referenced by the boreholes in the array.
+
+\paragraph{Field: Number of Boreholes in the X-Direction}
+
+This numeric field indicates the number of boreholes in one axis of the rectangular borehole field.
+
+\paragraph{Field: Number of Boreholes in the Y-Direction}
+
+This numeric field indicates the number of boreholes in the other axis of the rectangular borehole field.
+
+\paragraph{Field: Borehole Spacing}
+
+This numeric field indicates the center-to-center borehole spacing, in meters, which is applied to the rectangular borehole field.
+
+An example object is shown below.
+
+\begin{lstlisting}
+  GroundHeatExchanger:Vertical:Array,
+    GHE-Array,          !- Name
+    GHE-1 Props,        !- GHE Properties
+    2,                  !- Number of Boreholes in X Direction
+    2,                  !- Number of Boreholes in Y Direction
+    5;                  !- Borehole Spacing {m}
+\end{lstlisting}
+
+\subsection{GroundHeatExchanger:Vertical:Single}\label{groundheatexchangerverticalsingle}
+
+This object defines a single borehole heat exchanger.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This alpha field indicates the unique name of the object.
+
+\paragraph{Field: Properties}
+
+This alpha field indicates the name of the GroundHeatExchanger:Vertical:Properties object referenced by the borehole.
+
+\paragraph{Field: X-Location}
+
+This numeric field indicates the x-location of this borehole.
+
+\paragraph{Field: Y-Location}
+
+This numeric field indicates the y-location of this borehole.
+
+\begin{lstlisting}
+  GroundHeatExchanger:Vertical:Single,
+    GHE-1,              !- Name
+    GHE-1 Props,        !- GHE Properties
+    0,                  !- X Location {m}
+    0;                  !- Y Location {m}
+\end{lstlisting}
+
+\subsection{GroundHeatExchanger:ResponseFactors}\label{groundheatexchangerresponsefactors}
+
+This object is used to provide third-party g-functions which are generated by other tools.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This alpha field indicates the unique name of the object.
+
+\paragraph{Field: Properties}
+
+This alpha field indicates the name of the GroundHeatExchanger:Vertical:Properties object referenced g-function response factors.
+
+\paragraph{Field: G-Function Reference Ratio}\label{field-g-function-reference-ratio}
+
+The G-Functions may be formulated slightly differently based on the program which generated them. The original g-functions as defined by Eskilson are based on an borehole radius to active length ratio of 0.0005. If the physical ratio is different from this, a correction must be applied. EnergyPlus will apply the correction, based on the reference ratio entered in this field. Therefore, therefore two possible input configurations.
+
+\begin{itemize}
+\item
+  If the g-functions have not had a correction applied, then the g-functions are still based on a reference of 0.0005, so use a value of 0.0005 in this field. EnergyPlus will adjust the g-functions internally to create the properly referenced g-function.
+\item
+  If the correction has already been applied, then the input g-functions are based on a reference to the actual (physical) radius/length ratio, so enter the physical radius/length in this field. Entering the actual value will nullify any internal corrections, which will avoid re-basing the g-function set.
+\end{itemize}
+
+The software GLHEPro has been making this ``pre-correction'' to the data sets since version 3.1 of that software, so this input field should match the actual (physical) radius/length ratio.
+
+\paragraph{Field: g-function Ln(t/ts) Value \textless{}x\textgreater{}}\label{field-g-function-lntts-value-x}
+
+This numeric field contains the natural log of time/steady state time: \emph{ln(t/t\(_{s}\))}. Field is extensible.
+
+\paragraph{Field: g-function `g' Value \textless{}x\textgreater{}}\label{field-g-function-g-value-x}
+
+This numeric field contains the g-function value of the corresponding LNTTS. Field is extensible.
+
+An example object is shown below.
+
+\begin{lstlisting}
+  GroundHeatExchanger:ResponseFactors,
+    GHE-1 g-functions,       !- Name
+    GHE-1 Props,             !- GHE Properties
+    4,                       !- Number of Boreholes
+    0.0005,                  !- G-Function Reference Ratio {dimensionless}
+    -15.585075,              !- G-Function Ln(T/Ts) Value 1
+    -2.672011,               !- G-Function G Value 1
+    -15.440481,              !- G-Function Ln(T/Ts) Value 2
+    -2.575897,               !- G-Function G Value 2
+    -15.295888,              !- G-Function Ln(T/Ts) Value 3
+    -2.476279,               !- G-Function G Value 3
+    -15.151295,              !- G-Function Ln(T/Ts) Value 4
+    -2.372609,               !- G-Function G Value 4
+    ...,
+    12.365217,               !- G-Function G Value 70
+    1.112000,                !- G-Function Ln(T/Ts) Value 71
+    12.469007,               !- G-Function G Value 71
+    1.335000,                !- G-Function Ln(T/Ts) Value 72
+    12.547123,               !- G-Function G Value 72
+    1.679000;                !- G-Function Ln(T/Ts) Value 73
+\end{lstlisting}
 
 \subsection{GroundHeatExchanger:Slinky}\label{groundheatexchangerslinky}
 

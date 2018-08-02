@@ -81,6 +81,8 @@ There is no system level subroutine corresponding to \emph{SizeZoneEquipment.} I
 
 There is a logical flag \emph{SysSizingCalc} corresponding to \emph{ZoneSizingCalc}. It is used to allow the component routines to distinguish a normal simulation call from a being called during a system sizing calculation.
 
+\emph{Note that throughout this section, any reference to a ``zone'' is equivalent to ``air terminal unit''}.
+
 \subsubsection{BeginDay}\label{beginday}
 
 \begin{enumerate}
@@ -527,11 +529,37 @@ Since the flow rates have been altered the outside air fraction will change. Thi
 
 (vii)\emph{DesMainVolFlow\(_{sys}\)} = \textbf{MAX}(\emph{DesCoolVolFlow\(_{sys}\)},\emph{DesHeatVolFlow\(_{sys}\)})
 
+At this point, the design main flow is the larger of the cooling design flow or the heating design flow. The program stores the information for which was dominant for each airloop in the boolean data structure variables sysSizeCoolingDominant and sysSizeHeatingDominant. 
+
+\subsection{System Sizing Adjustments for Air Terminal Operation}\label{system-sizing-adjustments-for-air-terminal-operation}
+
+Additional adjustments are made to system air flow sizes based on details of the how the zone air terminals connected to the system will eventually operate.  These system sizing adjustments were added as of version 8.9 of EnergyPlus.  The basic idea is to account for operating details of the air terminal units attached to the system by making adjustments to the system sizing results after the zone equipment has been setup and sized.  The routine ManageSystemSizingAdjustments has been added that first sets up the zone equipment and then makes adjustments to the system sizing by mining information from the air terminal models for minimum flow fractions, operating modes during heating, and any user-defined hard sizes to improve accuracy and robustness.  Once the air terminals are setup, the actual operating flow rates during heating are often quite different from the design heating flow rate derived from the zone loads.  The adjustment method scans all the air terminals and develops accurate values for the minimum and maximum flow rates that will occur during heating operation.  Then the system design heating flow rate is adjusted to reflect this new result.  For example in a VAV system with Normal action dampers that is cooling dominated, the heating design flow rate is no longer really related to the zone loads, but is the cooling design flow rate times the minimum flow fraction at the dampers. Similarly when heating loads dominate, the cooling design flow rate needs to be adjusted to account for how the terminals will really operate during cooling rather than the cooling-load-based sizing result.
+
+The routine ManageSystemSizingAdjustments adjusts system sizing outcomes based on how the zone air terminals finish out their sizing. The zone models are executed to trigger their sizing routines, by calling ManageZoneEquipment(). Then for each airloop, the routine loops over all the zones attached to that air loop. The air terminal units are scanned to sum design flow rates. Every air terminal connected to a particular air loop is summed for: (1) minimum flow rate during heating operation (airLoopHeatingMinimumFlowRateSum), (2) maximum flow rate during heating operation (airLoopHeatingMaximumFlowRateSum), and (3) maximum flow rate (airLoopMaxFlowRateSum). The routine also stores zone level flow information for Standard 62.1 calculations, \emph{Vpz}, \emph{Vpzmin}, \emph{Vdz}, and \emph{Vdzmin} for both cooling and heating.
+
+The three summed values for terminal air flows for each airloop are reported to the EIO and table summary report using the outputs "Sum of Air Terminal Maximum Heating Flow Rates [m3/s]," "Sum of Air Terminal Minimum Heating Flow Rates [m3/s]," and "Sum of Air Terminal Maximum Flow Rates [m3/s]."
+
+ The summed values are used to "Adjust" the system sizing results in the following ways.  The setting for the type of zone sum to use can be either \emph{noncoincident} or \emph{coincident} (determined in the input field called Type of Zone Sum to Use in the Sizing:System input object).  For \emph{noncoincident} the design system heating flow rate is set to be the larger of the airloop heating maximum flow rate sum (from the air terminals) and the design flow rate from the load based calculations (described above).  The design system main flow rate is set to be the larger of the airloop maximum flow rate sum (from the air terminals) and the design flow rate from the larger of the cooling and heating calculations. The cooling design flow rate is set differently depending on if the air loop was cooling dominant or heating dominant.  For \emph{noncoincident} and \textbf{cooling dominant}, the cooling design air flow rate is set to the design main air flow (typically the airLoopMaxFlowRateSum). For \emph{coincident} and \textbf{heating dominant}, the cooling design air flow rate is set to the larger of the original cooling-load-based value for flow and the lowest value the air handler will really operate at (from the airLoopHeatingMinimumFlowRateSum).  
+ 
+ For \emph{coincident} type sums, the air terminal summation is not as useful because we generally expect that the straight sum of air terminal sizes will be larger than the coincident sum because by its very nature the straight sum is only expected to match noncoincident approach.  Therefore the adjustments are more to keep design flows within bounds set by minimum and maximum sums so that the coincident sum is within physical bounds set by how the air terminals can operate.  For \emph{coincident} and \textbf{cooling dominant} airloops,  (a) the heating design flow rate is the larger of the heating minimum flow rate (from the airLoopHeatingMinimumFlowRateSum) and the design heat flow from the coincident design calculation, (b) the main design flow is not typically altered but it will be checked to be at least as large as the heating minimum flow rate (from the airLoopHeatingMinimumFlowRateSum), and (c) the cooling design flow rate is set to the main design flow which we expect to be the result of the coincident design calculation.  For \emph{coincident} and \textbf{heating dominant} airloops, (a) the heating design flow rate is the larger of the heating maximum flow rate (from the airLoopHeatingMaximumFlowRateSum) and the design heat flow rate from the coincident design calculation, (b) the main design flow rate is set to be the larger of the heating maximum flow rate (from the airLoopHeatingMaximumFlowRateSum) and main design flow rate from the coincident sizing calculations, and (c) the cooling design flow rate is set to be the larger of the heating minimum flow rate (from the airLoopHeatingMinimumFlowRateSum) and the cooling design flow rate from the coincident calculation. 
+ 
+ The resulting adjusted system sizes for each airloop are reported to the EIO and table summary report using the outputs "Adjusted Heating Design Air Flow Rate [m3/s]," "Adjusted Cooling Design Air Flow Rate [m3/s]," and "Adjusted Main Design Air Flow Rate [m3/s]."
+
+\subsection{Central Heating Maximum System Air Flow Ratio Sizing}\label{central-heating-maximum-system-air-flow-ratio-sizing}
+
+The routine ManageSystemSizingAdjustments also includes calculating the ratio for the central heating maximum system air flow rate to the maximum flow rate for the airloop.  This ratio is the input field called Central Heating Maximum System Air Flow Ratio in the Sizing:System object and, as of version 8.9, can be autosized.  The value is calculated even if the input was not autosized so that inputs can be checked.  The corrected values are used to autosize the central heating flow ratio, if set to autosize by the user. The ratio is calculated by dividing the adjusted design heating flow by the adjusted design main flow. 
+
+\subsection{System Design Outdoor Air Flow Rate}\label{Design-Outdoor-Air-Flow-Rate}
+
+The design outdoor air flow rate input in the Sizing:System object can be set to autosize.  The sizing calculations for determining the system-level design outdoor air flow rate, \emph{Vot}, depend on the method chosen in the field called System Output Air Method in Sizing:System, either \emph{ZoneSum} or \emph{VentilationRateProcedure}, and the design results at the zone level, see Zone Outdoor Air Design Data discussion below.  The calculations generally follow the Standard 62.1 approach and are discussed separately in the Demand Controlled Ventilation section elsewhere in the Engineering Reference.  The sizing calculations apply the Standard 62.1 calculations separately for both peak cooling design conditions and peak heating design conditions and take the larger to be the single design outdoor air volume flow rate.  The predefined table summary report "Standard 62.1 Summary" provides comprehensive summary of the calculations for outdoor air rate.  As of version 8.9, the system level summations and flow rate results are based on the adjusted system sizes and zone level summations that mine the individual air terminals attached to the air handlers.
+
+
+
 \textbf{This concludes the system design calculation.}
 
 \begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
 
-\textbf{Scalable System HVAC Sizing}
+\subsection{Scalable System HVAC Sizing}\label{scalable-system-HVAC-sizing}
 
 The scalable system sizing applies to system supply air flow rates and sysyem capacity in coolin and heating modes.
 

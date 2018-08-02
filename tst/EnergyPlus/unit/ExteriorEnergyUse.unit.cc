@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -62,22 +63,22 @@ using namespace ObjexxFCL;
 using namespace DataGlobals;
 using namespace EnergyPlus::ScheduleManager;
 
-TEST_F( EnergyPlusFixture, ExteriorEquipmentTest_Test1 )
+TEST_F(EnergyPlusFixture, ExteriorEquipmentTest_Test1)
 {
 
-	NumExteriorLights = 0;
-	NumExteriorEqs = 2;
-	TimeStepZone = 0.25;
-	TimeStepZoneSec = TimeStepZone * SecInHour;
-	ExteriorEquipment.allocate( NumExteriorEqs );
-	ExteriorEquipment( 1 ).DesignLevel = 1000.0;
-	ExteriorEquipment( 2 ).DesignLevel = 0.0;
-	ExteriorEquipment( 1 ).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-	ExteriorEquipment( 2 ).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-	ReportExteriorEnergyUse();
+    NumExteriorLights = 0;
+    NumExteriorEqs = 2;
+    TimeStepZone = 0.25;
+    TimeStepZoneSec = TimeStepZone * SecInHour;
+    ExteriorEquipment.allocate(NumExteriorEqs);
+    ExteriorEquipment(1).DesignLevel = 1000.0;
+    ExteriorEquipment(2).DesignLevel = 0.0;
+    ExteriorEquipment(1).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    ExteriorEquipment(2).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    ReportExteriorEnergyUse();
 
-	EXPECT_EQ( 1000.0, ExteriorEquipment( 1 ).Power );
-	EXPECT_EQ( 0.0, ExteriorEquipment( 2 ).Power );
-	EXPECT_EQ( 900000.0, ExteriorEquipment( 1 ).CurrentUse );
-	EXPECT_EQ( 0.0, ExteriorEquipment( 2 ).CurrentUse );
+    EXPECT_EQ(1000.0, ExteriorEquipment(1).Power);
+    EXPECT_EQ(0.0, ExteriorEquipment(2).Power);
+    EXPECT_EQ(900000.0, ExteriorEquipment(1).CurrentUse);
+    EXPECT_EQ(0.0, ExteriorEquipment(2).CurrentUse);
 }

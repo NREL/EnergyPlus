@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -45,52 +46,52 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataViewFactorInformation.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataViewFactorInformation.hh>
 
 namespace EnergyPlus {
 
 namespace DataViewFactorInformation {
 
-	// Module containing the data dealing with view factor information for ScriptF
-	// and Diffuse Solar distribution calculations
+    // Module containing the data dealing with view factor information for ScriptF
+    // and Diffuse Solar distribution calculations
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Rob Hitchcock
-	//       DATE WRITTEN   September 2007; Moved from HeatBalanceIntRadExchange
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Rob Hitchcock
+    //       DATE WRITTEN   September 2007; Moved from HeatBalanceIntRadExchange
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// <description>
+    // PURPOSE OF THIS MODULE:
+    // <description>
 
-	// METHODOLOGY EMPLOYED:
-	// <description>
+    // METHODOLOGY EMPLOYED:
+    // <description>
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// OTHER NOTES:
-	// na
+    // OTHER NOTES:
+    // na
 
-	// USE STATEMENTS:
-	// <use statements for data only modules>
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // USE STATEMENTS:
+    // <use statements for data only modules>
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// <use statements for access to subroutines in other modules>
+    // <use statements for access to subroutines in other modules>
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	// Object Data
-	Array1D< ZoneViewFactorInformation > ZoneInfo;
+    // Object Data
+    Array1D<ZoneViewFactorInformation> ZoneInfo;
 
-} // DataViewFactorInformation
+} // namespace DataViewFactorInformation
 
-} // EnergyPlus
+} // namespace EnergyPlus

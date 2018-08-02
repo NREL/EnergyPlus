@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -65,6 +66,11 @@ namespace DataGlobals {
 	extern bool runReadVars;
 	extern bool DDOnlySimulation;
 	extern bool AnnualSimulation;
+    extern bool outputEpJSONConversion;
+    extern bool isEpJSON;
+    extern bool isCBOR;
+    extern bool isMsgPack;
+    extern bool preserveIDFOrder;
 
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const BeginDay;
@@ -79,7 +85,7 @@ namespace DataGlobals {
 	extern int const ksRunPeriodWeather;
 	extern int const ksHVACSizeDesignDay; // a regular design day run during HVAC Sizing Simulation
 	extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
-	extern int const ksReadAllWeatherData; // a weather period for reading all weather data proir to the simulation
+    extern int const ksReadAllWeatherData;      // a weather period for reading all weather data prior to the simulation
 
 	extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
 	extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -92,7 +98,7 @@ namespace DataGlobals {
 	extern Real64 const DegToRadians; // Conversion for Degrees to Radians
 	extern Real64 const RadToDeg; // Conversion for Radians to Degrees
 	extern Real64 const SecInHour; // Conversion for hours to seconds
-	extern Real64 const HoursInDay; // Number of Hourse in Day
+    extern Real64 const HoursInDay;                    // Number of Hours in Day
 	extern Real64 const SecsInDay; // Number of seconds in Day
 	extern Real64 const BigNumber; // Max Number real used for initializations
 	extern Real64 const rTinyValue; // Tiny value to replace use of TINY(x)
@@ -104,6 +110,7 @@ namespace DataGlobals {
 	extern Real64 const AutoCalculate; // automatically calculate some fields.
 	extern Real64 const CWInitConvTemp; // [deg C], standard init chilled water vol to mass flow conversion temp
 	extern Real64 const HWInitConvTemp; // [deg C], standard init hot water vol to mass flow conversion temp
+    extern Real64 const SteamInitConvTemp; // [deg C], standard init steam vol to mass flow conversion temp
 
 	extern Real64 const StefanBoltzmann; // Stefan-Boltzmann constant in W/(m2*K4)
 	extern Real64 const UniversalGasConst; // (J/mol*K)
@@ -146,6 +153,8 @@ namespace DataGlobals {
 	extern bool BeginTimeStepFlag; // True at the start of each time step, False after first subtime step of time step
 	extern int DayOfSim; // Counter for days (during the simulation)
 	extern std::string DayOfSimChr; // Counter for days (during the simulation) (character -- for reporting)
+    extern int CalendarYear;            // Calendar year of the current day of simulation
+    extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
 	extern bool EndEnvrnFlag; // True at the end of each environment (last time step of last hour of last day of environ)
 	extern bool EndDesignDayEnvrnsFlag; // True at the end of the last design day environment
 	// (last time step of last hour of last day of environ which is a design day)
@@ -173,6 +182,7 @@ namespace DataGlobals {
 	extern int OutputFileSysSizing; // Unit number of system sizing calc output file
 	extern int OutputFileMeters; // Unit number for meters output
 	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
+    extern int OutputFileShadingFrac;                // Unit number for shading output
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
 	extern int OutputDElightIn; // Unit number for the DElight In file
@@ -213,13 +223,15 @@ namespace DataGlobals {
 	extern bool RedoSizesHVACSimulation; // doing kick off simulation for redoing sizes as part of sizing
 	extern bool FinalSizingHVACSizingSimIteration; // true if this will be no more HVAC sizing sim iterations
 	extern bool AnyEnergyManagementSystemInModel; // true if there is any EMS or Erl in model.  otherwise false
+    extern bool AnyLocalEnvironmentsInModel;       // true if there is any local environmental data objected defined in model, otherwise false
 	extern bool AnyPlantInModel; // true if there are any plant or condenser loops in model, otherwise false
 	extern int CacheIPErrorFile; // Cache IP errors until IDF processing done.
 	extern bool AnyIdealCondEntSetPointInModel; // true if there is any ideal condenser entering set point manager in model.
 	extern bool RunOptCondEntTemp; // true if the ideal condenser entering set point optimization is running
 	extern bool CompLoadReportIsReq; // true if the extra sizing calcs are performed to create a "pulse" for the load component report
 	extern bool isPulseZoneSizing; // true during the set of zone sizing calcs that include the "pulse" for the load component report
-	extern int OutputFileZonePulse; // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
+    extern int
+        OutputFileZonePulse; // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
 	extern bool doLoadComponentPulseNow; // true for the time step that is the "pulse" for the load component report
 	extern bool ShowDecayCurvesInEIO; // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	extern bool AnySlabsInModel; // true if there are any zone-coupled ground domains in the input file
@@ -231,11 +243,10 @@ namespace DataGlobals {
 
 	// Clears the global data in DataGlobals.
 	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+    void clear_state();
 
-} // DataGlobals
+} // namespace DataGlobals
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -819,7 +819,7 @@ Many of the control and integration aspects of the high temperature radiant syst
 
 \subsubsection{Overview}\label{overview}
 
-The simple chilled ceiling model is similar to the high temperature radiant system and the hot water radiant/convective baseboard models and was developed to make the modeling of certain radiant systems easier.  The existing chilled beam model in EnergyPlus, while useful for modeling active chilled beam systems, is a convective heat transfer only model that is not suitable for all radiant panels or passive chilled beam systems.
+The simple chilled ceiling model (ZoneHVAC:CoolingPanel:RadiantConvective:Water) is similar to the high temperature radiant system and the hot water radiant/convective baseboard models and was developed to make the modeling of certain radiant systems easier.  The existing chilled beam model in EnergyPlus, while useful for modeling active chilled beam systems, is a convective heat transfer only model that is not suitable for all radiant panels or passive chilled beam systems.
 
 \subsubsection{Modeling Considerations/Assumptions}\label{modeling-considerations-assumptions}
 
@@ -840,13 +840,13 @@ The model is intended to be simple so several assumptions have been made regardi
 \item
   The total net heat loss to the zone is determined using a user defined coefficient to calculate a zone temperature.  This “fraction” radiant parameter defines what portion of the zone temperature is based on the zone MRT with the remainder determined by the zone MAT.  While this user defined coefficient remains constant throughout the simulation in keeping with the simple nature of this model, it is not the same as defining a fixed radiant/convective split since this will vary with changing MRT and MAT.  More information on this is given below.
 \item
-  The load met by the system is included in the zone air heat balance as any other system’s impact is.  The impact of the system includes the convective load, the radiant gain that is distributed to people (assumed that it is converted into a convective loss), and the increased convection loss from the zone surfaces.
+  The load met by the system is included in the zone air heat balance just as with any other system.  The impact of the system includes the convective load, the radiant gain that is distributed to people (assumed that it is converted into a convective loss), and the increased convection loss from the zone surfaces.
 \item
   The radiant loss/gain is distributed to the surfaces as per the radiant surface list that lists which surfaces the radiant cooling panel will interact with and what fraction of radiation each surface will “see”.  This is similar to the existing radiant-convective baseboard model and these fractions are user inputs.
 \item
   The model is an HVAC level model but interacts with the zone heat balances much like the radiant system and radiant/convective baseboard models.
 \item
-  Controls are based on controlling water flow rate (like the hydronic radiant system) to meet the thermostatic setpoint temperature of the unit with control types potentially including MAT, MRT, OpTemp, and/or ODB/OWB much like the low temperature radiant systems.  Controls based on standard air system thermostatic controls are also possible.
+  Controls are based on controlling water flow rate (like the hydronic radiant system) to meet the thermostatic setpoint temperature of the unit with control types options including MAT, MRT, OpTemp, ODB, or OWB much like the low temperature radiant systems.  Controls based on standard air system thermostatic controls are also possible.
 \item
   In the event that condensation is predicted on the surface of a panel, the model uses the same condensation control options as the low temperature radiant system.  These include: ignoring the problem and allowing the simulation to continue, shutting the system down when condensation is predicted, and a variable response that tries to keep the system running at a lower output while avoiding condensation conditions.
 \item
@@ -855,13 +855,13 @@ The model is intended to be simple so several assumptions have been made regardi
 
 \subsubsection{Algorithm Details: Unit Performance and Calculation of the UA Value}\label{algorithm-details-unit-performance-and-calculation-of-the-ua-value}
 
-As stated above in the assumptions, the most prudent simple method for calculating the performance of a radiant cooling panel is to use a heat exchanger style formulation.  Since the air within the space (and the other surfaces of the space) will presumably be at a “constant” temperature while the water flowing through the panel will change temperature, we have a situation where one fluid is changing temperature and one remains at the same temperature.  This is very similar to the low temperature radiant system models which use the effectiveness-NTU method for calculating heat exchange between the water in the loop and the slab in which the pipes are embedded.  A summary of how this will be modeled for the radiant cooling panel follows in the next paragraphs.
+As stated above in the assumptions, the most prudent simple method for calculating the performance of a radiant cooling panel is to use a heat exchanger style formulation.  Since the air within the space (and the other surfaces of the space) will presumably be at a “constant” temperature while the water flowing through the panel will change temperature, we have a situation where one fluid is changing temperature and one remains at the same temperature.  This is very similar to the low temperature radiant system models which use the effectiveness-NTU method for calculating heat exchange between the water in the loop and the slab in which the pipes are embedded.  A summary of how this is modeled for the radiant cooling panel follows in the next paragraphs.
 
 Several heat balances can be constructed that relate to the situation at hand.  First, a heat balance on the water loop results in:
 
 $q = \PB{m c_p}_{water} \PB{T_{wi}-T_{wo}}$  % note \PB is defined in header.tex
 
-where q is the energy transferred between the water loop and the surrounding space to which the cooling panel is exposed, m ̇ is the mass flow rate of the water, cp is the specific heat of the water, Twi is the inlet water temperature and Two is the outlet water temperature.
+where q is the energy transferred between the water loop and the surrounding space to which the cooling panel is exposed, m is the mass flow rate of the water, cp is the specific heat of the water, Twi is the inlet water temperature and Two is the outlet water temperature.
 
 The maximum amount of heat transfer that is possible according to the Second Law of Thermodynamics is:
 
@@ -869,11 +869,13 @@ $q_{max} = \PB{m c_p}_{water} \PB{T_{wi} - T_z}$
 
 where qmax is the maximum possible energy transfer and Tz is the temperature of the surroundings (assumes that the air and the unconditioned surfaces in the space are at the same temperature for the sake of this development and the calculation of a UA; more explanation of Tz is given in the next section).
 
-The ratio of the actual energy exchange to the maximum possible is known as the effectiveness of the heat exchanger, ε.  Thus, $ε = \frac{q}{q_{max}}$.
+The ratio of the actual energy exchange to the maximum possible is known as the effectiveness of the heat exchanger, $\varepsilon$
+
+$\varepsilon = \frac{q}{q_{max}}$.
 
 For the case when one fluid is stationary in a heat exchanger, Incropera and DeWitt (1985) state that the effectiveness of a heat exchanger can be related to the number of transfer units (NTU) through the following relation:
 
-$ε = 1 - e^{-NTU}$
+$\varepsilon = 1 - e^{-NTU}$
 
 and NTU is defined by:
 
@@ -881,63 +883,57 @@ $NTU = \frac{UA}{ \PB{m c_p}_{water} }$
 
 The above equations will be used to model the performance of the panel within EnergyPlus and also to obtain a “design” UA value for the panel.
 
-Calculating the UA value of a cooling panel or coming up with a relationship for such a term is not a simple matter.  However, most devices are either rated or tested by the manufacturer under certain conditions.  From this rating information, a UA value can be calculated.  The EnergyPlus model will request rating information (inlet water temperature, mass flow rate, “air” temperature, and panel output under rating conditions) and then use it to calculate a UA value that will be used to model the performance of the panel.
+Calculating the UA value of a cooling panel or coming up with a relationship for such a term is not a simple matter.  However, most devices are either rated or tested by the manufacturer under certain conditions.  From this rating information, a UA value can be calculated.  The EnergyPlus model requests rating information (inlet water temperature, mass flow rate, “air” temperature, and panel output under rating conditions) and then uses it to calculate a UA value that is used to model the performance of the panel.
 
-The development of the method for estimating the panel UA value will use the same equations shown above but simply with the purpose of calculating UA rather than the performance of the device, i.e. determining the output of the panel.  The method for estimating the UA value of the panel begins with the panel rating data that includes the following values:
+The development of the method for estimating the panel UA value uses the same equations shown above but simply with the purpose of calculating UA rather than the performance of the device, i.e. determining the output of the panel.  The method for estimating the UA value of the panel begins with the panel rating data that includes the following values:
 
 \begin{itemize}
 \tightlist
 \item
-  Rating Inlet Water Temperature (Trwi)
+  Rating Inlet Water Temperature $\PB{T_{rwi}}$
 \item
-  Rating Air/Surroundings Temperature (Trz)
+  Rating Air/Surroundings Temperature $\PB{T_{rz}}$
 \item
-  Rating Water Mass Flow Rate (m ̇\_r)
+  Rating Water Mass Flow Rate $\PB{m_r}$
 \item
-  Rated Output Capacity (Qr)
+  Rated Output Capacity $\PB{Q_r}$
 \end{itemize}
 
-To find UA, we first rearrange equations above to make NTU a function of effectiveness as follows:
+To find UA, first rearrange the equations above to make NTU a function of effectiveness as follows:
 
-$ε = 1 - e^{-NTU}$
+$\varepsilon = 1 - e^{-NTU}$
 
-$NTU = -\ln{\PB{1-ε}}$
+$NTU = -\ln{\PB{1-\varepsilon}}$
 
-where $ε = Qr/qmax$ and qmax is calculated using design conditions.  This leads to:
+where $\varepsilon = {Q_r}/{q_max}$ and qmax is calculated using design conditions.  This leads to:
 
-$NTU = -\ln{\PB{\frac{1-Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T_{rz}}}}}$
+$NTU = -\ln{\PB{1-\frac{Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T_{rz}}}}}$
 
-Finally, substituting the definition of NTU as shown in Equation 4, we obtain an equation for UA that is calculated directly from the rated values that the user supplies:
+Finally, substituting the definition of NTU as shown above, one can obtain an equation for UA that is calculated directly from the rated values that the user supplies:
 
-$UA = -\PB{m_r c_p}_{water} \ln{\PB{\frac{1-Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T_{rz}}}}}$
+$UA = -\PB{m_r c_p}_{water} \ln{\PB{1-\frac{Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T_{rz}}}}}$
 
-This UA value will be used by the simple model to calculate the output of the radiant cooling panel based on the current water inlet temperature and mass flow rate as well as the space temperature (combination of air and radiant temperature) as described below.
+This UA value is used by the simple model to calculate the output of the radiant cooling panel based on the current water inlet temperature and mass flow rate as well as the space temperature (combination of air and radiant temperature) as described below.
 
 \subsubsection{Algorithm Details: Zone Temperature for Radiant Panel Output and “Fraction Radiant” Input}\label{algoithm-details-zone-temperature-for-radiant-panel-and-fraction-radiant-input}
 
-The output from the panel will be based on the mean air temperature (MAT) and the mean radiant temperature (MRT) from the space.  These two temperatures will be combined to create a “zone” temperature that will be used in the model to calculate the radiant cooling panel output.  As shown in the previous section, a UA value will be calculated using rated conditions.  This UA value will be assumed to be constant and used in conjunction with the effectiveness-NTU method described in the previous section to determine the output of the panel based on water inlet temperature, water mass flow rate, and space conditions.  The space conditions will take into account both the mean air temperature and the mean radiant temperature via the following equation:
+The output from the panel will be based on the mean air temperature (MAT) and the mean radiant temperature (MRT) from the space.  These two temperatures are combined to create a “zone” temperature that is used in the model to calculate the radiant cooling panel output.  As shown in the previous section, a UA value is calculated using rated conditions.  This UA value is assumed to be constant and used in conjunction with the effectiveness-NTU method described in the previous section to determine the output of the panel based on water inlet temperature, water mass flow rate, and space conditions.  The space conditions take into account both the mean air temperature and the mean radiant temperature via the following equation:
 
 $T_z = x_r MRT+ ( 1-x_r ) MAT$
 
 where xr is the “Fraction Radiant” for the radiant cooling panel that the user provides.
 
-This will then be used in Equation 2 above to calculate the maximum possible panel output, qmax.  Knowing UA from Equation 7 and knowing what the water mass flow rate for the system is based on controls, NTU can be calculated.  Once NTU is calculated, the effectiveness can be computed using Equation 3 and then the panel output (q) can be found from:
+This is then used in the equation for qmax above to calculate the maximum possible panel output.  Knowing UA and knowing what the water mass flow rate for the system is based on controls, the NTU parameter can be calculated.  Once NTU is calculated, the effectiveness can be computed and used with the maximum possible panel output to calculated the actual panel output (q) from:
 
-$q=ε q_{max}$
+$q = \varepsilon {q_{max}}$
 
 Thus, the modeling equation to find the panel output is:
 
-$q=(1-e^(-UA/(m ̇c_p )_water ) ) (m ̇c_p )_water (T_wi-T_z )$
+$q = \PB{1-e^{\frac{-UA}{\PB{m c_p}_{water}}}} \PB{m c_p}_{water} \PB{{T}_{wi}-{T}_{z}}$
 
-Using the results of Equation 10, the outlet water temperature can also be calculated using a rearranged form of Equation 1.
+Using the results of the above equation, the outlet water temperature can also be calculated using a rearranged form of the water loop heat balance equation given at the beginning of this section.
 
-There has been some concern expressed that the “Fraction Radiant” value (xr) shown in Equation 8 is difficult to estimate and that the correct modeling of the performance of certain models, particularly the high temperature radiant heater, are highly dependent on having a very good estimate for this value.  The high temperature radiant heater is a high output device that is highly radiant and the control of these high output devices can be difficult to simulate.  The radiant cooling panels proposed here are generally not high output devices.  In addition, using available data, users can make a relatively good approximation for a value for the Fraction Radiant.
-
-One available source of information is found at:
-
-http://www.cmu.edu/iwess/components/radiant\_systems/performance/Performance\_study\_radiant\_panels.pdf
-
-This document shows that the ratio of the linearized radiation heat transfer coefficient from the panel to the surrounding surfaces generally falls within a range of 0.6-0.7 when compared to the combined radiation and convection heat transfer coefficient.  While it is true that this ratio is not exactly the same as the Fraction Radiant required from the user and that the mean radiant and mean air temperatures will not be the same value, choosing a value within this range should be a reasonable approximation of the performance of a radiant cooling panel and should not result in significant inaccuracies in the model result.
+There has been some concern expressed that the “Fraction Radiant” value (xr) used to calculate the zone temperature (Tz) is difficult to estimate and that the correct modeling of the performance of certain models, particularly the high temperature radiant heater, are highly dependent on having a good estimate for this value.  The high temperature radiant heater is a high output device that is highly radiant and the control of these high output devices can be difficult to simulate.  The radiant cooling panels discussed here are generally not high output devices.  A reasonable estimate for xr generally falls within a range of 0.6-0.7 when calculating Tz above.  While this value could vary for different scenarios, choosing a value within this range should be a reasonable approximation of the performance of a radiant cooling panel and should not result in significant inaccuracies in the model.
 
 \subsection{References}\label{references-039}
 

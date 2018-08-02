@@ -10,26 +10,58 @@ A complete simulation of each primary air system -- zone equipment air loop is d
 \end{itemize}
 
 \begin{lstlisting}
-DO WHILE ((SimAirLoops .OR. SimZoneEquipment) .AND. (IterAir.LE.MaxAir) )   IF (SimAirLoops) THEN     CALL ManageAirLoops(FirstHVACIteration,SimAirLoops,SimZoneEquipment)     SimPlantDemandLoops = .TRUE     SimElecCircuits = .TRUE.   END IF
+while ( ( SimAirLoops || SimZoneEquipment ) && ( IterAir <= MaxAir ) ) {
+	++IterAir; // Increment the iteration counter
+	// Call AirflowNetwork simulation to calculate air flows and pressures
+	ResimulateAirZone = false;
+	if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
+		ManageAirflowNetworkBalance( FirstHVACIteration, IterAir, ResimulateAirZone );
+	}
+	if ( SimAirLoops ) {
+		ManageAirLoops( FirstHVACIteration, SimAirLoops, SimZoneEquipment );
+		SimElecCircuits = true; //If this was simulated there are possible electric changes that need to be simulated
+	}
+
+	// make sure flow resolution gets done
+	if ( FlowResolutionNeeded ) {
+		SimZoneEquipment = true;
+	}
+	if ( SimZoneEquipment ) {
+		if ( ( IterAir == 1 ) && ( ! FlowMaxAvailAlreadyReset ) ) { // don't do reset if already done in FirstHVACIteration
+			// ResetTerminalUnitFlowLimits(); // don't do reset at all - interferes with convergence and terminal unit flow controls
+			FlowResolutionNeeded = true;
+		} else {
+			ResolveAirLoopFlowLimits();
+			FlowResolutionNeeded = false;
+		}
+		ManageZoneEquipment( FirstHVACIteration, SimZoneEquipment, SimAirLoops );
+		SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
+
+	}
+	FlowMaxAvailAlreadyReset = false;
+
+	//      IterAir = IterAir + 1   ! Increment the iteration counter
+	if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
+		if ( ResimulateAirZone ) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
+			SimAirLoops = true; // at min three times using ONOFF fan with the AirflowNetwork model
+			SimZoneEquipment = true;
+		}
+	}
+
+}
+
+RepIterAir += IterAir;
+if ( IterAir > MaxAir ) {
+	AirLoopConvergFail = 1;
+} else {
+	AirLoopConvergFail = 0;
+}
+// Check to see if any components have been locked out. If so, SimAirLoops will be reset to TRUE.
+ResolveLockoutFlags( SimAirLoops );
 \end{lstlisting}
 
-\begin{lstlisting}
-  IF (SimZoneEquipment) THEN     CALL ResolveAirLoopFlowLimits(IterAir+1)     CALL ManageZoneEquipment(FirstHVACIteration,SimZoneEquipment,SimAirLoops)     SimPlantDemandLoops = .TRUE.     SimElecCircuits = .TRUE.   END IF
-\end{lstlisting}
+The logical flags \emph{SimAirLoops} and \emph{SimZoneEquipment} are used to signal whether the primary air systems or the zone equipment sets need to be resimulated. These flags are set by the subroutine \emph{UpdateHVACInterface} which is called~ from within \emph{ManageAirLoops} and \emph{ManageZoneEquipment} at the end of each half-loop simulation. \emph{UpdateHVACInterface} (when called from \emph{ManageAirLoops}) passes the values at the outlet nodes of a primary air system on to the inlet nodes of the corresponding zone equipment half-loop and similarly (when called from \emph{ManageZoneEquipment}) passes the values of the outlet nodes of a zone equipment half-loop on to the inlet nodes of its corresponding~ primary air system. Each time \emph{UpdateHVACInterface} is called it also checks whether the values at the half-loop outlet nodes are in agreement with the values at the downstream half-loop inlet nodes. If they are not it sets the simulate flag of the downstream half-loop to \emph{true}. The values checked by \emph{UpdateHVACInterface} and their tolerances are as follows. If the air loop has no return path, then \emph{UpdateHVACInterface} compares and passes only the mass flow rate from the zone equipment inlet node to the primary air system inlet node.
 
-\begin{lstlisting}
-  IterAir = IterAir + 1
-\end{lstlisting}
-
-\begin{lstlisting}
-END DO
-\end{lstlisting}
-
-\begin{lstlisting}
-CALL ResolveLockoutFlags(SimAirLoops)
-\end{lstlisting}
-
-The logical flags \emph{SimAirLoops} and \emph{SimZoneEquipment} are used to signal whether the primary air systems or the zone equipment sets need to be resimulated. These flags are set by the subroutine \emph{UpdateHVACInterface} which is called~ from within \emph{ManageAirLoops} and \emph{ManageZoneEquipment} at the end of each half-loop simulation. \emph{UpdateHVACInterface} (when called from \emph{ManageAirLoops}) passes the values at the outlet nodes of a primary air system on to the inlet nodes of the corresponding zone equipment half-loop and similarly (when called from \emph{ManageZoneEquipment}) passes the values of the outlet nodes of a zone equipment half-loop on to the inlet nodes of its corresponding~ primary air system. Each time \emph{UpdateHVACInterface} is called it also checks whether the values at the half-loop outlet nodes are in agreement with the values at the downstream half-loop inlet nodes. If they are not it sets the simulate flag of the downstream half-loop to \emph{true}. The values checked by \emph{UpdateHVACInterface} and their tolerances are as follows.
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 

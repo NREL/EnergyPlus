@@ -153,6 +153,8 @@ is the moisture resistance between cells i and j and \(R_{ij}^v = \frac{\mu_{ij}
 
 Equation can be used together with the heat equation in an alternate step by step fashion to calculate the new temperature and relative humidity profiles for each cell for the next time step.
 
+Surfaces with Ground exterior boundary condition assumes saturated air ({100\%} relative humidity) condition to calculate the exterior mass transfer coefficient, which is used to model mass transport through a ground contact surfaces. 
+
 \subsubsection{Liquid Transport Coefficient D\(^{w}\)}\label{liquid-transport-coefficient-dw}
 
 The Moisture Dependant Liquid Transport Coefficient is entered as a series of moisture density and liquid transport coefficient data points. There are two different coefficients, one for suction, where the surface is wet due to rain, and one for redistribution where the surface is no longer wet. If the weather file has a rain flag it is used to switch between these two types of coefficient. HAMT-SUCTION and HAMT-REDISTRIBUTION.

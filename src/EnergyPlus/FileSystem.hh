@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -49,57 +50,42 @@
 
 #include <algorithm>
 
-namespace EnergyPlus{
+namespace EnergyPlus {
 
 namespace FileSystem {
 
-extern std::string const exeExtension;
+    extern std::string const exeExtension;
 
-void
-makeNativePath(std::string &path);
+    void makeNativePath(std::string &path);
 
-std::string
-getFileName( std::string const &filePath );
+    std::string getFileName(std::string const &filePath);
 
-std::string
-getParentDirectoryPath( std::string const &filePath );
+    std::string getParentDirectoryPath(std::string const &filePath);
 
-std::string
-getAbsolutePath( std::string const &filePath );
+    std::string getAbsolutePath(std::string const &filePath);
 
-std::string getProgramPath();
+    std::string getProgramPath();
 
-std::string
-getFileExtension(std::string const &fileName);
+    std::string getFileExtension(std::string const &fileName);
 
-std::string
-removeFileExtension(std::string const &fileName);
+    std::string removeFileExtension(std::string const &fileName);
 
-void
-makeDirectory(std::string const &directoryPath);
+    void makeDirectory(std::string const &directoryPath);
 
-bool
-pathExists(std::string const &path);
+    bool pathExists(std::string const &path);
 
-bool
-directoryExists(std::string const &directoryPath);
+    bool directoryExists(std::string const &directoryPath);
 
-bool
-fileExists(std::string const &filePath);
+    bool fileExists(std::string const &filePath);
 
-void
-moveFile(std::string const &filePath, std::string const &destination);
+    void moveFile(std::string const &filePath, std::string const &destination);
 
-int
-systemCall(std::string const &command);
+    int systemCall(std::string const &command);
 
-void
-removeFile(std::string const &fileName);
+    void removeFile(std::string const &fileName);
 
-void
-linkFile(std::string const &fileName, std::string const &link);
+    void linkFile(std::string const &fileName, std::string const &link);
 
-
-}
-}
+} // namespace FileSystem
+} // namespace EnergyPlus
 #endif

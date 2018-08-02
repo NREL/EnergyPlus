@@ -64,7 +64,7 @@ This field specifies the winding material used by the transformer. There are two
 
 \paragraph{Field: Full Load Temperature Rise}\label{field-full-load-temperature-rise}
 
-This numeric field defines the temperature rise of the windings above the ambient temperature, when the transformer is loaded at its nameplate rating. For liquid-immersed distribution transformers, the full load temperature rise usually takes the value of 65 °C. For dry-type transformers, the temperature rise usually takes three optional values: 80, 115 and 150 °C. This field accepts any value between the minimum (50 °C) and the maximum (180 °C). The default is 150 °C.
+This numeric field defines the temperature rise of the windings above the ambient temperature, when the transformer is loaded at its nameplate rating. For liquid-immersed distribution transformers, the full load temperature rise usually takes the value of 65 \textdegreeC. For dry-type transformers, the temperature rise usually takes three optional values: 80, 115 and 150 \textdegreeC. This field accepts any value between the minimum (50 \textdegreeC) and the maximum (180 \textdegreeC). The default is 150 \textdegreeC.
 
 \paragraph{Field: Fraction of Eddy Current Losses}\label{field-fraction-of-eddy-current-losses}
 
@@ -92,7 +92,7 @@ This field defines the percentage of the rated capacity at which the nameplate e
 
 \paragraph{Field: Reference Temperature for Nameplate Efficiency}\label{field-reference-temperature-for-nameplate-efficiency}
 
-This field defines the conductor temperature at which the nameplate efficiency is measured. This field is used only if the field of Performance Input Method is specified as NominalEfficiency . According to the NEMA Standard TP-1, the reference temperature takes the value of 75 °C for dry-type distribution transformers and it takes the value of 55 °C for liquid-filled distribution transformers. The default is 75 °C.
+This field defines the conductor temperature at which the nameplate efficiency is measured. This field is used only if the field of Performance Input Method is specified as NominalEfficiency . According to the NEMA Standard TP-1, the reference temperature takes the value of 75 \textdegreeC for dry-type distribution transformers and it takes the value of 55 \textdegreeC for liquid-filled distribution transformers. The default is 75 \textdegreeC.
 
 \paragraph{Field: Per Unit Load for Maximum Efficiency}\label{field-per-unit-load-for-maximum-efficiency}
 
@@ -318,7 +318,7 @@ This alpha field is used to describe how the electric load center is configured 
 
 \paragraph{Field: Inverter Object Name}\label{field-inverter-object-name}
 
-This field is used to identify the inverter connected to this load center (if any). This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverter, DirectCurrentWithInverterDCStorage, or DirectCurrentWithInverterACStorage and should contain the user-defined name of an inverter object. There are three types of inverter models available -see ElectricLoadCenter:Inverter:Simple, ElectricLoadCenter:Inverter:LookUpTable, or ElectricLoadCenter:Inverter:FunctionOfPower. Enter the name of one of these types of inverter objects defined elsewhere in the input file.
+This field is used to identify the inverter connected to this load center (if any). This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverter, DirectCurrentWithInverterDCStorage, or DirectCurrentWithInverterACStorage and should contain the user-defined name of an inverter object. There are three types of inverter models available -see ElectricLoadCenter:Inverter:Simple, ElectricLoadCenter:Inverter:LookUpTable, ElectricLoadCenter:Inverter:FunctionOfPower, or ElectricLoadCenter:Inverter:PVWatts. Enter the name of one of these types of inverter objects defined elsewhere in the input file.
 
 \paragraph{Field: Electrical Storage Object Name}\label{field-electrical-storage-object-name}
 
@@ -551,6 +551,8 @@ This alpha field contains the keyword for the type of generator. The available t
   Generator:CombustionTurbine
 \item
   Generator:Photovoltaic
+\item
+  Generator:PVWatts
 \item
   Generator:FuelCell
 \item
@@ -797,6 +799,58 @@ ElectricLoadCenter:Inverter:LookUpTable,
   0.934,                                     !- Efficiency at 75% Power and Nominal Voltage
   0.930;                                     !- Efficiency at 100% Power and Nominal Voltage
 \end{lstlisting}
+
+\subsection{ElectricLoadCenter:Inverter:PVWatts}\label{electricloadcenterinverterpvwatts}
+
+The ElectricLoadCenter:Inverter:PVWatts is intended to be used in an \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} with one or more \hyperref[generatorpvwatts]{Generator:PVWatts} objects. It is \textbf{not} compatible with other Generator objects, such as \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic}. 
+
+\subsubsection{Inputs}\label{inputs-electricloadcenterinverterpvwatts}
+
+\paragraph{Field: Name}\label{field-name-electricloadcenterinverterpvwatts}
+
+This field contains a unique name for the inverter. The name entered
+must also be unique across all other types of inverters that may also be
+in the input file.
+
+\paragraph{Field: DC to AC Size ratio}\label{field-dc-to-ac-size-ratio-electricloadcenterinverterpvwatts}
+
+The DC to AC size ratio is the ratio of the inverter's AC rated size to
+the array's DC rated size. Increasing the ratio increases the system's
+output over the year, but also increases the array's cost. The default
+value is 1.10, which means that a 4 kW system size would be for an array
+with a 4 DC kW nameplate size at standard test conditions (STC) and an
+inverter with a 3.63 AC kW nameplate size.
+
+For a system with a high DC to AC size ratio, during times when the
+array's DC power output exceeds the inverter's rated DC input size, the
+inverter limits the array's power output by increasing the DC operating
+voltage, which moves the array's operating point down its
+current-voltage (I-V) curve. PVWatts models this effect by limiting the
+inverter's power output to its rated AC size.
+
+The default value of 1.10 is reasonable for most systems. A typical
+range is 1.10 to 1.25, although some large-scale systems have ratios of
+as high as 1.50. The optimal value depends on the system's location,
+array orientation, and module cost.
+
+Default: 1.10
+
+\paragraph{Field: Inverter Efficiency}\label{field-inverter-efficiency-electricloadcenterinverterpvwatts}
+
+The inverter's nominal rated DC-to-AC conversion efficiency, defined as
+the inverter's rated AC power output divided by its rated DC power
+output.
+
+Default: 0.96
+
+\subsubsection{Outputs Description}\label{outputs-description-electricloadcenterinverterpvwatts}
+
+\begin{itemize}
+\item
+  HVAC,Average,Inverter Produced AC Electric Power {[}W{]}
+\item
+  HVAC,Sum,Inverter Produced AC Electric Energy {[}J{]}
+\end{itemize}
 
 \subsubsection{Outputs}\label{outputs-3-005}
 
@@ -1962,7 +2016,7 @@ This numeric field contains the electrical efficiency of the generator at refere
 
 \paragraph{Field: Reference Combustion Air Inlet Temperature}\label{field-reference-combustion-air-inlet-temperature}
 
-This numeric field specifies the reference temperature for the combustion inlet air in degrees Celsius. If this field is left blank, the default value of 15 °C will be used.
+This numeric field specifies the reference temperature for the combustion inlet air in degrees Celsius. If this field is left blank, the default value of 15 \textdegreeC will be used.
 
 \paragraph{Field: Reference Combustion Air Inlet Humidity Ratio}\label{field-reference-combustion-air-inlet-humidity-ratio}
 
@@ -2420,7 +2474,7 @@ This is the minimum flow rate of cooling water that must be available for the un
 
 \paragraph{Field: Maximum Cooling Water Temperature}\label{field-maximum-cooling-water-temperature}
 
-This is the maximum temperature of cooling water inlet or outlet that can occur without the unit shutting down to protect from overheating {[} °C{]}.
+This is the maximum temperature of cooling water inlet or outlet that can occur without the unit shutting down to protect from overheating {[} \textdegreeC{]}.
 
 \paragraph{Field: Electrical Efficiency Curve Name}\label{field-electrical-efficiency-curve-name}
 
@@ -2502,7 +2556,7 @@ This field describes the value for the coefficient used to determine the rate of
 
 \paragraph{Field: Nominal Engine Operating Temperature}\label{field-nominal-engine-operating-temperature}
 
-This field describes the nominal engine temperature during normal, steady-state operation, \({T_{eng,nom}}\) {[} °C{]}.
+This field describes the nominal engine temperature during normal, steady-state operation, \({T_{eng,nom}}\) {[} \textdegreeC{]}.
 
 \paragraph{Field: Warm Up Power Coefficient}\label{field-warm-up-power-coefficient}
 
@@ -2980,7 +3034,7 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Sum, Generator Fuel Cell Model Iteration Count {[]}
 \item
-  HVAC,Sum,Generator Regula Falsi Iteration Count {[]}
+  HVAC,Sum,Generator Root Solver Iteration Count {[]}
 \end{itemize}
 
 \paragraph{Generator Air Inlet Temperature {[}C{]}}\label{generator-air-inlet-temperature-c}
@@ -2997,7 +3051,7 @@ This variable provides the results for \({\dot N_{air}}\) , the flow rate of air
 
 \paragraph{Generator Power Module Entering Air Enthalpy {[}W{]}}\label{generator-power-module-entering-air-enthalpy-w}
 
-This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}\) , which is the enthalpy flow in the air stream entering the power module relative to 25 °C.
+This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}\) , which is the enthalpy flow in the air stream entering the power module relative to 25 \textdegreeC.
 
 \paragraph{Generator Blower Electric Power {[}W{]}}\label{generator-blower-electric-power-w}
 
@@ -3025,7 +3079,7 @@ This variable provides the results for \({\dot N_{fuel}}\) , which is the flow r
 
 \paragraph{Generator Power Module Entering Fuel Enthalpy {[}W{]}}\label{generator-power-module-entering-fuel-enthalpy-w}
 
-This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}\) , which is the enthalpy flow in the fuel stream entering the power module relative to 25 °C.
+This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}\) , which is the enthalpy flow in the fuel stream entering the power module relative to 25 \textdegreeC.
 
 \paragraph{Generator Fuel Compressor Electric Power {[}W{]}}\label{generator-fuel-compressor-electric-power-w}
 
@@ -3061,7 +3115,7 @@ This variable provides the results for energy used by the water pump. It is also
 
 \paragraph{Generator Power Module Entering Reforming Water Enthalpy {[}W{]}}\label{generator-power-module-entering-reforming-water-enthalpy-w}
 
-This variable provides the results for \({\dot H_{liq - water}}\) which is the enthalpy flow of the water stream entering the power module relative to 25 °C.
+This variable provides the results for \({\dot H_{liq - water}}\) which is the enthalpy flow of the water stream entering the power module relative to 25 \textdegreeC.
 
 \paragraph{Generator Product Gas Temperature {[}C{]}}\label{generator-product-gas-temperature-c}
 
@@ -3069,7 +3123,7 @@ This variable provides the results for the temperature of the product gas stream
 
 \paragraph{Generator Product Gas Enthalpy {[}W{]}}\label{generator-product-gas-enthalpy-w}
 
-This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}\) , which is the enthalpy flow in the product gas stream leaving the power module relative to 25 °C.
+This variable provides the results for \({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}\) , which is the enthalpy flow in the product gas stream leaving the power module relative to 25 \textdegreeC.
 
 \paragraph{Generator Product Gas Molar Flow Rate {[}kmol/s{]}}\label{generator-product-gas-molar-flow-rate-kmols}
 
@@ -3139,9 +3193,9 @@ This variable provides the results for the energy used by AC ancillaries. It is 
 
 This variable provides information on the numerical method used to calculate the FC model. EnergyPlus uses a sequential substitution iterative algorithm to solve the main heat balance equation for the FC model. This output variable indicates the number of iterations needed to converge.
 
-\paragraph{Generator Regula Falsi Iteration Count {[]}}\label{generator-regula-falsi-iteration-count}
+\paragraph{Generator Root Solver Iteration Count {[]}}\label{generator-regula-falsi-iteration-count}
 
-This variable provides information on the numerical method used to calculate product gas temperature as a function of the product gas s enthalpy. A Regula Falsi numerical method is used to invert the Shomate equation for enthalpy as a function of temperature. This output variable indicates the number of iterations needed for the Regula Falsi method to converge.
+This variable provides information on the numerical method used to calculate product gas temperature as a function of the product gas s enthalpy. A root solver numerical method is used to invert the Shomate equation for enthalpy as a function of temperature. This output variable indicates the number of iterations needed for the root solver method to converge.
 
 \paragraph{Generator Heat Recovery Exit Gas Temperature {[}C{]}}\label{generator-heat-recovery-exit-gas-temperature-c}
 
@@ -3498,18 +3552,18 @@ This field describes the excess air ratio beyond stoichiometric air supply. This
 This field contains the name of a QuadraticCurve input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofElectricPower. The quadratic curve named here describes the first part of the relation below used to calculate the rate of inlet air, \({\dot N_{air}}\) (kmol/s). It is a quadratic function of the net DC electrical power, \({P_{el}}\) (W).
 
 \begin{equation}
-{a_3}
+{\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]
 \end{equation}
 
 \paragraph{Field: Air Rate Air Temperature Coefficient}\label{field-air-rate-air-temperature-coefficient}
 
-This field is used to describe the air temperature coefficient, \({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\) , used to adjust inlet air flow rate in the relations for inlet air rate.
+This field is used to describe the air temperature coefficient, \({a_3}\), used to adjust inlet air flow rate in the relations for inlet air rate.
 
 \paragraph{Field: Air Rate Function of Fuel Rate Curve Name}\label{field-air-rate-function-of-fuel-rate-curve-name}
 
 This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofFuelRate. The quadratic curve named here describes the first part of the relation used to calculate the rate of inlet air, \({\dot N_{air}}\) (kmol/s). It is a quadratic function of the fuel flow rate, \({\dot N_{fuel}}\) .
 
-\({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\) \({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)
+ \({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)
 
 \paragraph{Field: Air Intake Heat Recovery Mode}\label{field-air-intake-heat-recovery-mode}
 
@@ -4246,7 +4300,7 @@ This output variable is the resulting efficiency of the PV array .
 
 The two more detailed PV models also have the following output variables.
 
-\paragraph{Generator PV Cell Temperature {[} °C{]}}\label{generator-pv-cell-temperature-c}
+\paragraph{Generator PV Cell Temperature {[} \textdegreeC{]}}\label{generator-pv-cell-temperature-c}
 
 This output variable represents the temperature of the solar cell used in the calculation of cell performance.
 
@@ -4705,6 +4759,157 @@ PhotovoltaicPerformance:Sandia,
 When using EpMacro with an typical installation of EnergyPlus, the above entry can be included in an input file by adding the following two lines to an input macro file (*.imf).
 
 \#\#include C:\textbackslash{}EnergyPlus\textbackslash{}MacroDataSets\textbackslash{}SandiaPVdata.imf ASE-50-ATF-17\_45{[]}
+
+\subsection{Generator:PVWatts}\label{generatorpvwatts}
+
+PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}. 
+
+\subsubsection{Inputs}\label{input-description}
+
+\paragraph{Field: Name}\label{field-name}
+
+This field is a unique name for the PV array.
+
+\paragraph{Field: PVWatts Version}\label{field-pvwatts-version}
+
+The version of the PVWatts calculations to use. Available Options:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{5}
+\end{itemize}
+
+\paragraph{Field: DC System Capacity}\label{field-dc-system-capacity}
+
+DC nameplate capacity of the system in W.
+
+\paragraph{Field: Module Type}\label{field-module-type}
+
+One of:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{Standard} - typical poly- or mono-crystalline silicon modules
+  with efficiencies in the range of 14-17\%
+\item
+  \texttt{Premium} - high efficiency (18-20\%) monocrystalline silicon
+  modules that have anti-reflective coatings and lower temperature
+  coefficients
+\item
+  \texttt{ThinFilm} - low efficiency (11\%) and a significantly lower
+  temperature coefficient which is representative of most installed thin
+  film modules
+\end{itemize}
+
+\paragraph{Field: Array Type}\label{field-array-type}
+
+One of:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{FixedOpenRack} - use for ground mounted arrays, assumes air
+  flows freely around the array.
+\item
+  \texttt{FixedRoofMounted} - use for typical residential arrays mounted
+  on the roof, assumes limited airflow around the modules
+\item
+  \texttt{OneAxis} - tilt and azimuth are fixed, the panels can rotate
+  as shown below
+\item
+  \texttt{OneAxisBacktracking} - Backtracking is a tracking algorithm
+  that rotates the array toward the horizontal during early morning and
+  late evening hours to reduce the effect of self shading. The one-axis
+  tracking algorithm assumes a rotation limit of ±45 degrees from the
+  horizontal.
+\item
+  \texttt{TwoAxis} - tilt and azimuth track the sun
+\end{itemize}
+
+\includegraphics{pvwatts_tracking.png}
+
+\paragraph{Field: System Losses}\label{field-system-losses}
+
+Fraction of the system output lost due to losses in a real system that
+are not explicitly calculated by the PVWatts model equations.
+
+Default: 0.14.
+
+\paragraph{Field: Array Geometry
+Type}\label{field-array-geometry-type}
+
+One of:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{TiltAzimuth} - The tilt and azimuth angles are specified in
+  the next two fields. An unshaded array is assumed.
+\item
+  \texttt{Surface} - The array geometry (tilt and azimuth) as well as
+  shading is determined from surface referenced.
+\end{itemize}
+
+\paragraph{Field: Tilt Angle}\label{field-tilt-angle}
+
+The tilt angle is the angle from horizontal of the photovoltaic modules
+in the array. For a fixed array, the tilt angle is the angle from
+horizontal of the array where 0\textdegree = horizontal, and 90\textdegree = vertical. For
+arrays with one-axis tracking, the tilt angle is the angle from
+horizontal of the tracking axis. The tilt angle does not apply to arrays
+with two-axis tracking.
+
+Default: 20\textdegree
+
+\paragraph{Field: Azimuth Angle}\label{field-azimuth-angle}
+
+For a fixed array, the azimuth angle is the angle clockwise from true
+north describing the direction that the array faces. An azimuth angle of
+180\textdegree is for a south-facing array, and an azimuth angle of 0\textdegree
+is for a north-facing array.
+
+For an array with one-axis tracking, the azimuth angle is the angle
+clockwise from true north of the axis of rotation. The azimuth angle
+does not apply to arrays with two-axis tracking.
+
+Default: 180\textdegree
+
+\paragraph{Field: Surface Name}\label{field-surface-name}
+
+This is the name of a surface that defines the location and geometry of
+the array. Required if Array Geometry Type is \texttt{Surface}. Shading
+will be calculated for this surface regardless of whether the array has
+1- or 2-axis tracking.
+
+\paragraph{Field: Ground Coverage
+Ratio}\label{field-ground-coverage-ratio}
+
+The ground coverage ratio (GCR) applies only to arrays with one-axis
+tracking, and is the ratio of module surface area to the area of the
+ground or roof occupied by the array. A GCR of 0.5 means that when the
+modules are horizontal, half of the surface below the array is occupied
+by the array. An array with wider spacing between rows of modules has a
+lower GCR than one with narrower spacing. A GCR of 1 would be for an
+array with no space between modules, and a GCR of 0 for infinite spacing
+between rows. Typical values range from 0.3 to 0.6.
+
+Default: 0.4
+
+\subsubsection{Outputs Description}\label{outputs-description}
+
+\begin{itemize}
+\item
+  HVAC,Average,Generator Produced DC Electric Power {[}W{]}
+\item
+  HVAC,Sum,Generator Produced DC Electric Energy {[}J{]}
+\item
+  HVAC,Average,Plane of Array Irradiance $\left [\frac{\text{W}}{\text{m}^2} \right ]$
+\item
+  HVAC,Average,Generator PV Cell Temperature {[}C{]}
+\end{itemize}
+
 
 \subsection{Generator:WindTurbine}\label{generatorwindturbine}
 

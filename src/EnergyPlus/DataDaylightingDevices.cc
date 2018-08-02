@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -52,50 +53,50 @@ namespace EnergyPlus {
 
 namespace DataDaylightingDevices {
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Peter Graham Ellis
-	//       DATE WRITTEN   May 2003
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Peter Graham Ellis
+    //       DATE WRITTEN   May 2003
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// This data-only module is a repository for variables used in daylighting devices which
-	// are shared by several modules.
+    // PURPOSE OF THIS MODULE:
+    // This data-only module is a repository for variables used in daylighting devices which
+    // are shared by several modules.
 
-	// METHODOLOGY EMPLOYED: na
-	// REFERENCES: na
-	// OTHER NOTES: na
+    // METHODOLOGY EMPLOYED: na
+    // REFERENCES: na
+    // OTHER NOTES: na
 
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS:
-	int const MaxTZones( 10 ); // Maximum number of transition zones
-	int const NumOfAngles( 19 ); // Number of data points on transmittance vs. angle curve
+    // MODULE PARAMETER DEFINITIONS:
+    int const MaxTZones(10);   // Maximum number of transition zones
+    int const NumOfAngles(19); // Number of data points on transmittance vs. angle curve
 
-	int const VisibleBeam( 1 ); // Constant for radiation type
-	int const SolarBeam( 2 ); // Constant for radiation type
-	int const SolarAniso( 3 ); // Constant for radiation type
-	int const SolarIso( 4 ); // Constant for radiation type
+    int const VisibleBeam(1); // Constant for radiation type
+    int const SolarBeam(2);   // Constant for radiation type
+    int const SolarAniso(3);  // Constant for radiation type
+    int const SolarIso(4);    // Constant for radiation type
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE TYPE DECLARATIONS:
+    // MODULE VARIABLE TYPE DECLARATIONS:
 
-	// INTERFACE BLOCK SPECIFICATIONS: na
+    // INTERFACE BLOCK SPECIFICATIONS: na
 
-	// MODULE VARIABLE DECLARATIONS:
-	int NumOfTDDPipes( 0 ); // Number of TDD pipes in the input file
-	int NumOfShelf( 0 ); // Number of daylighting shelves in the input file
+    // MODULE VARIABLE DECLARATIONS:
+    int NumOfTDDPipes(0); // Number of TDD pipes in the input file
+    int NumOfShelf(0);    // Number of daylighting shelves in the input file
 
-	// Object Data
-	Array1D< TDDPipeData > TDDPipe;
-	Array1D< ShelfData > Shelf;
+    // Object Data
+    Array1D<TDDPipeData> TDDPipe;
+    Array1D<ShelfData> Shelf;
 
-} // DataDaylightingDevices
+} // namespace DataDaylightingDevices
 
-} // EnergyPlus
+} // namespace EnergyPlus

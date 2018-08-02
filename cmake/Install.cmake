@@ -32,11 +32,7 @@ install(FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt" DESTINATION "./")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION ./ )
-
-
-#configure_file("${CMAKE_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in"
-#  "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake" @ONLY)
-#set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
+install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" DESTINATION ./ )
 
 INCLUDE(CPack)
 

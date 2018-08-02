@@ -12,15 +12,20 @@ set( test_src
   Fixtures/SQLiteFixture.hh
   PhaseChangeModeling/HysteresisModel.unit.cc
   AdvancedAFN.unit.cc
+  AirflowNetworkSimulationControl.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
+  AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
+  BoilerSteam.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
+  ChillerAbsorption.unit.cc
   ChillerConstantCOP.unit.cc
   ChillerElectric.unit.cc
   ChillerElectricEIR.unit.cc
@@ -32,6 +37,8 @@ set( test_src
   ConvectionCoefficients.unit.cc
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
+  DataEnvironment.unit.cc
+  DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc
@@ -58,8 +65,10 @@ set( test_src
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   FluidProperties.unit.cc
+  FuelCellElectricGenerator.unit.cc
   Furnaces.unit.cc
   General.unit.cc
+  GeneralRoutines.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceAirManager.unit.cc
   HeatBalanceManager.unit.cc
@@ -82,6 +91,7 @@ set( test_src
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
+  HVACUnitaryBypassVAV.unit.cc
   HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
@@ -107,17 +117,24 @@ set( test_src
   PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
+  Pipes.unit.cc
+  Plant/Branch.unit.cc
+  Plant/Subcomponent.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
+  PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
+  PVWatts.unit.cc
+  ReportCoilSelection.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
@@ -135,12 +152,14 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  StandardRatings.unit.cc
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
+  UnitaryHybridAirConditioner.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
@@ -153,15 +172,18 @@ set( test_src
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
   WindowAC.unit.cc
+  WindowEquivalentLayer.unit.cc
+  WindowLayerEffectiveMultipliers.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
+  ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
 set( test_dependencies
-  energyplusapi
+  epfmi
  )
 
 if(CMAKE_HOST_UNIX)
@@ -173,4 +195,5 @@ endif()
 # Executable name will be EnergyPlus_tests
 # Execute energyplus_tests --help for options using gtest runner
 # Execute energyplus_tests with no arguments to run all tests
-CREATE_TEST_TARGETS( energyplus "${test_src}" "${test_dependencies}" )
+CREATE_TEST_TARGETS( energypluslib "${test_src}" "${test_dependencies}" )
+

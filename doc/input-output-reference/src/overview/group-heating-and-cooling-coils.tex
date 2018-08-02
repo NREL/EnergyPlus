@@ -78,7 +78,7 @@ The coil has two modes of operation, termed as \textbf{SimpleAnalysis} and \text
 
 \paragraph{Field: Heat Exchanger Configuration}\label{field-heat-exchanger-configuration-000}
 
-The coil is operable in two modes, Cross Flow for general A/C applications and Counter flow mode. Air-conditioning systems generally use cross flow heat exchangers, hence the default is set to cross flow.
+The coil is operable in two modes, Cross Flow for general A/C applications and Counter Flow mode. Air-conditioning systems generally use cross flow heat exchangers. The default is set to Counter Flow mode.
 
 \paragraph{Field: Condensate Collection Water Storage Tank Name}\label{field-condensate-collection-water-storage-tank-name}
 
@@ -489,22 +489,22 @@ Coil:Heating:Electric,
 
 \begin{itemize}
 \item
-  HVAC,Sum,Heating Coil Air Heating Energy {[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Air Heating Rate {[}W{]}
+  HVAC,Average,Heating Coil Heating Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Electric Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil Electric Power {[}W{]}
 \end{itemize}
 
-\paragraph{Heating Coil Air Heating Energy (J)}\label{heating-coil-air-heating-energy-j}
+\paragraph{Heating Coil Heating Energy (J)}\label{heating-coil-heating-energy-j-2}
 
-Heating Coil Air Heating Energy is the total amount of heat transfer taking place in the coil at the operating conditions.
+Heating Coil Heating Energy is the total amount of heat transfer taking place in the coil at the operating conditions.
 
-\paragraph{Heating Coil Air Heating Rate {[}W{]}}\label{heating-coil-air-heating-rate-w}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-2}
 
-Heating Coil Air Heating Rate is the Rate of heat transfer taking place in the coil at the operating conditions. The units are (J/sec) or Watts.
+Heating Coil Heating Rate is the Rate of heat transfer taking place in the coil at the operating conditions. The units are (J/sec) or Watts.
 
 \paragraph{Heating Coil Electric Energy {[}J{]}}\label{heating-coil-electric-energy-j}
 
@@ -595,22 +595,22 @@ Coil:Heating:Electric:MultiStage,
 
 \begin{itemize}
 \item
-  HVAC,Sum,Heating Coil Energy{[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy{[}J{]}
 \item
-  HVAC,Average,Heating Coil Rate{[}W{]}
+  HVAC,Average,Heating Coil Heating Rate{[}W{]}
 \item
   HVAC,Sum,Heating Coil Electric Consumption {[}J{]}
 \item
   HVAC,Average,Heating Coil Electric Power {[}W{]}
 \end{itemize}
 
-\paragraph{Heating Coil Energy (J)}\label{heating-coil-energy-j}
+\paragraph{Heating Coil Heating Energy (J)}\label{heating-coil-energy-j}
 
-Heating Coil Energy is the total amount of heat transfer taking place in the coil at the operating conditions.
+Heating Coil Heating Energy is the total amount of heat transfer taking place in the coil at the operating conditions.
 
-\paragraph{Heating Coil Rate{[}W{]}}\label{heating-coil-ratew}
+\paragraph{Heating Coil Heating Rate{[}W{]}}\label{heating-coil-ratew}
 
-Heating Coil Rate is the Rate of heat transfer taking place in the coil at the operating conditions. The units are (J/sec) or Watts.
+Heating Coil Heating Rate is the rate of heat transfer taking place in the coil at the operating conditions. The units are (J/sec) or Watts.
 
 \paragraph{Heating Coil Electric Consumption {[}J{]}}\label{heating-coil-electric-consumption-j}
 
@@ -713,9 +713,9 @@ Coil:Heating:Desuperheater,
 
 \begin{itemize}
 \item
-  HVAC,Average,Heating Coil Rate {[}W{]}
+  HVAC,Average,Heating Coil Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Energy {[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil Electric Power {[}W{]}
 \item
@@ -723,9 +723,9 @@ Coil:Heating:Desuperheater,
 \item
   HVAC,Average,Heating Coil Runtime Fraction {[]}
 \item
-  HVAC,Average,Heating Coil Air Heating Rate {[}W{]}
+  HVAC,Average,Heating Coil Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Air Heating Energy {[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil Electric Power {[}W{]}
 \item
@@ -734,13 +734,13 @@ Coil:Heating:Desuperheater,
   HVAC,Average,Heating Coil Runtime Fraction
 \end{itemize}
 
-\paragraph{Heating Coil Air Heating Rate {[}W{]}}\label{heating-coil-air-heating-rate-w-1}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-3}
 
-This output is the average heating rate of the desuperheater heating coil in Watts over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+This output is the average heating rate to the air of the desuperheater heating coil in Watts over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Air Heating Energy {[}J{]}}\label{heating-coil-air-heating-energy-j-1}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-3}
 
-This output is the total heating output of the desuperheater heating coil in Joules over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
+This output is the total heating output to the air of the desuperheater heating coil in Joules over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
 \paragraph{Heating Coil Electric Power {[}W{]}}\label{heating-coil-electric-power-w-2}
 
@@ -948,32 +948,32 @@ Following is an example input for the object.
 \begin{lstlisting}
 
 COIL:Heating:DX:VariableRefrigerantFlow,
-  TU1 VRF DX Heating Coil, !- Coil Name
-  VRFAvailSched,                     !- Availability Schedule
-  autosize,                               !- Gross Rated Heating Capacity {W}
-  autosize,                               !- Rated Air Flow Rate {m3/s}
+  TU1 VRF DX Heating Coil,        !- Coil Name
+  VRFAvailSched,                  !- Availability Schedule
+  autosize,                       !- Gross Rated Heating Capacity {W}
+  autosize,                       !- Rated Air Flow Rate {m3/s}
   TU1 VRF DX CCoil Outlet Node,   !- Coil Air Inlet Node
   TU1 VRF DX HCoil Outlet Node,   !- Coil Air Outlet Node
-  VRFTUHeatCapFT,                   !- Heating Capacity Ratio Modifier Function of Temperature Curve Name
-  VRFACCoolCapFFF;                 !- Total heating capacity modifier curve Function of Flow Fraction
+  VRFTUHeatCapFT,                 !- Heating Capacity Ratio Modifier Function of Temperature Curve Name
+  VRFACCoolCapFFF;                !- Total heating capacity modifier curve Function of Flow Fraction
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-003}
 
 \begin{itemize}
 \item
-  HVAC,Average, Heating Coil Total Heating Rate {[}W{]}
+  HVAC,Average, Heating Coil Heating Rate {[}W{]}
 \item
-  HVAC,Sum, Heating Coil Total Heating Energy {[}J{]}
+  HVAC,Sum, Heating Coil Heating Energy {[}J{]}
 \item
   HVAC,Average, Heating Coil Runtime Fraction {[]}
 \end{itemize}
 
-\paragraph{Heating Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-4}
 
 This field is the total heating rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-4}
 
 This is the total heating output of the DX coil in Joules over the time step being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
@@ -1193,9 +1193,9 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
 
 \begin{itemize}
 \item
-  HVAC,Average, Heating Coil Total Heating Rate {[}W{]}
+  HVAC,Average, Heating Coil Heating Rate {[}W{]}
 \item
-  HVAC,Sum, Heating Coil Total Heating Energy {[}J{]}
+  HVAC,Sum, Heating Coil Heating Energy {[}J{]}
 \item
   HVAC,Average, Heating Coil Runtime Fraction {[]}
 \item
@@ -1204,11 +1204,11 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
   Heating Coil VRF Subcooling Degrees {[}C{]}
 \end{itemize}
 
-\paragraph{Heating Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w-1}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-5}
 
 This field is the total heating rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j-1}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-5}
 
 This is the total heating output of the DX coil in Joules over the time step being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
@@ -1290,9 +1290,9 @@ This numeric field is the parasitic fuel load associated with the coil's operati
 
 \begin{itemize}
 \item
-  HVAC,Sum,Heating Coil Air Heating Energy {[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Air Heating Rate {[}W{]}
+  HVAC,Average,Heating Coil Heating Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Gas Energy {[}J{]}
 \item
@@ -1309,13 +1309,13 @@ This numeric field is the parasitic fuel load associated with the coil's operati
   HVAC,Average,Heating Coil Ancillary <Fuel Type> Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Heating Coil Air Heating Energy {[}J{]}}\label{heating-coil-air-heating-energy-j-2}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-6}
 
-This field is the total heating output of the coil in Joules over the timestep being reported. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
+This field is the total heating output of the coil to the air in Joules over the timestep being reported. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Air Heating Rate {[}W{]}}\label{heating-coil-air-heating-rate-w-2}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-6}
 
-This field is the average heating rate output of the coil in Watts over the timestep being reported.
+This field is the average heating rate output of the coil to the air in Watts over the timestep being reported.
 
 \paragraph{Heating Coil <Fuel Type> Energy {[}J{]}}\label{heating-coil-gas-energy-j}
 
@@ -1467,9 +1467,9 @@ Coil:Heating:Gas:MultiStage,
 
 \begin{itemize}
 \item
-  HVAC,Sum,Heating Coil Energy{[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy{[}J{]}
 \item
-  HVAC,Average,Heating Coil Rate{[}W{]}
+  HVAC,Average,Heating Coil Heating Rate{[}W{]}
 \item
   HVAC,Sum,Heating Coil Gas Consumption {[}J{]}
 \item
@@ -1486,11 +1486,11 @@ Coil:Heating:Gas:MultiStage,
   HVAC,Average,Heating Coil Parasitic Gas Consumption Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Heating Coil Energy {[}J{]}}\label{heating-coil-energy-j-1}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-energy-j-1}
 
 This field is the total heating output of the coil in Joules over the timestep being reported. This output is also added to an output meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Rate {[}W{]}}\label{heating-coil-rate-w}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-rate-w}
 
 This field is the average heating rate output of the coil in Watts over the timestep being reported.
 
@@ -1825,6 +1825,10 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
        PLF = 1.0 + 0.0(PLR)
 \end{lstlisting}
 
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the default value is -25 °C.
+
 \paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin}
 
 The nominal time (in seconds) after startup for condensate to begin leaving the coil's condensate drain line at the coil's rated airflow and temperature conditions, starting with a dry coil. Nominal time is equal to the ratio of the energy of the coil's maximum condensate holding capacity (J) to the coil's steady-state latent capacity (W). Suggested value is 1000; zero value means the latent degradation model is disabled. The default value for this field is zero. The supply air fan operating mode must be continuous (i.e., the supply air fan operating mode may be specified in other parent objects and is assumed continuous in some objects (e.g., CoilSystem:Cooling:DX) or can be scheduled in other objects {[}e.g., AirloopHVAC:UnitaryHeatCool{]}), and this field as well as the next three input fields for this object must have positive values in order to model latent capacity degradation.
@@ -2070,6 +2074,10 @@ This optional alpha field specifies the outdoor air node name used to define the
 \paragraph{Field: Condenser Type}\label{field-condenser-type-1}
 
 The type of condenser used by the multi-speed DX cooling coil. Valid choices for this input field are \textbf{AirCooled} or \textbf{EvaporativelyCooled}. The default for this field is \textbf{AirCooled}.
+
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C). If this field is not included in the input, the default value is -25 °C.
 
 \paragraph{Field: High Speed Evaporative Condenser Effectiveness}\label{field-high-speed-evaporative-condenser-effectiveness}
 
@@ -2337,6 +2345,10 @@ This field is optional. It is used to describe where the coil obtains water used
 
 This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
 
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C). If this field is not included in the input, the default value is -25 °C.
+
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-2-000}
 
 This numeric field contains the capacity of the DX coil s electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
@@ -2433,6 +2445,10 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation-2}
 
 This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C. If this input field is left blank, the default value is 10 °C.
+
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C).
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-3-000}
 
@@ -2954,6 +2970,10 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation-3}
 
 This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C, and the default value is 10 °C.
+
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C).
 
 \paragraph{Field: Supply Water Storage Tank Name}\label{field-supply-water-storage-tank-name-4-000}
 
@@ -3726,7 +3746,6 @@ This alpha field defines the name of a bi-quadratic performance curve (ref: Perf
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
 
-This numeric field defines the minimum outdoor air dry-bulb temperature where the heating coil compressor turns off. The temperature for this input field must be greater than or equal to 20 C. If this input field is left blank, the default value is -8 C.
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature to Turn On Compressor}\label{field-outdoor-dry-bulb-temperature-to-turn-on-compressor}
 
@@ -3826,9 +3845,9 @@ Coil:Heating:DX:SingleSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Heating Coil Total Heating Rate {[}W{]}
+  HVAC,Average,Heating Coil Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Total Heating Energy {[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil Electric Power{[}W{]}
 \item
@@ -3845,11 +3864,11 @@ Coil:Heating:DX:SingleSpeed,
   HVAC,Average,Heating Coil Runtime Fraction {[]}
 \end{itemize}
 
-\paragraph{Heating Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w-2}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-7}
 
 This field is the total heating rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j-2}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-7}
 
 This is the total heating output of the DX coil in Joules over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = CoolingCoils, Group Key = System (ref. Output:Meter objects).
 
@@ -3935,7 +3954,7 @@ This alpha field defines the name of the HVAC system node to which the DX heatin
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-1}
 
-This numeric field defines the minimum outdoor air dry-bulb temperature where the heating coil compressor turns off. The temperature for this input field must be greater than or equal to 20 °C. If this input field is left blank, the default value is -8 °C.
+This numeric field defines the minimum outdoor air dry-bulb temperature where the heating coil compressor turns off. If this input field is left blank, the default value is -8 °C.
 
 \paragraph{Field: Crankcase Heater Capacity}\label{field-crankcase-heater-capacity-5}
 
@@ -4136,9 +4155,9 @@ COIL:Heating:DX:MultiSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Heating Coil Total Heating Rate {[}W{]}
+  HVAC,Average,Heating Coil Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Total Heating Energy {[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil Electric Power{[}W{]}
 \item
@@ -4168,11 +4187,11 @@ If Fuel Type is not Electricity:
   HVAC,Sum, Heating Coil \textless{}Fuel Type\textgreater{} Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Heating Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w-3}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-8}
 
 This field is the total heating rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j-3}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-8}
 
 This is the total heating output of the DX coil in Joules over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoil, Group Key = System (ref. Output:Meter objects).
 
@@ -4503,11 +4522,11 @@ Coil:Heating:DX:VariableSpeed,
   HVAC,Sum,Heating Coil Crankcase Heater Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Heating Coil Electric Power {[}W{]}}\label{heating-coil-electric-power-w-7}
+\paragraph{Heating Coil Electric Power {[}W{]}}\label{heating-coil-electric-power-w-6}
 
 This output variable is the average electric consumption rate of the heat pump in Watts over the timestep being reported.
 
-\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-2}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-9}
 
 The output variable is the average total heating capacity provide by the heat pump in Watts over the timestep being reported.
 
@@ -4559,9 +4578,9 @@ The output variable is the average speed ratio, for interpolating performances b
 
 The output variable is the total electric consumption of the heat pump in Joules over the timestep being reported.
 
-\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-2}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-9}
 
-The output variable is the total cooling output of the coil in Joules over the timestep being reported.
+The output variable is the total heating output of the coil in Joules over the timestep being reported.
 
 \paragraph{Heating Coil Source Side Heat Transfer Energy {[}J{]}}\label{heating-coil-source-side-heat-transfer-energy-j-1}
 
@@ -7137,11 +7156,11 @@ Coil:Heating:WaterToAirHeatPump:ParameterEstimation and Coil:Heating:WaterToAirH
   HVAC, Sum, Heating Coil Source Side Heat Transfer Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Heating Coil Electric Power {[}W{]}}\label{heating-coil-electric-power-w-8}
+\paragraph{Heating Coil Electric Power {[}W{]}}\label{heating-coil-electric-power-w-7}
 
 This output variable is the average electric consumption rate of the heat pump in Watts over the timestep being reported.
 
-\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-3}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-10}
 
 The output variable is the average total heating capacity provide by the heat pump which includes the sensible and latent capacity in Watts over the timestep being reported.
 
@@ -7197,9 +7216,9 @@ The output variable is the average leaving water temperature over the timestep b
 
 The output variable is the total electric consumption of the heat pump in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-3}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-10}
 
-The output variable is the total cooling output of the coil in Joules over the timestep being reported. Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
+The output variable is the heating output of the coil in Joules over the timestep being reported. Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
 \paragraph{Heating Coil Source Side Heat Transfer Energy {[}J{]}}\label{heating-coil-source-side-heat-transfer-energy-j-2}
 
@@ -7590,7 +7609,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
 
 This output variable is the average electric consumption rate of the heat pump in Watts over the timestep being reported.
 
-\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-4}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-11}
 
 The output variable is the average total heating capacity provide by the heat pump in Watts over the timestep being reported.
 
@@ -7658,9 +7677,9 @@ This output variable is the average recoverable waste heat rate of the heat pump
 
 The output variable is the total electric consumption of the heat pump in Joules over the timestep being reported.
 
-\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-4}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-11}
 
-The output variable is the total cooling output of the coil in Joules over the timestep being reported.
+The output variable is the total heating output of the coil in Joules over the timestep being reported.
 
 \paragraph{Heating Coil Source Side Heat Transfer Energy {[}J{]}}\label{heating-coil-source-side-heat-transfer-energy-j-3}
 
@@ -7732,7 +7751,7 @@ This field is used to determine what type of material is used for thermal storag
 
 \paragraph{Field: User Defined Fluid Type}\label{field-user-defined-fluid-type}
 
-This field is used to declare what type of user defined fluid is contained in the TES tank. This input field is only used (and required) if the previous field is set to UserDefinedFluidType. Water, EthyleneGlycol, and PropoleneGlycol have fluid properties built-in to EnergyPlus. Using a FluidProperties:GlycolConcentration object allows specifying a mixture of water and a glycol and the name of one can be entered here. For other types of fluids, a complete set of fluid property data is needed, see FluidProperties:Name, FluidProperties:Temperature, etc.
+This field is used to declare what type of user defined fluid is contained in the TES tank. This input field is only used (and required) if the previous field is set to UserDefinedFluidType. Water, EthyleneGlycol, and PropyleneGlycol have fluid properties built-in to EnergyPlus. Using a FluidProperties:GlycolConcentration object allows specifying a mixture of water and a glycol and the name of one can be entered here. For other types of fluids, a complete set of fluid property data is needed, see FluidProperties:Name, FluidProperties:Temperature, etc.
 
 \paragraph{Field: Fluid Storage Volume {[}m\(^{3}\){]}}\label{field-fluid-storage-volume-m3}
 

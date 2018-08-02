@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -54,42 +55,42 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <ZoneTempPredictorCorrector.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
-#include <DataHeatBalance.hh>
+#include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
-#include <DataHVACGlobals.hh>
-#include <DataStringGlobals.hh>
+#include <DataHeatBalance.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataRoomAirModel.hh>
+#include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneControls.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
+#include <DirectAirManager.hh>
 #include <EMSManager.hh>
 #include <FaultsManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HybridModel.hh>
-#include <InputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
+#include <OutputReportPredefined.hh>
+#include <OutputReportTabular.hh>
 #include <Psychrometrics.hh>
 #include <RoomAirModelAirflowNetwork.hh>
 #include <RoomAirModelManager.hh>
 #include <ScheduleManager.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
-#include <ZonePlenum.hh>
-#include <DirectAirManager.hh>
 #include <WeatherManager.hh>
-
+#include <ZonePlenum.hh>
+#include <ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -115,31 +116,28 @@ namespace ZoneTempPredictorCorrector {
 	//    "Predict" step is used to get zone loads for HVAC equipment
 	//    "correct" step determines zone air temp with available HVAC
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataHVACGlobals;
 	using namespace DataHeatBalance;
 	using namespace DataHeatBalFanSys;
-	using DataEnvironment::OutHumRat;
 	using DataEnvironment::OutBaroPress;
-	using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-	using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-	using DataZoneEnergyDemands::DeadBandOrSetback;
+    using DataEnvironment::OutHumRat;
 	using DataZoneEnergyDemands::CurDeadBandOrSetback;
+    using DataZoneEnergyDemands::DeadBandOrSetback;
 	using DataZoneEnergyDemands::Setback;
+    using DataZoneEnergyDemands::ZoneSysEnergyDemand;
+    using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 	using namespace Psychrometrics;
-	using DataAirflowNetwork::SimulateAirflowNetwork;
-	using DataAirflowNetwork::AirflowNetworkExchangeData;
-	using DataAirflowNetwork::AirflowNetworkZoneExhaustFan;
-	using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
-	using DataAirflowNetwork::AirflowNetworkFanActivated;
+    using DataAirflowNetwork::AirflowNetworkControlMultiADS;
 	using DataAirflowNetwork::AirflowNetworkControlMultizone;
 	using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-	using DataAirflowNetwork::AirflowNetworkControlMultiADS;
+    using DataAirflowNetwork::AirflowNetworkExchangeData;
+    using DataAirflowNetwork::AirflowNetworkFanActivated;
+    using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
+    using DataAirflowNetwork::AirflowNetworkZoneExhaustFan;
+    using DataAirflowNetwork::SimulateAirflowNetwork;
 	using namespace DataRoomAirModel;
 	using namespace DataZoneControls;
 	using namespace FaultsManager;
@@ -156,14 +154,43 @@ namespace ZoneTempPredictorCorrector {
 	//INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
 	//INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-	Array1D_string const ValidControlTypes( 4, { "ThermostatSetpoint:SingleHeating", "ThermostatSetpoint:SingleCooling", "ThermostatSetpoint:SingleHeatingOrCooling", "ThermostatSetpoint:DualSetpoint" } );
+    Array1D_string const ValidControlTypes(4,
+                                           {"ThermostatSetpoint:SingleHeating",
+                                            "ThermostatSetpoint:SingleCooling",
+                                            "ThermostatSetpoint:SingleHeatingOrCooling",
+                                            "ThermostatSetpoint:DualSetpoint"});
 
-	Array1D_string const ValidComfortControlTypes( 12, { "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating", "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling", "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeating", "ThermostatSetpoint:ThermalComfort:Pierce:SingleCooling", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Pierce:DualSetpoint", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeating", "ThermostatSetpoint:ThermalComfort:KSU:SingleCooling", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint" } );
+    Array1D_string const ValidComfortControlTypes(12,
+                                                  {"ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating",
+                                                   "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling",
+                                                   "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling",
+                                                   "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint",
+                                                   "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeating",
+                                                   "ThermostatSetpoint:ThermalComfort:Pierce:SingleCooling",
+                                                   "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeatingOrCooling",
+                                                   "ThermostatSetpoint:ThermalComfort:Pierce:DualSetpoint",
+                                                   "ThermostatSetpoint:ThermalComfort:KSU:SingleHeating",
+                                                   "ThermostatSetpoint:ThermalComfort:KSU:SingleCooling",
+                                                   "ThermostatSetpoint:ThermalComfort:KSU:SingleHeatingOrCooling",
+                                                   "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint"});
 
-	Array1D_string const cZControlTypes( 6, { "ZoneControl:Thermostat", "ZoneControl:Thermostat:ThermalComfort", "ZoneControl:Thermostat:OperativeTemperature", "ZoneControl:Humidistat", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint" } );
+    Array1D_string const cZControlTypes(6,
+                                        {"ZoneControl:Thermostat",
+                                         "ZoneControl:Thermostat:ThermalComfort",
+                                         "ZoneControl:Thermostat:OperativeTemperature",
+                                         "ZoneControl:Humidistat",
+                                         "ZoneControl:Thermostat:TemperatureAndHumidity",
+                                         "ZoneControl:Thermostat:StagedDualSetpoint"});
 
-	Array1D_string const AdaptiveComfortModelTypes( 8, { "None", "AdaptiveASH55CentralLine", "AdaptiveASH5590PercentUpperLine", "AdaptiveASH5580PercentUpperLine", "AdaptiveCEN15251CentralLine", "AdaptiveCEN15251CategoryIUpperLine", "AdaptiveCEN15251CategoryIIUpperLine", "AdaptiveCEN15251CategoryIIIUpperLine" } );
-
+    Array1D_string const AdaptiveComfortModelTypes(8,
+                                                   {"None",
+                                                    "AdaptiveASH55CentralLine",
+                                                    "AdaptiveASH5590PercentUpperLine",
+                                                    "AdaptiveASH5580PercentUpperLine",
+                                                    "AdaptiveCEN15251CentralLine",
+                                                    "AdaptiveCEN15251CategoryIUpperLine",
+                                                    "AdaptiveCEN15251CategoryIIUpperLine",
+                                                    "AdaptiveCEN15251CategoryIIIUpperLine"});
 
 	int const iZC_TStat( 1 );
 	int const iZC_TCTStat( 2 );
@@ -227,6 +254,8 @@ namespace ZoneTempPredictorCorrector {
 
 	// Number of zone with staged controlled objects
 	int NumStageCtrZone( 0 );
+    // Number of zone with on/off thermostat
+    int NumOnOffCtrZone(0);
 
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
@@ -236,7 +265,7 @@ namespace ZoneTempPredictorCorrector {
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool InitZoneAirSetPointsOneTimeFlag( true );
 		bool SetupOscillationOutputFlag( true );
-	}
+    } // namespace
 	Array1D< Real64 > ZoneSetPointLast;
 	Array1D< Real64 > TempIndZnLd;
 	Array1D< Real64 > TempDepZnLd;
@@ -250,6 +279,7 @@ namespace ZoneTempPredictorCorrector {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
+    std::unordered_set<std::string> HumidityControlZoneUniqueNames;
 	Array1D< ZoneTempControlType > SetPointSingleHeating;
 	Array1D< ZoneTempControlType > SetPointSingleCooling;
 	Array1D< ZoneTempControlType > SetPointSingleHeatCool;
@@ -262,10 +292,9 @@ namespace ZoneTempPredictorCorrector {
 	Array1D< Real64 > AdapComfortSetPointSummerDesDay(7, -1);
 
 	// Functions
-	void
-	clear_state()
+    void clear_state()
 	{
-
+        HumidityControlZoneUniqueNames.clear();
 		NumSingleTempHeatingControls = 0;
 		NumSingleTempCoolingControls = 0;
 		NumSingleTempHeatCoolControls = 0;
@@ -301,9 +330,7 @@ namespace ZoneTempPredictorCorrector {
 		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.deallocate();
 	}
 
-	void
-	ManageZoneAirUpdates(
-		int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneAirUpdates(int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
 		Real64 & ZoneTempChange, // Temp change in zone air btw previous and current timestep
 		bool const ShortenTimeStepSys,
 		bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
@@ -322,26 +349,8 @@ namespace ZoneTempPredictorCorrector {
 		// depending on the simulation status and determines the correct
 		// temperature setpoint for each zone from the schedule manager.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  INTEGER :: zoneloop
@@ -353,7 +362,8 @@ namespace ZoneTempPredictorCorrector {
 
 		InitZoneAirSetPoints();
 
-		{ auto const SELECT_CASE_var( UpdateType );
+        {
+            auto const SELECT_CASE_var(UpdateType);
 
 		if ( SELECT_CASE_var == iGetZoneSetPoints ) {
 			CalcZoneAirTempSetPoints();
@@ -372,13 +382,11 @@ namespace ZoneTempPredictorCorrector {
 
 		} else if ( SELECT_CASE_var == iPushSystemTimestepHistories ) {
 			PushSystemTimestepHistories();
-
-		}}
-
+            }
+        }
 	}
 
-	void
-	GetZoneAirSetPoints()
+    void GetZoneAirSetPoints()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -393,34 +401,21 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using namespace InputProcessor;
-		using ScheduleManager::GetScheduleIndex;
-		using ScheduleManager::CheckScheduleValueMinMax;
-		using ScheduleManager::GetScheduleMinValue;
-		using ScheduleManager::GetScheduleMaxValue;
-		using ScheduleManager::CheckScheduleValue;
-		using General::TrimSigDigits;
+        using General::CheckCreatedZoneItemName;
 		using General::FindNumberInList;
 		using General::RoundSigDigits;
-		using General::CheckCreatedZoneItemName;
+        using General::TrimSigDigits;
+        using ScheduleManager::CheckScheduleValue;
+        using ScheduleManager::CheckScheduleValueMinMax;
+        using ScheduleManager::GetScheduleIndex;
+        using ScheduleManager::GetScheduleMaxValue;
+        using ScheduleManager::GetScheduleMinValue;
 		using WeatherManager::NumDaysInYear;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneAirSetpoints: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TempControlledZoneNum; // The Splitter that you are currently loading input into
@@ -436,8 +431,6 @@ namespace ZoneTempPredictorCorrector {
 		//unused1208  CHARACTER(len=MaxNameLength), DIMENSION(29) :: AlphArray
 		static bool ErrorsFound( false );
 		bool errFlag;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int CTIndex;
 		int HumidControlledZoneNum; // The Humidity Controller that information is being loaded into
 		bool ValidScheduleControlType;
@@ -481,11 +474,9 @@ namespace ZoneTempPredictorCorrector {
 			Array1D_bool DidHave;
 
 			// Default Constructor
-			NeededControlTypes() :
-				MustHave( 4, false ),
-				DidHave( 4, false )
-			{}
-
+            NeededControlTypes() : MustHave(4, false), DidHave(4, false)
+            {
+            }
 		};
 
 		struct NeededComfortControlTypes
@@ -495,11 +486,9 @@ namespace ZoneTempPredictorCorrector {
 			Array1D_bool DidHave;
 
 			// Default Constructor
-			NeededComfortControlTypes() :
-				MustHave( 12, false ),
-				DidHave( 12, false )
-			{}
-
+            NeededComfortControlTypes() : MustHave(12, false), DidHave(12, false)
+            {
+            }
 		};
 
 		// Object Data
@@ -507,29 +496,35 @@ namespace ZoneTempPredictorCorrector {
 		Array1D< NeededComfortControlTypes > TComfortControlTypes;
 
 		// Formats
-		static gio::Fmt Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
+        static gio::Fmt Format_700("('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, "
+                                   "','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')");
 		static gio::Fmt Format_701( "('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)" );
 
 		// FLOW:
 		cCurrentModuleObject = cZControlTypes( iZC_TStat );
-		NumTStatStatements = GetNumObjectsFound( cCurrentModuleObject );
+        NumTStatStatements = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 		TStatObjects.allocate( NumTStatStatements );
 
 		// Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
 		NumTempControlledZones = 0;
 		for ( Item = 1; Item <= NumTStatStatements; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TStatObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
 			TStatObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
+            Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
 			if ( Item1 > 0 ) {
 				TStatObjects( Item ).TempControlledZoneStartPtr = NumTempControlledZones + 1;
 				++NumTempControlledZones;
@@ -543,7 +538,8 @@ namespace ZoneTempPredictorCorrector {
 				TStatObjects( Item ).ZoneListActive = true;
 				TStatObjects( Item ).ZoneOrZoneListPtr = ZLItem;
 			} else {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 		}
@@ -560,26 +556,40 @@ namespace ZoneTempPredictorCorrector {
 			CTSchedMapToControlledZone.dimension( NumTempControlledZones, 0 );
 
 			TempControlledZoneNum = 0;
+            NumOnOffCtrZone = 0;
 			for ( Item = 1; Item <= NumTStatStatements; ++Item ) {
-				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Item,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 				for ( Item1 = 1; Item1 <= TStatObjects( Item ).NumOfZones; ++Item1 ) {
 					++TempControlledZoneNum;
 					if ( TStatObjects( Item ).ZoneListActive ) {
 						cAlphaArgs( 2 ) = Zone( ZoneList( TStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name;
 					}
-					ZoneAssigned = FindItemInList( cAlphaArgs( 2 ), TempControlledZone, &ZoneTempControls::ZoneName, TempControlledZoneNum - 1 );
+                    ZoneAssigned =
+                        UtilityRoutines::FindItemInList(cAlphaArgs(2), TempControlledZone, &ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
 					if ( ZoneAssigned == 0 ) {
 						TempControlledZone( TempControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-						TempControlledZone( TempControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+                        TempControlledZone(TempControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
 						if ( TempControlledZone( TempControlledZoneNum ).ActualZoneNum == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" +
+                                            cAlphaArgs(2) + "\" not found.");
 							ErrorsFound = true;
 						} else {
 							Zone( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).TempControlledZoneIndex = TempControlledZoneNum;
 						}
 					} else {
 						TempControlledZone( TempControlledZoneNum ).ZoneName = cAlphaArgs( 2 ); // for continuity
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" zone previously assigned." );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                        "\" zone previously assigned.");
 						ShowContinueError( "...Zone was previously assigned to Thermostat=\"" + TempControlledZone( ZoneAssigned ).Name + "\"." );
 						ErrorsFound = true;
 						continue;
@@ -588,7 +598,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( ! TStatObjects( Item ).ZoneListActive ) {
 						TempControlledZone( TempControlledZoneNum ).Name = cAlphaArgs( 1 );
 					} else {
-						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( TStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( TStatObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, TStatObjects( Item ).Name, TempControlledZone, TempControlledZoneNum - 1, TempControlledZone( TempControlledZoneNum ).Name, errFlag );
+                        CheckCreatedZoneItemName(RoutineName,
+                                                 cCurrentModuleObject,
+                                                 Zone(ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
+                                                 ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
+                                                 TStatObjects(Item).Name,
+                                                 TempControlledZone,
+                                                 TempControlledZoneNum - 1,
+                                                 TempControlledZone(TempControlledZoneNum).Name,
+                                                 errFlag);
 						if ( errFlag ) ErrorsFound = true;
 					}
 
@@ -596,18 +614,29 @@ namespace ZoneTempPredictorCorrector {
 					TempControlledZone( TempControlledZoneNum ).CTSchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 					if ( Item1 == 1 ) { // only show error on first of several if zone list
 						if ( TempControlledZone( TempControlledZoneNum ).CTSchedIndex == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
+                                            cAlphaArgs(3) + "\" not found.");
 							ErrorsFound = true;
 						} else {
 							// Check validity of control types.
-							ValidScheduleControlType = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).CTSchedIndex, ">=", 0.0, "<=", 4.0 );
+                            ValidScheduleControlType =
+                                CheckScheduleValueMinMax(TempControlledZone(TempControlledZoneNum).CTSchedIndex, ">=", 0.0, "<=", 4.0);
 							if ( ! ValidScheduleControlType ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"" );
+                                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(2) + "=\"" +
+                                                cAlphaArgs(2) + "\"");
 								ShowContinueError( "..contains values outside of range [0,4]." );
 								ErrorsFound = true;
 							}
 						}
 					}
+
+                    if (lAlphaFieldBlanks(7)) {
+                        NumAlphas = 5;
+                    } else if (lAlphaFieldBlanks(9)) {
+                        NumAlphas = 7;
+                    } else if (lAlphaFieldBlanks(11)) {
+                        NumAlphas = 9;
+                    }
 
 					TempControlledZone( TempControlledZoneNum ).NumControlTypes = nint( ( NumAlphas - 3.0 ) / 2.0 );
 					TempControlledZone( TempControlledZoneNum ).ControlType.allocate( TempControlledZone( TempControlledZoneNum ).NumControlTypes );
@@ -620,111 +649,166 @@ namespace ZoneTempPredictorCorrector {
 						TempControlledZone( TempControlledZoneNum ).ControlTypeName( ControlTypeNum ) = cAlphaArgs( nint( 2.0 * ControlTypeNum + 3 ) );
 
 						if ( TempControlledZone( TempControlledZoneNum ).ControlType( ControlTypeNum ) != "" ) {
-							CTIndex = FindItem( TempControlledZone( TempControlledZoneNum ).ControlType( ControlTypeNum ), ValidControlTypes, 4 );
+                            CTIndex = UtilityRoutines::FindItem(
+                                TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum), ValidControlTypes, 4);
 							if ( CTIndex == 0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 3 ) ) + "=\"" + cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 3 ) ) + "\"" );
+                                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
+                                                cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 3)) + "=\"" +
+                                                cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 3)) + "\"");
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 3 ) ) + "=\"<blank>\"" );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
+                                            cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 3)) + "=\"<blank>\"");
 							ErrorsFound = true;
 						}
 						TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( ControlTypeNum ) = 0;
 					}
+                    if (NumNums > 0) {
+                        if (rNumericArgs(1) >= 0.0) {
+                            TempControlledZone(TempControlledZoneNum).DeltaTCutSet = rNumericArgs(1);
+                            if (rNumericArgs(1) > 0.0) NumOnOffCtrZone++;
+                        } else {
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                            TrimSigDigits(rNumericArgs(1), 0) + "].");
+                            ShowContinueError("..Allowable values must be greater or equal to 0");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (TempControlledZone(TempControlledZoneNum).DeltaTCutSet > 0.0) {
+                        for (ControlTypeNum = 1; ControlTypeNum <= TempControlledZone(TempControlledZoneNum).NumControlTypes; ++ControlTypeNum) {
+                            if (UtilityRoutines::SameString(TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum),
+                                                            "ThermostatSetpoint:SingleHeatingOrCooling")) {
+                                ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                                 ": The choice of Temperature Difference Between Cutout And Setpoint will not be applied to "
+                                                 "ThermostatSetpoint:SingleHeatingOrCooling.");
+                            }
+                        }
+                    }
 				}
 			} // NumTStatStatements
 		} // Check on number of TempControlledZones
 
 		cCurrentModuleObject = ValidControlTypes( SglHeatSetPoint );
-		NumSingleTempHeatingControls = GetNumObjectsFound( cCurrentModuleObject );
+        NumSingleTempHeatingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
 		if ( NumSingleTempHeatingControls > 0 ) SetPointSingleHeating.allocate( NumSingleTempHeatingControls );
 
 		for ( SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= NumSingleTempHeatingControls; ++SingleTempHeatingControlNum ) {
-			GetObjectItem( cCurrentModuleObject, SingleTempHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeating, SingleTempHeatingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SingleTempHeatingControlNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
 			SetPointSingleHeating( SingleTempHeatingControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedName = cAlphaArgs( 2 );
 			SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 
 		} // SingleTempHeatingControlNum
 
 		cCurrentModuleObject = ValidControlTypes( SglCoolSetPoint );
-		NumSingleTempCoolingControls = GetNumObjectsFound( cCurrentModuleObject );
+        NumSingleTempCoolingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
 		if ( NumSingleTempCoolingControls > 0 ) SetPointSingleCooling.allocate( NumSingleTempCoolingControls );
 
 		for ( SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= NumSingleTempCoolingControls; ++SingleTempCoolingControlNum ) {
-			GetObjectItem( cCurrentModuleObject, SingleTempCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleCooling, SingleTempCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SingleTempCoolingControlNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
 			SetPointSingleCooling( SingleTempCoolingControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedName = cAlphaArgs( 2 );
 			SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 
 		} // SingleTempCoolingControlNum
 
 		cCurrentModuleObject = ValidControlTypes( SglHCSetPoint );
-		NumSingleTempHeatCoolControls = GetNumObjectsFound( cCurrentModuleObject );
+        NumSingleTempHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
 		if ( NumSingleTempHeatCoolControls > 0 ) SetPointSingleHeatCool.allocate( NumSingleTempHeatCoolControls );
 
 		for ( SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum ) {
-			GetObjectItem( cCurrentModuleObject, SingleTempHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SingleTempHeatCoolControlNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 			SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedName = cAlphaArgs( 2 );
 			SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 
 		} // SingleTempHeatCoolControlNum
 
 		cCurrentModuleObject = ValidControlTypes( DualSetPoint );
-		NumDualTempHeatCoolControls = GetNumObjectsFound( cCurrentModuleObject );
+        NumDualTempHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
 		if ( NumDualTempHeatCoolControls > 0 ) SetPointDualHeatCool.allocate( NumDualTempHeatCoolControls );
 
 		for ( DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum ) {
-			GetObjectItem( cCurrentModuleObject, DualTempHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCool, DualTempHeatCoolControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          DualTempHeatCoolControlNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSetptSchedName = cAlphaArgs( 2 );
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSetptSchedName = cAlphaArgs( 3 );
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 			if ( SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 
@@ -732,31 +816,43 @@ namespace ZoneTempPredictorCorrector {
 
 		// Finish filling in Schedule pointing indexes
 		for ( TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum ) {
-			TempIndex = FindItem( ValidControlTypes( SglHeatSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
+            TempIndex = UtilityRoutines::FindItem(ValidControlTypes(SglHeatSetPoint),
+                                                  TempControlledZone(TempControlledZoneNum).ControlType,
+                                                  TempControlledZone(TempControlledZoneNum).NumControlTypes);
 			TempControlledZone( TempControlledZoneNum ).SchIndx_SingleHeatSetPoint = TempIndex;
 			if ( TempIndex > 0 ) {
-				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleHeating );
+                TempControlledZone(TempControlledZoneNum).ControlTypeSchIndx(TempIndex) =
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), SetPointSingleHeating);
 				TStatControlTypes( TempControlledZoneNum ).MustHave( SingleHeatingSetPoint ) = true;
 			}
 
-			TempIndex = FindItem( ValidControlTypes( SglCoolSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
+            TempIndex = UtilityRoutines::FindItem(ValidControlTypes(SglCoolSetPoint),
+                                                  TempControlledZone(TempControlledZoneNum).ControlType,
+                                                  TempControlledZone(TempControlledZoneNum).NumControlTypes);
 			TempControlledZone( TempControlledZoneNum ).SchIndx_SingleCoolSetPoint = TempIndex;
 			if ( TempIndex > 0 ) {
-				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleCooling );
+                TempControlledZone(TempControlledZoneNum).ControlTypeSchIndx(TempIndex) =
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), SetPointSingleCooling);
 				TStatControlTypes( TempControlledZoneNum ).MustHave( SingleCoolingSetPoint ) = true;
 			}
 
-			TempIndex = FindItem( ValidControlTypes( SglHCSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
+            TempIndex = UtilityRoutines::FindItem(ValidControlTypes(SglHCSetPoint),
+                                                  TempControlledZone(TempControlledZoneNum).ControlType,
+                                                  TempControlledZone(TempControlledZoneNum).NumControlTypes);
 			TempControlledZone( TempControlledZoneNum ).SchIndx_SingleHeatCoolSetPoint = TempIndex;
 			if ( TempIndex > 0 ) {
-				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleHeatCool );
+                TempControlledZone(TempControlledZoneNum).ControlTypeSchIndx(TempIndex) =
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), SetPointSingleHeatCool);
 				TStatControlTypes( TempControlledZoneNum ).MustHave( SingleHeatCoolSetPoint ) = true;
 			}
 
-			TempIndex = FindItem( ValidControlTypes( DualSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
+            TempIndex = UtilityRoutines::FindItem(ValidControlTypes(DualSetPoint),
+                                                  TempControlledZone(TempControlledZoneNum).ControlType,
+                                                  TempControlledZone(TempControlledZoneNum).NumControlTypes);
 			TempControlledZone( TempControlledZoneNum ).SchIndx_DualSetPointWDeadBand = TempIndex;
 			if ( TempIndex > 0 ) {
-				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointDualHeatCool );
+                TempControlledZone(TempControlledZoneNum).ControlTypeSchIndx(TempIndex) =
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), SetPointDualHeatCool);
 				TStatControlTypes( TempControlledZoneNum ).MustHave( DualSetPointWithDeadBand ) = true;
 			}
 		}
@@ -782,7 +878,8 @@ namespace ZoneTempPredictorCorrector {
 
 			for ( ControlTypeNum = SchedMin; ControlTypeNum <= SchedMax; ++ControlTypeNum ) {
 
-				{ auto const SELECT_CASE_var( ControlTypeNum );
+                {
+                    auto const SELECT_CASE_var(ControlTypeNum);
 
 				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
 
@@ -793,13 +890,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( TempIndex != 0 ) {
 						SchedTypeIndex = TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidControlTypes( SglHeatSetPoint ) + " Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) );
+                                ShowSevereError("GetZoneAirSetpoints: Could not find " + ValidControlTypes(SglHeatSetPoint) +
+                                                " Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex));
 							ErrorsFound = true;
 						}
 					} else { // TempIndex = 0
 						if ( CheckScheduleValue( CTIndex, SingleHeatingSetPoint ) ) {
 							ShowSevereError( "Control Type Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
-							ShowContinueError( "..specifies control type 1 (" + ValidControlTypes( SglHeatSetPoint ) + ") as the control type. Not valid for this zone." );
+                                ShowContinueError("..specifies control type 1 (" + ValidControlTypes(SglHeatSetPoint) +
+                                                  ") as the control type. Not valid for this zone.");
 							ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
 							ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
@@ -813,13 +912,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( TempIndex != 0 ) {
 						SchedTypeIndex = TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidControlTypes( SglCoolSetPoint ) + " Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) );
+                                ShowSevereError("GetZoneAirSetpoints: Could not find " + ValidControlTypes(SglCoolSetPoint) +
+                                                " Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex));
 							ErrorsFound = true;
 						}
 					} else { // TempIndex = 0
 						if ( CheckScheduleValue( CTIndex, SingleCoolingSetPoint ) ) {
 							ShowSevereError( "Control Type Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
-							ShowContinueError( "..specifies control type 2 (" + ValidControlTypes( SglCoolSetPoint ) + ") as the control type. Not valid for this zone." );
+                                ShowContinueError("..specifies control type 2 (" + ValidControlTypes(SglCoolSetPoint) +
+                                                  ") as the control type. Not valid for this zone.");
 							ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
 							ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
@@ -833,13 +934,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( TempIndex != 0 ) {
 						SchedTypeIndex = TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidControlTypes( SglHCSetPoint ) + " Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) );
+                                ShowSevereError("GetZoneAirSetpoints: Could not find " + ValidControlTypes(SglHCSetPoint) +
+                                                " Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex));
 							ErrorsFound = true;
 						}
 					} else { // TempIndex = 0
 						if ( CheckScheduleValue( CTIndex, SingleHeatCoolSetPoint ) ) {
 							ShowSevereError( "Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
-							ShowContinueError( "..specifies control type 3 (" + ValidControlTypes( SglHCSetPoint ) + ") as the control type. Not valid for this zone." );
+                                ShowContinueError("..specifies control type 3 (" + ValidControlTypes(SglHCSetPoint) +
+                                                  ") as the control type. Not valid for this zone.");
 							ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
 							ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
@@ -853,13 +956,15 @@ namespace ZoneTempPredictorCorrector {
 					if ( TempIndex != 0 ) {
 						SchedTypeIndex = TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidControlTypes( DualSetPoint ) + " Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ) );
+                                ShowSevereError("GetZoneAirSetpoints: Could not find " + ValidControlTypes(DualSetPoint) +
+                                                " Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex));
 							ErrorsFound = true;
 						}
 					} else { // TempIndex = 0
 						if ( CheckScheduleValue( CTIndex, DualSetPointWithDeadBand ) ) {
 							ShowSevereError( "Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
-							ShowContinueError( "..specifies control type 4 (" + ValidControlTypes( DualSetPoint ) + ") as the control type. Not valid for this zone." );
+                                ShowContinueError("..specifies control type 4 (" + ValidControlTypes(DualSetPoint) +
+                                                  ") as the control type. Not valid for this zone.");
 							ShowContinueError( "..reference " + cZControlTypes( iZC_TStat ) + '=' + TempControlledZone( TempControlledZoneNum ).Name );
 							ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
@@ -867,13 +972,14 @@ namespace ZoneTempPredictorCorrector {
 					}
 
 				} else {
-					ShowSevereError( "GetZoneAirSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( ControlTypeNum ) + ", in Schedule=" + TempControlledZone( TempControlledZoneNum ).ControlTypeSchedName );
+                        ShowSevereError("GetZoneAirSetpoints: Illegal control type for Zone=" + Zone(ActualZoneNum).Name +
+                                        ", Found value=" + TrimSigDigits(ControlTypeNum) +
+                                        ", in Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeSchedName);
 					ShowContinueError( "..valid range values are [0,4]." );
 					ErrorsFound = true;
-
-				}}
 			}
-
+                }
+            }
 		}
 
 		for ( TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum ) {
@@ -883,9 +989,12 @@ namespace ZoneTempPredictorCorrector {
 			if ( CTIndex == 0 ) continue; // error caught elsewhere -- would just be confusing here
 
 			for ( ControlTypeNum = 1; ControlTypeNum <= 4; ++ControlTypeNum ) {
-				if ( TStatControlTypes( TempControlledZoneNum ).MustHave( ControlTypeNum ) && TStatControlTypes( TempControlledZoneNum ).DidHave( ControlTypeNum ) ) continue;
+                if (TStatControlTypes(TempControlledZoneNum).MustHave(ControlTypeNum) &&
+                    TStatControlTypes(TempControlledZoneNum).DidHave(ControlTypeNum))
+                    continue;
 
-				{ auto const SELECT_CASE_var( ControlTypeNum );
+                {
+                    auto const SELECT_CASE_var(ControlTypeNum);
 
 				if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
 					if ( ! TStatControlTypes( TempControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
@@ -916,53 +1025,59 @@ namespace ZoneTempPredictorCorrector {
 					ShowContinueError( "..reference ZONE=" + TempControlledZone( TempControlledZoneNum ).ZoneName );
 
 				} else {
-				}}
+                    }
+                }
 			}
 		}
 
 		if ( allocated( TStatControlTypes ) ) TStatControlTypes.deallocate();
 		// This starts the Humidity Control Get Input section
 		cCurrentModuleObject = cZControlTypes( iZC_HStat );
-		NumHumidityControlZones = GetNumObjectsFound( cCurrentModuleObject );
+        NumHumidityControlZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-		if ( NumHumidityControlZones > 0 ) HumidityControlZone.allocate( NumHumidityControlZones );
+        if (NumHumidityControlZones > 0) {
+            HumidityControlZone.allocate(NumHumidityControlZones);
+            HumidityControlZoneUniqueNames.reserve(static_cast<unsigned>(NumHumidityControlZones));
+        }
 
 		for ( HumidControlledZoneNum = 1; HumidControlledZoneNum <= NumHumidityControlZones; ++HumidControlledZoneNum ) {
-			GetObjectItem( cCurrentModuleObject, HumidControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HumidityControlZone, &ZoneHumidityControls::ControlName, HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          HumidControlledZoneNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
 			HumidityControlZone( HumidControlledZoneNum ).ControlName = cAlphaArgs( 1 );
-			// Ensure unique zone name
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 2 ), HumidityControlZone, &ZoneHumidityControls::ZoneName, HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Zone Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 2 ) = "xxxxx";
-			}
+            GlobalNames::IntraObjUniquenessCheck(
+                cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), HumidityControlZoneUniqueNames, ErrorsFound);
 
 			HumidityControlZone( HumidControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-			HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum = FindItem( cAlphaArgs( 2 ), Zone );
+            HumidityControlZone(HumidControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItem(cAlphaArgs(2), Zone);
 			if ( HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 			HumidityControlZone( HumidControlledZoneNum ).HumidifyingSched = cAlphaArgs( 3 );
 			HumidityControlZone( HumidControlledZoneNum ).HumidifyingSchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 			if ( HumidityControlZone( HumidControlledZoneNum ).HumidifyingSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 			if ( NumAlphas == 4 ) {
 				HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSched = cAlphaArgs( 4 );
 				HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSchedIndex = GetScheduleIndex( cAlphaArgs( 4 ) );
 				if ( HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSchedIndex == 0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
+                                    "\" not found.");
 					ErrorsFound = true;
 				}
 			} else {
@@ -974,26 +1089,29 @@ namespace ZoneTempPredictorCorrector {
 
 		// Start to read Thermal comfort control objects
 		cCurrentModuleObject = cZControlTypes( iZC_TCTStat );
-		NumComfortTStatStatements = GetNumObjectsFound( cCurrentModuleObject );
+        NumComfortTStatStatements = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 		ComfortTStatObjects.allocate( NumComfortTStatStatements );
 
 		// Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
 		NumComfortControlledZones = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumComfortTStatStatements; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			// will not do much verifying -- that will come later.
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ComfortTStatObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				errFlag = true;
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
+            Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
 			ComfortTStatObjects( Item ).Name = cAlphaArgs( 1 );
 			if ( Item1 > 0 ) {
 				ComfortTStatObjects( Item ).ComfortControlledZoneStartPtr = NumComfortControlledZones + 1;
@@ -1008,7 +1126,8 @@ namespace ZoneTempPredictorCorrector {
 				ComfortTStatObjects( Item ).ZoneListActive = true;
 				ComfortTStatObjects( Item ).ZoneOrZoneListPtr = ZLItem;
 			} else {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				errFlag = true;
 				ErrorsFound = true;
 			}
@@ -1027,23 +1146,36 @@ namespace ZoneTempPredictorCorrector {
 
 			ComfortControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumComfortTStatStatements; ++Item ) {
-				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Item,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 				for ( Item1 = 1; Item1 <= ComfortTStatObjects( Item ).NumOfZones; ++Item1 ) {
 					++ComfortControlledZoneNum;
 					if ( ComfortTStatObjects( Item ).ZoneListActive ) {
 						cAlphaArgs( 2 ) = Zone( ZoneList( ComfortTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name;
 					}
-					ZoneAssigned = FindItemInList( cAlphaArgs( 2 ), ComfortControlledZone, &ZoneComfortControls::ZoneName, ComfortControlledZoneNum - 1 );
+                    ZoneAssigned = UtilityRoutines::FindItemInList(
+                        cAlphaArgs(2), ComfortControlledZone, &ZoneComfortControls::ZoneName, ComfortControlledZoneNum - 1);
 					if ( ZoneAssigned == 0 ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-						ComfortControlledZone( ComfortControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+                        ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
 						if ( ComfortControlledZone( ComfortControlledZoneNum ).ActualZoneNum == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" +
+                                            cAlphaArgs(2) + "\" not found.");
 							ErrorsFound = true;
 						}
 					} else {
 						ComfortControlledZone( ComfortControlledZoneNum ).ZoneName = cAlphaArgs( 2 ); // for continuity
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" zone previously assigned." );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                        "\" zone previously assigned.");
 						ShowContinueError( "...Zone was previously assigned to Thermostat=\"" + ComfortControlledZone( ZoneAssigned ).Name + "\"." );
 						ErrorsFound = true;
 						continue;
@@ -1052,7 +1184,8 @@ namespace ZoneTempPredictorCorrector {
 					if ( ! ComfortTStatObjects( Item ).ZoneListActive ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).Name = cAlphaArgs( 1 );
 					} else {
-						ComfortControlledZone( ComfortControlledZoneNum ).Name = Zone( ZoneList( ComfortTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name + ' ' + ComfortTStatObjects( Item ).Name;
+                        ComfortControlledZone(ComfortControlledZoneNum).Name =
+                            Zone(ZoneList(ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name + ' ' + ComfortTStatObjects(Item).Name;
 					}
 
 					// Read Fields A3 and A4 for averaging method
@@ -1064,33 +1197,36 @@ namespace ZoneTempPredictorCorrector {
 					}
 					// Could not find a people object for this particular zone
 					if ( IZoneCount == 0 && ComfortControlledZone( ComfortControlledZoneNum ).ActualZoneNum > 0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " no PEOPLE in " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" - cannot use Comfort Control." );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " no PEOPLE in " + cAlphaFieldNames(2) + "=\"" +
+                                        cAlphaArgs(2) + "\" - cannot use Comfort Control.");
 						ErrorsFound = true;
 					}
 					ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum = AverageMethodNum_NO;
 					if ( IZoneCount > 1 ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodName = cAlphaArgs( 3 );
-						if ( SameString( cAlphaArgs( 3 ), "SpecificObject" ) ) {
+                        if (UtilityRoutines::SameString(cAlphaArgs(3), "SpecificObject")) {
 							ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum = AverageMethodNum_SPE;
 						}
-						if ( SameString( cAlphaArgs( 3 ), "ObjectAverage" ) ) {
+                        if (UtilityRoutines::SameString(cAlphaArgs(3), "ObjectAverage")) {
 							ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum = AverageMethodNum_OBJ;
 						}
-						if ( SameString( cAlphaArgs( 3 ), "PeopleAverage" ) ) {
+                        if (UtilityRoutines::SameString(cAlphaArgs(3), "PeopleAverage")) {
 							ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum = AverageMethodNum_PEO;
 						}
 						if ( ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                                            "\".");
 							ShowContinueError( "Allowed keys are SpecificObject, ObjectAverage, or PeopleAverage" );
 							ErrorsFound = true;
 						}
 						if ( ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum == AverageMethodNum_SPE ) {
 							ComfortControlledZone( ComfortControlledZoneNum ).AverageObjectName = cAlphaArgs( 4 );
-							if ( FindItem( cAlphaArgs( 4 ), People ) == 0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
+                            if (UtilityRoutines::FindItem(cAlphaArgs(4), People) == 0) {
+                                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" +
+                                                cAlphaArgs(4) + "\".");
 								ErrorsFound = true;
 							} else {
-								ComfortControlledZone( ComfortControlledZoneNum ).SpecificObjectNum = FindItem( cAlphaArgs( 4 ), People );
+                                ComfortControlledZone(ComfortControlledZoneNum).SpecificObjectNum = UtilityRoutines::FindItem(cAlphaArgs(4), People);
 							}
 						}
 					} else {
@@ -1106,7 +1242,8 @@ namespace ZoneTempPredictorCorrector {
 							if ( People( i ).ActivityLevelPtr > 0 ) {
 								ValidScheduleControlType = CheckScheduleValueMinMax( People( i ).ActivityLevelPtr, ">=", 72.0, "<=", 909.0 );
 								if ( ! ValidScheduleControlType ) {
-									ShowSevereError( "GetPeople Activity Level: Invalid activity level values entered for thermal comfort calculation" );
+                                    ShowSevereError(
+                                        "GetPeople Activity Level: Invalid activity level values entered for thermal comfort calculation");
 									ShowContinueError( "Outside of range values [72,909], Reference object=" + People( i ).Name );
 									ErrorsFound = true;
 								}
@@ -1119,7 +1256,8 @@ namespace ZoneTempPredictorCorrector {
 							if ( People( i ).WorkEffPtr > 0 ) {
 								ValidScheduleControlType = CheckScheduleValueMinMax( People( i ).WorkEffPtr, ">=", 0.0, "<=", 1.0 );
 								if ( ! ValidScheduleControlType ) {
-									ShowSevereError( "GetPeople work efficiency: Invalid work efficiency values entered for thermal comfort calculation" );
+                                    ShowSevereError(
+                                        "GetPeople work efficiency: Invalid work efficiency values entered for thermal comfort calculation");
 									ShowContinueError( "Outside of range values [0,1], Reference object=" + People( i ).Name );
 									ErrorsFound = true;
 								}
@@ -1132,7 +1270,8 @@ namespace ZoneTempPredictorCorrector {
 							if ( People( i ).ClothingPtr > 0 ) {
 								ValidScheduleControlType = CheckScheduleValueMinMax( People( i ).ClothingPtr, ">", 0.0, "<=", 2.0 );
 								if ( ! ValidScheduleControlType ) {
-									ShowSevereError( "GetPeople Clothing Insulation: Invalid Clothing Insulation values entered for thermal comfort calculation" );
+                                    ShowSevereError(
+                                        "GetPeople Clothing Insulation: Invalid Clothing Insulation values entered for thermal comfort calculation");
 									ShowContinueError( "Outside of range values [0.0,2.0], Reference object=" + People( i ).Name );
 									ErrorsFound = true;
 								}
@@ -1154,7 +1293,8 @@ namespace ZoneTempPredictorCorrector {
 					if ( NumNums > 0 ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).TdbMinSetPoint = rNumericArgs( 1 );
 						if ( rNumericArgs( 1 ) > 50 || rNumericArgs( 1 ) < 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 0 ) + "]." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                            TrimSigDigits(rNumericArgs(1), 0) + "].");
 							ShowContinueError( "..Allowable values must be between 0 C and 50 C" );
 							ErrorsFound = true;
 						}
@@ -1162,20 +1302,23 @@ namespace ZoneTempPredictorCorrector {
 					if ( NumNums > 1 ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).TdbMaxSetPoint = rNumericArgs( 2 );
 						if ( rNumericArgs( 2 ) > 50 || rNumericArgs( 2 ) < 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 2 ) + "=[" + TrimSigDigits( rNumericArgs( 2 ), 0 ) + "]." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(2) + "=[" +
+                                            TrimSigDigits(rNumericArgs(2), 0) + "].");
 							ShowContinueError( "..Allowable values must be between 0 C and 50 C" );
 							ErrorsFound = true;
 						}
 					}
 					// Ensure MaxTemp >= MinTemp
-					if ( ComfortControlledZone( ComfortControlledZoneNum ).TdbMinSetPoint > ComfortControlledZone( ComfortControlledZoneNum ).TdbMaxSetPoint ) {
+                    if (ComfortControlledZone(ComfortControlledZoneNum).TdbMinSetPoint >
+                        ComfortControlledZone(ComfortControlledZoneNum).TdbMaxSetPoint) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
 						ShowContinueError( ".." + cNumericFieldNames( 1 ) + " > " + cNumericFieldNames( 2 ) );
 						ShowContinueError( "..[" + TrimSigDigits( rNumericArgs( 1 ), 0 ) + "] > [" + TrimSigDigits( rNumericArgs( 2 ), 0 ) + "]." );
 						ErrorsFound = true;
 					}
 					// If MaxTemp = MinTemp, no thermal comfort control
-					if ( ComfortControlledZone( ComfortControlledZoneNum ).TdbMinSetPoint == ComfortControlledZone( ComfortControlledZoneNum ).TdbMaxSetPoint ) {
+                    if (ComfortControlledZone(ComfortControlledZoneNum).TdbMinSetPoint ==
+                        ComfortControlledZone(ComfortControlledZoneNum).TdbMaxSetPoint) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
 						ShowContinueError( ".." + cNumericFieldNames( 1 ) + " = " + cNumericFieldNames( 2 ) );
 						ShowContinueError( "The zone will be controlled using this dry-bulb temperature setpoint." );
@@ -1184,38 +1327,50 @@ namespace ZoneTempPredictorCorrector {
 					ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName = cAlphaArgs( 5 );
 					ComfortControlledZone( ComfortControlledZoneNum ).ComfortSchedIndex = GetScheduleIndex( cAlphaArgs( 5 ) );
 					if ( ComfortControlledZone( ComfortControlledZoneNum ).ComfortSchedIndex == 0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\" not found." );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) +
+                                        "\" not found.");
 						ErrorsFound = true;
 					} else {
 						// Check validity of control types.
-						ValidScheduleControlType = CheckScheduleValueMinMax( ComfortControlledZone( ComfortControlledZoneNum ).ComfortSchedIndex, ">=", 0.0, "<=", 4.0 );
+                        ValidScheduleControlType =
+                            CheckScheduleValueMinMax(ComfortControlledZone(ComfortControlledZoneNum).ComfortSchedIndex, ">=", 0.0, "<=", 4.0);
 						if ( ! ValidScheduleControlType ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"" );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(5) + "=\"" +
+                                            cAlphaArgs(5) + "\"");
 							ShowContinueError( "..contains values outside of range [0,4]." );
 							ErrorsFound = true;
 						}
 					}
 					ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes = nint( ( NumAlphas - 5.0 ) / 2.0 );
-					ComfortControlledZone( ComfortControlledZoneNum ).ControlType.allocate( ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
-					ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName.allocate( ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
-					ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx.allocate( ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
+                    ComfortControlledZone(ComfortControlledZoneNum)
+                        .ControlType.allocate(ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
+                    ComfortControlledZone(ComfortControlledZoneNum)
+                        .ControlTypeName.allocate(ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
+                    ComfortControlledZone(ComfortControlledZoneNum)
+                        .ControlTypeSchIndx.allocate(ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
 
 					for ( ControlTypeNum = 1; ControlTypeNum <= ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes; ++ControlTypeNum ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).ControlType( ControlTypeNum ) = cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 5 ) );
 						ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ControlTypeNum ) = cAlphaArgs( nint( 2.0 * ControlTypeNum + 5 ) );
 						if ( ComfortControlledZone( ComfortControlledZoneNum ).ControlType( ControlTypeNum ) != "" ) {
-							CTIndex = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlType( ControlTypeNum ), ValidComfortControlTypes, 12 );
+                            CTIndex = UtilityRoutines::FindItem(
+                                ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum), ValidComfortControlTypes, 12);
 							if ( CTIndex == 0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "=\"" + cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "\"" );
+                                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
+                                                cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 5)) + "=\"" +
+                                                cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5)) + "\"");
 								ErrorsFound = true;
 							}
 							if ( CTIndex > 4 ) { // For Fanger control only for the time being
-								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "=\"" + cAlphaArgs( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "\"" );
+                                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
+                                                cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 5)) + "=\"" +
+                                                cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5)) + "\"");
 								ShowContinueError( "..Fanger is the only valid model." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( nint( 2.0 * ControlTypeNum - 1 + 5 ) ) + "=\"<blank>\"" );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
+                                            cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 5)) + "=\"<blank>\"");
 							ErrorsFound = true;
 						}
 						ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ControlTypeNum ) = 0;
@@ -1226,29 +1381,37 @@ namespace ZoneTempPredictorCorrector {
 		// End of Thermal comfort control reading and checking
 
 		cCurrentModuleObject = ValidComfortControlTypes( SglHeatSetPointFanger );
-		NumSingleFangerHeatingControls = GetNumObjectsFound( cCurrentModuleObject );
+        NumSingleFangerHeatingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
 		if ( NumSingleFangerHeatingControls > 0 ) SetPointSingleHeatingFanger.allocate( NumSingleFangerHeatingControls );
 
 		for ( SingleFangerHeatingControlNum = 1; SingleFangerHeatingControlNum <= NumSingleFangerHeatingControls; ++SingleFangerHeatingControlNum ) {
-			GetObjectItem( cCurrentModuleObject, SingleFangerHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeatingFanger, SingleFangerHeatingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SingleFangerHeatingControlNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
 			SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).PMVSchedName = cAlphaArgs( 2 );
 			SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).PMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).PMVSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			} else {
-				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).PMVSchedIndex, ">=", -3.0, "<=", 3.0 );
+                ValidScheduleControlType =
+                    CheckScheduleValueMinMax(SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" entered." );
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
+                                    cAlphaArgs(2) + "\" entered.");
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
@@ -1256,29 +1419,39 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleFangerHeatingControlNum
 
 		cCurrentModuleObject = ValidComfortControlTypes( SglCoolSetPointFanger );
-		NumSingleFangerCoolingControls = GetNumObjectsFound( cCurrentModuleObject );
+        NumSingleFangerCoolingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-		if ( NumSingleFangerCoolingControls > 0 ) SetPointSingleCoolingFanger.allocate( NumSingleFangerCoolingControls );
+        if (NumSingleFangerCoolingControls > 0) {
+            SetPointSingleCoolingFanger.allocate(NumSingleFangerCoolingControls);
+        }
 
 		for ( SingleFangerCoolingControlNum = 1; SingleFangerCoolingControlNum <= NumSingleFangerCoolingControls; ++SingleFangerCoolingControlNum ) {
-			GetObjectItem( cCurrentModuleObject, SingleFangerCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger, SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SingleFangerCoolingControlNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedName = cAlphaArgs( 2 );
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			} else {
-				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedIndex, ">=", -3.0, "<=", 3.0 );
+                ValidScheduleControlType =
+                    CheckScheduleValueMinMax(SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" entered." );
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
+                                    cAlphaArgs(2) + "\" entered.");
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
@@ -1287,30 +1460,38 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleFangerCoolingControlNum
 
 		cCurrentModuleObject = ValidComfortControlTypes( SglHCSetPointFanger );
-		NumSingleFangerHeatCoolControls = GetNumObjectsFound( cCurrentModuleObject );
+        NumSingleFangerHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
 		if ( NumSingleFangerHeatCoolControls > 0 ) SetPointSingleHeatCoolFanger.allocate( NumSingleFangerHeatCoolControls );
 
-		for ( SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= NumSingleFangerHeatCoolControls; ++SingleFangerHeatCoolControlNum ) {
-			GetObjectItem( cCurrentModuleObject, SingleFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger, SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+        for (SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= NumSingleFangerHeatCoolControls;
+             ++SingleFangerHeatCoolControlNum) {
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SingleFangerHeatCoolControlNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedName = cAlphaArgs( 2 );
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			} else {
-				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedIndex, ">=", -3.0, "<=", 3.0 );
+                ValidScheduleControlType =
+                    CheckScheduleValueMinMax(SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" entered." );
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
+                                    cAlphaArgs(2) + "\" entered.");
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
@@ -1319,41 +1500,52 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleFangerHeatCoolControlNum
 
 		cCurrentModuleObject = ValidComfortControlTypes( DualSetPointFanger );
-		NumDualFangerHeatCoolControls = GetNumObjectsFound( cCurrentModuleObject );
+        NumDualFangerHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
 		if ( NumDualFangerHeatCoolControls > 0 ) SetPointDualHeatCoolFanger.allocate( NumDualFangerHeatCoolControls );
 
 		for ( DualFangerHeatCoolControlNum = 1; DualFangerHeatCoolControlNum <= NumDualFangerHeatCoolControls; ++DualFangerHeatCoolControlNum ) {
-			GetObjectItem( cCurrentModuleObject, DualFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCoolFanger, DualFangerHeatCoolControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          DualFangerHeatCoolControlNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSetptSchedName = cAlphaArgs( 2 );
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).CoolPMVSetptSchedName = cAlphaArgs( 3 );
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).CoolPMVSchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 			if ( SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).CoolPMVSchedIndex == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                                "\" not found.");
 				ErrorsFound = true;
 			} else {
-				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSchedIndex, ">=", -3.0, "<=", 3.0 );
+                ValidScheduleControlType =
+                    CheckScheduleValueMinMax(SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex, ">=", -3.0, "<=", 3.0);
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" entered." );
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
+                                    cAlphaArgs(2) + "\" entered.");
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
-				ValidScheduleControlType = CheckScheduleValueMinMax( SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).CoolPMVSchedIndex, ">=", -3.0, "<=", 3.0 );
+                ValidScheduleControlType =
+                    CheckScheduleValueMinMax(SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex, ">=", -3.0, "<=", 3.0);
 				if ( ! ValidScheduleControlType ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid PMV values " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" entered." );
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(3) + "=\"" +
+                                    cAlphaArgs(3) + "\" entered.");
 					ShowContinueError( "..Values outside of range [-3,+3]." );
 					ErrorsFound = true;
 				}
@@ -1363,31 +1555,43 @@ namespace ZoneTempPredictorCorrector {
 
 		// Finish filling in Schedule pointing indexes for Thermal Comfort Control
 		for ( ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= NumComfortControlledZones; ++ComfortControlledZoneNum ) {
-			ComfortIndex = FindItem( ValidComfortControlTypes( SglHeatSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
+            ComfortIndex = UtilityRoutines::FindItem(ValidComfortControlTypes(SglHeatSetPointFanger),
+                                                     ComfortControlledZone(ComfortControlledZoneNum).ControlType,
+                                                     ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_SglHeatSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
-				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleHeatingFanger );
+                ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) = UtilityRoutines::FindItem(
+                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), SetPointSingleHeatingFanger);
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( SglHeatSetPointFanger ) = true;
 			}
 
-			ComfortIndex = FindItem( ValidComfortControlTypes( SglCoolSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
+            ComfortIndex = UtilityRoutines::FindItem(ValidComfortControlTypes(SglCoolSetPointFanger),
+                                                     ComfortControlledZone(ComfortControlledZoneNum).ControlType,
+                                                     ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_SglCoolSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
-				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleCoolingFanger );
+                ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) = UtilityRoutines::FindItem(
+                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), SetPointSingleCoolingFanger);
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( SglCoolSetPointFanger ) = true;
 			}
 
-			ComfortIndex = FindItem( ValidComfortControlTypes( SglHCSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
+            ComfortIndex = UtilityRoutines::FindItem(ValidComfortControlTypes(SglHCSetPointFanger),
+                                                     ComfortControlledZone(ComfortControlledZoneNum).ControlType,
+                                                     ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_SglHCSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
-				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleHeatCoolFanger );
+                ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) = UtilityRoutines::FindItem(
+                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), SetPointSingleHeatCoolFanger);
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( SglHCSetPointFanger ) = true;
 			}
 
-			ComfortIndex = FindItem( ValidComfortControlTypes( DualSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
+            ComfortIndex = UtilityRoutines::FindItem(ValidComfortControlTypes(DualSetPointFanger),
+                                                     ComfortControlledZone(ComfortControlledZoneNum).ControlType,
+                                                     ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_DualSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
-				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointDualHeatCoolFanger );
+                ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) = UtilityRoutines::FindItem(
+                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), SetPointDualHeatCoolFanger);
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( DualSetPointFanger ) = true;
 			}
 		}
@@ -1413,7 +1617,8 @@ namespace ZoneTempPredictorCorrector {
 
 			for ( ControlTypeNum = SchedMin; ControlTypeNum <= SchedMax; ++ControlTypeNum ) {
 
-				{ auto const SELECT_CASE_var( ControlTypeNum );
+                {
+                    auto const SELECT_CASE_var(ControlTypeNum);
 
 				if ( SELECT_CASE_var == 0 ) { // Thermal comfort uncontrolled
 
@@ -1424,14 +1629,17 @@ namespace ZoneTempPredictorCorrector {
 					if ( ComfortIndex != 0 ) {
 						SchedTypeIndex = ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes( SglHeatSetPointFanger ) + " Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) );
+                                ShowSevereError("GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes(SglHeatSetPointFanger) +
+                                                " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
 							ErrorsFound = true;
 						}
 					} else { // ComfortIndex = 0
 						if ( CheckScheduleValue( CTIndex, SglHeatSetPointFanger ) ) {
 							ShowSevereError( "Control Type Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
-							ShowContinueError( "..specifies thermal control type 1 (" + ValidComfortControlTypes( SglHeatSetPointFanger ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+                                ShowContinueError("..specifies thermal control type 1 (" + ValidComfortControlTypes(SglHeatSetPointFanger) +
+                                                  ") as the control type. Not valid for this zone.");
+                                ShowContinueError("..reference " + cZControlTypes(iZC_TCTStat) + '=' +
+                                                  ComfortControlledZone(ComfortControlledZoneNum).Name);
 							ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
@@ -1444,14 +1652,17 @@ namespace ZoneTempPredictorCorrector {
 					if ( ComfortIndex != 0 ) {
 						SchedTypeIndex = ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes( SglCoolSetPointFanger ) + " Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) );
+                                ShowSevereError("GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes(SglCoolSetPointFanger) +
+                                                " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
 							ErrorsFound = true;
 						}
 					} else { // ComfortIndex = 0
 						if ( CheckScheduleValue( CTIndex, SglCoolSetPointFanger ) ) {
 							ShowSevereError( "Control Type Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
-							ShowContinueError( "..specifies thermal control type 2 (" + ValidComfortControlTypes( SglCoolSetPointFanger ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+                                ShowContinueError("..specifies thermal control type 2 (" + ValidComfortControlTypes(SglCoolSetPointFanger) +
+                                                  ") as the control type. Not valid for this zone.");
+                                ShowContinueError("..reference " + cZControlTypes(iZC_TCTStat) + '=' +
+                                                  ComfortControlledZone(ComfortControlledZoneNum).Name);
 							ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
@@ -1464,14 +1675,17 @@ namespace ZoneTempPredictorCorrector {
 					if ( ComfortIndex != 0 ) {
 						SchedTypeIndex = ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes( SglHCSetPointFanger ) + " Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) );
+                                ShowSevereError("GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes(SglHCSetPointFanger) +
+                                                " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
 							ErrorsFound = true;
 						}
 					} else { // ComfortIndex = 0
 						if ( CheckScheduleValue( CTIndex, SglHCSetPointFanger ) ) {
 							ShowSevereError( "Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
-							ShowContinueError( "..specifies thermal control type 3 (" + ValidComfortControlTypes( SglHCSetPointFanger ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+                                ShowContinueError("..specifies thermal control type 3 (" + ValidComfortControlTypes(SglHCSetPointFanger) +
+                                                  ") as the control type. Not valid for this zone.");
+                                ShowContinueError("..reference " + cZControlTypes(iZC_TCTStat) + '=' +
+                                                  ComfortControlledZone(ComfortControlledZoneNum).Name);
 							ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
@@ -1484,14 +1698,17 @@ namespace ZoneTempPredictorCorrector {
 					if ( ComfortIndex != 0 ) {
 						SchedTypeIndex = ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex );
 						if ( SchedTypeIndex == 0 ) {
-							ShowSevereError( "GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes( DualSetPointFanger ) + " Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ) );
+                                ShowSevereError("GetZoneAirSetpoints: Could not find " + ValidComfortControlTypes(DualSetPointFanger) +
+                                                " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
 							ErrorsFound = true;
 						}
 					} else { // ComfortIndex = 0
 						if ( CheckScheduleValue( CTIndex, DualSetPointFanger ) ) {
 							ShowSevereError( "Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
-							ShowContinueError( "..specifies thermal control type 4 (" + ValidComfortControlTypes( DualSetPointFanger ) + ") as the control type. Not valid for this zone." );
-							ShowContinueError( "..reference " + cZControlTypes( iZC_TCTStat ) + '=' + ComfortControlledZone( ComfortControlledZoneNum ).Name );
+                                ShowContinueError("..specifies thermal control type 4 (" + ValidComfortControlTypes(DualSetPointFanger) +
+                                                  ") as the control type. Not valid for this zone.");
+                                ShowContinueError("..reference " + cZControlTypes(iZC_TCTStat) + '=' +
+                                                  ComfortControlledZone(ComfortControlledZoneNum).Name);
 							ShowContinueError( "..reference ZONE=" + ComfortControlledZone( ComfortControlledZoneNum ).ZoneName );
 							ErrorsFound = true;
 						}
@@ -1500,13 +1717,14 @@ namespace ZoneTempPredictorCorrector {
 					// CASE KSU
 
 				} else {
-					ShowSevereError( "GetZoneAirSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( ControlTypeNum ) + ", in Schedule=" + ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchedName );
+                        ShowSevereError("GetZoneAirSetpoints: Illegal control type for Zone=" + Zone(ActualZoneNum).Name +
+                                        ", Found value=" + TrimSigDigits(ControlTypeNum) +
+                                        ", in Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
 					ShowContinueError( "..valid range values are [0,4]." );
 					ErrorsFound = true;
-
-				}}
 			}
-
+                }
+            }
 		}
 
 		for ( ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= NumComfortControlledZones; ++ComfortControlledZoneNum ) {
@@ -1516,9 +1734,12 @@ namespace ZoneTempPredictorCorrector {
 			if ( CTIndex == 0 ) continue; // error caught elsewhere -- would just be confusing here
 
 			for ( ControlTypeNum = 1; ControlTypeNum <= 12; ++ControlTypeNum ) {
-				if ( TComfortControlTypes( ComfortControlledZoneNum ).MustHave( ControlTypeNum ) && TComfortControlTypes( ComfortControlledZoneNum ).DidHave( ControlTypeNum ) ) continue;
+                if (TComfortControlTypes(ComfortControlledZoneNum).MustHave(ControlTypeNum) &&
+                    TComfortControlTypes(ComfortControlledZoneNum).DidHave(ControlTypeNum))
+                    continue;
 
-				{ auto const SELECT_CASE_var( ControlTypeNum );
+                {
+                    auto const SELECT_CASE_var(ControlTypeNum);
 
 				if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
 					if ( ! TComfortControlTypes( ComfortControlledZoneNum ).MustHave( ControlTypeNum ) ) continue;
@@ -1552,7 +1773,8 @@ namespace ZoneTempPredictorCorrector {
 					// CASE KSU
 
 				} else {
-				}}
+                    }
+                }
 			}
 		}
 
@@ -1569,7 +1791,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
-		int NumZoneCapaMultiplier = GetNumObjectsFound( cCurrentModuleObject );
+        int NumZoneCapaMultiplier = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 		if ( NumZoneCapaMultiplier == 0 ) {
 		// Assign default multiplier values to all zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
@@ -1585,7 +1807,17 @@ namespace ZoneTempPredictorCorrector {
 			// Added by S. Lee and R. Zhang in Oct. 2016.
 			// Assign the user inputted multipliers to specified zones
 			for ( int ZoneCapNum = 1; ZoneCapNum <= NumZoneCapaMultiplier; ZoneCapNum++ ) {
-				GetObjectItem( cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              ZoneCapNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
 				if( lAlphaFieldBlanks( 2 )){
 				// default multiplier values for all the zones not specified
@@ -1597,8 +1829,8 @@ namespace ZoneTempPredictorCorrector {
 				// multiplier values for the specified zone 
 					int ZoneNum = 0;
 					ZLItem = 0;
-					Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
-					if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+                    Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+                    if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
 					if ( Item1 > 0 ) {
 						ZoneNum = Item1;
 						Zone( ZoneNum ).FlagCustomizedZoneCap = true;
@@ -1617,7 +1849,8 @@ namespace ZoneTempPredictorCorrector {
 						}
 
 					} else {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                        "\" not found.");
 						ErrorsFound = true;
 					}
 				}
@@ -1654,61 +1887,81 @@ namespace ZoneTempPredictorCorrector {
 					ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam_temp / NumOfZones;
 				}
 			}
-
 		}
 
 		gio::write( OutputFileInits, Format_700 );
 		gio::write( OutputFileInits, Format_701 ) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
 
 		cCurrentModuleObject = cZControlTypes( iZC_OTTStat );
-		NumOpTempControlledZones = GetNumObjectsFound( cCurrentModuleObject );
+        NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
 		if ( NumOpTempControlledZones > 0 ) {
 			AnyOpTempControl = true;
 
 			for ( OpTempContrlNum = 1; OpTempContrlNum <= NumOpTempControlledZones; ++OpTempContrlNum ) {
-				GetObjectItem( cCurrentModuleObject, OpTempContrlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              OpTempContrlNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 				// find matching name of  ZONECONTROL:THERMOSTAT object
-				found = FindItem( cAlphaArgs( 1 ), TStatObjects );
+                found = UtilityRoutines::FindItem(cAlphaArgs(1), TStatObjects);
 				if ( found == 0 ) {
 					// It might be in the TempControlledZones
-					found = FindItem( cAlphaArgs( 1 ), TempControlledZone );
+                    found = UtilityRoutines::FindItem(cAlphaArgs(1), TempControlledZone);
 					if ( found == 0 ) { // throw error
-						ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cZControlTypes( iZC_TStat ) + " reference not found." );
+                        ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cZControlTypes(iZC_TStat) +
+                                        " reference not found.");
 						ErrorsFound = true;
 					} else {
 						TempControlledZoneNum = found;
 						TempControlledZone( TempControlledZoneNum ).OperativeTempControl = true;
-						if ( SameString( cAlphaArgs( 2 ), "Scheduled" ) ) {
+                        if (UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled")) {
 							TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled = true;
 						}
-						if ( ( ! ( SameString( cAlphaArgs( 2 ), "Scheduled" ) ) ) && ( ! ( SameString( cAlphaArgs( 2 ), "Constant" ) ) ) ) {
-							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
+                        if ((!(UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled"))) &&
+                            (!(UtilityRoutines::SameString(cAlphaArgs(2), "Constant")))) {
+                            ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                            "\".");
 							ErrorsFound = true;
 						}
 
 						TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction = rNumericArgs( 1 );
 						TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched = GetScheduleIndex( cAlphaArgs( 3 ) );
-						if ( ( TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched == 0 ) && ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) { //throw error
-							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
+                        if ((TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched == 0) &&
+                            (TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled)) { // throw error
+                            ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
+                                            "\" not found.");
 							ErrorsFound = true;
 						}
 
 						//check validity of fixed radiative fraction
-						if ( ( TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction < 0.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) ) {
-							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be negative." );
+                        if ((TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction < 0.0) &&
+                            (!(TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled))) {
+                            ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                            TrimSigDigits(rNumericArgs(1), 2) + "\" cannot be negative.");
 							ErrorsFound = true;
 						}
-						if ( ( TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction >= 0.9 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) ) {
-							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot >= .9." );
+                        if ((TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction >= 0.9) &&
+                            (!(TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled))) {
+                            ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                            TrimSigDigits(rNumericArgs(1), 2) + "\" cannot >= .9.");
 							ErrorsFound = true;
 						}
 
 						// check schedule min max.
 						if ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) {
-							ValidRadFractSched = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9 );
+                            ValidRadFractSched =
+                                CheckScheduleValueMinMax(TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9);
 							if ( ! ValidRadFractSched ) {
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid values " + cAlphaFieldNames( 3 ) + "=[" + cAlphaArgs( 3 ) + "\"." );
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(3) + "=[" +
+                                                cAlphaArgs(3) + "\".");
 								ShowContinueError( "..Values outside of range [0.0,0.9)." );
 								ErrorsFound = true;
 							}
@@ -1718,13 +1971,16 @@ namespace ZoneTempPredictorCorrector {
 						// read adaptive comfort model and calculate adaptive thermal comfort setpoint
 						if ( TempControlledZone( TempControlledZoneNum ).OperativeTempControl ) {
 							if ( NumAlphas >= 4 && ! lAlphaFieldBlanks( 4 ) ) {
-								int adaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+                                int adaptiveComfortModelTypeIndex =
+                                    UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
 								if( !adaptiveComfortModelTypeIndex ) {
-									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
+                                    ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" +
+                                                    cAlphaArgs(4) + "\" not found.");
 									ErrorsFound = true;
 								} else if ( adaptiveComfortModelTypeIndex != ADAP_NONE ) {
 									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortTempControl = true;
-									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+                                    TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
+                                        UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
 									if ( !AdapComfortDailySetPointSchedule.initialized ) {
 										Array1D< Real64 > runningAverageASH( NumDaysInYear, 0.0 );
 										Array1D< Real64 > runningAverageCEN( NumDaysInYear, 0.0 );
@@ -1736,19 +1992,26 @@ namespace ZoneTempPredictorCorrector {
 						}
 
 						// CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
-						SetupOutputVariable( "Zone Thermostat Operative Temperature [C]", ZnAirRpt( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).ThermOperativeTemp, "Zone", "Average", Zone( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).Name );
+                        SetupOutputVariable("Zone Thermostat Operative Temperature",
+                                            OutputProcessor::Unit::C,
+                                            ZnAirRpt(TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
+                                            "Zone",
+                                            "Average",
+                                            Zone(TempControlledZone(TempControlledZoneNum).ActualZoneNum).Name);
 					}
 				} else {
 					for ( Item = 1; Item <= TStatObjects( found ).NumOfZones; ++Item ) {
 						TempControlledZoneNum = TStatObjects( found ).TempControlledZoneStartPtr + Item - 1;
 						if ( NumTempControlledZones == 0 ) continue;
 						TempControlledZone( TempControlledZoneNum ).OperativeTempControl = true;
-						if ( SameString( cAlphaArgs( 2 ), "Scheduled" ) ) {
+                        if (UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled")) {
 							TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled = true;
 						}
 						if ( Item == 1 ) {
-							if ( ( ! ( SameString( cAlphaArgs( 2 ), "Scheduled" ) ) ) && ( ! ( SameString( cAlphaArgs( 2 ), "Constant" ) ) ) ) {
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
+                            if ((!(UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled"))) &&
+                                (!(UtilityRoutines::SameString(cAlphaArgs(2), "Constant")))) {
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" +
+                                                cAlphaArgs(2) + "\".");
 								ErrorsFound = true;
 							}
 						}
@@ -1756,22 +2019,28 @@ namespace ZoneTempPredictorCorrector {
 						TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction = rNumericArgs( 1 );
 						TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched = GetScheduleIndex( cAlphaArgs( 3 ) );
 						if ( Item == 1 ) {
-							if ( ( TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched == 0 ) && ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) { //throw error
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
+                            if ((TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched == 0) &&
+                                (TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled)) { // throw error
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" +
+                                                cAlphaArgs(3) + "\" not found.");
 								ErrorsFound = true;
 							}
 						}
 
 						//check validity of fixed radiative fraction
 						if ( Item == 1 ) {
-							if ( ( TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction < 0.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) ) {
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be negative." );
+                            if ((TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction < 0.0) &&
+                                (!(TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled))) {
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                                TrimSigDigits(rNumericArgs(1), 2) + "\" cannot be negative.");
 								ErrorsFound = true;
 							}
 						}
 						if ( Item == 1 ) {
-							if ( ( TempControlledZone( TempControlledZoneNum ).FixedRadiativeFraction >= 0.9 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) ) ) {
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot >= .9." );
+                            if ((TempControlledZone(TempControlledZoneNum).FixedRadiativeFraction >= 0.9) &&
+                                (!(TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled))) {
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                                TrimSigDigits(rNumericArgs(1), 2) + "\" cannot >= .9.");
 								ErrorsFound = true;
 							}
 						}
@@ -1779,9 +2048,11 @@ namespace ZoneTempPredictorCorrector {
 						// check schedule min max.
 						if ( Item == 1 ) {
 							if ( TempControlledZone( TempControlledZoneNum ).OpTempCntrlModeScheduled ) {
-								ValidRadFractSched = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9 );
+                                ValidRadFractSched = CheckScheduleValueMinMax(
+                                    TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9);
 								if ( ! ValidRadFractSched ) {
-									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid values " + cAlphaFieldNames( 3 ) + "=[" + cAlphaArgs( 3 ) + "\"." );
+                                    ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(3) + "=[" +
+                                                    cAlphaArgs(3) + "\".");
 									ShowContinueError( "..Values outside of range [0.0,0.9)." );
 									ErrorsFound = true;
 								}
@@ -1792,13 +2063,16 @@ namespace ZoneTempPredictorCorrector {
 						// read adaptive comfort model and calculate adaptive thermal comfort setpoint
 						if ( TempControlledZone( TempControlledZoneNum ).OperativeTempControl ) {
 							if ( NumAlphas >= 4 && ! lAlphaFieldBlanks( 4 ) ) {
-								int adaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+                                int adaptiveComfortModelTypeIndex =
+                                    UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
 								if ( !adaptiveComfortModelTypeIndex ) {
-									ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
+                                    ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" +
+                                                    cAlphaArgs(4) + "\" not found.");
 									ErrorsFound = true;
 								} else if ( adaptiveComfortModelTypeIndex != ADAP_NONE ) {
 									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortTempControl = true;
-									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+                                    TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
+                                        UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
 									if ( !AdapComfortDailySetPointSchedule.initialized ) {
 										Array1D< Real64 > runningAverageASH( NumDaysInYear, 0.0 );
 										Array1D< Real64 > runningAverageCEN( NumDaysInYear, 0.0 );
@@ -1810,7 +2084,12 @@ namespace ZoneTempPredictorCorrector {
 						}
 
 						// CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
-						SetupOutputVariable( "Zone Thermostat Operative Temperature [C]", ZnAirRpt( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).ThermOperativeTemp, "Zone", "Average", Zone( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).Name );
+                        SetupOutputVariable("Zone Thermostat Operative Temperature",
+                                            OutputProcessor::Unit::C,
+                                            ZnAirRpt(TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
+                                            "Zone",
+                                            "Average",
+                                            Zone(TempControlledZone(TempControlledZoneNum).ActualZoneNum).Name);
 					} // TStat Objects Loop
 				} // found thermostat referene
 			} //loop over NumOpTempControlledZones
@@ -1818,63 +2097,85 @@ namespace ZoneTempPredictorCorrector {
 
 		// Overcool dehumidificaton GetInput starts here
 		cCurrentModuleObject = cZControlTypes( iZC_TandHStat );
-		NumTempAndHumidityControlledZones = GetNumObjectsFound( cCurrentModuleObject );
+        NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
 		if ( NumTempAndHumidityControlledZones > 0 ) {
 			AnyZoneTempAndHumidityControl = true;
 
 			for ( TempHumidityCntrlNum = 1; TempHumidityCntrlNum <= NumTempAndHumidityControlledZones; ++TempHumidityCntrlNum ) {
-				GetObjectItem( cCurrentModuleObject, TempHumidityCntrlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              TempHumidityCntrlNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 				// find matching name of  ZONECONTROL:THERMOSTAT object
-				found = FindItem( cAlphaArgs( 1 ), TStatObjects );
+                found = UtilityRoutines::FindItem(cAlphaArgs(1), TStatObjects);
 				if ( found == 0 ) {
 					// It might be in the TempControlledZones
-					found = FindItem( cAlphaArgs( 1 ), TempControlledZone );
+                    found = UtilityRoutines::FindItem(cAlphaArgs(1), TempControlledZone);
 					if ( found == 0 ) { // throw error
-						ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cZControlTypes( iZC_TStat ) + " reference not found." );
+                        ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cZControlTypes(iZC_TStat) +
+                                        " reference not found.");
 						ErrorsFound = true;
 					} else {
 						TempControlledZoneNum = found;
 						TempControlledZone( TempControlledZoneNum ).DehumidifyingSched = cAlphaArgs( 2 );
 						TempControlledZone( TempControlledZoneNum ).DehumidifyingSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( TempControlledZone( TempControlledZoneNum ).DehumidifyingSchedIndex == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                            "\" not found.");
 							ErrorsFound = true;
 						}
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControl = true;
-						if ( ( SameString( cAlphaArgs( 3 ), "None" ) ) ) {
+                        if ((UtilityRoutines::SameString(cAlphaArgs(3), "None"))) {
 							TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControl = false;
 						}
-						if ( SameString( cAlphaArgs( 4 ), "Scheduled" ) ) {
+                        if (UtilityRoutines::SameString(cAlphaArgs(4), "Scheduled")) {
 							TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled = true;
 						}
-						if ( ( ! ( SameString( cAlphaArgs( 4 ), "Scheduled" ) ) ) && ( ! ( SameString( cAlphaArgs( 4 ), "Constant" ) ) ) ) {
-							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
+                        if ((!(UtilityRoutines::SameString(cAlphaArgs(4), "Scheduled"))) &&
+                            (!(UtilityRoutines::SameString(cAlphaArgs(4), "Constant")))) {
+                            ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
+                                            "\".");
 							ErrorsFound = true;
 						}
 
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange = rNumericArgs( 1 );
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex = GetScheduleIndex( cAlphaArgs( 4 ) );
-						if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex == 0 ) && ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) { //throw error
-							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\" not found." );
+                        if ((TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex == 0) &&
+                            (TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled)) { // throw error
+                            ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) +
+                                            "\" not found.");
 							ErrorsFound = true;
 						}
 
 						//check validity of zone Overcool constant range
-						if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange < 0.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) ) {
-							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be negative." );
+                        if ((TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange < 0.0) &&
+                            (!(TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled))) {
+                            ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                            TrimSigDigits(rNumericArgs(1), 2) + "\" cannot be negative.");
 							ErrorsFound = true;
 						}
-						if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange > 3.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) ) {
-							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be > 3.0" );
+                        if ((TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange > 3.0) &&
+                            (!(TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled))) {
+                            ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                            TrimSigDigits(rNumericArgs(1), 2) + "\" cannot be > 3.0");
 							ErrorsFound = true;
 						}
 
 						// check zone Overcool range schedule min/max values.
 						if ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) {
-							ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0 );
+                            ValidZoneOvercoolRangeSched =
+                                CheckScheduleValueMinMax(TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0);
 							if ( ! ValidZoneOvercoolRangeSched ) {
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid values " + cAlphaFieldNames( 5 ) + "=[" + cAlphaArgs( 5 ) + "\"." );
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(5) + "=[" +
+                                                cAlphaArgs(5) + "\".");
 								ShowContinueError( "..Values outside of range [0.0,3.0]." );
 								ErrorsFound = true;
 							}
@@ -1882,7 +2183,8 @@ namespace ZoneTempPredictorCorrector {
 						// check Overcool Control Ratio limits
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControlRatio = rNumericArgs( 2 );
 						if ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControlRatio < 0.0 ) {
-							ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 2 ) + " invalid " + cNumericFieldNames( 2 ) + "=[" + TrimSigDigits( rNumericArgs( 2 ), 2 ) + "\" cannot be negative." );
+                            ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(2) + " invalid " + cNumericFieldNames(2) + "=[" +
+                                            TrimSigDigits(rNumericArgs(2), 2) + "\" cannot be negative.");
 							ErrorsFound = true;
 						}
 					}
@@ -1892,49 +2194,60 @@ namespace ZoneTempPredictorCorrector {
 						TempControlledZone( TempControlledZoneNum ).DehumidifyingSched = cAlphaArgs( 2 );
 						TempControlledZone( TempControlledZoneNum ).DehumidifyingSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 						if ( TempControlledZone( TempControlledZoneNum ).DehumidifyingSchedIndex == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                            "\" not found.");
 							ErrorsFound = true;
 						}
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControl = true;
-						if ( ( SameString( cAlphaArgs( 3 ), "None" ) ) ) {
+                        if ((UtilityRoutines::SameString(cAlphaArgs(3), "None"))) {
 							TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControl = false;
 						}
-						if ( SameString( cAlphaArgs( 4 ), "Scheduled" ) ) {
+                        if (UtilityRoutines::SameString(cAlphaArgs(4), "Scheduled")) {
 							TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled = false;
 						}
 						if ( Item == 1 ) {
-							if ( ( ! ( SameString( cAlphaArgs( 4 ), "Scheduled" ) ) ) && ( ! ( SameString( cAlphaArgs( 4 ), "Constant" ) ) ) ) {
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
+                            if ((!(UtilityRoutines::SameString(cAlphaArgs(4), "Scheduled"))) &&
+                                (!(UtilityRoutines::SameString(cAlphaArgs(4), "Constant")))) {
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(4) + "=\"" +
+                                                cAlphaArgs(4) + "\".");
 								ErrorsFound = true;
 							}
 						}
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange = rNumericArgs( 1 );
 						TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex = GetScheduleIndex( cAlphaArgs( 6 ) );
 						if ( Item == 1 ) {
-							if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex == 0 ) && ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) { //throw error
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\" not found." );
+                            if ((TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex == 0) &&
+                                (TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled)) { // throw error
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(5) + "=\"" +
+                                                cAlphaArgs(5) + "\" not found.");
 								ErrorsFound = true;
 							}
 						}
 						//check validity of zone Overcool constant range
 						if ( Item == 1 ) {
-							if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange < 0.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) ) {
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot be negative." );
+                            if ((TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange < 0.0) &&
+                                (!(TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled))) {
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                                TrimSigDigits(rNumericArgs(1), 2) + "\" cannot be negative.");
 								ErrorsFound = true;
 							}
 						}
 						if ( Item == 1 ) {
-							if ( ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolConstRange > 3.0 ) && ( ! ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) ) ) {
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 2 ) + "\" cannot > 3.0" );
+                            if ((TempControlledZone(TempControlledZoneNum).ZoneOvercoolConstRange > 3.0) &&
+                                (!(TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled))) {
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
+                                                TrimSigDigits(rNumericArgs(1), 2) + "\" cannot > 3.0");
 								ErrorsFound = true;
 							}
 						}
 						// check zone Overcool range schedule min/max values.
 						if ( Item == 1 ) {
 							if ( TempControlledZone( TempControlledZoneNum ).OvercoolCntrlModeScheduled ) {
-								ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0 );
+                                ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(
+                                    TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0);
 								if ( ! ValidZoneOvercoolRangeSched ) {
-									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid values " + cAlphaFieldNames( 5 ) + "=[" + cAlphaArgs( 5 ) + "\"." );
+                                    ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(5) + "=[" +
+                                                    cAlphaArgs(5) + "\".");
 									ShowContinueError( "..Values outside of range [0.0,3.0]." );
 									ErrorsFound = true;
 								}
@@ -1944,7 +2257,8 @@ namespace ZoneTempPredictorCorrector {
 						// check Overcool Control Ratio limits
 						if ( Item == 1 ) {
 							if ( TempControlledZone( TempControlledZoneNum ).ZoneOvercoolControlRatio < 0.0 ) {
-								ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 2 ) + " invalid " + cNumericFieldNames( 2 ) + "=[" + TrimSigDigits( rNumericArgs( 2 ), 2 ) + "\" cannot be negative." );
+                                ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs(2) + " invalid " + cNumericFieldNames(2) + "=[" +
+                                                TrimSigDigits(rNumericArgs(2), 2) + "\" cannot be negative.");
 								ErrorsFound = true;
 							}
 						}
@@ -1956,24 +2270,29 @@ namespace ZoneTempPredictorCorrector {
 
 		// Staged thermostat control inputs start
 		cCurrentModuleObject = cZControlTypes( iZC_StagedDual );
-		NumStageControlledZones = GetNumObjectsFound( cCurrentModuleObject );
+        NumStageControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 		if ( NumStageControlledZones > 0 ) StagedTStatObjects.allocate( NumStageControlledZones );
 
 		// Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
 		NumStageCtrZone = 0;
 		for ( Item = 1; Item <= NumStageControlledZones; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), StagedTStatObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
 			StagedTStatObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
+            Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
 			if ( Item1 > 0 ) {
 				StagedTStatObjects( Item ).StageControlledZoneStartPtr = NumStageCtrZone + 1;
 				++NumStageCtrZone;
@@ -1987,7 +2306,8 @@ namespace ZoneTempPredictorCorrector {
 				StagedTStatObjects( Item ).ZoneListActive = true;
 				StagedTStatObjects( Item ).ZoneOrZoneListPtr = ZLItem;
 			} else {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
 				ErrorsFound = true;
 			}
 		}
@@ -2004,26 +2324,40 @@ namespace ZoneTempPredictorCorrector {
 
 			StageControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumStageControlledZones; ++Item ) {
-				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Item,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 				for ( Item1 = 1; Item1 <= StagedTStatObjects( Item ).NumOfZones; ++Item1 ) {
 					++StageControlledZoneNum;
 					if ( StagedTStatObjects( Item ).ZoneListActive ) {
 						cAlphaArgs( 2 ) = Zone( ZoneList( StagedTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name;
 					}
-					ZoneAssigned = FindItemInList( cAlphaArgs( 2 ), StageControlledZone, &ZoneStagedControls::ZoneName, StageControlledZoneNum - 1 );
+                    ZoneAssigned = UtilityRoutines::FindItemInList(
+                        cAlphaArgs(2), StageControlledZone, &ZoneStagedControls::ZoneName, StageControlledZoneNum - 1);
 					if ( ZoneAssigned == 0 ) {
 						StageControlledZone( StageControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-						StageControlledZone( StageControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+                        StageControlledZone(StageControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
 						if ( StageControlledZone( StageControlledZoneNum ).ActualZoneNum == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" +
+                                            cAlphaArgs(2) + "\" not found.");
 							ErrorsFound = true;
 						} else {
-							//           Zone(StageControlledZone(StageControlledZoneNum)%ActualZoneNum)%StageControlledZoneIndex = StageControlledZoneNum
+                            //           Zone(StageControlledZone(StageControlledZoneNum)%ActualZoneNum)%StageControlledZoneIndex =
+                            //           StageControlledZoneNum
 						}
 						StageZoneLogic( StageControlledZone( StageControlledZoneNum ).ActualZoneNum ) = true;
 					} else {
 						StageControlledZone( StageControlledZoneNum ).ZoneName = cAlphaArgs( 2 ); // for continuity
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" zone previously assigned." );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                        "\" zone previously assigned.");
 						ShowContinueError( "...Zone was previously assigned to Thermostat=\"" + StageControlledZone( ZoneAssigned ).Name + "\"." );
 						ErrorsFound = true;
 						continue;
@@ -2032,13 +2366,22 @@ namespace ZoneTempPredictorCorrector {
 					if ( ! StagedTStatObjects( Item ).ZoneListActive ) {
 						StageControlledZone( StageControlledZoneNum ).Name = cAlphaArgs( 1 );
 					} else {
-						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( StagedTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( StagedTStatObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, StagedTStatObjects( Item ).Name, StageControlledZone, StageControlledZoneNum - 1, StageControlledZone( StageControlledZoneNum ).Name, errFlag );
+                        CheckCreatedZoneItemName(RoutineName,
+                                                 cCurrentModuleObject,
+                                                 Zone(ZoneList(StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
+                                                 ZoneList(StagedTStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
+                                                 StagedTStatObjects(Item).Name,
+                                                 StageControlledZone,
+                                                 StageControlledZoneNum - 1,
+                                                 StageControlledZone(StageControlledZoneNum).Name,
+                                                 errFlag);
 						if ( errFlag ) ErrorsFound = true;
 					}
 
 					StageControlledZone( StageControlledZoneNum ).NumOfHeatStages = rNumericArgs( 1 );
 					if ( rNumericArgs( 1 ) < 1 || rNumericArgs( 1 ) > 4 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cNumericFieldNames( 1 ) + "=\"" + RoundSigDigits( rNumericArgs( 1 ), 0 ) + "\"" );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cNumericFieldNames(1) + "=\"" +
+                                        RoundSigDigits(rNumericArgs(1), 0) + "\"");
 						ShowContinueError( "..contains values outside of range [1,4]." );
 						ErrorsFound = true;
 					}
@@ -2047,14 +2390,16 @@ namespace ZoneTempPredictorCorrector {
 					StageControlledZone( StageControlledZoneNum ).HSBchedIndex = GetScheduleIndex( cAlphaArgs( 3 ) );
 					if ( Item1 == 1 ) { // only show error on first of several if zone list
 						if ( StageControlledZone( StageControlledZoneNum ).HSBchedIndex == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
+                                            cAlphaArgs(3) + "\" not found.");
 							ErrorsFound = true;
 						}
 					}
 
 					StageControlledZone( StageControlledZoneNum ).HeatThroRange = rNumericArgs( 2 );
 					if ( rNumericArgs( 1 ) < 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" negative value is found at " + cNumericFieldNames( 2 ) + "=\"" + RoundSigDigits( rNumericArgs( 2 ), 1 ) + "\"" );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" negative value is found at " + cNumericFieldNames(2) +
+                                        "=\"" + RoundSigDigits(rNumericArgs(2), 1) + "\"");
 						ShowContinueError( ".. The minumum value is 0." );
 						ErrorsFound = true;
 					}
@@ -2064,17 +2409,20 @@ namespace ZoneTempPredictorCorrector {
 						for ( i = 1; i <= StageControlledZone( StageControlledZoneNum ).NumOfHeatStages; ++i ) {
 							StageControlledZone( StageControlledZoneNum ).HeatTOffset( i ) = rNumericArgs( 2 + i );
 							if ( rNumericArgs( 2 + i ) > 0.0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" positive value is found at " + cNumericFieldNames( 2 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 2 + i ), 1 ) + "\"" );
+                                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" positive value is found at " +
+                                                cNumericFieldNames(2 + i) + "=\"" + RoundSigDigits(rNumericArgs(2 + i), 1) + "\"");
 								ShowContinueError( ".. The maximum value is 0." );
 								ErrorsFound = true;
 							}
 							if ( lNumericFieldBlanks( 2 + i ) ) {
-								ShowSevereError( cCurrentModuleObject + " object =" + cAlphaArgs( 1 ) + ". The input of " + cNumericFieldNames( 2 + i ) + " is required, but a blank is found." );
+                                ShowSevereError(cCurrentModuleObject + " object =" + cAlphaArgs(1) + ". The input of " + cNumericFieldNames(2 + i) +
+                                                " is required, but a blank is found.");
 								ErrorsFound = true;
 							}
 							if ( i > 1 ) {
 								if ( rNumericArgs( 2 + i ) >= rNumericArgs( 1 + i ) ) {
-									ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" The value at " + cNumericFieldNames( 2 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 2 + i ), 1 ) + "\" has to be less than " );
+                                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The value at " + cNumericFieldNames(2 + i) +
+                                                    "=\"" + RoundSigDigits(rNumericArgs(2 + i), 1) + "\" has to be less than ");
 									ShowContinueError( cNumericFieldNames( 1 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 1 + i ), 1 ) );
 									ErrorsFound = true;
 								}
@@ -2084,7 +2432,8 @@ namespace ZoneTempPredictorCorrector {
 
 					StageControlledZone( StageControlledZoneNum ).NumOfCoolStages = rNumericArgs( 7 );
 					if ( rNumericArgs( 7 ) < 1 || rNumericArgs( 7 ) > 4 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cNumericFieldNames( 7 ) + "=\"" + RoundSigDigits( rNumericArgs( 7 ), 0 ) + "\"" );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cNumericFieldNames(7) + "=\"" +
+                                        RoundSigDigits(rNumericArgs(7), 0) + "\"");
 						ShowContinueError( "..contains values outside of range [1,4]." );
 						ErrorsFound = true;
 					}
@@ -2093,14 +2442,16 @@ namespace ZoneTempPredictorCorrector {
 					StageControlledZone( StageControlledZoneNum ).CSBchedIndex = GetScheduleIndex( cAlphaArgs( 4 ) );
 					if ( Item1 == 1 ) { // only show error on first of several if zone list
 						if ( StageControlledZone( StageControlledZoneNum ).CSBchedIndex == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
+                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + "=\"" +
+                                            cAlphaArgs(4) + "\" not found.");
 							ErrorsFound = true;
 						}
 					}
 
 					StageControlledZone( StageControlledZoneNum ).CoolThroRange = rNumericArgs( 8 );
 					if ( rNumericArgs( 8 ) < 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" negative value is found at " + cNumericFieldNames( 8 ) + "=\"" + RoundSigDigits( rNumericArgs( 8 ), 1 ) + "\"" );
+                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" negative value is found at " + cNumericFieldNames(8) +
+                                        "=\"" + RoundSigDigits(rNumericArgs(8), 1) + "\"");
 						ShowContinueError( ".. The minumum value is 0." );
 						ErrorsFound = true;
 					}
@@ -2110,17 +2461,20 @@ namespace ZoneTempPredictorCorrector {
 						for ( i = 1; i <= StageControlledZone( StageControlledZoneNum ).NumOfCoolStages; ++i ) {
 							StageControlledZone( StageControlledZoneNum ).CoolTOffset( i ) = rNumericArgs( 8 + i );
 							if ( rNumericArgs( 8 + i ) < 0.0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" negative value is found at " + cNumericFieldNames( 8 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 8 + i ), 1 ) + "\"" );
+                                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" negative value is found at " +
+                                                cNumericFieldNames(8 + i) + "=\"" + RoundSigDigits(rNumericArgs(8 + i), 1) + "\"");
 								ShowContinueError( ".. The minimum value is 0." );
 								ErrorsFound = true;
 							}
 							if ( lNumericFieldBlanks( 8 + i ) ) {
-								ShowSevereError( cCurrentModuleObject + " object =" + cAlphaArgs( 1 ) + ". The input of " + cNumericFieldNames( 8 + i ) + " is required, but a blank is found." );
+                                ShowSevereError(cCurrentModuleObject + " object =" + cAlphaArgs(1) + ". The input of " + cNumericFieldNames(8 + i) +
+                                                " is required, but a blank is found.");
 								ErrorsFound = true;
 							}
 							if ( i > 1 ) {
 								if ( rNumericArgs( 8 + i ) <= rNumericArgs( 7 + i ) ) {
-									ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" The value at " + cNumericFieldNames( 8 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 8 + i ), 1 ) + "\" has to be greater than " );
+                                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The value at " + cNumericFieldNames(8 + i) +
+                                                    "=\"" + RoundSigDigits(rNumericArgs(8 + i), 1) + "\" has to be greater than ");
 									ShowContinueError( cNumericFieldNames( 7 + i ) + "=\"" + RoundSigDigits( rNumericArgs( 7 + i ), 1 ) );
 									ErrorsFound = true;
 								}
@@ -2129,24 +2483,24 @@ namespace ZoneTempPredictorCorrector {
 					}
 				}
 			} //loop over NumStageControlledZones
-			if ( ( GetNumObjectsFound( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ) == 0 ) && ( GetNumObjectsFound( "AirLoopHVAC:UnitarySystem" ) == 0 ) && ( GetNumObjectsFound( "SetpointManager:SingleZone:OneStageCooling" ) == 0 ) && ( GetNumObjectsFound( "SetpointManager:SingleZone:OneStageHeating" ) == 0 ) ) {
+            if ((inputProcessor->getNumObjectsFound("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed") == 0) &&
+                (inputProcessor->getNumObjectsFound("AirLoopHVAC:UnitarySystem") == 0) &&
+                (inputProcessor->getNumObjectsFound("SetpointManager:SingleZone:OneStageCooling") == 0) &&
+                (inputProcessor->getNumObjectsFound("SetpointManager:SingleZone:OneStageHeating") == 0)) {
 				ShowWarningError( cCurrentModuleObject + " is applicable to only selected HVAC objects which are missing from input." );
 				ShowContinueError( "Model should include one or more of the following objects:  " );
 				ShowContinueError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, AirLoopHVAC:UnitarySystem, " );
-				ShowContinueError( "SetpointManager:SingleZone:OneStageCooling, and/or SetpointManager:SingleZone:OneStageHeating. The simulation continues..." );
+                ShowContinueError(
+                    "SetpointManager:SingleZone:OneStageCooling, and/or SetpointManager:SingleZone:OneStageHeating. The simulation continues...");
 			}
 		} // NumStageControlledZones > 0
 
 		if ( ErrorsFound ) {
 			ShowFatalError( "Errors getting Zone Control input data.  Preceding condition(s) cause termination." );
 		}
-
 	}
 
-	void CalculateMonthlyRunningAverageDryBulb(
-		Array1D< Real64 > & runningAverageASH,
-		Array1D< Real64 > & runningAverageCEN		
-	) 
+    void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xuan Luo
@@ -2156,30 +2510,18 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculate the monthly running average dry bulb temperature;
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 
-		using WeatherManager::NumDaysInYear;
 		using DataStringGlobals::inStatFileName;
 		using OutputReportTabular::GetColumnUsingTabs;
 		using OutputReportTabular::StrToReal;
+        using WeatherManager::NumDaysInYear;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2204,24 +2546,40 @@ namespace ZoneTempPredictorCorrector {
 		Array1D< Real64 > adaptiveTemp( NumDaysInYear, 0.0 );
 		Array1D< Real64 > dailyDryTemp( NumDaysInYear, 0.0 );
 
-
 		readStat = 0;
-		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); epwFileExists = flags.exists(); }
+        {
+            IOFlags flags;
+            gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
+            epwFileExists = flags.exists();
+        }
 
 		if ( epwFileExists ) {
 			//Read hourly dry bulb temperature first
 			epwFile = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, DataStringGlobals::inputWeatherFileName, flags ); readStat = flags.ios(); }
+            {
+                IOFlags flags;
+                flags.ACTION("READ");
+                gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
+                readStat = flags.ios();
+            }
 			if ( readStat != 0 ) {
 				ShowFatalError( "CalcThermalComfortAdaptive: Could not open file " + DataStringGlobals::inputWeatherFileName + " for input (read)." );
 			}
 			for ( i = 1; i <= 9; ++i ) { // Headers
-				{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
+                {
+                    IOFlags flags;
+                    gio::read(epwFile, fmtA, flags);
+                    readStat = flags.ios();
+                }
 			}
 			for ( i = 1; i <= NumDaysInYear; ++i ) {
 				avgDryBulb = 0.0;
 				for ( j = 1; j <= 24; ++j ) {
-					{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
+                    {
+                        IOFlags flags;
+                        gio::read(epwFile, fmtA, flags) >> epwLine;
+                        readStat = flags.ios();
+                    }
 					for ( ind = 1; ind <= 6; ++ind ) {
 						pos = index( epwLine, ',' );
 						epwLine.erase( 0, pos + 1 );
@@ -2248,8 +2606,7 @@ namespace ZoneTempPredictorCorrector {
 						runningAverageASH( dayOfYear ) = runningAverageASH( dayOfYear ) + avgDryBulb;
 					}
 					runningAverageASH( dayOfYear ) /= 30;
-				}
-				else { // Do special things for wrapping the epw
+                } else { // Do special things for wrapping the epw
 					calcStartDayASH += NumDaysInYear;
 					for ( i = 1; i <= calcEndDay; i++ ) {
 						avgDryBulb = dailyDryTemp( i );
@@ -2268,8 +2625,7 @@ namespace ZoneTempPredictorCorrector {
 						runningAverageCEN( dayOfYear ) = runningAverageCEN( dayOfYear ) + avgDryBulb;
 					}
 					runningAverageCEN( dayOfYear ) /= 7;
-				}
-				else { // Do special things for wrapping the epw
+                } else { // Do special things for wrapping the epw
 					calcStartDayCEN += NumDaysInYear;
 					for ( i = 1; i <= calcEndDay; i++ ) {
 						avgDryBulb = dailyDryTemp( i );
@@ -2282,17 +2638,12 @@ namespace ZoneTempPredictorCorrector {
 					runningAverageCEN( dayOfYear ) /= 7;
 				}
 			}
-		}
-		else {
+        } else {
 			ShowFatalError( "CalcThermalComfortAdaptive: Could not open file " + DataStringGlobals::inputWeatherFileName + " for input (read)." );
 		}
-		
 	}
 
-	void CalculateAdaptiveComfortSetPointSchl(
-		Array1D< Real64 > const & runningAverageASH,
-		Array1D< Real64 > const & runningAverageCEN
-	) 
+    void CalculateAdaptiveComfortSetPointSchl(Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xuan Luo
@@ -2302,12 +2653,6 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculate the zone operative temperature setpoint using adaptive comfort model.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using WeatherManager::DesDayInput;
 		using WeatherManager::NumDaysInYear;
@@ -2316,12 +2661,6 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int const summerDesignDayTypeIndex( 9 );
@@ -2338,9 +2677,12 @@ namespace ZoneTempPredictorCorrector {
 				}
 				if ( GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 30 ) {
 					AdapComfortSetPointSummerDesDay( 4 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 18.8;
-					AdapComfortSetPointSummerDesDay( 5 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 20.8;;
-					AdapComfortSetPointSummerDesDay( 6 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 21.8;;
-					AdapComfortSetPointSummerDesDay( 7 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 22.8;;
+                    AdapComfortSetPointSummerDesDay(5) = 0.33 * GrossApproxAvgDryBulbDesignDay + 20.8;
+                    ;
+                    AdapComfortSetPointSummerDesDay(6) = 0.33 * GrossApproxAvgDryBulbDesignDay + 21.8;
+                    ;
+                    AdapComfortSetPointSummerDesDay(7) = 0.33 * GrossApproxAvgDryBulbDesignDay + 22.8;
+                    ;
 				}
 			}
 		}
@@ -2359,8 +2701,7 @@ namespace ZoneTempPredictorCorrector {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = 0.31 * runningAverageASH( day ) + 17.8;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = 0.31 * runningAverageASH( day ) + 20.3;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = 0.31 * runningAverageASH( day ) + 21.3;
-			}
-			else {
+            } else {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = -1;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = -1;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = -1;
@@ -2370,8 +2711,7 @@ namespace ZoneTempPredictorCorrector {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( day ) = 0.33 * runningAverageCEN( day ) + 20.8;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( day ) = 0.33 * runningAverageCEN( day ) + 21.8;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( day ) = 0.33 * runningAverageCEN( day ) + 22.8;
-			}
-			else {
+            } else {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( day ) = -1;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( day ) = -1;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( day ) = -1;
@@ -2381,8 +2721,7 @@ namespace ZoneTempPredictorCorrector {
 		AdapComfortDailySetPointSchedule.initialized = true;
 	}
 
-	void
-	InitZoneAirSetPoints()
+    void InitZoneAirSetPoints()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2398,25 +2737,14 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataSurfaces::Surface;
+        using DataZoneEquipment::ZoneEquipInputsFilled;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitZoneAirSetpoints: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -2504,6 +2832,7 @@ namespace ZoneTempPredictorCorrector {
 
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				FirstSurfFlag = true;
+                if (Zone(Loop).SurfaceFirst > 0) {
 				for ( SurfNum = Zone( Loop ).SurfaceFirst; SurfNum <= Zone( Loop ).SurfaceLast; ++SurfNum ) {
 					if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
@@ -2516,39 +2845,126 @@ namespace ZoneTempPredictorCorrector {
 					if ( Surface( SurfNum ).TAirRef != TRefFlag ) {
 						ShowWarningError( "Different reference air temperatures for difference surfaces encountered in zone " + Zone( Loop ).Name );
 					}
-
+                    }
 				}
 			}
 
 			// CurrentModuleObject='Zone'
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
-				SetupOutputVariable( "Zone Air System Sensible Heating Energy [J]", SNLoadHeatEnergy( Loop ), "System", "Sum", Zone( Loop ).Name, _, "ENERGYTRANSFER", "Heating", _, "Building", Zone( Loop ).Name, Zone( Loop ).Multiplier, Zone( Loop ).ListMultiplier );
-				SetupOutputVariable( "Zone Air System Sensible Cooling Energy [J]", SNLoadCoolEnergy( Loop ), "System", "Sum", Zone( Loop ).Name, _, "ENERGYTRANSFER", "Cooling", _, "Building", Zone( Loop ).Name, Zone( Loop ).Multiplier, Zone( Loop ).ListMultiplier );
-				SetupOutputVariable( "Zone Air System Sensible Heating Rate [W]", SNLoadHeatRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Air System Sensible Cooling Rate [W]", SNLoadCoolRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Air Temperature [C]", ZT( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Thermostat Air Temperature [C]", TempTstatAir( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Air Humidity Ratio []", ZoneAirHumRat( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Air Relative Humidity [%]", ZoneAirRelHum( Loop ), "System", "Average", Zone( Loop ).Name );
+                SetupOutputVariable("Zone Air System Sensible Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    SNLoadHeatEnergy(Loop),
+                                    "System",
+                                    "Sum",
+                                    Zone(Loop).Name,
+                                    _,
+                                    "ENERGYTRANSFER",
+                                    "Heating",
+                                    _,
+                                    "Building",
+                                    Zone(Loop).Name,
+                                    Zone(Loop).Multiplier,
+                                    Zone(Loop).ListMultiplier);
+                SetupOutputVariable("Zone Air System Sensible Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    SNLoadCoolEnergy(Loop),
+                                    "System",
+                                    "Sum",
+                                    Zone(Loop).Name,
+                                    _,
+                                    "ENERGYTRANSFER",
+                                    "Cooling",
+                                    _,
+                                    "Building",
+                                    Zone(Loop).Name,
+                                    Zone(Loop).Multiplier,
+                                    Zone(Loop).ListMultiplier);
+                SetupOutputVariable(
+                    "Zone Air System Sensible Heating Rate", OutputProcessor::Unit::W, SNLoadHeatRate(Loop), "System", "Average", Zone(Loop).Name);
+                SetupOutputVariable(
+                    "Zone Air System Sensible Cooling Rate", OutputProcessor::Unit::W, SNLoadCoolRate(Loop), "System", "Average", Zone(Loop).Name);
+                SetupOutputVariable("Zone Air Temperature", OutputProcessor::Unit::C, ZT(Loop), "System", "Average", Zone(Loop).Name);
+                SetupOutputVariable(
+                    "Zone Thermostat Air Temperature", OutputProcessor::Unit::C, TempTstatAir(Loop), "System", "Average", Zone(Loop).Name);
+                SetupOutputVariable(
+                    "Zone Air Humidity Ratio", OutputProcessor::Unit::None, ZoneAirHumRat(Loop), "System", "Average", Zone(Loop).Name);
+                SetupOutputVariable(
+                    "Zone Air Relative Humidity", OutputProcessor::Unit::Perc, ZoneAirRelHum(Loop), "System", "Average", Zone(Loop).Name);
 				// This output variable is for the predicted Heating/Cooling load for the zone which can be compared to actual load
 				// These report variables are not multiplied by zone and group multipliers
-				SetupOutputVariable( "Zone Predicted Sensible Load to Setpoint Heat Transfer Rate [W]", SNLoadPredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate [W]", SNLoadPredictedHSPRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate [W]", SNLoadPredictedCSPRate( Loop ), "System", "Average", Zone( Loop ).Name );
+                SetupOutputVariable("Zone Predicted Sensible Load to Setpoint Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    SNLoadPredictedRate(Loop),
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    SNLoadPredictedHSPRate(Loop),
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    SNLoadPredictedCSPRate(Loop),
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
 				// This output variable is for the predicted moisture load for the zone with humidity controlled specified.
-				SetupOutputVariable( "Zone Predicted Moisture Load Moisture Transfer Rate [kgWater/s]", MoisturePredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate [kgWater/s]", ZoneSysMoistureDemand( Loop ).OutputRequiredToHumidifyingSP, "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate [kgWater/s]", ZoneSysMoistureDemand( Loop ).OutputRequiredToDehumidifyingSP, "System", "Average", Zone( Loop ).Name );
+                SetupOutputVariable("Zone Predicted Moisture Load Moisture Transfer Rate",
+                                    OutputProcessor::Unit::kgWater_s,
+                                    MoisturePredictedRate(Loop),
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
+                                    OutputProcessor::Unit::kgWater_s,
+                                    ZoneSysMoistureDemand(Loop).OutputRequiredToHumidifyingSP,
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
+                                    OutputProcessor::Unit::kgWater_s,
+                                    ZoneSysMoistureDemand(Loop).OutputRequiredToDehumidifyingSP,
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
 				// Zone thermostat setpoints
-				SetupOutputVariable( "Zone Thermostat Control Type []", TempControlType( Loop ), "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Thermostat Heating Setpoint Temperature [C]", ZoneThermostatSetPointLo( Loop ), "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Thermostat Cooling Setpoint Temperature [C]", ZoneThermostatSetPointHi( Loop ), "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Adaptive Comfort Operative Temperature Set Point [C]", AdapComfortCoolingSetPoint( Loop ), "Zone", "Average", Zone( Loop ).Name);
-				SetupOutputVariable( "Zone Predicted Sensible Load Room Air Correction Factor [ ]", LoadCorrectionFactor( Loop ), "System", "Average", Zone( Loop ).Name );
+                SetupOutputVariable(
+                    "Zone Thermostat Control Type", OutputProcessor::Unit::None, TempControlType(Loop), "Zone", "Average", Zone(Loop).Name);
+                SetupOutputVariable("Zone Thermostat Heating Setpoint Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ZoneThermostatSetPointLo(Loop),
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone Thermostat Cooling Setpoint Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ZoneThermostatSetPointHi(Loop),
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone Adaptive Comfort Operative Temperature Set Point",
+                                    OutputProcessor::Unit::C,
+                                    AdapComfortCoolingSetPoint(Loop),
+                                    "Zone",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone Predicted Sensible Load Room Air Correction Factor",
+                                    OutputProcessor::Unit::None,
+                                    LoadCorrectionFactor(Loop),
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
 
 				if ( allocated( StageZoneLogic ) ) {
 					if ( StageZoneLogic( Loop ) ) {
-						SetupOutputVariable( "Zone Thermostat Staged Number []", ZoneSysEnergyDemand( Loop ).StageNum, "System", "Average", Zone( Loop ).Name );
+                        SetupOutputVariable("Zone Thermostat Staged Number",
+                                            OutputProcessor::Unit::None,
+                                            ZoneSysEnergyDemand(Loop).StageNum,
+                                            "System",
+                                            "Average",
+                                            Zone(Loop).Name);
 					}
 				}
 
@@ -2559,26 +2975,65 @@ namespace ZoneTempPredictorCorrector {
 				// CurrentModuleObject='ZoneControl:Thermostat:ThermalComfort'
 				for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
 					ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-					SetupOutputVariable( "Zone Thermal Comfort Control Type []", ComfortControlType( ZoneNum ), "Zone", "Average", Zone( ZoneNum ).Name );
-					SetupOutputVariable( "Zone Thermal Comfort Control Fanger Low Setpoint PMV []", ZoneComfortControlsFanger( ZoneNum ).LowPMV, "Zone", "Average", Zone( ZoneNum ).Name );
-					SetupOutputVariable( "Zone Thermal Comfort Control Fanger High Setpoint PMV []", ZoneComfortControlsFanger( ZoneNum ).HighPMV, "Zone", "Average", Zone( ZoneNum ).Name );
+                    SetupOutputVariable("Zone Thermal Comfort Control Type",
+                                        OutputProcessor::Unit::None,
+                                        ComfortControlType(ZoneNum),
+                                        "Zone",
+                                        "Average",
+                                        Zone(ZoneNum).Name);
+                    SetupOutputVariable("Zone Thermal Comfort Control Fanger Low Setpoint PMV",
+                                        OutputProcessor::Unit::None,
+                                        ZoneComfortControlsFanger(ZoneNum).LowPMV,
+                                        "Zone",
+                                        "Average",
+                                        Zone(ZoneNum).Name);
+                    SetupOutputVariable("Zone Thermal Comfort Control Fanger High Setpoint PMV",
+                                        OutputProcessor::Unit::None,
+                                        ZoneComfortControlsFanger(ZoneNum).HighPMV,
+                                        "Zone",
+                                        "Average",
+                                        Zone(ZoneNum).Name);
 				}
 			}
 
 			// CurrentModuleObject='ZoneList'
 			for ( Loop = 1; Loop <= NumOfZoneLists; ++Loop ) {
-				SetupOutputVariable( "Zone List Sensible Heating Energy [J]", ListSNLoadHeatEnergy( Loop ), "System", "Sum", ZoneList( Loop ).Name );
-				SetupOutputVariable( "Zone List Sensible Cooling Energy [J]", ListSNLoadCoolEnergy( Loop ), "System", "Sum", ZoneList( Loop ).Name );
-				SetupOutputVariable( "Zone List Sensible Heating Rate [W]", ListSNLoadHeatRate( Loop ), "System", "Average", ZoneList( Loop ).Name );
-				SetupOutputVariable( "Zone List Sensible Cooling Rate [W]", ListSNLoadCoolRate( Loop ), "System", "Average", ZoneList( Loop ).Name );
+                SetupOutputVariable(
+                    "Zone List Sensible Heating Energy", OutputProcessor::Unit::J, ListSNLoadHeatEnergy(Loop), "System", "Sum", ZoneList(Loop).Name);
+                SetupOutputVariable(
+                    "Zone List Sensible Cooling Energy", OutputProcessor::Unit::J, ListSNLoadCoolEnergy(Loop), "System", "Sum", ZoneList(Loop).Name);
+                SetupOutputVariable(
+                    "Zone List Sensible Heating Rate", OutputProcessor::Unit::W, ListSNLoadHeatRate(Loop), "System", "Average", ZoneList(Loop).Name);
+                SetupOutputVariable(
+                    "Zone List Sensible Cooling Rate", OutputProcessor::Unit::W, ListSNLoadCoolRate(Loop), "System", "Average", ZoneList(Loop).Name);
 			} // Loop
 
 			// CurrentModuleObject='ZoneGroup'
 			for ( Loop = 1; Loop <= NumOfZoneGroups; ++Loop ) {
-				SetupOutputVariable( "Zone Group Sensible Heating Energy [J]", GroupSNLoadHeatEnergy( Loop ), "System", "Sum", ZoneGroup( Loop ).Name );
-				SetupOutputVariable( "Zone Group Sensible Cooling Energy [J]", GroupSNLoadCoolEnergy( Loop ), "System", "Sum", ZoneGroup( Loop ).Name );
-				SetupOutputVariable( "Zone Group Sensible Heating Rate [W]", GroupSNLoadHeatRate( Loop ), "System", "Average", ZoneGroup( Loop ).Name );
-				SetupOutputVariable( "Zone Group Sensible Cooling Rate [W]", GroupSNLoadCoolRate( Loop ), "System", "Average", ZoneGroup( Loop ).Name );
+                SetupOutputVariable("Zone Group Sensible Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    GroupSNLoadHeatEnergy(Loop),
+                                    "System",
+                                    "Sum",
+                                    ZoneGroup(Loop).Name);
+                SetupOutputVariable("Zone Group Sensible Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    GroupSNLoadCoolEnergy(Loop),
+                                    "System",
+                                    "Sum",
+                                    ZoneGroup(Loop).Name);
+                SetupOutputVariable("Zone Group Sensible Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    GroupSNLoadHeatRate(Loop),
+                                    "System",
+                                    "Average",
+                                    ZoneGroup(Loop).Name);
+                SetupOutputVariable("Zone Group Sensible Cooling Rate",
+                                    OutputProcessor::Unit::W,
+                                    GroupSNLoadCoolRate(Loop),
+                                    "System",
+                                    "Average",
+                                    ZoneGroup(Loop).Name);
 			} // Loop
 
 			InitZoneAirSetPointsOneTimeFlag = false;
@@ -2620,11 +3075,15 @@ namespace ZoneTempPredictorCorrector {
 			}
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = 0.0;
-				if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = 0.0;
-				if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP = 0.0;
+                if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
+                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP = 0.0;
+                if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
+                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP = 0.0;
 				if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired = 0.0;
-				if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP = 0.0;
-				if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = 0.0;
+                if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
+                    ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP = 0.0;
+                if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
+                    ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP = 0.0;
 			}
 
 			DeadBandOrSetback = false;
@@ -2642,7 +3101,8 @@ namespace ZoneTempPredictorCorrector {
 			SysDepZoneLoads = 0.0;
 			SysDepZoneLoadsLagged = 0.0;
 			ZoneAirRelHum = 0.0;
-			for ( auto & e : Zone ) e.NoHeatToReturnAir = false;
+            for (auto &e : Zone)
+                e.NoHeatToReturnAir = false;
 			ZoneT1 = 0.0;
 			ZoneW1 = OutHumRat;
 			ZoneWMX = OutHumRat;
@@ -2669,7 +3129,8 @@ namespace ZoneTempPredictorCorrector {
 		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
 			if ( ZoneEquipInputsFilled && ! ControlledZonesChecked ) {
 				if ( ! VerifyControlledZoneForThermostat( TempControlledZone( Loop ).ZoneName ) ) {
-					ShowSevereError( RoutineName + "Zone=\"" + TempControlledZone( Loop ).ZoneName + "\" has specified a Thermostatic control but is not a controlled zone." );
+                    ShowSevereError(RoutineName + "Zone=\"" + TempControlledZone(Loop).ZoneName +
+                                    "\" has specified a Thermostatic control but is not a controlled zone.");
 					ShowContinueError( "...must have a ZoneHVAC:EquipmentConnections specification for this zone." );
 					ErrorsFound = true;
 				}
@@ -2678,7 +3139,8 @@ namespace ZoneTempPredictorCorrector {
 			if ( TempControlledZone( Loop ).ManageDemand ) {
 				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
 
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
+                {
+                    auto const SELECT_CASE_var(TempControlType(ZoneNum));
 
 				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
 
@@ -2695,32 +3157,37 @@ namespace ZoneTempPredictorCorrector {
 					}
 
 				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					if ( ( TempZoneThermostatSetPoint( ZoneNum ) > TempControlledZone( Loop ).HeatingResetLimit ) || ( TempZoneThermostatSetPoint( ZoneNum ) < TempControlledZone( Loop ).CoolingResetLimit ) ) {
+                        if ((TempZoneThermostatSetPoint(ZoneNum) > TempControlledZone(Loop).HeatingResetLimit) ||
+                            (TempZoneThermostatSetPoint(ZoneNum) < TempControlledZone(Loop).CoolingResetLimit)) {
 
 						TempControlType( ZoneNum ) = DualSetPointWithDeadBand;
 						ZoneThermostatSetPointLo( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
 						ZoneThermostatSetPointHi( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
 
-						if ( ZoneThermostatSetPointLo( ZoneNum ) > TempControlledZone( Loop ).HeatingResetLimit ) ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).HeatingResetLimit;
-						if ( ZoneThermostatSetPointHi( ZoneNum ) < TempControlledZone( Loop ).CoolingResetLimit ) ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).CoolingResetLimit;
-
+                            if (ZoneThermostatSetPointLo(ZoneNum) > TempControlledZone(Loop).HeatingResetLimit)
+                                ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(Loop).HeatingResetLimit;
+                            if (ZoneThermostatSetPointHi(ZoneNum) < TempControlledZone(Loop).CoolingResetLimit)
+                                ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(Loop).CoolingResetLimit;
 					}
 
 				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					if ( ZoneThermostatSetPointLo( ZoneNum ) > TempControlledZone( Loop ).HeatingResetLimit ) ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).HeatingResetLimit;
-					if ( ZoneThermostatSetPointHi( ZoneNum ) < TempControlledZone( Loop ).CoolingResetLimit ) ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).CoolingResetLimit;
+                        if (ZoneThermostatSetPointLo(ZoneNum) > TempControlledZone(Loop).HeatingResetLimit)
+                            ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(Loop).HeatingResetLimit;
+                        if (ZoneThermostatSetPointHi(ZoneNum) < TempControlledZone(Loop).CoolingResetLimit)
+                            ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(Loop).CoolingResetLimit;
 
 				} else {
 					// Do nothing
-
-				}}
+                    }
+                }
 			}
 		}
 
 		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
 			if ( ZoneEquipInputsFilled && ! ControlledZonesChecked ) {
 				if ( ! VerifyControlledZoneForThermostat( ComfortControlledZone( Loop ).ZoneName ) ) {
-					ShowSevereError( RoutineName + "Zone=\"" + ComfortControlledZone( Loop ).ZoneName + "\" has specified a Comfort control but is not a controlled zone." );
+                    ShowSevereError(RoutineName + "Zone=\"" + ComfortControlledZone(Loop).ZoneName +
+                                    "\" has specified a Comfort control but is not a controlled zone.");
 					ShowContinueError( "...must have a ZoneHVAC:EquipmentConnections specification for this zone." );
 					ErrorsFound = true;
 				}
@@ -2728,7 +3195,8 @@ namespace ZoneTempPredictorCorrector {
 			if ( ComfortControlledZone( Loop ).ManageDemand ) {
 				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
 
-				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
+                {
+                    auto const SELECT_CASE_var(ComfortControlType(ZoneNum));
 
 				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
 
@@ -2747,115 +3215,31 @@ namespace ZoneTempPredictorCorrector {
 					}
 
 				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
-					if ( ( TempZoneThermostatSetPoint( ZoneNum ) >= ComfortControlledZone( Loop ).HeatingResetLimit ) || ( TempZoneThermostatSetPoint( ZoneNum ) <= ComfortControlledZone( Loop ).CoolingResetLimit ) ) {
+                        if ((TempZoneThermostatSetPoint(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit) ||
+                            (TempZoneThermostatSetPoint(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)) {
 
 						TempControlType( ZoneNum ) = DualSetPointWithDeadBand;
 						ZoneThermostatSetPointLo( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
 						ZoneThermostatSetPointHi( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
 
-						if ( ZoneThermostatSetPointLo( ZoneNum ) >= ComfortControlledZone( Loop ).HeatingResetLimit ) ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).HeatingResetLimit;
-						if ( ZoneThermostatSetPointHi( ZoneNum ) <= ComfortControlledZone( Loop ).CoolingResetLimit ) ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).CoolingResetLimit;
-
+                            if (ZoneThermostatSetPointLo(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit)
+                                ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
+                            if (ZoneThermostatSetPointHi(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)
+                                ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
 					}
 
 				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
 					TempControlType( ZoneNum ) = DualSetPointWithDeadBand;
-					if ( ZoneThermostatSetPointLo( ZoneNum ) >= ComfortControlledZone( Loop ).HeatingResetLimit ) ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).HeatingResetLimit;
-					if ( ZoneThermostatSetPointHi( ZoneNum ) <= ComfortControlledZone( Loop ).CoolingResetLimit ) ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).CoolingResetLimit;
+                        if (ZoneThermostatSetPointLo(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit)
+                            ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
+                        if (ZoneThermostatSetPointHi(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)
+                            ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
 
 				} else {
 					// Do nothing
-
-				}}
-			} //Demand manager
 		}
-
-		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
-			if ( TempControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
-				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
-
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else {
-					// Do nothing
-				}}
 			}
-			if ( TempControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
-				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
-
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-		}
-		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
-			if ( ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
-				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-			if ( ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
-				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-
+            } // Demand manager
 		}
 
 		if ( ErrorsFound ) {
@@ -2865,12 +3249,9 @@ namespace ZoneTempPredictorCorrector {
 		if ( ZoneEquipInputsFilled ) {
 			ControlledZonesChecked = true;
 		}
-
 	}
 
-	void
-	PredictSystemLoads(
-		bool const ShortenTimeStepSys,
+    void PredictSystemLoads(bool const ShortenTimeStepSys,
 		bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
 		Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
 	)
@@ -2909,53 +3290,42 @@ namespace ZoneTempPredictorCorrector {
 		//     the type of system being simulated.
 		// 3.  Calculate zone energy requirements
 
-		// REFERENCES:
-		// na
-
 		// USE STATEMENTS:
 
 		// Using/Aliasing
+        using DataLoopNode::Node;
 		using DataRoomAirModel::AirModel;
-		using DataRoomAirModel::RoomAirModel_Mixing;
 		using DataRoomAirModel::IsZoneDV;
-		using DataRoomAirModel::ZoneDVMixedFlag;
 		using DataRoomAirModel::IsZoneUI;
-		using DataRoomAirModel::ZTFloor;
 		using DataRoomAirModel::MATFloor;
-		using DataRoomAirModel::XMATFloor;
-		using DataRoomAirModel::XM2TFloor;
-		using DataRoomAirModel::XM3TFloor;
-		using DataRoomAirModel::XM4TFloor;
-		using DataRoomAirModel::ZTOC;
-		using DataRoomAirModel::ZTM1OC;
+        using DataRoomAirModel::MATMX;
 		using DataRoomAirModel::MATOC;
-		using DataRoomAirModel::XMATOC;
+        using DataRoomAirModel::RoomAirModel_Mixing;
+        using DataRoomAirModel::XM2TFloor;
+        using DataRoomAirModel::XM2TMX;
 		using DataRoomAirModel::XM2TOC;
+        using DataRoomAirModel::XM3TFloor;
+        using DataRoomAirModel::XM3TMX;
 		using DataRoomAirModel::XM3TOC;
+        using DataRoomAirModel::XM4TFloor;
+        using DataRoomAirModel::XM4TMX;
 		using DataRoomAirModel::XM4TOC;
-		using DataRoomAirModel::ZTMX;
-		using DataRoomAirModel::ZTM1MX;
-		using DataRoomAirModel::MATMX;
+        using DataRoomAirModel::XMATFloor;
 		using DataRoomAirModel::XMATMX;
-		using DataRoomAirModel::XM2TMX;
-		using DataRoomAirModel::XM3TMX;
-		using DataRoomAirModel::XM4TMX;
-		using RoomAirModelAirflowNetwork::LoadPredictionRoomAirModelAirflowNetwork;
+        using DataRoomAirModel::XMATOC;
+        using DataRoomAirModel::ZoneDVMixedFlag;
+        using DataRoomAirModel::ZTFloor;
+        using DataRoomAirModel::ZTM1MX;
+        using DataRoomAirModel::ZTM1OC;
+        using DataRoomAirModel::ZTMX;
+        using DataRoomAirModel::ZTOC;
 		using General::TrimSigDigits;
-		using DataLoopNode::Node;
+        using General::RoundSigDigits;
+        using RoomAirModelAirflowNetwork::LoadPredictionRoomAirModelAirflowNetwork;
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 SumIntGain; // Zone sum of convective internal gains
@@ -2993,11 +3363,16 @@ namespace ZoneTempPredictorCorrector {
 				if ( StageControlledZone( RelativeZoneNum ).HeatSetPoint >= StageControlledZone( RelativeZoneNum ).CoolSetPoint ) {
 					++StageControlledZone( RelativeZoneNum ).StageErrCount;
 					if ( StageControlledZone( RelativeZoneNum ).StageErrCount < 2 ) {
-						ShowWarningError( "ZoneControl:Thermostat:StagedDualSetpoint: The heating setpoint is equal to or above the cooling setpoint in " + StageControlledZone( RelativeZoneNum ).Name );
+                        ShowWarningError(
+                            "ZoneControl:Thermostat:StagedDualSetpoint: The heating setpoint is equal to or above the cooling setpoint in " +
+                            StageControlledZone(RelativeZoneNum).Name);
 						ShowContinueError( "The zone heating setpoint is set to the cooling setpoint - 0.1C." );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( "The heating setpoint is still above the cooling setpoint", StageControlledZone( RelativeZoneNum ).StageErrIndex, StageControlledZone( RelativeZoneNum ).HeatSetPoint, StageControlledZone( RelativeZoneNum ).HeatSetPoint );
+                        ShowRecurringWarningErrorAtEnd("The heating setpoint is still above the cooling setpoint",
+                                                       StageControlledZone(RelativeZoneNum).StageErrIndex,
+                                                       StageControlledZone(RelativeZoneNum).HeatSetPoint,
+                                                       StageControlledZone(RelativeZoneNum).HeatSetPoint);
 					}
 					StageControlledZone( RelativeZoneNum ).HeatSetPoint = StageControlledZone( RelativeZoneNum ).CoolSetPoint - 0.1; //???????????
 				}
@@ -3012,9 +3387,11 @@ namespace ZoneTempPredictorCorrector {
 					}
 					ZoneSysEnergyDemand( ActualZoneNum ).StageNum = Itemp;
 					if ( SetpointOffset >= 0.5 * StageControlledZone( RelativeZoneNum ).CoolThroRange ) {
-						ZoneThermostatSetPointHi( ActualZoneNum ) = StageControlledZone( RelativeZoneNum ).CoolSetPoint - 0.5 * StageControlledZone( RelativeZoneNum ).CoolThroRange;
+                        ZoneThermostatSetPointHi(ActualZoneNum) =
+                            StageControlledZone(RelativeZoneNum).CoolSetPoint - 0.5 * StageControlledZone(RelativeZoneNum).CoolThroRange;
 					} else {
-						ZoneThermostatSetPointHi( ActualZoneNum ) = StageControlledZone( RelativeZoneNum ).CoolSetPoint + 0.5 * StageControlledZone( RelativeZoneNum ).CoolThroRange;
+                        ZoneThermostatSetPointHi(ActualZoneNum) =
+                            StageControlledZone(RelativeZoneNum).CoolSetPoint + 0.5 * StageControlledZone(RelativeZoneNum).CoolThroRange;
 					}
 					ZoneThermostatSetPointLo( ActualZoneNum ) = ZoneThermostatSetPointHi( ActualZoneNum );
 				} else if ( StageControlledZone( RelativeZoneNum ).HeatSetPoint > ZoneT ) { // heating
@@ -3027,24 +3404,145 @@ namespace ZoneTempPredictorCorrector {
 					}
 					ZoneSysEnergyDemand( ActualZoneNum ).StageNum = Itemp;
 					if ( std::abs( SetpointOffset ) >= 0.5 * StageControlledZone( RelativeZoneNum ).CoolThroRange ) {
-						ZoneThermostatSetPointLo( ActualZoneNum ) = StageControlledZone( RelativeZoneNum ).HeatSetPoint + 0.5 * StageControlledZone( RelativeZoneNum ).HeatThroRange;
+                        ZoneThermostatSetPointLo(ActualZoneNum) =
+                            StageControlledZone(RelativeZoneNum).HeatSetPoint + 0.5 * StageControlledZone(RelativeZoneNum).HeatThroRange;
 					} else {
-						ZoneThermostatSetPointLo( ActualZoneNum ) = StageControlledZone( RelativeZoneNum ).HeatSetPoint - 0.5 * StageControlledZone( RelativeZoneNum ).HeatThroRange;
+                        ZoneThermostatSetPointLo(ActualZoneNum) =
+                            StageControlledZone(RelativeZoneNum).HeatSetPoint - 0.5 * StageControlledZone(RelativeZoneNum).HeatThroRange;
 					}
 					ZoneThermostatSetPointHi( ActualZoneNum ) = ZoneThermostatSetPointLo( ActualZoneNum );
 				} else {
-					ZoneThermostatSetPointHi( ActualZoneNum ) = StageControlledZone( RelativeZoneNum ).CoolSetPoint + 0.5 * StageControlledZone( RelativeZoneNum ).CoolThroRange;
-					ZoneThermostatSetPointLo( ActualZoneNum ) = StageControlledZone( RelativeZoneNum ).HeatSetPoint - 0.5 * StageControlledZone( RelativeZoneNum ).HeatThroRange;
+                    ZoneThermostatSetPointHi(ActualZoneNum) =
+                        StageControlledZone(RelativeZoneNum).CoolSetPoint + 0.5 * StageControlledZone(RelativeZoneNum).CoolThroRange;
+                    ZoneThermostatSetPointLo(ActualZoneNum) =
+                        StageControlledZone(RelativeZoneNum).HeatSetPoint - 0.5 * StageControlledZone(RelativeZoneNum).HeatThroRange;
 					ZoneSysEnergyDemand( ActualZoneNum ).StageNum = 0;
 				}
 			}
 		}
 
-		//Tuned Precompute controlled equip zone numbers for performance
-		std::vector< int > controlledZoneEquipConfigNums;
-		for ( int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( Zone( ZoneEquipConfigNum ).IsControlled ) {
-				controlledZoneEquipConfigNums.push_back( ZoneEquipConfigNum );
+        // Setpoint revision for onoff thermostat
+        if (NumOnOffCtrZone > 0) {
+            Real64 TempTole = 0.02;
+            Real64 Tprev;
+            for (RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum) {
+                if (TempControlledZone(RelativeZoneNum).DeltaTCutSet > 0.0) {
+                    if (ShortenTimeStepSys) {
+                        TempControlledZone(RelativeZoneNum).HeatModeLast = TempControlledZone(RelativeZoneNum).HeatModeLastSave;
+                        TempControlledZone(RelativeZoneNum).CoolModeLast = TempControlledZone(RelativeZoneNum).CoolModeLastSave;
+                    } else {
+                        TempControlledZone(RelativeZoneNum).HeatModeLastSave = TempControlledZone(RelativeZoneNum).HeatModeLast;
+                        TempControlledZone(RelativeZoneNum).CoolModeLastSave = TempControlledZone(RelativeZoneNum).CoolModeLast;
+                    }
+                    ZoneNum = TempControlledZone(RelativeZoneNum).ActualZoneNum;
+                    {   auto const SELECT_CASE_var(TempControlType(ZoneNum));
+                    TempControlledZone(RelativeZoneNum).CoolOffFlag = false;
+                    TempControlledZone(RelativeZoneNum).HeatOffFlag = false;
+                    if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                        Tprev = MAT(ZoneNum);
+                        if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
+                    } else {
+                        Tprev = ZoneT1(ZoneNum);
+                    }
+
+                    if (SELECT_CASE_var == SingleHeatingSetPoint) {
+                        TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                        ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                        if (Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempTole) {
+                            TempZoneThermostatSetPoint(ZoneNum) =
+                                TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempControlledZone(RelativeZoneNum).DeltaTCutSet;
+                            ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                        }
+                        else if (Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo &&
+                            (Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo +
+                                TempControlledZone(RelativeZoneNum).DeltaTCutSet - TempTole)) {
+                            TempZoneThermostatSetPoint(ZoneNum) =
+                                TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempControlledZone(RelativeZoneNum).DeltaTCutSet;
+                            ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                        }
+                        else {
+                            TempControlledZone(RelativeZoneNum).HeatOffFlag = true;
+                        }
+                        if (TempControlledZone(RelativeZoneNum).HeatModeLast && Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo) {
+                            TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                            ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                            TempControlledZone(RelativeZoneNum).HeatOffFlag = true;
+                        }
+                    }
+                    else if (SELECT_CASE_var == SingleCoolingSetPoint) {
+                        TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                        ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                        if (Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempTole) {
+                            TempZoneThermostatSetPoint(ZoneNum) =
+                                TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempControlledZone(RelativeZoneNum).DeltaTCutSet;
+                            ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                        }
+                        else if (Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi &&
+                            Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi -
+                            TempControlledZone(RelativeZoneNum).DeltaTCutSet + TempTole) {
+                            TempZoneThermostatSetPoint(ZoneNum) =
+                                TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempControlledZone(RelativeZoneNum).DeltaTCutSet;
+                            ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                        }
+                        else {
+                            TempControlledZone(RelativeZoneNum).CoolOffFlag = true;
+                        }
+                        if (TempControlledZone(RelativeZoneNum).CoolModeLast && Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi) {
+                            TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                            ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                            TempControlledZone(RelativeZoneNum).CoolOffFlag = true;
+                        }
+
+                    }
+                    else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
+                        ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                        ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                        if (Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempTole) {
+                            ZoneThermostatSetPointHi(ZoneNum) =
+                                TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempControlledZone(RelativeZoneNum).DeltaTCutSet;
+                        }
+                        else if (Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi &&
+                            Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi -
+                            TempControlledZone(RelativeZoneNum).DeltaTCutSet + TempTole) {
+                            ZoneThermostatSetPointHi(ZoneNum) =
+                                TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempControlledZone(RelativeZoneNum).DeltaTCutSet;
+                        }
+                        else {
+                            TempControlledZone(RelativeZoneNum).CoolOffFlag = true;
+                        }
+                        if (TempControlledZone(RelativeZoneNum).CoolModeLast && Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi) {
+                            ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                            TempControlledZone(RelativeZoneNum).CoolOffFlag = true;
+                        }
+
+                        if (Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempTole) {
+                            ZoneThermostatSetPointLo(ZoneNum) =
+                                TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempControlledZone(RelativeZoneNum).DeltaTCutSet;
+                        }
+                        else if (Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo &&
+                            (Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo +
+                                TempControlledZone(RelativeZoneNum).DeltaTCutSet - TempTole)) {
+                            ZoneThermostatSetPointLo(ZoneNum) =
+                                TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempControlledZone(RelativeZoneNum).DeltaTCutSet;
+                        }
+                        else {
+                            TempControlledZone(RelativeZoneNum).HeatOffFlag = true;
+                        }
+                        if (TempControlledZone(RelativeZoneNum).HeatModeLast && Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo) {
+                            ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                            TempControlledZone(RelativeZoneNum).HeatOffFlag = true;
+                        }
+                        // check setpoint for both and provde an error message
+                        if (ZoneThermostatSetPointLo(ZoneNum) >= ZoneThermostatSetPointHi(ZoneNum)) {
+                            ShowSevereError("DualSetPointWithDeadBand: When Temperature Difference Between Cutout And Setpoint is applied, the heating "
+                                "setpoint is greater than the cooling setpoint. ");
+                            ShowContinueErrorTimeStamp("occurs in Zone=" + Zone(ZoneNum).Name);
+                            ShowContinueError("Zone Heating ThermostatSetPoint=" + RoundSigDigits(ZoneThermostatSetPointLo(ZoneNum), 2));
+                            ShowContinueError("Zone Cooling ThermostatSetPoint=" + RoundSigDigits(ZoneThermostatSetPointHi(ZoneNum), 2));
+                            ShowFatalError("Program terminates due to above conditions.");
+                        }
+                    }}
+                }
 			}
 		}
 
@@ -3064,37 +3562,110 @@ namespace ZoneTempPredictorCorrector {
 				if ( NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep ) { // cannot reuse existing DS data, interpolate from zone time
 
 					//  MAT(ZoneNum),   XMAT(ZoneNum),   XM2T(ZoneNum),   XM3T(ZoneNum),   XM4T(ZoneNum), &
-					DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, XMAT( ZoneNum ), XM2T( ZoneNum ), XM3T( ZoneNum ), XM4T( ZoneNum ), XM4T( ZoneNum ), MAT( ZoneNum ), DSXMAT( ZoneNum ), DSXM2T( ZoneNum ), DSXM3T( ZoneNum ), DSXM4T( ZoneNum ) );
+                    DownInterpolate4HistoryValues(PriorTimeStep,
+                                                  TimeStepSys,
+                                                  XMAT(ZoneNum),
+                                                  XM2T(ZoneNum),
+                                                  XM3T(ZoneNum),
+                                                  XM4T(ZoneNum),
+                                                  XM4T(ZoneNum),
+                                                  MAT(ZoneNum),
+                                                  DSXMAT(ZoneNum),
+                                                  DSXM2T(ZoneNum),
+                                                  DSXM3T(ZoneNum),
+                                                  DSXM4T(ZoneNum));
 					//     ZoneAirHumRat(ZoneNum),   WZoneTimeMinus1(ZoneNum),   WZoneTimeMinus2(ZoneNum),   &
 					//                                 WZoneTimeMinus3(ZoneNum),   WZoneTimeMinus4(ZoneNum), &
-					DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, WZoneTimeMinus1( ZoneNum ), WZoneTimeMinus2( ZoneNum ), WZoneTimeMinus3( ZoneNum ), WZoneTimeMinus4( ZoneNum ), WZoneTimeMinus4( ZoneNum ), ZoneAirHumRat( ZoneNum ), DSWZoneTimeMinus1( ZoneNum ), DSWZoneTimeMinus2( ZoneNum ), DSWZoneTimeMinus3( ZoneNum ), DSWZoneTimeMinus4( ZoneNum ) );
+                    DownInterpolate4HistoryValues(PriorTimeStep,
+                                                  TimeStepSys,
+                                                  WZoneTimeMinus1(ZoneNum),
+                                                  WZoneTimeMinus2(ZoneNum),
+                                                  WZoneTimeMinus3(ZoneNum),
+                                                  WZoneTimeMinus4(ZoneNum),
+                                                  WZoneTimeMinus4(ZoneNum),
+                                                  ZoneAirHumRat(ZoneNum),
+                                                  DSWZoneTimeMinus1(ZoneNum),
+                                                  DSWZoneTimeMinus2(ZoneNum),
+                                                  DSWZoneTimeMinus3(ZoneNum),
+                                                  DSWZoneTimeMinus4(ZoneNum));
 
 					if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
 
 						//   MATFloor(ZoneNum),   XMATFloor(ZoneNum),    XM2TFloor(ZoneNum),  &
 						//                        XM3TFloor(ZoneNum),    XM4TFloor(ZoneNum) ,   &
-						DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, XMATFloor( ZoneNum ), XM2TFloor( ZoneNum ), XM3TFloor( ZoneNum ), XM4TFloor( ZoneNum ), XM4TFloor( ZoneNum ), MATFloor( ZoneNum ), DSXMATFloor( ZoneNum ), DSXM2TFloor( ZoneNum ), DSXM3TFloor( ZoneNum ), DSXM4TFloor( ZoneNum ) );
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      XMATFloor(ZoneNum),
+                                                      XM2TFloor(ZoneNum),
+                                                      XM3TFloor(ZoneNum),
+                                                      XM4TFloor(ZoneNum),
+                                                      XM4TFloor(ZoneNum),
+                                                      MATFloor(ZoneNum),
+                                                      DSXMATFloor(ZoneNum),
+                                                      DSXM2TFloor(ZoneNum),
+                                                      DSXM3TFloor(ZoneNum),
+                                                      DSXM4TFloor(ZoneNum));
 						//      MATOC(ZoneNum),   XMATOC(ZoneNum),    XM2TOC(ZoneNum),  &
 						//                        XM3TOC(ZoneNum),    XM4TOC(ZoneNum) ,   &
-						DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, XMATOC( ZoneNum ), XM2TOC( ZoneNum ), XM3TOC( ZoneNum ), XM4TOC( ZoneNum ), XM4TOC( ZoneNum ), MATOC( ZoneNum ), DSXMATOC( ZoneNum ), DSXM2TOC( ZoneNum ), DSXM3TOC( ZoneNum ), DSXM4TOC( ZoneNum ) );
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      XMATOC(ZoneNum),
+                                                      XM2TOC(ZoneNum),
+                                                      XM3TOC(ZoneNum),
+                                                      XM4TOC(ZoneNum),
+                                                      XM4TOC(ZoneNum),
+                                                      MATOC(ZoneNum),
+                                                      DSXMATOC(ZoneNum),
+                                                      DSXM2TOC(ZoneNum),
+                                                      DSXM3TOC(ZoneNum),
+                                                      DSXM4TOC(ZoneNum));
 						//  MATMX(ZoneNum),   XMATMX(ZoneNum),    XM2TMX(ZoneNum),  &
 						//                    XM3TMX(ZoneNum),    XM4TMX(ZoneNum) ,   &
-						DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, XMATMX( ZoneNum ), XM2TMX( ZoneNum ), XM3TMX( ZoneNum ), XM4TMX( ZoneNum ), XM4TMX( ZoneNum ), MATMX( ZoneNum ), DSXMATMX( ZoneNum ), DSXM2TMX( ZoneNum ), DSXM3TMX( ZoneNum ), DSXM4TMX( ZoneNum ) );
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      XMATMX(ZoneNum),
+                                                      XM2TMX(ZoneNum),
+                                                      XM3TMX(ZoneNum),
+                                                      XM4TMX(ZoneNum),
+                                                      XM4TMX(ZoneNum),
+                                                      MATMX(ZoneNum),
+                                                      DSXMATMX(ZoneNum),
+                                                      DSXM2TMX(ZoneNum),
+                                                      DSXM3TMX(ZoneNum),
+                                                      DSXM4TMX(ZoneNum));
 					}
 					if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
 						for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
 							auto & ThisRAFNNode( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ) );
-							DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ThisRAFNNode.AirTemp, ThisRAFNNode.AirTempX1, ThisRAFNNode.AirTempX2, ThisRAFNNode.AirTempX3, ThisRAFNNode.AirTempX4,
-								ThisRAFNNode.AirTemp, ThisRAFNNode.AirTempDSX1, ThisRAFNNode.AirTempDSX2, ThisRAFNNode.AirTempDSX3, ThisRAFNNode.AirTempDSX4 );
-							DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ThisRAFNNode.HumRat, ThisRAFNNode.HumRatX1, ThisRAFNNode.HumRatX2, ThisRAFNNode.HumRatX3, ThisRAFNNode.HumRatX4,
-								ThisRAFNNode.HumRat, ThisRAFNNode.HumRatDSX1, ThisRAFNNode.HumRatDSX2, ThisRAFNNode.HumRatDSX3, ThisRAFNNode.HumRatDSX4 );
+                            DownInterpolate4HistoryValues(PriorTimeStep,
+                                                          TimeStepSys,
+                                                          ThisRAFNNode.AirTemp,
+                                                          ThisRAFNNode.AirTempX1,
+                                                          ThisRAFNNode.AirTempX2,
+                                                          ThisRAFNNode.AirTempX3,
+                                                          ThisRAFNNode.AirTempX4,
+                                                          ThisRAFNNode.AirTemp,
+                                                          ThisRAFNNode.AirTempDSX1,
+                                                          ThisRAFNNode.AirTempDSX2,
+                                                          ThisRAFNNode.AirTempDSX3,
+                                                          ThisRAFNNode.AirTempDSX4);
+                            DownInterpolate4HistoryValues(PriorTimeStep,
+                                                          TimeStepSys,
+                                                          ThisRAFNNode.HumRat,
+                                                          ThisRAFNNode.HumRatX1,
+                                                          ThisRAFNNode.HumRatX2,
+                                                          ThisRAFNNode.HumRatX3,
+                                                          ThisRAFNNode.HumRatX4,
+                                                          ThisRAFNNode.HumRat,
+                                                          ThisRAFNNode.HumRatDSX1,
+                                                          ThisRAFNNode.HumRatDSX2,
+                                                          ThisRAFNNode.HumRatDSX3,
+                                                          ThisRAFNNode.HumRatDSX4);
 						}
 					}
 				} else { // reuse history data in DS terms from last zone time step to preserve information that would be lost
 					// do nothing because DS history would have been pushed prior and should be ready
-
 				}
-
 			}
 			// now update the variables actually used in the balance equations.
 			if ( UseZoneTimeStepHistory ) {
@@ -3114,17 +3685,18 @@ namespace ZoneTempPredictorCorrector {
 				WZoneTimeMinus1Temp( ZoneNum ) = DSWZoneTimeMinus1( ZoneNum );
 				WZoneTimeMinus2Temp( ZoneNum ) = DSWZoneTimeMinus2( ZoneNum );
 				WZoneTimeMinus3Temp( ZoneNum ) = DSWZoneTimeMinus3( ZoneNum );
-
 			}
 
-			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+            AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
+                              PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                              PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)) / (TimeStepSys * SecInHour);
 			AirCap = AIRRAT( ZoneNum );
 			RAFNFrac = 0.0;
 
 			// Calculate the various heat balance sums
 
 			// NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+            CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
 			TempDepCoef = SumHA + SumMCp;
 			TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SysDepZoneLoadsLagged( ZoneNum );
@@ -3147,20 +3719,22 @@ namespace ZoneTempPredictorCorrector {
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed ) {
 					RoomAirNode = RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID;
 					LoadPredictionRoomAirModelAirflowNetwork( ZoneNum, RoomAirNode );
-					TempDepCoef = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHA + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkMCp;
-					TempIndCoef = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumIntSensibleGain
-						+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHATsurf
-						- RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHATref
-						+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkMCpT + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SysDepZoneLoadsLagged;
-					AirCap = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirVolume * Zone( ZoneNum ).ZoneVolCapMultpSens
-						* RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).RhoAir
-						* RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).CpAir
-						/ ( TimeStepSys*SecInHour );
+                    TempDepCoef = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHA +
+                                  RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMCp;
+                    TempIndCoef = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain +
+                                  RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHATsurf -
+                                  RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHATref +
+                                  RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMCpT +
+                                  RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SysDepZoneLoadsLagged;
+                    AirCap = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirVolume * Zone(ZoneNum).ZoneVolCapMultpSens *
+                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir *
+                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir / (TimeStepSys * SecInHour);
 					AIRRAT( ZoneNum ) = AirCap;
 					TempHistoryTerm = AirCap * ( 3.0 * ZTM1( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3( ZoneNum ) );
 					TempDepZnLd( ZoneNum ) = ( 11.0 / 6.0 ) * AirCap + TempDepCoef;
 					TempIndZnLd( ZoneNum ) = TempHistoryTerm + TempIndCoef;
-					if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).HasHVACAssigned ) RAFNFrac = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).HVAC( 1 ).SupplyFraction;
+                    if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HasHVACAssigned)
+                        RAFNFrac = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HVAC(1).SupplyFraction;
 				}
 			} else { // other imperfectly mixed room models
 				TempHistoryTerm = AirCap * ( 3.0 * ZTM1( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3( ZoneNum ) );
@@ -3177,8 +3751,10 @@ namespace ZoneTempPredictorCorrector {
 						ZoneW1( ZoneNum ) = ZoneWM2( ZoneNum );
 						if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
 							for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
-								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTM2;
-								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWM2;
+                                RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
+                                    RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTM2;
+                                RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatW1 =
+                                    RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatWM2;
 							}
 						}
 					} else {
@@ -3186,8 +3762,10 @@ namespace ZoneTempPredictorCorrector {
 						ZoneW1( ZoneNum ) = ZoneWMX( ZoneNum );
 						if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
 							for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
-								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX;
-								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX;
+                                RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
+                                    RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX;
+                                RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatW1 =
+                                    RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatWMX;
 					}
 						}
 					}
@@ -3211,13 +3789,29 @@ namespace ZoneTempPredictorCorrector {
 
 			// Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
 			CalcPredictedHumidityRatio( ZoneNum, RAFNFrac );
+        }
 
+        if (NumOnOffCtrZone > 0) {
+            for (RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum) {
+                if (TempControlledZone(RelativeZoneNum).DeltaTCutSet > 0.0) {
+                    ZoneNum = TempControlledZone(RelativeZoneNum).ActualZoneNum;
+                    if (TempControlledZone(RelativeZoneNum).CoolOffFlag && ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired >= 0.0) {
+                        TempControlledZone(RelativeZoneNum).CoolModeLast = true;
+                    } else {
+                        TempControlledZone(RelativeZoneNum).CoolModeLast = false;
+                    }
+                    if (TempControlledZone(RelativeZoneNum).HeatOffFlag && ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired <= 0.0) {
+                        TempControlledZone(RelativeZoneNum).HeatModeLast = true;
+                    } else {
+                        TempControlledZone(RelativeZoneNum).HeatModeLast = false;
+                    }
+                }
+            }
 		}
 
 	}
 
-	void
-	CalcZoneAirTempSetPoints()
+    void CalcZoneAirTempSetPoints()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3231,32 +3825,14 @@ namespace ZoneTempPredictorCorrector {
 		// This routine sets what the setpoints for each controlled zone should be based on schedules.
 		// This is called each time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
+        using DataZoneControls::OccRoomTSetPointCool;
+        using DataZoneControls::OccRoomTSetPointHeat;
+        using General::TrimSigDigits;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleValuesForDay;
-		using General::TrimSigDigits;
-		using DataZoneControls::OccRoomTSetPointHeat;
-		using DataZoneControls::OccRoomTSetPointCool;
-		using InputProcessor::SameString;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RelativeZoneNum;
@@ -3269,6 +3845,7 @@ namespace ZoneTempPredictorCorrector {
 		int SchedTypeIndex;
 		Array2D< Real64 > DaySPValues; // Day room temp setpoint values - for optimum start
 		int OccStartTime; // Occupancy start time - for optimum start
+        Real64 DeltaT;               // Temperature difference between cutout and setpoint
 
 		// FLOW:
 		TempControlType = 0; // Default
@@ -3282,6 +3859,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 		OccRoomTSetPointHeat = 0.0;
 		OccRoomTSetPointCool = 100.0;
+        DeltaT = 0.0;
 
 		for ( RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum ) {
 
@@ -3289,10 +3867,11 @@ namespace ZoneTempPredictorCorrector {
 			ActualZoneNum = TempControlledZone( RelativeZoneNum ).ActualZoneNum;
 			TempControlSchedIndex = TempControlledZone( RelativeZoneNum ).CTSchedIndex;
 			TempControlType( ActualZoneNum ) = GetCurrentScheduleValue( TempControlSchedIndex );
-
 			// Error detection for these values is done in the Get routine
 
-			{ auto const SELECT_CASE_var( TempControlType( ActualZoneNum ) ); // Is this missing the possibility of sometimes having no control on a zone
+            {
+                auto const SELECT_CASE_var(
+                    TempControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
 			// during the simulation?
 			if ( SELECT_CASE_var == 0 ) { // Uncontrolled
 
@@ -3304,6 +3883,8 @@ namespace ZoneTempPredictorCorrector {
 
 				SetPointTempSchedIndex = SetPointSingleHeating( SchedTypeIndex ).TempSchedIndex;
 				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );			
+                    TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo = TempZoneThermostatSetPoint(ActualZoneNum);
+
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				ZoneThermostatSetPointLo( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
 				//        ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
@@ -3316,6 +3897,7 @@ namespace ZoneTempPredictorCorrector {
 
 				SetPointTempSchedIndex = SetPointSingleCooling( SchedTypeIndex ).TempSchedIndex;
 				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
+                    TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = TempZoneThermostatSetPoint(ActualZoneNum);
 
 				//Added Jan 17 (X. Luo)
 				//Adjust operative temperature based on adaptive comfort model
@@ -3324,7 +3906,6 @@ namespace ZoneTempPredictorCorrector {
 					AdapComfortCoolingSetPoint( ActualZoneNum ) = TempZoneThermostatSetPoint ( ActualZoneNum );
 				}
 				
-
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				ZoneThermostatSetPointHi( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
 				//        ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
@@ -3380,6 +3961,7 @@ namespace ZoneTempPredictorCorrector {
 				SetPointTempSchedIndexHot = SetPointDualHeatCool( SchedTypeIndex ).HeatTempSchedIndex;
 				SetPointTempSchedIndexCold = SetPointDualHeatCool( SchedTypeIndex ).CoolTempSchedIndex;
 				ZoneThermostatSetPointHi( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexCold );
+                    TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = ZoneThermostatSetPointHi(ActualZoneNum);
 
 				//Added Jan 17 (X. Luo)
 				//Adjust operative temperature based on adaptive comfort model
@@ -3391,6 +3973,7 @@ namespace ZoneTempPredictorCorrector {
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointHi( ActualZoneNum ) );
 
 				ZoneThermostatSetPointLo( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexHot );
+                    TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo = ZoneThermostatSetPointLo(ActualZoneNum);
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointLo( ActualZoneNum ) );
 
 				//Change the room set point to occupied set point during optimum start period--------------
@@ -3417,9 +4000,11 @@ namespace ZoneTempPredictorCorrector {
 				AdjustCoolingSetPointforTempAndHumidityControl( RelativeZoneNum, ActualZoneNum );
 
 			} else {
-				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( TempControlType( ActualZoneNum ) ) + ", in Schedule=" + TempControlledZone( RelativeZoneNum ).ControlTypeSchedName );
-
-			}}
+                    ShowSevereError("CalcZoneAirTempSetpoints: Illegal control type for Zone=" + Zone(ActualZoneNum).Name +
+                                    ", Found value=" + TrimSigDigits(TempControlType(ActualZoneNum)) +
+                                    ", in Schedule=" + TempControlledZone(RelativeZoneNum).ControlTypeSchedName);
+                }
+            }
 
 			//Apply offset for faulty therostats_Feb. 2015, zrp
 			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )) {
@@ -3427,7 +4012,7 @@ namespace ZoneTempPredictorCorrector {
 				//  loop through the FaultsThermostatOffset objects to find the one for the zone
 				for ( int iFault = 1; iFault <= NumFaultyThermostat; ++iFault ) {
 
-					if ( SameString( TempControlledZone( RelativeZoneNum ).Name, FaultsThermostatOffset( iFault ).FaultyThermostatName ) ) {
+                    if (UtilityRoutines::SameString(TempControlledZone(RelativeZoneNum).Name, FaultsThermostatOffset(iFault).FaultyThermostatName)) {
 
 						// Check fault availability schedules
 						if ( GetCurrentScheduleValue( FaultsThermostatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
@@ -3451,15 +4036,12 @@ namespace ZoneTempPredictorCorrector {
 					}
 				}
 			}
-
 		}
 
 		if ( NumComfortControlledZones > 0 ) CalcZoneAirComfortSetPoints();
-
 	}
 
-	void
-	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac )
+    void CalcPredictedSystemLoad(int const ZoneNum, Real64 RAFNFrac)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3471,28 +4053,10 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates the predicted system load for a time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using ScheduleManager::GetCurrentScheduleValue;
 		using DataLoopNode::Node;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+        using ScheduleManager::GetCurrentScheduleValue;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 LoadToHeatingSetPoint;
@@ -3514,11 +4078,6 @@ namespace ZoneTempPredictorCorrector {
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = 0.0;
 
 		} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-			// Determine zone load based on
-			// Qload + Qsys = 0 and Qsys = mCp(Tsys-Tzone)
-			// System Load Sign Convention:
-			//     - -> Cooling required to reach setpoint
-			//     + -> Heating required to reach setpoint
 
 			//PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
 			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
@@ -3529,10 +4088,13 @@ namespace ZoneTempPredictorCorrector {
 					LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 				} else {
 					Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
-					LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
+                        LoadToHeatingSetPoint =
+                            TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            TempIndZnLd(ZoneNum);
 				}
 			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
-				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum );
+                    LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
+                                            TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - TempIndZnLd(ZoneNum);
 			}
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
@@ -3552,12 +4114,18 @@ namespace ZoneTempPredictorCorrector {
 					LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 				} else {
 					Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
-					LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
+                        LoadToCoolingSetPoint =
+                            TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            TempIndZnLd(ZoneNum);
 				}
 			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
-				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
+                    LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
+                                            TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
 			}
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                    LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - TempIndZnLd(ZoneNum);
+                }
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToHeatingSetPoint = LoadToCoolingSetPoint;
@@ -3579,16 +4147,26 @@ namespace ZoneTempPredictorCorrector {
 					LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 				} else {
 					Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
-					LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
-					LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
+                        LoadToHeatingSetPoint =
+                            TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            TempIndZnLd(ZoneNum);
+                        LoadToCoolingSetPoint =
+                            TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            TempIndZnLd(ZoneNum);
 				}
 			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
-				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
-				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
+                    LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
+                                            TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
+                    LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
+                                            TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
 			}
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
+
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                    LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - TempIndZnLd(ZoneNum);
+                }
 
 			//PH 3/2/04      ZoneSysEnergyDemand(ZoneNum)%TotalOutputRequired = LoadToHeatingSetPoint ! = LoadToCoolingSetPoint
 			// Note that LoadToHeatingSetPoint is generally not equal to LoadToCoolingSetPoint
@@ -3603,9 +4181,11 @@ namespace ZoneTempPredictorCorrector {
 			// 4/  LoadToHeatingSetPoint <=0 & LoadToCoolingSetPoint >=0 -->  Dead Band Operation ! includes zero load cases
 			// First trap bad set-points
 			if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
-				ShowSevereError( "SingleHeatCoolSetPoint: Effective heating set-point higher than effective cooling set-point - use DualSetPointWithDeadBand if using unmixed air model" );
+                    ShowSevereError("SingleHeatCoolSetPoint: Effective heating set-point higher than effective cooling set-point - use "
+                                    "DualSetPointWithDeadBand if using unmixed air model");
 				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
-				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+                    ShowContinueError("LoadToHeatingSetPoint=" + RoundSigDigits(LoadToHeatingSetPoint, 3) +
+                                      ", LoadToCoolingSetPoint=" + RoundSigDigits(LoadToCoolingSetPoint, 3));
 				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone TempIndZnLd=" + RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone ThermostatSetPoint=" + RoundSigDigits( TempZoneThermostatSetPoint( ZoneNum ), 2 ) );
@@ -3625,9 +4205,11 @@ namespace ZoneTempPredictorCorrector {
 				}
 				DeadBandOrSetback( ZoneNum ) = true;
 			} else { // this should never occur!
-				ShowSevereError( "SingleHeatCoolSetPoint: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team" );
+                    ShowSevereError(
+                        "SingleHeatCoolSetPoint: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team");
 				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
-				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+                    ShowContinueError("LoadToHeatingSetPoint=" + RoundSigDigits(LoadToHeatingSetPoint, 3) +
+                                      ", LoadToCoolingSetPoint=" + RoundSigDigits(LoadToCoolingSetPoint, 3));
 				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone TempIndZnLd=" + RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone ThermostatSetPoint=" + RoundSigDigits( TempZoneThermostatSetPoint( ZoneNum ), 2 ) );
@@ -3646,15 +4228,25 @@ namespace ZoneTempPredictorCorrector {
 					LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 				} else {
 					Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
-					LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
-					LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
+                        LoadToHeatingSetPoint =
+                            TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            TempIndZnLd(ZoneNum);
+                        LoadToCoolingSetPoint =
+                            TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            TempIndZnLd(ZoneNum);
 				}
 			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
-				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ZoneThermostatSetPointLo( ZoneNum ) - TempIndZnLd( ZoneNum );
-				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ZoneThermostatSetPointHi( ZoneNum ) - TempIndZnLd( ZoneNum );
+                    LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) +
+                                            TempDepZnLd(ZoneNum) * ZoneThermostatSetPointLo(ZoneNum) - TempIndZnLd(ZoneNum);
+                    LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) +
+                                            TempDepZnLd(ZoneNum) * ZoneThermostatSetPointHi(ZoneNum) - TempIndZnLd(ZoneNum);
 			}
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
+
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                    LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - TempIndZnLd(ZoneNum);
+                }
 
 			// Possible combinations:
 			// 1/  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required
@@ -3664,15 +4256,18 @@ namespace ZoneTempPredictorCorrector {
 			// 4/  LoadToHeatingSetPoint <=0 & LoadToCoolingSetPoint >=0 -->  Dead Band Operation - includes zero load cases
 			// First trap bad set-points
 			if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
-				ShowSevereError( "DualSetPointWithDeadBand: Effective heating set-point higher than effective cooling set-point - increase deadband if using unmixed air model" );
+                    ShowSevereError("DualSetPointWithDeadBand: Effective heating set-point higher than effective cooling set-point - increase "
+                                    "deadband if using unmixed air model");
 				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
-				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+                    ShowContinueError("LoadToHeatingSetPoint=" + RoundSigDigits(LoadToHeatingSetPoint, 3) +
+                                      ", LoadToCoolingSetPoint=" + RoundSigDigits(LoadToCoolingSetPoint, 3));
 				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone TempIndZnLd=" + RoundSigDigits( TempIndZnLd( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone Heating ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone Cooling ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
+
 			if ( LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0 ) {
 				ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 				ZoneSetPoint = ZoneThermostatSetPointLo( ZoneNum );
@@ -3689,9 +4284,11 @@ namespace ZoneTempPredictorCorrector {
 				}
 				DeadBandOrSetback( ZoneNum ) = true;
 			} else { // this should never occur!
-				ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team" );
+                    ShowSevereError(
+                        "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team");
 				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
-				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+                    ShowContinueError("LoadToHeatingSetPoint=" + RoundSigDigits(LoadToHeatingSetPoint, 3) +
+                                      ", LoadToCoolingSetPoint=" + RoundSigDigits(LoadToCoolingSetPoint, 3));
 				ShowContinueError( "Zone Heating Set-point=" + RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone Cooling Set-point=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
@@ -3700,8 +4297,8 @@ namespace ZoneTempPredictorCorrector {
 
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
-
-		}}
+            }
+        }
 
 		// Staged control zone
 		if ( NumStageCtrZone > 0 ) {
@@ -3724,10 +4321,13 @@ namespace ZoneTempPredictorCorrector {
 							LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 						} else {
 							Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
-							LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
+                            LoadToCoolingSetPoint =
+                                TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                                TempIndZnLd(ZoneNum);
 						}
 					} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
-						LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ZoneThermostatSetPointHi( ZoneNum ) - TempIndZnLd( ZoneNum );
+                        LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) +
+                                                TempDepZnLd(ZoneNum) * ZoneThermostatSetPointHi(ZoneNum) - TempIndZnLd(ZoneNum);
 					}
 					ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 					ZoneSetPoint = ZoneThermostatSetPointHi( ZoneNum );
@@ -3742,10 +4342,13 @@ namespace ZoneTempPredictorCorrector {
 							LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 						} else {
 							Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
-							LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
+                            LoadToHeatingSetPoint =
+                                TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                                TempIndZnLd(ZoneNum);
 						}
 					} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
-						LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) ) - TempIndZnLd( ZoneNum );
+                        LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) +
+                                                TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum)) - TempIndZnLd(ZoneNum);
 					}
 					ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 					ZoneSetPoint = ZoneThermostatSetPointLo( ZoneNum );
@@ -3777,18 +4380,23 @@ namespace ZoneTempPredictorCorrector {
 
 		// Apply the Zone Multiplier and Load Correction factor to the total zone load
 		ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired *= Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * LoadCorrectionFactor( ZoneNum );
-		ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP = LoadToHeatingSetPoint * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * LoadCorrectionFactor( ZoneNum );
-		ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP = LoadToCoolingSetPoint * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * LoadCorrectionFactor( ZoneNum );
+        ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP =
+            LoadToHeatingSetPoint * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier * LoadCorrectionFactor(ZoneNum);
+        ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP =
+            LoadToCoolingSetPoint * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier * LoadCorrectionFactor(ZoneNum);
 
 		//init each sequenced demand to the full output
-		if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired; // array assignment
-		if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP; // array assignment
-		if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP; // array assignment
-
+        if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired))
+            ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired; // array assignment
+        if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
+            ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP =
+                ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP; // array assignment
+        if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
+            ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
+                ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
 	}
 
-	void
-	CalcPredictedHumidityRatio( int const ZoneNum, Real64 RAFNFrac )
+    void CalcPredictedHumidityRatio(int const ZoneNum, Real64 RAFNFrac)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3809,24 +4417,17 @@ namespace ZoneTempPredictorCorrector {
 		// for BLAST.
 
 		// Using/Aliasing
-		using ScheduleManager::GetCurrentScheduleValue;
-		using General::RoundSigDigits;
-		using DataSurfaces::Surface;
 		using DataSurfaces::HeatTransferModel_EMPD;
 		using DataSurfaces::HeatTransferModel_HAMT;
-		using InputProcessor::SameString;
+        using DataSurfaces::Surface;
+        using General::RoundSigDigits;
+        using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcPredictedHumidityRatio" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 LatentGain; // Zone latent load
@@ -3879,9 +4480,10 @@ namespace ZoneTempPredictorCorrector {
 				//  loop through the FaultsHumidistatOffset objects to find the one for the zone
 				for ( int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault ) {
 
-					if ( SameString( HumidityControlZone( HumidControlledZoneNum ).ControlName, FaultsHumidistatOffset( iFault ).FaultyHumidistatName ) ) {
+                    if (UtilityRoutines::SameString(HumidityControlZone(HumidControlledZoneNum).ControlName,
+                                                    FaultsHumidistatOffset(iFault).FaultyHumidistatName)) {
 
-						if ( SameString( FaultsHumidistatOffset( iFault ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
+                        if (UtilityRoutines::SameString(FaultsHumidistatOffset(iFault).FaultyHumidistatType, "ThermostatOffsetDependent")) {
 						// For Humidistat Offset Type I: ThermostatOffsetDependent
 
 							bool IsThermostatFound = false;
@@ -3897,7 +4499,8 @@ namespace ZoneTempPredictorCorrector {
 								//  loop through the FaultsThermostatOffset objects to find the one causes the Humidistat Offset
 								for ( int iFaultThermo = 1; iFaultThermo <= NumFaultyThermostat; ++iFaultThermo ) {
 
-									if ( SameString( FaultsHumidistatOffset( iFault ).FaultyThermostatName, FaultsThermostatOffset( iFaultThermo ).Name ) ) {
+                                    if (UtilityRoutines::SameString(FaultsHumidistatOffset(iFault).FaultyThermostatName,
+                                                                    FaultsThermostatOffset(iFaultThermo).Name)) {
 										IsThermostatFound = true;
 
 										// Check fault availability schedules
@@ -3919,16 +4522,22 @@ namespace ZoneTempPredictorCorrector {
 
 							// The FaultsThermostatOffset specified in the FaultHumidistatOffset is not found
 							if ( ! IsThermostatFound ) {
-								ShowSevereError( "FaultModel:HumidistatOffset = \"" + FaultsHumidistatOffset( iFault ).Name + "\" invalid Reference Humidistat Offset Name = \"" + FaultsHumidistatOffset( iFault ).FaultyThermostatName + "\" not found." );
+                                ShowSevereError("FaultModel:HumidistatOffset = \"" + FaultsHumidistatOffset(iFault).Name +
+                                                "\" invalid Reference Humidistat Offset Name = \"" +
+                                                FaultsHumidistatOffset(iFault).FaultyThermostatName + "\" not found.");
 								ShowFatalError( "Errors getting FaultModel input data.  Preceding condition(s) cause termination." );
 							}
 
 							if ( offsetThermostat != 0.0 ) {
 								// Calculate the humidistat offset value from the thermostat offset value
-								faultZoneWHumidifyingSetPoint = PsyWFnTdbRhPb( ( MAT( ZoneNum ) + offsetThermostat ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress );
-								faultZoneWDehumidifyingSetPoint = PsyWFnTdbRhPb( ( MAT( ZoneNum ) + offsetThermostat ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress );
-								offsetZoneRHHumidifyingSetPoint = ZoneRHHumidifyingSetPoint - PsyRhFnTdbWPb( MAT( ZoneNum ), faultZoneWHumidifyingSetPoint, OutBaroPress ) * 100.0;
-								offsetZoneRHDehumidifyingSetPoint = ZoneRHDehumidifyingSetPoint - PsyRhFnTdbWPb( MAT( ZoneNum ), faultZoneWDehumidifyingSetPoint, OutBaroPress ) * 100.0;
+                                faultZoneWHumidifyingSetPoint =
+                                    PsyWFnTdbRhPb((MAT(ZoneNum) + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), OutBaroPress);
+                                faultZoneWDehumidifyingSetPoint =
+                                    PsyWFnTdbRhPb((MAT(ZoneNum) + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), OutBaroPress);
+                                offsetZoneRHHumidifyingSetPoint =
+                                    ZoneRHHumidifyingSetPoint - PsyRhFnTdbWPb(MAT(ZoneNum), faultZoneWHumidifyingSetPoint, OutBaroPress) * 100.0;
+                                offsetZoneRHDehumidifyingSetPoint =
+                                    ZoneRHDehumidifyingSetPoint - PsyRhFnTdbWPb(MAT(ZoneNum), faultZoneWDehumidifyingSetPoint, OutBaroPress) * 100.0;
 
 								// Apply the calculated humidistat offset value
 								// Positive offset means the sensor reading is higher than the actual value
@@ -3962,7 +4571,6 @@ namespace ZoneTempPredictorCorrector {
 								ZoneRHHumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHHumidifyingSetPoint ) );
 								ZoneRHDehumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHDehumidifyingSetPoint ) );
 							}
-
 						}
 
 						// Stop searching the FaultsHumidistatOffset object for the zone
@@ -3975,11 +4583,15 @@ namespace ZoneTempPredictorCorrector {
 			if ( ZoneRHHumidifyingSetPoint > ZoneRHDehumidifyingSetPoint ) {
 				//      HumidityControlZone(HumidControlledZoneNum)%ErrorCount = HumidityControlZone(HumidControlledZoneNum)%ErrorCount + 1
 				if ( HumidityControlZone( HumidControlledZoneNum ).ErrorIndex == 0 ) {
-					ShowWarningMessage( "HUMIDISTAT: The humidifying setpoint is above the dehumidifying setpoint in " + HumidityControlZone( HumidControlledZoneNum ).ControlName );
+                    ShowWarningMessage("HUMIDISTAT: The humidifying setpoint is above the dehumidifying setpoint in " +
+                                       HumidityControlZone(HumidControlledZoneNum).ControlName);
 					ShowContinueError( "The zone humidifying setpoint is set to the dehumidifying setpoint." );
 					ShowContinueErrorTimeStamp( "Occurrence info:" );
 				}
-				ShowRecurringWarningErrorAtEnd( "The humidifying setpoint is still above the dehumidifying setpoint", HumidityControlZone( HumidControlledZoneNum ).ErrorIndex, ZoneRHHumidifyingSetPoint, ZoneRHHumidifyingSetPoint );
+                ShowRecurringWarningErrorAtEnd("The humidifying setpoint is still above the dehumidifying setpoint",
+                                               HumidityControlZone(HumidControlledZoneNum).ErrorIndex,
+                                               ZoneRHHumidifyingSetPoint,
+                                               ZoneRHHumidifyingSetPoint);
 				ZoneRHHumidifyingSetPoint = ZoneRHDehumidifyingSetPoint;
 			}
 			if ( ZoneRHHumidifyingSetPoint == ZoneRHDehumidifyingSetPoint ) SingleSetPoint = true;
@@ -4020,13 +4632,17 @@ namespace ZoneTempPredictorCorrector {
 			H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
 
 			// Assume that the system will have flow
-			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+            if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
+                (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated)) {
 				// Multizone airflow calculated in AirflowNetwork
-				B = ( LatentGain / H2OHtOfVap ) + AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW + SumHmARaW( ZoneNum );
+                B = (LatentGain / H2OHtOfVap) + AirflowNetworkExchangeData(ZoneNum).SumMHrW + AirflowNetworkExchangeData(ZoneNum).SumMMHrW +
+                    SumHmARaW(ZoneNum);
 				A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
 			} else {
-				B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
-				A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+                B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) +
+                    SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+                A = OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
+                    MDotOA(ZoneNum);
 			}
 			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
@@ -4035,10 +4651,10 @@ namespace ZoneTempPredictorCorrector {
 				H2OHtOfVap = PsyHgAirFnWTdb( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).HumRat,
 					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirTemp );
 				A = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkM + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHmARa;
-				B = ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumIntLatentGain / H2OHtOfVap )
-					+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkMW + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHmARaW;
-				C = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).RhoAir * RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirVolume
-					* Zone( ZoneNum ).ZoneVolCapMultpMoist / ( SecInHour * TimeStepSys );
+                B = (RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain / H2OHtOfVap) +
+                    RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMW + RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW;
+                C = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir * RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirVolume *
+                    Zone(ZoneNum).ZoneVolCapMultpMoist / (SecInHour * TimeStepSys);
 			}
 
 			// Use a 3rd Order derivative to predict zone moisture addition or removal and
@@ -4049,7 +4665,9 @@ namespace ZoneTempPredictorCorrector {
 			WZoneSetPoint = PsyWFnTdbRhPb( ZT( ZoneNum ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress, RoutineName );
 			Real64 exp_700_A_C( 0.0 );
 			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
-				LoadToHumidifySetPoint = ( ( 11.0 / 6.0 ) * C + A ) * WZoneSetPoint - ( B + C * ( 3.0 * WZoneTimeMinus1Temp( ZoneNum ) - ( 3.0 / 2.0 ) * WZoneTimeMinus2Temp( ZoneNum ) + ( 1.0 / 3.0 ) * WZoneTimeMinus3Temp( ZoneNum ) ) );
+                LoadToHumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
+                                         (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
+                                                   (1.0 / 3.0) * WZoneTimeMinus3Temp(ZoneNum)));
 				// Exact solution
 			} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 				if ( A == 0.0 ) { // B=0
@@ -4065,7 +4683,9 @@ namespace ZoneTempPredictorCorrector {
 			ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
 			WZoneSetPoint = PsyWFnTdbRhPb( ZT( ZoneNum ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress, RoutineName );
 			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
-				LoadToDehumidifySetPoint = ( ( 11.0 / 6.0 ) * C + A ) * WZoneSetPoint - ( B + C * ( 3.0 * WZoneTimeMinus1Temp( ZoneNum ) - ( 3.0 / 2.0 ) * WZoneTimeMinus2Temp( ZoneNum ) + ( 1.0 / 3.0 ) * WZoneTimeMinus3Temp( ZoneNum ) ) );
+                LoadToDehumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
+                                           (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
+                                                     (1.0 / 3.0) * WZoneTimeMinus3Temp(ZoneNum)));
 				// Exact solution
 			} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 				if ( A == 0.0 ) { // B=0
@@ -4094,9 +4714,11 @@ namespace ZoneTempPredictorCorrector {
 				} else if ( LoadToHumidifySetPoint <= 0.0 && LoadToDehumidifySetPoint >= 0.0 ) { // deadband includes zero loads
 					ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired = 0.0;
 				} else { // this should never occur!
-					ShowSevereError( "Humidistat: Unanticipated combination of humidifying and dehumidifying loads - report to EnergyPlus Development Team" );
+                    ShowSevereError(
+                        "Humidistat: Unanticipated combination of humidifying and dehumidifying loads - report to EnergyPlus Development Team");
 					ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
-					ShowContinueError( "LoadToHumidifySetPoint=" + RoundSigDigits( LoadToHumidifySetPoint, 5 ) + ", LoadToDehumidifySetPoint=" + RoundSigDigits( LoadToDehumidifySetPoint, 5 ) );
+                    ShowContinueError("LoadToHumidifySetPoint=" + RoundSigDigits(LoadToHumidifySetPoint, 5) +
+                                      ", LoadToDehumidifySetPoint=" + RoundSigDigits(LoadToDehumidifySetPoint, 5));
 					ShowContinueError( "Zone RH Humidifying Set-point=" + RoundSigDigits( ZoneRHHumidifyingSetPoint, 1 ) );
 					ShowContinueError( "Zone RH Dehumidifying Set-point=" + RoundSigDigits( ZoneRHDehumidifyingSetPoint, 2 ) );
 					ShowFatalError( "Program terminates due to above conditions." );
@@ -4113,10 +4735,14 @@ namespace ZoneTempPredictorCorrector {
 		ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP *= Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 		//init each sequenced demand to the full output
-		if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired; // array assignment
-		if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP; // array assignment
-		if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP; // array assignment
-
+        if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
+            ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired; // array assignment
+        if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
+            ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP =
+                ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP; // array assignment
+        if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
+            ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP =
+                ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
 	}
 
   Real64 
@@ -4135,9 +4761,10 @@ namespace ZoneTempPredictorCorrector {
 	  static Real64 SumSysMCp( 0.0 ); // Zone sum of air system MassFlowRate*Cp
 	  static Real64 SumSysMCpT( 0.0 ); // Zone sum of air system MassFlowRate*Cp*T
 
-    std::vector< int > controlledZoneEquipConfigNums;
+    //std::vector< int > controlledZoneEquipConfigNums;
 
-    CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+    //CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+    CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
 
 	  Real64 TempDepCoef = SumHA;// + SumMCp;
 	  Real64 TempIndCoef = SumIntGain + SumHATsurf;// - SumHATref + SumMCpT;
@@ -4217,12 +4844,10 @@ namespace ZoneTempPredictorCorrector {
   //  }
   //}
 
-	void
-	CorrectZoneAirTemp(
-		Real64 & ZoneTempChange, // Temperature change in zone air between previous and current timestep
-		bool const ShortenTimeStepSys,
-		bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
-		Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
+  void CorrectZoneAirTemp(Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
+    bool const ShortenTimeStepSys,
+    bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
+    Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
 	)
 	{
 
@@ -4237,56 +4862,44 @@ namespace ZoneTempPredictorCorrector {
 		// This subroutine updates the zone air temperature and modifies the system
 		// time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
+        using DataEnvironment::DayOfYear;
 		using DataLoopNode::Node;
 		using DataRoomAirModel::AirModel;
-		using DataRoomAirModel::RoomAirModel_Mixing;
 		using DataRoomAirModel::IsZoneDV;
-		using DataRoomAirModel::ZoneDVMixedFlag;
 		using DataRoomAirModel::IsZoneUI;
-		using DataRoomAirModel::ZTFloor;
 		using DataRoomAirModel::MATFloor;
-		using DataRoomAirModel::XMATFloor;
-		using DataRoomAirModel::XM2TFloor;
-		using DataRoomAirModel::XM3TFloor;
-		using DataRoomAirModel::XM4TFloor;
-		using DataRoomAirModel::ZTOC;
-		using DataRoomAirModel::ZTM1OC;
+        using DataRoomAirModel::MATMX;
 		using DataRoomAirModel::MATOC;
-		using DataRoomAirModel::XMATOC;
+        using DataRoomAirModel::RoomAirModel_Mixing;
+        using DataRoomAirModel::RoomAirModel_Mundt;
+        using DataRoomAirModel::RoomAirModel_UserDefined;
+        using DataRoomAirModel::XM2TFloor;
+        using DataRoomAirModel::XM2TMX;
 		using DataRoomAirModel::XM2TOC;
+        using DataRoomAirModel::XM3TFloor;
+        using DataRoomAirModel::XM3TMX;
 		using DataRoomAirModel::XM3TOC;
+        using DataRoomAirModel::XM4TFloor;
+        using DataRoomAirModel::XM4TMX;
 		using DataRoomAirModel::XM4TOC;
-		using DataRoomAirModel::ZTMX;
-		using DataRoomAirModel::ZTM1MX;
-		using DataRoomAirModel::MATMX;
+        using DataRoomAirModel::XMATFloor;
 		using DataRoomAirModel::XMATMX;
-		using DataRoomAirModel::XM2TMX;
-		using DataRoomAirModel::XM3TMX;
-		using DataRoomAirModel::XM4TMX;
-		using DataRoomAirModel::RoomAirModel_Mundt;
-		using DataRoomAirModel::RoomAirModel_UserDefined;
-		using RoomAirModelManager::ManageAirModel;
+        using DataRoomAirModel::XMATOC;
+        using DataRoomAirModel::ZoneDVMixedFlag;
+        using DataRoomAirModel::ZTFloor;
+        using DataRoomAirModel::ZTM1MX;
+        using DataRoomAirModel::ZTM1OC;
+        using DataRoomAirModel::ZTMX;
+        using DataRoomAirModel::ZTOC;
 		using General::TrimSigDigits;
-		using DataEnvironment::DayOfYear;
+        using RoomAirModelManager::ManageAirModel;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CorrectZoneAirTemp" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CpAir; // specific heat of air
@@ -4318,14 +4931,6 @@ namespace ZoneTempPredictorCorrector {
 		// Initializations
 		ZoneTempChange = constant_zero;
 
-		//Tuned Precompute controlled equip zone numbers for performance
-		std::vector< int > controlledZoneEquipConfigNums;
-		for ( int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( Zone( ZoneEquipConfigNum ).IsControlled ) {
-				controlledZoneEquipConfigNums.push_back( ZoneEquipConfigNum );
-			}
-		}
-
 		// Update zone temperatures
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -4334,25 +4939,99 @@ namespace ZoneTempPredictorCorrector {
 			if ( ShortenTimeStepSys ) {
 				// time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
 				if ( NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep ) { // cannot reuse existing DS data, interpolate from zone time
-					DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, MAT( ZoneNum ), XMAT( ZoneNum ), XM2T( ZoneNum ), XM3T( ZoneNum ), XM4T( ZoneNum ), MAT( ZoneNum ), DSXMAT( ZoneNum ), DSXM2T( ZoneNum ), DSXM3T( ZoneNum ), DSXM4T( ZoneNum ) );
-					DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ZoneAirHumRat( ZoneNum ), WZoneTimeMinus1( ZoneNum ), WZoneTimeMinus2( ZoneNum ), WZoneTimeMinus3( ZoneNum ), WZoneTimeMinus4( ZoneNum ), ZoneAirHumRat( ZoneNum ), DSWZoneTimeMinus1( ZoneNum ), DSWZoneTimeMinus2( ZoneNum ), DSWZoneTimeMinus3( ZoneNum ), DSWZoneTimeMinus4( ZoneNum ) );
+                    DownInterpolate4HistoryValues(PriorTimeStep,
+                                                  TimeStepSys,
+                                                  MAT(ZoneNum),
+                                                  XMAT(ZoneNum),
+                                                  XM2T(ZoneNum),
+                                                  XM3T(ZoneNum),
+                                                  XM4T(ZoneNum),
+                                                  MAT(ZoneNum),
+                                                  DSXMAT(ZoneNum),
+                                                  DSXM2T(ZoneNum),
+                                                  DSXM3T(ZoneNum),
+                                                  DSXM4T(ZoneNum));
+                    DownInterpolate4HistoryValues(PriorTimeStep,
+                                                  TimeStepSys,
+                                                  ZoneAirHumRat(ZoneNum),
+                                                  WZoneTimeMinus1(ZoneNum),
+                                                  WZoneTimeMinus2(ZoneNum),
+                                                  WZoneTimeMinus3(ZoneNum),
+                                                  WZoneTimeMinus4(ZoneNum),
+                                                  ZoneAirHumRat(ZoneNum),
+                                                  DSWZoneTimeMinus1(ZoneNum),
+                                                  DSWZoneTimeMinus2(ZoneNum),
+                                                  DSWZoneTimeMinus3(ZoneNum),
+                                                  DSWZoneTimeMinus4(ZoneNum));
 					if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
-						DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, MATFloor( ZoneNum ), XMATFloor( ZoneNum ), XM2TFloor( ZoneNum ), XM3TFloor( ZoneNum ), XM4TFloor( ZoneNum ), MATFloor( ZoneNum ), DSXMATFloor( ZoneNum ), DSXM2TFloor( ZoneNum ), DSXM3TFloor( ZoneNum ), DSXM4TFloor( ZoneNum ) );
-						DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, MATOC( ZoneNum ), XMATOC( ZoneNum ), XM2TOC( ZoneNum ), XM3TOC( ZoneNum ), XM4TOC( ZoneNum ), MATOC( ZoneNum ), DSXMATOC( ZoneNum ), DSXM2TOC( ZoneNum ), DSXM3TOC( ZoneNum ), DSXM4TOC( ZoneNum ) );
-						DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, MATMX( ZoneNum ), XMATMX( ZoneNum ), XM2TMX( ZoneNum ), XM3TMX( ZoneNum ), XM4TMX( ZoneNum ), MATMX( ZoneNum ), DSXMATMX( ZoneNum ), DSXM2TMX( ZoneNum ), DSXM3TMX( ZoneNum ), DSXM4TMX( ZoneNum ) );
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      MATFloor(ZoneNum),
+                                                      XMATFloor(ZoneNum),
+                                                      XM2TFloor(ZoneNum),
+                                                      XM3TFloor(ZoneNum),
+                                                      XM4TFloor(ZoneNum),
+                                                      MATFloor(ZoneNum),
+                                                      DSXMATFloor(ZoneNum),
+                                                      DSXM2TFloor(ZoneNum),
+                                                      DSXM3TFloor(ZoneNum),
+                                                      DSXM4TFloor(ZoneNum));
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      MATOC(ZoneNum),
+                                                      XMATOC(ZoneNum),
+                                                      XM2TOC(ZoneNum),
+                                                      XM3TOC(ZoneNum),
+                                                      XM4TOC(ZoneNum),
+                                                      MATOC(ZoneNum),
+                                                      DSXMATOC(ZoneNum),
+                                                      DSXM2TOC(ZoneNum),
+                                                      DSXM3TOC(ZoneNum),
+                                                      DSXM4TOC(ZoneNum));
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      MATMX(ZoneNum),
+                                                      XMATMX(ZoneNum),
+                                                      XM2TMX(ZoneNum),
+                                                      XM3TMX(ZoneNum),
+                                                      XM4TMX(ZoneNum),
+                                                      MATMX(ZoneNum),
+                                                      DSXMATMX(ZoneNum),
+                                                      DSXM2TMX(ZoneNum),
+                                                      DSXM3TMX(ZoneNum),
+                                                      DSXM4TMX(ZoneNum));
 					}
 					if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
 						for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
 							auto & ThisRAFNNode( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ) );
-							DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ThisRAFNNode.AirTemp, ThisRAFNNode.AirTempX1, ThisRAFNNode.AirTempX2, ThisRAFNNode.AirTempX3, ThisRAFNNode.AirTempX4,
-								ThisRAFNNode.AirTemp, ThisRAFNNode.AirTempDSX1, ThisRAFNNode.AirTempDSX2, ThisRAFNNode.AirTempDSX3, ThisRAFNNode.AirTempDSX4 );
-							DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ThisRAFNNode.HumRat, ThisRAFNNode.HumRatX1, ThisRAFNNode.HumRatX2, ThisRAFNNode.HumRatX3, ThisRAFNNode.HumRatX4,
-								ThisRAFNNode.HumRat, ThisRAFNNode.HumRatDSX1, ThisRAFNNode.HumRatDSX2, ThisRAFNNode.HumRatDSX3, ThisRAFNNode.HumRatDSX4 );
+                            DownInterpolate4HistoryValues(PriorTimeStep,
+                                                          TimeStepSys,
+                                                          ThisRAFNNode.AirTemp,
+                                                          ThisRAFNNode.AirTempX1,
+                                                          ThisRAFNNode.AirTempX2,
+                                                          ThisRAFNNode.AirTempX3,
+                                                          ThisRAFNNode.AirTempX4,
+                                                          ThisRAFNNode.AirTemp,
+                                                          ThisRAFNNode.AirTempDSX1,
+                                                          ThisRAFNNode.AirTempDSX2,
+                                                          ThisRAFNNode.AirTempDSX3,
+                                                          ThisRAFNNode.AirTempDSX4);
+                            DownInterpolate4HistoryValues(PriorTimeStep,
+                                                          TimeStepSys,
+                                                          ThisRAFNNode.HumRat,
+                                                          ThisRAFNNode.HumRatX1,
+                                                          ThisRAFNNode.HumRatX2,
+                                                          ThisRAFNNode.HumRatX3,
+                                                          ThisRAFNNode.HumRatX4,
+                                                          ThisRAFNNode.HumRat,
+                                                          ThisRAFNNode.HumRatDSX1,
+                                                          ThisRAFNNode.HumRatDSX2,
+                                                          ThisRAFNNode.HumRatDSX3,
+                                                          ThisRAFNNode.HumRatDSX4);
 						}
 					}
 				} else { // reuse history data in DS terms from last zone time step to preserve information that would be lost
 					// do nothing because DS history would have been pushed prior and should be ready?
-
 				}
 			}
 
@@ -4375,14 +5054,16 @@ namespace ZoneTempPredictorCorrector {
 				WZoneTimeMinus3Temp( ZoneNum ) = WZoneTimeMinus3( ZoneNum );
 			}
 
-			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+            AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
+                              PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName) *
+                              PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)) / (TimeStepSys * SecInHour);
 
 			AirCap = AIRRAT( ZoneNum );
 
 			ManageAirModel( ZoneNum );
 
 			// Calculate the various heat balance sums
-			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+            CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 			//    ZoneTempHistoryTerm = (3.0D0 * ZTM1(ZoneNum) - (3.0D0/2.0D0) * ZTM2(ZoneNum) + (1.0D0/3.0D0) * ZTM3(ZoneNum))
 			ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
 
@@ -4392,7 +5073,8 @@ namespace ZoneTempPredictorCorrector {
 
 				// Heat balance coefficients for controlled zone, i.e. with system air flow
 				TempDepCoef = SumHA + SumMCp + SumSysMCp;
-				TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SumSysMCpT + ( NonAirSystemResponse( ZoneNum ) / ZoneMult + SysDepZoneLoadsLagged( ZoneNum ) );
+                TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SumSysMCpT +
+                              (NonAirSystemResponse(ZoneNum) / ZoneMult + SysDepZoneLoadsLagged(ZoneNum));
 				//    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
 				if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
@@ -4401,19 +5083,23 @@ namespace ZoneTempPredictorCorrector {
 				//    TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
 				//    TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
 				// Solve for zone air temperature
-				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
+                {
+                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
 				if ( SELECT_CASE_var == Use3rdOrder ) {
-					ZT( ZoneNum ) = ( TempIndCoef + AirCap * ( 3.0 * ZTM1( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3( ZoneNum ) ) ) / ( ( 11.0 / 6.0 ) * AirCap + TempDepCoef );
+                        ZT(ZoneNum) = (TempIndCoef + AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum))) /
+                                      ((11.0 / 6.0) * AirCap + TempDepCoef);
 					// Exact solution
 				} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZT( ZoneNum ) = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZT( ZoneNum ) = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+                            ZT(ZoneNum) = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
+                                          TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZT( ZoneNum ) = ( AirCap * ZoneT1( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
-				}}
+                    }
+                }
 				// Update zone node temperature and thermostat temperature unless already updated in Room Air Model,
 				// calculate load correction factor
 				if ( ( AirModel( ZoneNum ).AirModelType == RoomAirModel_Mixing ) || ( ! AirModel( ZoneNum ).SimAirModel ) ) {
@@ -4438,7 +5124,8 @@ namespace ZoneTempPredictorCorrector {
 						// Negligible flow, assume mixed - reasonable lagged starting value for first step time with significant flow
 						LoadCorrectionFactor( ZoneNum ) = 1.0;
 					}
-				} else if ( AirModel( ZoneNum ).SimAirModel && ( ( AirModel( ZoneNum ).AirModelType == RoomAirModel_UserDefined ) || ( AirModel( ZoneNum ).AirModelType == RoomAirModel_Mundt ) ) ) {
+                } else if (AirModel(ZoneNum).SimAirModel &&
+                           ((AirModel(ZoneNum).AirModelType == RoomAirModel_UserDefined) || (AirModel(ZoneNum).AirModelType == RoomAirModel_Mundt))) {
 					if ( SumSysMCp > SmallMassFlow ) {
 						TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
 						if ( std::abs( TempSupplyAir - ZT( ZoneNum ) ) > TempConvergTol ) {
@@ -4471,7 +5158,8 @@ namespace ZoneTempPredictorCorrector {
 				ZoneEnthalpyIn = SumSysMCpT;
 
 				// SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
-				SNLoad = ZoneEnthalpyIn - ( Node( ZoneNodeNum ).MassFlowRate / ZoneMult ) * CpAir * Node( ZoneNodeNum ).Temp + NonAirSystemResponse( ZoneNum ) / ZoneMult + SysDepZoneLoadsLagged( ZoneNum );
+                SNLoad = ZoneEnthalpyIn - (Node(ZoneNodeNum).MassFlowRate / ZoneMult) * CpAir * Node(ZoneNodeNum).Temp +
+                         NonAirSystemResponse(ZoneNum) / ZoneMult + SysDepZoneLoadsLagged(ZoneNum);
 
 			} else {
 
@@ -4488,19 +5176,23 @@ namespace ZoneTempPredictorCorrector {
 				//      TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
 
 				// Solve for zone air temperature
-				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
+                {
+                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
 				if ( SELECT_CASE_var == Use3rdOrder ) {
-					ZT( ZoneNum ) = ( TempIndCoef + AirCap * ( 3.0 * ZTM1( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3( ZoneNum ) ) ) / ( ( 11.0 / 6.0 ) * AirCap + TempDepCoef );
+                        ZT(ZoneNum) = (TempIndCoef + AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum))) /
+                                      ((11.0 / 6.0) * AirCap + TempDepCoef);
 					// Exact solution
 				} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZT( ZoneNum ) = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZT( ZoneNum ) = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+                            ZT(ZoneNum) = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
+                                          TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZT( ZoneNum ) = ( AirCap * ZoneT1( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
-				}}
+                    }
+                }
 
 				if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
 					ZT( ZoneNum ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID ).AirTemp;
@@ -4525,15 +5217,18 @@ namespace ZoneTempPredictorCorrector {
 					ZT( ZoneNum ) = Zone( ZoneNum ).ZoneMeasuredTemperature;
 
 					// Hybrid Modeling-Infiltration calcualtion start
-					if ( HybridModelZone( ZoneNum ).InfiltrationCalc && SumSysMCpT == 0 && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
+                    if (HybridModelZone(ZoneNum).InfiltrationCalc && SumSysMCpT == 0 &&
+                        UseZoneTimeStepHistory) { // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
 
 						// Calculate MCPI used for hybrid modeling included in TempIndCoef and TempDepCoef
 						Real64 a = Zone( ZoneNum ).OutDryBulbTemp;
-						Real64 b = SumIntGain + SumHATsurf - SumHATref + MCPTV( ZoneNum ) + MCPTM( ZoneNum ) + MCPTE( ZoneNum ) + MCPTC( ZoneNum ) + MDotCPOA( ZoneNum ) * Zone( ZoneNum ).OutDryBulbTemp;
+                        Real64 b = SumIntGain + SumHATsurf - SumHATref + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) +
+                                   MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
 						Real64 c = SumHA + MCPV( ZoneNum ) + MCPM( ZoneNum ) + MCPE( ZoneNum ) + MCPC( ZoneNum ) + MDotCPOA( ZoneNum );
 						Real64 d = AirCap;
 						//Use3rdOrder
-						Real64 AA = b + d * ( 3.0 * PreviousMeasuredZT1( ZoneNum ) - ( 3.0 / 2.0 ) * PreviousMeasuredZT2( ZoneNum ) + ( 1.0 / 3.0 ) * PreviousMeasuredZT3( ZoneNum ) );
+                        Real64 AA = b + d * (3.0 * PreviousMeasuredZT1(ZoneNum) - (3.0 / 2.0) * PreviousMeasuredZT2(ZoneNum) +
+                                             (1.0 / 3.0) * PreviousMeasuredZT3(ZoneNum));
 						Real64 BB = ( 11.0 / 6.0 ) * d + c;
 						Real64 InfilVolumeOADensityHM;
 						Real64 AirDensity;
@@ -4545,14 +5240,15 @@ namespace ZoneTempPredictorCorrector {
 						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Zone( ZoneNum ).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration );
 						if ( Zone( ZoneNum ).ZoneMeasuredTemperature == Zone( ZoneNum ).OutDryBulbTemp ){
 							MCPIHM = 0.0;
-						}
-						else {
-							MCPIHM = ( AA - Zone( ZoneNum ).ZoneMeasuredTemperature * BB ) / ( Zone( ZoneNum ).ZoneMeasuredTemperature - a ); // MCPIHM calculation using Use3rdOrder method 
+                        } else {
+                            MCPIHM = (AA - Zone(ZoneNum).ZoneMeasuredTemperature * BB) /
+                                     (Zone(ZoneNum).ZoneMeasuredTemperature - a); // MCPIHM calculation using Use3rdOrder method
 						}
 
 						InfilVolumeOADensityHM = ( MCPIHM / CpAir / AirDensity ) * TimeStepZone * SecInHour;
 						
-						if ( abs( Zone( ZoneNum ).ZoneMeasuredTemperature - Zone( ZoneNum ).OutDryBulbTemp ) > 5.0 && abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) < 0.1 ) {// Filter
+                        if (abs(Zone(ZoneNum).ZoneMeasuredTemperature - Zone(ZoneNum).OutDryBulbTemp) > 5.0 &&
+                            abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) < 0.1) { // Filter
 							InfilOAACHHM = InfilVolumeOADensityHM / ( TimeStepZone * Zone( ZoneNum ).Volume );
 							InfilOAACHHM = max( 0.0, min( 10.0, InfilOAACHHM ) );  // ACH max 10, min 0
 						} else {
@@ -4565,37 +5261,38 @@ namespace ZoneTempPredictorCorrector {
 					} // Hybrid model infiltration calcualtion end
 
 					// Hybrid modeling internal thermal mass calcualtion start
-					if ( HybridModelZone( ZoneNum).InternalThermalMassCalc && SumSysMCpT == 0 && ZT( ZoneNum ) != PreviousMeasuredZT1( ZoneNum ) && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
+                    if (HybridModelZone(ZoneNum).InternalThermalMassCalc && SumSysMCpT == 0 && ZT(ZoneNum) != PreviousMeasuredZT1(ZoneNum) &&
+                        UseZoneTimeStepHistory) { // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
 
 						// Calculate air capacity using UseAnalyticalSolution
 						if ( TempDepCoef == 0.0 ) {
 							AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ); // Inverse equation
-						}
-						else {
+                        } else {
 							Real64 AirCapHM_temp = 0.0;
 							if ( TempIndCoef == TempDepCoef * ZT( ZoneNum ) ){
 								AirCapHM_temp = 0.0;
-							}
-							else {
-								AirCapHM_temp = ( TempIndCoef - TempDepCoef * PreviousMeasuredZT1( ZoneNum ) ) / ( TempIndCoef - TempDepCoef * ZT( ZoneNum ) );
+                            } else {
+                                AirCapHM_temp =
+                                    (TempIndCoef - TempDepCoef * PreviousMeasuredZT1(ZoneNum)) / (TempIndCoef - TempDepCoef * ZT(ZoneNum));
 							}
 
 							if ( (AirCapHM_temp > 0 ) && ( AirCapHM_temp != 1 ) ){ // Avoide IND
 								AirCapHM = TempDepCoef / std::log( AirCapHM_temp ); // Inverse equation
-							}
-							else {
+                            } else {
 								AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) );
 							}
 						}
 
 						// Calculate multiplier
 						if ( abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) > 0.05 ){ // Filter
-							MultpHM = AirCapHM / ( Zone( ZoneNum ).Volume * PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ) ) * ( TimeStepZone * SecInHour ); // Inverse equation
+                            MultpHM = AirCapHM /
+                                      (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                                       PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) *
+                                      (TimeStepZone * SecInHour);      // Inverse equation
 							if ( ( MultpHM < 1.0 ) || ( MultpHM > 30.0 ) ){ // Temperature capacity multiplier greater than 1 and less than 30
 								MultpHM = 1.0; // Default value 1.0 
 							}
-						}
-						else {
+                        } else {
 							MultpHM = 1.0; // Default value 1.0 
 						}
 
@@ -4635,23 +5332,26 @@ namespace ZoneTempPredictorCorrector {
 			SNLoadCoolEnergy( ZoneNum ) = std::abs( min( SNLoad, 0.0 ) * TimeStepSys * SecInHour );
 
 			// Final humidity calcs
-			CorrectZoneHumRat( ZoneNum, controlledZoneEquipConfigNums );
+            CorrectZoneHumRat(ZoneNum);
 
 			ZoneAirHumRat( ZoneNum ) = ZoneAirHumRatTemp( ZoneNum );
 			ZoneAirRelHum( ZoneNum ) = 100.0 * PsyRhFnTdbWPb( ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, RoutineName );
 
 			// ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
-			{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
+            {
+                auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
 			if ( SELECT_CASE_var == Use3rdOrder ) {
 				if ( IsZoneDV( ZoneNum ) ) {
 					if ( ZoneDVMixedFlag( ZoneNum ) == 0 ) {
-						ZoneTempChange = max( ZoneTempChange, max( std::abs( ZTOC( ZoneNum ) - ZTM1OC( ZoneNum ) ), std::abs( ZTMX( ZoneNum ) - ZTM1MX( ZoneNum ) ) ) );
+                            ZoneTempChange =
+                                max(ZoneTempChange, max(std::abs(ZTOC(ZoneNum) - ZTM1OC(ZoneNum)), std::abs(ZTMX(ZoneNum) - ZTM1MX(ZoneNum))));
 					} else {
 						ZoneTempChange = max( ZoneTempChange, std::abs( ZT( ZoneNum ) - ZTM1( ZoneNum ) ) );
 					}
 				} else if ( IsZoneUI( ZoneNum ) ) {
 					if ( ZoneUFMixedFlag( ZoneNum ) == 0 ) {
-						ZoneTempChange = max( ZoneTempChange, max( std::abs( ZTOC( ZoneNum ) - ZTM1OC( ZoneNum ) ), std::abs( ZTMX( ZoneNum ) - ZTM1MX( ZoneNum ) ) ) );
+                            ZoneTempChange =
+                                max(ZoneTempChange, max(std::abs(ZTOC(ZoneNum) - ZTM1OC(ZoneNum)), std::abs(ZTMX(ZoneNum) - ZTM1MX(ZoneNum))));
 					} else {
 						ZoneTempChange = max( ZoneTempChange, std::abs( ZT( ZoneNum ) - ZTM1( ZoneNum ) ) );
 					}
@@ -4661,29 +5361,43 @@ namespace ZoneTempPredictorCorrector {
 			} else if ( ( SELECT_CASE_var == UseAnalyticalSolution ) || ( SELECT_CASE_var == UseEulerMethod ) ) {
 				if ( IsZoneDV( ZoneNum ) ) {
 					if ( ZoneDVMixedFlag( ZoneNum ) == 0 ) {
-						ZoneTempChange = max( ZoneTempChange, max( std::abs( ZTOC( ZoneNum ) - Zone1OC( ZoneNum ) ), std::abs( ZTMX( ZoneNum ) - Zone1MX( ZoneNum ) ) ) );
+                            ZoneTempChange =
+                                max(ZoneTempChange, max(std::abs(ZTOC(ZoneNum) - Zone1OC(ZoneNum)), std::abs(ZTMX(ZoneNum) - Zone1MX(ZoneNum))));
 					} else {
 						ZoneTempChange = max( ZoneTempChange, std::abs( ZT( ZoneNum ) - ZoneT1( ZoneNum ) ) );
 					}
 				} else if ( IsZoneUI( ZoneNum ) ) {
 					if ( ZoneUFMixedFlag( ZoneNum ) == 0 ) {
-						ZoneTempChange = max( ZoneTempChange, max( std::abs( ZTOC( ZoneNum ) - Zone1OC( ZoneNum ) ), std::abs( ZTMX( ZoneNum ) - Zone1MX( ZoneNum ) ) ) );
+                            ZoneTempChange =
+                                max(ZoneTempChange, max(std::abs(ZTOC(ZoneNum) - Zone1OC(ZoneNum)), std::abs(ZTMX(ZoneNum) - Zone1MX(ZoneNum))));
 					} else {
 						ZoneTempChange = max( ZoneTempChange, std::abs( ZT( ZoneNum ) - ZoneT1( ZoneNum ) ) );
 					}
 				} else {
 					ZoneTempChange = max( ZoneTempChange, std::abs( ZT( ZoneNum ) - ZoneT1( ZoneNum ) ) );
 				}
-			}}
+                }
+            }
 
-			CalcZoneComponentLoadSums( ZoneNum, TempDepCoef, TempIndCoef, ZnAirRpt( ZoneNum ).SumIntGains, ZnAirRpt( ZoneNum ).SumHADTsurfs, ZnAirRpt( ZoneNum ).SumMCpDTzones, ZnAirRpt( ZoneNum ).SumMCpDtInfil, ZnAirRpt( ZoneNum ).SumMCpDTsystem, ZnAirRpt( ZoneNum ).SumNonAirSystem, ZnAirRpt( ZoneNum ).CzdTdt, ZnAirRpt( ZoneNum ).imBalance, controlledZoneEquipConfigNums ); // convection part of internal gains | surface convection heat transfer | interzone mixing | OA of various kinds except via system | air system | non air system | air mass energy storage term | measure of imbalance in zone air heat balance
+            CalcZoneComponentLoadSums(ZoneNum,
+                                      TempDepCoef,
+                                      TempIndCoef,
+                                      ZnAirRpt(ZoneNum).SumIntGains,
+                                      ZnAirRpt(ZoneNum).SumHADTsurfs,
+                                      ZnAirRpt(ZoneNum).SumMCpDTzones,
+                                      ZnAirRpt(ZoneNum).SumMCpDtInfil,
+                                      ZnAirRpt(ZoneNum).SumMCpDTsystem,
+                                      ZnAirRpt(ZoneNum).SumNonAirSystem,
+                                      ZnAirRpt(ZoneNum).CzdTdt,
+                                      ZnAirRpt(ZoneNum).imBalance); // convection part of internal gains | surface convection heat transfer |
+                                                                    // interzone mixing | OA of various kinds except via system | air system | non air
+                                                                    // system | air mass energy storage term | measure of imbalance in zone air heat
+                                                                    // balance
 
 		} // ZoneNum
-
 	}
 
-	void
-	PushZoneTimestepHistories()
+    void PushZoneTimestepHistories()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4698,24 +5412,9 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		static std::string const CorrectZoneAirTemp( "CorrectZoneAirTemp" );
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -4739,7 +5438,8 @@ namespace ZoneTempPredictorCorrector {
 			WZoneTimeMinusP( ZoneNum ) = ZoneAirHumRatTemp( ZoneNum );
 			ZoneAirRelHum( ZoneNum ) = 100.0 * PsyRhFnTdbWPb( ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, CorrectZoneAirTemp );
 
-			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDDV || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFI || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFE ) {
+            if (AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDDV || AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFI ||
+                AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFE) {
 				XM4TFloor( ZoneNum ) = XM3TFloor( ZoneNum );
 				XM3TFloor( ZoneNum ) = XM2TFloor( ZoneNum );
 				XM2TFloor( ZoneNum ) = XMATFloor( ZoneNum );
@@ -4779,7 +5479,8 @@ namespace ZoneTempPredictorCorrector {
 				ZoneTMX( ZoneNum ) = ZTAV( ZoneNum ); // using average for whole zone time step.
 				ZoneWM2( ZoneNum ) = ZoneWMX( ZoneNum );
 				ZoneWMX( ZoneNum ) = ZoneAirHumRatAvg( ZoneNum ); // using average for whole zone time step.
-				if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDDV || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFI || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFE ) {
+                if (AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDDV || AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFI ||
+                    AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFE) {
 					ZoneM2Floor( ZoneNum ) = ZoneMXFloor( ZoneNum );
 					ZoneMXFloor( ZoneNum ) = ZTFloor( ZoneNum ); // using average for whole zone time step.
 					ZoneM2OC( ZoneNum ) = ZoneMXOC( ZoneNum );
@@ -4792,19 +5493,19 @@ namespace ZoneTempPredictorCorrector {
 					for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTM2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX;
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTemp;
-//						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1;
+                        //						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX =
+                        // RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1;
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWM2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX;
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRat;
-//						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1;
+                        //						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX =
+                        // RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1;
 			}
 				}
 			}
 		} // zone loop
-
 	}
 
-	void
-	PushSystemTimestepHistories()
+    void PushSystemTimestepHistories()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4818,25 +5519,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -4893,7 +5575,8 @@ namespace ZoneTempPredictorCorrector {
 				ZoneWM2( ZoneNum ) = ZoneWMX( ZoneNum );
 				ZoneWMX( ZoneNum ) = ZoneAirHumRatTemp( ZoneNum ); // using average for whole zone time step.
 
-				if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDDV || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFI || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFE ) {
+                if (AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDDV || AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFI ||
+                    AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFE) {
 					ZoneM2Floor( ZoneNum ) = ZoneMXFloor( ZoneNum );
 					ZoneMXFloor( ZoneNum ) = ZTFloor( ZoneNum ); // using average for whole zone time step.
 					ZoneM2OC( ZoneNum ) = ZoneMXOC( ZoneNum );
@@ -4905,19 +5588,19 @@ namespace ZoneTempPredictorCorrector {
 					for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTM2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX;
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTemp;
-//						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1;
+                        //						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX =
+                        // RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1;
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWM2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX;
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRat;
-//						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1;
+                        //						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX =
+                        // RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1;
 					}
 				}
 			} // zone loop
 		}
-
 	}
 
-	void
-	RevertZoneTimestepHistories()
+    void RevertZoneTimestepHistories()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Brent Griffith
@@ -4930,25 +5613,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// METHODOLOGY EMPLOYED:
 		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -4967,7 +5631,8 @@ namespace ZoneTempPredictorCorrector {
 			WZoneTimeMinus2( ZoneNum ) = WZoneTimeMinus3( ZoneNum );
 			WZoneTimeMinus3( ZoneNum ) = WZoneTimeMinus4( ZoneNum );
 
-			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDDV || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFI || AirModel( ZoneNum ).AirModelType == RoomAirModel_UCSDUFE ) {
+            if (AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDDV || AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFI ||
+                AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFE) {
 
 				//      MATFloor(ZoneNum)= XMATFloor(ZoneNum)
 				XMATFloor( ZoneNum ) = XM2TFloor( ZoneNum );
@@ -4982,7 +5647,6 @@ namespace ZoneTempPredictorCorrector {
 				XMATMX( ZoneNum ) = XM2TMX( ZoneNum );
 				XM2TMX( ZoneNum ) = XM3TMX( ZoneNum );
 				XM3TMX( ZoneNum ) = XM4TMX( ZoneNum );
-
 			}
 
 			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
@@ -4997,14 +5661,9 @@ namespace ZoneTempPredictorCorrector {
 				}
 			}
 		} // zone loop
-
 	}
 
-	void
-	CorrectZoneHumRat(
-		int const ZoneNum,
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
-	)
+    void CorrectZoneHumRat(int const ZoneNum)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -5016,36 +5675,25 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine updates the zone humidities.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// Routine FinalZnCalcs - FINAL ZONE CALCULATIONS, authored by Dale Herron
 		// for BLAST.
 
 		// Using/Aliasing
+        using DataDefineEquip::AirDistUnit;
 		using DataLoopNode::Node;
+        using DataSurfaces::HeatTransferModel_EMPD;
+        using DataSurfaces::HeatTransferModel_HAMT;
+        using DataSurfaces::Surface;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneReturnPlenums;
-		using ZonePlenum::NumZoneSupplyPlenums;
-		using DataDefineEquip::AirDistUnit;
-		using DataSurfaces::Surface;
-		using DataSurfaces::HeatTransferModel_HAMT;
-		using DataSurfaces::HeatTransferModel_EMPD;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CorrectZoneHumRat" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NodeNum;
@@ -5063,8 +5711,6 @@ namespace ZoneTempPredictorCorrector {
 		Real64 C;
 		Real64 WZSat;
 		Real64 MoistureMassFlowRate;
-		Real64 ExhMassFlowRate;
-		Real64 TotExitMassFlowRate;
 		Real64 ZoneMassFlowRate;
 		Real64 SysTimeStepInSeconds;
 		Real64 H2OHtOfVap;
@@ -5077,58 +5723,34 @@ namespace ZoneTempPredictorCorrector {
 		// FLOW:
 		MoistureMassFlowRate = 0.0;
 		ZoneMassFlowRate = 0.0;
-		ExhMassFlowRate = 0.0;
-		TotExitMassFlowRate = 0.0;
 		ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 		// Check to see if this is a controlled zone
-		ZoneEquipConfigNum = 0;
-		ControlledZoneAirFlag = false;
-		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
-			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
-				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
-				ControlledZoneAirFlag = true;
-				break;
-			}
-		}
+        ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
 
 		// Check to see if this is a plenum zone
-		ZoneRetPlenumAirFlag = false;
-		for ( ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= NumZoneReturnPlenums; ++ZoneRetPlenumNum ) {
-			if ( ZoneRetPlenCond( ZoneRetPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneRetPlenumAirFlag = true;
-			break;
-		} // ZoneRetPlenumNum
-		ZoneSupPlenumAirFlag = false;
-		for ( ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= NumZoneSupplyPlenums; ++ZoneSupPlenumNum ) {
-			if ( ZoneSupPlenCond( ZoneSupPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneSupPlenumAirFlag = true;
-			break;
-		} // ZoneSupPlenumNum
+        ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
+        ZoneSupPlenumAirFlag = Zone(ZoneNum).IsSupplyPlenum;
 
 		if ( ControlledZoneAirFlag ) { // If there is system flow then calculate the flow rates
-
+            ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
 			// Calculate moisture flow rate into each zone
 			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 
-				MoistureMassFlowRate += ( Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate * Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).HumRat ) / ZoneMult;
+                MoistureMassFlowRate += (Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
+                                         Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat) /
+                                        ZoneMult;
 				ZoneMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
 
-			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
-				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
-			} // NodeNum
-			ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
-
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
-				TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;
-			}
-
 			// Do the calculations for the plenum zone
 		} else if ( ZoneRetPlenumAirFlag ) {
+            ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
 			for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumInletNodes; ++NodeNum ) {
 
-				MoistureMassFlowRate += ( Node( ZoneRetPlenCond( ZoneRetPlenumNum ).InletNode( NodeNum ) ).MassFlowRate * Node( ZoneRetPlenCond( ZoneRetPlenumNum ).InletNode( NodeNum ) ).HumRat ) / ZoneMult;
+                MoistureMassFlowRate += (Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
+                                         Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).HumRat) /
+                                        ZoneMult;
 				ZoneMassFlowRate += Node( ZoneRetPlenCond( ZoneRetPlenumNum ).InletNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
 			// add in the leak flow
@@ -5145,17 +5767,13 @@ namespace ZoneTempPredictorCorrector {
 					ZoneMassFlowRate += AirDistUnit( ADUNum ).MassFlowRateDnStrLk / ZoneMult;
 				}
 			}
-			// Do not allow exhaust mass flow for a plenum zone
-			ExhMassFlowRate = 0.0;
-			TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 
 		} else if ( ZoneSupPlenumAirFlag ) {
-
-			MoistureMassFlowRate += ( Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate * Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).HumRat ) / ZoneMult;
+            ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
+            MoistureMassFlowRate +=
+                (Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate * Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).HumRat) /
+                ZoneMult;
 			ZoneMassFlowRate += Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate / ZoneMult;
-			// Do not allow exhaust mass flow for a plenum zone
-			ExhMassFlowRate = 0.0;
-			TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 		}
 
 		// Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
@@ -5185,26 +5803,18 @@ namespace ZoneTempPredictorCorrector {
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
 		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
 
-		// Check for the flow and NO flow condition
-		if ( ZoneMassFlowRate > 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
-			A = TotExitMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
-			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+        B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) +
+            (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+        A = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
+            MDotOA(ZoneNum);
+        if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
+            (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated)) {
 				// Multizone airflow calculated in AirflowNetwork
-				B = ( LatentGain / H2OHtOfVap ) + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum );
-				A = TotExitMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
+            B = (LatentGain / H2OHtOfVap) + (AirflowNetworkExchangeData(ZoneNum).SumMHrW + AirflowNetworkExchangeData(ZoneNum).SumMMHrW) +
+                (MoistureMassFlowRate) + SumHmARaW(ZoneNum);
+            A = ZoneMassFlowRate + AirflowNetworkExchangeData(ZoneNum).SumMHr + AirflowNetworkExchangeData(ZoneNum).SumMMHr + SumHmARa(ZoneNum);
 			}
 			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
-		} else if ( ZoneMassFlowRate <= 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutHumRat ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum );
-			A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum );
-			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-				// Multizone airflow calculated in AirflowNetwork
-				B = ( LatentGain / H2OHtOfVap ) + SumHmARaW( ZoneNum ) + AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW;
-				A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
-			}
-			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
-		}
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
 			B += AirflowNetworkExchangeData( ZoneNum ).TotalLat;
@@ -5212,9 +5822,12 @@ namespace ZoneTempPredictorCorrector {
 
 		// Use a 3rd order derivative to predict final zone humidity ratio and
 		// smooth the changes using the zone air capacitance.
-		{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
+        {
+            auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
 		if ( SELECT_CASE_var == Use3rdOrder ) {
-			ZoneAirHumRatTemp( ZoneNum ) = ( B + C * ( 3.0 * WZoneTimeMinus1Temp( ZoneNum ) - ( 3.0 / 2.0 ) * WZoneTimeMinus2Temp( ZoneNum ) + ( 1.0 / 3.0 ) * WZoneTimeMinus3Temp( ZoneNum ) ) ) / ( ( 11.0 / 6.0 ) * C + A );
+                ZoneAirHumRatTemp(ZoneNum) = (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
+                                                       (1.0 / 3.0) * WZoneTimeMinus3Temp(ZoneNum))) /
+                                             ((11.0 / 6.0) * C + A);
 			// Exact solution
 		} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 			if ( A == 0.0 ) { // B=0
@@ -5224,7 +5837,8 @@ namespace ZoneTempPredictorCorrector {
 			}
 		} else if ( SELECT_CASE_var == UseEulerMethod ) {
 			ZoneAirHumRatTemp( ZoneNum ) = ( C * ZoneW1( ZoneNum ) + B ) / ( C + A );
-		}}
+            }
+        }
 
 		// Set the humidity ratio to zero if the zone has been dried out
 		if ( ZoneAirHumRatTemp( ZoneNum ) < 0.0 ) ZoneAirHumRatTemp( ZoneNum ) = 0.0;
@@ -5245,12 +5859,9 @@ namespace ZoneTempPredictorCorrector {
 			Node( ZoneNodeNum ).HumRat = ZoneAirHumRatTemp( ZoneNum );
 			Node( ZoneNodeNum ).Enthalpy = PsyHFnTdbW( ZT( ZoneNum ), ZoneAirHumRatTemp( ZoneNum ) );
 		}
-
 	}
 
-	void
-	DownInterpolate4HistoryValues(
-		Real64 const OldTimeStep,
+    void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
 		Real64 const NewTimeStep,
 		Real64 & oldVal0,
 		Real64 & oldVal1,
@@ -5279,24 +5890,6 @@ namespace ZoneTempPredictorCorrector {
 		// This routine assumes that the direction is to a shorter timestep.
 		// The down step ratio, DSRatio = OldTimeStep/ NewTimeStep
 		//  is expected to be roughly integer-valued and near 2.0 or 3.0 or 4.0 or more.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 oldTime0;
@@ -5351,12 +5944,9 @@ namespace ZoneTempPredictorCorrector {
 			newVal3 = oldVal0 + ( oldVal1 - oldVal0 ) * ( ( oldTime0 - newTime3 ) / ( OldTimeStep ) );
 			newVal4 = oldVal0 + ( oldVal1 - oldVal0 ) * ( ( oldTime0 - newTime4 ) / ( OldTimeStep ) );
 		}
-
 	}
 
-	void
-	CalcZoneSums(
-		int const ZoneNum, // Zone number
+    void CalcZoneSums(int const ZoneNum,  // Zone number
 		Real64 & SumIntGain, // Zone sum of convective internal gains
 		Real64 & SumHA, // Zone sum of Hc*Area
 		Real64 & SumHATsurf, // Zone sum of Hc*Area*Tsurf
@@ -5364,8 +5954,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCp, // Zone sum of MassFlowRate*Cp
 		Real64 & SumMCpT, // Zone sum of MassFlowRate*Cp*T
 		Real64 & SumSysMCp, // Zone sum of air system MassFlowRate*Cp
-		Real64 & SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+                      Real64 &SumSysMCpT  // Zone sum of air system MassFlowRate*Cp*T
 	)
 	{
 
@@ -5390,25 +5979,17 @@ namespace ZoneTempPredictorCorrector {
 		// For future implementations, Tref can be easily converted into an array to
 		// allow a different reference temperature to be specified for each surface.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSurfaces;
 		using namespace DataHeatBalance;
 		using namespace DataHeatBalSurface;
+        using DataDefineEquip::AirDistUnit;
 		using DataLoopNode::Node;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using ZonePlenum::ZoneRetPlenCond;
-		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneReturnPlenums;
-		using ZonePlenum::NumZoneSupplyPlenums;
-		using DataDefineEquip::AirDistUnit;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
+        using ZonePlenum::ZoneRetPlenCond;
+        using ZonePlenum::ZoneSupPlenCond;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5451,16 +6032,18 @@ namespace ZoneTempPredictorCorrector {
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
-			SumAllReturnAirConvectionGains( ZoneNum, RetAirGain );
+            SumAllReturnAirConvectionGains(ZoneNum, RetAirGain, 0);
 			SumIntGain += RetAirGain;
 		}
 
 		// Sum all non-system air flow, i.e. infiltration, simple ventilation, mixing, earth tube: SumMCp, SumMCpT
 		SumMCp = MCPI( ZoneNum ) + MCPV( ZoneNum ) + MCPM( ZoneNum ) + MCPE( ZoneNum ) + MCPC( ZoneNum ) + MDotCPOA( ZoneNum );
-		SumMCpT = MCPTI( ZoneNum ) + MCPTV( ZoneNum ) + MCPTM( ZoneNum ) + MCPTE( ZoneNum ) + MCPTC( ZoneNum ) + MDotCPOA( ZoneNum ) * Zone( ZoneNum ).OutDryBulbTemp;
+        SumMCpT =
+            MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
 
 		// Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model
-		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+        if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
+            (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated)) {
 			// Multizone airflow calculated in AirflowNetwork
 			SumMCp = AirflowNetworkExchangeData( ZoneNum ).SumMCp + AirflowNetworkExchangeData( ZoneNum ).SumMMCp;
 			SumMCpT = AirflowNetworkExchangeData( ZoneNum ).SumMCpT + AirflowNetworkExchangeData( ZoneNum ).SumMMCpT;
@@ -5468,34 +6051,15 @@ namespace ZoneTempPredictorCorrector {
 
 		// Sum all system air flow: SumSysMCp, SumSysMCpT
 		// Check to see if this is a controlled zone
-
-		ZoneEquipConfigNum = 0;
-		ControlledZoneAirFlag = false;
-		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
-			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
-				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
-				ControlledZoneAirFlag = true;
-				break;
-			}
-		}
+        ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
 
 		// Check to see if this is a plenum zone
-		// BG feb 2008 repeating this do loop every time seems crazy, store ControlledZoneAirFlag in Zone structure?
-		ZoneRetPlenumAirFlag = false;
-		for ( ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= NumZoneReturnPlenums; ++ZoneRetPlenumNum ) {
-			if ( ZoneRetPlenCond( ZoneRetPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneRetPlenumAirFlag = true;
-			break;
-		} // ZoneRetPlenumNum
-		ZoneSupPlenumAirFlag = false;
-		for ( ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= NumZoneSupplyPlenums; ++ZoneSupPlenumNum ) {
-			if ( ZoneSupPlenCond( ZoneSupPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneSupPlenumAirFlag = true;
-			break;
-		} // ZoneSupPlenumNum
+        ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
+        ZoneSupPlenumAirFlag = Zone(ZoneNum).IsSupplyPlenum;
 
 		// Plenum and controlled zones have a different set of inlet nodes which must be calculated.
 		if ( ControlledZoneAirFlag ) {
+            ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
 			auto const & zec( ZoneEquipConfig( ZoneEquipConfigNum ) );
 			for ( int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum ) {
 				// Get node conditions
@@ -5512,6 +6076,7 @@ namespace ZoneTempPredictorCorrector {
 			} // NodeNum
 
 		} else if ( ZoneRetPlenumAirFlag ) {
+            ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
 			auto const & zrpc( ZoneRetPlenCond( ZoneRetPlenumNum ) );
 			Real64 const air_hum_rat( ZoneAirHumRat( ZoneNum ) );
 			for ( int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum ) {
@@ -5526,7 +6091,8 @@ namespace ZoneTempPredictorCorrector {
 				SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
 			} // NodeNum
 			// add in the leaks
-			for ( int ADUListIndex = 1, ADUListIndex_end = ZoneRetPlenCond( ZoneRetPlenumNum ).NumADUs; ADUListIndex <= ADUListIndex_end; ++ADUListIndex ) {
+            for (int ADUListIndex = 1, ADUListIndex_end = ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ADUListIndex <= ADUListIndex_end;
+                 ++ADUListIndex) {
 				ADUNum = ZoneRetPlenCond( ZoneRetPlenumNum ).ADUIndex( ADUListIndex );
 				if ( AirDistUnit( ADUNum ).UpStreamLeak ) {
 					ADUInNode = AirDistUnit( ADUNum ).InletNodeNum;
@@ -5549,6 +6115,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 		} else if ( ZoneSupPlenumAirFlag ) {
+            ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
 			// Get node conditions
 			NodeTemp = Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).Temp;
 			MassFlowRate = Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate;
@@ -5556,7 +6123,6 @@ namespace ZoneTempPredictorCorrector {
 
 			SumSysMCp += MassFlowRate * CpAir;
 			SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-
 		}
 
 		ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
@@ -5631,7 +6197,8 @@ namespace ZoneTempPredictorCorrector {
 			SumHATsurf += HConvIn( SurfNum ) * Area * TempSurfInTmp( SurfNum );
 
 			// determine reference air temperature for this surface
-			{ auto const SELECT_CASE_var( Surface( SurfNum ).TAirRef );
+            {
+                auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
 			if ( SELECT_CASE_var == ZoneMeanAirTemp ) {
 				// The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
 				RefAirTemp = MAT( ZoneNum );
@@ -5658,15 +6225,13 @@ namespace ZoneTempPredictorCorrector {
 				// currently set to mean air temp but should add error warning here
 				RefAirTemp = MAT( ZoneNum );
 				SumHA += HA;
-			}}
+                }
+            }
 
 		} // SurfNum
-
 	}
 
-	void
-	CalcZoneComponentLoadSums(
-		int const ZoneNum, // Zone number
+    void CalcZoneComponentLoadSums(int const ZoneNum,        // Zone number
 		Real64 const TempDepCoef, // Dependent coefficient
 		Real64 const TempIndCoef, // Independent coefficient
 		Real64 & SumIntGains, // Zone sum of convective internal gains
@@ -5676,8 +6241,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCpDTsystem, // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
 		Real64 & SumNonAirSystem, // Zone sum of non air system convective heat gains
 		Real64 & CzdTdt, // Zone air energy storage term.
-		Real64 & imBalance, // put all terms in eq. 5 on RHS , should be zero
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+                                   Real64 &imBalance         // put all terms in eq. 5 on RHS , should be zero
 	)
 	{
 
@@ -5700,9 +6264,6 @@ namespace ZoneTempPredictorCorrector {
 		//  these are not mulitplied by zone multipliers.
 		//  The values are all Watts.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// Equation 5 in Engineering Reference.
 
@@ -5710,17 +6271,15 @@ namespace ZoneTempPredictorCorrector {
 		using namespace DataSurfaces;
 		using namespace DataHeatBalance;
 		using namespace DataHeatBalSurface;
+        using DataDefineEquip::AirDistUnit;
 		using DataLoopNode::Node;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataDefineEquip::AirDistUnit;
-		using ZonePlenum::ZoneRetPlenCond;
-		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneReturnPlenums;
-		using ZonePlenum::NumZoneSupplyPlenums;
+        using DirectAirManager::DirectAir;
 		using General::RoundSigDigits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
-		using DirectAirManager::DirectAir;
+        using ZonePlenum::ZoneRetPlenCond;
+        using ZonePlenum::ZoneSupPlenCond;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5777,7 +6336,7 @@ namespace ZoneTempPredictorCorrector {
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
-			SumAllReturnAirConvectionGains( ZoneNum, SumRetAirGains );
+            SumAllReturnAirConvectionGains(ZoneNum, SumRetAirGains, 0);
 			SumIntGains += SumRetAirGains;
 		}
 
@@ -5786,45 +6345,31 @@ namespace ZoneTempPredictorCorrector {
 
 		// Sum non-system air flow, i.e. infiltration, simple ventilation, earth tube
 		//  reuse SumMCp, SumMCpT from CalcZoneSum but use MAT (or maybe ZTAV?) to complete
-		SumMCpDtInfil = ( MCPTI( ZoneNum ) - MCPI( ZoneNum ) * MAT( ZoneNum ) ) + ( MCPTV( ZoneNum ) - MCPV( ZoneNum ) * MAT( ZoneNum ) ) + ( MCPTE( ZoneNum ) - MCPE( ZoneNum ) * MAT( ZoneNum ) ) + ( MCPTC( ZoneNum ) - MCPC( ZoneNum ) * MAT( ZoneNum ) ) + ( MDotCPOA( ZoneNum ) * Zone( ZoneNum ).OutDryBulbTemp - MDotCPOA( ZoneNum ) * MAT( ZoneNum ) ); // infiltration | Ventilation (simple) | Earth tube. | Cooltower | combined OA flow
+        SumMCpDtInfil = (MCPTI(ZoneNum) - MCPI(ZoneNum) * MAT(ZoneNum)) + (MCPTV(ZoneNum) - MCPV(ZoneNum) * MAT(ZoneNum)) +
+                        (MCPTE(ZoneNum) - MCPE(ZoneNum) * MAT(ZoneNum)) + (MCPTC(ZoneNum) - MCPC(ZoneNum) * MAT(ZoneNum)) +
+                        (MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp -
+                         MDotCPOA(ZoneNum) * MAT(ZoneNum)); // infiltration | Ventilation (simple) | Earth tube. | Cooltower | combined OA flow
 
 		// Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model (if used)
-		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+        if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
+            (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated)) {
 			// Multizone airflow calculated in AirflowNetwork
 			SumMCpDtInfil = AirflowNetworkExchangeData( ZoneNum ).SumMCpT - AirflowNetworkExchangeData( ZoneNum ).SumMCp * MAT( ZoneNum );
 			SumMCpDTzones = AirflowNetworkExchangeData( ZoneNum ).SumMMCpT - AirflowNetworkExchangeData( ZoneNum ).SumMMCp * MAT( ZoneNum );
 		}
 
 		// Sum all system air flow: reusing how SumSysMCp, SumSysMCpT are calculated in CalcZoneSums
-		// Check to see if this is a controlled zone
 
-		// CR 7384 continuation needed below.  eliminate do loop for speed and clarity
-		ZoneEquipConfigNum = 0;
-		ControlledZoneAirFlag = false;
-		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
-			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
-				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
-				ControlledZoneAirFlag = true;
-				break;
-			}
-		}
+        // Check to see if this is a controlled zone
+        ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
 
 		// Check to see if this is a plenum zone
-		ZoneRetPlenumAirFlag = false;
-		for ( ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= NumZoneReturnPlenums; ++ZoneRetPlenumNum ) {
-			if ( ZoneRetPlenCond( ZoneRetPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneRetPlenumAirFlag = true;
-			break;
-		} // ZoneRetPlenumNum
-		ZoneSupPlenumAirFlag = false;
-		for ( ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= NumZoneSupplyPlenums; ++ZoneSupPlenumNum ) {
-			if ( ZoneSupPlenCond( ZoneSupPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneSupPlenumAirFlag = true;
-			break;
-		} // ZoneSupPlenumNum
+        ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
+        ZoneSupPlenumAirFlag = Zone(ZoneNum).IsSupplyPlenum;
 
 		// Plenum and controlled zones have a different set of inlet nodes which must be calculated.
 		if ( ControlledZoneAirFlag ) {
+            ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
 			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 				// Get node conditions
 				NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
@@ -5833,10 +6378,8 @@ namespace ZoneTempPredictorCorrector {
 
 				SumMCpDTsystem += MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
 
-			} // NodeNum
-
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ADUNum > 0 ) {
-				ADUNum = ZoneEquipConfig( ZoneEquipConfigNum ).ADUNum;
+                ADUNum = ZoneEquipConfig(ZoneEquipConfigNum).InletNodeADUNum(NodeNum);
+                if (ADUNum > 0) {
 				NodeTemp = Node( AirDistUnit( ADUNum ).OutletNodeNum ).Temp;
 				MassFlowRate = Node( AirDistUnit( ADUNum ).OutletNodeNum ).MassFlowRate;
 				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
@@ -5847,8 +6390,8 @@ namespace ZoneTempPredictorCorrector {
 				AirDistUnit( ADUNum ).CoolGain = AirDistUnit( ADUNum ).CoolRate * TimeStepSys * SecInHour;
 			}
 
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).SDUNum > 0 ) {
-				SDUNum = ZoneEquipConfig( ZoneEquipConfigNum ).SDUNum;
+                SDUNum = ZoneEquipConfig(ZoneEquipConfigNum).InletNodeSDUNum(NodeNum);
+                if (SDUNum > 0) {
 				NodeTemp = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).Temp;
 				MassFlowRate = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).MassFlowRate;
 				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
@@ -5859,7 +6402,10 @@ namespace ZoneTempPredictorCorrector {
 				DirectAir( SDUNum ).CoolEnergy = DirectAir( SDUNum ).CoolRate * TimeStepSys * SecInHour;
 			}
 
+            } // NodeNum
+
 		} else if ( ZoneRetPlenumAirFlag ) {
+            ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
 			for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumInletNodes; ++NodeNum ) {
 				// Get node conditions
 				NodeTemp = Node( ZoneRetPlenCond( ZoneRetPlenumNum ).InletNode( NodeNum ) ).Temp;
@@ -5889,13 +6435,13 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 		} else if ( ZoneSupPlenumAirFlag ) {
+            ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
 			// Get node conditions
 			NodeTemp = Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).Temp;
 			MassFlowRate = Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate;
 			CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
 
 			SumMCpDTsystem += MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
-
 		}
 
 		// non air system response.
@@ -5908,7 +6454,8 @@ namespace ZoneTempPredictorCorrector {
 
 			Area = Surface( SurfNum ).Area; // For windows, this is the glazing area
 			// determine reference air temperature for this surface's convective heat transfer model
-			{ auto const SELECT_CASE_var( Surface( SurfNum ).TAirRef );
+            {
+                auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
 			if ( SELECT_CASE_var == ZoneMeanAirTemp ) {
 				// The zone air is the reference temperature
 				RefAirTemp = MAT( ZoneNum );
@@ -5941,8 +6488,8 @@ namespace ZoneTempPredictorCorrector {
 			} else {
 				// currently set to mean air temp but should add error warning here
 				RefAirTemp = MAT( ZoneNum );
-
-			}}
+                }
+            }
 
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
 
@@ -5961,7 +6508,8 @@ namespace ZoneTempPredictorCorrector {
 				if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) SumIntGains += SurfaceWindow( SurfNum ).OtherConvHeatGain;
 
 				// Convective heat gain from natural convection in gap between glass and interior shade or blind
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) SumIntGains += SurfaceWindow( SurfNum ).ConvHeatFlowNatural;
+                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn)
+                    SumIntGains += SurfaceWindow(SurfNum).ConvHeatFlowNatural;
 
 				// Convective heat gain from airflow window
 				if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 ) {
@@ -5975,14 +6523,15 @@ namespace ZoneTempPredictorCorrector {
 				if ( SurfaceWindow( SurfNum ).FrameArea > 0.0 ) {
 					// Window frame contribution
 
-					SumHADTsurfs += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * ( SurfaceWindow( SurfNum ).FrameTempSurfIn - RefAirTemp );
-
+                    SumHADTsurfs += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn) *
+                                    (SurfaceWindow(SurfNum).FrameTempSurfIn - RefAirTemp);
 				}
 
-				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceWindow( SurfNum ).ShadingFlag != IntShadeOn && SurfaceWindow( SurfNum ).ShadingFlag != IntBlindOn ) {
+                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && SurfaceWindow(SurfNum).ShadingFlag != IntShadeOn &&
+                    SurfaceWindow(SurfNum).ShadingFlag != IntBlindOn) {
 					// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-					SumHADTsurfs += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * ( SurfaceWindow( SurfNum ).DividerTempSurfIn - RefAirTemp );
-
+                    SumHADTsurfs += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn) *
+                                    (SurfaceWindow(SurfNum).DividerTempSurfIn - RefAirTemp);
 				}
 
 			} // End of check if window
@@ -5996,22 +6545,26 @@ namespace ZoneTempPredictorCorrector {
 		CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) );
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) );
 
-		{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
+        {
+            auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
 		if ( SELECT_CASE_var == Use3rdOrder ) {
-			CzdTdt = RhoAir * CpAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpSens * ( MAT( ZoneNum ) - ZTM1( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+                CzdTdt = RhoAir * CpAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens * (MAT(ZoneNum) - ZTM1(ZoneNum)) /
+                         (TimeStepSys * SecInHour);
 			// Exact solution
 		} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 			CzdTdt = TempIndCoef - TempDepCoef * MAT( ZoneNum );
 		} else if ( SELECT_CASE_var == UseEulerMethod ) {
 			CzdTdt = AIRRAT( ZoneNum ) * ( MAT( ZoneNum ) - ZoneT1( ZoneNum ) );
-		}}
+            }
+        }
 
 		if ( DisplayZoneAirHeatBalanceOffBalance ) {
 			imBalance = SumIntGains + SumHADTsurfs + SumMCpDTzones + SumMCpDtInfil + SumMCpDTsystem + SumNonAirSystem - CzdTdt;
 
 			// throw warning if seriously out of balance (this may need to be removed if too noisy... )
 			// formulate dynamic threshold value based on 20% of quadrature sum of components
-			Threshold = 0.2 * std::sqrt( pow_2( SumIntGains ) + pow_2( SumHADTsurfs ) + pow_2( SumMCpDTzones ) + pow_2( SumMCpDtInfil ) + pow_2( SumMCpDTsystem ) + pow_2( SumNonAirSystem ) + pow_2( CzdTdt ) );
+            Threshold = 0.2 * std::sqrt(pow_2(SumIntGains) + pow_2(SumHADTsurfs) + pow_2(SumMCpDTzones) + pow_2(SumMCpDtInfil) +
+                                        pow_2(SumMCpDTsystem) + pow_2(SumNonAirSystem) + pow_2(CzdTdt));
 			if ( ( std::abs( imBalance ) > Threshold ) && ( ! WarmupFlag ) && ( ! DoingSizing ) ) { // air balance is out by more than threshold
 				if ( Zone( ZoneNum ).AirHBimBalanceErrIndex == 0 ) {
 					ShowWarningMessage( "Zone Air Heat Balance is out of balance for zone named " + Zone( ZoneNum ).Name );
@@ -6022,14 +6575,18 @@ namespace ZoneTempPredictorCorrector {
 
 					ShowContinueErrorTimeStamp( " Occurrence info:" );
 				}
-				ShowRecurringWarningErrorAtEnd( "Zone Air Heat Balance is out of balance ... zone named " + Zone( ZoneNum ).Name, Zone( ZoneNum ).AirHBimBalanceErrIndex, std::abs( imBalance ) - Threshold, std::abs( imBalance ) - Threshold, _, "{W}", "{W}" );
+                ShowRecurringWarningErrorAtEnd("Zone Air Heat Balance is out of balance ... zone named " + Zone(ZoneNum).Name,
+                                               Zone(ZoneNum).AirHBimBalanceErrIndex,
+                                               std::abs(imBalance) - Threshold,
+                                               std::abs(imBalance) - Threshold,
+                                               _,
+                                               "{W}",
+                                               "{W}");
 			}
 		}
-
 	}
 
-	bool
-	VerifyThermostatInZone( std::string const & ZoneName ) // Zone to verify
+    bool VerifyThermostatInZone(std::string const &ZoneName) // Zone to verify
 	{
 
 		// FUNCTION INFORMATION:
@@ -6042,39 +6599,15 @@ namespace ZoneTempPredictorCorrector {
 		// This function verifies that a zone (by name) has a Zone Control:Thermostatic
 		// object entered.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		bool HasThermostat; // True if does, false if not.
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetZoneAirStatsInputFlag ) {
 			GetZoneAirSetPoints();
 			GetZoneAirStatsInputFlag = false;
 		}
 		if ( NumTempControlledZones > 0 ) {
-			if ( FindItemInList( ZoneName, TempControlledZone, &ZoneTempControls::ZoneName ) > 0 ) {
+            if (UtilityRoutines::FindItemInList(ZoneName, TempControlledZone, &ZoneTempControls::ZoneName) > 0) {
 				HasThermostat = true;
 			} else {
 				HasThermostat = false;
@@ -6083,11 +6616,9 @@ namespace ZoneTempPredictorCorrector {
 			HasThermostat = false;
 		}
 		return HasThermostat;
-
 	}
 
-	bool
-	VerifyControlledZoneForThermostat( std::string const & ZoneName ) // Zone to verify
+    bool VerifyControlledZoneForThermostat(std::string const &ZoneName) // Zone to verify
 	{
 
 		// FUNCTION INFORMATION:
@@ -6100,39 +6631,14 @@ namespace ZoneTempPredictorCorrector {
 		// This function verifies that a zone (by name) has a ZoneHVAC:EquipmentConnections
 		// object entered.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::EquipConfiguration;
+        using DataZoneEquipment::ZoneEquipConfig;
 
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		return ( FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName ) > 0 );
+        return (UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName) > 0);
 	}
 
-	void
-	DetectOscillatingZoneTemp()
+    void DetectOscillatingZoneTemp()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -6149,28 +6655,6 @@ namespace ZoneTempPredictorCorrector {
 		// MaxZoneTempDiff since ManageHVAC keeps shortening the timestep
 		// until that is reached unless it goes to less than the
 		// MinTimeStepSys.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iZone;
@@ -6192,10 +6676,12 @@ namespace ZoneTempPredictorCorrector {
 			//set up zone by zone variables
 			// CurrentModuleObject='Zone'
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-				SetupOutputVariable( "Zone Oscillating Temperatures Time [hr]", ZoneTempOscillate( iZone ), "System", "Sum", Zone( iZone ).Name );
+                SetupOutputVariable(
+                    "Zone Oscillating Temperatures Time", OutputProcessor::Unit::hr, ZoneTempOscillate(iZone), "System", "Sum", Zone(iZone).Name);
 			}
 			//set up a variable covering all zones
-			SetupOutputVariable( "Facility Any Zone Oscillating Temperatures Time [hr]", AnyZoneTempOscillate, "System", "Sum", "Facility" );
+            SetupOutputVariable(
+                "Facility Any Zone Oscillating Temperatures Time", OutputProcessor::Unit::hr, AnyZoneTempOscillate, "System", "Sum", "Facility");
 			SetupOscillationOutputFlag = false;
 		}
 		//precalc the negative value for performance
@@ -6242,12 +6728,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 	}
 
-	void
-	AdjustAirSetPointsforOpTempCntrl(
-		int const TempControlledZoneID,
-		int const ActualZoneNum,
-		Real64 & ZoneAirSetPoint
-	)
+    void AdjustAirSetPointsforOpTempCntrl(int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6262,24 +6743,9 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// pass in data and alter setpoint if needed
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalance::MRT;
 		using ScheduleManager::GetCurrentScheduleValue;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 thisMRT; // local variable for mean radiant temperature in this zone
@@ -6302,14 +6768,9 @@ namespace ZoneTempPredictorCorrector {
 		// modify setpoint for operative temperature control
 		//  traping for MRT fractions between 0.0 and 0.9 during get input, so shouldn't be able to divide by zero here.
 		ZoneAirSetPoint = ( ZoneAirSetPoint - thisMRTFraction * thisMRT ) / ( 1.0 - thisMRTFraction );
-
 	}
 
-	void
-	AdjustOperativeSetPointsforAdapComfort(
-		int const TempControlledZoneID,
-		Real64 & ZoneAirSetPoint
-		)
+    void AdjustOperativeSetPointsforAdapComfort(int const TempControlledZoneID, Real64 &ZoneAirSetPoint)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xuan Luo
@@ -6320,17 +6781,11 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine adjust the operative setpoints for each controlled adaptive thermal comfort models.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::DayOfYear;
 		using WeatherManager::DesDayInput;
-		using WeatherManager::Envrn;
 		using WeatherManager::Environment;		
+        using WeatherManager::Envrn;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int originZoneAirSetPoint = ZoneAirSetPoint;
@@ -6363,11 +6818,9 @@ namespace ZoneTempPredictorCorrector {
 				case CEN15251_UPPER_III:
 					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( DayOfYear );
 					break;
-				default:
-					;
-			}
+            default:;
 		}
-		else {
+        } else {
 			int const envrnDayNum( Environment( Envrn ).DesignDayNum );
 			int const summerDesignDayTypeIndex( 9 );
 			// Adjust summer design day set point
@@ -6385,8 +6838,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 	}
 
-	void
-	CalcZoneAirComfortSetPoints()
+    void CalcZoneAirComfortSetPoints()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6399,29 +6851,12 @@ namespace ZoneTempPredictorCorrector {
 		// This routine sets the thermal comfort setpoints for each controlled zone based on air tempeature
 		// obtained from thermal comfort models.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using ScheduleManager::GetCurrentScheduleValue;
 		using General::TrimSigDigits;
+        using ScheduleManager::GetCurrentScheduleValue;
 		using ThermalComfort::ManageThermalComfort;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RelativeZoneNum;
@@ -6459,7 +6894,9 @@ namespace ZoneTempPredictorCorrector {
 
 			// Get PMV values
 
-			{ auto const SELECT_CASE_var( ComfortControlType( ActualZoneNum ) ); // Is this missing the possibility of sometimes having no control on a zone
+            {
+                auto const SELECT_CASE_var(
+                    ComfortControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
 			// during the simulation?
 			if ( SELECT_CASE_var == 0 ) { // Uncontrolled for thermal comfort
 				ZoneComfortControlsFanger( ActualZoneNum ).LowPMV = -999.0;
@@ -6504,22 +6941,30 @@ namespace ZoneTempPredictorCorrector {
 				if ( ZoneComfortControlsFanger( ActualZoneNum ).LowPMV > ZoneComfortControlsFanger( ActualZoneNum ).HighPMV ) {
 					++ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrCount;
 					if ( ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrCount < 2 ) {
-						ShowWarningError( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above the cooling PMV setpoint in " + SetPointDualHeatCoolFanger( SchedTypeIndex ).Name );
+                            ShowWarningError("ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above the cooling "
+                                             "PMV setpoint in " +
+                                             SetPointDualHeatCoolFanger(SchedTypeIndex).Name);
 						ShowContinueError( "The zone dual heating PMV setpoint is set to the dual cooling PMV setpoint." );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( "The heating PMV setpoint is still above the cooling PMV setpoint", ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrIndex, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV );
+                            ShowRecurringWarningErrorAtEnd("The heating PMV setpoint is still above the cooling PMV setpoint",
+                                                           ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrIndex,
+                                                           ZoneComfortControlsFanger(ActualZoneNum).LowPMV,
+                                                           ZoneComfortControlsFanger(ActualZoneNum).LowPMV);
 					}
 					ZoneComfortControlsFanger( ActualZoneNum ).LowPMV = ZoneComfortControlsFanger( ActualZoneNum ).HighPMV;
 				}
 
 			} else {
-				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal thermal control control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( ComfortControlType( ActualZoneNum ) ) + ", in Schedule=" + ComfortControlledZone( RelativeZoneNum ).ControlTypeSchedName );
-
-			}}
+                    ShowSevereError("CalcZoneAirTempSetpoints: Illegal thermal control control type for Zone=" + Zone(ActualZoneNum).Name +
+                                    ", Found value=" + TrimSigDigits(ComfortControlType(ActualZoneNum)) +
+                                    ", in Schedule=" + ComfortControlledZone(RelativeZoneNum).ControlTypeSchedName);
+                }
+            }
 
 			// Check Average method
-			{ auto const SELECT_CASE_var( ComfortControlledZone( RelativeZoneNum ).AverageMethodNum );
+            {
+                auto const SELECT_CASE_var(ComfortControlledZone(RelativeZoneNum).AverageMethodNum);
 			if ( SELECT_CASE_var == AverageMethodNum_NO ) {
 				PeopleNum = ComfortControlledZone( RelativeZoneNum ).SpecificObjectNum;
 				if ( ComfortControlType( ActualZoneNum ) == SglCoolSetPointFanger ) {
@@ -6527,7 +6972,8 @@ namespace ZoneTempPredictorCorrector {
 				} else {
 					GetComfortSetPoints( PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV, SetPointLo );
 				}
-				if ( ComfortControlType( ActualZoneNum ) == DualSetPointFanger ) GetComfortSetPoints( PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger( ActualZoneNum ).HighPMV, SetPointHi );
+                    if (ComfortControlType(ActualZoneNum) == DualSetPointFanger)
+                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
 			} else if ( SELECT_CASE_var == AverageMethodNum_SPE ) {
 				PeopleNum = ComfortControlledZone( RelativeZoneNum ).SpecificObjectNum;
 				if ( ComfortControlType( ActualZoneNum ) == SglCoolSetPointFanger ) {
@@ -6535,7 +6981,8 @@ namespace ZoneTempPredictorCorrector {
 				} else {
 					GetComfortSetPoints( PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV, SetPointLo );
 				}
-				if ( ComfortControlType( ActualZoneNum ) == DualSetPointFanger ) GetComfortSetPoints( PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger( ActualZoneNum ).HighPMV, SetPointHi );
+                    if (ComfortControlType(ActualZoneNum) == DualSetPointFanger)
+                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
 			} else if ( SELECT_CASE_var == AverageMethodNum_OBJ ) {
 				ObjectCount = 0;
 				SetPointLo = 0.0;
@@ -6577,11 +7024,16 @@ namespace ZoneTempPredictorCorrector {
 					//          ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount = &
 					//                                           ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).PeopleAverageErrIndex == 0 ) {
-						ShowWarningMessage( "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " + Zone( ActualZoneNum ).Name + " is zero. The People Average option is not used." );
+                            ShowWarningMessage("ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " +
+                                               Zone(ActualZoneNum).Name + " is zero. The People Average option is not used.");
 						ShowContinueError( "The Object Average option is used instead. Simulation continues ....." );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " + Zone( ActualZoneNum ).Name + " is still zero. The People Average option is not used", ComfortControlledZone( RelativeZoneNum ).PeopleAverageErrIndex, PeopleCount, PeopleCount );
+                        ShowRecurringWarningErrorAtEnd("ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " +
+                                                           Zone(ActualZoneNum).Name + " is still zero. The People Average option is not used",
+                                                       ComfortControlledZone(RelativeZoneNum).PeopleAverageErrIndex,
+                                                       PeopleCount,
+                                                       PeopleCount);
 					ObjectCount = 0;
 					SetPointLo = 0.0;
 					SetPointHi = 0.0;
@@ -6599,29 +7051,40 @@ namespace ZoneTempPredictorCorrector {
 					SetPointLo /= ObjectCount;
 					if ( ComfortControlType( ActualZoneNum ) == DualSetPointFanger ) SetPointHi /= ObjectCount;
 				}
-			}}
+                }
+            }
 
 			// Assign setpoint
-			{ auto const SELECT_CASE_var( ComfortControlType( ActualZoneNum ) ); // Is this missing the possibility of sometimes having no control on a zone
+            {
+                auto const SELECT_CASE_var(
+                    ComfortControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
 			// during the simulation?
 			if ( SELECT_CASE_var == 0 ) { // Uncontrolled for thermal comfort
-				{ auto const SELECT_CASE_var1( TempControlType( ActualZoneNum ) );
+                    {
+                        auto const SELECT_CASE_var1(TempControlType(ActualZoneNum));
 				if ( SELECT_CASE_var1 == SingleHeatingSetPoint ) {
 					ZoneThermostatSetPointHi( ActualZoneNum ) = 0.0;
 				} else if ( SELECT_CASE_var1 == SingleCoolingSetPoint ) {
 					ZoneThermostatSetPointLo( ActualZoneNum ) = 0.0;
-				}}
+                        }
+                    }
 
 			} else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
 				if ( SetPointLo < ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint ) {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbMinErrCount = ComfortControlledZone(RelativeZoneNum)%TdbMinErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbMinErrIndex < 2 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is below the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
+                            ShowWarningMessage("ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is below the Minimum dry-bulb "
+                                               "temperature setpoint " +
+                                               ComfortControlledZone(RelativeZoneNum).Name);
 						ShowContinueError( "The zone heating setpoint is set to the Minimum dry-bulb temperature setpoint" );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is still below the Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbMinErrIndex, SetPointLo, SetPointLo );
+                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is still below the "
+                                                       "Minimum dry-bulb temperature setpoint ...",
+                                                       ComfortControlledZone(RelativeZoneNum).TdbMinErrIndex,
+                                                       SetPointLo,
+                                                       SetPointLo);
 				}
 				TempZoneThermostatSetPoint( ActualZoneNum ) = SetPointLo;
 				ZoneThermostatSetPointLo( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
@@ -6633,11 +7096,17 @@ namespace ZoneTempPredictorCorrector {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbMaxErrCount = ComfortControlledZone(RelativeZoneNum)%TdbMaxErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbMaxErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is above the Maximum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
+                            ShowWarningMessage("ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is above the Maximum dry-bulb "
+                                               "temperature setpoint " +
+                                               ComfortControlledZone(RelativeZoneNum).Name);
 						ShowContinueError( "The zone cooling setpoint is set to the Maximum dry-bulb temperature setpoint" );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is still above the Maximum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbMaxErrIndex, SetPointLo, SetPointLo );
+                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is still above the "
+                                                       "Maximum dry-bulb temperature setpoint ...",
+                                                       ComfortControlledZone(RelativeZoneNum).TdbMaxErrIndex,
+                                                       SetPointLo,
+                                                       SetPointLo);
 				}
 				TempZoneThermostatSetPoint( ActualZoneNum ) = SetPointLo;
 				ZoneThermostatSetPointHi( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
@@ -6648,16 +7117,26 @@ namespace ZoneTempPredictorCorrector {
 				if ( ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint == ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint ) {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint;
 				}
-				if ( SetPointLo > ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint ) SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint;
-				if ( SetPointLo < ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint ) SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint;
-				if ( SetPointLo < ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint || SetPointLo > ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint ) {
+                    if (SetPointLo > ComfortControlledZone(RelativeZoneNum).TdbMaxSetPoint)
+                        SetPointLo = ComfortControlledZone(RelativeZoneNum).TdbMaxSetPoint;
+                    if (SetPointLo < ComfortControlledZone(RelativeZoneNum).TdbMinSetPoint)
+                        SetPointLo = ComfortControlledZone(RelativeZoneNum).TdbMinSetPoint;
+                    if (SetPointLo < ComfortControlledZone(RelativeZoneNum).TdbMinSetPoint ||
+                        SetPointLo > ComfortControlledZone(RelativeZoneNum).TdbMaxSetPoint) {
 					//          ComfortControlledZone(RelativeZoneNum)%TdbHCErrCount = ComfortControlledZone(RelativeZoneNum)%TdbHCErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbHCErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is above the Maximum or below the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
-						ShowContinueError( "The zone setpoint is set to the Maximum dry-bulb temperature setpoint if above or the Minimum dry-bulb temperature setpoint if below" );
+                            ShowWarningMessage("ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is above the Maximum or "
+                                               "below the Minimum dry-bulb temperature setpoint " +
+                                               ComfortControlledZone(RelativeZoneNum).Name);
+                            ShowContinueError("The zone setpoint is set to the Maximum dry-bulb temperature setpoint if above or the Minimum "
+                                              "dry-bulb temperature setpoint if below");
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is still beyond the range between Maximum and Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbHCErrIndex, SetPointLo, SetPointLo );
+                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is still beyond "
+                                                       "the range between Maximum and Minimum dry-bulb temperature setpoint ...",
+                                                       ComfortControlledZone(RelativeZoneNum).TdbHCErrIndex,
+                                                       SetPointLo,
+                                                       SetPointLo);
 				}
 				TempZoneThermostatSetPoint( ActualZoneNum ) = SetPointLo;
 				ZoneThermostatSetPointHi( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
@@ -6668,23 +7147,37 @@ namespace ZoneTempPredictorCorrector {
 
 				if ( SetPointLo < ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint ) {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint;
-					//          ComfortControlledZone(RelativeZoneNum)%TdbDualMinErrCount = ComfortControlledZone(RelativeZoneNum)%TdbDualMinErrCount+1
+                        //          ComfortControlledZone(RelativeZoneNum)%TdbDualMinErrCount =
+                        //          ComfortControlledZone(RelativeZoneNum)%TdbDualMinErrCount+1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbDualMinErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is below the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
+                            ShowWarningMessage("ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is below the Minimum dry-bulb "
+                                               "temperature setpoint " +
+                                               ComfortControlledZone(RelativeZoneNum).Name);
 						ShowContinueError( "The zone dual heating setpoint is set to the Minimum dry-bulb temperature setpoint" );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still below the Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbDualMinErrIndex, SetPointLo, SetPointLo );
+                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still below the Minimum "
+                                                       "dry-bulb temperature setpoint ...",
+                                                       ComfortControlledZone(RelativeZoneNum).TdbDualMinErrIndex,
+                                                       SetPointLo,
+                                                       SetPointLo);
 				}
 				if ( SetPointHi > ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint ) {
 					SetPointHi = ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint;
-					//          ComfortControlledZone(RelativeZoneNum)%TdbDualMaxErrCount = ComfortControlledZone(RelativeZoneNum)%TdbDualMaxErrCount + 1
+                        //          ComfortControlledZone(RelativeZoneNum)%TdbDualMaxErrCount =
+                        //          ComfortControlledZone(RelativeZoneNum)%TdbDualMaxErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbDualMaxErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is above the Maximum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
+                            ShowWarningMessage("ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is above the Maximum dry-bulb "
+                                               "temperature setpoint " +
+                                               ComfortControlledZone(RelativeZoneNum).Name);
 						ShowContinueError( "The zone dual cooling setpoint is set to the Maximum dry-bulb temperature setpoint" );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still above the Maximum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbDualMaxErrIndex, SetPointLo, SetPointLo );
+                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still above the Maximum "
+                                                       "dry-bulb temperature setpoint ...",
+                                                       ComfortControlledZone(RelativeZoneNum).TdbDualMaxErrIndex,
+                                                       SetPointLo,
+                                                       SetPointLo);
 				}
 
 				ZoneThermostatSetPointLo( ActualZoneNum ) = SetPointLo;
@@ -6692,17 +7185,15 @@ namespace ZoneTempPredictorCorrector {
 				TempControlType( ActualZoneNum ) = DualSetPointWithDeadBand;
 
 			} else {
-				ShowSevereError( "CalcZoneAirComfortSetpoints: Illegal thermal control control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( ComfortControlType( ActualZoneNum ) ) + ", in Schedule=" + ComfortControlledZone( ActualZoneNum ).ControlTypeSchedName );
-
-			}}
-
+                    ShowSevereError("CalcZoneAirComfortSetpoints: Illegal thermal control control type for Zone=" + Zone(ActualZoneNum).Name +
+                                    ", Found value=" + TrimSigDigits(ComfortControlType(ActualZoneNum)) +
+                                    ", in Schedule=" + ComfortControlledZone(ActualZoneNum).ControlTypeSchedName);
+                }
+            }
 		}
-
 	}
 
-	void
-	GetComfortSetPoints(
-		int const PeopleNum,
+    void GetComfortSetPoints(int const PeopleNum,
 		int const ComfortControlNum,
 		Real64 const PMVSet,
 		Real64 & Tset // drybulb setpoint temperature for a given PMV value
@@ -6720,14 +7211,8 @@ namespace ZoneTempPredictorCorrector {
 		// obtained from thermal comfort models.
 		// This is called each time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+        using General::SolveRoot;
 		using ThermalComfort::CalcThermalComfortFanger;
 
 		// Locals
@@ -6735,14 +7220,8 @@ namespace ZoneTempPredictorCorrector {
 		// 0 = Solution; 1 = Set to Min; 2 Set to Max
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Acc( 0.001 ); // accuracy control for SolveRegulaFalsi
-		int const MaxIter( 500 ); // iteration control for SolveRegulaFalsi
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+        Real64 const Acc(0.001); // accuracy control for SolveRoot
+        int const MaxIter(500);  // iteration control for SolveRoot
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Tmin; // Minimun drybulb setpoint temperature
@@ -6751,7 +7230,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 PMVMin; // Minimum allowed PMV value
 		Real64 PMVMax; // Calculated PMV value
 		Array1D< Real64 > Par( 2 ); // Passed parameter for RegularFalsi function
-		int SolFla; // feed back flag from SolveRegulaFalsi
+        int SolFla;             // feed back flag from SolveRoot
 		static int IterLimitExceededNum1( 0 );
 		static int IterLimitErrIndex1( 0 );
 		static int IterLimitExceededNum2( 0 );
@@ -6767,23 +7246,33 @@ namespace ZoneTempPredictorCorrector {
 		if ( PMVSet > PMVMin && PMVSet < PMVMax ) {
 			Par( 1 ) = PMVSet;
 			Par( 2 ) = double( PeopleNum );
-			SolveRegulaFalsi( Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par );
+            SolveRoot(Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
 			if ( SolFla == -1 ) {
 				if ( ! WarmupFlag ) {
 					++IterLimitExceededNum1;
 					if ( IterLimitExceededNum1 == 1 ) {
-						ShowWarningError( ComfortControlledZone( ComfortControlNum ).Name + ": Iteration limit exceeded calculating thermal comfort Fanger setpoint and non-converged setpoint is used" );
+                        ShowWarningError(ComfortControlledZone(ComfortControlNum).Name +
+                                         ": Iteration limit exceeded calculating thermal comfort Fanger setpoint and non-converged setpoint is used");
 					} else {
-						ShowRecurringWarningErrorAtEnd( ComfortControlledZone( ComfortControlNum ).Name + ":  Iteration limit exceeded calculating thermal comfort setpoint.", IterLimitErrIndex1, Tset, Tset );
+                        ShowRecurringWarningErrorAtEnd(ComfortControlledZone(ComfortControlNum).Name +
+                                                           ":  Iteration limit exceeded calculating thermal comfort setpoint.",
+                                                       IterLimitErrIndex1,
+                                                       Tset,
+                                                       Tset);
 					}
 				}
 			} else if ( SolFla == -2 ) {
 				if ( ! WarmupFlag ) {
 					++IterLimitExceededNum2;
 					if ( IterLimitExceededNum2 == 1 ) {
-						ShowWarningError( ComfortControlledZone( ComfortControlNum ).Name + ": Solution is not found in calculating thermal comfort Fanger setpoint and the minimum setpoint is used" );
+                        ShowWarningError(ComfortControlledZone(ComfortControlNum).Name +
+                                         ": Solution is not found in calculating thermal comfort Fanger setpoint and the minimum setpoint is used");
 					} else {
-						ShowRecurringWarningErrorAtEnd( ComfortControlledZone( ComfortControlNum ).Name + ":  Solution is not found in  calculating thermal comfort Fanger setpoint.", IterLimitErrIndex2, Tset, Tset );
+                        ShowRecurringWarningErrorAtEnd(ComfortControlledZone(ComfortControlNum).Name +
+                                                           ":  Solution is not found in  calculating thermal comfort Fanger setpoint.",
+                                                       IterLimitErrIndex2,
+                                                       Tset,
+                                                       Tset);
 					}
 				}
 			}
@@ -6792,12 +7281,9 @@ namespace ZoneTempPredictorCorrector {
 		} else if ( PMVSet > PMVMax ) {
 			Tset = Tmax;
 		}
-
 	}
 
-	Real64
-	PMVResidual(
-		Real64 const Tset,
+    Real64 PMVResidual(Real64 const Tset,
 		Array1< Real64 > const & Par // par(1) = PMV set point
 	)
 	{
@@ -6844,12 +7330,9 @@ namespace ZoneTempPredictorCorrector {
 		CalcThermalComfortFanger( PeopleNum, Tset, PMVresult );
 		PMVResidual = Par( 1 ) - PMVresult;
 		return PMVResidual;
-
 	}
 
-	void
-	AdjustCoolingSetPointforTempAndHumidityControl(
-		int const TempControlledZoneID,
+    void AdjustCoolingSetPointforTempAndHumidityControl(int const TempControlledZoneID,
 		int const ActualZoneNum // controlled zone actual zone number
 	)
 	{
@@ -6907,15 +7390,330 @@ namespace ZoneTempPredictorCorrector {
 			ZoneOvercoolRange = min( ZoneOvercoolRange, MaxAllowedOvercoolRange );
 		}
 		// Calculate difference between zone air relative humidity and the dehumidifying setpoint
-		RelativeHumidityDiff = ZoneAirRelHum( ActualZoneNum ) - GetCurrentScheduleValue( TempControlledZone( TempControlledZoneID ).DehumidifyingSchedIndex );
+        RelativeHumidityDiff =
+            ZoneAirRelHum(ActualZoneNum) - GetCurrentScheduleValue(TempControlledZone(TempControlledZoneID).DehumidifyingSchedIndex);
 		if ( RelativeHumidityDiff > 0.0 && ZoneOvercoolControlRatio > 0.0 ) {
 			// proportionally reset the cooling setpoint temperature downward (zone Overcool)
 			ZoneOvercoolRange = min( ZoneOvercoolRange, RelativeHumidityDiff / ZoneOvercoolControlRatio );
 			ZoneThermostatSetPointHi( ActualZoneNum ) -= ZoneOvercoolRange;
 		}
+    }
 
+    void OverrideAirSetPointsforEMSCntrl()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         L. Gu
+        //       DATE WRITTEN   June 2017
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine overrides the air temperature setpoint based on EMS
+
+        // Locals
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Loop;    // index of temp control
+        int ZoneNum; // Zone index
+
+        for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
+            if (TempControlledZone(Loop).EMSOverrideHeatingSetPointOn) {
+                ZoneNum = TempControlledZone(Loop).ActualZoneNum;
+
+                {
+                    auto const SELECT_CASE_var(TempControlType(ZoneNum));
+
+                    if (SELECT_CASE_var == 0) { // Uncontrolled
+
+                    } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
+                        TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                    } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
+                        // do nothing
+                    } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
+                        TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                    } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
+                        ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                    } else {
+                        // Do nothing
+                    }
+                }
+            }
+            if (TempControlledZone(Loop).EMSOverrideCoolingSetPointOn) {
+                ZoneNum = TempControlledZone(Loop).ActualZoneNum;
+
+                {
+                    auto const SELECT_CASE_var(TempControlType(ZoneNum));
+
+                    if (SELECT_CASE_var == 0) { // Uncontrolled
+
+                    } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
+                        // do nothing
+                    } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
+                        TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                    } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
+                        TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                    } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
+                        ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                    } else {
+                        // Do nothing
+                    }
+                }
+            }
+        }
+
+        for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
+            if (ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn) {
+                ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
+                {
+                    auto const SELECT_CASE_var(ComfortControlType(ZoneNum));
+
+                    if (SELECT_CASE_var == 0) { // Uncontrolled
+
+                    } else if (SELECT_CASE_var == SglHeatSetPointFanger) {
+                        TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                    } else if (SELECT_CASE_var == SglCoolSetPointFanger) {
+                        // do nothing
+                    } else if (SELECT_CASE_var == SglHCSetPointFanger) {
+                        TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                    } else if (SELECT_CASE_var == DualSetPointFanger) {
+                        ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                    } else {
+                        // Do nothing
+                    }
+                }
+            }
+            if (ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn) {
+                ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
+                {
+                    auto const SELECT_CASE_var(ComfortControlType(ZoneNum));
+
+                    if (SELECT_CASE_var == 0) { // Uncontrolled
+
+                    } else if (SELECT_CASE_var == SglHeatSetPointFanger) {
+                        // do nothing
+                    } else if (SELECT_CASE_var == SglCoolSetPointFanger) {
+                        TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                    } else if (SELECT_CASE_var == SglHCSetPointFanger) {
+                        TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                    } else if (SELECT_CASE_var == DualSetPointFanger) {
+                        ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                    } else {
+                        // Do nothing
+                    }
+                }
+            }
+        }
+    }
+
+    // add values to the LEED tabular report related to schedules used by the thermostat objects
+    void FillPredefinedTableOnThermostatSetpoints()
+    {
+        // J.Glazer - Aug 2017
+        using namespace OutputReportPredefined;
+        std::vector<int> uniqSch;
+        uniqSch.reserve(NumSingleTempHeatingControls + NumSingleTempCoolingControls + NumSingleTempHeatCoolControls +
+                        NumDualTempHeatCoolControls * 2);
+        Real64 setPointAt11;
+        Real64 setPointAt23;
+        int numDays;
+        std::string monthAssumed;
+        std::string monthAssumed2;
+        const int wednesday = 4;
+
+        for (int SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= NumSingleTempHeatingControls; ++SingleTempHeatingControlNum) {
+            if (std::find(uniqSch.begin(), uniqSch.end(), SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex);
+                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                                 SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName,
+                                 SetPointSingleHeating(SingleTempHeatingControlNum).Name);
+
+                std::tie(setPointAt11, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
+
+                std::tie(setPointAt23, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
+
+                PreDefTableEntry(pdChLeedSchStPtMonthUsed, SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, monthAssumed);
+            }
+        }
+        for (int SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= NumSingleTempCoolingControls; ++SingleTempCoolingControlNum) {
+            if (std::find(uniqSch.begin(), uniqSch.end(), SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex);
+                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                                 SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName,
+                                 SetPointSingleCooling(SingleTempCoolingControlNum).Name);
+
+                std::tie(setPointAt11, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
+
+                std::tie(setPointAt23, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
+
+                PreDefTableEntry(pdChLeedSchStPtMonthUsed, SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, monthAssumed);
+            }
+        }
+        for (int SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum) {
+            if (std::find(uniqSch.begin(), uniqSch.end(), SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex);
+                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                                 SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName,
+                                 SetPointSingleHeatCool(SingleTempHeatCoolControlNum).Name);
+
+                std::string schNm = SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (summer)";
+                std::tie(setPointAt11, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, schNm, numDays);
+
+                std::tie(setPointAt23, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, schNm, numDays);
+
+                schNm = SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (winter)";
+                std::tie(setPointAt11, numDays, monthAssumed2) =
+                    temperatureAndCountInSch(SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, schNm, numDays);
+
+                std::tie(setPointAt23, numDays, monthAssumed2) =
+                    temperatureAndCountInSch(SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, schNm, numDays);
+
+                PreDefTableEntry(pdChLeedSchStPtMonthUsed,
+                                 SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName,
+                                 monthAssumed + " and " + monthAssumed2);
+            }
+        }
+        for (int DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum) {
+            if (std::find(uniqSch.begin(), uniqSch.end(), SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex);
+                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                                 SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName,
+                                 SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
+
+                std::tie(setPointAt11, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
+
+                std::tie(setPointAt23, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
+
+                PreDefTableEntry(pdChLeedSchStPtMonthUsed, SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, monthAssumed);
+            }
+            if (std::find(uniqSch.begin(), uniqSch.end(), SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex);
+                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                                 SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName,
+                                 SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
+
+                std::tie(setPointAt11, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
+
+                std::tie(setPointAt23, numDays, monthAssumed) =
+                    temperatureAndCountInSch(SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
+
+                PreDefTableEntry(pdChLeedSchStPtMonthUsed, SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, monthAssumed);
+            }
+        }
+    }
+
+    // returns the temperature value from a schedule at a certain time for the first day of the week in either January or July
+    std::tuple<Real64, int, std::string>
+    temperatureAndCountInSch(int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay)
+    {
+        // J.Glazer - Aug 2017
+
+        // determine month to use based on hemiphere and season
+        int monthToUse;
+        if (isSummer) {
+            if (DataEnvironment::Latitude > 0.) {
+                monthToUse = 7; // July - summer in northern hemisphere
+            } else {
+                monthToUse = 1; // January - summer in southern hemisphere
+            }
+        } else {
+            if (DataEnvironment::Latitude > 0.) {
+                monthToUse = 1; // January - winter in northern hemisphere
+            } else {
+                monthToUse = 7; // July - winter in southern hemisphere
+            }
+        }
+        std::string monthName;
+        if (monthToUse == 1) {
+            monthName = "January";
+        } else {
+            monthName = "July";
+        }
+
+        int jdateSelect = General::nthDayOfWeekOfMonth(dayOfWeek, 1, monthToUse);
+
+        // determine number of days in year
+        int DaysInYear;
+        if (DataEnvironment::CurrentYearIsLeapYear) {
+            DaysInYear = 366;
+        } else {
+            DaysInYear = 365;
+        }
+
+        // should adjust date if lands on a holiday but for now assume that it does not
+
+        // adjust time of day for daylight savings time
+        int hourSelect = hourOfDay + WeatherManager::DSTIndex(jdateSelect);
+
+        // get the value at the selected time
+        int const firstTimeStep = 1;
+        int weekSchIndexSelect = ScheduleManager::Schedule(scheduleIndex).WeekSchedulePointer(jdateSelect);
+        int daySchIndexSelect = ScheduleManager::WeekSchedule(weekSchIndexSelect).DaySchedulePointer(dayOfWeek);
+        Real64 valueAtSelectTime = ScheduleManager::DaySchedule(daySchIndexSelect).TSValue(firstTimeStep, hourSelect);
+        int countOfSame = 0;
+
+        // count the number of times with that same value
+        for (int jdateOfYear = 1; jdateOfYear <= DaysInYear; ++jdateOfYear) {
+            int wkSch = ScheduleManager::Schedule(scheduleIndex).WeekSchedulePointer(jdateOfYear);
+            if (wkSch == weekSchIndexSelect) { // if same week schedule can short circuit rest of testing and increment counter
+                ++countOfSame;
+            } else {
+                int daySch = ScheduleManager::WeekSchedule(wkSch).DaySchedulePointer(dayOfWeek);
+                if (daySch == daySchIndexSelect) { // if same day schedule can short circuit rest of testing and increment counter
+                    ++countOfSame;
+                } else {
+                    Real64 valueAt = ScheduleManager::DaySchedule(daySch).TSValue(firstTimeStep, hourSelect);
+                    if (valueAt == valueAtSelectTime) {
+                        ++countOfSame;
+                    }
+                }
+            }
+        }
+
+        return std::make_tuple(valueAtSelectTime, countOfSame, monthName);
 	}
 
-} // ZoneTempPredictorCorrector
+} // namespace ZoneTempPredictorCorrector
 
-} // EnergyPlus
+} // namespace EnergyPlus

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -47,27 +48,24 @@
 #ifndef CommandLineInterface_hh_INCLUDED
 #define CommandLineInterface_hh_INCLUDED
 
-#include <string>
 #include <EnergyPlusAPI.hh>
+#include <string>
 
-namespace EnergyPlus{
+namespace EnergyPlus {
 
 namespace CommandLineInterface {
 
- // Process command line arguments
- int
- ENERGYPLUSLIB_API ProcessArgs( int argc, const char * argv[] );
+    // Process command line arguments
+    int ENERGYPLUSLIB_API ProcessArgs(int argc, const char *argv[]);
 
- void
- ReadINIFile(
- 	int const UnitNumber, // Unit number of the opened INI file
- 	std::string const & Heading, // Heading for the parameters ('[heading]')
- 	std::string const & KindofParameter, // Kind of parameter to be found (String)
- 	std::string & DataOut // Output from the retrieval
- );
+    void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
+                     std::string const &Heading,         // Heading for the parameters ('[heading]')
+                     std::string const &KindofParameter, // Kind of parameter to be found (String)
+                     std::string &DataOut                // Output from the retrieval
+    );
 
-} // CommandLineInterface
+} // namespace CommandLineInterface
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

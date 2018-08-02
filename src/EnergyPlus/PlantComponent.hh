@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -47,28 +48,43 @@
 #ifndef PLANTCOMPONENT_HH_INCLUDED
 #define PLANTCOMPONENT_HH_INCLUDED
 
+#include <DataGlobals.hh>
+
 namespace EnergyPlus {
 
-	// Forward Declarations
-	struct PlantLocation;
+// Forward Declarations
+struct PlantLocation;
 
-	class PlantComponent {
+class PlantComponent
+{
 
-		public:
-			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) = 0;
+public:
+    virtual void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) = 0;
 
-			virtual void getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & EP_UNUSED(MaxLoad), Real64 & EP_UNUSED(MinLoad), Real64 & EP_UNUSED(OptLoad) ) {}
+    virtual void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                     Real64 &EP_UNUSED(MaxLoad),
+                                     Real64 &EP_UNUSED(MinLoad),
+                                     Real64 &EP_UNUSED(OptLoad))
+    {
+    }
 
-			virtual void getDesignTemperatures( Real64 & EP_UNUSED(TempDesCondIn), Real64 & EP_UNUSED(TempDesEvapOut) ) {}
+    virtual void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut))
+    {
+    }
 
-			virtual void getSizingFactor( Real64 & EP_UNUSED(SizFac) ) {}
+    virtual void getSizingFactor(Real64 &EP_UNUSED(SizFac))
+    {
+    }
 
-			virtual void onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) {}
+    virtual void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+    }
 
-		~PlantComponent() {}
+    ~PlantComponent()
+    {
+    }
+};
 
-	};
-
-}
+} // namespace EnergyPlus
 
 #endif

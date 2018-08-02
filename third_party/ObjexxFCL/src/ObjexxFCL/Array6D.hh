@@ -3,9 +3,9 @@
 
 // Array6D: Row-Major 6D Array
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -1384,7 +1384,7 @@ operator ==( Array6S< T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1409,7 +1409,7 @@ operator !=( Array6S< T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1434,7 +1434,7 @@ operator <( Array6S< T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1459,7 +1459,7 @@ operator <=( Array6S< T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1484,7 +1484,7 @@ operator >( Array6S< T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1509,7 +1509,7 @@ operator >=( Array6S< T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1534,7 +1534,7 @@ operator ==( Array6S< T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1559,7 +1559,7 @@ operator !=( Array6S< T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1584,7 +1584,7 @@ operator <( Array6S< T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1609,7 +1609,7 @@ operator <=( Array6S< T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1634,7 +1634,7 @@ operator >( Array6S< T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1659,7 +1659,7 @@ operator >=( Array6S< T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1737,7 +1737,7 @@ Array6D< bool >
 operator ==( Array6S< T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1761,7 +1761,7 @@ Array6D< bool >
 operator !=( Array6S< T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1785,7 +1785,7 @@ Array6D< bool >
 operator <( Array6S< T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1809,7 +1809,7 @@ Array6D< bool >
 operator <=( Array6S< T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1833,7 +1833,7 @@ Array6D< bool >
 operator >( Array6S< T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1857,7 +1857,7 @@ Array6D< bool >
 operator >=( Array6S< T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1938,7 +1938,7 @@ operator ==( MArray6< A, T > const & a, MArray6< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1963,7 +1963,7 @@ operator !=( MArray6< A, T > const & a, MArray6< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -1988,7 +1988,7 @@ operator <( MArray6< A, T > const & a, MArray6< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2013,7 +2013,7 @@ operator <=( MArray6< A, T > const & a, MArray6< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2038,7 +2038,7 @@ operator >( MArray6< A, T > const & a, MArray6< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2063,7 +2063,7 @@ operator >=( MArray6< A, T > const & a, MArray6< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2088,7 +2088,7 @@ operator ==( MArray6< A, T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2113,7 +2113,7 @@ operator !=( MArray6< A, T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2138,7 +2138,7 @@ operator <( MArray6< A, T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2163,7 +2163,7 @@ operator <=( MArray6< A, T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2188,7 +2188,7 @@ operator >( MArray6< A, T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2213,7 +2213,7 @@ operator >=( MArray6< A, T > const & a, Array6< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2292,7 +2292,7 @@ operator ==( MArray6< A, T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2317,7 +2317,7 @@ operator !=( MArray6< A, T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2342,7 +2342,7 @@ operator <( MArray6< A, T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2367,7 +2367,7 @@ operator <=( MArray6< A, T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2392,7 +2392,7 @@ operator >( MArray6< A, T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2417,7 +2417,7 @@ operator >=( MArray6< A, T > const & a, Array6S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2495,7 +2495,7 @@ Array6D< bool >
 operator ==( MArray6< A, T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2519,7 +2519,7 @@ Array6D< bool >
 operator !=( MArray6< A, T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2543,7 +2543,7 @@ Array6D< bool >
 operator <( MArray6< A, T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2567,7 +2567,7 @@ Array6D< bool >
 operator <=( MArray6< A, T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2591,7 +2591,7 @@ Array6D< bool >
 operator >( MArray6< A, T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
@@ -2615,7 +2615,7 @@ Array6D< bool >
 operator >=( MArray6< A, T > const & a, T const & t )
 {
 	Array6D< bool > r( Array6D< bool >::shape( a ) );
-	Array6D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {

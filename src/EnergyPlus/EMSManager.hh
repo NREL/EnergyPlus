@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -55,169 +56,118 @@
 
 namespace EnergyPlus {
 
-//note there are routines that lie outside of the Module at the end of this file
+// note there are routines that lie outside of the Module at the end of this file
 
 namespace EMSManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-	extern int const iTemperatureSetPoint; // integer for node setpoint control type
-	extern int const iTemperatureMinSetPoint; // integer for node setpoint control type
-	extern int const iTemperatureMaxSetPoint; // integer for node setpoint control type
-	extern int const iHumidityRatioSetPoint; // integer for node setpoint control type
-	extern int const iHumidityRatioMinSetPoint; // integer for node setpoint control type
-	extern int const iHumidityRatioMaxSetPoint; // integer for node setpoint control type
-	extern int const iMassFlowRateSetPoint; // integer for node setpoint control type
-	extern int const iMassFlowRateMinSetPoint; // integer for node setpoint control type
-	extern int const iMassFlowRateMaxSetPoint; // integer for node setpoint control type
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    extern int const iTemperatureSetPoint;      // integer for node setpoint control type
+    extern int const iTemperatureMinSetPoint;   // integer for node setpoint control type
+    extern int const iTemperatureMaxSetPoint;   // integer for node setpoint control type
+    extern int const iHumidityRatioSetPoint;    // integer for node setpoint control type
+    extern int const iHumidityRatioMinSetPoint; // integer for node setpoint control type
+    extern int const iHumidityRatioMaxSetPoint; // integer for node setpoint control type
+    extern int const iMassFlowRateSetPoint;     // integer for node setpoint control type
+    extern int const iMassFlowRateMinSetPoint;  // integer for node setpoint control type
+    extern int const iMassFlowRateMaxSetPoint;  // integer for node setpoint control type
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE TYPE DECLARATIONS:
+    // MODULE VARIABLE TYPE DECLARATIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern bool GetEMSUserInput; // Flag to prevent input from being read multiple times
-	extern bool ZoneThermostatActuatorsHaveBeenSetup;
-	extern bool FinishProcessingUserInput; // Flag to indicate still need to process input
+    // MODULE VARIABLE DECLARATIONS:
+    extern bool GetEMSUserInput; // Flag to prevent input from being read multiple times
+    extern bool ZoneThermostatActuatorsHaveBeenSetup;
+    extern bool FinishProcessingUserInput; // Flag to indicate still need to process input
 
-	// SUBROUTINE SPECIFICATIONS:
+    // SUBROUTINE SPECIFICATIONS:
 
-	// Functions
-	void
-	clear_state();
-	
-	void
-	CheckIfAnyEMS();
+    // Functions
+    void clear_state();
 
-	// MODULE SUBROUTINES:
+    void CheckIfAnyEMS();
 
-	void
-	ManageEMS(
-		int const iCalledFrom, // indicates where subroutine was called from, parameters in DataGlobals.
-		bool & anyProgramRan, // true if any Erl programs ran for this call 
-		Optional_int_const ProgramManagerToRun = _ // specific program manager to run
-	);
+    // MODULE SUBROUTINES:
 
-	void
-	InitEMS( int const iCalledFrom ); // indicates where subroutine was called from, parameters in DataGlobals.
+    void ManageEMS(int const iCalledFrom,                     // indicates where subroutine was called from, parameters in DataGlobals.
+                   bool &anyProgramRan,                       // true if any Erl programs ran for this call
+                   Optional_int_const ProgramManagerToRun = _ // specific program manager to run
+    );
 
-	void
-	ReportEMS();
+    void InitEMS(int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
-	void
-	GetEMSInput();
+    void ReportEMS();
 
-	void
-	ProcessEMSInput( bool const reportErrors ); // .  If true, then report out errors ,otherwise setup what we can
+    void GetEMSInput();
 
-	void
-	GetVariableTypeAndIndex(
-		std::string const & VarName,
-		std::string const & VarKeyName,
-		int & VarType,
-		int & VarIndex
-	);
+    void ProcessEMSInput(bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
-	void
-	EchoOutActuatorKeyChoices();
+    void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
 
-	void
-	EchoOutInternalVariableChoices();
+    void EchoOutActuatorKeyChoices();
 
-	void
-	SetupNodeSetPointsAsActuators();
+    void EchoOutInternalVariableChoices();
 
-	void
-	UpdateEMSTrendVariables();
+    void SetupNodeSetPointsAsActuators();
 
-	void
-	CheckIfNodeSetPointManagedByEMS(
-		int const NodeNum, // index of node being checked.
-		int const SetPointType,
-		bool & ErrorFlag
-	);
+    void UpdateEMSTrendVariables();
 
-	bool
-	CheckIfNodeMoreInfoSensedByEMS( 
-		int const nodeNum, // index of node being checked.
-		std::string const & varName
-	);
+    void CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
+                                         int const SetPointType,
+                                         bool &ErrorFlag);
 
-	void
-	SetupPrimaryAirSystemAvailMgrAsActuators();
+    bool CheckIfNodeMoreInfoSensedByEMS(int const nodeNum, // index of node being checked.
+                                        std::string const &varName);
 
-	void
-	SetupWindowShadingControlActuators();
+    void SetupPrimaryAirSystemAvailMgrAsActuators();
 
-	void
-	SetupThermostatActuators();
+    void SetupWindowShadingControlActuators();
 
-	void
-	SetupSurfaceConvectionActuators();
+    void SetupThermostatActuators();
 
-	void
-	SetupSurfaceConstructionActuators();
+    void SetupSurfaceConvectionActuators();
 
-	void
-	SetupSurfaceOutdoorBoundaryConditionActuators();
+    void SetupSurfaceConstructionActuators();
 
-	void
-	SetupZoneInfoAsInternalDataAvail();
+    void SetupSurfaceOutdoorBoundaryConditionActuators();
 
-	void
-	checkForUnusedActuatorsAtEnd();
+    void SetupZoneOutdoorBoundaryConditionActuators();
 
-} // EMSManager
+    void SetupZoneInfoAsInternalDataAvail();
 
-//Moved these setup EMS actuator routines out of module to solve circular use problems between
+    void checkForUnusedActuatorsAtEnd();
+
+} // namespace EMSManager
+
+// Moved these setup EMS actuator routines out of module to solve circular use problems between
 //  ScheduleManager and OutputProcessor. Followed pattern used for SetupOutputVariable
 
-void
-SetupEMSActuator(
-	std::string const & cComponentTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cControlTypeName,
-	std::string const & cUnits,
-	bool & lEMSActuated,
-	Real64 & rValue
-);
+void SetupEMSActuator(std::string const &cComponentTypeName,
+                      std::string const &cUniqueIDName,
+                      std::string const &cControlTypeName,
+                      std::string const &cUnits,
+                      bool &lEMSActuated,
+                      Real64 &rValue);
 
-void
-SetupEMSActuator(
-	std::string const & cComponentTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cControlTypeName,
-	std::string const & cUnits,
-	bool & lEMSActuated,
-	int & iValue
-);
+void SetupEMSActuator(std::string const &cComponentTypeName,
+                      std::string const &cUniqueIDName,
+                      std::string const &cControlTypeName,
+                      std::string const &cUnits,
+                      bool &lEMSActuated,
+                      int &iValue);
 
-void
-SetupEMSActuator(
-	std::string const & cComponentTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cControlTypeName,
-	std::string const & cUnits,
-	bool & lEMSActuated,
-	bool & lValue
-);
+void SetupEMSActuator(std::string const &cComponentTypeName,
+                      std::string const &cUniqueIDName,
+                      std::string const &cControlTypeName,
+                      std::string const &cUnits,
+                      bool &lEMSActuated,
+                      bool &lValue);
 
-void
-SetupEMSInternalVariable(
-	std::string const & cDataTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cUnits,
-	Real64 & rValue
-);
+void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue);
 
-void
-SetupEMSInternalVariable(
-	std::string const & cDataTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cUnits,
-	int & iValue
-);
+void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue);
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -1,8 +1,8 @@
 // Stream Functions
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -96,7 +96,14 @@ cross_platform_get_line( std::istream & stream, std::string & line, char const d
 				stream_buffer->sbumpc();
 				return stream;
 			}
-			// Flow into default
+			if ( saving ) {
+				if ( c == delim ) {
+					saving = false;
+				} else {
+					line += static_cast< char >( c );
+				}
+			}
+			break;
 		default:
 			if ( saving ) {
 				if ( c == delim ) {

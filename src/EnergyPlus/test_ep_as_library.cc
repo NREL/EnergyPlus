@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -44,29 +45,29 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
 #include "EnergyPlusPgm.hh"
+#include <iostream>
 
-void message_callback_handler( std::string const & message )
+void message_callback_handler(std::string const &message)
 {
-	std::cout << "EnergyPlusLibrary (message): " << message << std::endl;
+    std::cout << "EnergyPlusLibrary (message): " << message << std::endl;
 }
 
-void progress_callback_handler( int const progress )
+void progress_callback_handler(int const progress)
 {
-	std::cout << "EnergyPlusLibrary (progress): " << progress << std::endl;
+    std::cout << "EnergyPlusLibrary (progress): " << progress << std::endl;
 }
 
-int main( int argc, char* argv[] )
+int main(int argc, char *argv[])
 {
-	std::cout << "Using EnergyPlus as a library." << std::endl;
-	StoreMessageCallback( message_callback_handler );
-	StoreProgressCallback( progress_callback_handler );
+    std::cout << "Using EnergyPlus as a library." << std::endl;
+    StoreMessageCallback(message_callback_handler);
+    StoreProgressCallback(progress_callback_handler);
 
-	if ( argc < 2 ) {
-		std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
-		return 1;
-	} else {
-		EnergyPlusPgm( argv[1] );
-	}
+    if (argc < 2) {
+        std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
+        return 1;
+    } else {
+        EnergyPlusPgm(argv[1]);
+    }
 }
