@@ -287,7 +287,7 @@ namespace CurveManager {
 
         // Default Constructor
         TableLookupData()
-            : InterpolationOrder(0), NumX1Vars(0), NumX2Vars(0), NumX3Vars(0), NumX4Vars(0), NumX5Vars(0), NumX6Vars(0)
+            : InterpolationOrder(4), NumX1Vars(0), NumX2Vars(0), NumX3Vars(0), NumX4Vars(0), NumX5Vars(0), NumX6Vars(0)
         {
         }
     };
