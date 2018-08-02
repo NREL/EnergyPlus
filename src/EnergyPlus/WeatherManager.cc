@@ -8330,8 +8330,6 @@ namespace WeatherManager {
 
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ReportWarningFlag(true); // if true reports warning when Site:WaterMainsTemperature does not exit in the idf
-
         // FLOW:
         {
             auto const SELECT_CASE_var(WaterMainsTempsMethod);
@@ -8348,12 +8346,6 @@ namespace WeatherManager {
                     WaterMainsTemp = 10.0; // 50 F
                 }
             } else {
-                if (ReportWarningFlag) {
-                    ShowWarningError("CalcWaterMainsTemp: Site:WaterMainsTemperature object does not exist.");
-                    ShowContinueError("Water Mains Monthly Temperature cannot be calculated.");
-                    ShowContinueError("Instead a fixed default value of 10.0 C will be used.");
-                    ReportWarningFlag = false;
-                }
                 WaterMainsTemp = 10.0; // 50 F
             }
         }
