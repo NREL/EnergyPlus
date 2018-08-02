@@ -1330,32 +1330,32 @@ namespace DataSurfaces {
         //  MeetDaylightIlluminanceSetpoint or OnIfHighGlare.
         Real64 SetPoint2; // Second control setpoint for control types that take two setpoints.
         //   Dimension is deg C or W/m2.
-        bool ShadingControlIsScheduled; // True if shading control has a schedule
-        bool GlareControlIsActive;      // True if shading control to reduce daylight glare is active
-        int SlatAngleSchedule;          // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
-        int SlatAngleControlForBlinds;  // Takes one of the following values that specifies
-                                        //  CHARACTER(len=32) :: SlatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
-                                        //  how slat angle is controled in a blind when ShadingType =
-                                        //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
-                                        //  FixedSlatAngle: the slat angle is fixed at the constant value given in the
-                                        //    associated Material:WindowBlind
-                                        //  ScheduledSlatAngle: the slat angle in degrees between 1 and 180 is given
-                                        //    by the schedule with index SlatAngleSchedule
-                                        //  BlockBeamSolar: if beam solar is incident on the window, and a blind is on the
-                                        //    window, the slat angle is adjusted to just block beam solar; otherwise the
-                                        //    slat angle is set to the value given in the associated Material:WindowBlind.
-        int DaylightControlIndex; // Pointer to the array of Daylighting Controls
-        int MultiSurfaceCtrlType; // Type of control order when multiple surfaces are referenced
-        // 0 = not specified
-        // 1 = Sequential
-        // 2 = Group
-        Array1D_int FenestrationIndex; // Pointers to fenestration surfaces
+        bool ShadingControlIsScheduled;  // True if shading control has a schedule
+        bool GlareControlIsActive;       // True if shading control to reduce daylight glare is active
+        int SlatAngleSchedule;           // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
+        int SlatAngleControlForBlinds;   // Takes one of the following values that specifies
+                                         //  CHARACTER(len=32) :: SlatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
+                                         //  how slat angle is controled in a blind when ShadingType =
+                                         //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
+                                         //  FixedSlatAngle: the slat angle is fixed at the constant value given in the
+                                         //    associated Material:WindowBlind
+                                         //  ScheduledSlatAngle: the slat angle in degrees between 1 and 180 is given
+                                         //    by the schedule with index SlatAngleSchedule
+                                         //  BlockBeamSolar: if beam solar is incident on the window, and a blind is on the
+                                         //    window, the slat angle is adjusted to just block beam solar; otherwise the
+                                         //    slat angle is set to the value given in the associated Material:WindowBlind.
+        std::string DaylightingControlName; // string holding the Daylighting Control Object Name string
+        int DaylightControlIndex;        // Pointer to the array of Daylighting Controls
+        int MultiSurfaceCtrlIsGroup;     // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
+        int FenestrationCount;           // count of fenestration references
+        Array1D<std::string> FenestrationName; // string holding list of fenestration surfaces 
+        Array1D_int FenestrationIndex;   // Pointers to fenestration surfaces
 
         // Default Constructor
         WindowShadingControlData()
             : SequenceNumber(0), ShadingType(WSC_ST_NoShade), ShadedConstruction(0), ShadingDevice(0), ShadingControlType(0), Schedule(0),
               SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0),
-              SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlType(0)
+              SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false)
         {
         }
     };

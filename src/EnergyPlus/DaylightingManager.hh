@@ -345,6 +345,8 @@ namespace DaylightingManager {
 
     void CheckTDDsAndLightShelvesInDaylitZones();
 
+    void AssociateWindowShadingControlWithDaylighting();
+
     void GetLightWellData(bool &ErrorsFound); // If errors found in input
 
     void DayltgGlare(int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt

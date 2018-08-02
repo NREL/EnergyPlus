@@ -1955,18 +1955,27 @@ namespace SurfaceGeometry {
 
             } // End of surface loop
 
-            // Warning if a WindowShadingControl is not referenced by any window; user may think
-            // window shading is occurring when it really isn't
-            for (ShadingCtrl = 1; ShadingCtrl <= TotWinShadingControl; ++ShadingCtrl) {
-                WinShadingCtrlReferenced = false;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                    if (Surface(SurfNum).WindowShadingControlPtr == ShadingCtrl) WinShadingCtrlReferenced = true;
-                }
-                if (!WinShadingCtrlReferenced) {
-                    ShowWarningError(RoutineName + "WindowShadingControl: \"" + WindowShadingControl(ShadingCtrl).Name +
-                                     "\" is not referenced by any window.");
+            // associate fenestration surfaces referenced in WindowShadingControl
+            for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+                for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
+                    int fenestrationIndex =
+                        UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), Surface, TotSurfaces);
+                    WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
                 }
             }
+
+            //WSCO // Warning if a WindowShadingControl is not referenced by any window; user may think
+            //WSCO // window shading is occurring when it really isn't
+            //WSCO for (ShadingCtrl = 1; ShadingCtrl <= TotWinShadingControl; ++ShadingCtrl) {
+            //WSCO     WinShadingCtrlReferenced = false;
+            //WSCO     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            //WSCO         if (Surface(SurfNum).WindowShadingControlPtr == ShadingCtrl) WinShadingCtrlReferenced = true;
+            //WSCO     }
+            //WSCO     if (!WinShadingCtrlReferenced) {
+            //WSCO         ShowWarningError(RoutineName + "WindowShadingControl: \"" + WindowShadingControl(ShadingCtrl).Name +
+            //WSCO                          "\" is not referenced by any window.");
+            //WSCO     }
+            //WSCO }
         }
 
         // Check for zones with not enough surfaces
@@ -4126,25 +4135,28 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
 
-//WSCO					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
-//WSCO						if ( TotWinShadingControl > 0 ) {
-//WSCO							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl, TotWinShadingControl );
-//WSCO						}
-//WSCO						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
-//WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + "=\"" + cAlphaArgs( WindowShadingField ) + "\"." );
-//WSCO							ErrorsFound = true;
-//WSCO						}
-//WSCO
-//WSCO						// Error if this is not an exterior window and shading device has been specified
-//WSCO						// PETER: should doors be disallowed too?
-//WSCO						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment ) {
-//WSCO
-//WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + " because it is not an exterior window." );
-//WSCO							ErrorsFound = true;
-//WSCO						}
-//WSCO					}
+                // WSCO					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
+                // WSCO						if ( TotWinShadingControl > 0 ) {
+                // WSCO							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs(
+                // WindowShadingField ), WindowShadingControl, TotWinShadingControl );  WSCO						}  WSCO
+                // if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
+                // WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name +
+                // "\", invalid
+                // "
+                // + cAlphaFieldNames( WindowShadingField ) + "=\"" + cAlphaArgs( WindowShadingField ) + "\"." );  WSCO
+                // ErrorsFound = true;  WSCO						}  WSCO
+                // WSCO						// Error if this is not an exterior window and shading device has been specified
+                // WSCO						// PETER: should doors be disallowed too?
+                // WSCO						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum
+                // ).ExtBoundCond
+                // != ExternalEnvironment ) {  WSCO
+                // WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name +
+                // "\", invalid
+                // "
+                // + cAlphaFieldNames( WindowShadingField ) + " because it is not an exterior window." );  WSCO
+                // ErrorsFound = true;  WSCO						}  WSCO					}
 
-                CheckWindowShadingControlFrameDivider( "GetHTSubSurfaceData", ErrorsFound, SurfNum, 7 );
+                CheckWindowShadingControlFrameDivider("GetHTSubSurfaceData", ErrorsFound, SurfNum, 7);
 
                 if (SurfaceTmp(SurfNum).Sides == 3) { // Triangular window
                     if (!cAlphaArgs(6).empty()) {
@@ -4450,23 +4462,28 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     }
 
-//WSCO					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
-//WSCO						if ( TotWinShadingControl > 0 ) {
-//WSCO							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl, TotWinShadingControl );
-//WSCO						}
-//WSCO						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
-//WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + "=\"" + cAlphaArgs( WindowShadingField ) + "\"." );
-//WSCO							ErrorsFound = true;
-//WSCO						}
-//WSCO
-//WSCO						// Error if this is not an exterior window and shading device has been specified
-//WSCO						// PETER: should doors be disallowed too?
-//WSCO						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment ) {
-//WSCO
-//WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + " because it is not an exterior window." );
-//WSCO							ErrorsFound = true;
-//WSCO						}
-//WSCO					}
+                    // WSCO					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
+                    // WSCO						if ( TotWinShadingControl > 0 ) {
+                    // WSCO							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList(
+                    // cAlphaArgs( WindowShadingField
+                    // ), WindowShadingControl, TotWinShadingControl );  WSCO						}  WSCO if ( SurfaceTmp(
+                    // SurfNum ).WindowShadingControlPtr == 0 ) {
+                    // WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum
+                    // ).Name
+                    // +
+                    // "\", invalid
+                    // "
+                    // + cAlphaFieldNames( WindowShadingField ) + "=\"" + cAlphaArgs( WindowShadingField ) + "\"." );  WSCO ErrorsFound = true;  WSCO
+                    // }  WSCO WSCO						// Error if this is not an exterior window and shading device has been
+                    // specified  WSCO						// PETER: should doors be disallowed too?  WSCO
+                    // if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment ) {  WSCO
+                    // WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum
+                    // ).Name
+                    // +
+                    // "\", invalid
+                    // "
+                    // + cAlphaFieldNames( WindowShadingField ) + " because it is not an exterior window." );  WSCO ErrorsFound = true;  WSCO }  WSCO
+                    // }
 
                     CheckWindowShadingControlFrameDivider("GetRectSubSurfaces", ErrorsFound, SurfNum, FrameField);
 
@@ -6294,10 +6311,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfLocalEnvironment;
-        using DataSurfaces::TotSurfaces;
+        using DataSurfaces::Surface;
         using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::TotSurfaces;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6451,10 +6468,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfLocalEnvironment;
-        using DataSurfaces::TotSurfaces;
+        using DataSurfaces::Surface;
         using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::TotSurfaces;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6571,11 +6588,11 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
+        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataHeatBalance::HeatTransferAlgosUsed;
         using DataHeatBalance::HighHConvLimit;
         using DataHeatBalance::LowHConvLimit;
         using DataHeatBalance::NumberOfHeatTransferAlgosUsed;
-        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
 
@@ -7838,7 +7855,28 @@ namespace SurfaceGeometry {
             if (cAlphaArgs(7) == "YES") WindowShadingControl(ControlNum).GlareControlIsActive = true;
             WindowShadingControl(ControlNum).SlatAngleSchedule = GetScheduleIndex(cAlphaArgs(10));
 
+            // store the string for now and associate it after daylighting control objects are read
+            WindowShadingControl(ControlNum).DaylightingControlName = cAlphaArgs(11);
+
+            if (cAlphaArgs(12) == "SEQUENTIAL") {
+                WindowShadingControl(ControlNum).MultiSurfaceCtrlIsGroup = false;
+            } else if (cAlphaArgs(12) == "GROUP") {
+                WindowShadingControl(ControlNum).MultiSurfaceCtrlIsGroup = true;
+            } else {
+                WindowShadingControl(ControlNum).MultiSurfaceCtrlIsGroup = false;
+                ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" should be either SEQUENTIAL or GROUP " +
+                                 cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\", defaulting to \"SEQUENTIAL\"");
+            }
             ControlType = cAlphaArgs(4);
+
+            if (ControlNumAlpha >= 13) {
+                WindowShadingControl(ControlNum).FenestrationCount = ControlNumAlpha - 12;
+                WindowShadingControl(ControlNum).FenestrationName.allocate(WindowShadingControl(ControlNum).FenestrationCount);
+                WindowShadingControl(ControlNum).FenestrationIndex.allocate(WindowShadingControl(ControlNum).FenestrationCount);
+                for (int i = 1; i <= WindowShadingControl(ControlNum).FenestrationCount; i++) {
+                    WindowShadingControl(ControlNum).FenestrationName(i) = cAlphaArgs(i + 12);
+                }
+            }
 
             if (ControlType == "SCHEDULE") {
                 ControlType = "ONIFSCHEDULEALLOWS";
@@ -9874,19 +9912,19 @@ namespace SurfaceGeometry {
         if (edgeNot2orig.size() == size_t(0)) {
             edgeNot2 = edgeNot2orig;
             return true;
-        } else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not on the
-                 // "other side" of the edge Go through all the points looking for the number that are colinear and see if that is consistent with the
-                 // number of edges found that didn't have a count of two
+        } else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not
+                 // on the "other side" of the edge Go through all the points looking for the number that are colinear and see if that is
+                 // consistent with the number of edges found that didn't have a count of two
             DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints(
                 zonePoly, uniqueVertices); // this is done after initial test since it is computationally intensive.
             std::vector<EdgeOfSurf> edgeNot2again = edgesNotTwoForEnclosedVolumeTest(updatedZonePoly, uniqueVertices);
             if (edgeNot2again.size() == size_t(0)) {
                 return true;
             } else {
-                edgeNot2 = edgesInBoth(
-                    edgeNot2orig,
-                    edgeNot2again); // only return a list of those edges that appear in both the original edge and the revised edges
-                                    // this eliminates added edges that will confuse users and edges that were caught by the updateZonePoly routine
+                edgeNot2 = edgesInBoth(edgeNot2orig,
+                                       edgeNot2again); // only return a list of those edges that appear in both the original edge and the
+                                                       // revised edges this eliminates added edges that will confuse users and edges that
+                                                       // were caught by the updateZonePoly routine
                 return false;
             }
         }
@@ -10027,8 +10065,8 @@ namespace SurfaceGeometry {
         }
     }
 
-    // updates the polyhedron used to describe a zone to include points on an edge that are between and collinear to points already describing the
-    // edge
+    // updates the polyhedron used to describe a zone to include points on an edge that are between and collinear to points already describing
+    // the edge
     DataVectorTypes::Polyhedron updateZonePolygonsForMissingColinearPoints(DataVectorTypes::Polyhedron const &zonePoly,
                                                                            std::vector<Vector> const &uniqVertices)
     {
@@ -10219,8 +10257,8 @@ namespace SurfaceGeometry {
         return std::make_tuple(isFlrHoriz, isClgHoriz, areWlVert);
     }
 
-    // tests whether a pair of walls in the zone are the same except offset from one another and facing the opposite direction and also returns the
-    // wall area and distance between
+    // tests whether a pair of walls in the zone are the same except offset from one another and facing the opposite direction and also
+    // returns the wall area and distance between
     bool areOppositeWallsSame(DataVectorTypes::Polyhedron const &zonePoly,
                               Real64 &oppositeWallArea,            // return the area of the wall that has an opposite wall
                               Real64 &distanceBetweenOppositeWalls // returns distance
@@ -12207,12 +12245,12 @@ namespace SurfaceGeometry {
                     Real64 Tri1Area(AreaPolygon(3, Triangle1) / TotalArea);
                     Real64 Tri2Area(AreaPolygon(3, Triangle2) / TotalArea);
 
-                    // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex quadralateral
-                    // using the wrong two triangles
+                    // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
+                    // quadralateral using the wrong two triangles
                     if ((Tri1Area + Tri2Area) > 1.05) {
 
-                        // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this time)
-                        // split into 2 3-sided polygons (Triangle 1 and Triangle 2)
+                        // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this
+                        // time) split into 2 3-sided polygons (Triangle 1 and Triangle 2)
                         Triangle1(1) = vertex(1);
                         Triangle1(2) = vertex(2);
                         Triangle1(3) = vertex(4);
@@ -12671,7 +12709,8 @@ namespace SurfaceGeometry {
             }
             OldVertex.deallocate();
             if (DisplayExtraWarnings) {
-                ShowWarningError("CheckConvexity: Surface=\"" + SurfaceTmp(SurfNum).Name + "\": The vertex points has been reprocessed as Sides = " + RoundSigDigits(SurfaceTmp(SurfNum).Sides));
+                ShowWarningError("CheckConvexity: Surface=\"" + SurfaceTmp(SurfNum).Name +
+                                 "\": The vertex points has been reprocessed as Sides = " + RoundSigDigits(SurfaceTmp(SurfNum).Sides));
             }
         }
     }

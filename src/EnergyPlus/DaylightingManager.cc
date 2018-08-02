@@ -546,6 +546,7 @@ namespace DaylightingManager {
         if (firstTime) {
             GetDaylightingParametersInput();
             CheckTDDsAndLightShelvesInDaylitZones();
+            AssociateWindowShadingControlWithDaylighting();
             firstTime = false;
             if (allocated(CheckTDDZone)) CheckTDDZone.deallocate();
         } // End of check if firstTime
@@ -5632,6 +5633,25 @@ namespace DaylightingManager {
         } // ShelfNum
 
         if (ErrorsFound) ShowFatalError("CheckTDDsAndLightShelvesInDaylitZones: Errors in DAYLIGHTING input.");
+    }
+
+    void AssociateWindowShadingControlWithDaylighting()
+    {
+        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            int found = -1;
+            for (int jZone = 1; jZone <= NumOfZones; ++jZone) {
+                if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).DaylightingControlName, ZoneDaylight(jZone).Name)) {
+                    found = jZone;
+                    exit;
+                }
+            }
+            if (found > 0) {
+                WindowShadingControl(iShadeCtrl).DaylightControlIndex = found;
+            } else {
+                ShowWarningError("AssociateWindowShadingControlWithDaylighting: Daylighting object name used in WindowShadingControl not found.");
+                ShowContinueError("..The WindowShadingControl object=\"" + WindowShadingControl(iShadeCtrl).Name + "\" and referenes an object named: \"" + WindowShadingControl(iShadeCtrl).DaylightingControlName + "\"" );
+            }
+        }
     }
 
     void GetLightWellData(bool &ErrorsFound) // If errors found in input
