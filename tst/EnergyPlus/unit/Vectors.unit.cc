@@ -119,7 +119,7 @@ TEST(VectorTest, CoplnarPoints) {
 
         EXPECT_EQ(coplanarPoints[0],1); // 1st point in query is coplanar with base
         EXPECT_EQ(coplanarPoints[1],3); // 3rd point in query is coplanar with base
-        EXPECT_EQ(coplanarPoints.size(),2); // Only 2 points in query are coplanar with base
+        EXPECT_EQ(coplanarPoints.size(),2u); // Only 2 points in query are coplanar with base
 
     }
 }
