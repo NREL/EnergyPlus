@@ -3113,201 +3113,62 @@ namespace CurveManager {
         int CurveIndex;
 
         for (CurveIndex = 1; CurveIndex <= NumCurves; ++CurveIndex) {
-            {
-                auto const SELECT_CASE_var(PerfCurve(CurveIndex).ObjectType);
-                // CurrentModuleObject='Table:MultiVariableLookup'
-                if (SELECT_CASE_var == "Table:MultiVariableLookup") {
-                    {
-                        auto const SELECT_CASE_var1(PerfCurve(CurveIndex).NumDims);
-                        if (SELECT_CASE_var1 == 1) { //- 1 independent variable
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                        } else if (SELECT_CASE_var1 == 2) { //- 2 independent variables
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                        } else if (SELECT_CASE_var1 == 3) { //- 3 independent variables
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                        } else if (SELECT_CASE_var1 == 4) { //- 4 independent variables
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 4 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput4,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                        } else if (SELECT_CASE_var1 == 5) { //- 5 independent variables
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 4 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput4,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 5 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput5,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                        } else {
-                        }
-                    }
-                } else if (SELECT_CASE_var == "Table:OneIndependentVariable") {
-                    // CurrentModuleObject='Table:OneIndependentVariable'
-                    SetupOutputVariable("Performance Curve Input Variable 1 Value",
+            for (int dim = 1; dim <= PerfCurve(CurveIndex).NumDims; ++dim) {
+                std::string numStr = std::to_string(dim);
+
+                // TODO: Make CurveInput an Array for better looping here...
+                switch (dim) {
+                case 1:
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         PerfCurve(CurveIndex).CurveInput1,
                                         "HVAC",
                                         "Average",
                                         PerfCurve(CurveIndex).Name);
-                } else if (SELECT_CASE_var == "Table:TwoIndependentVariables") {
-                    // CurrentModuleObject='Table:TwoIndependentVariables'
-                    SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                        OutputProcessor::Unit::None,
-                                        PerfCurve(CurveIndex).CurveInput1,
-                                        "HVAC",
-                                        "Average",
-                                        PerfCurve(CurveIndex).Name);
-                    SetupOutputVariable("Performance Curve Input Variable 2 Value",
+                    break;
+                case 2:
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         PerfCurve(CurveIndex).CurveInput2,
                                         "HVAC",
                                         "Average",
                                         PerfCurve(CurveIndex).Name);
-                } else {
-                    {
-                        auto const SELECT_CASE_var1(PerfCurve(CurveIndex).NumDims);
-                        if (SELECT_CASE_var1 == 1) {
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                        } else if (SELECT_CASE_var1 == 2) {
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                        } else if (SELECT_CASE_var1 == 3) {
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                        } else if (SELECT_CASE_var1 == 4) {
-                            SetupOutputVariable("Performance Curve Input Variable 1 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput1,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 2 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput2,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 3 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput3,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                            SetupOutputVariable("Performance Curve Input Variable 4 Value",
-                                                OutputProcessor::Unit::None,
-                                                PerfCurve(CurveIndex).CurveInput4,
-                                                "HVAC",
-                                                "Average",
-                                                PerfCurve(CurveIndex).Name);
-                        }
-                    }
+                    break;
+                case 3:
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
+                                        OutputProcessor::Unit::None,
+                                        PerfCurve(CurveIndex).CurveInput3,
+                                        "HVAC",
+                                        "Average",
+                                        PerfCurve(CurveIndex).Name);
+                    break;
+                case 4:
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
+                                        OutputProcessor::Unit::None,
+                                        PerfCurve(CurveIndex).CurveInput4,
+                                        "HVAC",
+                                        "Average",
+                                        PerfCurve(CurveIndex).Name);
+                    break;
+                case 5:
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
+                                        OutputProcessor::Unit::None,
+                                        PerfCurve(CurveIndex).CurveInput5,
+                                        "HVAC",
+                                        "Average",
+                                        PerfCurve(CurveIndex).Name);
+                    break;
+                case 6:
+                    SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
+                                        OutputProcessor::Unit::None,
+                                        PerfCurve(CurveIndex).CurveInput6,
+                                        "HVAC",
+                                        "Average",
+                                        PerfCurve(CurveIndex).Name);
+                    break;
+                default:
+                    // Warning?
+                    break;
                 }
             }
             // set the output up last so it shows up after the input in the csv file
