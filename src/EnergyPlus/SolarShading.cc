@@ -48,6 +48,7 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -89,8 +90,12 @@
 #include <SolarShading.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
+#include <WCEMultiLayerOptics.hpp>
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
+#include <WindowManager.hh>
+#include <WindowManagerExteriorData.hh>
+#include <WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -144,6 +149,9 @@ namespace SolarShading {
     using DataBSDFWindow::SUNCOSTS;
     using namespace DataVectorTypes;
     using namespace DataTimings;
+    using namespace WindowManager;
+    using namespace FenestrationCommon;
+    using namespace SingleLayerOptics;
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -2195,7 +2203,7 @@ namespace SolarShading {
             }     // Window Reporting
             if (Surface(SurfLoop).Class == SurfaceClass_Window && Surface(SurfLoop).ExtBoundCond > 0 &&
                 Surface(SurfLoop).ExtBoundCond != SurfLoop) { // Interzone window
-                // CurrentModuleObject='InterzoneWindows'
+                                                              // CurrentModuleObject='InterzoneWindows'
                 SetupOutputVariable("Surface Window Transmitted Beam Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
                                     SurfaceWindow(SurfLoop).BmSolTransThruIntWinRep,
@@ -6719,12 +6727,14 @@ namespace SolarShading {
                         // will not be loaded in that case even if diffuse part of solar radiation is entering through the window
                         if (FenSolAbsPtr == 0) {
                             // Put in the equivalent layer absorptions
+                            // Simon: This should not be multiplied with CosInc since Abs coefficient already includes angular
+                            // factor
                             for (Lay = 1; Lay <= SurfaceWindow(SurfNum).ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState).NLayers;
                                  ++Lay) {
-                                AbWin = SurfaceWindow(SurfNum)
-                                            .ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
-                                            .WinBmFtAbs(HourOfDay, TimeStep, Lay) *
-                                        CosInc * SunLitFract * SurfaceWindow(SurfNum).OutProjSLFracMult(HourOfDay);
+                                auto absBeamWin = SurfaceWindow(SurfNum)
+                                                      .ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
+                                                      .WinBmFtAbs(HourOfDay, TimeStep, Lay);
+                                AbWin = absBeamWin * CosInc * SunLitFract * SurfaceWindow(SurfNum).OutProjSLFracMult(HourOfDay);
 
                                 // Add contribution of beam reflected from outside and inside reveal
                                 AWinSurf(Lay, SurfNum) =
@@ -6900,7 +6910,7 @@ namespace SolarShading {
                     }
                 }
 
-                if ((SurfaceWindow(SurfNum).WindowModelType != WindowBSDFModel) && (SurfaceWindow(SurfNum).WindowModelType != WindowEQLModel)) {
+                if (SurfaceWindow(SurfNum).WindowModelType != WindowBSDFModel && SurfaceWindow(SurfNum).WindowModelType != WindowEQLModel) {
                     if (ShadeFlag <= 0 || ShadeFlag >= 10) {
                         // Unshaded window
                         DSZone(ZoneNum) += DSZoneWin;
@@ -8274,6 +8284,321 @@ namespace SolarShading {
         CalcWinTransDifSolInitialDistribution();
     }
 
+    void CalcAborbedOnExteriorOpaqueSurfaces()
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   May 2017
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculates solar energy absorbed on exterior opaque surfaces
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        using DaylightingDevices::FindTDDPipe;
+        using namespace DataDaylightingDevices;
+
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
+                    SurfaceWindow(SurfNum).OriginalClass != SurfaceClass_TDD_Diffuser)
+                    continue;
+                if (!Surface(SurfNum).HeatTransSurf) continue;
+                // TH added 3/24/2010 while debugging CR 7872
+                if (!Surface(SurfNum).ExtSolar) continue;
+                int ConstrNum = Surface(SurfNum).Construction;
+                int ConstrNumSh = SurfaceWindow(SurfNum).ShadedConstruction;
+                if (SurfaceWindow(SurfNum).StormWinFlag == 1) {
+                    ConstrNum = Surface(SurfNum).StormWinConstruction;
+                    ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                }
+
+                int SurfNum2 = 0;
+                if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
+                    int PipeNum = FindTDDPipe(SurfNum);
+                    SurfNum2 = TDDPipe(PipeNum).Dome;
+                } else {
+                    SurfNum2 = SurfNum;
+                }
+
+                Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum2);
+                Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum2);
+
+                //-------------------------------------------------------------------------
+                // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
+                //-------------------------------------------------------------------------
+
+                if (SunLitFract > 0.0 && Construct(ConstrNum).TransDiff <= 0.0) {
+                    AOSurf(SurfNum) = Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
+
+                    // Note: movable insulation, if present, is accounted for in subr. InitIntSolarDistribution,
+                    // where QRadSWOutMvIns is calculated from QRadSWOutAbs and insulation solar absorptance
+                }
+            }
+        }
+    }
+
+    void CalcInteriorSolarDistributionWCE()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   May 2017
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculates solar distribution
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        CalcAborbedOnExteriorOpaqueSurfaces();
+
+        if (winOpticalModel->isSimplifiedModel()) {
+            CalcInteriorSolarDistributionWCESimple();
+        } // else for built in BSDF (possible future implementation)
+    }
+
+    void CalcInteriorSolarDistributionWCESimple()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   May 2017
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // For a time step, calculates solar radiation absorbed by window layers, sky and diffuse solar
+        // gain into zone from exterior window, beam solar on exterior window transmitted as beam and/or diffuse
+        // and interior beam from exterior window that is absorbed/transmitted by back surfaces
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        using DaylightingDevices::FindTDDPipe;
+        using ScheduleManager::GetCurrentScheduleValue;
+        using namespace DataDaylightingDevices;
+        using namespace MultiLayerOptics;
+
+        if (MustAllocSolarShading) {
+            DBZoneIntWin.allocate(NumOfZones);
+        }
+
+        DSZone = 0.0;
+        DGZone = 0.0;
+        DBZone = 0.0;
+        DBZoneIntWin = 0.0;
+        AISurf = 0.0;
+        AOSurf = 0.0;
+
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+
+            Real64 BABSZone = 0;
+            Real64 BTOTZone = 0;
+            ZoneTransSolar(ZoneNum) = 0;
+            ZoneTransSolarEnergy(ZoneNum) = 0;
+            ZoneBmSolFrExtWinsRep(ZoneNum) = 0;
+            ZoneDifSolFrExtWinsRep(ZoneNum) = 0;
+            ZoneBmSolFrExtWinsRepEnergy(ZoneNum) = 0;
+            ZoneDifSolFrExtWinsRepEnergy(ZoneNum) = 0;
+
+            for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
+                int SurfNum2 = 0;
+                if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
+                    int PipeNum = FindTDDPipe(SurfNum);
+                    SurfNum2 = TDDPipe(PipeNum).Dome;
+                } else {
+                    SurfNum2 = SurfNum;
+                }
+                auto &window = SurfaceWindow(SurfNum2);
+                Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum2);
+                std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(SurfNum2, BSDFHemisphere::Incoming);
+                Real64 Theta = incomingAngle.first;
+                Real64 Phi = incomingAngle.second;
+                Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum2);
+
+                int ConstrNum = Surface(SurfNum2).Construction;
+                if (window.ShadedConstruction > 0) ConstrNum = window.ShadedConstruction;
+                auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(WavelengthRange::Solar, ConstrNum);
+
+                ///////////////////////////////////////////////
+                // Solar absorbed in window layers
+                ///////////////////////////////////////////////
+                if (SunlitFracWithoutReveal(TimeStep, HourOfDay, SurfNum2) > 0.0) {
+                    auto numOfLayers = aLayer->getNumOfLayers();
+                    if (SurfaceWindow(SurfNum).WindowModelType == WindowBSDFModel) {
+                        auto CurrentState = SurfaceWindow(SurfNum).ComplexFen.CurrentState;
+                        auto &cplxState = SurfaceWindow(SurfNum).ComplexFen.State(CurrentState);
+                        for (size_t Lay = 1; Lay <= numOfLayers; ++Lay) {
+                            // Simon: Imporant note about this equation is to use BeamSolarRad and not QRadSWOutIncident
+                            // is becuase BeamSolarRad is direct normal radiation (looking at the Sun) while QRadSWOutIncident
+                            // is normal to window incidence. Since BSDF coefficients are taking into account angle of incidence,
+                            // BeamSolarRad should be used in this case
+                            QRadSWwinAbs(Lay, SurfNum) = cplxState.WinSkyFtAbs(Lay) * window.SkySolarInc +
+                                                         cplxState.WinSkyGndAbs(Lay) * window.GndSolarInc + AWinSurf(Lay, SurfNum) * BeamSolarRad +
+                                                         AWinCFOverlap(Lay, SurfNum) * BeamSolarRad;
+                            QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                            AWinSurfDiffFront(Lay, SurfNum) = cplxState.WinSkyGndAbs(Lay);
+                        }
+                    } else {
+                        for (size_t Lay = 1; Lay <= numOfLayers; ++Lay) {
+                            auto AbWinBeam = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Direct, Theta, Phi) *
+                                             window.OutProjSLFracMult(HourOfDay);
+                            auto AbWinDiffFront = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi);
+                            auto AbWinDiffBack = aLayer->getAbsorptanceLayer(Lay, Side::Back, ScatteringSimple::Diffuse, Theta, Phi);
+
+                            // Simon: This should not be multiplied with cosine of incident angle. This however gives same
+                            // results as BSDF and Winkelmann models.
+                            AWinSurf(Lay, SurfNum) = AbWinBeam * CosInc * SunLitFract * SurfaceWindow(SurfNum).OutProjSLFracMult(HourOfDay);
+                            AWinSurfDiffFront(Lay, SurfNum) = AbWinDiffFront;
+                            AWinSurfDiffBack(Lay, SurfNum) = AbWinDiffBack;
+
+                            // Simon: Same not as for BSDF. Normal solar radiation should be taken here because angle of
+                            // incidence is already taken into account
+                            auto absBeam = AWinSurf(Lay, SurfNum) * BeamSolarRad;
+                            auto absDiff = AWinSurfDiffFront(Lay, SurfNum) * (window.SkySolarInc + window.GndSolarInc);
+                            QRadSWwinAbs(Lay, SurfNum) = (absBeam + absDiff);
+                            QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                        }
+                    }
+                }
+
+                ////////////////////////////////////////////////////////////////////
+                // SKY AND GROUND DIFFUSE SOLAR GAIN INTO ZONE FROM EXTERIOR WINDOW
+                ////////////////////////////////////////////////////////////////////
+                Real64 Tdiff = aLayer->getPropertySimple(PropertySimple::T, Side::Front, Scattering::DiffuseDiffuse, Theta, Phi);
+                Construct(ConstrNum).TransDiff = Tdiff;
+                Real64 DSZoneWin = window.SkySolarInc * Tdiff * Surface(SurfNum2).Area;
+                if ((DifSolarRad != 0)) {
+                    DSZoneWin /= DifSolarRad;
+                } else {
+                    DSZoneWin /= 1e-8;
+                }
+
+                Real64 DGZoneWin = window.GndSolarInc * Tdiff * Surface(SurfNum2).Area;
+                (GndSolarRad != 0) ? DGZoneWin /= GndSolarRad : DGZoneWin /= 1e-8;
+
+                DSZone(ZoneNum) = DSZoneWin;
+                DGZone(ZoneNum) = DGZoneWin;
+
+                ////////////////////////////////////////////////////////////////////
+                // BEAM SOLAR ON EXTERIOR WINDOW TRANSMITTED AS BEAM AND/OR DIFFUSE
+                ////////////////////////////////////////////////////////////////////
+                Real64 TBmBm = aLayer->getPropertySimple(PropertySimple::T, Side::Front, Scattering::DirectDirect, Theta, Phi);
+                Real64 TBmDif = aLayer->getPropertySimple(PropertySimple::T, Side::Front, Scattering::DirectDiffuse, Theta, Phi);
+                Real64 WinTransBmBmSolar = TBmBm * SunLitFract * CosInc * Surface(SurfNum).Area * window.InOutProjSLFracMult(HourOfDay);
+                Real64 WinTransBmDifSolar = TBmDif * SunLitFract * CosInc * Surface(SurfNum).Area * window.InOutProjSLFracMult(HourOfDay);
+                BTOTZone += WinTransBmBmSolar + WinTransBmDifSolar;
+
+                Real64 DifSolarRadiation = window.SkySolarInc + window.GndSolarInc;
+                WinBmSolar(SurfNum) = BeamSolarRad * (TBmBm + TBmDif) * Surface(SurfNum).Area * CosInc;
+                WinDifSolar(SurfNum) = DifSolarRadiation * Tdiff * Surface(SurfNum).Area;
+                WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
+                WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
+                WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum);
+                WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
+
+                // Add beam solar absorbed by outside reveal to outside of window's base surface.
+                // Add beam solar absorbed by inside reveal to inside of window's base surface.
+                // This ignores 2-D heat transfer effects.
+                int BaseSurfNum = Surface(SurfNum).BaseSurf;
+                AISurf(BaseSurfNum) = window.BmSolAbsdInsReveal / Surface(BaseSurfNum).Area;
+                AOSurf(BaseSurfNum) = window.BmSolAbsdOutsReveal / Surface(BaseSurfNum).Area;
+
+                ////////////////////////////////////////////////////////////////////
+                // BEAM SOLAR ON EXTERIOR WINDOW TRANSMITTED AS BEAM AND/OR DIFFUSE
+                ////////////////////////////////////////////////////////////////////
+                Real64 TBm = TBmBm;
+                // Correction for beam absorbed by inside reveal
+                Real64 TBmDenom = SunLitFract * CosInc * Surface(SurfNum).Area * window.InOutProjSLFracMult(HourOfDay);
+                if (TBmDenom != 0.0) { // when =0.0, no correction
+                    TBm -= SurfaceWindow(SurfNum).BmSolAbsdInsReveal / TBmDenom;
+                }
+
+                TBm = max(0.0, TBm);
+
+                int NumOfBackSurf = ShadowComb(BaseSurfNum).NumBackSurf;
+
+                if (SolarDistribution == FullInteriorExterior) {
+                    for (int IBack = 1; IBack <= NumOfBackSurf; ++IBack) {
+
+                        int BackSurfNum = BackSurfaces(TimeStep, HourOfDay, IBack, SurfNum);
+
+                        if (BackSurfNum == 0) break; // No more irradiated back surfaces for this exterior window
+                        int ConstrNumBack = Surface(BackSurfNum).Construction;
+                        // NBackGlass = Construct( ConstrNumBack ).TotGlassLayers;
+                        // Irradiated (overlap) area for this back surface, projected onto window plane
+                        // (includes effect of shadowing on exterior window)
+                        Real64 AOverlap = OverlapAreas(TimeStep, HourOfDay, IBack, SurfNum);
+                        Real64 BOverlap = TBm * AOverlap * CosInc; //[m2]
+
+                        if (Construct(ConstrNumBack).TransDiff <= 0.0) {
+                            // Back surface is opaque interior or exterior wall
+
+                            Real64 AbsIntSurf = Construct(ConstrNumBack).InsideAbsorpSolar;
+
+                            // Check for movable insulation; reproduce code from subr. EvalInsideMovableInsulation;
+                            // Can't call that routine here since cycle prevents SolarShadingGeometry from USEing
+                            // HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
+                            Real64 HMovInsul = 0.0;
+                            Real64 AbsInt = 0;
+                            if (Surface(BackSurfNum).MaterialMovInsulInt > 0) {
+                                Real64 MovInsulSchedVal = GetCurrentScheduleValue(Surface(BackSurfNum).SchedMovInsulInt);
+                                if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
+                                    HMovInsul = 0.0;
+                                } else { // Movable insulation present
+                                    HMovInsul = 1.0 / (MovInsulSchedVal * Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
+                                    AbsInt = Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                                }
+                            }
+                            if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
+
+                            AISurf(BackSurfNum) += BOverlap * AbsIntSurf / Surface(BackSurfNum).Area; //[-]
+                            BABSZone += BOverlap * AbsIntSurf;                                        //[m2]
+                        }
+                    }
+                } else {
+                    for (int FloorNum = Zone(ZoneNum).SurfaceFirst; FloorNum <= Zone(ZoneNum).SurfaceLast; ++FloorNum) {
+                        // In following, ISABSF is zero except for nominal floor surfaces
+                        if (!Surface(FloorNum).HeatTransSurf) continue;
+                        if (ISABSF(FloorNum) <= 0.0 || FloorNum == SurfNum) continue; // Keep only floor surfaces
+                        int FlConstrNum = Surface(FloorNum).Construction;
+
+                        Real64 BTOTWinZone = TBm * SunLitFract * Surface(SurfNum).Area * CosInc * window.InOutProjSLFracMult(HourOfDay); //[m2]
+
+                        if (Construct(FlConstrNum).TransDiff <= 0.0) {
+                            // Opaque surface
+
+                            AISurf(FloorNum) += BTOTWinZone * ISABSF(FloorNum) / Surface(FloorNum).Area; //[-]
+                        }
+                    }
+                }
+                ZoneTransSolar(ZoneNum) += WinTransSolar(SurfNum);                         //[W]
+                ZoneTransSolarEnergy(ZoneNum) = ZoneTransSolar(ZoneNum) * TimeStepZoneSec; //[J]
+                ZoneBmSolFrExtWinsRep(ZoneNum) += WinBmSolar(SurfNum);
+                ZoneDifSolFrExtWinsRep(ZoneNum) += WinDifSolar(SurfNum);
+                ZoneBmSolFrExtWinsRepEnergy(ZoneNum) = ZoneBmSolFrExtWinsRep(ZoneNum) * TimeStepZoneSec;   //[J]
+                ZoneDifSolFrExtWinsRepEnergy(ZoneNum) = ZoneDifSolFrExtWinsRep(ZoneNum) * TimeStepZoneSec; //[J]
+            }
+            DBZone(ZoneNum) = BTOTZone - BABSZone;
+        }
+    }
+
     int WindowScheduledSolarAbs(int const SurfNum, // Surface number
                                 int const ConstNum // Construction number
     )
@@ -8311,11 +8636,10 @@ namespace SolarShading {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int i;
 
         WindowScheduledSolarAbs = 0;
 
-        for (i = 1; i <= TotFenLayAbsSSG; ++i) {
+        for (int i = 1; i <= TotFenLayAbsSSG; ++i) {
             if ((FenLayAbsSSG(i).SurfPtr == SurfNum) && (FenLayAbsSSG(i).ConstrPtr == ConstNum)) {
                 WindowScheduledSolarAbs = i;
                 return WindowScheduledSolarAbs;
@@ -8362,11 +8686,10 @@ namespace SolarShading {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int i;
 
         SurfaceScheduledSolarInc = 0;
 
-        for (i = 1; i <= TotSurfIncSolSSG; ++i) {
+        for (int i = 1; i <= TotSurfIncSolSSG; ++i) {
             if ((SurfIncSolSSG(i).SurfPtr == SurfNum) && (SurfIncSolSSG(i).ConstrPtr == ConstNum)) {
                 SurfaceScheduledSolarInc = i;
                 return SurfaceScheduledSolarInc;

@@ -997,7 +997,7 @@ namespace ChillerGasAbsorption {
 
             if (GasAbsorber(ChillNum).HWLoopNum > 0) {
                 rho = GetDensityGlycol(PlantLoop(GasAbsorber(ChillNum).HWLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(GasAbsorber(ChillNum).HWLoopNum).FluidIndex,
                                        RoutineName);
             } else {
