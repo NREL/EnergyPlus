@@ -503,8 +503,16 @@ namespace ReportSizingManager {
                 }
             } else {
 
+                int tempZoneNum = CurZoneEqNum;
+                bool FinalZoneSizingNotAllocated = false;
+                if (!allocated(DataSizing::FinalZoneSizing)) {
+                    DataSizing::FinalZoneSizing.allocate(1);
+                    DataSizing::ZoneSizingData &finalZoneSizing = DataSizing::FinalZoneSizing(1);
+                    tempZoneNum = 1;
+                    FinalZoneSizingNotAllocated = true;
+                }
                 DataSizing::ZoneEqSizingData &zoneEqSizing = DataSizing::ZoneEqSizing(CurZoneEqNum);
-                DataSizing::ZoneSizingData &finalZoneSizing = DataSizing::FinalZoneSizing(CurZoneEqNum);
+                DataSizing::ZoneSizingData &finalZoneSizing = DataSizing::FinalZoneSizing(tempZoneNum);
 
                 if (SizingType == SystemAirflowSizing) {
 
@@ -2039,7 +2047,11 @@ namespace ReportSizingManager {
                 } else {
                     // should never happen
                 }
+
+                // get rid of temporary sizing array so next pass through will know there was no sizing data available
+                if (FinalZoneSizingNotAllocated) DataSizing::FinalZoneSizing.deallocate();
             }
+
         } else if (CurSysNum > 0) {
             if (!IsAutoSize && !SizingDesRunThisAirSys) {
                 HardSizeNoDesRun = true;
