@@ -2147,6 +2147,7 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
+                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
                         if (PerfCurve(Material(MaterNum).GlassSpecAngFRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
@@ -2202,6 +2203,7 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
+                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
                         if (PerfCurve(Material(MaterNum).GlassSpecAngBRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
