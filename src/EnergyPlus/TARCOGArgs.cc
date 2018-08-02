@@ -703,7 +703,7 @@ namespace TARCOGArgs {
                 } else if ((ThermalMod == THERM_MOD_ISO15099) || (ThermalMod == THERM_MOD_CSM)) {
                     thick(i) = SlatThick(i);
                     const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobals::Pi / 360.0;
-                    double C4_VENET(0);
+                    Real64 C4_VENET(0);
                     if(LayerType(i) == VENETBLIND_HORIZ) {
                         C4_VENET = C4_VENET_HORIZONTAL;
                     }

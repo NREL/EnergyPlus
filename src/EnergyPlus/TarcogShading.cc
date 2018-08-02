@@ -1082,10 +1082,10 @@ namespace TarcogShading {
     {
         for (int i = 1; i <= nlayer; ++i) {
             if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
-                const double slatAngRad = SlatAngle(i) * 2 * DataGlobals::Pi / 360;
-                double C1_VENET(0);
-                double C2_VENET(0);
-                double C3_VENET(0);
+                const Real64 slatAngRad = SlatAngle(i) * 2 * DataGlobals::Pi / 360;
+                Real64 C1_VENET(0);
+                Real64 C2_VENET(0);
+                Real64 C3_VENET(0);
 
                 if (LayerType(i) == VENETBLIND_HORIZ) {
                     C1_VENET = C1_VENET_HORIZONTAL;
