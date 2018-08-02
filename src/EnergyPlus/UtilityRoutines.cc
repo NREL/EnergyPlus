@@ -597,7 +597,6 @@ void AbortEnergyPlus()
     // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
     // indicating that E+ terminated with an error.
     if (NumExternalInterfaces > 0) CloseSocket(-1);
-    std::exit(EXIT_FAILURE);
 }
 
 void CloseMiscOpenFiles()
@@ -709,6 +708,9 @@ void CloseOutOpenFiles()
 
     bool exists;
     bool opened;
+    std::string name;
+    std::string stdin_name("stdin");
+    std::string stdout_name("stdout");
     int UnitNumber;
     int ios;
 
@@ -719,8 +721,13 @@ void CloseOutOpenFiles()
             exists = flags.exists();
             opened = flags.open();
             ios = flags.ios();
+            name = flags.name();
         }
-        if (exists && opened && ios == 0) gio::close(UnitNumber);
+        if (exists && opened && ios == 0) {
+            if ((name.compare(stdin_name) != 0) && (name.compare(stdout_name) != 0)) {
+                gio::close(UnitNumber);
+            }
+        }
     }
 }
 
@@ -844,7 +851,6 @@ void EndEnergyPlus()
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation
     if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
-    std::exit(EXIT_SUCCESS);
 }
 
 int GetNewUnitNumber()
