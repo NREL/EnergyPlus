@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,4;
 
@@ -16402,7 +16402,6 @@
     0.8,                     !- Nominal Thermal Efficiency
     LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable
     HeatSys1 Boiler Efficiency Curve,  !- Normalized Boiler Efficiency Curve Name
-    81.0,                    !- Design Water Outlet Temperature {C}
     AUTOSIZE,                !- Design Water Flow Rate {m3/s}
     0.0,                     !- Minimum Part Load Ratio
     1.2,                     !- Maximum Part Load Ratio

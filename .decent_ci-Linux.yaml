@@ -54,15 +54,16 @@ compilers:
     skip_packaging: true
 
 #  - name: "gcc"
-#    build_tag: ValidationDocumentation
+#    build_tag: 179D_Reporting
 #    build_package_generator: "STGZ"
 #    version: "4.8"
 #    skip_packaging: true
 #    release_only: true
-#    s3_upload: ValidationReports-prefix/src/ValidationReports-build/Products
+#    s3_upload: 179D_Reports
 #    s3_upload_bucket: energyplus
 #    skip_regression: true
-#    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DBUILD_VALIDATION_REPORTS=ON -DBUILD_PYTHON_TESTS:BOOL=ON
+#    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA
+#-D179D_COMPLIANCE:BOOL=ON
 
   - name: custom_check
     commands:

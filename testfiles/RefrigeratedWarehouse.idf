@@ -193,7 +193,7 @@
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.9;
+  Version,9.0;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -14412,12 +14412,10 @@
     AllSummary;              !- Report 1 Name
 
   Output:Diagnostics,
-    DisplayUnusedObjects,    !- Key 1
     DisplayUnusedSchedules;  !- Key 2
 
   Output:Diagnostics,
-    DisplayZoneAirHeatBalanceOffBalance,  !- Key 1
-    DisplayAllWarnings;      !- Key 2
+    DisplayZoneAirHeatBalanceOffBalance;  !- Key 1
 
   Output:Diagnostics,
     DisplayAdvancedReportVariables;  !- Key 1

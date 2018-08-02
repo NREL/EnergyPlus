@@ -1164,3 +1164,30 @@ TEST_F(EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest)
     PerfCurve.deallocate();
     TableLookup.deallocate();
 }
+
+TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
+{
+    std::string const idf_objects = delimited_string({
+        "Version,8.5;",
+        "Curve:ExponentialSkewNormal,",
+        "  FanEff120CPLANormal,     !- Name",
+        "  0.072613,                !- Coefficient1 C1",
+        "  0.833213,                !- Coefficient2 C2",
+        "  0.,                      !- Coefficient3 C3",
+        "  0.013911,                !- Coefficient4 C4",
+        "  -4.,                     !- Minimum Value of x",
+        "  5.,                      !- Maximum Value of x",
+        "  0.1,                     !- Minimum Curve Output",
+        "  1.;                      !- Maximum Curve Output",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_EQ(0, CurveManager::NumCurves);
+    CurveManager::GetCurveInput();
+    CurveManager::GetCurvesInputFlag = false;
+    ASSERT_EQ(1, CurveManager::NumCurves);
+
+    EXPECT_EQ(1.0, PerfCurve(1).CurveMax);     
+    EXPECT_TRUE(PerfCurve(1).CurveMaxPresent);
+
+}

@@ -99,8 +99,8 @@
 #include <string.h>
 #include <algorithm>
 #include <memory>
+#include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace re2 {
 
@@ -113,10 +113,12 @@ class SparseArray {
 
   // IndexValue pairs: exposed in SparseArray::iterator.
   class IndexValue;
+  static_assert(std::is_trivially_destructible<IndexValue>::value,
+                "IndexValue must be trivially destructible");
 
   typedef IndexValue value_type;
-  typedef typename std::vector<IndexValue>::iterator iterator;
-  typedef typename std::vector<IndexValue>::const_iterator const_iterator;
+  typedef IndexValue* iterator;
+  typedef const IndexValue* const_iterator;
 
   SparseArray(const SparseArray& src);
   SparseArray(SparseArray&& src) /*noexcept*/;
@@ -138,17 +140,17 @@ class SparseArray {
 
   // Iterate over the array.
   iterator begin() {
-    return dense_.begin();
+    return dense_.get();
   }
   iterator end() {
-    return dense_.begin() + size_;
+    return dense_.get() + size_;
   }
 
   const_iterator begin() const {
-    return dense_.begin();
+    return dense_.get();
   }
   const_iterator end() const {
-    return dense_.begin() + size_;
+    return dense_.get() + size_;
   }
 
   // Change the maximum size of the array.
@@ -198,13 +200,13 @@ class SparseArray {
 
   iterator find(int i) {
     if (has_index(i))
-      return dense_.begin() + sparse_to_dense_[i];
+      return dense_.get() + sparse_to_dense_[i];
     return end();
   }
 
   const_iterator find(int i) const {
     if (has_index(i))
-      return dense_.begin() + sparse_to_dense_[i];
+      return dense_.get() + sparse_to_dense_[i];
     return end();
   }
 
@@ -261,7 +263,7 @@ class SparseArray {
     DebugCheckInvariants();
     std::pair<iterator, bool> p;
     if (has_index(v.index_)) {
-      p = {dense_.begin() + sparse_to_dense_[v.index_], false};
+      p = {dense_.get() + sparse_to_dense_[v.index_], false};
     } else {
       p = {set_new(std::forward<U>(v).index_, std::forward<U>(v).second), true};
     }
@@ -273,7 +275,7 @@ class SparseArray {
   iterator SetInternal(bool allow_overwrite, int i, U&& v) {  // NOLINT
     DebugCheckInvariants();
     if (static_cast<uint32_t>(i) >= static_cast<uint32_t>(max_size_)) {
-      assert(!"illegal index");
+      assert(false && "illegal index");
       // Semantically, end() would be better here, but we already know
       // the user did something stupid, so begin() insulates them from
       // dereferencing an invalid pointer.
@@ -295,7 +297,7 @@ class SparseArray {
     assert(has_index(i));
     dense_[sparse_to_dense_[i]].value() = std::forward<U>(v);
     DebugCheckInvariants();
-    return dense_.begin() + sparse_to_dense_[i];
+    return dense_.get() + sparse_to_dense_[i];
   }
 
   // Add the index i to the array.
@@ -310,10 +312,24 @@ class SparseArray {
   // and at the beginning and end of all public non-const member functions.
   void DebugCheckInvariants() const;
 
+  static bool ShouldInitializeMemory() {
+#if defined(__has_feature)
+#if __has_feature(memory_sanitizer)
+    return true;
+#else
+    return false;
+#endif
+#elif defined(RE2_ON_VALGRIND)
+    return true;
+#else
+    return false;
+#endif
+  }
+
   int size_ = 0;
   int max_size_ = 0;
   std::unique_ptr<int[]> sparse_to_dense_;
-  std::vector<IndexValue> dense_;
+  std::unique_ptr<IndexValue[]> dense_;
 };
 
 template<typename Value>
@@ -324,8 +340,9 @@ SparseArray<Value>::SparseArray(const SparseArray& src)
     : size_(src.size_),
       max_size_(src.max_size_),
       sparse_to_dense_(new int[max_size_]),
-      dense_(src.dense_) {
+      dense_(new IndexValue[max_size_]) {
   std::copy_n(src.sparse_to_dense_.get(), max_size_, sparse_to_dense_.get());
+  std::copy_n(src.dense_.get(), max_size_, dense_.get());
 }
 
 template<typename Value>
@@ -336,17 +353,18 @@ SparseArray<Value>::SparseArray(SparseArray&& src) /*noexcept*/  // NOLINT
       dense_(std::move(src.dense_)) {
   src.size_ = 0;
   src.max_size_ = 0;
-  src.dense_.clear();
 }
 
 template<typename Value>
 SparseArray<Value>& SparseArray<Value>::operator=(const SparseArray& src) {
-  std::unique_ptr<int[]> a(new int[src.max_size_]);
+  size_ = src.size_;
+  max_size_ = src.max_size_;
+  std::unique_ptr<int[]> a(new int[max_size_]);
   std::copy_n(src.sparse_to_dense_.get(), src.max_size_, a.get());
   sparse_to_dense_ = std::move(a);
-  dense_ = src.dense_;
-  max_size_ = src.max_size_;
-  size_ = src.size_;
+  std::unique_ptr<IndexValue[]> b(new IndexValue[max_size_]);
+  std::copy_n(src.dense_.get(), src.max_size_, b.get());
+  dense_ = std::move(b);
   return *this;
 }
 
@@ -360,7 +378,6 @@ SparseArray<Value>& SparseArray<Value>::operator=(
   // clear out the source
   src.size_ = 0;
   src.max_size_ = 0;
-  src.dense_.clear();
   return *this;
 }
 
@@ -413,14 +430,18 @@ void SparseArray<Value>::resize(int max_size) {
     }
     sparse_to_dense_ = std::move(a);
 
-    dense_.resize(max_size);
-
-#ifdef MEMORY_SANITIZER
-    for (int i = max_size_; i < max_size; i++) {
-      sparse_to_dense_[i] = 0xababababU;
-      dense_[i].index_ = 0xababababU;
+    std::unique_ptr<IndexValue[]> b(new IndexValue[max_size]);
+    if (dense_) {
+      std::copy_n(dense_.get(), max_size_, b.get());
     }
-#endif
+    dense_ = std::move(b);
+
+    if (ShouldInitializeMemory()) {
+      for (int i = max_size_; i < max_size; i++) {
+        sparse_to_dense_[i] = 0xababababU;
+        dense_[i].index_ = 0xababababU;
+      }
+    }
   }
   max_size_ = max_size;
   if (size_ > max_size_)
@@ -479,16 +500,16 @@ void SparseArray<Value>::create_index(int i) {
 
 template<typename Value> SparseArray<Value>::SparseArray(int max_size) {
   max_size_ = max_size;
-  sparse_to_dense_ = std::unique_ptr<int[]>(new int[max_size]);
-  dense_.resize(max_size);
+  sparse_to_dense_.reset(new int[max_size]);
+  dense_.reset(new IndexValue[max_size]);
   size_ = 0;
 
-#ifdef MEMORY_SANITIZER
-  for (int i = 0; i < max_size; i++) {
-    sparse_to_dense_[i] = 0xababababU;
-    dense_[i].index_ = 0xababababU;
+  if (ShouldInitializeMemory()) {
+    for (int i = 0; i < max_size; i++) {
+      sparse_to_dense_[i] = 0xababababU;
+      dense_[i].index_ = 0xababababU;
+    }
   }
-#endif
 
   DebugCheckInvariants();
 }

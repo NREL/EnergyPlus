@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <InputProcessing/IdfParser.hh>
-#include <milo/dtoa.hpp>
-#include <milo/itoa.hpp>
+#include <milo/dtoa.h>
+#include <milo/itoa.h>
 
 #ifdef _WIN32
 std::string const NL("\r\n"); // Platform newline
@@ -253,20 +253,20 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 if (name_iter != obj.end()) {
                     name = name_iter.value();
                     obj.erase(name_iter);
-                    if (root[obj_name].find(name) != root[obj_name].end()) {
-                        // hacky but needed to warn if there are duplicate names in parsed IDF
-                        if (obj_name == "RunPeriod") {
-                            name = obj_name + " " + s;
-                        } else {
-                            errors_.emplace_back("Duplicate name found. name: \"" + name + "\". Overwriting existing object.");
-                        }
-                    }
                 } else {
                     auto const it = obj_loc.find("name");
                     if (it != obj_loc.end()) {
-                        name = "";
+                        if (obj_name == "RunPeriod") {
+                            name = obj_name + " " + s;
+                        } else {
+                            name = "";
+                        }
                     }
                 }
+            }
+
+            if (root[obj_name].find(name) != root[obj_name].end()) {
+                errors_.emplace_back("Duplicate name found. name: \"" + name + "\". Overwriting existing object.");
             }
 
             root[obj_name][name] = std::move(obj);
