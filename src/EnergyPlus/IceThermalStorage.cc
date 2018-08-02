@@ -124,6 +124,9 @@ namespace IceThermalStorage {
     int const IceStorageType_Simple(1);
     int const IceStorageType_Detailed(2);
 
+    int const CurveQuadraticLinear(1);
+    int const CurveCubicLinear(2);
+
     int const DetIceInsideMelt(1);  // Inside melt system--charge starting with bare coil
     int const DetIceOutsideMelt(2); // Outside melt system--charge from existing ice layer on coil
 
@@ -606,15 +609,11 @@ namespace IceThermalStorage {
                     AvgFracCharged = DetIceStor(IceNum).IceFracRemaining + (ChargeFrac / 2.0);
                 }
 
-                // TODO: This is bad. There is no documentation for the change in meaning behind these two curve types
-                if (CurveManager::PerfCurve(DetIceStor(IceNum).ChargeCurveNum).ObjectType == "Curve:QuadraticLinear") {
+                if (DetIceStor(IceNum).ChargeCurveTypeNum == CurveQuadraticLinear) {
                     Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, AvgFracCharged, LMTDstar));
-                } else if (CurveManager::PerfCurve(DetIceStor(IceNum).ChargeCurveNum).ObjectType == "Curve:CubicLinear") {
+                } else { // ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveCubicLinear )
                     MassFlowstar = DetIceStor(IceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
                     Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, LMTDstar, MassFlowstar));
-                }  else {
-                    Qstar = 0.0;
-                    ShowFatalError("Unsupported curve type for detailed ice thermal storage: " + CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType);
                 }
 
                 ActualLoad = Qstar * DetIceStor(IceNum).NomCapacity / DetIceStor(IceNum).CurveFitTimeStep;
@@ -639,15 +638,11 @@ namespace IceThermalStorage {
                             // Calculate new values for LMTDstar and Qstar based on updated outlet temperature
                             ToutOld = ToutNew;
                             LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(IceNum).FreezingTemp);
-                            // TODO: This is bad. There is no documentation for the change in meaning behind these two curve types
-                            if (CurveManager::PerfCurve(DetIceStor(IceNum).ChargeCurveNum).ObjectType == "Curve:QuadraticLinear") {
+                            if (DetIceStor(IceNum).DischargeCurveTypeNum == CurveQuadraticLinear) {
                                 Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, AvgFracCharged, LMTDstar));
-                            } else if (CurveManager::PerfCurve(DetIceStor(IceNum).ChargeCurveNum).ObjectType == "Curve:CubicLinear") {
+                            } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
                                 MassFlowstar = DetIceStor(IceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
                                 Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, LMTDstar, MassFlowstar));
-                            } else {
-                                Qstar = 0.0;
-                                ShowFatalError("Unsupported curve type for detailed ice thermal storage: " + CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType);
                             }
 
                             // Now make sure that we don't go above 100% charged and calculate the new average fraction
@@ -759,14 +754,10 @@ namespace IceThermalStorage {
                 if ((DetIceStor(IceNum).IceFracRemaining - ChargeFrac) < 0.0) ChargeFrac = DetIceStor(IceNum).IceFracRemaining;
                 AvgFracCharged = DetIceStor(IceNum).IceFracRemaining - (ChargeFrac / 2.0);
 
-                // TODO: This is bad. There is no documentation for the change in meaning behind these two curve types
-                if (CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType == "Curve:QuadraticLinear") {
+                if (DetIceStor(IceNum).DischargeCurveTypeNum == CurveQuadraticLinear) {
                     Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, (1.0 - AvgFracCharged), LMTDstar));
-                } else if (CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType == "Curve:CubicLinear") {
+                } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
                     Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, LMTDstar, AvgFracCharged));
-                } else {
-                    Qstar = 0.0;
-                    ShowFatalError("Unsupported curve type for detailed ice thermal storage: " + CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType);
                 }
 
                 ActualLoad = Qstar * DetIceStor(IceNum).NomCapacity / DetIceStor(IceNum).CurveFitTimeStep;
@@ -792,14 +783,10 @@ namespace IceThermalStorage {
                             ToutOld = ToutNew;
                             LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(IceNum).FreezingTemp);
 
-                            // TODO: This is bad. There is no documentation for the change in meaning behind these two curve types
-                            if (CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType == "Curve:QuadraticLinear") {
+                            if (DetIceStor(IceNum).DischargeCurveTypeNum == CurveQuadraticLinear) {
                                 Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, (1.0 - AvgFracCharged), LMTDstar));
-                            } else if (CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType == "Curve:CubicLinear") {
+                            } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
                                 Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, LMTDstar, AvgFracCharged));
-                            } else {
-                                Qstar = 0.0;
-                                ShowFatalError("Unsupported curve type for detailed ice thermal storage: " + CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType);
                             }
 
                             // Now make sure that we don't go below 100% discharged and calculate the new average fraction
@@ -1113,13 +1100,7 @@ namespace IceThermalStorage {
             // Test InletNode and OutletNode
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Chilled Water Nodes");
 
-
             // Obtain the Charging and Discharging Curve types and names
-            if (!lAlphaFieldBlanks(5)) {
-                ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
-                ShowContinueError("...Field \"" + cAlphaFieldNames(5) + "\" has been marked deprecated and will be ignored.");
-            }
-
             DetIceStor(IceNum).DischargeCurveName = cAlphaArgs(6);
             DetIceStor(IceNum).DischargeCurveNum = GetCurveIndex(cAlphaArgs(6));
             if (DetIceStor(IceNum).DischargeCurveNum <= 0) {
@@ -1127,6 +1108,19 @@ namespace IceThermalStorage {
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
+
+            std::string dischargeCurveType = CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType;
+            if (dischargeCurveType == "Curve:QuadraticLinear" && cAlphaArgs(5) == "QUADRATICLINEAR") {
+                DetIceStor(IceNum).DischargeCurveTypeNum = CurveQuadraticLinear;
+            } else if (dischargeCurveType == "Curve:CubicLinear" && cAlphaArgs(5) == "CUBICLINEAR") {
+                DetIceStor(IceNum).DischargeCurveTypeNum = CurveCubicLinear;
+            } else {
+                ShowSevereError(cCurrentModuleObject + ": Discharge curve type not valid, type=" + cAlphaArgs(5));
+                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowContinueError("Type does not match type for curve name or type does not equal QuadraticLinear or CubicLinear");
+                ErrorsFound = true;
+            }
+
             ErrorsFound |= CurveManager::CheckCurveDims(
                 DetIceStor(IceNum).DischargeCurveNum,   // Curve index
                 {2},                            // Valid dimensions
@@ -1135,11 +1129,6 @@ namespace IceThermalStorage {
                 DetIceStor(IceNum).Name,        // Object Name
                 cAlphaFieldNames(6));           // Field Name
 
-            if (!lAlphaFieldBlanks(7)) {
-                ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
-                ShowContinueError("...Field \"" + cAlphaFieldNames(7) + "\" has been marked deprecated and will be ignored.");
-            }
-
             DetIceStor(IceNum).ChargeCurveName = cAlphaArgs(8);
             DetIceStor(IceNum).ChargeCurveNum = GetCurveIndex(cAlphaArgs(8));
             if (DetIceStor(IceNum).ChargeCurveNum <= 0) {
@@ -1147,6 +1136,19 @@ namespace IceThermalStorage {
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
+
+            std::string chargeCurveType = CurveManager::PerfCurve(DetIceStor(IceNum).ChargeCurveNum).ObjectType;
+            if (chargeCurveType == "Curve:QuadraticLinear" && cAlphaArgs(7) == "QUADRATICLINEAR") {
+                DetIceStor(IceNum).ChargeCurveTypeNum = CurveQuadraticLinear;
+            } else if (chargeCurveType == "Curve:CubicLinear" && cAlphaArgs(7) == "CUBICLINEAR") {
+                DetIceStor(IceNum).ChargeCurveTypeNum = CurveCubicLinear;
+            } else {
+                ShowSevereError(cCurrentModuleObject + ": Charge curve type not valid, type=" + cAlphaArgs(7));
+                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowContinueError("Type does not match type for curve name or type does not equal QuadraticLinear or CubicLinear");
+                ErrorsFound = true;
+            }
+
             ErrorsFound |= CurveManager::CheckCurveDims(
                 DetIceStor(IceNum).ChargeCurveNum,   // Curve index
                 {2},                            // Valid dimensions
