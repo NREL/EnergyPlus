@@ -6024,9 +6024,10 @@ namespace CurveManager {
             for (std::size_t i = 1; i < validDims.size(); i++) {
                 validString += " or " + std::to_string(validDims[i]);
             }
-            std::string plural = validDims.size() > 1 ? "s" : "";
-            ShowContinueError("...Input curve=\"" + PerfCurve(CurveIndex).Name + "\" has " + std::to_string(curveDim) + " dimensions.");
-            ShowContinueError("...Curve type must have " + validString + " dimension" + plural + ".");
+            std::string plural1 = curveDim > 1 ? "s" : "";
+            std::string plural2 = validDims[validDims.size()-1] > 1 ? "s" : "";
+            ShowContinueError("...Input curve=\"" + PerfCurve(CurveIndex).Name + "\" has " + std::to_string(curveDim) + " dimension" + plural1 + ".");
+            ShowContinueError("...Curve type must have " + validString + " dimension" + plural2 + ".");
             return true;
         }
     }
