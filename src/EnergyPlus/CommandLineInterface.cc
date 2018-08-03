@@ -150,10 +150,14 @@ namespace CommandLineInterface {
 
         opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
 
-        opt.add("L", 0, 1, 0,
+        opt.add("L",
+                0,
+                1,
+                0,
                 "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: "
                 "Dash (e.g., eplus-table.csv)",
-                "-s", "--output-suffix");
+                "-s",
+                "--output-suffix");
 
         opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
@@ -515,17 +519,6 @@ namespace CommandLineInterface {
         // Check if specified files exist
         {
             IOFlags flags;
-            gio::inquire(inputIddFileName, flags);
-            FileExists = flags.exists();
-        }
-        if (!FileExists) {
-            DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + ".");
-            DisplayString(errorFollowUp);
-            exit(EXIT_FAILURE);
-        }
-
-        {
-            IOFlags flags;
             gio::inquire(inputFileName, flags);
             FileExists = flags.exists();
         }
@@ -599,6 +592,18 @@ namespace CommandLineInterface {
             }
             std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
             bool inputFileNamedIn = (getAbsolutePath(inputFileName) == getAbsolutePath("in.idf"));
+
+            // check if IDD actually exists since ExpandObjects still requires it
+            {
+                IOFlags flags;
+                gio::inquire(inputIddFileName, flags);
+                FileExists = flags.exists();
+            }
+            if (!FileExists) {
+                DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + ".");
+                DisplayString(errorFollowUp);
+                exit(EXIT_FAILURE);
+            }
 
             bool iddFileNamedEnergy = (getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
 

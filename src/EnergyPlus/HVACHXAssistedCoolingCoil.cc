@@ -289,11 +289,11 @@ namespace HVACHXAssistedCoolingCoil {
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using DXCoils::GetDXCoilIndex;
-        using HVACControllers::GetControllerNameAndIndex;
         using HeatRecovery::GetSecondaryInletNode;
         using HeatRecovery::GetSecondaryOutletNode;
         using HeatRecovery::GetSupplyInletNode;
         using HeatRecovery::GetSupplyOutletNode;
+        using HVACControllers::GetControllerNameAndIndex;
         using NodeInputManager::GetOnlySingleNode;
         using WaterCoils::GetCoilWaterInletNode;
         auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
@@ -362,8 +362,17 @@ namespace HVACHXAssistedCoolingCoil {
         CurrentModuleObject = "CoilSystem:Cooling:DX:HeatExchangerAssisted";
 
         for (HXAssistedCoilNum = 1; HXAssistedCoilNum <= NumHXAssistedDXCoils; ++HXAssistedCoilNum) {
-            inputProcessor->getObjectItem(CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          HXAssistedCoilNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueHXAssistedCoilNames, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             HXAssistedCoil(HXAssistedCoilNum).Name = AlphArray(1);
@@ -390,8 +399,10 @@ namespace HVACHXAssistedCoolingCoil {
                 HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
                 HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
                 CoolingCoilErrFlag = false;
-                GetDXCoilIndex(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
-                               CoolingCoilErrFlag, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType);
+                GetDXCoilIndex(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                               HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
+                               CoolingCoilErrFlag,
+                               HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                     ErrorsFound = true;
@@ -447,8 +458,8 @@ namespace HVACHXAssistedCoolingCoil {
             if (UtilityRoutines::SameString(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
-                CoolingCoilInletNodeNum = GetDXCoilInletNode(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                                             HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
+                CoolingCoilInletNodeNum = GetDXCoilInletNode(
+                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                 }
@@ -464,8 +475,8 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
-                CoolingCoilOutletNodeNum = GetDXCoilOutletNode(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                                               HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
+                CoolingCoilOutletNodeNum = GetDXCoilOutletNode(
+                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                 }
@@ -519,33 +530,68 @@ namespace HVACHXAssistedCoolingCoil {
                 }
             }
 
-            TestCompSet(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType, HXAssistedCoil(HXAssistedCoilNum).Name, NodeID(SupplyAirInletNode),
-                        NodeID(SecondaryAirOutletNode), "Air Nodes");
+            TestCompSet(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                        HXAssistedCoil(HXAssistedCoilNum).Name,
+                        NodeID(SupplyAirInletNode),
+                        NodeID(SecondaryAirOutletNode),
+                        "Air Nodes");
 
-            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum =
-                GetOnlySingleNode(NodeID(SupplyAirInletNode), ErrorsFound, CurrentModuleObject, HXAssistedCoil(HXAssistedCoilNum).Name, NodeType_Air,
-                                  NodeConnectionType_Inlet, 1, ObjectIsParent);
-            CoolingCoilInletNodeNum =
-                GetOnlySingleNode(NodeID(SupplyAirOutletNode), ErrorsFound, CurrentModuleObject, HXAssistedCoil(HXAssistedCoilNum).Name, NodeType_Air,
-                                  NodeConnectionType_Internal, 1, ObjectIsParent);
-            HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum =
-                GetOnlySingleNode(NodeID(SecondaryAirInletNode), ErrorsFound, CurrentModuleObject, HXAssistedCoil(HXAssistedCoilNum).Name,
-                                  NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent);
-            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum =
-                GetOnlySingleNode(NodeID(SecondaryAirOutletNode), ErrorsFound, CurrentModuleObject, HXAssistedCoil(HXAssistedCoilNum).Name,
-                                  NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum = GetOnlySingleNode(NodeID(SupplyAirInletNode),
+                                                                                             ErrorsFound,
+                                                                                             CurrentModuleObject,
+                                                                                             HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                                                             NodeType_Air,
+                                                                                             NodeConnectionType_Inlet,
+                                                                                             1,
+                                                                                             ObjectIsParent);
+            CoolingCoilInletNodeNum = GetOnlySingleNode(NodeID(SupplyAirOutletNode),
+                                                        ErrorsFound,
+                                                        CurrentModuleObject,
+                                                        HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                        NodeType_Air,
+                                                        NodeConnectionType_Internal,
+                                                        1,
+                                                        ObjectIsParent);
+            HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum = GetOnlySingleNode(NodeID(SecondaryAirInletNode),
+                                                                                           ErrorsFound,
+                                                                                           CurrentModuleObject,
+                                                                                           HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                                                           NodeType_Air,
+                                                                                           NodeConnectionType_Internal,
+                                                                                           1,
+                                                                                           ObjectIsParent);
+            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum = GetOnlySingleNode(NodeID(SecondaryAirOutletNode),
+                                                                                              ErrorsFound,
+                                                                                              CurrentModuleObject,
+                                                                                              HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                                                              NodeType_Air,
+                                                                                              NodeConnectionType_Outlet,
+                                                                                              1,
+                                                                                              ObjectIsParent);
 
             // Add cooling coil to component sets array
-            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType, HXAssistedCoil(HXAssistedCoilNum).Name,
-                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
-                          NodeID(SupplyAirOutletNode), NodeID(SecondaryAirInletNode), "Air Nodes");
+            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                          HXAssistedCoil(HXAssistedCoilNum).Name,
+                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
+                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                          NodeID(SupplyAirOutletNode),
+                          NodeID(SecondaryAirInletNode),
+                          "Air Nodes");
             // Add heat exchanger to component sets array
-            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType, HXAssistedCoil(HXAssistedCoilNum).Name,
-                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
-                          NodeID(SupplyAirInletNode), NodeID(SupplyAirOutletNode), "Process Air Nodes");
-            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType, HXAssistedCoil(HXAssistedCoilNum).Name,
-                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
-                          NodeID(SecondaryAirInletNode), NodeID(SecondaryAirOutletNode), "Secondary Air Nodes");
+            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                          HXAssistedCoil(HXAssistedCoilNum).Name,
+                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType,
+                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
+                          NodeID(SupplyAirInletNode),
+                          NodeID(SupplyAirOutletNode),
+                          "Process Air Nodes");
+            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                          HXAssistedCoil(HXAssistedCoilNum).Name,
+                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType,
+                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
+                          NodeID(SecondaryAirInletNode),
+                          NodeID(SecondaryAirOutletNode),
+                          "Secondary Air Nodes");
 
         } // End of the Coil:DX:CoolingHXAssisted Loop
 
@@ -554,8 +600,17 @@ namespace HVACHXAssistedCoolingCoil {
 
         for (HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= NumHXAssistedWaterCoils; ++HXAssistedCoilNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          HXAssistedCoilNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueHXAssistedCoilNames, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             HXAssistedCoil(HXAssistedCoilNum).Name = AlphArray(1);
@@ -617,12 +672,14 @@ namespace HVACHXAssistedCoolingCoil {
 
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
-                CoolingCoilInletNodeNum = GetWaterCoilInletNode(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                                                HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
-                CoolingCoilWaterInletNodeNum = GetCoilWaterInletNode(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                                                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
-                GetControllerNameAndIndex(CoolingCoilWaterInletNodeNum, HXAssistedCoil(HXAssistedCoilNum).ControllerName,
-                                          HXAssistedCoil(HXAssistedCoilNum).ControllerIndex, CoolingCoilErrFlag);
+                CoolingCoilInletNodeNum = GetWaterCoilInletNode(
+                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
+                CoolingCoilWaterInletNodeNum = GetCoilWaterInletNode(
+                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
+                GetControllerNameAndIndex(CoolingCoilWaterInletNodeNum,
+                                          HXAssistedCoil(HXAssistedCoilNum).ControllerName,
+                                          HXAssistedCoil(HXAssistedCoilNum).ControllerIndex,
+                                          CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag)
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                 if (SupplyAirOutletNode != CoolingCoilInletNodeNum) {
@@ -637,8 +694,8 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
-                CoolingCoilOutletNodeNum = GetWaterCoilOutletNode(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                                                  HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
+                CoolingCoilOutletNodeNum = GetWaterCoilOutletNode(
+                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag)
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                 if (SecondaryAirInletNode != CoolingCoilOutletNodeNum) {
@@ -659,33 +716,68 @@ namespace HVACHXAssistedCoolingCoil {
                 ErrorsFound = true;
             }
 
-            TestCompSet(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType, HXAssistedCoil(HXAssistedCoilNum).Name, NodeID(SupplyAirInletNode),
-                        NodeID(SecondaryAirOutletNode), "Air Nodes");
+            TestCompSet(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                        HXAssistedCoil(HXAssistedCoilNum).Name,
+                        NodeID(SupplyAirInletNode),
+                        NodeID(SecondaryAirOutletNode),
+                        "Air Nodes");
 
-            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum =
-                GetOnlySingleNode(NodeID(SupplyAirInletNode), ErrorsFound, CurrentModuleObject, HXAssistedCoil(HXAssistedCoilNum).Name, NodeType_Air,
-                                  NodeConnectionType_Inlet, 1, ObjectIsParent);
-            CoolingCoilInletNodeNum =
-                GetOnlySingleNode(NodeID(SupplyAirOutletNode), ErrorsFound, CurrentModuleObject, HXAssistedCoil(HXAssistedCoilNum).Name, NodeType_Air,
-                                  NodeConnectionType_Internal, 1, ObjectIsParent);
-            HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum =
-                GetOnlySingleNode(NodeID(SecondaryAirInletNode), ErrorsFound, CurrentModuleObject, HXAssistedCoil(HXAssistedCoilNum).Name,
-                                  NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent);
-            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum =
-                GetOnlySingleNode(NodeID(SecondaryAirOutletNode), ErrorsFound, CurrentModuleObject, HXAssistedCoil(HXAssistedCoilNum).Name,
-                                  NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum = GetOnlySingleNode(NodeID(SupplyAirInletNode),
+                                                                                             ErrorsFound,
+                                                                                             CurrentModuleObject,
+                                                                                             HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                                                             NodeType_Air,
+                                                                                             NodeConnectionType_Inlet,
+                                                                                             1,
+                                                                                             ObjectIsParent);
+            CoolingCoilInletNodeNum = GetOnlySingleNode(NodeID(SupplyAirOutletNode),
+                                                        ErrorsFound,
+                                                        CurrentModuleObject,
+                                                        HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                        NodeType_Air,
+                                                        NodeConnectionType_Internal,
+                                                        1,
+                                                        ObjectIsParent);
+            HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum = GetOnlySingleNode(NodeID(SecondaryAirInletNode),
+                                                                                           ErrorsFound,
+                                                                                           CurrentModuleObject,
+                                                                                           HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                                                           NodeType_Air,
+                                                                                           NodeConnectionType_Internal,
+                                                                                           1,
+                                                                                           ObjectIsParent);
+            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum = GetOnlySingleNode(NodeID(SecondaryAirOutletNode),
+                                                                                              ErrorsFound,
+                                                                                              CurrentModuleObject,
+                                                                                              HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                                                              NodeType_Air,
+                                                                                              NodeConnectionType_Outlet,
+                                                                                              1,
+                                                                                              ObjectIsParent);
 
             // Add cooling coil to component sets array
-            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType, HXAssistedCoil(HXAssistedCoilNum).Name,
-                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
-                          NodeID(SupplyAirOutletNode), NodeID(SecondaryAirInletNode), "Air Nodes");
+            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                          HXAssistedCoil(HXAssistedCoilNum).Name,
+                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
+                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                          NodeID(SupplyAirOutletNode),
+                          NodeID(SecondaryAirInletNode),
+                          "Air Nodes");
             // Add heat exchanger to component sets array
-            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType, HXAssistedCoil(HXAssistedCoilNum).Name,
-                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
-                          NodeID(SupplyAirInletNode), NodeID(SupplyAirOutletNode), "Process Air Nodes");
-            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType, HXAssistedCoil(HXAssistedCoilNum).Name,
-                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
-                          NodeID(SecondaryAirInletNode), NodeID(SecondaryAirOutletNode), "Secondary Air Nodes");
+            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                          HXAssistedCoil(HXAssistedCoilNum).Name,
+                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType,
+                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
+                          NodeID(SupplyAirInletNode),
+                          NodeID(SupplyAirOutletNode),
+                          "Process Air Nodes");
+            SetUpCompSets(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                          HXAssistedCoil(HXAssistedCoilNum).Name,
+                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType,
+                          HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
+                          NodeID(SecondaryAirInletNode),
+                          NodeID(SecondaryAirOutletNode),
+                          "Secondary Air Nodes");
 
         } // End of the Coil:Water:CoolingHXAssisted Loop
 
@@ -848,13 +940,26 @@ namespace HVACHXAssistedCoolingCoil {
         // Force at least 2 iterations to pass outlet node information
         while ((std::abs(Error) > 0.0005 && Iter <= MaxIter) || Iter < 2) {
 
-            SimHeatRecovery(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, FirstHVACIteration,
-                            HXAssistedCoil(HXAssistedCoilNum).HeatExchangerIndex, FanOpMode, PartLoadRatio, HXUnitOn, CompanionCoilIndexNum, _,
-                            EconomizerFlag, _, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num);
+            SimHeatRecovery(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
+                            FirstHVACIteration,
+                            HXAssistedCoil(HXAssistedCoilNum).HeatExchangerIndex,
+                            FanOpMode,
+                            PartLoadRatio,
+                            HXUnitOn,
+                            CompanionCoilIndexNum,
+                            _,
+                            EconomizerFlag,
+                            _,
+                            HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num);
 
             if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-                SimDXCoil(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CompOp, FirstHVACIteration,
-                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex, FanOpMode, PartLoadRatio, OnOffAirFlow);
+                SimDXCoil(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                          CompOp,
+                          FirstHVACIteration,
+                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
+                          FanOpMode,
+                          PartLoadRatio,
+                          OnOffAirFlow);
             } else if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                 Real64 QZnReq(-1.0);               // Zone load (W), input to variable-speed DX coil
                 Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
@@ -862,13 +967,21 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
                 Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
                 Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-                VariableSpeedCoils::SimVariableSpeedCoils(
-                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex, CompOp,
-                    MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, 1.0, PartLoadRatio, HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds,
-                    QZnReq, QLatReq, OnOffAirFlowRatio); // call vs coil model at top speed.
+                VariableSpeedCoils::SimVariableSpeedCoils(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                                                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
+                                                          CompOp,
+                                                          MaxONOFFCyclesperHour,
+                                                          HPTimeConstant,
+                                                          FanDelayTime,
+                                                          1.0,
+                                                          PartLoadRatio,
+                                                          HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds,
+                                                          QZnReq,
+                                                          QLatReq,
+                                                          OnOffAirFlowRatio); // call vs coil model at top speed.
             } else {
-                SimulateWaterCoilComponents(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, FirstHVACIteration,
-                                            HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex);
+                SimulateWaterCoilComponents(
+                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, FirstHVACIteration, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex);
             }
 
             Error = CoilOutputTempLast - Node(HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum).Temp;
@@ -1046,8 +1159,8 @@ namespace HVACHXAssistedCoolingCoil {
                 if (HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                     CoilCapacity = GetDXCoilCapacity(HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
                 } else if (HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                    CoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(HXAssistedCoil(WhichCoil).CoolingCoilType,
-                                                                                    HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
+                    CoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
+                        HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
                 }
                 if (errFlag) {
                     ShowRecurringWarningErrorAtEnd("Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
@@ -1627,7 +1740,8 @@ namespace HVACHXAssistedCoolingCoil {
             } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {
                     MaxWaterFlowRate = GetWaterCoilMaxFlowRate(cAllCoilTypes(GetCoilObjectTypeNum(CoilType, CoilName, ErrorsFound)),
-                                                               GetHXDXCoilName(CoilType, CoilName, ErrorsFound), ErrorsFound);
+                                                               GetHXDXCoilName(CoilType, CoilName, ErrorsFound),
+                                                               ErrorsFound);
                 }
             } else {
                 WhichCoil = 0;

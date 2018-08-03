@@ -114,8 +114,8 @@ namespace WindowComplexManager {
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::NumOfZones;
     using DataGlobals::Pi;
-    using DataGlobals::TimeStepZoneSec;
     using DataGlobals::rTinyValue;
+    using DataGlobals::TimeStepZoneSec;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
     using DataEnvironment::CloudFraction;
     using DataEnvironment::IsRain;
@@ -407,8 +407,8 @@ namespace WindowComplexManager {
                         BasisList(WindowStateList(IState, IWind).IncBasisIndx); // Put in the basis structure from the BasisList
                     ComplexWind(ISurf).Geom(IState).Trn = BasisList(WindowStateList(IState, IWind).TrnBasisIndx);
 
-                    SetupComplexWindowStateGeometry(ISurf, IState, IConst, ComplexWind(ISurf), ComplexWind(ISurf).Geom(IState),
-                                                    SurfaceWindow(ISurf).ComplexFen.State(IState));
+                    SetupComplexWindowStateGeometry(
+                        ISurf, IState, IConst, ComplexWind(ISurf), ComplexWind(ISurf).Geom(IState), SurfaceWindow(ISurf).ComplexFen.State(IState));
                     // Note--setting up the state geometry will include constructing outgoing basis/surface
                     //  maps and those incoming maps that will not depend on shading.
                 } else {
@@ -555,15 +555,15 @@ namespace WindowComplexManager {
         ConstructBasis(iConst, ComplexWind(iSurf).Geom(NumOfStates).Inc);
         ConstructBasis(iConst, ComplexWind(iSurf).Geom(NumOfStates).Trn);
 
-        SetupComplexWindowStateGeometry(iSurf, NumOfStates, iConst, ComplexWind(iSurf), ComplexWind(iSurf).Geom(NumOfStates),
-                                        SurfaceWindow(iSurf).ComplexFen.State(NumOfStates));
+        SetupComplexWindowStateGeometry(
+            iSurf, NumOfStates, iConst, ComplexWind(iSurf), ComplexWind(iSurf).Geom(NumOfStates), SurfaceWindow(iSurf).ComplexFen.State(NumOfStates));
 
         // allocation of memory for hourly data can be performed only after window state geometry has been setup
         AllocateCFSStateHourlyData(iSurf, NumOfStates);
 
         // calculate static properties for complex fenestration
-        CalcWindowStaticProperties(iSurf, NumOfStates, ComplexWind(iSurf), ComplexWind(iSurf).Geom(NumOfStates),
-                                   SurfaceWindow(iSurf).ComplexFen.State(NumOfStates));
+        CalcWindowStaticProperties(
+            iSurf, NumOfStates, ComplexWind(iSurf), ComplexWind(iSurf).Geom(NumOfStates), SurfaceWindow(iSurf).ComplexFen.State(NumOfStates));
 
         // calculate hourly data from complex fenestration
         CFSShadeAndBeamInitialization(iSurf, NumOfStates);
@@ -1151,8 +1151,8 @@ namespace WindowComplexManager {
             for (IState = 1; IState <= NumStates; ++IState) {
                 // IConst = WindowStateList ( IWind , IState )%Konst
                 SurfaceWindow(ISurf).ComplexFen.State(IState).Konst = WindowStateList(IState, IWind).Konst;
-                CalcWindowStaticProperties(ISurf, IState, ComplexWind(ISurf), ComplexWind(ISurf).Geom(IState),
-                                           SurfaceWindow(ISurf).ComplexFen.State(IState));
+                CalcWindowStaticProperties(
+                    ISurf, IState, ComplexWind(ISurf), ComplexWind(ISurf).Geom(IState), SurfaceWindow(ISurf).ComplexFen.State(IState));
             }
         }
     }
@@ -1393,7 +1393,13 @@ namespace WindowComplexManager {
                         Phi = (J - 1) * DPhi;
                         Basis.Phis(I, J) = Phi; // Note: this ordering of I & J are necessary to allow Phis(Theta) to
                         //  be searched as a one-dimensional table
-                        FillBasisElement(Theta, Phi, ElemNo, Basis.Grid(ElemNo), LowerTheta, UpperTheta, DPhi,
+                        FillBasisElement(Theta,
+                                         Phi,
+                                         ElemNo,
+                                         Basis.Grid(ElemNo),
+                                         LowerTheta,
+                                         UpperTheta,
+                                         DPhi,
                                          BasisType_WINDOW); // This gets all the simple grid characteristics
                         Basis.Lamda(ElemNo) = Lamda;
                         Basis.SolAng(ElemNo) = SolAng;
@@ -1456,7 +1462,13 @@ namespace WindowComplexManager {
                     Phi = 0.0;
                     Basis.Phis(I, 1) = Phi; // Note: this ordering of I & J are necessary to allow Phis(Theta) to
                     //  be searched as a one-dimensional table
-                    FillBasisElement(Theta, Phi, ElemNo, Basis.Grid(ElemNo), LowerTheta, UpperTheta, DPhi,
+                    FillBasisElement(Theta,
+                                     Phi,
+                                     ElemNo,
+                                     Basis.Grid(ElemNo),
+                                     LowerTheta,
+                                     UpperTheta,
+                                     DPhi,
                                      BasisType_WINDOW); // This gets all the simple grid characteristics
                     Basis.Lamda(ElemNo) = Lamda;
                     Basis.SolAng(ElemNo) = SolAng;
@@ -2938,9 +2950,9 @@ namespace WindowComplexManager {
         using namespace DataBSDFWindow;
         using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataGlobals::StefanBoltzmann;
-        using DataHeatBalSurface::HcExtSurf;
         using DataHeatBalance::GasCoeffsAir;
         using DataHeatBalance::SupportPillar;
+        using DataHeatBalSurface::HcExtSurf;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSlatAng; // Function for slat angle interpolation
@@ -3676,14 +3688,117 @@ namespace WindowComplexManager {
             edgeGlCorrFac = 1;
 
         //  call TARCOG
-        TARCOG90(nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, CalcDeflection,
-                 Pa, Pini, Tini, gap, GapDefMax, thick, scon, YoungsMod, PoissonsRat, tir, emis, totsol, tilt, asol, height, heightt, width, presure,
-                 iprop, frct, gcon, gvis, gcp, wght, gama, nmix, SupportPlr, PillarSpacing, PillarRadius, theta, LayerDef, q, qv, ufactor, sc, hflux,
-                 hcin, hcout, hrin, hrout, hin, hout, hcgap, hrgap, shgc, nperr, tarcogErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah,
-                 SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, hg,
-                 hr, hs, he, hi, Ra, Nu, standard, ThermalMod, Debug_mode, Debug_dir, Debug_file, Window_ID, IGU_ID, ShadeEmisRatioOut,
-                 ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, CalcSHGC,
-                 NumOfIterations, edgeGlCorrFac);
+        TARCOG90(nlayer,
+                 iwd,
+                 tout,
+                 tind,
+                 trmin,
+                 wso,
+                 wsi,
+                 dir,
+                 outir,
+                 isky,
+                 tsky,
+                 esky,
+                 fclr,
+                 VacuumPressure,
+                 VacuumMaxGapThickness,
+                 CalcDeflection,
+                 Pa,
+                 Pini,
+                 Tini,
+                 gap,
+                 GapDefMax,
+                 thick,
+                 scon,
+                 YoungsMod,
+                 PoissonsRat,
+                 tir,
+                 emis,
+                 totsol,
+                 tilt,
+                 asol,
+                 height,
+                 heightt,
+                 width,
+                 presure,
+                 iprop,
+                 frct,
+                 gcon,
+                 gvis,
+                 gcp,
+                 wght,
+                 gama,
+                 nmix,
+                 SupportPlr,
+                 PillarSpacing,
+                 PillarRadius,
+                 theta,
+                 LayerDef,
+                 q,
+                 qv,
+                 ufactor,
+                 sc,
+                 hflux,
+                 hcin,
+                 hcout,
+                 hrin,
+                 hrout,
+                 hin,
+                 hout,
+                 hcgap,
+                 hrgap,
+                 shgc,
+                 nperr,
+                 tarcogErrorMessage,
+                 shgct,
+                 tamb,
+                 troom,
+                 ibc,
+                 Atop,
+                 Abot,
+                 Al,
+                 Ar,
+                 Ah,
+                 SlatThick,
+                 SlatWidth,
+                 SlatAngle,
+                 SlatCond,
+                 SlatSpacing,
+                 SlatCurve,
+                 vvent,
+                 tvent,
+                 LayerType,
+                 nslice,
+                 LaminateA,
+                 LaminateB,
+                 sumsol,
+                 hg,
+                 hr,
+                 hs,
+                 he,
+                 hi,
+                 Ra,
+                 Nu,
+                 standard,
+                 ThermalMod,
+                 Debug_mode,
+                 Debug_dir,
+                 Debug_file,
+                 Window_ID,
+                 IGU_ID,
+                 ShadeEmisRatioOut,
+                 ShadeEmisRatioIn,
+                 ShadeHcRatioOut,
+                 ShadeHcRatioIn,
+                 HcUnshadedOut,
+                 HcUnshadedIn,
+                 Keff,
+                 ShadeGapKeffConv,
+                 SDScalar,
+                 CalcSHGC,
+                 NumOfIterations,
+                 edgeGlCorrFac);
 
         // process results from TARCOG
         if ((nperr > 0) && (nperr < 1000)) { // process error signal from tarcog
