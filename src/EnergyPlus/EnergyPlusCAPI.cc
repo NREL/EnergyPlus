@@ -45,27 +45,59 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-#include <stdio.h>
-#include <iostream>
-#include <windows.h>
-#include "EnergyPlusPgm.hh"
+#include "EnergyPlusCAPI.hh"
 
-#define CALLCONV __stdcall
-#define EXPORTCALL __declspec(dllexport)
+void WrappedMessageCallback(std::string const &message)
+{
+	const char * msg = message.c_str();
+	if (GLOBAL_MESSAGE_CALLBACK == NULL) {
+		std::cerr << "GLOBAL_MESSAGE_CALLBACK is NULL" << std::endl;
+	} else {
+		GLOBAL_MESSAGE_CALLBACK(msg);
+	}
+}
 
-typedef void (CALLCONV * MsgCallback)(const char *);
-typedef void (CALLCONV * ProgressCallback)(int const);
-
-MsgCallback GLOBAL_MESSAGE_CALLBACK;
-ProgressCallback GLOBAL_PROGRESS_CALLBACK;
-
-void WrappedMessageCallback(std::string const &);
-void WrappedProgressCallback(int const);
+void WrappedProgressCallback(int const progress)
+{
+	if (GLOBAL_PROGRESS_CALLBACK == NULL) {
+		std::cerr << "GLOBAL_PROGRESS_CALLBACK is NULL" << std::endl;
+	} else {
+		GLOBAL_PROGRESS_CALLBACK( progress );
+	}
+}
 
 extern "C"
 {
-	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length);
-	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f);
-	int EXPORTCALL CALLCONV SetProgressCallback(ProgressCallback f);
+	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length)
+	{
+		int status(EXIT_FAILURE);
+		std::string filepath;
+		if (path_length == 0) {
+			filepath = std::string();
+		} else {
+			filepath = std::string(path, path_length);
+		}
+		try {
+			status = EnergyPlusPgmReturnCodes(filepath);
+		}
+		catch (...) {
+			std::cerr << "Exception encountered" << std::endl;
+			return EXIT_FAILURE;
+		}
+		return status;
+	}
+
+	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f)
+	{
+		GLOBAL_MESSAGE_CALLBACK = f;
+		StoreMessageCallback(WrappedMessageCallback);
+		return EXIT_SUCCESS;
+	}
+
+	int EXPORTCALL CALLCONV SetProgressCallback(ProgressCallback f)
+	{
+		GLOBAL_PROGRESS_CALLBACK = f;
+		StoreProgressCallback(WrappedProgressCallback);
+		return EXIT_SUCCESS;
+	}
 }
