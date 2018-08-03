@@ -550,12 +550,10 @@ int EnergyPlusPgmReturnCodes(std::string const & filepath)
         }
 
     } catch (const std::exception &e) {
-        AbortEnergyPlus();
-        return EXIT_FAILURE;
+        return AbortEnergyPlus();
     }
 
-    EndEnergyPlus();
-    return EXIT_SUCCESS;
+    return EndEnergyPlus();
 }
 
 void StoreProgressCallback(void (*f)(int const))
