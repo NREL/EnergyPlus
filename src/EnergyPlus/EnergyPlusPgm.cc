@@ -225,6 +225,16 @@
 
 void EnergyPlusPgm(std::string const &filepath)
 {
+    int status(EnergyPlusPgmReturnCodes(filepath));
+    if (status != EXIT_SUCCESS) {
+        std::exit(status);
+    }
+    std::exit(EXIT_SUCCESS);
+}
+
+int
+EnergyPlusPgmReturnCodes( std::string const & filepath )
+{
     // Using/Aliasing
     using namespace EnergyPlus;
 
@@ -546,9 +556,11 @@ void EnergyPlusPgm(std::string const &filepath)
 
     } catch (const std::exception &e) {
         AbortEnergyPlus();
+        return EXIT_FAILURE;
     }
 
     EndEnergyPlus();
+    return EXIT_SUCCESS;
 }
 
 void StoreProgressCallback(void (*f)(int const))

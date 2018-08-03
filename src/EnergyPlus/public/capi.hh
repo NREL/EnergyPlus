@@ -45,24 +45,27 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EnergyPlusPgm_hh_INCLUDED
-#define EnergyPlusPgm_hh_INCLUDED
+#pragma once
+#include <stdio.h>
+#include <iostream>
+#include <windows.h>
+#include "EnergyPlusPgm.hh"
 
-#include <EnergyPlusAPI.hh>
+#define CALLCONV __stdcall
+#define EXPORTCALL __declspec(dllexport)
 
-// C++ Headers
-#include <string>
+typedef void (CALLCONV * MsgCallback)(const char *);
+typedef void (CALLCONV * ProgressCallback)(int const);
 
-// Functions
+MsgCallback GLOBAL_MESSAGE_CALLBACK;
+ProgressCallback GLOBAL_PROGRESS_CALLBACK;
 
-void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
+void WrappedMessageCallback(std::string const &);
+void WrappedProgressCallback(int const);
 
-void ENERGYPLUSLIB_API EnergyPlusPgm(std::string const &filepath = std::string());
-
-int ENERGYPLUSLIB_API EnergyPlusPgmReturnCodes(std::string const & filepath = std::string());
-
-void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
-
-void ENERGYPLUSLIB_API StoreMessageCallback(void (*f)(std::string const &));
-
-#endif
+extern "C"
+{
+	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length);
+	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f);
+	int EXPORTCALL CALLCONV SetProgressCallback(ProgressCallback f);
+}

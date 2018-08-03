@@ -45,24 +45,59 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EnergyPlusPgm_hh_INCLUDED
-#define EnergyPlusPgm_hh_INCLUDED
+#include "capi.hh"
 
-#include <EnergyPlusAPI.hh>
+void WrappedMessageCallback( std::string const &message )
+{
+	const char * msg = message.c_str();
+	if ( GLOBAL_MESSAGE_CALLBACK == NULL ) {
+		std::cerr << "GLOBAL_MESSAGE_CALLBACK is NULL" << std::endl;
+	} else {
+		GLOBAL_MESSAGE_CALLBACK( msg );
+	}
+}
 
-// C++ Headers
-#include <string>
+void WrappedProgressCallback(int const progress)
+{
+	if (GLOBAL_PROGRESS_CALLBACK == NULL) {
+		std::cerr << "GLOBAL_PROGRESS_CALLBACK is NULL" << std::endl;
+	} else {
+		GLOBAL_PROGRESS_CALLBACK( progress );
+	}
+}
 
-// Functions
+extern "C"
+{
+	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length)
+	{
+		int status( EXIT_FAILURE );
+		std::string filepath;
+		if (path_length == 0) {
+			filepath = std::string();
+		} else {
+			filepath = std::string( path, path_length );
+		}
+		try {
+			status = EnergyPlusPgmReturnCodes( filepath );
+		}
+		catch (...) {
+			std::cerr << "Exception encountered" << std::endl;
+			return EXIT_FAILURE;
+		}
+		return status;
+	}
 
-void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
+	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f)
+	{
+		GLOBAL_MESSAGE_CALLBACK = f;
+		StoreMessageCallback( WrappedMessageCallback );
+		return EXIT_SUCCESS;
+	}
 
-void ENERGYPLUSLIB_API EnergyPlusPgm(std::string const &filepath = std::string());
-
-int ENERGYPLUSLIB_API EnergyPlusPgmReturnCodes(std::string const & filepath = std::string());
-
-void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
-
-void ENERGYPLUSLIB_API StoreMessageCallback(void (*f)(std::string const &));
-
-#endif
+	int EXPORTCALL CALLCONV SetProgressCallback(ProgressCallback f)
+	{
+		GLOBAL_PROGRESS_CALLBACK = f;
+		StoreProgressCallback(WrappedProgressCallback);
+		return EXIT_SUCCESS;
+	}
+}
