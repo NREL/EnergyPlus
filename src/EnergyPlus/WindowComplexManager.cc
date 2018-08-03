@@ -3225,7 +3225,6 @@ namespace WindowComplexManager {
         Real64 CpAirZone;             // Heat capacity of zone air (J/kg-K)
         Real64 ConvHeatGainToZoneAir; // Convective heat gain to zone air from window gap airflow (W)
                                       //		int ConstrNumSh; // Construction number with shading device
-        Real64 TransDiff;             // Diffuse shortwave transmittance
         static int CalcSHGC(0);       // SHGC calculations are not necessary for E+ run
         static int NumOfIterations(0);
 
