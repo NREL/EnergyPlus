@@ -29,7 +29,7 @@ FEI<sub>t,i</sub>: FEI based on fan total pressure
 
 FEI<sub>s,i</sub>: FEI based on fan static pressure
 
-We propose to add field as a flag to the current fan model **Fan:SystemModel** for reporting FEI (considering that it can be substituted for **Fan:ConstantVolume**,**Fan:OnOff**, **Fan:VariableVolume**, and **FanPerformance:NightVentilation** objects and they may be deprecated and eventually removed in the future). We will use the user defined Fan objects to simulate the actual fan electrical input power FEP<sub>act,i</sub> at the design operating point. We will calculate the reference fan electrical input power FEP<sub>ref,i</sub> using the following method.
+We propose to report the design point FEI of the current fan models, including **Fan:SystemModel**, **Fan:ConstantVolume**,**Fan:OnOff**, **Fan:VariableVolume**, and **FanPerformance:NightVentilation**. We will use the user defined Fan objects to simulate the actual fan electrical input power FEP<sub>act,i</sub> at the design operating point. We will calculate the reference fan electrical input power FEP<sub>ref,i</sub> using the following method.
 
 Reference fan shaft power (H<sub>i,ref</sub>) is calculated on a fan total pressure basis or a static pressure basis, depending on the category of the reference fan to calculate FEI. However, in EnergyPlus **Fan:SystemModel**, only total pressure is defined. So the FEI is reportable only for limited category of fans that are calculated based on the fan total pressure, namely Centrifugal Housed, Centrifugal Inline, Centrifugal PRV Supply, Axial Inline, Laboratory Exhaust, Jet Fan and Circulating 
 
@@ -101,17 +101,6 @@ $$\eta_{ctrl,ref} = 1 $$ (7)
 
 
 ## Approach
-We propose to add field as a flag to the current fan model **Fan:SystemModel** for reporting FEI object, and fields for the user input to calculate the FEI based on ANSI/AMCA standards 207-17 and 208-18.
-
-```json
-**Fan:SystemModel,**
-  A10, \field Report Fan Energy Index
-       \type choice
-       \key Yes
-       \key No
-       \default No
-       \note If Yes, design point FEI will be calculated and reported.
-```
 
 The FEI calculation results will be added to the existing summary report for Equipment Summary | Fans, as shown in Table 2.
 
@@ -131,7 +120,7 @@ EnergyPlus simulation results will be manually checked and compared with those f
 N/A
 
 ## IDD Object(s) (Revised):
-The existing fan object, **Fan:SystemModel**, is revised to add a couple of new fields to define the reference fan.
+N/A
 
 ## Proposed additions to Meters:
 N/A

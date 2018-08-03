@@ -1469,6 +1469,7 @@ namespace Fans {
             ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Motor Efficiency []", Fan(FanNum).MotEff);
             ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Efficiency []", Fan(FanNum).VFDEff);
             ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Combined Efficiency []", Fan(FanNum).FanEff);
+            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Point Fan Energy Index", Fan(FanNum).DesignPointFEI);
 
             // cpw31Aug2010 Temporary code for debugging fan component model
             //    WRITE(300,*) TRIM(RoundSigDigits(RhoAir,4))//','//TRIM(RoundSigDigits(FanVolFlow,4)) &
@@ -1506,12 +1507,16 @@ namespace Fans {
         PreDefTableEntry(pdchFanDeltaP, equipName, Fan(FanNum).DeltaPress);
         PreDefTableEntry(pdchFanVolFlow, equipName, FanVolFlow);
         RatedPower = FanVolFlow * Fan(FanNum).DeltaPress / Fan(FanNum).FanEff; // total fan power
+        if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
+            ReportFEI(FanVolFlow, RatedPower, FanNum);
+        }
         PreDefTableEntry(pdchFanPwr, equipName, RatedPower);
         if (FanVolFlow != 0.0) {
             PreDefTableEntry(pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
         }
         PreDefTableEntry(pdchFanMotorIn, equipName, Fan(FanNum).MotInAirFrac);
         PreDefTableEntry(pdchFanEndUse, equipName, Fan(FanNum).EndUseSubcategoryName);
+        PreDefTableEntry(OutputReportPredefined::pdchFanEnergyIndex, equipName, Fan(FanNum).DesignPointFEI);
 
         NVPerfNum = Fan(FanNum).NVPerfNum;
         if (NVPerfNum > 0) {
@@ -1521,6 +1526,40 @@ namespace Fans {
         }
 
         if (++NumFansSized == NumFans) FanNumericFields.deallocate(); // remove temporary array for field names at end of sizing
+    }
+
+    void ReportFEI(Real64 const DesignFlowRate, Real64 const DesignElecPower, int const FanNum)
+    {
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculate the Fan Energy Index
+
+        // REFERENCES:
+        // ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
+        // AANSI / AMCA Standard 208 - 18: Calculation of the Fan Energy Index, 2018.
+
+        // Calculate reference fan shaft power
+        Real64 refFanShaftPower = (DesignFlowRate + 0.118) * (Fan(FanNum).DeltaPress + 100) / (1000 * 0.66);
+
+        // Calculate reference reference fan transmission efficiency
+        Real64 refFanTransEff = 0.96 * pow((refFanShaftPower / (refFanShaftPower + 1.64)), 0.05);
+
+        // Calculate reference reference fan motor efficiency
+        Real64 refFanMotorOutput = refFanShaftPower / refFanTransEff;
+
+        Real64 refFanMotorEff;
+        if (refFanMotorOutput < 185.0) {
+            refFanMotorEff = -0.003812 * pow(std::log10(refFanMotorOutput), 4) + 0.025834 * pow(std::log10(refFanMotorOutput), 3) -
+                             0.072577 * pow(std::log10(refFanMotorOutput), 2) + 0.125559 * std::log10(refFanMotorOutput) + 0.850274;
+        } else {
+            refFanMotorEff = 0.962;
+        }
+
+        // Calculate reference reference fan motor controller  efficiency
+        Real64 refFanMotorCtrlEff = 1;
+
+        Real64 refFanElecPower = refFanShaftPower / (refFanTransEff * refFanMotorEff * refFanMotorCtrlEff);
+
+        Fan(FanNum).DesignPointFEI = refFanElecPower * 1000 / DesignElecPower;
     }
 
     // End Initialization Section of the Module

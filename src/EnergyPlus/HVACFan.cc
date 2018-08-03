@@ -294,11 +294,9 @@ namespace HVACFan {
                 }
             }
         }
-		
-        if (m_reportFEIFlag) {
-            report_fei();
-            ReportSizingManager::ReportSizingOutput(m_fanType, name, "Design Point Fan Energy Index", m_designPointFEI);
-        }
+
+        report_fei();
+        ReportSizingManager::ReportSizingOutput(m_fanType, name, "Design Point Fan Energy Index", m_designPointFEI);
 
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanType, name, m_fanType);
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanTotEff, name, m_fanTotalEff);
@@ -310,9 +308,7 @@ namespace HVACFan {
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanPwrPerFlow, name, designElecPower / designAirVolFlowRate);
         }
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanMotorIn, name, m_motorInAirFrac);
-        if (m_reportFEIFlag) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanEnergyIndex, name, m_designPointFEI);
-        }
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanEnergyIndex, name, m_designPointFEI);
 
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanEndUse, name, m_endUseSubcategoryName);
 
@@ -328,9 +324,9 @@ namespace HVACFan {
         // ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
         // AANSI / AMCA Standard 208 - 18: Calculation of the Fan Energy Index, 2018.
 
-        // Calculate reference fan shaft power 
+        // Calculate reference fan shaft power
         Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
-        Real64 refFanShaftPower = (designAirVolFlowRate + 0.118) * (deltaPress + 100 * RhoAir / DataEnvironment::StdRhoAir ) / (1000 * 0.66);
+        Real64 refFanShaftPower = (designAirVolFlowRate + 0.118) * (deltaPress + 100 * RhoAir / DataEnvironment::StdRhoAir) / (1000 * 0.66);
 
         // Calculate reference reference fan transmission efficiency
         Real64 refFanTransEff = 0.96 * pow((refFanShaftPower / (refFanShaftPower + 1.64)), 0.05);
@@ -340,8 +336,8 @@ namespace HVACFan {
 
         Real64 refFanMotorEff;
         if (refFanMotorOutput < 185.0) {
-            refFanMotorEff = -0.003812 * pow(std::log10(refFanMotorOutput), 4) + 0.025834 * pow(std::log10(refFanMotorOutput), 3)
-                - 0.072577 * pow(std::log10(refFanMotorOutput), 2) + 0.125559 * std::log10(refFanMotorOutput) + 0.850274;
+            refFanMotorEff = -0.003812 * pow(std::log10(refFanMotorOutput), 4) + 0.025834 * pow(std::log10(refFanMotorOutput), 3) -
+                             0.072577 * pow(std::log10(refFanMotorOutput), 2) + 0.125559 * std::log10(refFanMotorOutput) + 0.850274;
         } else {
             refFanMotorEff = 0.962;
         }
@@ -352,13 +348,12 @@ namespace HVACFan {
         Real64 refFanElecPower = refFanShaftPower / (refFanTransEff * refFanMotorEff * refFanMotorCtrlEff);
 
         m_designPointFEI = refFanElecPower * 1000 / designElecPower;
-
-	}
+    }
 
     FanSystem::FanSystem( // constructor
         std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
-          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), fanIsSecondaryDriver(false), m_reportFEIFlag(false), m_designPointFEI(0.0), m_fanType_Num(0),
+          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), fanIsSecondaryDriver(false), m_designPointFEI(0.0), m_fanType_Num(0),
           m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
           m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::powerSizingMethodNotSet), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
@@ -529,18 +524,6 @@ namespace HVACFan {
             m_endUseSubcategoryName = alphaArgs(9);
         } else {
             m_endUseSubcategoryName = "General";
-        }
-
-        if (isAlphaFieldBlank(10)) {
-            m_reportFEIFlag = false;
-        } else if (UtilityRoutines::SameString(alphaArgs(10), "Yes")) {
-            m_reportFEIFlag = true;
-        } else if (UtilityRoutines::SameString(alphaArgs(10), "No")) {
-            m_reportFEIFlag = false;
-        } else {
-            ShowSevereError(routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-            ShowContinueError("Invalid " + alphaFieldNames(10) + " = " + alphaArgs(10));
-            errorsFound = true;
         }
 
         if (!isNumericFieldBlank(13)) {

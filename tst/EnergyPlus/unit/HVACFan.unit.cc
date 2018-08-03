@@ -170,7 +170,6 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc1)
         "  , !- Motor Loss Zone Name",
         "  , !- Motor Loss Radiative Fraction ",
         "  Fan Energy, !- End-Use Subcategory",
-        "  ,  !- Report Fan Energy Index",
         "  2, !- Number of Speeds",
         "  0.5, !- Speed 1 Flow Fraction",
         "  0.125, !- Speed 1 Electric Power Fraction",
@@ -230,7 +229,6 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2)
         "  , !- Motor Loss Zone Name",
         "  , !- Motor Loss Radiative Fraction ",
         "  Fan Energy, !- End-Use Subcategory",
-        "  ,  !- Report Fan Energy Index",
         "  2, !- Number of Speeds",
         "  0.5, !- Speed 1 Flow Fraction",
         "  , !- Speed 1 Electric Power Fraction",
@@ -303,7 +301,6 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc3)
         "  , !- Motor Loss Zone Name",
         "  , !- Motor Loss Radiative Fraction ",
         "  Fan Energy, !- End-Use Subcategory",
-        "  ,  !- Report Fan Energy Index",
         "  2, !- Number of Speeds",
         "  0.5, !- Speed 1 Flow Fraction",
         "  0.125, !- Speed 1 Electric Power Fraction",
@@ -490,9 +487,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_FanEnergyIndex)
         "    ,                            !- Night Ventilation Mode Flow Fraction",
         "    ,                            !- Motor Loss Zone Name",
         "    ,                            !- Motor Loss Radiative Fraction ",
-        "    Fan Energy,                  !- End-Use Subcategory",
-        "    Yes;                         !- Report Fan Energy Index",
-    });
+        "    Fan Energy;                  !- End-Use Subcategory"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -502,13 +497,12 @@ TEST_F(EnergyPlusFixture, SystemFanObj_FanEnergyIndex)
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
     DataEnvironment::StdRhoAir = 1.2;
-    HVACFan::fanObjs[0]->simulate(_, _, _, _);                          // triggers sizing call
+    HVACFan::fanObjs[0]->simulate(_, _, _, _);                         // triggers sizing call
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate; // get function
     EXPECT_NEAR(1.0000, locFanSizeVdot, 0.00000001);
     Real64 locDesignPressureRise = HVACFan::fanObjs[0]->deltaPress;
     EXPECT_NEAR(locDesignPressureRise, 100, 0.001);
 
-    EXPECT_TRUE(HVACFan::fanObjs[0]->m_reportFEIFlag);
     EXPECT_NEAR(HVACFan::fanObjs[0]->m_designPointFEI, 1.386, 0.001);
 }
 

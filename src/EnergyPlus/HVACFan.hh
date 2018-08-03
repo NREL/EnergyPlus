@@ -137,7 +137,6 @@ namespace HVACFan {
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
 
         // FEI
-        bool m_reportFEIFlag; // Indicate whether to calculate and report the Fan Energy Index for the fan
         Real64 m_designPointFEI; // Fan Energy Index for the fan at the design operating point
 
     private: // methods
