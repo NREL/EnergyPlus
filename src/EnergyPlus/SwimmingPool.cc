@@ -874,22 +874,22 @@ namespace SwimmingPool {
                                        bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
     )
     {
-        
+
         if (!MyPlantScanFlagPool) {
             if (Pool(PoolNum).WaterInletNode > 0) {
                 PlantUtilities::InitComponentNodes(0.0,
-                                   Pool(PoolNum).WaterMassFlowRateMax,
-                                   Pool(PoolNum).WaterInletNode,
-                                   Pool(PoolNum).WaterOutletNode,
-                                   Pool(PoolNum).HWLoopNum,
-                                   Pool(PoolNum).HWLoopSide,
-                                   Pool(PoolNum).HWBranchNum,
-                                   Pool(PoolNum).HWCompNum);
+                                                   Pool(PoolNum).WaterMassFlowRateMax,
+                                                   Pool(PoolNum).WaterInletNode,
+                                                   Pool(PoolNum).WaterOutletNode,
+                                                   Pool(PoolNum).HWLoopNum,
+                                                   Pool(PoolNum).HWLoopSide,
+                                                   Pool(PoolNum).HWBranchNum,
+                                                   Pool(PoolNum).HWCompNum);
                 PlantUtilities::RegisterPlantCompDesignFlow(Pool(PoolNum).WaterInletNode, Pool(PoolNum).WaterVolFlowMax);
             }
         }
     }
-    
+
     void CalcSwimmingPool(int const PoolNum // number of the swimming pool
     )
     {

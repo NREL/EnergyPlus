@@ -337,9 +337,9 @@ namespace ReportSizingManager {
         using DataGlobals::DisplayExtraWarnings;
         using namespace DataSizing;
         using namespace DataHVACGlobals;
-        using DXCoils::ValidateADP;
         using DataPlant::PlantLoop;
         using DesiccantDehumidifiers::DesicDehum;
+        using DXCoils::ValidateADP;
         using Fans::FanDesDT;
         using Fans::FanDesHeatGain;
         using FluidProperties::GetDensityGlycol;

@@ -12688,7 +12688,8 @@ namespace SurfaceGeometry {
             }
             OldVertex.deallocate();
             if (DisplayExtraWarnings) {
-                ShowWarningError("CheckConvexity: Surface=\"" + SurfaceTmp(SurfNum).Name + "\": The vertex points has been reprocessed as Sides = " + RoundSigDigits(SurfaceTmp(SurfNum).Sides));
+                ShowWarningError("CheckConvexity: Surface=\"" + SurfaceTmp(SurfNum).Name +
+                                 "\": The vertex points has been reprocessed as Sides = " + RoundSigDigits(SurfaceTmp(SurfNum).Sides));
             }
         }
     }

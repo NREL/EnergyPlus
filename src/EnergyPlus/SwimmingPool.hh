@@ -188,7 +188,7 @@ namespace SwimmingPool {
     void InitSwimmingPoolPlantNodeFlow(int const PoolNum,             // number of the swimming pool
                                        bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
     );
-    
+
     void CalcSwimmingPool(int const PoolNum // Index of the swimming pool under consideration within the derived types
     );
 

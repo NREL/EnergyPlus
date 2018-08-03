@@ -406,15 +406,15 @@ namespace LowTempRadiantSystem {
         int Item;                              // Item to be "gotten"
         int MaxAlphas;                         // Maximum number of alphas for these input keywords
         int MaxNumbers;                        // Maximum number of numbers for these input keywords
-        Array1D<Real64> Numbers; // Numeric items for object
-        int NumAlphas;           // Number of Alphas for each GetObjectItem call
-        int NumArgs;             // Unused variable that is part of a subroutine call
-        int NumNumbers;          // Number of Numbers for each GetObjectItem call
-        int SurfListNum; // Index within the SurfList derived type for a surface list name
-        int SurfNum;     // DO loop counter for surfaces
-        int BaseNum;                 // Temporary number for creating RadiantSystemTypes structure
-        Array1D_bool lAlphaBlanks;   // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+        Array1D<Real64> Numbers;               // Numeric items for object
+        int NumAlphas;                         // Number of Alphas for each GetObjectItem call
+        int NumArgs;                           // Unused variable that is part of a subroutine call
+        int NumNumbers;                        // Number of Numbers for each GetObjectItem call
+        int SurfListNum;                       // Index within the SurfList derived type for a surface list name
+        int SurfNum;                           // DO loop counter for surfaces
+        int BaseNum;                           // Temporary number for creating RadiantSystemTypes structure
+        Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
+        Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
 
         MaxAlphas = 0;
         MaxNumbers = 0;
@@ -2300,7 +2300,7 @@ namespace LowTempRadiantSystem {
         bool ErrorsFound(false); // If errors detected in input
         Real64 rho;
         Real64 Cp;
-        bool IsAutoSize(false); // Indicator to autosize
+        bool IsAutoSize(false);              // Indicator to autosize
         Real64 WaterVolFlowMaxHeatDes(0.0);  // Design hot water flow for reproting
         Real64 WaterVolFlowMaxHeatUser(0.0); // User hard-sized hot water flow for
         Real64 WaterVolFlowMaxCoolDes(0.0);  // Design chilled water flow for reproting
@@ -4789,7 +4789,6 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
 
         LoadMet = SumHATsurf(CFloRadSys(RadSysNum).ZonePtr) - ZeroSourceSumHATsurf(CFloRadSys(RadSysNum).ZonePtr);
-
     }
 
     void CalcLowTempElecRadiantSystem(int const RadSysNum, // name of the low temperature radiant system

@@ -3827,7 +3827,8 @@ namespace SetPointManager {
                             }
                         }
                         if (!found) {
-                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneHtSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " + NodeID(SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneHtSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
+                                            NodeID(SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
                             ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
@@ -3858,7 +3859,8 @@ namespace SetPointManager {
                             }
                         }
                         if (!found) {
-                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneClSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " + NodeID(SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneClSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
+                                            NodeID(SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
                             ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
@@ -3969,12 +3971,14 @@ namespace SetPointManager {
                             }
                         }
                         if (!found) {
-                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of "+NodeID(SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
-                            ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName +". Please check inputs.");
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
+                                            NodeID(SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
+                            ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
                         if (AirLoopNum == 0) {
-                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node is not connected to an air loop.");
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name +
+                                            "\", The zone inlet node is not connected to an air loop.");
                             ErrorsFound = true;
                             continue;
                         }
