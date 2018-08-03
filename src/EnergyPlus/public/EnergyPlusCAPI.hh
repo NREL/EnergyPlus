@@ -52,7 +52,11 @@
 #include <windows.h>
 #include "EnergyPlusPgm.hh"
 
+#if _WIN32 || _MSC_VER
 #define CALLCONV __stdcall
+#else
+#define CALLCONV
+#endif
 #define EXPORTCALL __declspec(dllexport)
 
 typedef void (CALLCONV * MsgCallback)(const char *);
