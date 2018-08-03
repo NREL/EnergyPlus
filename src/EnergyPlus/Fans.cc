@@ -68,6 +68,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HVACFan.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -1508,7 +1509,7 @@ namespace Fans {
         PreDefTableEntry(pdchFanVolFlow, equipName, FanVolFlow);
         RatedPower = FanVolFlow * Fan(FanNum).DeltaPress / Fan(FanNum).FanEff; // total fan power
         if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
-            ReportFEI(FanVolFlow, RatedPower, FanNum);
+            Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, StdRhoAir);
         }
         PreDefTableEntry(pdchFanPwr, equipName, RatedPower);
         if (FanVolFlow != 0.0) {
@@ -1526,40 +1527,6 @@ namespace Fans {
         }
 
         if (++NumFansSized == NumFans) FanNumericFields.deallocate(); // remove temporary array for field names at end of sizing
-    }
-
-    void ReportFEI(Real64 const DesignFlowRate, Real64 const DesignElecPower, int const FanNum)
-    {
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculate the Fan Energy Index
-
-        // REFERENCES:
-        // ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
-        // AANSI / AMCA Standard 208 - 18: Calculation of the Fan Energy Index, 2018.
-
-        // Calculate reference fan shaft power
-        Real64 refFanShaftPower = (DesignFlowRate + 0.118) * (Fan(FanNum).DeltaPress + 100) / (1000 * 0.66);
-
-        // Calculate reference reference fan transmission efficiency
-        Real64 refFanTransEff = 0.96 * pow((refFanShaftPower / (refFanShaftPower + 1.64)), 0.05);
-
-        // Calculate reference reference fan motor efficiency
-        Real64 refFanMotorOutput = refFanShaftPower / refFanTransEff;
-
-        Real64 refFanMotorEff;
-        if (refFanMotorOutput < 185.0) {
-            refFanMotorEff = -0.003812 * pow(std::log10(refFanMotorOutput), 4) + 0.025834 * pow(std::log10(refFanMotorOutput), 3) -
-                             0.072577 * pow(std::log10(refFanMotorOutput), 2) + 0.125559 * std::log10(refFanMotorOutput) + 0.850274;
-        } else {
-            refFanMotorEff = 0.962;
-        }
-
-        // Calculate reference reference fan motor controller  efficiency
-        Real64 refFanMotorCtrlEff = 1;
-
-        Real64 refFanElecPower = refFanShaftPower / (refFanTransEff * refFanMotorEff * refFanMotorCtrlEff);
-
-        Fan(FanNum).DesignPointFEI = refFanElecPower * 1000 / DesignElecPower;
     }
 
     // End Initialization Section of the Module

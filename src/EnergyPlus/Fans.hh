@@ -333,8 +333,6 @@ namespace Fans {
 
     void ReportFan(int const FanNum);
 
-    void ReportFEI(Real64 const DesignFlowRate, Real64 const DesignElecPower, int const FanNum);
-
     //        End of Reporting subroutines for the Fan Module
     // *****************************************************************************
 

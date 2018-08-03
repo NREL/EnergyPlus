@@ -294,8 +294,9 @@ namespace HVACFan {
                 }
             }
         }
+        Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
+        m_designPointFEI = report_fei(designAirVolFlowRate, designElecPower, deltaPress, rhoAir);
 
-        report_fei();
         ReportSizingManager::ReportSizingOutput(m_fanType, name, "Design Point Fan Energy Index", m_designPointFEI);
 
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanType, name, m_fanType);
@@ -315,7 +316,7 @@ namespace HVACFan {
         m_objSizingFlag = false;
     }
 
-    void FanSystem::report_fei()
+    Real64 FanSystem::report_fei(Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the Fan Energy Index
@@ -325,8 +326,7 @@ namespace HVACFan {
         // AANSI / AMCA Standard 208 - 18: Calculation of the Fan Energy Index, 2018.
 
         // Calculate reference fan shaft power
-        Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
-        Real64 refFanShaftPower = (designAirVolFlowRate + 0.118) * (deltaPress + 100 * RhoAir / DataEnvironment::StdRhoAir) / (1000 * 0.66);
+        Real64 refFanShaftPower = (designFlowRate + 0.118) * (designDeltaPress + 100 * inletRhoAir / DataEnvironment::StdRhoAir) / (1000 * 0.66);
 
         // Calculate reference reference fan transmission efficiency
         Real64 refFanTransEff = 0.96 * pow((refFanShaftPower / (refFanShaftPower + 1.64)), 0.05);
@@ -347,7 +347,7 @@ namespace HVACFan {
 
         Real64 refFanElecPower = refFanShaftPower / (refFanTransEff * refFanMotorEff * refFanMotorCtrlEff);
 
-        m_designPointFEI = refFanElecPower * 1000 / designElecPower;
+        return refFanElecPower * 1000 / designElecPower;
     }
 
     FanSystem::FanSystem( // constructor

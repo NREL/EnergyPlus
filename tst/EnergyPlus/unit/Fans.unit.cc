@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -81,6 +82,8 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
     Fan(FanNum).MaxAirFlowRate = AutoSize;
     Fan(FanNum).DeltaPress = 500.0;
     Fan(FanNum).FanEff = 0.4; // Prevent divide by zero computing RatedPower
+
+    DataEnvironment::StdRhoAir = 1.2;
 
     FanNumericFields(FanNum).FieldNames(3) = "Maximum Flow Rate";
 

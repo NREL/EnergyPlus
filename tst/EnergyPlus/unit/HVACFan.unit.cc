@@ -464,46 +464,9 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
 TEST_F(EnergyPlusFixture, SystemFanObj_FanEnergyIndex)
 {
     // this unit test checks the functions calculating FEI
-    std::string const idf_objects = delimited_string({
-
-        "  Fan:SystemModel,",
-        "    Test Fan ,                   !- Name",
-        "    ,                            !- Availability Schedule Name",
-        "    TestFanAirInletNode,         !- Air Inlet Node Name",
-        "    TestFanOutletNode,           !- Air Outlet Node Name",
-        "    1.0 ,                        !- Design Maximum Air Flow Rate",
-        "    Discrete ,                   !- Speed Control Method",
-        "    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
-        "    100.0,                       !- Design Pressure Rise",
-        "    0.9 ,                        !- Motor Efficiency",
-        "    1.0 ,                        !- Motor In Air Stream Fraction",
-        "    AUTOSIZE,                    !- Design Electric Power Consumption",
-        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
-        "    ,                            !- Electric Power Per Unit Flow Rate",
-        "    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
-        "    0.50,                        !- Fan Total Efficiency",
-        "    ,                            !- Electric Power Function of Flow Fraction Curve Name",
-        "    ,                            !- Night Ventilation Mode Pressure Rise",
-        "    ,                            !- Night Ventilation Mode Flow Fraction",
-        "    ,                            !- Motor Loss Zone Name",
-        "    ,                            !- Motor Loss Radiative Fraction ",
-        "    Fan Energy;                  !- End-Use Subcategory"});
-
-    ASSERT_TRUE(process_idf(idf_objects));
-
-    std::string fanName = "TEST FAN";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::CurSysNum = 0;
-    DataSizing::CurOASysNum = 0;
     DataEnvironment::StdRhoAir = 1.2;
-    HVACFan::fanObjs[0]->simulate(_, _, _, _);                         // triggers sizing call
-    Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate; // get function
-    EXPECT_NEAR(1.0000, locFanSizeVdot, 0.00000001);
-    Real64 locDesignPressureRise = HVACFan::fanObjs[0]->deltaPress;
-    EXPECT_NEAR(locDesignPressureRise, 100, 0.001);
-
-    EXPECT_NEAR(HVACFan::fanObjs[0]->m_designPointFEI, 1.386, 0.001);
+    Real64 testFEI = HVACFan::FanSystem::report_fei(1.0, 1000.0, 100.0, 1.2);
+    EXPECT_NEAR(testFEI, 0.4917, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_noPowerFFlowCurve)

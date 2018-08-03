@@ -137,14 +137,12 @@ namespace HVACFan {
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
 
         // FEI
-        Real64 m_designPointFEI; // Fan Energy Index for the fan at the design operating point
+        static Real64 report_fei(Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
 
     private: // methods
         void init();
 
         void set_size();
-
-        void report_fei();
 
         void calcSimpleSystemFan(Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
                                  Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
@@ -243,6 +241,7 @@ namespace HVACFan {
         Real64 m_massFlowRateMinAvail;
         Real64 m_rhoAirStdInit;
         //	bool oneTimePowerCurveCheck_; // one time flag used for error message
+        Real64 m_designPointFEI; // Fan Energy Index for the fan at the design operating point
 
     }; // class FanSystem
 
