@@ -225,11 +225,7 @@
 
 void EnergyPlusPgm(std::string const &filepath)
 {
-    int status(EnergyPlusPgmReturnCodes(filepath));
-    if (status != EXIT_SUCCESS) {
-        std::exit(status);
-    }
-    std::exit(EXIT_SUCCESS);
+    std::exit(EnergyPlusPgmReturnCodes(filepath));
 }
 
 int EnergyPlusPgmReturnCodes(std::string const & filepath)
