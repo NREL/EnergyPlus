@@ -160,17 +160,18 @@ set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 if( BUILD_TESTING )
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
   set(BUILD_GTEST ON CACHE BOOL "" FORCE)
-  set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+  set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()
   include(CTest)
-#  ADD_SUBDIRECTORY(third_party/gtest)
+  ADD_SUBDIRECTORY(third_party/gtest)
 endif()
 
 # E+ required libraries
 ADD_SUBDIRECTORY(idd)
 
 set(BUILD_BTWXT_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+set(BTWXT_GET_EIGEN OFF CACHE BOOL "" FORCE)
 ADD_SUBDIRECTORY(third_party/btwxt)
 INCLUDE_DIRECTORIES( ${gtest_SOURCE_DIR}/include/ SYSTEM )
 
