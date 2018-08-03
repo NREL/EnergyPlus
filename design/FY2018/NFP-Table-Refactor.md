@@ -112,17 +112,19 @@ The name of an external CSV file that represents the tabular data. This file sho
 `iv1[3]` | `iv2[2]` | `iv3[3]` | `out[3][2][3]`
 `iv1[3]` | `iv2[2]` | `iv3[4]` | `out[3][2][4]`
 
+Alternatively, the output may be defined using the *Output Value \<x\>* fields below.
+
 ##### Field: External File Column Number
 
 The column number (starting at 1) in the CSV file corresponding to this output.
 
-##### Field: External File First Row Number
+##### Field: External File Starting Row Number
 
 The row number (starting at 1) in the CSV file where the data for this output begins. If there are not enough rows of data to fill out the full grid of data an error will be presented to the user.
 
 ##### Output Value \<x\>
 
-This field is repeated to capture the full set of output data in the table (if not otherwise defined in an external file). The data for this particular output is ordered according to the order of the corresponding independent variables. For example, for three independent variables (`iv1`, `iv2`, `iv3`) with 3, 2, and 4 values respectively. The output values (`out[iv1][iv2][iv3]`) should be ordered as:
+If not reading from an external file, this field is repeated to capture the full set of output data in the table (if not otherwise defined in an external file). The data for this particular output is ordered according to the order of the corresponding independent variables. For example, for three independent variables (`iv1`, `iv2`, `iv3`) with 3, 2, and 4 values respectively. The output values (`out[iv1][iv2][iv3]`) should be ordered as:
 
 
 `iv1` | `iv2` | `iv3` | `output`
@@ -167,7 +169,7 @@ Table:Lookup,
   !- Output Unit Type
   !- External File Name
   !- External File Column Number
-  !- External File First Row Number
+  !- External File Starting Row Number
   !- Output Value 1
   !- ...
   !- Output Value N
@@ -316,6 +318,8 @@ The name of an external CSV file that represents the tabular data. This file sho
 
 Independent variable values must appear in **ascending** order (an error will be issued if this is not the case).
 
+Alternatively, the independent variables may be defined using the *Value \<x\>* fields below.
+
 ##### Field: External File Column Number
 
 The column number (starting at 1) in the CSV file corresponding to this independent variable. As the values of the independent variables each repeat over a defined cycle, EnergyPlus will only read unique values from this column. EnergyPlus does not validate that the cycles are repeating correctly. In fact, the same data can be read by only defining each value once as it is first encountered:
@@ -347,13 +351,13 @@ The column number (starting at 1) in the CSV file corresponding to this independ
 | | | | `out[3][2][3]`
 | | | | `out[3][2][4]`
 
-##### Field: External File First Row Number
+##### Field: External File Starting Row Number
 
 The row number (starting at 1) in the CSV file where the data for this independent variable begins. Any values in the same column below this row are considered part of the range.
 
 ##### Field: Value \<x\>
 
-This field is repeated to capture the full set of values for this independent variable. These values must be defined in **ascending** order (an error will be issued if this is not the case).
+If not reading from an external file, this field is repeated to capture the full set of values for this independent variable. These values must be defined in **ascending** order (an error will be issued if this is not the case).
 
 #### Example IDF
 
@@ -744,7 +748,7 @@ Table:Lookup,
   N3,  \field External File Column Number
        \type integer
        \minimum 1
-  N4,  \field External File Row Number
+  N4,  \field External File Starting Row Number
        \type integer
        \minimum 1
   N5;  \field Output Value 1
@@ -810,7 +814,7 @@ Table:IndependentVariable,
   N4,  \field External File Column Number
        \type integer
        \minimum 1
-  N5,  \field External File Row Number
+  N5,  \field External File Starting Row Number
        \type integer
        \minimum 1
   N6;  \field Value 1

@@ -4,6 +4,8 @@ Performance tables provide a method to enter specific performance data in tabula
 
 \subsection{Tables based on a single independent variable}\label{tables-based-on-a-single-independent-variable}
 
+\textbf{NOTE: Tables based on a single independent variable are being phased out in preference to the more general \emph{Table:Lookup} object.}
+
 The tabular data entered for polynomials with a single independent variable represent x and outupt data pairs as described in the previous section for performance curves.~ The x in each of the previous equations represent the independent variable (model input) and the output represents the dependent variable. The data pairs are organized as the data point for the independent variable followed by the data point for the dependent variable. The data pairs form a one-dimensional array that may either be linearly interpolated, interpolated based on a polynomial equation, or this data may be used to calculate the equation coefficients (a-e) as described in the previous section.
 
 The equation form is user selected as either linear, quadratic, cubic, quartic, or exponent. This choice determines: 1) where this table object may be used (i.e., certain objects may required a specific form of the equation), and 2) the degree or order used to calculate the regression coefficients. The following example describes the methodology used when tabular input data is used in place of common performance curve objects. Although Energyplus does not use a performance curve in the manner described in this example, this example is ideally suited for teaching the basics of tabular data entry.
@@ -95,6 +97,8 @@ Curve:Cubic,
 \end{figure}
 
 \subsection{Tables based on two independent variables}\label{tables-based-on-two-independent-variables}
+
+\textbf{NOTE: Tables based on two independent variables are being phased out in preference to the more general \emph{Table:Lookup} object.}
 
 The tabular data entered for polynomials with two independent variables represent x, y and output data pairs as described in the previous section for performance curves.~ The x and y in each of the previous equations represent the independent variables (model inputs) and the output represents the dependent variable. The data pairs are organized as the data points for the independent variables followed by the data point for the dependent variable. The order of the data is significant in that the x and y data are entered in the same order as shown in the model's fundamental equation. The data pairs form a two-dimensional array that may either be linearly interpolated, interpolated using a second order polynomial, or this data may be used to calculate the equation coefficients (a-f) as described in the previous section.
 
@@ -199,6 +203,8 @@ END CREATING NEW CURVE OBJECT
 
 \subsection{Lookup Tables}\label{lookup-tables}
 
+\textbf{NOTE: \emph{Table:MultivariableLookup} is being phased out in preference to the more general \emph{Table:Lookup} object.}
+
 Lookup tables provide a method to evaluate a group of data that may or may not conform to a fundamental equation. Only tabular data which conform to existing performance curve equations are currently allowed (i.e., that lookup table name is entered where any valid performance curve is allowed therefore the table data must conform to the models fundamental equation for that specific curve). Efforts to include this lookup table in the energy management system would allow custom use of lookup tables, however, calling lookup tables from the EMS system is not currenly possible. Lookup tables can interpolate the actual data using a non-linear polynomial equation (order higher than 1). As with other table or curve objects, the lookup table can be used anywhere a valid curve object name is allowed. Care must be taken to ensure the table data format is consistent with the associate model that is using the performance curve (e.g., DX cooling coil capacity as a function of temperature where independent variable X1 = indoor wet-bulb temperature and independent variable X2 = outdoor dry-bulb temperature).
 
 The lookup tables are evaluated using the Lagrange form of the interpolation polynomial or the previously described interpolation methods of LinearInterpolationOfTable and EvaluateCurveToLimits. When using the Lagrange method, the number of points used in the interpolation is equal to 1 plus the polynomial order (e.g., a second order interpolation would use 3 points).
@@ -288,3 +294,82 @@ Table:MultiVariableLookup,
     7067.1,  7157.9,  8552.6,
     6818.0,  6818.0,  8165.8;
 \end{lstlisting}
+
+\subsection{Table:Lookup}\label{table-lookup}
+
+Lookup tables provide a method to evaluate a group of data that may or
+may not conform to a fundamental equation. Only tabular data which
+conform to existing performance curve equations are currently allowed
+(i.e., that lookup table name is entered where any valid performance
+curve is allowed therefore the table data must conform to the model's
+fundamental equation for that specific curve). Efforts to include this
+lookup table in the energy management system would allow custom use of
+lookup tables, however, calling lookup tables from the EMS system is not
+currently possible. Lookup tables can interpolate the actual data using
+a linear interpolation or piecewise cubic spline. As with other table or
+curve objects, the lookup table can be used anywhere a valid curve
+object name is allowed. Care must be taken to ensure the table data
+format is consistent with the associate model that is using the
+performance curve (e.g., DX cooling coil capacity as a function of
+temperature where independent variable X1 = indoor wet-bulb temperature
+and independent variable X2 = outdoor dry-bulb temperature).
+
+An interpolative lookup can be specified to be either linear or cubic
+independently for each dimension (input variable). For performance
+points outside the defined grid space, an extrapolation method--constant
+or linear--can be set independently for each dimension. Finally, each
+axis can have specified boundaries beyond which extrapolation is not
+permitted.
+
+\subsubsection{Linear Interpolation}\label{linear-interpolation}
+
+For linear interpolation in 1 dimension, given known values of \(f\) at
+\(x_0\) and \(x_1\), and a point \(x\) between \(x_0\) and \(x_1\), the
+value at \(x\) is estimated by:
+
+\[f\left(x\right) = \left(1-\mu\right) \cdot f\left(x_0\right) + \mu \cdot f\left(x_1\right)\]
+
+where \(\mu\) is the location of \(x\) expressed as a fraction of the
+distance between \(x_0\) and \(x_1\):
+
+\[\mu = \left(x-x_0\right) / \left(x_1 - x_0\right)\]
+
+\subsubsection{Cubic Spline
+Interpolation}\label{cubic-spline-interpolation}
+
+The general formula for a 1-dimensional piecewise cubic spline (for
+\(x\) between known values \(f\left(x_0\right)\) and
+\(f\left(x_1\right)\)) is:
+
+\[\begin{array}{rll}
+    f\left(x\right) &= \left(2\mu^3 - 3\mu^2 + 1\right) \cdot f\left(x_0\right)
+    &+ \left(-2\mu^3 + 3\mu^2\right) \cdot f\left(x_1\right) \\
+    &+ \left(\mu^3 - 2\mu^2 + \mu\right) \cdot f^\prime \left(x_0\right)
+    &+ \left(\mu^3 - \mu^2\right) \cdot f^\prime \left(x_1\right)
+\end{array}\]
+
+The Catmull-Rom cubic spline interpolation defines the derivatives
+\(f^\prime \left(x_0\right)\) and \(f^\prime\left(x_1\right)\) as the
+slope between the previous and following grid points on the axis:
+
+\[\begin{array}{rl}
+    f^\prime(x_0) &= ( f(x_1) - f(x_{-1}) ) / ( x_1 - x_{-1}) \\
+    f^\prime(x_1) &= ( f(x_2) - f(x_0) ) / ( x_2 - x_0)
+\end{array}\]
+
+When the hypercube is at the edge of the grid, Catmull-Rom simply
+extends the slope of the final segment for defining the slope terms:
+i.e., if there is no \(x_{-1}\), we substitute \(x_0\) into the
+\(f^\prime(x_0)\) formula.
+
+If a mix of interpolation methods are specified among the included
+dimensions, the library will perform that mix as requested.
+
+If the lookup point is beyond the grid edge on any axis, the library
+will perform the requested extrapolation method (linear or constant) on
+that dimension while proceeding with interpolation along any in-bounds
+dimension. If a ``do-not-extrapolate-beyond'' boundary is specified, the
+library will perform a constant extrapolation from that boundary outward
+(in that dimension), and it will return the resulting numerical answer
+along with a warning that the request was outside the boundaries.
+
