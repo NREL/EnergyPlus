@@ -49,7 +49,7 @@ R\(^{dir}_{gl,f}\), R\(^{dir}_{gl,b}\) & Direct front and back reflectance of gl
 A\(^{f}_{i}\), A\(^{b}_{i}\) & Front~ absorptance, back absorptance of layer i & - & - \tabularnewline
 N & Number of glass layers & - & Nlayer \tabularnewline
 $\lambda$ & Wavelength & microns & Wle \tabularnewline
-E\(_{s}\) ($\lambda$) & Solar spectral irradiance function & W/m\(^{2}\)-micron & E \tabularnewline
+E\(_{s}\)($\lambda$) & Solar spectral irradiance function & W/m\(^{2}\)-micron & E \tabularnewline
 V($\lambda$) & Photopic response function of the eye & - & y30 \tabularnewline
 $\varphi$ & Angle of incidence (angle between surface normal and direction of incident beam radiation) & Rad & Phi \tabularnewline
 $\tau$ & Transmittivity or transmittance & - & tf0 \tabularnewline
@@ -122,12 +122,10 @@ Given \emph{n} and \emph{T}, find \emph{R}:
 
 \textbf{Example:}
 
-\emph{T} = 0.86156
-
-\emph{n} = 1.526
-
 \begin{equation}
   \begin{array}{l}
+    T = 0.86156 \\
+    n = 1.526 \\
     r = \left( \frac{1.526 - 1}{1.526 + 1} \right)^2 \\
     \tau = 0.93974 \\
     R = 0.07846
