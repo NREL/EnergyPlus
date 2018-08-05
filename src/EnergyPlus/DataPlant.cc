@@ -146,7 +146,7 @@ namespace DataPlant {
     Array1D_string const PressureSimType(4, {"NONE", "PUMPPOWERCORRECTION", "LOOPFLOWCORRECTION", "PRESSURESIMULATION"});
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-    int const NumSimPlantEquipTypes(94);
+    int const NumSimPlantEquipTypes(95);
     Array1D_string const SimPlantEquipTypes(NumSimPlantEquipTypes,
                                             {"BOILER:HOTWATER",
                                              "BOILER:STEAM",
@@ -235,6 +235,7 @@ namespace DataPlant {
                                              "PLANTCOMPONENT:TEMPERATURESOURCE",
                                              "CENTRALHEATPUMPSYSTEM",
                                              "AIRLOOPHVAC:UNITARYSYSTEM",
+                                             "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY",
                                              "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
                                              "COOLINGTOWER:VARIABLESPEED:MERKEL",
                                              "SWIMMINGPOOL:INDOOR",
@@ -330,7 +331,8 @@ namespace DataPlant {
                                                "HeatExchanger:FluidToFluid",
                                                "PlantComponent:TemperatureSource",
                                                "CentralHeatPumpSystem",
-                                               "AirloopHVAC:UnitarySystem",
+                                               "AirLoopHVAC:UnitarySystem",
+                                               "AirloopHVAC:UnitarySystem:Legacy",
                                                "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                                "CoolingTower:VariableSpeed:Merkel",
                                                "SwimmingPool:Indoor",
@@ -351,8 +353,8 @@ namespace DataPlant {
          LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant,
          LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant,
          LoopType_Plant, LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,
-         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Both,
-         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Plant});
+         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Plant,
+         LoopType_Both, LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Plant});
 
     int const TypeOf_Other(-1);
     int const TypeOf_Boiler_Simple(1);
@@ -442,14 +444,15 @@ namespace DataPlant {
     int const TypeOf_FluidToFluidPlantHtExchg(84);
     int const TypeOf_WaterSource(85);
     int const TypeOf_CentralGroundSourceHeatPump(86);
-    int const TypeOf_UnitarySystemRecovery(87);
-    int const TypeOf_PackagedTESCoolingCoil(88);
-    int const TypeOf_CoolingTower_VarSpdMerkel(89);
-    int const TypeOf_SwimmingPool_Indoor(90);
-    int const TypeOf_GrndHtExchgSlinky(91);
-    // int const TypeOf_HPWrappedCondenser ?? 92 ??
-    int const TypeOf_FourPipeBeamAirTerminal(93);
-    int const TypeOf_CoolingPanel_Simple(94);
+    int const TypeOf_UnitarySysRecovery(87);
+    int const TypeOf_UnitarySystemRecovery(88);
+    int const TypeOf_PackagedTESCoolingCoil(89);
+    int const TypeOf_CoolingTower_VarSpdMerkel(90);
+    int const TypeOf_SwimmingPool_Indoor(91);
+    int const TypeOf_GrndHtExchgSlinky(92);
+    // int const TypeOf_HPWrappedCondenser ?? 93 ??
+    int const TypeOf_FourPipeBeamAirTerminal(94);
+    int const TypeOf_CoolingPanel_Simple(95);
 
     // Parameters for General Equipment Types
     int const NumGeneralEquipTypes(23);

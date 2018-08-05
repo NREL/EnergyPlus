@@ -88,7 +88,9 @@
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <SimAirServingZones.hh>
 #include <SteamCoils.hh>
+#include <UnitarySystem.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
 
@@ -149,7 +151,8 @@ namespace OutdoorAirUnit {
     int const HeatXchngr(10);
     int const Desiccant(11);
     int const DXHeatPumpSystem(12);
-    int const UnitarySystem(13);
+    int const UnitarySystemHVAC(13);
+    int const UnitarySystemModel(14);
 
     //  Control Types
     int const Neutral(1);       // Controls system using zone mean air temperature
@@ -840,7 +843,13 @@ namespace OutdoorAirUnit {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = DXHeatPumpSystem;
 
                             } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
-                                OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystem;
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystemModel;
+                                UnitarySystems::UnitarySys thisSys;
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(SimAirServingZones::UnitarySystemModel, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, false);
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer->checkUnitarySysCoilInOASysExists(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName);
+
+                            } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") {
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystemHVAC;
                                 CheckUnitarySysCoilInOASysExists(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName);
 
                                 // Heat recovery
@@ -2376,7 +2385,21 @@ namespace OutdoorAirUnit {
                     SimDXHeatPumpSystem(EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
                 }
 
-            } else if (SELECT_CASE_var == UnitarySystem) { // 'AirLoopHVAC:UnitarySystem'
+            // RAR need new AirLoopHVAC:UnitarySystem object here
+            } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
+                if (Sim) {
+                    // This may have to be done in the unitary system object since there can be both cooling and heating
+                    if (((OpMode == NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Temperature)) && (OpMode == HeatingMode)) {
+                        Dxsystemouttemp = 100.0; // There is no cooling demand.
+                    } else if (((OpMode == NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Temperature)) && (OpMode == CoolingMode)) {
+                        Dxsystemouttemp = -20.0; // There is no heating demand.
+                    } else {
+                        Dxsystemouttemp = CompAirOutTemp - FanEffect;
+                    }
+                    OutAirUnit(OAUnitNum).OAEquip(SimCompNum).compPointer->simulate(EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp, false);
+                }
+
+            } else if (SELECT_CASE_var == UnitarySystemHVAC) { // 'AirLoopHVAC:UnitarySystem:Legacy'
                 if (Sim) {
                     // This may have to be done in the unitary system object since there can be both cooling and heating
                     if (((OpMode == NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Temperature)) && (OpMode == HeatingMode)) {

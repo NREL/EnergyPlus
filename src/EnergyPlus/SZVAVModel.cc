@@ -912,6 +912,8 @@ namespace SZVAVModel {
         int coilCompNum(0);
         int coilAirInletNode(0);
         int coilAirOutletNode(0);
+        Real64 HeatCoilLoad(0.0);
+        Real64 SupHeaterLoad(0.0);
 
         Real64 TempSensOutput; // iterative sensible capacity [W]
         Real64 TempLatOutput;  // iterative latent capacity [W]
@@ -1068,8 +1070,8 @@ namespace SZVAVModel {
                                         TempSensOutput,
                                         TempLatOutput,
                                         HXUnitOn,
-                                        _,
-                                        _,
+                                        HeatCoilLoad,
+                                        SupHeaterLoad,
                                         CompressorONFlag);
             } else {
                 SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
@@ -1081,8 +1083,8 @@ namespace SZVAVModel {
                                         TempSensOutput,
                                         TempLatOutput,
                                         HXUnitOn,
-                                        _,
-                                        _,
+                                        ZoneLoad,
+                                        SupHeaterLoad,
                                         CompressorONFlag);
             }
             coilActive = DataLoopNode::Node(coilAirInletNode).Temp - DataLoopNode::Node(coilAirOutletNode).Temp;
@@ -1170,8 +1172,8 @@ namespace SZVAVModel {
                                             TempSensOutput,
                                             TempLatOutput,
                                             HXUnitOn,
-                                            _,
-                                            _,
+                                            HeatCoilLoad,
+                                            SupHeaterLoad,
                                             CompressorONFlag);
                 } else {
                     SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
@@ -1183,8 +1185,8 @@ namespace SZVAVModel {
                                             TempSensOutput,
                                             TempLatOutput,
                                             HXUnitOn,
-                                            _,
-                                            _,
+                                            ZoneLoad,
+                                            SupHeaterLoad,
                                             CompressorONFlag);
                 }
                 coilActive = DataLoopNode::Node(coilAirInletNode).Temp - DataLoopNode::Node(coilAirOutletNode).Temp;
@@ -1236,8 +1238,8 @@ namespace SZVAVModel {
                                             TempSensOutput,
                                             TempLatOutput,
                                             HXUnitOn,
-                                            _,
-                                            _,
+                                            HeatCoilLoad,
+                                            SupHeaterLoad,
                                             CompressorONFlag);
                 } else {
                     thisSys->calcUnitarySystemToLoad(AirLoopNum,
@@ -1248,8 +1250,8 @@ namespace SZVAVModel {
                                             TempSensOutput,
                                             TempLatOutput,
                                             HXUnitOn,
-                                            _,
-                                            _,
+                                            ZoneLoad,
+                                            SupHeaterLoad,
                                             CompressorONFlag);
                 }
 

@@ -203,6 +203,7 @@
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -432,6 +433,7 @@ void EnergyPlusFixture::clear_all_states()
     SystemAvailabilityManager::clear_state();
     SwimmingPool::clear_state();
     ThermalComfort::clear_state();
+    UnitarySystems::clear_state();
     UnitHeater::clear_state();
     UnitVentilator::clear_state();
     VariableSpeedCoils::clear_state();

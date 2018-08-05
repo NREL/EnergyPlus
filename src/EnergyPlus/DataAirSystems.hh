@@ -91,7 +91,7 @@ namespace DataAirSystems {
         std::string Name;         // Component name
         int CompType_Num;         // Numeric designator for CompType (TypeOf)
         int CompIndex;            // Component Index in whatever is using this component
-        UnitarySys *compPointer; // pointer to component
+        UnitarySys *compPointer;  // pointer to UnitarySystem
         int FlowCtrl;             // Component flow control (ACTIVE/PASSIVE)
         bool ON;                  // When true, the designated component or operation scheme is available
         bool Parent;              // When true, the designated component is made up of sub-components

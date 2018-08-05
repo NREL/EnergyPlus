@@ -178,7 +178,7 @@ namespace DataHVACGlobals {
                   {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"});
 
     // parameters describing unitary systems
-    int const NumUnitarySystemTypes(7);
+    int const NumUnitarySystemTypes(8);
     // Furnace/Unitary System Types
     int const Furnace_HeatOnly(1);
     int const Furnace_HeatCool(2);
@@ -186,7 +186,8 @@ namespace DataHVACGlobals {
     int const UnitarySys_HeatCool(4);
     int const UnitarySys_HeatPump_AirToAir(5);
     int const UnitarySys_HeatPump_WaterToAir(6);
-    int const UnitarySystem_AnyCoilType(7);
+    int const UnitarySys_AnyCoilType(7);
+    int const UnitarySystem_AnyCoilType(8);
     Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
                                        {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                         "AirLoopHVAC:Unitary:Furnace:HeatCool",
@@ -194,7 +195,8 @@ namespace DataHVACGlobals {
                                         "AirLoopHVAC:UnitaryHeatCool",
                                         "AirLoopHVAC:UnitaryHeatPump:AirToAir",
                                         "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
-                                        "AirLoopHVAC:UnitarySystem"});
+                                        "AirLoopHVAC:UnitarySystem",
+                                        "AirLoopHVAC:UnitarySystem:Legacy"});
 
     // parameters describing coil types
     int const NumAllCoilTypes(34);

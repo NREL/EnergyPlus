@@ -1453,6 +1453,8 @@ namespace PlantLoopEquip {
 
             } else if (EquipTypeNum == TypeOf_MultiSpeedHeatPumpRecovery) {
 
+            } else if (EquipTypeNum == TypeOf_UnitarySysRecovery) {
+
             } else if (EquipTypeNum == TypeOf_UnitarySystemRecovery) {
 
             } else if (EquipTypeNum == TypeOf_SwimmingPool_Indoor) {

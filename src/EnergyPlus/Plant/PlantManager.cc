@@ -1240,6 +1240,10 @@ namespace PlantManager {
                             this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                             this_comp.CurOpSchemeType = DemandOpSchemeType;
                         } else if (UtilityRoutines::SameString(this_comp_type, "AirLoopHVAC:UnitarySystem")) {
+                            this_comp.TypeOf_Num = TypeOf_UnitarySysRecovery;
+                            this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        } else if (UtilityRoutines::SameString(this_comp_type, "AirLoopHVAC:UnitarySystem:Legacy")) {
                             this_comp.TypeOf_Num = TypeOf_UnitarySystemRecovery;
                             this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                             this_comp.CurOpSchemeType = DemandOpSchemeType;

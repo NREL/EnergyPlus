@@ -15160,8 +15160,8 @@ namespace DXCoils {
                 UtilityRoutines::SameString(CompSetsParentType, "ZoneHVAC:PackagedTerminalHeatPump") ||
                 UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed") ||
                 UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass") ||
-                UtilityRoutines::SameString(CompSetsParentType, "UnitarySystem") ||
-                UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitarySystem")) {
+                UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitarySystem") ||
+                UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitarySystem:Legacy")) {
                 //       Search for DX cooling coils
                 for (WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp) {
                     if (!UtilityRoutines::SameString(CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||

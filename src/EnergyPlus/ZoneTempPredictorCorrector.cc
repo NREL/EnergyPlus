@@ -2485,11 +2485,12 @@ namespace ZoneTempPredictorCorrector {
             } // loop over NumStageControlledZones
             if ((inputProcessor->getNumObjectsFound("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed") == 0) &&
                 (inputProcessor->getNumObjectsFound("AirLoopHVAC:UnitarySystem") == 0) &&
+                (inputProcessor->getNumObjectsFound("AirLoopHVAC:UnitarySystem:Legacy") == 0) &&
                 (inputProcessor->getNumObjectsFound("SetpointManager:SingleZone:OneStageCooling") == 0) &&
                 (inputProcessor->getNumObjectsFound("SetpointManager:SingleZone:OneStageHeating") == 0)) {
                 ShowWarningError(cCurrentModuleObject + " is applicable to only selected HVAC objects which are missing from input.");
                 ShowContinueError("Model should include one or more of the following objects:  ");
-                ShowContinueError("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, AirLoopHVAC:UnitarySystem, ");
+                ShowContinueError("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, AirLoopHVAC:UnitarySystem, AirLoopHVAC:UnitarySystem:Legacy, ");
                 ShowContinueError(
                     "SetpointManager:SingleZone:OneStageCooling, and/or SetpointManager:SingleZone:OneStageHeating. The simulation continues...");
             }

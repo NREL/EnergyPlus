@@ -637,7 +637,7 @@ namespace HVACUnitarySystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlUnitarySystemtoSP(int const UnitarySysNum,                   // Index of AirloopHVAC:UnitarySystem object
+    void ControlUnitarySystemtoSP(int const UnitarySysNum,                   // Index of AirloopHVAC:UnitarySystem:Legacy object
                                   int const AirLoopNum,                      // Primary air loop number
                                   bool const FirstHVACIteration,             // True when first HVAC iteration
                                   int &CompOn,                               // compressor on/off control
@@ -645,7 +645,7 @@ namespace HVACUnitarySystem {
                                   Optional_bool HXUnitOn = _                 // Flag to control HX for HXAssisted Cooling Coil
     );
 
-    void ControlUnitarySystemtoLoad(int const UnitarySysNum,                   // Index of AirloopHVAC:UnitarySystem object
+    void ControlUnitarySystemtoLoad(int const UnitarySysNum,                   // Index of AirloopHVAC:UnitarySystem:Legacy object
                                     int const AirLoopNum,                      // Primary air loop number
                                     bool const FirstHVACIteration,             // True when first HVAC iteration
                                     int &CompOn,                               // Determines if compressor is on or off
@@ -653,7 +653,7 @@ namespace HVACUnitarySystem {
                                     Optional_bool HXUnitOn = _                 // Flag to control HX for HXAssisted Cooling Coil
     );
 
-    void ControlUnitarySystemOutput(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void ControlUnitarySystemOutput(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                                     int const AirLoopNum,          // Index to air loop
                                     bool const FirstHVACIteration, // True when first HVAC iteration
                                     Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
@@ -666,7 +666,7 @@ namespace HVACUnitarySystem {
                                               Array1<Real64> const &Par   // Function parameters
     );
 
-    void SetSpeedVariables(int const UnitarySysNum,   // Index of AirloopHVAC:UnitarySystem object
+    void SetSpeedVariables(int const UnitarySysNum,   // Index of AirloopHVAC:UnitarySystem:Legacy object
                            bool const SensibleLoad,   // True when meeting a sensible load (not a moisture load)
                            Real64 const PartLoadRatio // operating PLR
     );
@@ -675,7 +675,7 @@ namespace HVACUnitarySystem {
                                          Array1<Real64> const &Par   // Function parameters
     );
 
-    void CalcUnitarySystemToLoad(int const UnitarySysNum,           // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitarySystemToLoad(int const UnitarySysNum,           // Index of AirloopHVAC:UnitarySystem:Legacy object
                                  int const AirLoopNum,              // index to air loop
                                  bool const FirstHVACIteration,     // True when first HVAC iteration
                                  Real64 const CoolPLR,              // operating cooling part-load ratio []
@@ -689,12 +689,12 @@ namespace HVACUnitarySystem {
                                  Optional_int_const CompOn = _      // Determines if compressor is on or off
     );
 
-    void calculateCapacity(int const UnitarySysNum, // index of AirloopHVAC:UnitarySystem object
-                           Real64 &SensOutput,      // sensible output of AirloopHVAC:UnitarySystem
-                           Real64 &LatOutput        // latent output of AirloopHVAC:UnitarySystem
+    void calculateCapacity(int const UnitarySysNum, // index of AirloopHVAC:UnitarySystem:Legacy object
+                           Real64 &SensOutput,      // sensible output of AirloopHVAC:UnitarySystem:Legacy
+                           Real64 &LatOutput        // latent output of AirloopHVAC:UnitarySystem:Legacy
     );
 
-    void CalcUnitaryCoolingSystem(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitaryCoolingSystem(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                                   int const AirLoopNum,          // index to air loop
                                   bool const FirstHVACIteration, // True when first HVAC iteration
                                   Real64 const PartLoadRatio,    // coil operating part-load ratio
@@ -704,7 +704,7 @@ namespace HVACUnitarySystem {
                                   bool const HXUnitOn           // Flag to control HX for HXAssisted Cooling Coil
     );
 
-    void CalcUnitaryHeatingSystem(int const UnitarySysNum,                // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitaryHeatingSystem(int const UnitarySysNum,                // Index of AirloopHVAC:UnitarySystem:Legacy object
                                   int const AirLoopNum,                   // index to air loop
                                   bool const FirstHVACIteration,          // True when first HVAC iteration
                                   Real64 const PartLoadRatio,             // coil operating part-load ratio
@@ -713,13 +713,13 @@ namespace HVACUnitarySystem {
                                   Optional<Real64 const> HeatCoilLoad = _ // adjusted heating coil load if outlet temp exceeds max (W)
     );
 
-    void CalcUnitarySuppHeatingSystem(int const UnitarySysNum,                // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitarySuppHeatingSystem(int const UnitarySysNum,                // Index of AirloopHVAC:UnitarySystem:Legacy object
                                       bool const FirstHVACIteration,          // True when first HVAC iteration
                                       Real64 const PartLoadRatio,             // coil operating part-load ratio
                                       Optional<Real64 const> SuppCoilLoad = _ // adjusted supp coil load when outlet temp exceeds max (W)
     );
 
-    void CalcUnitarySuppSystemToSP(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitarySuppSystemToSP(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem:Legacy object
                                    bool const FirstHVACIteration // True when first HVAC iteration
     );
 
@@ -741,7 +741,7 @@ namespace HVACUnitarySystem {
                                bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void SimMultiSpeedCoils(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void SimMultiSpeedCoils(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                             int const AirLoopNum,          // Index to air loop
                             bool const FirstHVACIteration, // True when first HVAC iteration
                             int &CompOn,                   // compressor on/off control
@@ -751,7 +751,7 @@ namespace HVACUnitarySystem {
                             int const CoilType,
                             Optional_int_const SpeedNumber = _);
 
-    void CalcPassiveSystem(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem object
+    void CalcPassiveSystem(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem:Legacy object
                            int const AirLoopNum,         // Index to air loop
                            bool const FirstHVACIteration // True when first HVAC iteration
     );

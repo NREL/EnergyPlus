@@ -3613,16 +3613,33 @@ namespace ZoneEquipmentManager {
                                                 ZoneEquipTypeNum,
                                                 ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
-                    } else if (SELECT_CASE_var == ZoneUnitarySystem_Num) { // 'AirloopHVAC:UnitarySystem'
+                    } else if (SELECT_CASE_var == ZoneUnitarySys_Num) { // 'AirloopHVAC:UnitarySystem'
+                        int AirLoopNum = 0;
+                        bool HeatingActive = false;
+                        bool CoolingActive = false;
+                        int OAUnitNum = 0;
+                        Real64 OAUCoilOutTemp = 0.0;
+                        bool ZoneEquipFlag = true;
+                        ZoneEquipList(CurZoneEqNum).compPointer[EquipPtr]->simulate(PrioritySimOrder(EquipTypeNum).EquipName,
+                            FirstHVACIteration,
+                            AirLoopNum,
+                            ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                            HeatingActive,
+                            CoolingActive,
+                            OAUnitNum,
+                            OAUCoilOutTemp,
+                            ZoneEquipFlag);
+
+                    } else if (SELECT_CASE_var == ZoneUnitarySystem_Num) { // 'AirloopHVAC:UnitarySystem:Legacy'
                         SimUnitarySystem(PrioritySimOrder(EquipTypeNum).EquipName,
-                                         FirstHVACIteration,
-                                         ActualZoneNum,
-                                         ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
-                                         _,
-                                         _,
-                                         _,
-                                         _,
-                                         true);
+                            FirstHVACIteration,
+                            ActualZoneNum,
+                            ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                            _,
+                            _,
+                            _,
+                            _,
+                            true);
 
                     } else if (SELECT_CASE_var == ZoneDXDehumidifier_Num) { // 'ZoneHVAC:Dehumidifier:DX'
                         SimZoneDehumidifier(PrioritySimOrder(EquipTypeNum).EquipName,

@@ -1006,7 +1006,10 @@ namespace FaultsManager {
                         HVACDXHeatPumpSystem::DXHeatPumpSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
                     }
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "AirLoopHVAC:UnitarySystem")) {
-                    // Read in DXCoolingSystem input if not done yet
+                    // UnitarySystem model connects to FaultManager via function call to FaultsManager::SetFaultyCoilSATSensor
+
+                } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "AirLoopHVAC:UnitarySystem:Legacy")) {
+                    // Read in legacy Unitary System input if not done yet
                     if (HVACUnitarySystem::GetInputFlag) {
                         HVACUnitarySystem::GetUnitarySystemInput();
                         HVACUnitarySystem::GetInputFlag = false;
@@ -2079,6 +2082,20 @@ namespace FaultsManager {
         FaultsCondenserSWTSensor.deallocate();
         FaultsTowerFouling.deallocate();
         FaultsCoilSATSensor.deallocate();
+    }
+
+    void SetFaultyCoilSATSensor( std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex ) {
+
+        FaultyCoilSATFlag = false;
+        FaultyCoilSATIndex = 0;
+        if (NumFaultyCoilSATSensor == 0) return;
+        for (int jFault_CoilSAT = 1; jFault_CoilSAT <= NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
+            if (UtilityRoutines::SameString(FaultsCoilSATSensor(jFault_CoilSAT).CoilType, CompType) && UtilityRoutines::SameString(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, CompName)) {
+                FaultyCoilSATFlag = true;
+                FaultyCoilSATIndex = jFault_CoilSAT;
+                break;
+            }
+        }
     }
 
 } // namespace FaultsManager

@@ -2109,7 +2109,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
 TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
 {
     std::string const idf_objects = delimited_string({
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -2153,7 +2153,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    std::string const CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
+    std::string const CurrentModuleObject = "AirLoopHVAC:UnitarySystem:Legacy";
 
     int num_unitary_systems = inputProcessor->getNumObjectsFound(CurrentModuleObject);
     ASSERT_EQ(1, num_unitary_systems);
@@ -2328,7 +2328,7 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load distribution scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
@@ -2391,7 +2391,7 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
 
     EXPECT_EQ(4, NumAlphas2);
     EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1"}), Alphas2));
+        std::vector<std::string>({"ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY", "GASHEAT DXAC FURNACE 1"}), Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false}), lAlphaBlanks2));
 
     EXPECT_EQ(2, NumNumbers2);

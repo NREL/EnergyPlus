@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
+#include <UnitarySystem.hh>
 #include <EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -265,6 +266,7 @@ namespace DataAirLoop {
         Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
         // module can address
         Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
+        std::vector <UnitarySystems::UnitarySys *> compPointer;
         Array1D_string ControllerName;
         Array1D_string ControllerType;
         Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here

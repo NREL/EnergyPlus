@@ -174,7 +174,7 @@ protected:
         ZoneEquipList(1).EquipData.allocate(ZoneEquipList(1).NumOfEquipTypes);
         ZoneEquipList(1).CoolingPriority.allocate(ZoneEquipList(1).NumOfEquipTypes);
         ZoneEquipList(1).HeatingPriority.allocate(ZoneEquipList(1).NumOfEquipTypes);
-        ZoneEquipList(1).EquipType(1) = "AIRLOOPHVAC:UNITARYSYSTEM";
+        ZoneEquipList(1).EquipType(1) = "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY";
         ZoneEquipList(1).EquipName(1) = "UNITARY SYSTEM MODEL";
         ZoneEquipList(1).CoolingPriority(1) = 1;
         ZoneEquipList(1).HeatingPriority(1) = 1;
@@ -259,7 +259,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_TwoSpeedDXCoolCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -445,7 +445,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultiSpeedDXCoolCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -690,7 +690,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultiStageGasHeatCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -884,7 +884,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultiStageElecHeatCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -1073,7 +1073,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_ElecHeatCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -1234,7 +1234,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -1774,7 +1774,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,    !- Name",
         "  Setpoint,                !- Control Type",
         "  East Zone,               !- Controlling Zone or Thermostat Location",
@@ -2391,7 +2391,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTest
     DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
     UnitarySystem.allocate(HVACUnitarySystem::NumUnitarySystem);
-    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem";
+    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem:Legacy";
     UnitarySystem(UnitarySysNum).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
     UnitarySystem(UnitarySysNum).RequestAutoSize = true;
 
@@ -2916,12 +2916,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInput)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -3255,12 +3255,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VSDXCoilSizing)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,  !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -3628,12 +3628,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VarSpeedCoils)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -4060,12 +4060,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VarSpeedCoils_CyclingFan)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -4498,12 +4498,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -4690,7 +4690,7 @@ TEST_F(EnergyPlusFixture, HVACUnitarySystem_ReportingTest)
         "ZoneHVAC:EquipmentList,",
         "  SPACE2-1 Equipment,                                      !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem,                               !- Zone Equipment Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy,                               !- Zone Equipment Object Type",
         "  Sys 2 Furnace DX Cool MultiSpd Unitary System,           !- Zone Equipment Name",
         "  1,                                                       !- Zone Equipment Cooling Sequence",
         "  1;                                                       !- Zone Equipment Heating or No-Load Sequence",
@@ -4795,7 +4795,7 @@ TEST_F(EnergyPlusFixture, HVACUnitarySystem_ReportingTest)
         "  Until: 24:00,                                            !- Field 3",
         "  1;                                                       !- Field 4",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Sys 2 Furnace DX Cool MultiSpd Unitary System,           !- Name",
         "  Load,                                                    !- Control Type",
         "  SPACE2-1,                                                !- Controlling Zone or Thermostat Location",
@@ -5176,12 +5176,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  Multispeed DXAC,         !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Multispeed DXAC,        !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -5927,7 +5927,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
         "Branch,",
         "  Air Loop Main Branch, !- Name",
         "  , !- Pressure Drop Curve Name",
-        "  AirLoopHVAC:UnitarySystem, !- Component 2 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Component 2 Object Type",
         "  DXAC Heat Pump 1, !- Component 2 Name",
         "  	Mixed Air Node, !- Component 2 Inlet Node Name",
         "  Air Loop Outlet Node; !- Component 2 Outlet Node Name",
@@ -5944,7 +5944,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
         "  Zone Equipment Inlet Node, !- Demand Side Inlet Node Names",
         "  Air Loop Outlet Node;    !- Supply Side Outlet Node Names",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  DXAC Heat Pump 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -6614,7 +6614,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
     PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
     PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
     PrimaryAirSystem(1).Branch(1).Comp(1).Name = "DXAC HEAT PUMP 1";
-    PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem";
+    PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem:Legacy";
 
     NumTempControlledZones = 1;
     TempControlledZone.allocate(NumTempControlledZones);
@@ -6857,12 +6857,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  Multispeed DXAC,         !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Multispeed DXAC,        !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -7726,13 +7726,13 @@ TEST_F(EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  WSHP Furnace,            !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  WSHP Furnace,           !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -8115,13 +8115,13 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,           !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  ASHRAE Model HVAC,        !- Zone Equipment 1 Name",
         "  1,                        !- Zone Equipment 1 Cooling Sequence",
         "  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  ASHRAE Model HVAC,       !- Name",
         "  SingleZoneVAV,           !- Control Type",
         "  East Zone,               !- Controlling Zone or Thermostat Location",
@@ -8641,12 +8641,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXHeatingCoilOnly)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  Multispeed DXAC,         !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Multispeed DXAC,        !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -9241,7 +9241,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_SizingWithFans)
     DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
     UnitarySystem.allocate(HVACUnitarySystem::NumUnitarySystem);
-    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem";
+    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem:Legacy";
     UnitarySystem(UnitarySysNum).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
     UnitarySystem(UnitarySysNum).RequestAutoSize = true;
 
@@ -9309,7 +9309,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerInlet)
 
         "AirTerminal:SingleDuct:Mixer,",
         "    East Zone DOAS Air Terminal,   !- Name",
-        "    AirLoopHVAC:UnitarySystem,     !- ZoneHVAC Terminal Unit Object Type",
+        "    AirLoopHVAC:UnitarySystem:Legacy,     !- ZoneHVAC Terminal Unit Object Type",
         "    East Zone Unitary System,      !- ZoneHVAC Terminal Unit Name",
         "    East Zone Unitary System Inlet,!- Terminal Unit Outlet Node Name",
         "    East Zone Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
@@ -9342,7 +9342,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerInlet)
         "    East Zone Zone Air Node,  !- Zone Air Node Name",
         "    East Zone Return Outlet;  !- Zone Return Air Node Name",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  East Zone Unitary System,       !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -9442,7 +9442,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply)
 
         "AirTerminal:SingleDuct:Mixer,",
         "    East Zone DOAS Air Terminal,   !- Name",
-        "    AirLoopHVAC:UnitarySystem,     !- ZoneHVAC Terminal Unit Object Type",
+        "    AirLoopHVAC:UnitarySystem:Legacy,     !- ZoneHVAC Terminal Unit Object Type",
         "    East Zone Unitary System,      !- ZoneHVAC Terminal Unit Name",
         "    East Zone Supply Inlet,        !- Terminal Unit Outlet Node Name",
         "    East Zone Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
@@ -9475,7 +9475,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply)
         "    East Zone Zone Air Node,  !- Zone Air Node Name",
         "    East Zone Return Outlet;  !- Zone Return Air Node Name",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  East Zone Unitary System,       !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -9576,7 +9576,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipment)
         "ZoneHVAC:EquipmentList,",
         "    East Zone Equipment,     !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirLoopHVAC:UnitarySystem,  !- Zone Equipment 1 Object Type",
+        "    AirLoopHVAC:UnitarySystem:Legacy,  !- Zone Equipment 1 Object Type",
         "    East Zone Unitary System,   !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
@@ -9592,7 +9592,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipment)
         "    East Zone Zone Air Node,  !- Zone Air Node Name",
         "    East Zone Return Outlet;  !- Zone Return Air Node Name",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  East Zone Unitary System,       !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",

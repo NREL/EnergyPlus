@@ -86,7 +86,7 @@ namespace SimAirServingZones {
     extern int const Desiccant;
     extern int const Unglazed_SolarCollector;
     extern int const EvapCooler;
-    extern int const UnitarySystem;
+    extern int const UnitarySystemHVAC;
     extern int const Furnace_UnitarySys;
     extern int const Humidifier;
     extern int const Duct;

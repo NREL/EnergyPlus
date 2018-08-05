@@ -110,7 +110,7 @@ namespace EnergyPlus {
 
 namespace HVACUnitarySystem {
     // Module containing the Unitary System simulation routines
-    // AirloopHVAC:UnitarySystem
+    // AirloopHVAC:UnitarySystem:Legacy
     // Unitary System allows any coil type with fan and coils optional
     // Unitary System model can be placed anywhere in the simulation:
     //   (air loops, outside air systems, Outdoor air units, zone equipment)
@@ -358,7 +358,7 @@ namespace HVACUnitarySystem {
 
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int UnitarySysNum; // Index to AirloopHVAC:UnitarySystem object
+        int UnitarySysNum; // Index to AirloopHVAC:UnitarySystem:Legacy object
         bool HXUnitOn;     // Flag to control HX for HXAssisted Cooling Coil
         int CompOn;        // Determines if compressor is on or off
         Real64 TempMassFlowRateMaxAvail;
@@ -1983,7 +1983,7 @@ namespace HVACUnitarySystem {
                 UnitarySystem(UnitarySysNum).StageNum = ZoneSysEnergyDemand(UnitarySystem(UnitarySysNum).ControlZoneNum).StageNum;
             } else {
                 if (MyStagedFlag(UnitarySysNum)) {
-                    ShowWarningError("ZoneControl:Thermostat:StagedDualSetpoint is found, but is not applied to this AirLoopHVAC:UnitarySystem "
+                    ShowWarningError("ZoneControl:Thermostat:StagedDualSetpoint is found, but is not applied to this AirLoopHVAC:UnitarySystem:Legacy "
                                      "object with UnitarySystemPerformance:Multispeed type = ");
                     ShowContinueError(UnitarySystem(UnitarySysNum).Name + ". Please make correction. Simulation continues...");
                     MyStagedFlag(UnitarySysNum) = false;
@@ -2839,7 +2839,7 @@ namespace HVACUnitarySystem {
         // Not sure if this may be needed for special cases
         if (UnitarySystem(UnitarySysNum).CoolCoilExists && UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow < 0.0) {
             if (!SysSizingRunDone) {
-                BranchNum = GetAirBranchIndex("AirloopHVAC:UnitarySystem", UnitarySystem(UnitarySysNum).Name);
+                BranchNum = GetAirBranchIndex("AirloopHVAC:UnitarySystem:Legacy", UnitarySystem(UnitarySysNum).Name);
                 FanType = "";
                 FanName = "";
                 BranchFanFlow = 0.0;
@@ -3206,7 +3206,7 @@ namespace HVACUnitarySystem {
         GetUnitarySystemInputData(ErrorFlag);
 
         if (ErrorFlag) {
-            ShowFatalError(RoutineName + "Errors found in getting AirLoopHVAC:UnitarySystem input. Preceding condition(s) causes termination.");
+            ShowFatalError(RoutineName + "Errors found in getting AirLoopHVAC:UnitarySystem:Legacy input. Preceding condition(s) causes termination.");
         }
     }
 
@@ -3459,7 +3459,7 @@ namespace HVACUnitarySystem {
         int iHRWaterInletNodeAlphaNum;             // get input index to unitary system HR water inlet node
         int iHRWaterOutletNodeAlphaNum;            // get input index to unitary system HR water outlet node
 
-        CurrentModuleObject = "AirloopHVAC:UnitarySystem";
+        CurrentModuleObject = "AirloopHVAC:UnitarySystem:Legacy";
         NumUnitarySystem = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         if (GetUnitarySystemDoOnlyOnceFlag) {
@@ -3575,7 +3575,7 @@ namespace HVACUnitarySystem {
                 }
             }
         }
-        // AirLoopHVAC:UnitarySystem,
+        // AirLoopHVAC:UnitarySystem:Legacy,
         iNameAlphaNum = 1;                          // A1,  \field Name - \required-field
         iControlTypeAlphaNum = 2;                   // A2,  \field Control Type
         iControlZoneAlphaNum = 3;                   // A3,  \field Controlling Zone or Thermostat Location
@@ -3639,7 +3639,7 @@ namespace HVACUnitarySystem {
         }
 
         // Get the data for the Unitary System
-        CurrentModuleObject = "AirloopHVAC:UnitarySystem";
+        CurrentModuleObject = "AirloopHVAC:UnitarySystem:Legacy";
         for (UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum) {
             if (MyGetInputSuccessfulFlag(UnitarySysNum)) continue; // skip any units that were successfully gotten
             FanInletNode = 0;
@@ -3652,7 +3652,7 @@ namespace HVACUnitarySystem {
             SupHeatCoilInletNode = 0;
             SupHeatCoilOutletNode = 0;
 
-            CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
+            CurrentModuleObject = "AirLoopHVAC:UnitarySystem:Legacy";
             UnitarySystem(UnitarySysNum).UnitType = CurrentModuleObject;
             UnitarySystem(UnitarySysNum).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
             UnitarySystem(UnitarySysNum).iterationMode.allocate(20);
@@ -7557,25 +7557,25 @@ namespace HVACUnitarySystem {
                 }
 
                 if (AnyEnergyManagementSystemInModel) {
-                    SetupEMSActuator("AirLoopHVAC:UnitarySystem",
+                    SetupEMSActuator("AirLoopHVAC:UnitarySystem:Legacy",
                                      UnitarySystem(UnitarySysNum).Name,
                                      "Autosized Supply Air Flow Rate",
                                      "[m3/s]",
                                      UnitarySystem(UnitarySysNum).DesignFanVolFlowRateEMSOverrideOn,
                                      UnitarySystem(UnitarySysNum).DesignFanVolFlowRateEMSOverrideValue);
-                    SetupEMSActuator("AirLoopHVAC:UnitarySystem",
+                    SetupEMSActuator("AirLoopHVAC:UnitarySystem:Legacy",
                                      UnitarySystem(UnitarySysNum).Name,
                                      "Autosized Supply Air Flow Rate During Cooling Operation",
                                      "[m3/s]",
                                      UnitarySystem(UnitarySysNum).MaxCoolAirVolFlowEMSOverrideOn,
                                      UnitarySystem(UnitarySysNum).MaxCoolAirVolFlowEMSOverrideValue);
-                    SetupEMSActuator("AirLoopHVAC:UnitarySystem",
+                    SetupEMSActuator("AirLoopHVAC:UnitarySystem:Legacy",
                                      UnitarySystem(UnitarySysNum).Name,
                                      "Autosized Supply Air Flow Rate During Heating Operation",
                                      "[m3/s]",
                                      UnitarySystem(UnitarySysNum).MaxHeatAirVolFlowEMSOverrideOn,
                                      UnitarySystem(UnitarySysNum).MaxHeatAirVolFlowEMSOverrideValue);
-                    SetupEMSActuator("AirLoopHVAC:UnitarySystem",
+                    SetupEMSActuator("AirLoopHVAC:UnitarySystem:Legacy",
                                      UnitarySystem(UnitarySysNum).Name,
                                      "Autosized Supply Air Flow Rate During No Heating or Cooling Operation",
                                      "[m3/s]",
@@ -7631,7 +7631,7 @@ namespace HVACUnitarySystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlUnitarySystemtoSP(int const UnitarySysNum,               // Index of AirloopHVAC:UnitarySystem object
+    void ControlUnitarySystemtoSP(int const UnitarySysNum,               // Index of AirloopHVAC:UnitarySystem:Legacy object
                                   int const AirLoopNum,                  // Primary air loop number
                                   bool const FirstHVACIteration,         // True when first HVAC iteration
                                   int &CompOn,                           // compressor on/off control
@@ -7768,7 +7768,7 @@ namespace HVACUnitarySystem {
         UnitarySystem(UnitarySysNum).InitHeatPump = false;
     }
 
-    void ControlUnitarySystemtoLoad(int const UnitarySysNum,               // Index of AirloopHVAC:UnitarySystem object
+    void ControlUnitarySystemtoLoad(int const UnitarySysNum,               // Index of AirloopHVAC:UnitarySystem:Legacy object
                                     int const AirLoopNum,                  // Primary air loop number
                                     bool const FirstHVACIteration,         // True when first HVAC iteration
                                     int &CompOn,                           // Determines if compressor is on or off
@@ -7950,7 +7950,7 @@ namespace HVACUnitarySystem {
         }
     }
 
-    void ControlUnitarySystemOutput(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void ControlUnitarySystemOutput(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                                     int const AirLoopNum,          // Index to air loop
                                     bool const FirstHVACIteration, // True when first HVAC iteration
                                     Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
@@ -9238,7 +9238,7 @@ namespace HVACUnitarySystem {
         return Residuum;
     }
 
-    void SetSpeedVariables(int const UnitarySysNum,   // Index of AirloopHVAC:UnitarySystem object
+    void SetSpeedVariables(int const UnitarySysNum,   // Index of AirloopHVAC:UnitarySystem:Legacy object
                            bool const SensibleLoad,   // True when meeting a sensible load (not a moisture load)
                            Real64 const PartLoadRatio // operating PLR
     )
@@ -9447,7 +9447,7 @@ namespace HVACUnitarySystem {
         return Residuum;
     }
 
-    void CalcUnitarySystemToLoad(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitarySystemToLoad(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                                  int const AirLoopNum,          // index to air loop
                                  bool const FirstHVACIteration, // True when first HVAC iteration
                                  Real64 const CoolPLR,          // operating cooling part-load ratio []
@@ -9763,7 +9763,7 @@ namespace HVACUnitarySystem {
         UnitarySystem(UnitarySysNum).LatentLoadMet = LatOutput;
     }
 
-    void CalcUnitaryCoolingSystem(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitaryCoolingSystem(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                                   int const AirLoopNum,          // index to air loop
                                   bool const FirstHVACIteration, // True when first HVAC iteration
                                   Real64 const PartLoadRatio,    // coil operating part-load ratio
@@ -10027,7 +10027,7 @@ namespace HVACUnitarySystem {
         UnitarySystem(UnitarySysNum).CoolingPartLoadFrac = PartLoadRatio;
     }
 
-    void CalcUnitaryHeatingSystem(int const UnitarySysNum,            // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitaryHeatingSystem(int const UnitarySysNum,            // Index of AirloopHVAC:UnitarySystem:Legacy object
                                   int const AirLoopNum,               // index to air loop
                                   bool const FirstHVACIteration,      // True when first HVAC iteration
                                   Real64 const PartLoadRatio,         // coil operating part-load ratio
@@ -10298,7 +10298,7 @@ namespace HVACUnitarySystem {
         UnitarySystem(UnitarySysNum).HeatingPartLoadFrac = PartLoadRatio;
     }
 
-    void CalcUnitarySuppHeatingSystem(int const UnitarySysNum,            // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitarySuppHeatingSystem(int const UnitarySysNum,            // Index of AirloopHVAC:UnitarySystem:Legacy object
                                       bool const FirstHVACIteration,      // True when first HVAC iteration
                                       Real64 const PartLoadRatio,         // coil operating part-load ratio
                                       Optional<Real64 const> SuppCoilLoad // adjusted supp coil load when outlet temp exceeds max (W)
@@ -10445,7 +10445,7 @@ namespace HVACUnitarySystem {
         //  UnitarySystem(UnitarySysNum)%SuppHeatPartLoadFrac = PartLoadRatio
     }
 
-    void CalcUnitarySuppSystemToSP(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitarySuppSystemToSP(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem:Legacy object
                                    bool const FirstHVACIteration // True when first HVAC iteration
     )
     {
@@ -12908,7 +12908,7 @@ namespace HVACUnitarySystem {
         }
     }
 
-    void SimMultiSpeedCoils(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void SimMultiSpeedCoils(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                             int const AirLoopNum,          // Index to air loop
                             bool const FirstHVACIteration, // True when first HVAC iteration
                             int &CompOn,                   // compresor on/off control
@@ -13105,7 +13105,7 @@ namespace HVACUnitarySystem {
         }
     }
 
-    void CalcPassiveSystem(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem object
+    void CalcPassiveSystem(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem:Legacy object
                            int const AirLoopNum,         // index to air loop
                            bool const FirstHVACIteration // True when first HVAC iteration
     )
@@ -15902,10 +15902,10 @@ namespace HVACUnitarySystem {
                     }
                 }
             } else {
-                ShowSevereError(RoutineName + "System not found = AirloopHVAC:UnitarySystem \"" + UnitarySysName + "\"");
+                ShowSevereError(RoutineName + "System not found = AirloopHVAC:UnitarySystem:Legacy \"" + UnitarySysName + "\"");
             }
         } else {
-            ShowSevereError(RoutineName + "System not found = AirloopHVAC:UnitarySystem \"" + UnitarySysName + "\"");
+            ShowSevereError(RoutineName + "System not found = AirloopHVAC:UnitarySystem:Legacy \"" + UnitarySysName + "\"");
         }
     }
 
