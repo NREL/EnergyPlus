@@ -134,8 +134,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: AlphaNumI
   REAL :: SaveNumber
 
-  ! for Schedule:Compact from 8.8 to 8.9
-  CHARACTER(len=MaxNameLength) ::  UpperInArg=blank
+  ! for WINDOWPROPERTY:SHADINGCONTROL from 8.9 to 9.0
+  INTEGER :: NumSurfObjs = 0
+  INTEGER :: surfNum = 0
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -406,7 +407,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with F, insert the rules here
 
+              CASE('FENESTRATIONSURFACE:DETAILED')
+                ! Delete field 7 (A6) Shading Control Name
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:6) = InArgs(1:6)
+                OutArgs(7:CurArgs-1) = InArgs(8:CurArgs)
+                CurArgs = CurArgs - 1
+                nodiff = .false.
+
               ! If your original object starts with G, insert the rules here
+
+              CASE('GLAZEDDOOR')
+                ! Delete field 4 (A4) Shading Control Name
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:3) = InArgs(1:3)
+                OutArgs(4:CurArgs-1) = InArgs(5:CurArgs)
+                CurArgs = CurArgs - 1
+                nodiff = .false.
 
               ! If your original object starts with H, insert the rules here
 
@@ -433,6 +450,37 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with V, insert the rules here
 
               ! If your original object starts with W, insert the rules here
+
+              CASE('WINDOW')
+                ! Delete field 4 (A4) Shading Control Name
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:3) = InArgs(1:3)
+                OutArgs(4:CurArgs-1) = InArgs(5:CurArgs)
+                CurArgs = CurArgs - 1
+                nodiff = .false.
+
+              CASE('WINDOWPROPERTY:SHADINGCONTROL')
+                ! lots of stuff . . . 
+                ObjectName = 'WindowShadingControl'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                OutArgs(2) = Blank ! Shading Control Sequence Number
+                OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
+                IF ( CurArgs .LT. 12) THEN
+                  OutArgs(CurArgs+1:13) = Blank
+                ENDIF
+                OutArgs(14) = Blank ! Daylighting Control Name ????
+                OutArgs(15) = 'Sequential' ! Multiple Surface Control Type
+                CurArgs = 15
+                NumSurfObjs = GetNumObjectsFound('FENESTRATIONSURFACE:DETAILED')
+                DO surfNum=1,NumSurfObjs
+                  CALL GetObjectItem('FENESTRATIONSURFACE:DETAILED',surfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                  IF ( SameString( TRIM(Alphas(6)), TRIM(InArgs(1)) ) ) THEN
+                    CurArgs = CurArgs + 1
+                    OutArgs(CurArgs) = TRIM(Alphas(1))
+                  ENDIF
+                ENDDO
+                nodiff = .false.
 
               ! If your original object starts with Z, insert the rules here
 
