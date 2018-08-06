@@ -5860,7 +5860,7 @@ namespace DaylightingManager {
         // Calculate background luminance including effect of inter-reflected illuminance from light
         // entering zone through its interior windows
 
-        RefPoints = min(2, ZoneDaylight(ZoneNum).TotalDaylRefPoints);
+        RefPoints = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
         for (IL = 1; IL <= RefPoints; ++IL) {
             BacLum = ZoneDaylight(ZoneNum).BacLum(IL) + ZoneDaylight(ZoneNum).InterReflIllFrIntWins * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi;
             BacLum = max(ZoneDaylight(ZoneNum).IllumSetPoint(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, BacLum);
@@ -6396,9 +6396,7 @@ namespace DaylightingManager {
         tmpSourceLumFromWinAtRefPt = 0.0;
 
         // FLOW:
-        // Limit the number of control reference points to 2
         NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
-        if (NREFPT > 2) NREFPT = 2;
 
         // Initialize reference point illuminance and window background luminance
         for (IL = 1; IL <= NREFPT; ++IL) {
@@ -7281,9 +7279,7 @@ namespace DaylightingManager {
         //  ENDIF
 
         if (ScheduledAvailable) {
-            // Limit the number of control reference points to 2
             NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
-            if (NREFPT > 2) NREFPT = 2;
 
             // Total fraction of zone that is daylit
             ZFTOT = ZoneDaylight(ZoneNum).FracZoneDaylit(1);
