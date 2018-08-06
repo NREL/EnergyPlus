@@ -3718,7 +3718,7 @@ namespace MixedAir {
 
             curAirLoopFlow.OAMinFrac = OutAirMinFrac;
             if (this->FixedMin) {
-                curAirLoopFlow.MinOutAir = OutAirMinFrac * curAirLoopFlow.DesSupply;
+                curAirLoopFlow.MinOutAir = min(OutAirMinFrac * curAirLoopFlow.DesSupply, this->MixMassFlow);
             } else {
                 curAirLoopFlow.MinOutAir = OutAirMinFrac * this->MixMassFlow;
             }
@@ -4576,7 +4576,8 @@ namespace MixedAir {
 
                     // 1 - check min OA flow result
                     if (this->FixedMin) {
-                        Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, OutAirMinFrac * AirLoopFlow(AirLoopNum).DesSupply);
+                        Node(this->OANode).MassFlowRate =
+                            min(max(this->ExhMassFlow, OutAirMinFrac * AirLoopFlow(AirLoopNum).DesSupply), Node(this->MixNode).MassFlowRate);
                         Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
                         // save actual OA flow frac for use as min value for RegulaFalsi call
                         minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / AirLoopFlow(AirLoopNum).DesSupply);
