@@ -105,6 +105,7 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -1214,6 +1215,8 @@ namespace HeatBalanceManager {
             AlphaName(3) = "NO";
         }
 
+        WindowManager::initWindowModel();
+
         gio::write(OutputFileInits, Format_728);
         if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
             gio::write(OutputFileInits, Format_730) << "Yes" << AlphaName(1);
@@ -2144,6 +2147,7 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
+                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
                         if (PerfCurve(Material(MaterNum).GlassSpecAngFRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
@@ -2199,6 +2203,7 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
+                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
                         if (PerfCurve(Material(MaterNum).GlassSpecAngBRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
@@ -4507,7 +4512,7 @@ namespace HeatBalanceManager {
 
         CurrentModuleObject = "Construction:WindowDataFile";
         for (Loop = 1; Loop <= TotWindow5Constructs; ++Loop) { // Loop through all Window5 constructions. These constructions come
-            // from the Window5 data file and can be referenced only by windows
+                                                               // from the Window5 data file and can be referenced only by windows
 
             // Get the object names for each construction from the input processor
             inputProcessor->getObjectItem(CurrentModuleObject,
@@ -5209,8 +5214,9 @@ namespace HeatBalanceManager {
 
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
-            InitGlassOpticalCalculations();          // Initialize the window optical properties
-            InitDaylightingDevices();                // Initialize any daylighting devices
+            // InitGlassOpticalCalculations(); // Initialize the window optical properties
+            InitWindowOpticalCalculations();
+            InitDaylightingDevices(); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
         }

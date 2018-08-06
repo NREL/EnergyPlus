@@ -177,9 +177,15 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 3;
     bool ErrorsFound = false;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode =
-        NodeInputManager::GetOnlySingleNode("Zone 1 Node", ErrorsFound, "Zone", "BeamTest", DataLoopNode::NodeType_Air,
-                                            DataLoopNode::NodeConnectionType_ZoneNode, 1, DataLoopNode::ObjectIsNotParent, "Test zone node");
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode("Zone 1 Node",
+                                                                                         ErrorsFound,
+                                                                                         "Zone",
+                                                                                         "BeamTest",
+                                                                                         DataLoopNode::NodeType_Air,
+                                                                                         DataLoopNode::NodeConnectionType_ZoneNode,
+                                                                                         1,
+                                                                                         DataLoopNode::ObjectIsNotParent,
+                                                                                         "Test zone node");
 
     DataDefineEquip::NumAirDistUnits = 1;
     DataDefineEquip::AirDistUnit.allocate(1);
@@ -1689,8 +1695,8 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
-    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 35.064466069323743, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.19320550334974979, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 34.895727719471829, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.18997902875440670, 0.00001);
 
     EXPECT_NEAR(NonAirSysOutput, 8023.9273066417645, 0.0001);
 
@@ -1732,8 +1738,8 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
-    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 33.836239364981424, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.10040605035467959, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 33.646641648256931, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.098729299097229120, 0.00001);
     // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
     // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 );
     // EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 33.836239364981424, 0.00001 );

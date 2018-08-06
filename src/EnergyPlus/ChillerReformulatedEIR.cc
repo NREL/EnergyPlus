@@ -1115,7 +1115,7 @@ namespace ChillerReformulatedEIR {
 
             if (ElecReformEIRChiller(EIRChillNum).HeatRecActive) {
                 rho = GetDensityGlycol(PlantLoop(ElecReformEIRChiller(EIRChillNum).HRLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(ElecReformEIRChiller(EIRChillNum).HRLoopNum).FluidIndex,
                                        RoutineName);
                 ElecReformEIRChiller(EIRChillNum).DesignHeatRecMassFlowRate = rho * ElecReformEIRChiller(EIRChillNum).DesignHeatRecVolFlowRate;

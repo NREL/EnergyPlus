@@ -69,6 +69,9 @@ namespace IceThermalStorage {
     extern int const IceStorageType_Simple;
     extern int const IceStorageType_Detailed;
 
+    extern int const CurveType_QuadraticLinear;
+    extern int const CurveType_CubicLinear;
+
     extern int const DetIceInsideMelt;  // Inside melt system--charge starting with bare coil
     extern int const DetIceOutsideMelt; // Outside melt system--charge from existing ice layer on coil
 
@@ -208,8 +211,10 @@ namespace IceThermalStorage {
         int MapNum;                     // Number to Map structure
         std::string DischargeCurveName; // Curve name for discharging (used to find the curve index)
         int DischargeCurveNum;          // Curve index for discharging
+        int DischargeCurveTypeNum;      // Integer version of discharging curve type
         std::string ChargeCurveName;    // Curve name for charging (used to find the curve index)
         int ChargeCurveNum;             // Curve index for charging
+        int ChargeCurveTypeNum;         // Integer version of charging curve type
         Real64 CurveFitTimeStep;        // Time step used to generate performance data [hours]
         Real64 DischargeParaElecLoad;   // Parasitic electric load duing discharging [dimensionless]
         // (This is multiplied by the tank capacity to obtain elec consump)
