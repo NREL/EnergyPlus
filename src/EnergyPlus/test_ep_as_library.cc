@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     } else {
         status = EnergyPlusPgmReturnCodes(argv[1]);
     }
-    std::cout << "THIS LINE SHOULD DISPLAY." << std::endl;
+    std::cerr << "THIS LINE SHOULD DISPLAY." << std::endl;
+    std::cout << "THIS LINE SHOULD DISPLAY, TOO. (SHOULD BE FIXED IN ObjexxFCL 4.3.0 AND ABOVE)" << std::endl;
     return status;
 }
