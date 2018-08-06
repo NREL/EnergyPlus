@@ -233,6 +233,7 @@ namespace DataSizing {
     extern bool ZoneEqUnitVent;                       // TRUE if a unit ventilator is being simulated
     extern bool ZoneEqVentedSlab;                     // TRUE if a ventilated slab is being simulated
     extern bool ZoneEqDXCoil;                         // TRUE if a ZoneHVAC DX coil is being simulated
+    extern bool ZoneEqUnitarySys;                     // TRUE if a zone UnitarySystem is being simulated
     extern bool ZoneCoolingOnlyFan;                   // TRUE if a ZoneHVAC DX cooling coil is only coil in parent
     extern bool ZoneHeatingOnlyFan;                   // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
     extern bool SysSizingRunDone;                     // True if a system sizing run is successfully completed.

@@ -507,7 +507,6 @@ namespace ReportSizingManager {
                 bool FinalZoneSizingNotAllocated = false;
                 if (!allocated(DataSizing::FinalZoneSizing)) {
                     DataSizing::FinalZoneSizing.allocate(1);
-                    DataSizing::ZoneSizingData &finalZoneSizing = DataSizing::FinalZoneSizing(1);
                     tempZoneNum = 1;
                     FinalZoneSizingNotAllocated = true;
                 }
