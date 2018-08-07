@@ -572,56 +572,56 @@ namespace TARCOGArgs {
         return ArgCheck;
     }
 
-    void PrepVariablesISO15099( int const nlayer,
-                                Real64 const tout,
-                                Real64 const tind,
-                                Real64 &trmin,
-                                int const isky,
-                                Real64 const outir,
-                                // IR radiance of window's exterior/interior surround (W/m2)
-                                Real64 const tsky,
-                                Real64 &esky,
-                                Real64 const fclr,
-                                Array1A<Real64> gap,
-                                Array1A<Real64> thick,
-                                Array1A<Real64> scon,
-                                Array1A<Real64> const tir,
-                                Array1A<Real64> const emis,
-                                Real64 const tilt,
-                                Real64 &hin,
-                                Real64 &hout,
-                                Array1A_int const ibc,
-                                Array1A<Real64> const SlatThick,
-                                Array1A<Real64> const SlatWidth,
-                                Array1A<Real64> const SlatAngle,
-                                Array1A<Real64> const SlatCond,
-                                Array1A_int const LayerType,
-                                int const ThermalMod,
-                                Real64 const SDScalar,
-                                Real64 &ShadeEmisRatioOut,
-                                Real64 &ShadeEmisRatioIn,
-                                Real64 &ShadeHcRatioOut,
-                                Real64 &ShadeHcRatioIn,
-                                Array1A<Real64> Keff,
-                                Array1A<Real64> ShadeGapKeffConv,
-                                Real64 &sc,
-                                Real64 &shgc,
-                                Real64 &ufactor,
-                                Real64 &flux,
-                                Array1A<Real64> LaminateAU,
-                                Array1A<Real64> sumsolU,
-                                Array1A<Real64> sol0,
-                                Real64 &hint,
-                                Real64 &houtt,
-                                Real64 &trmout,
-                                Real64 &ebsky,
-                                Real64 &ebroom,
-                                Real64 &Gout,
-                                Real64 &Gin,
-                                Array1A<Real64> rir,
-                                Array1A<Real64> vfreevent,
-                                int &nperr,
-                                std::string &ErrorMessage )
+    void PrepVariablesISO15099(int const nlayer,
+                               Real64 const tout,
+                               Real64 const tind,
+                               Real64 &trmin,
+                               int const isky,
+                               Real64 const outir,
+                               // IR radiance of window's exterior/interior surround (W/m2)
+                               Real64 const tsky,
+                               Real64 &esky,
+                               Real64 const fclr,
+                               Array1A<Real64> gap,
+                               Array1A<Real64> thick,
+                               Array1A<Real64> scon,
+                               Array1A<Real64> const tir,
+                               Array1A<Real64> const emis,
+                               Real64 const tilt,
+                               Real64 &hin,
+                               Real64 &hout,
+                               Array1A_int const ibc,
+                               Array1A<Real64> const SlatThick,
+                               Array1A<Real64> const SlatWidth,
+                               Array1A<Real64> const SlatAngle,
+                               Array1A<Real64> const SlatCond,
+                               Array1A_int const LayerType,
+                               int const ThermalMod,
+                               Real64 const SDScalar,
+                               Real64 &ShadeEmisRatioOut,
+                               Real64 &ShadeEmisRatioIn,
+                               Real64 &ShadeHcRatioOut,
+                               Real64 &ShadeHcRatioIn,
+                               Array1A<Real64> Keff,
+                               Array1A<Real64> ShadeGapKeffConv,
+                               Real64 &sc,
+                               Real64 &shgc,
+                               Real64 &ufactor,
+                               Real64 &flux,
+                               Array1A<Real64> LaminateAU,
+                               Array1A<Real64> sumsolU,
+                               Array1A<Real64> sol0,
+                               Real64 &hint,
+                               Real64 &houtt,
+                               Real64 &trmout,
+                               Real64 &ebsky,
+                               Real64 &ebroom,
+                               Real64 &Gout,
+                               Real64 &Gin,
+                               Array1A<Real64> rir,
+                               Array1A<Real64> vfreevent,
+                               int &nperr,
+                               std::string &ErrorMessage)
     {
 
         // Argument array dimensioning
@@ -704,10 +704,10 @@ namespace TARCOGArgs {
                     thick(i) = SlatThick(i);
                     const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobals::Pi / 360.0;
                     Real64 C4_VENET(0);
-                    if(LayerType(i) == VENETBLIND_HORIZ) {
+                    if (LayerType(i) == VENETBLIND_HORIZ) {
                         C4_VENET = C4_VENET_HORIZONTAL;
                     }
-                    if(LayerType(i) == VENETBLIND_VERT) {
+                    if (LayerType(i) == VENETBLIND_VERT) {
                         C4_VENET = C4_VENET_VERTICAL;
                     }
                     thick(i) = C4_VENET * (SlatWidth(i) * cos(slatAngRad) + thick(i) * sin(slatAngRad));
