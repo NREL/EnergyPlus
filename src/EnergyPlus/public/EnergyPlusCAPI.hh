@@ -47,9 +47,7 @@
 
 #ifndef EnergyPlusCAPI_hh_INCLUDED
 #define EnergyPlusCAPI_hh_INCLUDED
-#include <stdio.h>
 #include <iostream>
-#include <windows.h>
 #include "EnergyPlusPgm.hh"
 
 #if _WIN32 || _MSC_VER
