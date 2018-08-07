@@ -6339,19 +6339,19 @@ namespace DaylightingManager {
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
         static Vector2<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
-        static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (first index),
-        //   bare/shaded window (second index)
+        static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
+        //   bare/shaded window (first index)
         static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
-        static Array2D<Real64> BFSKHR(2, 4); // Sky background luminance factor for sky type (first index),
-        //   bare/shaded window (second index)
+        static Array2D<Real64> BFSKHR(2, 4); // Sky background luminance factor for sky type (second index),
+        //   bare/shaded window (first index)
         static Vector2<Real64> BFSUHR;       // Sun background luminance factor for bare/shaded window
-        static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (first index),
-        //   bare/shaded window (second index)
+        static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
+        //   bare/shaded window (first index)
         static Vector2<Real64> SFSUHR;       // Sun source luminance factor for bare/shaded window
-        static Array2D<Real64> WDAYIL(2, 2); // Illuminance from window at reference point (first index)
-        //   for shade open/closed (second index)
-        static Array2D<Real64> WBACLU(2, 2); // Background illuminance from window at reference point (first index)
-        //   for shade open/closed (second index)
+        static Array2D<Real64> WDAYIL(2, 2); // Illuminance from window at reference point (second index)
+        //   for shade open/closed (first index)
+        static Array2D<Real64> WBACLU(2, 2); // Background illuminance from window at reference point (second index)
+        //   for shade open/closed (first index)
         static Vector2<Real64> RDAYIL; // Illuminance from window at reference point after closing shade
         static Vector2<Real64> RBACLU; // Background illuminance from window at reference point after closing shade
         static Vector2<Real64> GLRNDX; // Glare index at reference point
