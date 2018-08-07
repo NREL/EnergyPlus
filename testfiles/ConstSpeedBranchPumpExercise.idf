@@ -190,7 +190,6 @@ Boiler:HotWater,
   0.8,                                    !- Nominal Thermal Efficiency
   ,                                       !- Efficiency Curve Temperature Evaluation Variable
   ,                                       !- Normalized Boiler Efficiency Curve Name
-  82,                                     !- Design Water Outlet Temperature {C}
   0.001,                                  !- Design Water Flow Rate {m3/s}
   0,                                      !- Minimum Part Load Ratio
   1,                                      !- Maximum Part Load Ratio
@@ -232,7 +231,6 @@ Boiler:HotWater,
   0.8,                                    !- Nominal Thermal Efficiency
   ,                                       !- Efficiency Curve Temperature Evaluation Variable
   ,                                       !- Normalized Boiler Efficiency Curve Name
-  82,                                     !- Design Water Outlet Temperature {C}
   0.001,                                  !- Design Water Flow Rate {m3/s}
   0,                                      !- Minimum Part Load Ratio
   1,                                      !- Maximum Part Load Ratio

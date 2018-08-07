@@ -108,7 +108,7 @@ set( test_src
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
   OASystemHWPreheatCoil.unit.cc
-#  OutdoorAirUnit.unit.cc
+  OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReports.unit.cc
@@ -157,6 +157,7 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
+  SZVAVModel.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
@@ -172,6 +173,7 @@ set( test_src
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  WinCalcEngine.unit.cc
   WindowAC.unit.cc
   WindowEquivalentLayer.unit.cc
   WindowLayerEffectiveMultipliers.unit.cc

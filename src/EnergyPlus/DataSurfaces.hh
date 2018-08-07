@@ -372,7 +372,7 @@ namespace DataSurfaces {
     extern Array1D<Real64> DSZone; // Factor for sky diffuse solar radiation into a zone
     extern Array1D<Real64> DGZone; // Factor for ground diffuse solar radiation into a zone
     extern Array1D<Real64> DBZone; // Factor for diffuse radiation in a zone from
-    // beam reflecting from inside surfaces
+                                   // beam reflecting from inside surfaces
     extern Array1D<Real64>
         DBZoneSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
     extern Array1D<Real64> CBZone; // Factor for beam solar absorbed by interior shades
@@ -388,6 +388,10 @@ namespace DataSurfaces {
 
     extern Array2D<Real64> AWinSurf; // Time step value of factor for beam
     // absorbed in window glass layers
+
+    // Time step value of factor for diffuse absorbed in window layers
+    extern Array2D<Real64> AWinSurfDiffFront;
+    extern Array2D<Real64> AWinSurfDiffBack;
 
     extern Array2D<Real64> AWinCFOverlap; // Time step value of factor for beam
     // absorbed in window glass layers which comes from other windows
@@ -445,7 +449,7 @@ namespace DataSurfaces {
     extern Array1D<Real64> WinSysSolReflectance; // Effective solar reflectance of window + shading device,
     // if present
     extern Array1D<Real64> WinSysSolAbsorptance; // Effective solar absorptance of window + shading device,
-    // if present
+                                                 // if present
     extern Array2D<Real64>
         SUNCOSHR; // Hourly values of SUNCOS (solar direction cosines) //Autodesk:Init Zero-initialization added to avoid use uninitialized
     extern Array2D<Real64> ReflFacBmToDiffSolObs;
@@ -489,7 +493,7 @@ namespace DataSurfaces {
         using EdgesXY = std::vector<EdgeXY>;
 
     public: // Creation
-        // Constructor
+            // Constructor
         Surface2DSlab(Real64 const yl, Real64 const yu) : xl(0.0), xu(0.0), yl(yl), yu(yu)
         {
         }
@@ -527,14 +531,14 @@ namespace DataSurfaces {
         Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu);
 
     public: // Predicates
-        // Bounding box contains a point?
+            // Bounding box contains a point?
         bool bb_contains(Vector2D const &v) const
         {
             return (vl.x <= v.x) && (v.x <= vu.x) && (vl.y <= v.y) && (v.y <= vu.y);
         }
 
     public: // Comparison
-        // Equality
+            // Equality
         friend bool operator==(Surface2D const &a, Surface2D const &b)
         {
             auto const &v1 = a.vertices;
@@ -758,7 +762,7 @@ namespace DataSurfaces {
         Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
 
         std::vector<int> DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
-        // the surface diffusion model
+                                                    // the surface diffusion model
 
         // Default Constructor
         SurfaceData()
@@ -795,17 +799,33 @@ namespace DataSurfaces {
         }
 
     public: // Methods
-        // Set Precomputed Parameters
+            // Set Precomputed Parameters
         void set_computed_geometry();
 
         void SetOutBulbTempAt();
 
-        void SetWindSpeedAt(Real64 const fac);
-
         void SetWindDirAt(Real64 const fac);
 
+        void SetWindSpeedAt(Real64 const fac);
+
+        Real64 getInsideAirTemperature(const int t_SurfNum) const;
+
+        static Real64 getInsideIR(const int t_SurfNum);
+
+        Real64 getOutsideAirTemperature(const int t_SurfNum) const;
+
+        Real64 getOutsideIR(const int t_SurfNum) const;
+
+        static Real64 getSWIncident(const int t_SurfNum);
+
+        static Real64 getSWBeamIncident(const int t_SurfNum);
+
+        static Real64 getSWDiffuseIncident(const int t_SurfNum);
+
+        int getTotLayers() const;
+
     private: // Methods
-        // Computed Shape Category
+             // Computed Shape Category
         ShapeCat computed_shapeCat() const;
 
         // Computed Plane
@@ -1158,6 +1178,18 @@ namespace DataSurfaces {
             SkySolarInc = 0.0;
             GndSolarInc = 0.0;
         }
+
+        Real64 AbsorptanceFromExteriorFrontSide() const;
+
+        Real64 AbsorptanceFromInteriorFrontSide() const;
+
+        Real64 AbsFrontSide() const;
+
+        Real64 AbsorptanceFromExteriorBackSide() const;
+
+        Real64 AbsorptanceFromInteriorBackSide() const;
+
+        Real64 AbsBackSide() const;
     };
 
     struct FrameDividerProperties
@@ -1301,16 +1333,16 @@ namespace DataSurfaces {
         bool GlareControlIsActive;      // True if shading control to reduce daylight glare is active
         int SlatAngleSchedule;          // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
         int SlatAngleControlForBlinds;  // Takes one of the following values that specifies
-        //  CHARACTER(len=32) :: SlatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
-        //  how slat angle is controled in a blind when ShadingType =
-        //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
-        //  FixedSlatAngle: the slat angle is fixed at the constant value given in the
-        //    associated Material:WindowBlind
-        //  ScheduledSlatAngle: the slat angle in degrees between 1 and 180 is given
-        //    by the schedule with index SlatAngleSchedule
-        //  BlockBeamSolar: if beam solar is incident on the window, and a blind is on the
-        //    window, the slat angle is adjusted to just block beam solar; otherwise the
-        //    slat angle is set to the value given in the associated Material:WindowBlind.
+                                        //  CHARACTER(len=32) :: SlatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
+                                        //  how slat angle is controled in a blind when ShadingType =
+                                        //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
+                                        //  FixedSlatAngle: the slat angle is fixed at the constant value given in the
+                                        //    associated Material:WindowBlind
+                                        //  ScheduledSlatAngle: the slat angle in degrees between 1 and 180 is given
+                                        //    by the schedule with index SlatAngleSchedule
+                                        //  BlockBeamSolar: if beam solar is incident on the window, and a blind is on the
+                                        //    window, the slat angle is adjusted to just block beam solar; otherwise the
+                                        //    slat angle is set to the value given in the associated Material:WindowBlind.
 
         // Default Constructor
         WindowShadingControlData()

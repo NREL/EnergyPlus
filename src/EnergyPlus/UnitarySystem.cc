@@ -216,8 +216,8 @@ namespace UnitarySystems {
           m_SensPLRFail(0), m_SensPLRFailIndex(0), m_LatPLRIter(0), m_LatPLRIterIndex(0), m_LatPLRFail(0), m_LatPLRFailIndex(0), m_HeatCoilSensPLRIter(0),
           m_HeatCoilSensPLRIterIndex(0), m_HeatCoilSensPLRFail(0), m_HeatCoilSensPLRFailIndex(0), m_SuppHeatCoilSensPLRIter(0),
           m_SuppHeatCoilSensPLRIterIndex(0), m_SuppHeatCoilSensPLRFail(0), m_SuppHeatCoilSensPLRFailIndex(0),
-          m_LatMaxIterIndex(0), m_LatRegulaFalsIFailedIndex(0), m_initLoadBasedControlAirLoopPass(false), m_airLoopPassCounter(0),
-          m_UnitarySysNum(-1), MaxIterIndex(0), RegulaFalsIFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0),
+          m_LatMaxIterIndex(0), m_LatRegulaFalsiFailedIndex(0), m_initLoadBasedControlAirLoopPass(false), m_airLoopPassCounter(0),
+          m_UnitarySysNum(-1), MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0),
           ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0),
           LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), 
           CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0),
@@ -563,6 +563,7 @@ namespace UnitarySystems {
                                         Real64 const OAUCoilOutTemp)
     {
         static std::string const routineName("InitUnitarySystems");
+        bool errorsFound = false; // error flag for mining functions
 
         if (myOneTimeFlag) {
             // initialize or allocate something once
@@ -585,6 +586,73 @@ namespace UnitarySystems {
                     ShowSevereError(this->UnitType + ": " + this->Name);
                     ShowContinueError("  Invalid application of Control Type = SingleZoneVAV in outdoor air system.");
                     ShowFatalError("InitUnitarySystems: Program terminated for previous conditions.");
+                }
+            }
+        }
+
+        if (this->m_MyFanFlag) {
+            std::string FanType = ""; // used in warning messages
+            std::string FanName = ""; // used in warning messages
+            if (this->m_ActualFanVolFlowRate != DataSizing::AutoSize) {
+                if (this->m_ActualFanVolFlowRate > 0.0) {
+                    this->m_HeatingFanSpeedRatio = this->m_MaxHeatAirVolFlow / this->m_ActualFanVolFlowRate;
+                    this->m_CoolingFanSpeedRatio = this->m_MaxCoolAirVolFlow / this->m_ActualFanVolFlowRate;
+                    this->m_NoHeatCoolSpeedRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_ActualFanVolFlowRate;
+                    if (this->m_FanExists && !this->m_MultiOrVarSpeedHeatCoil && !this->m_MultiOrVarSpeedCoolCoil) {
+                        bool fanHasPowerSpeedRatioCurve = false;
+                        if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                            if (HVACFan::fanObjs[this->m_FanIndex]->powerModFuncFlowFractionCurveIndex > 0) fanHasPowerSpeedRatioCurve = true;
+                            FanType = "Fan:SystemModel";
+                            FanName = this->m_FanName;
+                        } else {
+                            if (Fans::GetFanSpeedRatioCurveIndex(FanType, FanName, this->m_FanIndex) > 0) fanHasPowerSpeedRatioCurve = true;
+                        }
+                        if (fanHasPowerSpeedRatioCurve) {
+
+                            if (this->m_ActualFanVolFlowRate == this->m_MaxHeatAirVolFlow && this->m_ActualFanVolFlowRate == this->m_MaxCoolAirVolFlow &&
+                                this->m_ActualFanVolFlowRate == this->m_MaxNoCoolHeatAirVolFlow) {
+                                ShowWarningError(this->UnitType + " \"" + this->Name + "\"");
+                                ShowContinueError("...For fan type and name = " + FanType + " \"" + FanName + "\"");
+                                ShowContinueError("...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the "
+                                    "same as the unitary system volumetric flow rate.");
+                                ShowContinueError(
+                                    "...Fan volumetric flow rate            = " + General::RoundSigDigits(this->m_ActualFanVolFlowRate, 5) + " m3/s.");
+                                ShowContinueError("...Unitary system volumetric flow rate = " + General::RoundSigDigits(this->m_MaxHeatAirVolFlow, 5) +
+                                    " m3/s.");
+                            }
+                        }
+                    }
+                    if (this->m_MultiOrVarSpeedHeatCoil || this->m_MultiOrVarSpeedCoolCoil) {
+                        if (this->m_MultiOrVarSpeedCoolCoil) {
+                            int NumSpeeds = this->m_NumOfSpeedCooling;
+                            if (this->m_MSCoolingSpeedRatio.size() == 0)
+                                this->m_MSCoolingSpeedRatio.resize(NumSpeeds);
+                            for (int Iter = 1; Iter <= NumSpeeds; ++Iter) {
+                                this->m_MSCoolingSpeedRatio[Iter] =
+                                    this->m_CoolVolumeFlowRate[Iter] / this->m_ActualFanVolFlowRate;
+                            }
+                        }
+                        if (this->m_MultiOrVarSpeedHeatCoil) {
+                            int NumSpeeds = this->m_NumOfSpeedHeating;
+                            if (this->m_MSHeatingSpeedRatio.size() == 0)
+                                this->m_MSHeatingSpeedRatio.resize(NumSpeeds);
+                            for (int Iter = 1; Iter <= NumSpeeds; ++Iter) {
+                                this->m_MSHeatingSpeedRatio[Iter] =
+                                    this->m_HeatVolumeFlowRate[Iter] / this->m_ActualFanVolFlowRate;
+                            }
+                        }
+                        this->m_IdleSpeedRatio =
+                            this->m_IdleVolumeAirRate / this->m_ActualFanVolFlowRate;
+                    }
+                }
+                this->m_MyFanFlag = false;
+            } else {
+                if (this->m_FanExists) {
+                    if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                        this->m_ActualFanVolFlowRate = HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate;
+                    } else {
+                        this->m_ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(blankString, blankString, errorsFound, this->m_FanIndex);
+                    }
                 }
             }
         }
@@ -1696,6 +1764,22 @@ namespace UnitarySystems {
             DataSizing::DataConstantUsedForSizing = 0.0;
         }
 
+        // If not set, set DesignFanVolFlowRate as greater of cooling and heating to make sure this value > 0.
+        // If fan is hard-sized, use that value, otherwise the fan will size to DesignFanVolFlowRate
+        if (this->m_DesignFanVolFlowRate <= 0.0) {
+            this->m_DesignFanVolFlowRate =
+                max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
+            if (this->m_ActualFanVolFlowRate > 0.0)
+                this->m_DesignFanVolFlowRate = this->m_ActualFanVolFlowRate;
+            if (this->m_DesignFanVolFlowRate <= 0.0) {
+                ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowFatalError("Unable to determine fan air flow rate.");
+            }
+        }
+        if (!this->m_FanExists)
+            this->m_ActualFanVolFlowRate = this->m_DesignFanVolFlowRate;
+
+
         if (this->m_CoolCoilExists || this->m_HeatCoilExists || this->m_SuppCoilExists) {
 
             SizingMethod = DataHVACGlobals::SystemAirflowSizing;
@@ -1771,6 +1855,25 @@ namespace UnitarySystems {
             this->LowSpeedHeatFanRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_MaxHeatAirVolFlow;
         }
 
+        // Change the Volume Flow Rates to Mass Flow Rates
+        this->m_DesignMassFlowRate = this->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
+        this->MaxCoolAirMassFlow = this->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
+        this->MaxHeatAirMassFlow = this->m_MaxHeatAirVolFlow * DataEnvironment::StdRhoAir;
+        this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * DataEnvironment::StdRhoAir;
+
+        // initialize idle air flow rate variables in case these are needed in multi-speed heating coil sizing when no multi-speed cooling coil exists
+        // the multi-speed coils will overwrite this data and these variables are only used for multi-speed coils in function SetOnOffMassFlowRate
+        if (this->m_MultiOrVarSpeedCoolCoil || this->m_MultiOrVarSpeedHeatCoil) {
+            if (this->m_DesignFanVolFlowRate > 0.0) {
+                this->m_IdleVolumeAirRate = this->m_DesignFanVolFlowRate;
+            } else {
+                this->m_IdleVolumeAirRate =
+                    max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
+            }
+            this->m_IdleMassFlowRate = this->m_IdleVolumeAirRate * DataEnvironment::StdRhoAir;
+            this->m_IdleSpeedRatio = 1.0;
+        }
+
         // initialize multi-speed coils
         if ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed)) {
@@ -1783,7 +1886,6 @@ namespace UnitarySystems {
 
             MSHPIndex = this->m_DesignSpecMSHPIndex;
             if (MSHPIndex > -1) {
-                designSpecMSHP[MSHPIndex].coolingVolFlowRatio.resize(designSpecMSHP[MSHPIndex].numOfSpeedCooling);
                 for (Iter = designSpecMSHP[MSHPIndex].numOfSpeedCooling; Iter >= 1; --Iter) {
                     if (designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter-1] == DataSizing::AutoSize) {
                         designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter-1] = double(Iter) / double(designSpecMSHP[MSHPIndex].numOfSpeedCooling);
@@ -1804,7 +1906,12 @@ namespace UnitarySystems {
                                                       0.0,
                                                       0.0,
                                                       0.0); // conduct the sizing operation in the VS WSHP
-            this->m_NumOfSpeedCooling = VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
+            if (this->m_NumOfSpeedCooling != VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds) {
+                ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowContinueError("Number of cooling speeds does not match coil object.");
+                ShowFatalError("Cooling coil = " + VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).VarSpeedCoilType + ": " +
+                    VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).Name);
+            }
             DataSizing::DXCoolCap = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
                 DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
             EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
@@ -1812,24 +1919,25 @@ namespace UnitarySystems {
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
                 this->m_CoolVolumeFlowRate[Iter] = VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(Iter);
                 this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
-                // it seems the ratio should reference the actual flow rates, not the fan flow ???
-                if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
-                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
-                } else {
-                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_CoolVolumeFlowRate[this->m_NumOfSpeedCooling];
-                }
+                this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
             }
 
-            this->m_IdleVolumeAirRate = this->m_CoolVolumeFlowRate[1];
-            this->m_IdleMassFlowRate = this->m_CoolMassFlowRate[1];
-            this->m_IdleSpeedRatio = this->m_MSCoolingSpeedRatio[1];
+            if (MSHPIndex > 0) {
+                this->m_IdleVolumeAirRate = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                this->m_IdleMassFlowRate = this->m_IdleVolumeAirRate * DataEnvironment::StdRhoAir;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+            } else if (this->m_CoolVolumeFlowRate.size() == 0) {
+                this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+            }
 
-        } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+        } else if ( this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ) {
 
-            if (this->m_NumOfSpeedCooling > 0) {
-                if (this->m_CoolVolumeFlowRate.size() == 0) this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling+1);
-                if (this->m_CoolMassFlowRate.size() == 0) this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling+1);
-                if (this->m_MSCoolingSpeedRatio.size() == 0) this->m_MSCoolingSpeedRatio.resize(this->m_NumOfSpeedCooling+1);
+            if ( this->m_NumOfSpeedCooling > 0 ) {
+                if ( this->m_CoolVolumeFlowRate.size() == 0 ) this->m_CoolVolumeFlowRate.resize( this->m_NumOfSpeedCooling + 1 );
+                if ( this->m_CoolMassFlowRate.size() == 0 ) this->m_CoolMassFlowRate.resize( this->m_NumOfSpeedCooling + 1 );
+                if ( this->m_MSCoolingSpeedRatio.size() == 0 ) this->m_MSCoolingSpeedRatio.resize( this->m_NumOfSpeedCooling + 1 );
             }
 
             // set the multi-speed high flow rate variable in case a non-zero air flow rate resides on the coil inlet during sizing (e.g., upstream
@@ -1837,24 +1945,53 @@ namespace UnitarySystems {
             DataHVACGlobals::MSHPMassFlowRateHigh =
                 EqSizing.CoolingAirVolFlow *
                 DataEnvironment::StdRhoAir; // doesn't matter what this value is since only coil size is needed and CompOn = 0 here
-            DXCoils::SimDXCoilMultiSpeed(blankString, 1.0, 1.0, this->m_CoolingCoilIndex, 0, 0, 0);
-            DataSizing::DXCoolCap = DXCoils::GetCoilCapacityByIndexType(this->m_CoolingCoilIndex, this->m_CoolingCoilType_Num, ErrFound);
+            DXCoils::SimDXCoilMultiSpeed( blankString, 1.0, 1.0, this->m_CoolingCoilIndex, 0, 0, 0 );
+            DataSizing::DXCoolCap = DXCoils::GetCoilCapacityByIndexType( this->m_CoolingCoilIndex, this->m_CoolingCoilType_Num, ErrFound );
             EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
             MSHPIndex = this->m_DesignSpecMSHPIndex;
 
-            if (MSHPIndex > -1) {
+            if ( MSHPIndex > -1 ) {
                 // use reverse order since we divide by CoolVolumeFlowRate(max)
+                for ( Iter = designSpecMSHP[ MSHPIndex ].numOfSpeedCooling; Iter > 0; --Iter ) {
+                    if ( designSpecMSHP[ MSHPIndex ].coolingVolFlowRatio[ Iter - 1 ] == DataSizing::AutoSize )
+                        designSpecMSHP[ MSHPIndex ].coolingVolFlowRatio[ Iter - 1 ] = double( Iter ) / double( designSpecMSHP[ MSHPIndex ].numOfSpeedCooling );
+                    this->m_CoolVolumeFlowRate[ Iter ] = this->m_MaxCoolAirVolFlow * designSpecMSHP[ MSHPIndex ].coolingVolFlowRatio[ Iter - 1 ];
+                    this->m_CoolMassFlowRate[ Iter ] = this->m_CoolVolumeFlowRate[ Iter ] * DataEnvironment::StdRhoAir;
+                    this->m_MSCoolingSpeedRatio[ Iter ] = this->m_CoolVolumeFlowRate[ Iter ] / this->m_DesignFanVolFlowRate;
+                }
+                this->m_IdleVolumeAirRate = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                this->m_IdleMassFlowRate = this->m_IdleVolumeAirRate * DataEnvironment::StdRhoAir;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+            } else if ( this->m_CoolVolumeFlowRate.size() == 0 ) {
+                this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+            }
+        } else if ( this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
+            this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
+
+            if (this->m_NumOfSpeedCooling > 0) {
+                if (this->m_CoolVolumeFlowRate.size() == 0) this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling+1);
+                if (this->m_CoolMassFlowRate.size() == 0) this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling+1);
+                if (this->m_MSCoolingSpeedRatio.size() == 0) this->m_MSCoolingSpeedRatio.resize(this->m_NumOfSpeedCooling+1);
+            }
+            MSHPIndex = this->m_DesignSpecMSHPIndex;
+
+            if (MSHPIndex > -1) {
                 for (Iter = designSpecMSHP[MSHPIndex].numOfSpeedCooling; Iter > 0; --Iter) {
                     if (designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter-1] == DataSizing::AutoSize)
                         designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter-1] = double(Iter) / double(designSpecMSHP[MSHPIndex].numOfSpeedCooling);
                     this->m_CoolVolumeFlowRate[Iter] = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter-1];
                     this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
-                    this->m_MSCoolingSpeedRatio[Iter] =
-                        this->m_CoolVolumeFlowRate[Iter] / this->m_CoolVolumeFlowRate[designSpecMSHP[MSHPIndex].numOfSpeedCooling];
+                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
                 }
-                this->m_IdleVolumeAirRate = this->m_CoolVolumeFlowRate[1];
-                this->m_IdleMassFlowRate = this->m_CoolMassFlowRate[1];
-                this->m_IdleSpeedRatio = this->m_MSCoolingSpeedRatio[1];
+                this->m_IdleVolumeAirRate = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                this->m_IdleMassFlowRate = this->m_IdleVolumeAirRate * DataEnvironment::StdRhoAir;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+            } else if ( this->m_CoolVolumeFlowRate.size() == 0 ) {
+                this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
             }
         }
 
@@ -1898,13 +2035,34 @@ namespace UnitarySystems {
                     }
                     this->m_HeatVolumeFlowRate[Iter] = this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter-1];
                     this->m_HeatMassFlowRate[Iter] = this->m_HeatVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
-                    this->m_MSHeatingSpeedRatio[Iter] =
-                        this->m_HeatVolumeFlowRate[Iter] / this->m_HeatVolumeFlowRate[designSpecMSHP[MSHPIndex].numOfSpeedHeating];
+                    this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
                 }
-                // these coil types do not have an idle speed air flow rate
-                this->m_IdleVolumeAirRate = 0.0;
-                this->m_IdleMassFlowRate = 0.0;
-                this->m_IdleSpeedRatio = 0.0;
+                if (this->m_CoolCoilExists) {
+                    if (this->m_CoolVolumeFlowRate.size() > 0 && MSHPIndex > -1) {
+                    this->m_IdleVolumeAirRate =
+                            min(this->m_IdleVolumeAirRate,
+                                this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
+                    this->m_IdleMassFlowRate =
+                            min(this->m_IdleMassFlowRate,
+                                this->MaxHeatAirMassFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
+                    this->m_IdleSpeedRatio =
+                            min(this->m_IdleSpeedRatio,
+                                this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate);
+                    } else {
+                        this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                        this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                        this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+                    }
+                } else if (MSHPIndex > 0) {
+                    this->m_IdleVolumeAirRate =
+                        this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                    this->m_IdleMassFlowRate = this->m_IdleVolumeAirRate * DataEnvironment::StdRhoAir;
+                    this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+                } else {
+                    this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                    this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                    this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+                }
             }
         } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
@@ -1932,7 +2090,12 @@ namespace UnitarySystems {
                                                       0.0,
                                                       0.0); // conduct the sizing operation in the VS WSHP
 
-            this->m_NumOfSpeedHeating = VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
+            if (this->m_NumOfSpeedHeating != VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds) {
+                ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowContinueError("Number of heating speeds does not match coil object.");
+                ShowFatalError("Heating coil = " + VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).VarSpeedCoilType + ": " +
+                    VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).Name);
+            }
 
             if (this->m_NumOfSpeedHeating > 0) {
                 if (this->m_HeatVolumeFlowRate.size() == 0) this->m_HeatVolumeFlowRate.resize(this->m_NumOfSpeedHeating+1);
@@ -1950,44 +2113,44 @@ namespace UnitarySystems {
                 }
             }
 
-            if (this->m_CoolCoilExists) {
-                if (this->m_CoolVolumeFlowRate.size() > 0) {
-                    this->m_IdleVolumeAirRate = min(this->m_IdleVolumeAirRate, this->m_HeatVolumeFlowRate[1]);
-                    this->m_IdleMassFlowRate = min(this->m_IdleMassFlowRate, this->m_HeatMassFlowRate[1]);
-                    this->m_IdleSpeedRatio = min(this->m_IdleSpeedRatio, this->m_MSHeatingSpeedRatio[1]);
+            if (this->m_CoolCoilExists && this->m_NumOfSpeedHeating > 0) {
+                if (this->m_CoolVolumeFlowRate.size() > 0 && MSHPIndex > 0) {
+                    this->m_IdleVolumeAirRate =
+                        min(this->m_IdleVolumeAirRate,
+                            this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
+                    this->m_IdleMassFlowRate =
+                        min(this->m_IdleMassFlowRate,
+                            this->MaxHeatAirMassFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
+                    this->m_IdleSpeedRatio =
+                        min(this->m_IdleSpeedRatio,
+                            this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate);
+                } else if (this->m_CoolVolumeFlowRate.size() == 0 && MSHPIndex > 0) {
+                    this->m_IdleVolumeAirRate =
+                        this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                    this->m_IdleMassFlowRate =
+                        this->MaxHeatAirMassFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                    this->m_IdleSpeedRatio =
+                        this->m_MSHeatingSpeedRatio[this->m_NumOfSpeedHeating] * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                } else if (this->m_CoolVolumeFlowRate.size() > 0) {
+                    this->m_IdleVolumeAirRate = min(this->m_IdleVolumeAirRate, this->m_MaxNoCoolHeatAirVolFlow);
+                    this->m_IdleMassFlowRate = min(this->m_IdleMassFlowRate, this->MaxNoCoolHeatAirMassFlow);
+                    this->m_IdleSpeedRatio =
+                        min(this->m_IdleSpeedRatio, this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate);
                 } else {
-                    this->m_IdleVolumeAirRate = this->m_HeatVolumeFlowRate[1];
-                    this->m_IdleMassFlowRate = this->m_HeatMassFlowRate[1];
-                    this->m_IdleSpeedRatio = this->m_MSHeatingSpeedRatio[1];
+                    this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                    this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                    this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
                 }
+            } else if (MSHPIndex > 0) {
+                this->m_IdleVolumeAirRate =
+                    this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                this->m_IdleMassFlowRate = this->m_IdleVolumeAirRate * DataEnvironment::StdRhoAir;
+                this->m_IdleSpeedRatio =
+                    this->m_MSHeatingSpeedRatio[this->m_NumOfSpeedHeating] * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
             } else {
-                this->m_IdleVolumeAirRate = this->m_HeatVolumeFlowRate[1];
-                this->m_IdleMassFlowRate = this->m_HeatMassFlowRate[1];
-                this->m_IdleSpeedRatio = this->m_MSHeatingSpeedRatio[1];
-            }
-        }
-        if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
-            this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
-
-            if (this->m_NumOfSpeedCooling > 0) {
-                if (this->m_CoolVolumeFlowRate.size() == 0) this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling+1);
-                if (this->m_CoolMassFlowRate.size() == 0) this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling+1);
-                if (this->m_MSCoolingSpeedRatio.size() == 0) this->m_MSCoolingSpeedRatio.resize(this->m_NumOfSpeedCooling+1);
-            }
-            MSHPIndex = this->m_DesignSpecMSHPIndex;
-
-            if (MSHPIndex > -1) {
-                for (Iter = designSpecMSHP[MSHPIndex].numOfSpeedCooling; Iter > 0; --Iter) {
-                    if (designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter-1] == DataSizing::AutoSize)
-                        designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter-1] = double(Iter) / double(designSpecMSHP[MSHPIndex].numOfSpeedCooling);
-                    this->m_CoolVolumeFlowRate[Iter] = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter-1];
-                    this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
-                    this->m_MSCoolingSpeedRatio[Iter] =
-                        this->m_CoolVolumeFlowRate[Iter] / this->m_CoolVolumeFlowRate[designSpecMSHP[MSHPIndex].numOfSpeedCooling];
-                }
-                this->m_IdleVolumeAirRate = this->m_CoolVolumeFlowRate[1];
-                this->m_IdleMassFlowRate = this->m_CoolMassFlowRate[1];
-                this->m_IdleSpeedRatio = this->m_MSCoolingSpeedRatio[1];
+                this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
             }
         }
         if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
@@ -1999,19 +2162,44 @@ namespace UnitarySystems {
             }
 
             MSHPIndex = this->m_DesignSpecMSHPIndex;
-            if (MSHPIndex > -1) {
+            if ( MSHPIndex > -1 ) {
                 for (Iter = designSpecMSHP[MSHPIndex].numOfSpeedHeating; Iter > 0; --Iter) {
-                    if (designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter-1] == DataSizing::AutoSize) {
-                        designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter-1] = double(Iter) / double(designSpecMSHP[MSHPIndex].numOfSpeedHeating);
+                    if (designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] == DataSizing::AutoSize) {
+                        designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] = double(Iter) / double(designSpecMSHP[MSHPIndex].numOfSpeedHeating);
                     }
-                    this->m_HeatVolumeFlowRate[Iter] = this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter-1];
+                    this->m_HeatVolumeFlowRate[Iter] = this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1];
                     this->m_HeatMassFlowRate[Iter] = this->m_HeatVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
-                    this->m_MSHeatingSpeedRatio[Iter] =
-                        this->m_HeatVolumeFlowRate[Iter] / this->m_HeatVolumeFlowRate[designSpecMSHP[MSHPIndex].numOfSpeedHeating];
+                    this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
                 }
-                this->m_IdleVolumeAirRate = this->m_HeatVolumeFlowRate[1];
-                this->m_IdleMassFlowRate = this->m_HeatMassFlowRate[1];
-                this->m_IdleSpeedRatio = this->m_MSHeatingSpeedRatio[1];
+                if (this->m_CoolCoilExists) {
+                    if (this->m_CoolVolumeFlowRate.size() > 0 && MSHPIndex > 0 ) {
+                        this->m_IdleVolumeAirRate =
+                            min(this->m_IdleVolumeAirRate,
+                                this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
+                        this->m_IdleMassFlowRate =
+                            min(this->m_IdleMassFlowRate,
+                                this->MaxHeatAirMassFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
+                        this->m_IdleSpeedRatio =
+                            min(this->m_IdleSpeedRatio,
+                                this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate);
+                    } else {
+                        this->m_IdleVolumeAirRate =
+                            min(this->m_IdleVolumeAirRate, this->m_MaxNoCoolHeatAirVolFlow);
+                        this->m_IdleMassFlowRate =
+                            min(this->m_IdleMassFlowRate, this->MaxNoCoolHeatAirMassFlow);
+                        this->m_IdleSpeedRatio =
+                            min(this->m_IdleSpeedRatio,
+                            (this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate));
+                    }
+                } else if ( MSHPIndex > 0 ) {
+                    this->m_IdleVolumeAirRate = this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                    this->m_IdleMassFlowRate = this->MaxHeatAirMassFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                    this->m_IdleSpeedRatio = this->m_MSHeatingSpeedRatio[this->m_NumOfSpeedHeating] * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                } else {
+                    this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                    this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                    this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+                }
             }
         }
 
@@ -2043,12 +2231,6 @@ namespace UnitarySystems {
                 }
             }
         }
-
-        // Change the Volume Flow Rates to Mass Flow Rates
-        this->m_DesignMassFlowRate = this->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
-        this->MaxCoolAirMassFlow = this->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
-        this->MaxHeatAirMassFlow = this->m_MaxHeatAirVolFlow * DataEnvironment::StdRhoAir;
-        this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * DataEnvironment::StdRhoAir;
 
         // why is this here?
         this->m_SenLoadLoss = 0.0;
@@ -7613,7 +7795,7 @@ namespace UnitarySystems {
                                                                ZoneLoad);
                             }
                         } else if (SolFlag == -2) {
-                            if (this->RegulaFalsIFailedIndex == 0) {
+                            if (this->RegulaFalsiFailedIndex == 0) {
                                 ShowWarningMessage("Coil control failed for " + this->UnitType + ':' + this->Name);
                                 ShowContinueError("  sensible part-load ratio determined to be outside the range of 0-1.");
                                 ShowContinueErrorTimeStamp("Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
@@ -7622,12 +7804,12 @@ namespace UnitarySystems {
                             ShowRecurringWarningErrorAtEnd(
                                 this->UnitType + " \"" + this->Name +
                                     "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
-                                this->RegulaFalsIFailedIndex,
+                                this->RegulaFalsiFailedIndex,
                                 ZoneLoad,
                                 ZoneLoad);
                         }
                     } else if (SolFlag == -2) {
-                        if (this->RegulaFalsIFailedIndex == 0) {
+                        if (this->RegulaFalsiFailedIndex == 0) {
                             ShowWarningMessage("Coil control failed for " + this->UnitType + ':' + this->Name);
                             ShowContinueError("  sensible part-load ratio determined to be outside the range of 0-1.");
                             ShowContinueErrorTimeStamp("Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
@@ -7635,7 +7817,7 @@ namespace UnitarySystems {
                         }
                         ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
                                                            "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
-                                                       this->RegulaFalsIFailedIndex,
+                                                       this->RegulaFalsiFailedIndex,
                                                        ZoneLoad,
                                                        ZoneLoad);
                     }    // IF (SolFlag == -1) THEN
@@ -7881,7 +8063,7 @@ namespace UnitarySystems {
                         MoistureLoad);
                 }
             } else if (SolFlagLat == -2) {
-                if (this->m_LatRegulaFalsIFailedIndex == 0) {
+                if (this->m_LatRegulaFalsiFailedIndex == 0) {
                     ShowWarningMessage("Coil control failed for " + this->UnitType + ':' + this->Name);
                     ShowContinueError("  Latent part-load ratio determined to be outside the range of 0-1.");
                     ShowContinueErrorTimeStamp("Latent load to be met = " + General::TrimSigDigits(MoistureLoad, 2) +
@@ -7889,12 +8071,12 @@ namespace UnitarySystems {
                 }
                 ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
                                                    "\" - Latent part-load ratio out of range error continues. Latent load statistics:",
-                                               this->m_LatRegulaFalsIFailedIndex,
+                                               this->m_LatRegulaFalsiFailedIndex,
                                                MoistureLoad,
                                                MoistureLoad);
             }
         } else if (SolFlagLat == -2) {
-            if (this->m_LatRegulaFalsIFailedIndex == 0) {
+            if (this->m_LatRegulaFalsiFailedIndex == 0) {
                 ShowWarningMessage("Coil control failed for " + this->UnitType + ':' + this->Name);
                 ShowContinueError("  Latent part-load ratio determined to be outside the range of 0-1.");
                 ShowContinueErrorTimeStamp("Latent load to be met = " + General::TrimSigDigits(MoistureLoad, 2) +
@@ -7902,7 +8084,7 @@ namespace UnitarySystems {
             }
             ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
                                                "\" - Latent part-load ratio out of range error continues. Latent load statistics:",
-                                           this->m_LatRegulaFalsIFailedIndex,
+                                           this->m_LatRegulaFalsiFailedIndex,
                                            MoistureLoad,
                                            MoistureLoad);
         }
@@ -7960,8 +8142,6 @@ namespace UnitarySystems {
         // static Real64 CntrlZoneTerminalUnitMassFlowRateMax( 0.0 ); // Maximum mass flow rate through controlled zone //
         // InitLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax
         ////////////////////////////////////////////////////////////////////////////////////
-        std::string FanType; // used in warning messages
-        std::string m_FanName; // used in warning messages
         // inlet node and system outlet node
         Real64 MassFlowRate = 0.0; // mass flow rate to calculate loss
         Real64 MaxTemp = 0.0;      // Maximum temperature used in latent loss calculation
@@ -8080,47 +8260,6 @@ namespace UnitarySystems {
 
         if (!DataGlobals::BeginEnvrnFlag) {
             this->m_MyEnvrnFlag2 = true;
-        }
-
-        if (this->m_MyFanFlag) {
-            if (this->m_ActualFanVolFlowRate != DataSizing::AutoSize) {
-                if (this->m_ActualFanVolFlowRate > 0.0) {
-                    this->m_HeatingFanSpeedRatio = this->m_MaxHeatAirVolFlow / this->m_ActualFanVolFlowRate;
-                    this->m_CoolingFanSpeedRatio = this->m_MaxCoolAirVolFlow / this->m_ActualFanVolFlowRate;
-                    this->m_NoHeatCoolSpeedRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_ActualFanVolFlowRate;
-                    if (this->m_FanExists && !this->m_MultiOrVarSpeedHeatCoil && !this->m_MultiOrVarSpeedCoolCoil) {
-                        bool fanHasPowerSpeedRatioCurve = false;
-                        if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            if (HVACFan::fanObjs[this->m_FanIndex]->powerModFuncFlowFractionCurveIndex > 0) fanHasPowerSpeedRatioCurve = true;
-                        } else {
-                            if (Fans::GetFanSpeedRatioCurveIndex(FanType, m_FanName, this->m_FanIndex) > 0) fanHasPowerSpeedRatioCurve = true;
-                        }
-                        if (fanHasPowerSpeedRatioCurve) {
-
-                            if (this->m_ActualFanVolFlowRate == this->m_MaxHeatAirVolFlow && this->m_ActualFanVolFlowRate == this->m_MaxCoolAirVolFlow &&
-                                this->m_ActualFanVolFlowRate == this->m_MaxNoCoolHeatAirVolFlow) {
-                                ShowWarningError(this->UnitType + " \"" + this->Name + "\"");
-                                ShowContinueError("...For fan type and name = " + FanType + " \"" + m_FanName + "\"");
-                                ShowContinueError("...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the "
-                                                  "same as the unitary system volumetric flow rate.");
-                                ShowContinueError(
-                                    "...Fan volumetric flow rate            = " + General::RoundSigDigits(this->m_ActualFanVolFlowRate, 5) + " m3/s.");
-                                ShowContinueError("...Unitary system volumetric flow rate = " + General::RoundSigDigits(this->m_MaxHeatAirVolFlow, 5) +
-                                                  " m3/s.");
-                            }
-                        }
-                    }
-                }
-                this->m_MyFanFlag = false;
-            } else {
-                if (this->m_FanExists) {
-                    if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        this->m_ActualFanVolFlowRate = HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate;
-                    } else {
-                        this->m_ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(blankString, blankString, errorsFound, this->m_FanIndex);
-                    }
-                }
-            }
         }
 
         if (allocated(DataZoneEquipment::ZoneEquipConfig) && this->m_MyCheckFlag) {

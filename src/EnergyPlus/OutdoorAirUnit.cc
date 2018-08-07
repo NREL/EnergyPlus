@@ -131,6 +131,7 @@ namespace OutdoorAirUnit {
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
+    using DataSizing::ZoneEqOutdoorAirUnit;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
     using namespace FluidProperties;
@@ -276,6 +277,8 @@ namespace OutdoorAirUnit {
             }
         }
 
+        ZoneEqOutdoorAirUnit = true;
+
         if (ZoneSizingCalc || SysSizingCalc) return;
 
         InitOutdoorAirUnit(OAUnitNum, ZoneNum, FirstHVACIteration);
@@ -285,6 +288,8 @@ namespace OutdoorAirUnit {
         // CALL UpdateOutdoorAirUnit(OAUnitNum, FirstHVACIteration)
 
         ReportOutdoorAirUnit(OAUnitNum);
+
+        ZoneEqOutdoorAirUnit = false;
     }
 
     void GetOutdoorAirUnitInputs()
@@ -321,7 +326,9 @@ namespace OutdoorAirUnit {
         using ScheduleManager::GetScheduleIndex;
         using SteamCoils::GetCoilAirInletNode;
         using SteamCoils::GetCoilAirOutletNode;
+        using SteamCoils::GetCoilMaxSteamFlowRate;
         using SteamCoils::GetCoilSteamInletNode;
+        using SteamCoils::GetCoilSteamOutletNode;
         using SteamCoils::GetSteamCoilIndex;
         using WaterCoils::CheckWaterCoilSchedule;
         using namespace DataLoopNode;
@@ -745,7 +752,13 @@ namespace OutdoorAirUnit {
                                     GetCoilSteamInletNode(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex,
                                                           OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                                           ErrorsFound);
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilWaterOutletNode =
+                                    GetCoilSteamOutletNode(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType,
+                                                           OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
+                                                           ErrorsFound);
 
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).MaxVolWaterFlow =
+                                    GetCoilMaxSteamFlowRate(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex, ErrorsFound);
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).MinVolWaterFlow = 0.0;
                                 // below: no extra error needed if steam properties not in input
                                 // file because getting the steam coil will have done that.
@@ -1109,6 +1122,7 @@ namespace OutdoorAirUnit {
         auto &GetWaterCoilMaxFlowRate(WaterCoils::GetCoilMaxWaterFlowRate);
         using DataSizing::AutoSize;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+        using SteamCoils::GetCoilMaxSteamFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
 
         // Locals
@@ -1288,11 +1302,13 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
                     }
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum == TypeOf_CoilSteamAirHeating) {
-                        // DSU deal with steam mass flow rate , currenlty just like hot water  DSU?
-                        rho = GetDensityGlycol(PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
-                                               60.0,
-                                               PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
-                                               RoutineName);
+                        OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow =
+                            GetCoilMaxSteamFlowRate(OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentIndex, errFlag);
+                        Real64 rho = GetSatDensityRefrig(PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
+                                                         DataGlobals::SteamInitConvTemp,
+                                                         1.0,
+                                                         PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
+                                                         RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MinVolWaterFlow;
                         InitComponentNodes(OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,

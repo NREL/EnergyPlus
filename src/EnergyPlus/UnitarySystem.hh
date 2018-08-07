@@ -106,8 +106,6 @@ namespace UnitarySystems {
 
     private:
         int m_DesignSpecMSHPType_Num;
-        std::vector<Real64> m_MSCoolingSpeedRatio;
-        std::vector<Real64> m_MSHeatingSpeedRatio;
         bool m_SingleModeFlag;
 
         static void getDesignSpecMSHP();
@@ -414,7 +412,7 @@ namespace UnitarySystems {
         int m_SuppHeatCoilSensPLRFail;                    // used in supp heat coil calculations
         int m_SuppHeatCoilSensPLRFailIndex;               // used in supp heat coil calculations
         int m_LatMaxIterIndex;                            // used in PLR calculations for moisture load
-        int m_LatRegulaFalsIFailedIndex;                  // used in PLR calculations for moisture load
+        int m_LatRegulaFalsiFailedIndex;                  // used in PLR calculations for moisture load
         bool m_initLoadBasedControlAirLoopPass;
         int m_airLoopPassCounter;
 
@@ -424,7 +422,7 @@ namespace UnitarySystems {
         std::string UnitType;
         int UnitarySystemType_Num;
         int MaxIterIndex;
-        int RegulaFalsIFailedIndex;
+        int RegulaFalsiFailedIndex;
         int NodeNumOfControlledZone;
         Real64 FanPartLoadRatio;
         Real64 CoolCoilWaterFlowRatio;
