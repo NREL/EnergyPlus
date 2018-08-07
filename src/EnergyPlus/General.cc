@@ -186,6 +186,7 @@ namespace General {
 
         X0 = X_0;
         X1 = X_1;
+        XTemp = X0;
         Conv = false;
         StopMaxIte = false;
         Cont = true;
@@ -205,6 +206,9 @@ namespace General {
 
             DY = Y0 - Y1;
             if (std::abs(DY) < SMALL) DY = SMALL;
+            if (std::abs(X1 - X0) < SMALL) {
+                break;
+            }
             // new estimation
             switch (HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
@@ -360,6 +364,7 @@ namespace General {
 
         X0 = X_0;
         X1 = X_1;
+        XTemp = X0;
         Conv = false;
         StopMaxIte = false;
         Cont = true;
@@ -378,6 +383,9 @@ namespace General {
 
             DY = Y0 - Y1;
             if (std::abs(DY) < SMALL) DY = SMALL;
+            if (std::abs(X1 - X0) < SMALL) {
+                break;
+            }
             // new estimation
             if (AlgorithmTypeNum == Bisection) {
                 // Bisection
@@ -503,6 +511,7 @@ namespace General {
 
         X0 = X_0;
         X1 = X_1;
+        XTemp = X0;
         Conv = false;
         StopMaxIte = false;
         Cont = true;
@@ -522,6 +531,9 @@ namespace General {
 
             DY = Y0 - Y1;
             if (std::abs(DY) < SMALL) DY = SMALL;
+            if (std::abs(X1 - X0) < SMALL) {
+                break;
+            }
             // new estimation
             switch (HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
@@ -687,6 +699,7 @@ namespace General {
 
         X0 = X_0;
         X1 = X_1;
+        XTemp = X0;
         Conv = false;
         StopMaxIte = false;
         Cont = true;
@@ -705,6 +718,9 @@ namespace General {
 
             DY = Y0 - Y1;
             if (std::abs(DY) < SMALL) DY = SMALL;
+            if (std::abs(X1 - X0) < SMALL) {
+                break;
+            }
             // new estimation
             if (AlgorithmTypeNum == Bisection) {
                 // Bisection
@@ -3342,8 +3358,17 @@ namespace General {
 
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(1));
@@ -3390,8 +3415,17 @@ namespace General {
 
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(1));
@@ -3433,8 +3467,17 @@ namespace General {
 
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 VarDict = true;
                 VarDictOption1 = cAlphaArgs(1);
                 VarDictOption2 = cAlphaArgs(2);
@@ -3443,8 +3486,17 @@ namespace General {
             cCurrentModuleObject = "Output:Constructions";
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (has_prefix(cAlphaArgs(1), "CONSTRUCT")) {
                     Constructions = true;
                 } else if (has_prefix(cAlphaArgs(1), "MAT")) {
@@ -3462,8 +3514,17 @@ namespace General {
             cCurrentModuleObject = "Output:EnergyManagementSystem";
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              RepNum,
+                                              cAlphaArgs,
+                                              NumNames,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 EMSoutput = true;
 

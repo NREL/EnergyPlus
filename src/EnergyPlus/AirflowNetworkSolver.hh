@@ -432,6 +432,6 @@ namespace AirflowNetworkSolver {
 
 } // namespace AirflowNetworkSolver
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

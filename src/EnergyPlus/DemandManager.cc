@@ -436,8 +436,17 @@ namespace DemandManager {
 
             for (ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks,
-                                              cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              ListNum,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
                 DemandManagerList(ListNum).Name = AlphArray(1);
@@ -559,26 +568,54 @@ namespace DemandManager {
                 }
 
                 // Setup report variables
-                SetupOutputVariable("Demand Manager Meter Demand Power", OutputProcessor::Unit::W, DemandManagerList(ListNum).MeterDemand, "Zone",
-                                    "Average", DemandManagerList(ListNum).Name);
+                SetupOutputVariable("Demand Manager Meter Demand Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).MeterDemand,
+                                    "Zone",
+                                    "Average",
+                                    DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Average Demand Power", OutputProcessor::Unit::W, DemandManagerList(ListNum).AverageDemand, "Zone",
-                                    "Average", DemandManagerList(ListNum).Name);
+                SetupOutputVariable("Demand Manager Average Demand Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).AverageDemand,
+                                    "Zone",
+                                    "Average",
+                                    DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Peak Demand Power", OutputProcessor::Unit::W, DemandManagerList(ListNum).PeakDemand, "Zone",
-                                    "Average", DemandManagerList(ListNum).Name);
+                SetupOutputVariable("Demand Manager Peak Demand Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).PeakDemand,
+                                    "Zone",
+                                    "Average",
+                                    DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Scheduled Limit Power", OutputProcessor::Unit::W, DemandManagerList(ListNum).ScheduledLimit,
-                                    "Zone", "Average", DemandManagerList(ListNum).Name);
+                SetupOutputVariable("Demand Manager Scheduled Limit Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).ScheduledLimit,
+                                    "Zone",
+                                    "Average",
+                                    DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Demand Limit Power", OutputProcessor::Unit::W, DemandManagerList(ListNum).DemandLimit, "Zone",
-                                    "Average", DemandManagerList(ListNum).Name);
+                SetupOutputVariable("Demand Manager Demand Limit Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).DemandLimit,
+                                    "Zone",
+                                    "Average",
+                                    DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Over Limit Power", OutputProcessor::Unit::W, DemandManagerList(ListNum).OverLimit, "Zone",
-                                    "Average", DemandManagerList(ListNum).Name);
+                SetupOutputVariable("Demand Manager Over Limit Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).OverLimit,
+                                    "Zone",
+                                    "Average",
+                                    DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Over Limit Time", OutputProcessor::Unit::hr, DemandManagerList(ListNum).OverLimitDuration, "Zone",
-                                    "Sum", DemandManagerList(ListNum).Name);
+                SetupOutputVariable("Demand Manager Over Limit Time",
+                                    OutputProcessor::Unit::hr,
+                                    DemandManagerList(ListNum).OverLimitDuration,
+                                    "Zone",
+                                    "Sum",
+                                    DemandManagerList(ListNum).Name);
 
                 if (ErrorsFound) {
                     ShowFatalError("Errors found in processing input for " + CurrentModuleObject);
@@ -590,14 +627,18 @@ namespace DemandManager {
             NumArray.deallocate();
 
             // Iteration diagnostic reporting for all DEMAND MANAGER LISTs
-            SetupOutputVariable("Demand Manager Exterior Energy Iteration Count", OutputProcessor::Unit::None, DemandManagerExtIterations, "Zone",
-                                "Sum", "ManageDemand");
-
-            SetupOutputVariable("Demand Manager Heat Balance Iteration Count", OutputProcessor::Unit::None, DemandManagerHBIterations, "Zone", "Sum",
+            SetupOutputVariable("Demand Manager Exterior Energy Iteration Count",
+                                OutputProcessor::Unit::None,
+                                DemandManagerExtIterations,
+                                "Zone",
+                                "Sum",
                                 "ManageDemand");
 
-            SetupOutputVariable("Demand Manager HVAC Iteration Count", OutputProcessor::Unit::None, DemandManagerHVACIterations, "Zone", "Sum",
-                                "ManageDemand");
+            SetupOutputVariable(
+                "Demand Manager Heat Balance Iteration Count", OutputProcessor::Unit::None, DemandManagerHBIterations, "Zone", "Sum", "ManageDemand");
+
+            SetupOutputVariable(
+                "Demand Manager HVAC Iteration Count", OutputProcessor::Unit::None, DemandManagerHVACIterations, "Zone", "Sum", "ManageDemand");
         }
     }
 
@@ -623,8 +664,8 @@ namespace DemandManager {
         using DataHeatBalance::LightsObjects;
         using DataHeatBalance::ZoneElectric;
         using DataHeatBalance::ZoneElectricObjects;
-        using DataZoneControls::TStatObjects;
         using DataZoneControls::TempControlledZone;
+        using DataZoneControls::TStatObjects;
         using ExteriorEnergyUse::ExteriorLights;
         using General::RoundSigDigits;
         using MixedAir::GetOAController;
@@ -710,8 +751,17 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              MgrNum - StartIndex + 1,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
@@ -814,8 +864,17 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              MgrNum - StartIndex + 1,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
@@ -939,8 +998,17 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              MgrNum - StartIndex + 1,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
@@ -1064,8 +1132,17 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              MgrNum - StartIndex + 1,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
@@ -1197,8 +1274,17 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              MgrNum - StartIndex + 1,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
@@ -1695,11 +1781,11 @@ namespace DemandManager {
         // METHODOLOGY EMPLOYED:
 
         // Using/Aliasing
+        using DataHeatBalance::Lights;
+        using DataHeatBalance::ZoneElectric;
         using DataHeatBalFanSys::ComfortControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
-        using DataHeatBalance::Lights;
-        using DataHeatBalance::ZoneElectric;
         using DataZoneControls::ComfortControlledZone;
         using DataZoneControls::NumComfortControlledZones;
         using DataZoneControls::TempControlledZone;

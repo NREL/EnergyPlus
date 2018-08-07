@@ -56,12 +56,14 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 using namespace EnergyPlus;
 
@@ -281,4 +283,118 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     // Clean up
     DataHeatBalFanSys::ZoneAirHumRat.deallocate();
     DataMoistureBalance::RhoVaporAirIn.deallocate();
+}
+TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
+{
+    std::string const idf_objects =
+        delimited_string({"Version, 8.9;",
+
+                          "Material,",
+                          "WOOD,                    !- Name",
+                          "MediumSmooth,            !- Roughness",
+                          "1.9099999E-02,           !- Thickness {m}",
+                          "0.1150000,               !- Conductivity {W/m-K}",
+                          "513.0000,                !- Density {kg/m3}",
+                          "1381.000,                !- Specific Heat {J/kg-K}",
+                          "0.900000,                !- Thermal Absorptance",
+                          "0.780000,                !- Solar Absorptance",
+                          "0.780000;                !- Visible Absorptance",
+
+                          "MaterialProperty:MoisturePenetrationDepth:Settings,",
+                          "WOOD,                    !- Name",
+                          "150,                     !- Water Vapor Diffusion Resistance Factor {dimensionless} (mu)",
+                          "0.204,                   !- Moisture Equation Coefficient a {dimensionless} (MoistACoeff)",
+                          "2.32,                    !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
+                          "0.43,                    !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
+                          "72,                      !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
+                          "0.0011,                  !- Surface-layer penetrtion depth {m} (dEMPD)",
+                          "0.004,                   !- Deep-layer penetration depth {m} (dEPMDdeep)",
+                          "0,                       !- Coating layer permability {m} (CoatingThickness)",
+                          "0;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool errors_found(false);
+    HeatBalanceManager::GetMaterialData(errors_found);
+    ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
+
+    // Surface
+    using DataSurfaces::TotSurfaces;
+    int surfNum = 1;
+    TotSurfaces = 1;
+    DataSurfaces::Surface.allocate( TotSurfaces );
+    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface( surfNum );
+    surface.Name = "SurfaceWood";
+    surface.Area = 1.0;
+    surface.HeatTransSurf = true;
+
+    // Zone
+    int zoneNum = 1;
+    surface.Zone = 1;
+    DataHeatBalFanSys::ZoneAirHumRat.allocate( zoneNum );
+    DataMoistureBalance::RhoVaporAirIn.allocate( surfNum );
+    DataMoistureBalance::HMassConvInFD.allocate( surfNum );
+    DataHeatBalFanSys::MAT.allocate( zoneNum );
+    DataHeatBalFanSys::MAT( zoneNum ) = 20.0;
+    DataHeatBalFanSys::ZoneAirHumRat( zoneNum ) = 0.0061285406810457849;
+
+    // Construction
+    int constNum = 1;
+    surface.Construction = constNum;
+    DataHeatBalance::Construct.allocate( constNum );
+    DataHeatBalance::ConstructionData &construction = DataHeatBalance::Construct( constNum );
+    construction.TotLayers = constNum;
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", DataHeatBalance::Material);
+
+    // Initialize and get inputs
+    MoistureBalanceEMPDManager::InitMoistureBalanceEMPD();
+
+    // Set up conditions
+    DataGlobals::TimeStepZone = 0.25;
+    DataEnvironment::OutBaroPress = 101325.;
+    DataMoistureBalanceEMPD::RVSurface(surfNum) = 0.0070277983586713262;
+    DataMoistureBalanceEMPD::RVSurfaceOld(surfNum) = DataMoistureBalanceEMPD::RVSurface( surfNum );
+    DataMoistureBalance::HMassConvInFD(surfNum) = 0.0016826898264131584;
+    DataMoistureBalance::RhoVaporAirIn(surfNum) = 0.0073097913062508896;
+    DataMoistureBalanceEMPD::RVSurfLayer(surfNum) = 0.0070277983586713262;
+    DataMoistureBalanceEMPD::RVDeepLayer(surfNum) = 0.0051402944814058216;
+    DataMoistureBalanceEMPD::RVdeepOld(surfNum) = 0.0051402944814058216;
+    DataMoistureBalanceEMPD::RVSurfLayerOld(surfNum) = 0.0070277983586713262;
+
+    using DataHeatBalance::Material;
+    using DataHeatBalSurface::TempSurfIn;
+    using Psychrometrics::PsyRhFnTdbRhov;
+
+    auto const &material(Material(1));
+
+    Real64 Tsat(0.0);
+    Real64 const KelvinConv(273.15);
+    DataHeatBalSurface::TempSurfIn.allocate(surfNum);
+    DataHeatBalSurface::TempSurfIn(surfNum) = 20.0;
+    
+    // Calculate average vapor density [kg/m^3]
+    Real64 Taver = DataHeatBalSurface::TempSurfIn(surfNum);
+    // Calculate RH for use in material property calculations.
+    Real64 RV_Deep_Old = DataMoistureBalanceEMPD::RVdeepOld( surfNum );
+    Real64 RVaver = DataMoistureBalanceEMPD::RVSurfLayerOld(surfNum);
+    Real64 RHaver = RVaver * 461.52 * (Taver + KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
+    Real64 dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow(RHaver, material.MoistBCoeff - 1) +
+                    material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
+
+    // Convert stored vapor density to RH.
+    Real64 RH_deep_layer_old = PsyRhFnTdbRhov(Taver, RV_Deep_Old);
+    Real64 RH_surf_layer_old = PsyRhFnTdbRhov(Taver, RVaver);
+    Real64 mass_flux_surf_deep_max = material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (DataGlobals::TimeStepZone * 3600.0);
+
+    Real64 hm_deep_layer = 6.9551289450635225e-05;
+    Real64 mass_flux_surf_deep_result = hm_deep_layer * (RVaver - RV_Deep_Old);
+    if (std::abs(mass_flux_surf_deep_max) < std::abs(mass_flux_surf_deep_result)) {
+        mass_flux_surf_deep_result = mass_flux_surf_deep_max;
+    }
+
+    // Calculate and verify it against the results determined above
+    MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(1, Taver, Taver, Tsat);
+    auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(surfNum);
+    EXPECT_DOUBLE_EQ(mass_flux_surf_deep_result, report_vars.mass_flux_deep);
+
 }
