@@ -3382,8 +3382,10 @@ namespace SingleDuct {
                 MaxDeviceAirMassFlowReheat = Sys(SysNum).AirMassFlowRateMax;
             } else if (Sys(SysNum).DamperHeatingAction == ReverseActionWithLimits) {
                 MaxDeviceAirMassFlowReheat = Sys(SysNum).AirMassFlowDuringReheatMax;
+            } else if (Sys(SysNum).DamperHeatingAction == Normal) {
+                MaxDeviceAirMassFlowReheat = Sys(SysNum).ZoneMinAirFrac * Sys(SysNum).AirMassFlowRateMax;
             } else {
-                MaxDeviceAirMassFlowReheat = Sys(SysNum).AirMassFlowRateMax;
+                assert(false);
             }
 
             // determine flow based on leaving reheat temperature limit
