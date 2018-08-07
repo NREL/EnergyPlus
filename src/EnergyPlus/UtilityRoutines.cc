@@ -710,8 +710,10 @@ void CloseOutOpenFiles()
     bool exists;
     bool opened;
     std::string name;
-    std::string stdin_name("stdin");
-    std::string stdout_name("stdout");
+    const std::string stdin_name("stdin");
+    const std::string stdout_name("stdout");
+    const std::string stderr_name("stderr");
+    bool not_special(false);
     int UnitNumber;
     int ios;
 
@@ -725,9 +727,10 @@ void CloseOutOpenFiles()
             name = flags.name();
         }
         if (exists && opened && ios == 0) {
-            if ((name.compare(stdin_name) != 0) && (name.compare(stdout_name) != 0)) {
-                gio::close(UnitNumber);
-            }
+            not_special = name.compare(stdin_name) != 0;
+            not_special = not_special && (name.compare(stdout_name) != 0);
+            not_special = not_special && (name.compare(stderr_name) != 0);
+            if (not_special) gio::close(UnitNumber);
         }
     }
 }
