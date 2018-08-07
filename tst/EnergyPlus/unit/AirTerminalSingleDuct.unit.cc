@@ -644,7 +644,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     int const InletNode = Sys(SysNum).InletNodeNum;
     int const OutletNode = Sys(SysNum).OutletNodeNum;
     int const ZonePtr = Sys(SysNum).ActualZoneNum;
-    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
+    int const ZoneAirNodeNum = thisZoneEquip.ZoneNode;
     Schedule(Sys(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
 
     // design maximum air mass flow rate
@@ -677,7 +677,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     Real64 expectedMassFlowAirReheatMin = 0.2 * MassFlowRateMaxAvail;
     bool FirstHVACIteration = false;
 
-    auto &thisAirDistUnit(DataDefineEquip::AirDistUnit(NumOfZones));
+    auto &thisAirDistUnit(DataDefineEquip::AirDistUnit(ZonePtr));
     // run SimulateSingleDuct() function
     SimulateSingleDuct(thisAirDistUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDistUnit.EquipIndex(1));
     // check min, actual and max air mass flow rates during reheat with Normal Action
