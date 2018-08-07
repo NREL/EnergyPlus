@@ -495,17 +495,6 @@ TEST_F(EnergyPlusFixture, ASHRAE_TauModelTest)
     std::string const idf_objects = delimited_string({
         "  Version,9.0;",
 
-        //"  Timestep,1;",
-
-        //"  SimulationControl, NO, NO, NO, YES, No;",
-
-        //"  Site:Location,",
-        //"    Atlanta,                 !- Name",
-        //"    33.64,                   !- Latitude {deg}",
-        //"    -84.43,                  !- Longitude {deg}",
-        //"    -5,                      !- Time Zone {hr}",
-        //"    313;                     !- Elevation {m}",
-
         "  SizingPeriod:DesignDay,",
         "    Atlanta Jan 21 cooling,  !- Name",
         "    1,                       !- Month",
