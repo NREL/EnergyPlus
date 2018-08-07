@@ -4810,8 +4810,8 @@ namespace WeatherManager {
             IDifH = 0.0;
             IGlbH = 0.0;
         } else {
-            AB = 1.219 - 0.043 * TauB - 0.151 * TauD - 0.204 * TauB * TauD;
-            AD = 0.202 + 0.852 * TauB - 0.007 * TauD - 0.357 * TauB * TauD;
+            AB = 1.454 - 0.406 * TauB - 0.268 * TauD + 0.021 * TauB * TauD;
+            AD = 0.507 + 0.205 * TauB - 0.080 * TauD - 0.190 * TauB * TauD;
             M = AirMass(CosZen);
             IDirN = ETR * std::exp(-TauB * std::pow(M, AB));
             IDifH = ETR * std::exp(-TauD * std::pow(M, AD));

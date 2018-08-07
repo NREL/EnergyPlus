@@ -157,7 +157,7 @@ The Clear Sky model usually over estimates the amount of solar radiation availab
 
 The ASHRAE 2009 HOF introduced a revised clear sky model based on location-specific optical depths for direct and diffuse radiation.~ These values are tabulated by month for all 5564 locations in the ASHRAE design data that accompanies the 2009 HOF.
 
-The model requires air mass, m, calculated as follows --
+The model requires relative air mass, m, calculated as follows --
 
 \begin{equation}
 m = {1 \mathord{\left/ {\vphantom {1 {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}} \right. } {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}
@@ -183,7 +183,7 @@ where:
 
 \({E_o}\) ~ = extraterrestrial normal irradiance,
 
-\emph{\(m\)}~ = air mass
+\emph{\(m\)}~ = relative air mass
 
 $\tau$\(_{b}\) and $\tau$\(_{d}\) = beam and diffuse optical depths (from ASHRAE climatic design data)
 
@@ -194,11 +194,11 @@ Values of $\tau$\(_{b}\) and $\tau$\(_{d}\) are location-specific and vary durin
 The air mass exponents \(ab\) ~and \(ad\) ~were correlated to $\tau$\(_{b}\) and $\tau$\(_{d}\) through the following empirical relationships:
 
 \begin{equation}
-ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} \cdot {\tau_d}
+ab = 1.454 - 0.406 \cdot {\tau_b} - 0.268 \cdot {\tau_d} + 0.021 \cdot {\tau_b} \cdot {\tau_d}
 \end{equation}
 
 \begin{equation}
-ad = 0.202 + 0.852 \cdot {\tau_b} - 0.007 \cdot {\tau_d} - 0.357 \cdot {\tau_b} \cdot {\tau_d}
+ad = 0.507 + 0.205 \cdot {\tau_b} - 0.080 \cdot {\tau_d} - 0.190 \cdot {\tau_b} \cdot {\tau_d}
 \end{equation}
 
 Studies done as part of ASHRAE research projects show that the revised tau model produces more physically plausible irradiance values than does the traditional clear sky model.~ In particular, diffuse irradiance values are more realistic.
