@@ -561,7 +561,7 @@ namespace DataZoneEquipment {
                 ZoneEquipList(ControlledZoneNum).NumOfEquipTypes = maxEquipCount;
                 ZoneEquipList(ControlledZoneNum).EquipType.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
                 ZoneEquipList(ControlledZoneNum).EquipType_Num.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
-                ZoneEquipList(ControlledZoneNum).compPointer.resize(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes+1);
+                ZoneEquipList(ControlledZoneNum).compPointer.resize(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes + 1);
                 ZoneEquipList(ControlledZoneNum).EquipName.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
                 ZoneEquipList(ControlledZoneNum).EquipIndex.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
                 ZoneEquipList(ControlledZoneNum).EquipData.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
@@ -643,7 +643,8 @@ namespace DataZoneEquipment {
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") { // Unitary System
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
                             UnitarySystems::UnitarySys thisSys;
-                            ZoneEquipList(ControlledZoneNum).compPointer[ZoneEquipTypeNum] = thisSys.factory(ZoneUnitarySys_Num, ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum), true);
+                            ZoneEquipList(ControlledZoneNum).compPointer[ZoneEquipTypeNum] =
+                                thisSys.factory(ZoneUnitarySys_Num, ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum), 0, true);
 
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") { // Unitary System
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySystem_Num;

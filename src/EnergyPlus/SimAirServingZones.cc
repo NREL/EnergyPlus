@@ -385,8 +385,8 @@ namespace SimAirServingZones {
         using MixedAir::GetOAMixerInletNodeNumber;
         using MixedAir::GetOASysControllerListIndex;
         using MixedAir::GetOASysNumCoolingCoils;
-        using MixedAir::GetOASysNumHXs;
         using MixedAir::GetOASysNumHeatingCoils;
+        using MixedAir::GetOASysNumHXs;
         using MixedAir::GetOASysNumSimpControllers;
         using MixedAir::GetOASystemNumber;
         using NodeInputManager::GetNodeNums;
@@ -1294,7 +1294,7 @@ namespace SimAirServingZones {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemModel;
                             UnitarySystems::UnitarySys thisSys;
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
-                                thisSys.factory(UnitarySystemModel, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false);
+                                thisSys.factory(UnitarySystemModel, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, 0, false);
                         } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemHVAC;
                         } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
@@ -3365,16 +3365,16 @@ namespace SimAirServingZones {
         using EvaporativeCoolers::SimEvapCooler;
         using Fans::SimulateFanComponents;
         using Furnaces::SimFurnace;
+        using HeatingCoils::SimulateHeatingCoilComponents;
+        using HeatRecovery::SimHeatRecovery;
+        using Humidifiers::SimHumidifier;
+        using HVACDuct::SimDuct;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
-        using HVACDuct::SimDuct;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using HVACMultiSpeedHeatPump::SimMSHeatPump;
         using HVACUnitaryBypassVAV::SimUnitaryBypassVAV;
         using HVACUnitarySystem::SimUnitarySystem;
-        using HeatRecovery::SimHeatRecovery;
-        using HeatingCoils::SimulateHeatingCoilComponents;
-        using Humidifiers::SimHumidifier;
         using MixedAir::ManageOutsideAirSystem;
         using SteamCoils::SimulateSteamCoilComponents;
         using UserDefinedComponents::SimCoilUserDefined;

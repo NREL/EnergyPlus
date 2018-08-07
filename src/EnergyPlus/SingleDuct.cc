@@ -5482,10 +5482,12 @@ namespace SingleDuct {
                 SysATMixer(ATMixerNum).ZoneHVACUnitType = 4;
             } else if (cAlphaArgs(2) == "ZONEHVAC:VARIABLEREFRIGERANTFLOW") {
                 SysATMixer(ATMixerNum).ZoneHVACUnitType = 5;
-            } else if (cAlphaArgs(2) == "AIRLOOP:UNITARYSYSTEM") {
+            } else if (cAlphaArgs(2) == "AIRLOOPHVAC:UNITARYSYSTEM") {
                 SysATMixer(ATMixerNum).ZoneHVACUnitType = 6;
-            } else if (cAlphaArgs(2) == "ZONEHVAC:UNITVENTILATOR") {
+            } else if (cAlphaArgs(2) == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") {
                 SysATMixer(ATMixerNum).ZoneHVACUnitType = 7;
+            } else if (cAlphaArgs(2) == "ZONEHVAC:UNITVENTILATOR") {
+                SysATMixer(ATMixerNum).ZoneHVACUnitType = 8;
             }
 
             SysATMixer(ATMixerNum).ZoneHVACUnitName = cAlphaArgs(3);

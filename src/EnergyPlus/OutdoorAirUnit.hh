@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <UnitarySystem.hh>
 
 namespace EnergyPlus {
 

@@ -858,8 +858,10 @@ namespace OutdoorAirUnit {
                             } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystemModel;
                                 UnitarySystems::UnitarySys thisSys;
-                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(SimAirServingZones::UnitarySystemModel, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, false);
-                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer->checkUnitarySysCoilInOASysExists(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName);
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(
+                                    SimAirServingZones::UnitarySystemModel, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, false, OAUnitNum);
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer->checkUnitarySysCoilInOASysExists(
+                                    OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, OAUnitNum);
 
                             } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystemHVAC;
@@ -2401,7 +2403,7 @@ namespace OutdoorAirUnit {
                     SimDXHeatPumpSystem(EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
                 }
 
-            // RAR need new AirLoopHVAC:UnitarySystem object here
+                // RAR need new AirLoopHVAC:UnitarySystem object here
             } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
                 if (Sim) {
                     // This may have to be done in the unitary system object since there can be both cooling and heating
@@ -2412,7 +2414,10 @@ namespace OutdoorAirUnit {
                     } else {
                         Dxsystemouttemp = CompAirOutTemp - FanEffect;
                     }
-                    OutAirUnit(OAUnitNum).OAEquip(SimCompNum).compPointer->simulate(EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp, false);
+                    OutAirUnit(OAUnitNum)
+                        .OAEquip(SimCompNum)
+                        .compPointer->simulate(
+                            EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp, false);
                 }
 
             } else if (SELECT_CASE_var == UnitarySystemHVAC) { // 'AirLoopHVAC:UnitarySystem:Legacy'
