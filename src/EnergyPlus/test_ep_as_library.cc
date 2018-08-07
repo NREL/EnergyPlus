@@ -71,6 +71,10 @@ int main(int argc, char *argv[])
     } else {
         status = EnergyPlusPgmReturnCodes(argv[1]);
     }
-    std::cout << "THIS LINE SHOULD DISPLAY." << std::endl;
+    if (!std::cin.good()) std::cin.clear();
+    if (!std::cerr.good()) std::cerr.clear();
+    if (!std::cout.good()) std::cout.clear();
+    std::cerr << "THIS LINE SHOULD DISPLAY." << std::endl;
+    std::cout << "THIS LINE SHOULD DISPLAY, TOO." << std::endl;
     return status;
 }
