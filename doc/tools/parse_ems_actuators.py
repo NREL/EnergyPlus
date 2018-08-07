@@ -36,15 +36,16 @@ __organization__ = 'EffiBEM, EURL, www.effibem.com'
 __copyright__ = "Copyright 2018, EffiBEM EURL"
 __email__ = "julien@effibem.com"
 __license__ = "MIT"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __status__ = "Production"
 
 
 import os
 import re
 import io
+import csv
 import glob as gb
-import pandas as pd
+from itertools import groupby
 
 
 def parse_ems_var(source_dir, verbose=False):
@@ -61,13 +62,13 @@ def parse_ems_var(source_dir, verbose=False):
     Returns:
     --------
 
-        * df (pd.DataFrame): a dataframe of the parsed results
+        * ems_arr_dict (list): a list of dict of the parsed results
 
     Needs:
     -------
         import os, re, io
         import glob as gb
-        import pandas as pd
+        import csv
     """
 
     # Regex
@@ -123,12 +124,11 @@ def parse_ems_var(source_dir, verbose=False):
                 if 'cModuleObjects' not in cCurrentModuleObject:
                     cModuleObjects = [cCurrentModuleObject]
 
-
             # If we have either of these two function calls, we concat as many
             # lines as needed by counting the opening and closing parentheses
             # so we get the full function call
             if (('SetupEMSActuator' in working_line) |
-                ('SetupEMSInternalVariable' in working_line)):
+               ('SetupEMSInternalVariable' in working_line)):
                 match_braces = (working_line.count('(') -
                                 working_line.count(')'))
                 j = i+1
@@ -138,7 +138,6 @@ def parse_ems_var(source_dir, verbose=False):
                     match_braces -= _line.count(')')
                     working_line += _line
                     j += 1
-
 
             if 'SetupEMSActuator' in working_line:
                 # Try naively, that is assume it's all on one line
@@ -179,7 +178,7 @@ def parse_ems_var(source_dir, verbose=False):
                 c_l = [x.replace('"', '').strip() for x in
                        working_line.replace('SetupEMSInternalVariable(', '')
                                    .replace(');', '').split(',')]
-                if len(c_l) != 4 :
+                if len(c_l) != 4:
                     print("Problem: In file {}, Line {}: "
                           "{}".format(file_name, i, working_line))
                     continue
@@ -203,27 +202,20 @@ def parse_ems_var(source_dir, verbose=False):
 
                     ems_arr_dict.append(d)
 
-    # Create dataframe from list of dict
-    df = pd.DataFrame.from_dict(ems_arr_dict)
+    # Sort by Name primarily, type secondarily
+    ems_arr_dict = sorted(ems_arr_dict, key=lambda k: k['Type'])
+    ems_arr_dict = sorted(ems_arr_dict, key=lambda k: k['Name'])
 
-    col_order = ['cComponentTypeName', 'cControlTypeName / cDataTypeName',
-                 'cUniqueIDName', 'cUnits', 'lEMSActuated', 'Value',
-                 'FileName', 'Line']
-
-    df = df.set_index(['Name', 'Type'])[col_order]
-
-    df.sort_index(axis=0, level=0, sort_remaining=True, inplace=True)
-
-    return df
+    return ems_arr_dict
 
 
-def summary(df):
+def summary(ems_arr_dict):
     """
     Create high-level summary info on EMS variables found
 
     Args:
     -----
-        * df (pd.DataFrame): the parse dataframe
+        * ems_arr_dict (list): the list of dict of the parsed results@
 
     Returns:
     --------
@@ -233,15 +225,21 @@ def summary(df):
 
     """
 
+    def keyfunc(x):
+        return x['Type']
+    data = sorted(ems_arr_dict, key=keyfunc)
+
     out_str = ''
-    for t, gp in df.groupby(level='Type'):
+    for k, v in groupby(data, key=keyfunc):
+        gp = list(v)
         n_vars = len(gp)
-        n_files = len(gp.FileName.unique())
-        n_unique_objects = len(gp.index.unique())
+        n_files = len(set([x['FileName'] for x in gp]))
+        n_unique_objects = len(set([x['Name'] for x in gp]))
         out_str += ('\nWe found {v} unique EMS {t}s defined, '
                     'in {f} files, affecting {o} unique '
-                    'objects'.format(v=n_vars, t=t, f=n_files,
+                    'objects'.format(v=n_vars, t=k, f=n_files,
                                      o=n_unique_objects))
+
     return out_str
 
 
@@ -262,8 +260,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    print(args)
-
     if args.source_dir:
         source_dir = args.source_dir
     else:
@@ -278,12 +274,21 @@ if __name__ == "__main__":
         print("Defaulting output csv file to "
               "{}".format(os.path.abspath(output_file)))
 
-    df = parse_ems_var(source_dir, verbose=args.verbose)
+    ems_arr_dict = parse_ems_var(source_dir, verbose=args.verbose)
 
     # Print output summary
-    out_str = summary(df)
+    out_str = summary(ems_arr_dict)
     print(out_str)
 
     # Output csv file
-    df.to_csv(output_file)
-    print("Saving to {}".format(os.path.abspath(output_file)))
+    col_order = ['Name', 'Type',
+                 'cComponentTypeName', 'cControlTypeName / cDataTypeName',
+                 'cUniqueIDName', 'cUnits', 'lEMSActuated', 'Value',
+                 'FileName', 'Line']
+
+    with open(output_file, 'w') as f:
+        dict_writer = csv.DictWriter(f, col_order)
+        dict_writer.writeheader()
+        dict_writer.writerows(ems_arr_dict)
+
+    print("\nSaving to {}".format(os.path.abspath(output_file)))
