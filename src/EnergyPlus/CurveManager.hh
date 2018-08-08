@@ -83,8 +83,6 @@ namespace CurveManager {
     extern int const TriQuadratic;
     extern int const Exponent;
     extern int const Quartic;
-    extern int const FuncPressDrop;
-    extern int const MultiVariableLookup;
     extern int const FanPressureRise;
     extern int const ExponentialSkewNormal;
     extern int const Sigmoid;
@@ -107,36 +105,6 @@ namespace CurveManager {
     // Sort Order
     extern int const ASCENDING;
     extern int const DESCENDING;
-
-    // parameters describing curve object/table types
-    extern int const NumAllCurveTypes;
-
-    // curve object/table types (used for warning messages)
-    extern int const CurveType_Linear;
-    extern int const CurveType_Quadratic;
-    extern int const CurveType_Cubic;
-    extern int const CurveType_Quartic;
-    extern int const CurveType_Exponent;
-    extern int const CurveType_BiCubic;
-    extern int const CurveType_BiQuadratic;
-    extern int const CurveType_QuadraticLinear;
-    extern int const CurveType_TriQuadratic;
-    extern int const CurveType_FuncPressDrop;
-    extern int const CurveType_TableOneIV;
-    extern int const CurveType_TableTwoIV;
-    extern int const CurveType_TableMultiIV;
-    extern int const CurveType_FanPressureRise;
-    extern int const CurveType_ExponentialSkewNormal;
-    extern int const CurveType_Sigmoid;
-    extern int const CurveType_RectangularHyperbola1;
-    extern int const CurveType_RectangularHyperbola2;
-    extern int const CurveType_ExponentialDecay;
-    extern int const CurveType_DoubleExponentialDecay;
-    extern int const CurveType_QuadLinear;
-    extern int const CurveType_CubicLinear;
-    extern int const CurveType_ChillerPartLoadWithLift;
-
-    extern Array1D_string const cCurveTypes;
 
     // DERIVED TYPE DEFINITIONS
 
@@ -221,12 +189,12 @@ namespace CurveManager {
     {
         // Members
         std::string Name;                                 // Curve Name
-        int ObjectType;                                   // Curve object type (e.g., integer for Curve:Linear above)
+        std::string ObjectType;                           // Curve object type
         int CurveType;                                    // Curve type (see parameter definitions above)
         int InterpolationType;                            // table interpolation method
         int DataFormat;                                   // format of tabular data
         int TableIndex;                                   // Index to tablular data (0 if a standard curve object)
-        int TableVariables;                               // Number of independent variables (0 if a standard curve object)
+        int NumDims;                                      // Number of dimensions (AKA, independent variables)
         int NumIVLowErrorIndex;                           // Index to table object error message for too few IV's
         int NumIVHighErrorIndex;                          // Index to table object error message for too many IV's
         int X1SortOrder;                                  // sort order for table data for X1
@@ -286,7 +254,7 @@ namespace CurveManager {
 
         // Default Constructor
         PerfomanceCurveData()
-            : ObjectType(0), CurveType(0), InterpolationType(0), DataFormat(0), TableIndex(0), TableVariables(0), NumIVLowErrorIndex(0),
+            : ObjectType(""), CurveType(0), InterpolationType(0), DataFormat(0), TableIndex(0), NumDims(0), NumIVLowErrorIndex(0),
               NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), Coeff1(0.0), Coeff2(0.0), Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0),
               Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0), Coeff11(0.0), Coeff12(0.0), Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0),
               Var3Max(0.0), Var3Min(0.0), Var4Max(0.0), Var4Min(0.0), Var5Max(0.0), Var5Min(0.0), Var6Max(0.0), Var6Min(0.0), CurveMin(0.0),
@@ -302,7 +270,6 @@ namespace CurveManager {
     struct TableLookupData
     {
         // Members
-        int NumIndependentVars; // Curve type (see parameter definitions above)
         int InterpolationOrder; // number of points to interpolate (table data only)
         int NumX1Vars;          // Number of variables for independent variable #1
         Array1D<Real64> X1Var;
@@ -320,7 +287,7 @@ namespace CurveManager {
 
         // Default Constructor
         TableLookupData()
-            : NumIndependentVars(0), InterpolationOrder(0), NumX1Vars(0), NumX2Vars(0), NumX3Vars(0), NumX4Vars(0), NumX5Vars(0), NumX6Vars(0)
+            : InterpolationOrder(4), NumX1Vars(0), NumX2Vars(0), NumX3Vars(0), NumX4Vars(0), NumX5Vars(0), NumX6Vars(0)
         {
         }
     };
@@ -417,7 +384,12 @@ namespace CurveManager {
 
     bool IsCurveOutputTypeValid(std::string const &InOutputType); // index of curve in curve array
 
-    std::string GetCurveType(int const CurveIndex); // index of curve in curve array
+    bool CheckCurveDims(int const CurveIndex,
+                        std::vector<int> validDims,
+                        std::string routineName,
+                        std::string objectType,
+                        std::string objectName,
+                        std::string curveFieldText);
 
     std::string GetCurveName(int const CurveIndex); // index of curve in curve array
 
@@ -457,8 +429,6 @@ namespace CurveManager {
     Real64 PressureCurveValue(int const PressureCurveIndex, Real64 const MassFlow, Real64 const Density, Real64 const Viscosity);
 
     Real64 CalculateMoodyFrictionFactor(Real64 const ReynoldsNumber, Real64 const RoughnessRatio);
-
-    int GetCurveObjectTypeNum(int const CurveIndex); // index of curve in curve array
 
     void checkCurveIsNormalizedToOne(std::string const callingRoutineObj, // calling routine with object type
                                      std::string const objectName,        // parent object where curve is used
