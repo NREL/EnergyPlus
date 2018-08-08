@@ -250,14 +250,14 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_UserDidNotEnterMinMaxXY)
     CurveManager::GetCurveInput();
     CurveManager::GetCurvesInputFlag = false;
     ASSERT_EQ(1, CurveManager::NumCurves);
-    EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
     bool error = false;
     int index = CurveManager::GetCurveCheck("TESTTABLEMINMAX", error, "TEST");
     EXPECT_FALSE(error);
     EXPECT_EQ(1, index);
-    EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+    EXPECT_EQ("Table:OneIndependentVariable", CurveManager::PerfCurve(1).ObjectType);
     EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0));     // In-range value
     EXPECT_DOUBLE_EQ(0.75, CurveManager::CurveValue(1, 0.75)); // In-range value
     EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, -10.0)); // Minimum x
@@ -301,7 +301,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEnt
     ASSERT_EQ(1, CurveManager::NumCurves);
 
     // Linear curve type, specified min/max
-    EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEOVERWRITE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEOVERWRITE"));
     bool error = false;
@@ -312,7 +312,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEnt
     CurveManager::GetCurveMinMaxValues(1, min, max);
     EXPECT_EQ(0.1, min); // Minimum Value of X
     EXPECT_EQ(4.9, max); // Maximum Value of X
-    EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+    EXPECT_EQ("Table:OneIndependentVariable", CurveManager::PerfCurve(1).ObjectType);
 
     EXPECT_DOUBLE_EQ(1.2, CurveManager::CurveValue(1, 0.5));               // Value too small, Min Table Output used
     EXPECT_DOUBLE_EQ(2.5, CurveManager::CurveValue(1, 4));                 // Value too large, Max Table Output used
@@ -361,7 +361,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange_UserDidntEnterM
     ASSERT_EQ(1, CurveManager::NumCurves);
 
     // Linear curve type, specified min/max
-    EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEOVERWRITE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEOVERWRITE"));
     bool error = false;
@@ -372,7 +372,7 @@ TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange_UserDidntEnterM
     CurveManager::GetCurveMinMaxValues(1, min, max);
     EXPECT_EQ(0.21, min); // Minimum Value of X in data set
     EXPECT_EQ(4.93, max); // Maximum Value of X in data set
-    EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+    EXPECT_EQ("Table:OneIndependentVariable", CurveManager::PerfCurve(1).ObjectType);
 
     EXPECT_DOUBLE_EQ(0.73417721518987344, CurveManager::CurveValue(1, 0.5)); // Value in range, no Min Table Output used, show actual value
     Real64 curvOut = ((0.5 - 0.21) / (1.0 - 0.21)) * (2.0 - 0.0);            // Check above: delta X divided by X range multiplied by Y range
@@ -469,7 +469,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAndU
     ASSERT_EQ(2, CurveManager::NumCurves);
 
     // BiQuadratic curve type, specified min/max
-    EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(1));
+    EXPECT_EQ(2, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TWOVARS", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TWOVARS"));
     bool error = false;
@@ -484,7 +484,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAndU
     EXPECT_EQ(46.11111, max2); // Maximum Value of Y
     EXPECT_EQ((15000.0 / 25000.0), CurveManager::PerfCurve(1).CurveMin);
     EXPECT_EQ((40000.0 / 25000.0), CurveManager::PerfCurve(1).CurveMax);
-    EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
+    EXPECT_EQ("Table:TwoIndependentVariables", CurveManager::PerfCurve(1).ObjectType);
 
     EXPECT_GT(CurveManager::CurveValue(1, 10.0, 15.0),
               (15000.0 / 25000.0)); // both values too small, Minimum Value of X (12.8) and Y (18) are used, Min Table Output is not used
@@ -524,7 +524,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAndU
 
     // Evaluate 2nd performance curve
     // BiQuadratic curve type, no specified min/max
-    EXPECT_EQ("BIQUADRATIC", CurveManager::GetCurveType(2));
+    EXPECT_EQ(2, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TWOVARS2", CurveManager::GetCurveName(2));
     EXPECT_EQ(2, CurveManager::GetCurveIndex("TWOVARS2"));
     error = false;
@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAndU
     EXPECT_FALSE(CurveManager::PerfCurve(2).CurveMinPresent); // min won't be used since value is NOT present
     EXPECT_NEAR(0.0, CurveManager::PerfCurve(2).CurveMax, 0.0000000001);
     EXPECT_FALSE(CurveManager::PerfCurve(2).CurveMaxPresent); // max won't be used since value is NOT present
-    EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(2));
+    EXPECT_EQ("Table:TwoIndependentVariables", CurveManager::PerfCurve(2).ObjectType);
 
     EXPECT_GT(CurveManager::CurveValue(2, 10.0, 15.0),
               (15000.0 / 25000.0)); // both values too small, Minimum Value of X1 (12.8) and X2 (18) are used, Min Table Output is not present
@@ -681,7 +681,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMi
     ASSERT_EQ(1, CurveManager::NumCurves);
 
     // QuadraticLinear curve type, no min/max for IVs
-    EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(2, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
     bool error = false;
@@ -694,7 +694,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMi
     EXPECT_EQ(5.0, max1); // CurveValue will test against upper boundary and use aray maximum
     EXPECT_EQ(1.0, min2); // CurveValue will test against lower boundary and use aray minimum
     EXPECT_EQ(2.0, max2); // CurveValue will test against upper boundary and use aray maximum
-    EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
+    EXPECT_EQ("Table:TwoIndependentVariables", CurveManager::PerfCurve(1).ObjectType);
 
     EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0, 1.5));   // In-range value
     EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 0.5, 1.5)); // In-range value
@@ -826,7 +826,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
     ASSERT_EQ(2, CurveManager::NumCurves);
 
     // QuadraticLinear curve type
-    EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(1));
+    EXPECT_EQ(2, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("TESTTABLEMINMAX", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("TESTTABLEMINMAX"));
     bool error = false;
@@ -839,7 +839,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
     EXPECT_EQ(5.0, max1); // user entered value is retained, however, CurveValue will test against upper array boundary and use aray maximum
     EXPECT_EQ(1.0, min2); // user entered value is retained, however, CurveValue will test against lower array boundary and use aray minimum
     EXPECT_EQ(2, max2);   // user entered value is retained, however, CurveValue will test against upper array boundary and use aray maximum
-    EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(1));
+    EXPECT_EQ("Table:TwoIndependentVariables", CurveManager::PerfCurve(1).ObjectType);
 
     EXPECT_DOUBLE_EQ(0.0, CurveManager::CurveValue(1, 0, 1.5));   // In-range value
     EXPECT_DOUBLE_EQ(1.0, CurveManager::CurveValue(1, 0.5, 1.5)); // In-range value
@@ -856,7 +856,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
     // Test 2nd table with tighter min/max X Y limits than data set
 
     // QuadraticLinear curve type
-    EXPECT_EQ("QUADRATICLINEAR", CurveManager::GetCurveType(2));
+    EXPECT_EQ(2, CurveManager::PerfCurve(2).NumDims);
     EXPECT_EQ("TESTTABLEMINMAX2", CurveManager::GetCurveName(2));
     EXPECT_EQ(2, CurveManager::GetCurveIndex("TESTTABLEMINMAX2"));
     error = false;
@@ -869,7 +869,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
     EXPECT_EQ(4.0, max1); // user entered value is retained and used since it's less than upper array boundary
     EXPECT_EQ(1.5, min2); // user entered value is retained and used since it's greater than lower array boundary
     EXPECT_EQ(2.0, max2); // user entered value is NOT retained since it's greater than upper array boundary
-    EXPECT_EQ(CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum(2));
+    EXPECT_EQ("Table:TwoIndependentVariables", CurveManager::PerfCurve(2).ObjectType);
 
     EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(2, 0, 1.5));     // In-range value, result is based on tighten Minimum X Value limit
     EXPECT_DOUBLE_EQ(2.0, CurveManager::CurveValue(2, 0.5, 1.5));   // In-range value, result is based on tighten Maximum X Value limit
@@ -1023,8 +1023,8 @@ TEST_F(EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest)
     PerfCurve(1).Var2Max = 0.0;
     PerfCurve(1).Var2Min = 0.0;
     PerfCurve(1).CurveType = Linear;
-    TableLookup(PerfCurve(1).TableIndex).NumIndependentVars = 1;
-    PerfCurve(1).ObjectType = CurveType_TableOneIV;
+    PerfCurve(1).NumDims = 1;
+    PerfCurve(1).ObjectType = "Table:OneIndependentVariable";
     PerfCurve(1).Name = "Table 1";
     TableLookup(1).NumX1Vars = 2;
     TableLookup(1).InterpolationOrder = 2;
@@ -1055,8 +1055,8 @@ TEST_F(EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest)
     PerfCurve(2).Var3Max = 0.0;
     PerfCurve(2).Var3Min = 0.0;
     PerfCurve(2).CurveType = Linear;
-    TableLookup(PerfCurve(2).TableIndex).NumIndependentVars = 2;
-    PerfCurve(2).ObjectType = CurveType_TableTwoIV;
+    PerfCurve(2).NumDims = 2;
+    PerfCurve(2).ObjectType = "Table:TwoIndependentVariables";
     PerfCurve(2).Name = "Table 2";
     TableLookup(2).NumX1Vars = 2;
     TableLookup(2).NumX2Vars = 1;
@@ -1090,8 +1090,8 @@ TEST_F(EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest)
     PerfCurve(Index).Var3Max = 0.0;
     PerfCurve(Index).Var3Min = 0.0;
     PerfCurve(Index).CurveType = Linear;
-    TableLookup(PerfCurve(Index).TableIndex).NumIndependentVars = 3;
-    PerfCurve(Index).ObjectType = CurveType_TableMultiIV;
+    PerfCurve(Index).NumDims = 3;
+    PerfCurve(Index).ObjectType = "Table:MultiVariableLookup";
     PerfCurve(Index).Name = "Table 3";
     TableLookup(Index).NumX1Vars = 2;
     TableLookup(Index).NumX2Vars = 1;
@@ -1130,8 +1130,8 @@ TEST_F(EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest)
     PerfCurve(Index).Var4Max = 0.0;
     PerfCurve(Index).Var4Min = 0.0;
     PerfCurve(Index).CurveType = Linear;
-    TableLookup(PerfCurve(Index).TableIndex).NumIndependentVars = 4;
-    PerfCurve(Index).ObjectType = CurveType_TableMultiIV;
+    PerfCurve(Index).NumDims = 4;
+    PerfCurve(Index).ObjectType = "Table:MultiVariableLookup";
     PerfCurve(Index).Name = "Table 4";
     TableLookup(Index).NumX1Vars = 2;
     TableLookup(Index).NumX2Vars = 1;

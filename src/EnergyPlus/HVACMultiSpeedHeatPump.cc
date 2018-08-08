@@ -541,7 +541,6 @@ namespace HVACMultiSpeedHeatPump {
 
         using BranchNodeConnections::SetUpCompSets;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DXCoils::GetDXCoilIndex;
         auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
