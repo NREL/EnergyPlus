@@ -68,7 +68,7 @@ void WrappedProgressCallback(int const progress)
 
 extern "C"
 {
-	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length)
+	int ENERGYPLUSLIB_API CALLCONV RunEPlus(const char* path, int path_length)
 	{
 		int status(EXIT_FAILURE);
 		std::string filepath;
@@ -87,14 +87,14 @@ extern "C"
 		return status;
 	}
 
-	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f)
+	int ENERGYPLUSLIB_API CALLCONV SetMessageCallback(MsgCallback f)
 	{
 		GLOBAL_MESSAGE_CALLBACK = f;
 		StoreMessageCallback(WrappedMessageCallback);
 		return EXIT_SUCCESS;
 	}
 
-	int EXPORTCALL CALLCONV SetProgressCallback(ProgressCallback f)
+	int ENERGYPLUSLIB_API CALLCONV SetProgressCallback(ProgressCallback f)
 	{
 		GLOBAL_PROGRESS_CALLBACK = f;
 		StoreProgressCallback(WrappedProgressCallback);

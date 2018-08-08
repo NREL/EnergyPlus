@@ -47,15 +47,16 @@
 
 #ifndef EnergyPlusCAPI_hh_INCLUDED
 #define EnergyPlusCAPI_hh_INCLUDED
-#include <iostream>
+
+#include "EnergyPlusAPI.hh"
 #include "EnergyPlusPgm.hh"
+#include <iostream>
 
 #if _WIN32 || _MSC_VER
 #define CALLCONV __stdcall
 #else
 #define CALLCONV
 #endif
-#define EXPORTCALL __declspec(dllexport)
 
 typedef void (CALLCONV * MsgCallback)(const char *);
 typedef void (CALLCONV * ProgressCallback)(int const);
@@ -68,9 +69,9 @@ void WrappedProgressCallback(int const);
 
 extern "C"
 {
-	int EXPORTCALL CALLCONV RunEPlus(const char* path, int path_length);
-	int EXPORTCALL CALLCONV SetMessageCallback(MsgCallback f);
-	int EXPORTCALL CALLCONV SetProgressCallback(ProgressCallback f);
+	int ENERGYPLUSLIB_API CALLCONV RunEPlus(const char* path, int path_length);
+	int ENERGYPLUSLIB_API CALLCONV SetMessageCallback(MsgCallback f);
+	int ENERGYPLUSLIB_API CALLCONV SetProgressCallback(ProgressCallback f);
 }
 
 #endif
