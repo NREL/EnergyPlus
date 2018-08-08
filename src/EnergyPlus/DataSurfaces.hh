@@ -1268,6 +1268,7 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;   // User supplied name of this set of shading control data
+        int ZoneIndex;      // number of the zone referenced
         int SequenceNumber; // Shading control sequence number
         int ShadingType;    // Shading type (InteriorShade, SwitchableGlazing,
         //  CHARACTER(len=32) :: ShadingType    = ' ' ! Shading type (InteriorShade, SwitchableGlazing,
@@ -1354,7 +1355,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         WindowShadingControlData()
-            : SequenceNumber(0), ShadingType(WSC_ST_NoShade), ShadedConstruction(0), ShadingDevice(0), ShadingControlType(0), Schedule(0),
+            : ZoneIndex(0), SequenceNumber(0), ShadingType(WSC_ST_NoShade), ShadedConstruction(0), ShadingDevice(0), ShadingControlType(0), Schedule(0),
               SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0),
               SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false)
         {
