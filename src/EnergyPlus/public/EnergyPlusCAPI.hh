@@ -69,9 +69,9 @@ void WrappedProgressCallback(int const);
 
 extern "C"
 {
-	int ENERGYPLUSLIB_API CALLCONV RunEPlus(const char* path, int path_length);
-	int ENERGYPLUSLIB_API CALLCONV SetMessageCallback(MsgCallback f);
-	int ENERGYPLUSLIB_API CALLCONV SetProgressCallback(ProgressCallback f);
+	int ENERGYPLUSLIB_API CALLCONV CAPI_EnergyPlusPgmReturnCodes(const char* path, int path_length);
+	int ENERGYPLUSLIB_API CALLCONV CAPI_StoreMessageCallback(MsgCallback f);
+	int ENERGYPLUSLIB_API CALLCONV CAPI_StoreProgressCallback(ProgressCallback f);
 }
 
 #endif
