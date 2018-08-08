@@ -4172,6 +4172,7 @@ namespace SurfaceGeometry {
             } // check on non-opaquedoor subsurfaces
 
             CheckSubSurfaceMiscellaneous("GetHTSubSurfaceData", ErrorsFound, SurfNum, cAlphaArgs(1), cAlphaArgs(3), AddedSubSurfaces);
+            AssociateWindowShadingControlFenestration(ErrorsFound);
 
         } // End of main loop over subsurfaces
     }
@@ -6312,10 +6313,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfLocalEnvironment;
-        using DataSurfaces::TotSurfaces;
+        using DataSurfaces::Surface;
         using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::TotSurfaces;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6469,10 +6470,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfLocalEnvironment;
-        using DataSurfaces::TotSurfaces;
+        using DataSurfaces::Surface;
         using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::TotSurfaces;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6589,11 +6590,11 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
+        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataHeatBalance::HeatTransferAlgosUsed;
         using DataHeatBalance::HighHConvLimit;
         using DataHeatBalance::LowHConvLimit;
         using DataHeatBalance::NumberOfHeatTransferAlgosUsed;
-        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
 
@@ -8211,6 +8212,14 @@ namespace SurfaceGeometry {
                 }
             }
         } // End of loop over window shading controls
+    }
+
+    void AssociateWindowShadingControlFenestration(bool &ErrorsFound)
+    {
+        // J.Glazer 2018
+        for (auto wsc : WindowShadingControl) {
+            for 
+        }
     }
 
     void GetStormWindowData(bool &ErrorsFound) // If errors found in input
