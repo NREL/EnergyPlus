@@ -259,7 +259,6 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveName;
-        using CurveManager::GetCurveType;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_Chiller_ElectricEIR;
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
@@ -475,11 +474,11 @@ namespace StandardRatings {
                 }
                 if (ChillerCapFT <= 0.0) {
                     ShowContinueError(" Check limits in Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                      GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex) + '.');
+                                      CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex) + '.');
                     ShowContinueError(" ..ChillerCapFT value at standard test condition = " + RoundSigDigits(ChillerCapFT, 2));
                 }
                 if (ChillerEIRFT <= 0.0) {
-                    ShowContinueError(" Check limits in EIR Function of Temperature Curve, Curve Type = " + GetCurveType(EIRFTempCurveIndex) +
+                    ShowContinueError(" Check limits in EIR Function of Temperature Curve, Curve Type = " + CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType +
                                       ", Curve Name = " + GetCurveName(EIRFTempCurveIndex) + '.');
                     ShowContinueError(" ..ChillerEIRFT value at standard test condition = " + RoundSigDigits(ChillerEIRFT, 2));
                 }
@@ -684,7 +683,6 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using CurveManager::GetCurveType;
         using DataGlobals::DisplayExtraWarnings;
         using DataPlant::TypeOf_Chiller_ElectricEIR;
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
@@ -783,10 +781,10 @@ namespace StandardRatings {
                 }
                 if (CapCurveIPLVLimitsExceeded) {
                     ShowContinueError(" Check limits in Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                      GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                      CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                 }
                 if (EIRCurveIPLVLimitsExceeded) {
-                    ShowContinueError(" Check limits in EIR Function of Temperature Curve, Curve Type = " + GetCurveType(EIRFTempCurveIndex) +
+                    ShowContinueError(" Check limits in EIR Function of Temperature Curve, Curve Type = " + CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType +
                                       ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                 }
             }
@@ -925,7 +923,6 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::GetCurveType;
         using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
         using DataHVACGlobals::CoilDX_HeatingEmpirical;
         using DataHVACGlobals::CoilDX_MultiSpeedCooling;
@@ -1202,7 +1199,6 @@ namespace StandardRatings {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using CurveManager::GetCurveType;
         using General::RoundSigDigits;
 
         // Locals
@@ -1285,15 +1281,13 @@ namespace StandardRatings {
         EIRFlowModFac = CurveValue(EIRFFlowCurveIndex, AirMassFlowRatioRated);
 
         {
-            auto const SELECT_CASE_var(GetCurveType(CapFTempCurveIndex));
-
-            if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
+            if (CurveManager::PerfCurve(CapFTempCurveIndex).NumDims == 1) {
                 TotCapTempModFacRated = CurveValue(CapFTempCurveIndex, HeatingOutdoorCoilInletAirDBTempRated);
 
                 CapTempModFacH2Test = CurveValue(CapFTempCurveIndex, HeatingOutdoorCoilInletAirDBTempH2Test);
 
                 CapTempModFacH3Test = CurveValue(CapFTempCurveIndex, HeatingOutdoorCoilInletAirDBTempH3Test);
-            } else if (SELECT_CASE_var == "BIQUADRATIC") {
+            } else {
                 TotCapTempModFacRated = CurveValue(CapFTempCurveIndex, HeatingIndoorCoilInletAirDBTempRated, HeatingOutdoorCoilInletAirDBTempRated);
 
                 CapTempModFacH2Test = CurveValue(CapFTempCurveIndex, HeatingIndoorCoilInletAirDBTempRated, HeatingOutdoorCoilInletAirDBTempH2Test);
@@ -1303,15 +1297,13 @@ namespace StandardRatings {
         }
 
         {
-            auto const SELECT_CASE_var(GetCurveType(EIRFTempCurveIndex));
-
-            if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
+            if (CurveManager::PerfCurve(EIRFTempCurveIndex).NumDims == 1) {
                 EIRTempModFacRated = CurveValue(EIRFTempCurveIndex, HeatingOutdoorCoilInletAirDBTempRated);
 
                 EIRTempModFacH2Test = CurveValue(EIRFTempCurveIndex, HeatingOutdoorCoilInletAirDBTempH2Test);
 
                 EIRTempModFacH3Test = CurveValue(EIRFTempCurveIndex, HeatingOutdoorCoilInletAirDBTempH3Test);
-            } else if (SELECT_CASE_var == "BIQUADRATIC") {
+            } else {
                 EIRTempModFacRated = CurveValue(EIRFTempCurveIndex, HeatingIndoorCoilInletAirDBTempRated, HeatingOutdoorCoilInletAirDBTempRated);
 
                 EIRTempModFacH2Test = CurveValue(EIRFTempCurveIndex, HeatingIndoorCoilInletAirDBTempRated, HeatingOutdoorCoilInletAirDBTempH2Test);
@@ -1334,36 +1326,36 @@ namespace StandardRatings {
             EIRTempModFacH2Test < 0.0 || EIRTempModFacH3Test < 0.0) {
             if (TotCapTempModFacRated < 0.0) {
                 ShowSevereError(" Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits(TotCapTempModFacRated, 2) +
-                                ", Curve Type = " + GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                ", Curve Type = " + CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                 ShowContinueError(" ...Net heating capacity at high temperature is set to zero. The curve value must be > 0. Check the curve.");
                 NetHeatingCapRated = 0.0;
             }
             if (CapTempModFacH3Test < 0.0) {
                 ShowSevereError(" Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits(CapTempModFacH3Test, 2) +
-                                ", Curve Type = " + GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                ", Curve Type = " + CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                 ShowContinueError(" ...Net heating capacity at low temperature is set to zero. The curve value must be > 0. Check the curve.");
                 NetHeatingCapH3Test = 0.0;
             }
             if (CapTempModFacH2Test < 0.0) {
                 ShowSevereError(" Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits(CapTempModFacH2Test, 2) +
-                                ", Curve Type = " + GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                ", Curve Type = " + CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                 ShowContinueError(" ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve.");
                 NetHeatingCapH3Test = 0.0;
             }
             // check EIR curve values
             if (EIRTempModFacRated < 0.0) {
                 ShowSevereError(" Invalid EIR Function of Temperature Curve value = " + RoundSigDigits(EIRTempModFacRated, 2) +
-                                ", Curve Type = " + GetCurveType(EIRFTempCurveIndex) + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
+                                ", Curve Type = " + CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                 ShowContinueError(" ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve.");
             }
             if (EIRTempModFacH2Test < 0.0) {
                 ShowSevereError(" Invalid EIR Function of Temperature Curve value = " + RoundSigDigits(EIRTempModFacH2Test, 2) +
-                                ", Curve Type = " + GetCurveType(EIRFTempCurveIndex) + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
+                                ", Curve Type = " + CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                 ShowContinueError(" ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve.");
             }
             if (EIRTempModFacH3Test < 0.0) {
                 ShowSevereError(" Invalid EIR Function of Temperature Curve value = " + RoundSigDigits(EIRTempModFacH3Test, 2) +
-                                ", Curve Type = " + GetCurveType(EIRFTempCurveIndex) + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
+                                ", Curve Type = " + CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                 ShowContinueError(" ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve.");
             }
             ShowContinueError(" ...HSPF value has been reset to 0.0 and simulation is continuing.");
@@ -2015,7 +2007,6 @@ namespace StandardRatings {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using CurveManager::GetCurveType;
 
         // Argument array dimensioning
         CapFTempCurveIndex.dim(nsp);
@@ -2117,13 +2108,12 @@ namespace StandardRatings {
         for (spnum = 1; spnum <= nsp; ++spnum) {
             TotCapFlowModFac(spnum) = CurveValue(CapFFlowCurveIndex(spnum), AirMassFlowRatioRated);
             {
-                auto const SELECT_CASE_var(GetCurveType(CapFTempCurveIndex(spnum)));
-                if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
+                if (CurveManager::PerfCurve(CapFTempCurveIndex(spnum)).NumDims == 1) {
                     TotCapTempModFacH0 = CurveValue(CapFTempCurveIndex(spnum), HeatingOutdoorCoilInletAirDBTempH0Test);
                     TotCapTempModFacH1 = CurveValue(CapFTempCurveIndex(spnum), HeatingOutdoorCoilInletAirDBTempRated);
                     TotCapTempModFacH2 = CurveValue(CapFTempCurveIndex(spnum), HeatingOutdoorCoilInletAirDBTempH2Test);
                     TotCapTempModFacH3 = CurveValue(CapFTempCurveIndex(spnum), HeatingOutdoorCoilInletAirDBTempH3Test);
-                } else if (SELECT_CASE_var == "BIQUADRATIC") {
+                } else {
                     TotCapTempModFacH0 =
                         CurveValue(CapFTempCurveIndex(spnum), HeatingIndoorCoilInletAirDBTempRated, HeatingOutdoorCoilInletAirDBTempH0Test);
                     TotCapTempModFacH1 =
@@ -2147,13 +2137,12 @@ namespace StandardRatings {
             EIRFlowModFac(spnum) = CurveValue(EIRFFlowCurveIndex(spnum), AirMassFlowRatioRated);
 
             {
-                auto const SELECT_CASE_var(GetCurveType(EIRFTempCurveIndex(spnum)));
-                if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
+                if (CurveManager::PerfCurve(EIRFTempCurveIndex(spnum)).NumDims == 1) {
                     EIRTempModFacH0 = CurveValue(EIRFTempCurveIndex(spnum), HeatingOutdoorCoilInletAirDBTempH0Test);
                     EIRTempModFacH1 = CurveValue(EIRFTempCurveIndex(spnum), HeatingOutdoorCoilInletAirDBTempRated);
                     EIRTempModFacH2 = CurveValue(EIRFTempCurveIndex(spnum), HeatingOutdoorCoilInletAirDBTempH2Test);
                     EIRTempModFacH3 = CurveValue(EIRFTempCurveIndex(spnum), HeatingOutdoorCoilInletAirDBTempH3Test);
-                } else if (SELECT_CASE_var == "BIQUADRATIC") {
+                } else {
                     EIRTempModFacH0 =
                         CurveValue(EIRFTempCurveIndex(spnum), HeatingIndoorCoilInletAirDBTempRated, HeatingOutdoorCoilInletAirDBTempH0Test);
                     EIRTempModFacH1 =
@@ -2635,7 +2624,6 @@ namespace StandardRatings {
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using CurveManager::GetCurveType;
         using DataGlobals::DisplayExtraWarnings;
         using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
         using DataHVACGlobals::CoilDX_HeatingEmpirical;
@@ -2788,11 +2776,11 @@ namespace StandardRatings {
                                               ":  Standard Rating Cooling Capacity calculated is not at the AHRI test condition.");
                             if (CapCurveHighOATLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                                  CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                             }
                             if (CapCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(CapFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
                             }
                         }
                     }
@@ -2804,19 +2792,19 @@ namespace StandardRatings {
                                               ":  Energy Efficiency Ratio (EER) calculated is not at the AHRI test condition.");
                             if (CapCurveHighOATLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                                  CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                             }
                             if (CapCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(CapFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
                             }
                             if (EIRCurveHighOATLimitsExceeded) {
                                 ShowContinueError(" Check limits in Energy Input Ratio Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(EIRFTempCurveIndex) + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
+                                                  CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                             }
                             if (EIRCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(EIRFFlowCurveIndex) + ", Curve Name = " + GetCurveName(EIRFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(EIRFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFFlowCurveIndex));
                             }
                         }
                     }
@@ -2829,23 +2817,23 @@ namespace StandardRatings {
                                               ":  Seasonal Energy Efficiency Ratio (SEER) calculated is not at the AHRI test condition.");
                             if (CapCurveMidOATLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                                  CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                             }
                             if (CapCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(CapFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
                             }
                             if (EIRCurveMidOATLimitsExceeded) {
                                 ShowContinueError(" Check limits in Energy Input Ratio Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(EIRFTempCurveIndex) + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
+                                                  CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                             }
                             if (EIRCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(EIRFFlowCurveIndex) + ", Curve Name = " + GetCurveName(EIRFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(EIRFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFFlowCurveIndex));
                             }
                             if (PLFfPLRforSEERLimitsExceeded) {
                                 ShowContinueError(" Check limits in Part Load Fraction Correlation Curve, Curve Type = " +
-                                                  GetCurveType(PLFFPLRCurveIndex) + ", Curve Name = " + GetCurveName(PLFFPLRCurveIndex));
+                                                  CurveManager::PerfCurve(PLFFPLRCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(PLFFPLRCurveIndex));
                             }
                         }
                     }
@@ -2857,19 +2845,19 @@ namespace StandardRatings {
                                               ":  Integrated Energy Efficiency Ratio (IEER) calculated is not at the AHRI test condition.");
                             if (CapCurveIEERLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                                  CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                             }
                             if (CapCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(CapFFlowCurveIndex) + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(CapFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
                             }
                             if (EIRCurveIEERLimitsExceeded) {
                                 ShowContinueError(" Check limits in EIR Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(EIRFTempCurveIndex) + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
+                                                  CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                             }
                             if (EIRCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(EIRFFlowCurveIndex) + ", Curve Name = " + GetCurveName(EIRFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(EIRFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFFlowCurveIndex));
                             }
                         }
                     }
@@ -2877,9 +2865,7 @@ namespace StandardRatings {
                 } // End of curve error messages
             } else if (SELECT_CASE_var == CoilDX_HeatingEmpirical) {
                 {
-                    auto const SELECT_CASE_var1(GetCurveType(CapFTempCurveIndex));
-
-                    if ((SELECT_CASE_var1 == "QUADRATIC") || (SELECT_CASE_var1 == "CUBIC")) {
+                    if (CurveManager::PerfCurve(CapFTempCurveIndex).NumDims == 1) {
                         GetCurveMinMaxValues(CapFTempCurveIndex, HeatingCapODBTempMin, HeatingCapODBTempMax);
 
                         // Checking the limits of capacity modifying curve for temperatures (IEER high and low test conditions)
@@ -2887,7 +2873,7 @@ namespace StandardRatings {
                             HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test) {
                             HeatingCapCurveHSPFLimitsExceeded = true;
                         }
-                    } else if (SELECT_CASE_var1 == "BIQUADRATIC") {
+                    } else {
                         GetCurveMinMaxValues(
                             CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin, HeatingCapODBTempMax);
 
@@ -2901,9 +2887,7 @@ namespace StandardRatings {
                     }
                 }
                 {
-                    auto const SELECT_CASE_var1(GetCurveType(EIRFTempCurveIndex));
-
-                    if ((SELECT_CASE_var1 == "QUADRATIC") || (SELECT_CASE_var1 == "CUBIC")) {
+                    if (CurveManager::PerfCurve(EIRFTempCurveIndex).NumDims == 1) {
                         GetCurveMinMaxValues(EIRFTempCurveIndex, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
 
                         // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
@@ -2911,7 +2895,7 @@ namespace StandardRatings {
                             HeatingEIRODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test) {
                             HeatingEIRCurveHSPFLimitsExceeded = true;
                         }
-                    } else if (SELECT_CASE_var1 == "BIQUADRATIC") {
+                    } else {
                         GetCurveMinMaxValues(
                             EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
 
@@ -2940,10 +2924,10 @@ namespace StandardRatings {
                         ShowContinueError(" Review the Standard Ratings calculations in the Engineering Reference for this coil type.");
                         if (HeatingCapCurveHSPFLimitsExceeded) {
                             ShowContinueError(" Check limits in Total Heating Capacity Function of Temperature Curve, Curve Type = " +
-                                              GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                              CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                         }
                         if (HeatingEIRCurveHSPFLimitsExceeded) {
-                            ShowContinueError(" Check limits in EIR Function of Temperature Curve, Curve Type = " + GetCurveType(EIRFTempCurveIndex) +
+                            ShowContinueError(" Check limits in EIR Function of Temperature Curve, Curve Type = " + CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType +
                                               ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                         }
                     }
@@ -3007,11 +2991,11 @@ namespace StandardRatings {
                                               ":  The Standard Rating Cooling Capacity calculated is not at the AHRI test condition.");
                             if (CapCurveHighOATLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                                  CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                             }
                             if (CapCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(CapFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
                             }
                         }
                     }
@@ -3024,19 +3008,19 @@ namespace StandardRatings {
                                               ":  The Seasonal Energy Efficiency Ratio (SEER) calculated is not at the AHRI test condition.");
                             if (CapCurveLowOATLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                                  CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                             }
                             if (CapCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(CapFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFFlowCurveIndex));
                             }
                             if (EIRCurveLowOATLimitsExceeded) {
                                 ShowContinueError(" Check limits in Energy Input Ratio Function of Temperature Curve, Curve Type = " +
-                                                  GetCurveType(EIRFTempCurveIndex) + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
+                                                  CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                             }
                             if (EIRCurveFlowLimitsExceeded) {
                                 ShowContinueError(" Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
-                                                  GetCurveType(EIRFFlowCurveIndex) + ", Curve Name = " + GetCurveName(EIRFFlowCurveIndex));
+                                                  CurveManager::PerfCurve(EIRFFlowCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(EIRFFlowCurveIndex));
                             }
                         }
                     }
@@ -3046,9 +3030,7 @@ namespace StandardRatings {
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedHeating) {
 
                 {
-                    auto const SELECT_CASE_var1(GetCurveType(CapFTempCurveIndex));
-
-                    if ((SELECT_CASE_var1 == "QUADRATIC") || (SELECT_CASE_var1 == "CUBIC")) {
+                    if (CurveManager::PerfCurve(CapFTempCurveIndex).NumDims == 1) {
                         GetCurveMinMaxValues(CapFTempCurveIndex, HeatingCapODBTempMin, HeatingCapODBTempMax);
 
                         if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
@@ -3062,7 +3044,7 @@ namespace StandardRatings {
                             HeatingCapCurveHSPFLimitsExceeded = true;
                         }
 
-                    } else if (SELECT_CASE_var1 == "BIQUADRATIC") {
+                    } else {
                         GetCurveMinMaxValues(
                             CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin, HeatingCapODBTempMax);
 
@@ -3078,9 +3060,7 @@ namespace StandardRatings {
                 }
 
                 {
-                    auto const SELECT_CASE_var1(GetCurveType(EIRFTempCurveIndex));
-
-                    if ((SELECT_CASE_var1 == "QUADRATIC") || (SELECT_CASE_var1 == "CUBIC")) {
+                    if (CurveManager::PerfCurve(EIRFTempCurveIndex).NumDims == 1) {
                         GetCurveMinMaxValues(EIRFTempCurveIndex, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
                         // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
                         if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
@@ -3088,7 +3068,7 @@ namespace StandardRatings {
                             HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempH0Test) {
                             HeatingEIRCurveHSPFLimitsExceeded = true;
                         }
-                    } else if (SELECT_CASE_var1 == "BIQUADRATIC") {
+                    } else {
                         GetCurveMinMaxValues(
                             EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
 
@@ -3119,7 +3099,7 @@ namespace StandardRatings {
                     if (DisplayExtraWarnings) {
                         ShowWarningError(DXCoilType + '=' + DXCoilName + ":  The Net Heating Capacity Calculated is not at the AHRI test condition.");
                         ShowContinueError(" Check limits in Total Heating Capacity Function of Temperature Curve, Curve Type = " +
-                                          GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                          CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                     }
                 }
                 if (HeatingCapCurveHSPFLimitsExceeded || HeatingEIRCurveHSPFLimitsExceeded) {
@@ -3128,10 +3108,10 @@ namespace StandardRatings {
                                          ":  The Heating Seasonal Performance Factor calculated is not at the AHRI test condition.");
                         if (HeatingCapCurveHSPFLimitsExceeded) {
                             ShowContinueError(" Check limits in Total Heating Capacity Function of Temperature Curve, Curve Type = " +
-                                              GetCurveType(CapFTempCurveIndex) + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
+                                              CurveManager::PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(CapFTempCurveIndex));
                         }
                         if (HeatingEIRCurveHSPFLimitsExceeded) {
-                            ShowContinueError(" Check limits in EIR Function of Temperature Curve, Curve Type = " + GetCurveType(EIRFTempCurveIndex) +
+                            ShowContinueError(" Check limits in EIR Function of Temperature Curve, Curve Type = " + CurveManager::PerfCurve(EIRFTempCurveIndex).ObjectType +
                                               ", Curve Name = " + GetCurveName(EIRFTempCurveIndex));
                         }
                     }

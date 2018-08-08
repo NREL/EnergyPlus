@@ -427,6 +427,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with S, insert the rules here
 
               ! If your original object starts with T, insert the rules here
+              CASE('TABLE:ONEINDEPENDENTVARIABLE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                IF (SameString(InArgs(2),'EXPONENT')) THEN
+                  OutArgs(2) = Blank
+                  nodiff=.false.
+                ENDIF
 
               ! If your original object starts with U, insert the rules here
 
