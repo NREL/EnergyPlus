@@ -156,6 +156,7 @@ namespace UnitarySystems {
         friend class DesignSpecMSHP;
         // UnitarySys *compPointer; // don't need this here
         int m_UnitarySysNum;
+        int m_unitarySystemType_Num;
         bool m_ThisSysInputShouldBeGotten;
         int m_SysAvailSchedPtr; // Pointer to the availability schedule
         ControlType m_ControlType;

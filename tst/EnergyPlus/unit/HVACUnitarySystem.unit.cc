@@ -1234,7 +1234,7 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_MultiStageGasHeatCoil_Only_ContFan 
 
     std::string const idf_objects = delimited_string( {
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -2590,7 +2590,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTest
     MultiOrVarSpeedCoolCoil = false;
     MultiOrVarSpeedHeatCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
     MultiOrVarSpeedHeatCoil = false;
-    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem";
     UnitarySystem(UnitarySysNum).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
     UnitarySystem(UnitarySysNum).RequestAutoSize = true;
 
@@ -9445,7 +9444,6 @@ TEST_F(EnergyPlusFixture, UnitarySystem_SizingWithFans)
     MultiOrVarSpeedCoolCoil = false;
     MultiOrVarSpeedHeatCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
     MultiOrVarSpeedHeatCoil = false;
-    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem";
     UnitarySystem(UnitarySysNum).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
     UnitarySystem(UnitarySysNum).RequestAutoSize = true;
 

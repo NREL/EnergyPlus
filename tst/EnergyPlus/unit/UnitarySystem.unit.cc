@@ -183,7 +183,7 @@ protected:
         DataPlant::TotNumLoops = 2;
         DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
         DataSizing::PlantSizData.allocate(DataPlant::TotNumLoops);
-        int NumPltSizInput = DataPlant::TotNumLoops;
+        //int NumPltSizInput = DataPlant::TotNumLoops;
 
         for (int loopindex = 1; loopindex <= DataPlant::TotNumLoops; ++loopindex) {
             auto &loop(DataPlant::PlantLoop(loopindex));
@@ -418,9 +418,9 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     int compTypeOfNum = DataZoneEquipment::ZoneUnitarySys_Num;
     bool FirstHVACIteration = true;
     UnitarySys *thisSys;
-    thisSys = mySys.factory(compTypeOfNum, compName, zoneEquipment);
+    thisSys = mySys.factory(compTypeOfNum, compName, zoneEquipment, 0);
 
-    thisSys->getUnitarySystemInputData(compName, zoneEquipment, ErrorsFound); // get UnitarySystem input from object above
+    thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
                                                                             // verify the size of the vector and the processed names
     // 2 UnitarySystem objects
     EXPECT_EQ(1u, unitarySys.size());
@@ -584,9 +584,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     std::string compName = "EAST ZONE UNITARY SYSTEM";
     bool zoneEquipment = true;
     int compTypeOfNum = DataZoneEquipment::ZoneUnitarySys_Num;
-    mySys = thisSys.factory(compTypeOfNum, compName, zoneEquipment);
+    mySys = thisSys.factory(compTypeOfNum, compName, zoneEquipment, 0);
 
-    mySys->getUnitarySystemInputData(compName, zoneEquipment, ErrorsFound); // get UnitarySystem input from object above
+    mySys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
 
     EXPECT_FALSE(ErrorsFound);              // expect no errors
     EXPECT_FALSE(mySys->ATMixerExists);

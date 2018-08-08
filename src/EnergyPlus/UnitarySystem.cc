@@ -165,12 +165,12 @@ namespace UnitarySystems {
     // std::unordered_map<std::string, std::string> UniqueUnitarySysNames;
 
     DesignSpecMSHP::DesignSpecMSHP()
-        : m_DesignSpecMSHPType_Num(0), noLoadAirFlowRateRatio(0.0), numOfSpeedHeating(0), numOfSpeedCooling(0), m_SingleModeFlag(false)
+        : numOfSpeedHeating(0), numOfSpeedCooling(0), noLoadAirFlowRateRatio(0.0), m_DesignSpecMSHPType_Num(0), m_SingleModeFlag(false)
     {
     }
 
     UnitarySys::UnitarySys() // constructor
-        : UnitarySystemType_Num(0), m_ThisSysInputShouldBeGotten(true), m_SysAvailSchedPtr(0), m_ControlType(ControlType::None),
+        : m_UnitarySysNum(-1), m_unitarySystemType_Num(0), m_ThisSysInputShouldBeGotten(true), m_SysAvailSchedPtr(0), m_ControlType(ControlType::None),
           m_DehumidControlType_Num(DehumCtrlType::None), m_Humidistat(false), m_ValidASHRAECoolCoil(false), m_ValidASHRAEHeatCoil(false),
           m_SimASHRAEModel(false), m_setFaultModelInput(true), m_FanIndex(0), m_FanPlace(FanPlace::NotYetSet), m_FanOpModeSchedPtr(0),
           m_FanExists(false), m_FanType_Num(0), m_RequestAutoSize(false), m_ActualFanVolFlowRate(0.0), m_DesignFanVolFlowRate(0.0),
@@ -211,7 +211,7 @@ namespace UnitarySystems {
           m_HeatingFanSpeedRatio(0.0), m_CoolingFanSpeedRatio(0.0), m_NoHeatCoolSpeedRatio(0.0), m_MyFanFlag(true), m_MyCheckFlag(true),
           m_SensibleLoadMet(0.0), m_LatentLoadMet(0.0), m_MyStagedFlag(false), m_SensibleLoadPredicted(0.0), m_MoistureLoadPredicted(0.0),
           m_FaultyCoilSATFlag(false), m_FaultyCoilSATIndex(0), m_FaultyCoilSATOffset(0.0), m_TESOpMode(0), m_initLoadBasedControlAirLoopPass(false),
-          m_airLoopPassCounter(0), m_UnitarySysNum(-1), MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0),
+          m_airLoopPassCounter(0), UnitarySystemType_Num(0), MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0),
           CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0),
           MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0),
           LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0),
@@ -1491,7 +1491,6 @@ namespace UnitarySystems {
         Real64 SysHeatingFlow = 0.0;
         Real64 CoolCapAtPeak = 0.0;
         Real64 HeatCapAtPeak = 0.0;
-        int SupFanNum = 0;
 
         if (DataSizing::CurSysNum > 0 && DataSizing::CurOASysNum == 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -2183,7 +2182,7 @@ namespace UnitarySystems {
                 BranchFanFlow = 0.0;
                 if (BranchNum > 0.0) BranchInputManager::GetBranchFanTypeName(BranchNum, FanType, m_FanName, ErrFound);
                 if (!ErrFound && BranchNum > 0) {
-                    if (this->m_FanType_Num = DataHVACGlobals::FanType_SystemModelObject) {
+                    if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         BranchFanFlow = HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate;
                     } else {
                         BranchFanFlow = Fans::GetFanDesignVolumeFlowRate(FanType, m_FanName, ErrFound);
@@ -2532,7 +2531,7 @@ namespace UnitarySystems {
                 }
 
                 auto const &fields = instance.value();
-
+                thisSys.m_unitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
                 thisSys.m_IterationMode.resize(21);
 
                 std::string loc_heatingCoilType("");
@@ -2871,6 +2870,12 @@ namespace UnitarySystems {
                 bool OASysFound = false;
                 bool ZoneEquipmentFound = false;
                 bool ZoneInletNodeFound = false;
+
+                if (sysNum == -1) {
+                    // Early calls to ATMixer doesn't have enough info to pass GetInput. Need to push_back here, and protect against the next time through.
+                    unitarySys.push_back(thisSys);
+                    continue;
+                }
 
                 // Get AirTerminal mixer data
                 SingleDuct::GetATMixer(thisObjectName,
@@ -6796,7 +6801,6 @@ namespace UnitarySystems {
         Real64 ZoneLoad = 0.0;      // zone load (W)
         Real64 SupHeaterLoad = 0.0; // additional heating required by supplemental heater (W)
         Real64 OnOffAirFlowRatio = 1.0;
-        Real64 QZnReq = 0.0;
         this->updateUnitarySystemControl(AirLoopNum,
                                          this->CoolCoilOutletNodeNum,
                                          this->m_SystemCoolControlNodeNum,
@@ -7267,9 +7271,7 @@ namespace UnitarySystems {
         Real64 NoLoadOutletTemp;          // outlet temp of system with coils off [C]
 
         std::string CompName = this->Name;
-        int InletNode = this->AirInNode;
         int OutletNode = this->AirOutNode;
-        bool OpMode = this->m_FanOpMode;
 
         if (ScheduleManager::GetCurrentScheduleValue(this->m_SysAvailSchedPtr) <= 0.0) {
             return;
@@ -8322,11 +8324,9 @@ namespace UnitarySystems {
         // InitLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax
         ////////////////////////////////////////////////////////////////////////////////////
         // inlet node and system outlet node
-        Real64 MassFlowRate = 0.0; // mass flow rate to calculate loss
         Real64 MaxTemp = 0.0;      // Maximum temperature used in latent loss calculation
         Real64 QZnReq = 0.0;
         Real64 QActual = 0.0;
-        Real64 CoilMaxVolFlowRate = 0.0;
         Real64 SensOutputOff = 0.0;
         Real64 LatOutputOff = 0.0;
         Real64 HeatCoilLoad = 0.0;
@@ -9289,9 +9289,7 @@ namespace UnitarySystems {
 
         Real64 CoilCoolHeatRat = 0.0; // ratio of cooling to heating PLR for cycling fan RH control
 
-        int OutletNode = this->AirOutNode;
         int InletNode = this->AirInNode;
-        int ZoneNode = this->NodeNumOfControlledZone;
 
         int CoolingCompOn = 0;
         if (CoolPLR > 0) {
@@ -10105,7 +10103,6 @@ namespace UnitarySystems {
         // Retrieve the load on the controlled zone
         int OutletNode = this->CoolCoilOutletNodeNum;
         int InletNode = this->CoolCoilInletNodeNum;
-        int ControlNode = this->m_SystemCoolControlNodeNum;
         Real64 DesOutTemp = this->m_DesiredOutletTemp;
         Real64 DesOutHumRat = this->m_DesiredOutletHumRat;
         int CoilType_Num = this->m_CoolingCoilType_Num;
@@ -11338,14 +11335,13 @@ namespace UnitarySystems {
         // Retrieve the load on the controlled zone
         int InletNode = this->HeatCoilInletNodeNum;
         int OutletNode = this->HeatCoilOutletNodeNum;
-        int ControlNode = this->m_SystemHeatControlNodeNum;
         std::string CompName = this->m_HeatingCoilName;
         int CompIndex = this->m_HeatingCoilIndex;
         int FanOpMode = this->m_FanOpMode;
         Real64 DesOutTemp = this->m_DesiredOutletTemp;
 
         Real64 LoopHeatingCoilMaxRTFSave = DataAirLoop::LoopHeatingCoilMaxRTF;
-        Real64 LoopHeatingCoilMaxRTF = 0.0;
+        DataAirLoop::LoopHeatingCoilMaxRTF = 0.0;
         Real64 LoopDXCoilMaxRTFSave = DataAirLoop::LoopDXCoilRTF;
         DataAirLoop::LoopDXCoilRTF = 0.0;
         Real64 PartLoadFrac = 0.0;
@@ -11946,7 +11942,6 @@ namespace UnitarySystems {
         // Set local variables
         int OutletNode = this->m_SuppCoilAirOutletNode;
         int InletNode = this->m_SuppCoilAirInletNode;
-        int ControlNode = this->m_SuppCoilAirOutletNode;
         Real64 DesOutTemp = this->m_DesiredOutletTemp;
         std::string CompName = this->m_SuppHeatCoilName;
         int CompIndex = this->m_SuppHeatCoilIndex;
@@ -12453,7 +12448,6 @@ namespace UnitarySystems {
 
         Real64 OnOffAirFlowRatio = 1.0;
         Real64 CoilCoolHeatRat = 1.0;
-        Real64 QZnReq = 0.0;
         Real64 HeatCoilLoad = 0.0;
         // CALL the series of components that simulate a Unitary System
         if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru) {
@@ -13067,7 +13061,7 @@ namespace UnitarySystems {
         UnitarySys *thisSys = &unitarySys[m_UnitarySysNum];
 
         bool FirstHVACIteration = (Par[2] > 0.0);
-        int FanOpMode = int(Par[3]);
+        //int FanOpMode = int(Par[3]);
         int CompOp = int(Par[4]);
         Real64 LoadToBeMet = Par[5];
         Real64 OnOffAirFlowRatio = Par[8];
@@ -14436,13 +14430,13 @@ namespace UnitarySystems {
         UnitarySys *thisSys = &unitarySys[m_UnitarySysNum];
 
         bool FirstHVACIteration = (Par[2] > 0.0);
-        int ControlledZoneNum = int(Par[3]);
+        //int ControlledZoneNum = int(Par[3]);
         Real64 QZnReq = Par[4];
         int AirControlNode = int(Par[5]);
         Real64 OnOffAirFlowRat = Par[6];
         int AirLoopNum = int(Par[7]);
         int WaterControlNode = int(Par[8]);
-        Real64 lowWaterMdot = Par[9];
+        //Real64 lowWaterMdot = Par[9];
         Real64 highWaterMdot = Par[10];
         Real64 lowSpeedRatio = Par[11];
         Real64 airMdot = Par[12];

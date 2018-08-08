@@ -373,7 +373,7 @@ namespace DataPlant {
     int const TypeOf_CoolingTower_VarSpd(14);
     int const TypeOf_Generator_FCExhaust(15);
     int const TypeOf_HeatPumpWtrHeaterPumped(16);
-    int const TypeOf_HeatPumpWtrHeaterWrapped(92);
+    int const TypeOf_HeatPumpWtrHeaterWrapped(93);
     int const TypeOf_HPWaterEFCooling(17);
     int const TypeOf_HPWaterEFHeating(18);
     int const TypeOf_HPWaterPECooling(19);

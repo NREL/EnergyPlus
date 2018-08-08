@@ -644,7 +644,7 @@ namespace DataZoneEquipment {
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
                             UnitarySystems::UnitarySys thisSys;
                             ZoneEquipList(ControlledZoneNum).compPointer[ZoneEquipTypeNum] =
-                                thisSys.factory(ZoneUnitarySys_Num, ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum), 0, true);
+                                thisSys.factory(ZoneUnitarySys_Num, ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum), true, 0);
 
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") { // Unitary System
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySystem_Num;

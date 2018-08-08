@@ -1294,7 +1294,7 @@ namespace SimAirServingZones {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemModel;
                             UnitarySystems::UnitarySys thisSys;
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
-                                thisSys.factory(UnitarySystemModel, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, 0, false);
+                                thisSys.factory(UnitarySystemModel, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false, 0);
                         } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemHVAC;
                         } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {

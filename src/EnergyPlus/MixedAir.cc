@@ -1217,7 +1217,7 @@ namespace MixedAir {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystemModel;
                         UnitarySystems::UnitarySys thisSys;
                         OutsideAirSys(OASysNum).compPointer[CompNum] =
-                            thisSys.factory(SimAirServingZones::UnitarySystemModel, OutsideAirSys(OASysNum).ComponentName(CompNum), 0, false);
+                            thisSys.factory(SimAirServingZones::UnitarySystemModel, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystemHVAC;
                     } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
