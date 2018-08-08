@@ -4472,6 +4472,9 @@ namespace SurfaceGeometry {
                     // WSCO						if ( TotWinShadingControl > 0 ) {
                     // WSCO							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList(
                     // cAlphaArgs( WindowShadingField
+
+                    // This would be were to insert SurfaceTmp( SurfNum ).HasShadeControl = true;
+                    
                     // ), WindowShadingControl, TotWinShadingControl );  WSCO						}  WSCO if ( SurfaceTmp(
                     // SurfNum ).WindowShadingControlPtr == 0 ) {
                     // WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum
