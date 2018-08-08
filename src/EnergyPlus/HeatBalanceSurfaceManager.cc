@@ -1109,7 +1109,7 @@ namespace HeatBalanceSurfaceManager {
                             vistranAreaNonNorth += TransVisNorm * windowAreaWMult;
                         }
                         // shading
-                        if (curWSC != 0) {
+                        if (Surface(iSurf).HasShadeControl) {
                             PreDefTableEntry(pdchFenSwitchable, surfName, "Yes");
                             // shading report
                             PreDefTableEntry(pdchWscName, surfName, WindowShadingControl(curWSC).Name);

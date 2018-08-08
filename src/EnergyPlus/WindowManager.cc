@@ -2008,7 +2008,7 @@ namespace WindowManager {
 
             // TH 2/16/2010. CR 8010. The following code was modified and moved to GetSurfaceData
             //  in SurfaceGeometry module, because for blinds with variable slats new blinds were created and assigned
-            if (Surface(SurfNum).WindowShadingControlPtr != 0) {
+            if (Surface(SurfNum).HasShadeControl) {
                 //  ConstrNumSh = Surface(SurfNum)%ShadedConstruction
                 ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
                 //  IF(ShadingType == WSC_ST_ExteriorBlind) THEN
@@ -2090,7 +2090,7 @@ namespace WindowManager {
                 ConstrNum = Surface(SurfNum).Construction;
                 MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers);
                 if (Material(MatNum).SolarDiffusing) {
-                    if (Surface(SurfNum).WindowShadingControlPtr == 0) {
+                    if (!Surface(SurfNum).HasShadeControl) {
                         SurfaceWindow(SurfNum).SolarDiffusing = true;
                     } else { // There is a shading control
                         if (WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType == SwitchableGlazing) {
@@ -8373,7 +8373,7 @@ namespace WindowManager {
         PrintTransMap = false;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
-            if (Surface(SurfNum).WindowShadingControlPtr != 0) {
+            if (Surface(SurfNum).HasShadeControl) {
                 ConstrNumSh = Surface(SurfNum).ShadedConstruction;
                 MatNum = Construct(ConstrNumSh).LayerPoint(1);
                 ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
