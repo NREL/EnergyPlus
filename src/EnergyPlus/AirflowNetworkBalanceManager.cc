@@ -141,7 +141,6 @@ namespace AirflowNetworkBalanceManager {
     using AirflowNetworkSolver::SETSKY;
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
-    using CurveManager::GetCurveType;
     using DataAirLoop::AirToZoneNodeInfo;
     using DataContaminantBalance::CO2ZoneTimeMinus1;
     using DataContaminantBalance::Contaminant;
@@ -735,36 +734,26 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError(
                             "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues.");
                     } else {
-                        // Verify Curve Object, only legal type is linear or quadratic
-                        {
-                            auto const SELECT_CASE_var(GetCurveType(OccupantVentilationControl(i).ComfortLowTempCurveNum));
-                            if (SELECT_CASE_var == "LINEAR" || SELECT_CASE_var == "QUADRATIC") {
-                            } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl(i).Name + "\", invalid");
-                                ShowContinueError("...illegal " + cAlphaFields(2) +
-                                                  " type for this object = " + GetCurveType(OccupantVentilationControl(i).ComfortLowTempCurveNum));
-                                ShowContinueError("Curve type must be either Linear or Quadratic.");
-                                ErrorsFound = true;
-                            }
-                        }
+                        ErrorsFound |= CurveManager::CheckCurveDims(
+                            OccupantVentilationControl(i).ComfortLowTempCurveNum,   // Curve index
+                            {1},                            // Valid dimensions
+                            RoutineName,                    // Routine name
+                            CurrentModuleObject,            // Object Type
+                            OccupantVentilationControl(i).Name,    // Object Name
+                            cAlphaFields(2));               // Field Name
                     }
                 }
                 if (!lAlphaBlanks(3)) {
                     OccupantVentilationControl(i).ComfortHighTempCurveName = Alphas(3);
                     OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(Alphas(3)); // convert curve name to number
                     if (OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
-                        // Verify Curve Object, only legal type is BiQuadratic
-                        {
-                            auto const SELECT_CASE_var(GetCurveType(OccupantVentilationControl(i).ComfortHighTempCurveNum));
-                            if (SELECT_CASE_var == "LINEAR" || SELECT_CASE_var == "QUADRATIC") {
-                            } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl(i).Name + "\", invalid");
-                                ShowContinueError("...illegal " + cAlphaFields(3) +
-                                                  " type for this object = " + GetCurveType(OccupantVentilationControl(i).ComfortHighTempCurveNum));
-                                ShowContinueError("Curve type must be either Linear or Quadratic.");
-                                ErrorsFound = true;
-                            }
-                        }
+                        ErrorsFound |= CurveManager::CheckCurveDims(
+                            OccupantVentilationControl(i).ComfortHighTempCurveNum,   // Curve index
+                            {1},                            // Valid dimensions
+                            RoutineName,                    // Routine name
+                            CurrentModuleObject,            // Object Type
+                            OccupantVentilationControl(i).Name,    // Object Name
+                            cAlphaFields(3));               // Field Name
                     } else {
                         ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(3) +
                                          " not found = " + OccupantVentilationControl(i).ComfortHighTempCurveName);
@@ -5956,7 +5945,8 @@ namespace AirflowNetworkBalanceManager {
         CurveManager::TableData(TableNum).Y.allocate(N);
 
         CurveManager::PerfCurve(CurveNum).Name = name;
-        CurveManager::PerfCurve(CurveNum).ObjectType = CurveManager::CurveType_TableOneIV;
+        CurveManager::PerfCurve(CurveNum).ObjectType = "Table:OneIndependentVariable";
+        CurveManager::PerfCurve(CurveNum).NumDims = 1;
         CurveManager::PerfCurve(CurveNum).TableIndex = TableNum;
         CurveManager::PerfCurve(CurveNum).CurveType = CurveManager::Linear;
         CurveManager::TableLookup(TableNum).InterpolationOrder = 2;
@@ -5990,7 +5980,6 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // move table data to more compact array to allow interpolation using multivariable lookup table method
-        CurveManager::TableLookup(TableNum).NumIndependentVars = 1;
         CurveManager::TableLookup(TableNum).NumX1Vars = N;
         CurveManager::TableLookup(TableNum).X1Var = CurveManager::PerfCurveTableData(TableNum).X1;
         // CurveManager::TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) = CurveManager::PerfCurveTableData( TableNum ).Y( 1, _ );
