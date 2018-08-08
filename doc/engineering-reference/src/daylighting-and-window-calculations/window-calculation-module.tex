@@ -1925,28 +1925,32 @@ For solar radiation calculations, each of the layers as well as entire glazing s
 
 \subparagraph{\textbf{Scattering (Non-Specular) Glazing and Shading Devices}}\label{scattering-non-specular-glazing-and-shading-devices}
 
-A general scattering fenestration system is characterized by BTDFs and BRDFs, which were described above.~ Given an incident direction \textbf{\emph{p}}\(^{(I)}\), and an incident irradiance \emph{E}( \textbf{\emph{p}}\(^{(I)}\)), the transmitted radiance in the outgoing direction \textbf{\emph{p}}\(^{(T)}\) is
+A general scattering fenestration system is characterized by BTDFs and BRDFs, which were described above.~ Given an incident direction \textbf{\emph{p}}\(^{(I)}\), and an incident irradiance \emph{E}( \textbf{\emph{p}}\(^{(I)}\)), the transmitted radiance in the outgoing direction \textbf{\emph{p}}\(^{(T)}\) is:
 
 \begin{equation}
-S({{\bf{p}}^{{\rm{(T)}}}}) = {\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})dE({{\bf{p}}^{{\rm{(I)}}}})
+S({{\bf{p}}^{{\rm{(T)}}}}) = {\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})dE({{\bf{p}}^{{\rm{(I)}}}})
+\label{eq:SofptotheTDiffEq}
 \end{equation}
 
-where the function T is the BTDF.~ In the absence of a source of effectively plane-parallel incident radiation (such as direct sunlight) d\emph{E(\textbf{p}}\(^{(I)}\)\emph{)} is an infinitesimal quantity, and the right side of the equation must be summed over the irradiance from all incident directions to produce the outgoing radiance:
+where the function $\mathcal{T}$ is the BTDF.~ In the absence of a source of effectively plane-parallel incident radiation (such as direct sunlight) d\emph{E(\textbf{p}}\(^{(I)}\)\emph{)} is an infinitesimal quantity, and the right side of the equation must be summed over the irradiance from all incident directions to produce the outgoing radiance:
 
 \begin{equation}
-S({{\bf{p}}^{{\rm{(T)}}}}) = \int {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})\frac{{dE({{\bf{p}}^{{\rm{(I)}}}})}}{{d\Omega }}d\Omega }
+S({{\bf{p}}^{{\rm{(T)}}}}) = \int {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})\frac{{dE({{\bf{p}}^{{\rm{(I)}}}})}}{{d\Omega }}d\Omega }
+\label{eq:SofptotheTIntegral}
 \end{equation}
 
 A similar equation gives the reflected radiance in the direction \textbf{\emph{p}}\(^{(R)}\):
 
 \begin{equation}
-S({{\bf{p}}^{{\rm{(R)}}}}) = \int {{\mathop{\rm R}\nolimits} ({{\bf{p}}^{{\rm{(R)}}}},{{\bf{p}}^{{\rm{(I)}}}})\frac{{dE({{\bf{p}}^{{\rm{(I)}}}})}}{{d\Omega }}d\Omega }
+S({{\bf{p}}^{{\rm{(R)}}}}) = \int {{\mathop{\rm \mathcal{R}}\nolimits} ({{\bf{p}}^{{\rm{(R)}}}},{{\bf{p}}^{{\rm{(I)}}}})\frac{{dE({{\bf{p}}^{{\rm{(I)}}}})}}{{d\Omega }}d\Omega }
+\label{eq:SofptotheREquation}
 \end{equation}
 
-We can express the irradiance in terms of the exterior luminance, S, in that direction,
+We can express the irradiance in terms of the exterior luminance, S, in that direction:
 
 \begin{equation}
 dE({{\bf{p}}^{{\rm{(I)}}}})dA = {S^{{\rm{(I)}}}}({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}dA
+\label{eq:dEpIdAEquation}
 \end{equation}
 
 \begin{figure}[hbtp] % fig 90
@@ -1958,18 +1962,20 @@ dE({{\bf{p}}^{{\rm{(I)}}}})dA = {S^{{\rm{(I)}}}}({{\bf{p}}^{{\rm{(I)}}}})\left( 
 which allows one to express the transmittance of exterior radiation to produce the total outgoing radiance from the fenestration into the room in a particular direction:
 
 \begin{equation}
-S({{\bf{p}}^{{\rm{(T)}}}}) = \int\limits_{{\Omega ^{{\rm{(I)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(I)}}}}({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}}
+S({{\bf{p}}^{{\rm{(T)}}}}) = \int\limits_{{\Omega ^{{\rm{(I)}}}}} {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(I)}}}}({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}}
+\label{eq:SofPtotheTEquation}
 \end{equation}
 
 The negative sign is added to account for the fact that \textbf{\emph{p}}\(^{(I)}\) and \textbf{\emph{n}} have opposite sign for incoming radiation.
 
-The radiance in equation is emitted from the back side of the element of area shown in Figure~\ref{fig:irradiance-geometry}.~ Considering a second surface, viewing the back side of the fenestration system, we can use equation to calculate the irradiance on surface 2,
+The radiance in Equation~\ref{eq:SofPtotheTEquation} is emitted from the back side of the element of area shown in Figure~\ref{fig:irradiance-geometry}.~ Considering a second surface, viewing the back side of the fenestration system, we can use Equation~\ref{eq:dEpIdAEquation} to calculate the irradiance on surface 2:
 
 \begin{equation}
 {E^{{\rm{(2)}}}}({{\bf{p}}^{{\rm{(T)}}}})d{A^{{\rm{(2)}}}} = {S^{{\rm{(T)}}}}({{\bf{p}}^{{\rm{(T)}}}})\left( { - {{\bf{p}}^{{\rm{(T)}}}}\cdot {{\bf{n}}^{{\rm{(2)}}}}} \right)d{\Omega ^{{\rm{(I,2)}}}}d{A^{{\rm{(2)}}}}
+\label{eq:E2pTdA2Equation}
 \end{equation}
 
-This expression, however, contains a number of new quantities, such as \(d{\Omega ^{{\rm{(I,2)}}}}\) , the element of solid angle for incoming radiation as seen from surface 2.~ We can sort this out by referring to Figure~\ref{fig:radiation-exchange-between-two-surface} and making some changes and clarifications in notation.
+This expression, however, contains a number of new quantities, such as \(d{\Omega ^{{\rm{(I,2)}}}}\), the element of solid angle for incoming radiation as seen from surface 2.~ We can sort this out by referring to Figure~\ref{fig:radiation-exchange-between-two-surface} and making some changes and clarifications in notation.
 
 \begin{figure}[hbtp] % fig 91
 \centering
@@ -1977,19 +1983,20 @@ This expression, however, contains a number of new quantities, such as \(d{\Omeg
 \caption{Radiation exchange between two surface elements \protect \label{fig:radiation-exchange-between-two-surface}}
 \end{figure}
 
-In this figure we consider that surface 1 is the back side of the fenestration system, and surface 2 is some other surface in the room that receives the transmitted solar radiation through the fenestration system.~ We consider infinitesimal elements \emph{dA}\(^{(1)}\) and \emph{dA}\(^{(2)}\) of the two surfaces, and define vector surface elements by \emph{d\textbf{A}}\textbf{\(^{(}\)}\(^{1)}\) = \emph{dA}\(^{(1)}\)\textbf{\emph{n}}\(^{(1)}\) and \emph{d\textbf{A}}\textbf{\(^{(}\)}\(^{1)}\) = \emph{dA}\(^{(1)}\)\textbf{\emph{n}}\(^{(1)}\).~ The quantity \textbf{\emph{r}} in the figure denotes a vector pointing from surface 1 to surface 2, the magnitude of which is the distance \emph{r} between the two surface elements.~ This is used to define two unit vectors: \({{\bf{\hat r}}^{{\rm{(1)}}}} = {{\bf{r}} \mathord{\left/ {\vphantom {{\bf{r}} r}} \right. } r}\) ~is a unit vector pointing from surface element 1 to surface element 2, and \({{\bf{\hat r}}^{{\rm{(2)}}}} = - {{\bf{r}} \mathord{\left/ {\vphantom {{\bf{r}} r}} \right. } r}\) ~is a unit vector pointing from surface element 2 back to surface element 1.~ The unit vector \textbf{\emph{p}}\(^{(T)}\) in equation is in fact \({{\bf{\hat r}}^{{\rm{(1)}}}}\) .~ The shaded quadrilaterals in the figure are the projected area elements normal to \textbf{\emph{r}}.~ Since the areas are infinitesimal, all the radiation leaving one surface element and arriving at the other will be in the direction \textbf{\emph{r}}, so that all radiation will be contained within the parallelepiped defined by the dashed lines (parallel to \textbf{\emph{r}}) joining the corners of the two surface elements.~ It follows that the area \emph{dA}\(^{(2)}\)~ is not independent of \emph{dA}\(^{(1)}\).~ The figure also shows the solid angle that has been denoted \emph{d}W\(^{(I,2)}\) above, which is the solid angle subtended by \emph{dA}\(^{(1)}\) as seen from \emph{dA}\(^{(2)}\) and is given by
+In this figure, we consider that surface 1 is the back side of the fenestration system, and surface 2 is some other surface in the room that receives the transmitted solar radiation through the fenestration system.~ We consider infinitesimal elements \emph{dA}\(^{(1)}\) and \emph{dA}\(^{(2)}\) of the two surfaces, and define vector surface elements by \emph{d\textbf{A}}\textbf{\(^{(}\)}\(^{1)}\) = \emph{dA}\(^{(1)}\)\textbf{\emph{n}}\(^{(1)}\) and \emph{d\textbf{A}}\textbf{\(^{(}\)}\(^{1)}\) = \emph{dA}\(^{(1)}\)\textbf{\emph{n}}\(^{(1)}\).~ The quantity \textbf{\emph{r}} in the figure denotes a vector pointing from surface 1 to surface 2, the magnitude of which is the distance \emph{r} between the two surface elements.~ This is used to define two unit vectors: \({{\bf{\hat r}}^{{\rm{(1)}}}} = {{\bf{r}} \mathord{\left/ {\vphantom {{\bf{r}} r}} \right. } r}\) ~is a unit vector pointing from surface element 1 to surface element 2, and \({{\bf{\hat r}}^{{\rm{(2)}}}} = - {{\bf{r}} \mathord{\left/ {\vphantom {{\bf{r}} r}} \right. } r}\) ~is a unit vector pointing from surface element 2 back to surface element 1.~ The unit vector \textbf{\emph{p}}\(^{(T)}\) in Equation~\ref{eq:SofPtotheTEquation} is in fact \({{\bf{\hat r}}^{{\rm{(1)}}}}\) .~ The shaded quadrilaterals in the figure are the projected area elements normal to \textbf{\emph{r}}.~ Since the areas are infinitesimal, all the radiation leaving one surface element and arriving at the other will be in the direction \textbf{\emph{r}}, so that all radiation will be contained within the parallelepiped defined by the dashed lines (parallel to \textbf{\emph{r}}) joining the corners of the two surface elements.~ It follows that the area \emph{dA}\(^{(2)}\)~ is not independent of \emph{dA}\(^{(1)}\).~ The figure also shows the solid angle that has been denoted \emph{d}\(\Omega\)\(^{(I,2)}\) above, which is the solid angle subtended by \emph{dA}\(^{(1)}\) as seen from \emph{dA}\(^{(2)}\) and is given by:
 
 \begin{equation}
 d{\Omega ^{{\rm{(I,2)}}}} = \frac{{d{{\bf{A}}^{{\rm{(1)}}}} \cdot {{\bf{r}}^{{\rm{(1)}}}}}}{{{r^2}}}
+\label{eq:dOmegaI2Equation}
 \end{equation}
 
-The net power from surface element 1 to surface element 2 is
+The net power from surface element 1 to surface element 2 is:
 
 \begin{equation}
 {W^{(1 \to 2)}} = \left( {{S^{{\rm{(1)}}}}({{{\bf{\hat r}}}^{{\rm{(1)}}}}) - {S^{{\rm{(2)}}}}({{{\bf{\hat r}}}^{{\rm{(2)}}}})} \right)\frac{{\left( {d{{\bf{A}}^{{\rm{(1)}}}} \cdot {{{\bf{\hat r}}}^{{\rm{(1)}}}}} \right)\left( {d{{\bf{A}}^{{\rm{(2)}}}} \cdot {{{\bf{\hat r}}}^{{\rm{(2)}}}}} \right)}}{{{r^2}}}
 \end{equation}
 
-where \({S^{{\rm{(1)}}}}({{\bf{\hat r}}^{{\rm{(1)}}}})\) ~is the radiance leaving surface element 1 in the direction of surface element 2, and vice-versa for \({S^{{\rm{(2)}}}}({{\bf{\hat r}}^{{\rm{(2)}}}})\) .~ In this case, the latter is zero and the former is the quantity called \emph{S}\(^{(T)}\)(\textbf{\emph{p}}\(^{(T)}\)) above.~ Given equation , we can recognize the quantity multiplying the radiance as the solid angle \emph{d}W\(^{(I,2)}\) times the projected area of surface element 2 perpendicular to \textbf{\emph{r}}.~ But the expression is symmetrical in the two surface elements, so we could also express it as
+where \({S^{{\rm{(1)}}}}({{\bf{\hat r}}^{{\rm{(1)}}}})\) ~is the radiance leaving surface element 1 in the direction of surface element 2, and vice-versa for \({S^{{\rm{(2)}}}}({{\bf{\hat r}}^{{\rm{(2)}}}})\) .~ In this case, the latter is zero and the former is the quantity called \emph{S}\(^{(T)}\)(\textbf{\emph{p}}\(^{(T)}\)) above.~ Given Equation~\ref{eq:dOmegaI2Equation}, we can recognize the quantity multiplying the radiance as the solid angle \emph{d}\(\Omega\)\(^{(I,2)}\) times the projected area of surface element 2 perpendicular to \textbf{\emph{r}}.~ But the expression is symmetrical in the two surface elements, so we could also express it as:
 
 \begin{equation}
 {W^{(1 \to 2)}} = {S^{{\rm{(T)}}}}({{\bf{p}}^{{\rm{(T)}}}})\left( {d{{\bf{A}}^{{\rm{(1)}}}} \cdot {{{\bf{\hat r}}}^{{\rm{(1)}}}}} \right)d{\Omega ^{{\rm{(T)}}}}
@@ -2001,19 +2008,20 @@ where
 d{\Omega ^{{\rm{(T)}}}} = \frac{{\left( {d{{\bf{A}}^{{\rm{(2)}}}} \cdot {{{\bf{\hat r}}}^{{\rm{(2)}}}}} \right)}}{{{r^2}}}
 \end{equation}
 
-The superscript (T) is used here because the solid angle element pertains to the direction \textbf{\emph{p}}\(^{(T)}\).~ In the particular case under discussion that restricts attention to those directions for which the outgoing radiation strikes surface element 2.~ We can now rewrite equation as
+The superscript (T) is used here because the solid angle element pertains to the direction \textbf{\emph{p}}\(^{(T)}\).~ In the particular case under discussion that restricts attention to those directions for which the outgoing radiation strikes surface element 2.~ We can now rewrite Equation~\ref{eq:E2pTdA2Equation} as:
 
 \begin{equation}
 {E^{{\rm{(2)}}}}({{\bf{p}}^{{\rm{(T)}}}})d{A^{{\rm{(2)}}}} = {S^{{\rm{(T)}}}}({{\bf{p}}^{{\rm{(T)}}}})\left( {{{\bf{n}}^{{\rm{(1)}}}} \cdot {{{\bf{\hat r}}}^{{\rm{(1)}}}}} \right)d{\Omega ^{{\rm{(T)}}}}d{A^{{\rm{(1)}}}}
+\label{eq:E2pTdA2Equation}
 \end{equation}
 
-and since, as can readily be seen from Figure~\ref{fig:radiation-exchange-between-two-surface}, \(\left( {d{{\bf{A}}^{{\rm{(1)}}}} \cdot {{{\bf{\hat r}}}^{{\rm{(1)}}}}} \right) = \left( {d{{\bf{A}}^{{\rm{(2)}}}} \cdot {{{\bf{\hat r}}}^{{\rm{(2)}}}}} \right)\) , this becomes
+and since, as can readily be seen from Figure~\ref{fig:radiation-exchange-between-two-surface}, \(\left( {d{{\bf{A}}^{{\rm{(1)}}}} \cdot {{{\bf{\hat r}}}^{{\rm{(1)}}}}} \right) = \left( {d{{\bf{A}}^{{\rm{(2)}}}} \cdot {{{\bf{\hat r}}}^{{\rm{(2)}}}}} \right)\) , this becomes:
 
 \begin{equation}
 {E^{{\rm{(2)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = {S^{{\rm{(T)}}}}({{\bf{p}}^{{\rm{(T)}}}})\left( { - {{\bf{p}}^{{\rm{(T)}}}} \cdot {{\bf{n}}^{{\rm{(2)}}}}} \right)d{\Omega ^{{\rm{(T)}}}}
 \end{equation}
 
-Substituting equation for \emph{S}\(^{(T)}\)(\textbf{\emph{p}}\(^{(T)}\), we obtain a propagation equation for outside radiation passing through the window and arriving at surface element 2:
+Substituting Equation~\ref{eq:SofPtotheTEquation} for \emph{S}\(^{(T)}\)(\textbf{\emph{p}}\(^{(T)}\)), we obtain a propagation equation for outside radiation passing through the window and arriving at surface element 2:
 
 \begin{equation}
 E^{(2)}(\bf{p}^{(T)}) = \int_{\Omega^{(I)}} 
@@ -2022,32 +2030,36 @@ E^{(2)}(\bf{p}^{(T)}) = \int_{\Omega^{(I)}}
       d\Omega^{(I)}(-\bf{p}^{(T)}\cdot\bf{n}^{(2)})d\Omega^{(T)}
 \end{equation}
 
-or, in terms involving only irradiance,
+or, in terms involving only irradiance:
 
 \begin{equation}
 {E^{{\rm{(2)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = \int\limits_{{\Omega ^{{\rm{(I)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})E({{\bf{p}}^{{\rm{(I)}}}})d{\Omega ^{{\rm{(I)}}}}} \left( { - {{\bf{p}}^{{\rm{(T)}}}} \cdot {{\bf{n}}^{{\rm{(2)}}}}} \right)d{\Omega ^{{\rm{(T)}}}}
 \end{equation}
 
-Comparing these two equations with equations and , we can see that physically they represent the processes of (a) propagation of radiation outgoing at one surface (initially, the sky ``surface''), where it is characterized by radiance, to incidence on a second surface, characterized by irradiance, followed (b) transmittance, which converts incoming radiation traveling in a given direction to outgoing radiation in a different set of directions, characterized again by radiance.~ We can make the former of these processes explicit by defining a propagation function.~ Considering the first surface element to be located at a position specified by the vector \textbf{\emph{x}}\(^{(1)}\) and the second at \textbf{\emph{x}}\(^{(2)}\), then radiation leaving surface 1 in a direction \textbf{\emph{p}}\(^{(1)}\) and arriving at surface 2 in a direction \textbf{\emph{p}}\(^{(2)}\) produces an irradiance given by
+Comparing these two equations with Equations~\ref{eq:SofptotheTDiffEq} and~\ref{eq:SofptotheREquation}, we can see that physically they represent the processes of (a) propagation of radiation outgoing at one surface (initially, the sky ``surface''), where it is characterized by radiance, to incidence on a second surface, characterized by irradiance, followed (b) transmittance, which converts incoming radiation traveling in a given direction to outgoing radiation in a different set of directions, characterized again by radiance.~ We can make the former of these processes explicit by defining a propagation function.~ Considering the first surface element to be located at a position specified by the vector \textbf{\emph{x}}\(^{(1)}\) and the second at \textbf{\emph{x}}\(^{(2)}\), then radiation leaving surface 1 in a direction \textbf{\emph{p}}\(^{(1)}\) and arriving at surface 2 in a direction \textbf{\emph{p}}\(^{(2)}\) produces an irradiance given by:
 
 \begin{equation}
-{E^{(2)}}({{\bf{p}}^{{\rm{(2)}}}}) = \int {L({{\bf{x}}^{{\rm{(2)}}}},{{\bf{p}}^{{\rm{(2)}}}};{{\bf{x}}^{{\rm{(1)}}}},{{\bf{p}}^{{\rm{(1)}}}}){S^{{\rm{(1)}}}}({{\bf{p}}^{{\rm{(1)}}}})} d{\Omega ^{{\rm{(1)}}}}
+{E^{(2)}}({{\bf{p}}^{{\rm{(2)}}}}) = \int {\mathcal{L}({{\bf{x}}^{{\rm{(2)}}}},{{\bf{p}}^{{\rm{(2)}}}};{{\bf{x}}^{{\rm{(1)}}}},{{\bf{p}}^{{\rm{(1)}}}}){S^{{\rm{(1)}}}}({{\bf{p}}^{{\rm{(1)}}}})} d{\Omega ^{{\rm{(1)}}}}
+\label{eq:E2p2Equation}
 \end{equation}
 
-where the propagation function L is defined by
+where the propagation function $\mathcal{L}$ is defined by:
 
 \begin{equation}
-L({{\bf{x}}^{{\rm{(2)}}}},{{\bf{p}}^{{\rm{(2)}}}};{{\bf{x}}^{{\rm{(1)}}}},{{\bf{p}}^{{\rm{(1)}}}}) = \left( { - {{\bf{p}}^{{\rm{(2)}}}}\cdot {{\bf{n}}^{{\rm{(2)}}}}} \right)d{\Omega ^{{\rm{(2)}}}}\delta ({{\bf{p}}^{{\rm{(2)}}}},{{\bf{p}}^{{\rm{(1)}}}})\delta ({{\bf{x}}^{{\rm{(2)}}}},{{\bf{x}}^{{\rm{(1)}}}} + {\bf{r}})
+\mathcal{L}({{\bf{x}}^{{\rm{(2)}}}},{{\bf{p}}^{{\rm{(2)}}}};{{\bf{x}}^{{\rm{(1)}}}},{{\bf{p}}^{{\rm{(1)}}}}) = \left( { - {{\bf{p}}^{{\rm{(2)}}}}\cdot {{\bf{n}}^{{\rm{(2)}}}}} \right)d{\Omega ^{{\rm{(2)}}}}\delta ({{\bf{p}}^{{\rm{(2)}}}},{{\bf{p}}^{{\rm{(1)}}}})\delta ({{\bf{x}}^{{\rm{(2)}}}},{{\bf{x}}^{{\rm{(1)}}}} + {\bf{r}})
+\label{eq:ScriptLEquation}
 \end{equation}
 
-The spatial dependence is inserted to guarantee that the geometrical relations in Figure~\ref{fig:radiation-exchange-between-two-surface} are preserved.~ The delta functions in direction and spatial vectors are the mathematically standard d-distributions defined so that
+The spatial dependence is inserted to guarantee that the geometrical relations in Figure~\ref{fig:radiation-exchange-between-two-surface} are preserved.~ The delta functions in direction and spatial vectors are the mathematically standard \(\delta\)-distributions defined so that:
 
 \begin{equation}
 \int {\delta ({{\bf{p}}^{{\rm{(2)}}}},{{\bf{p}}^{{\rm{(1)}}}})} f({{\bf{p}}^{{\rm{(1)}}}})d{\Omega ^{{\rm{(1)}}}} = f({{\bf{p}}^{{\rm{(2)}}}})
+\label{eq:deltap2p1fp1dOmega1Equation}
 \end{equation}
 
 \begin{equation}
 \int\limits_\Omega  {\delta ({{\bf{p}}^{{\rm{(2)}}}},{{\bf{p}}^{{\rm{(1)}}}})d{\Omega ^{{\rm{(1)}}}}}  = \left\{ {\begin{array}{*{20}{c}}1&{{{\bf{p}}^{{\rm{(2)}}}} \in \Omega }\\0&{{{\bf{p}}^{{\rm{(2)}}}} \notin \Omega }\end{array}} \right.
+\label{eq:deltap2p1dOmega1Integral}
 \end{equation}
 
 \begin{equation}
@@ -2058,57 +2070,61 @@ The spatial dependence is inserted to guarantee that the geometrical relations i
 \int\limits_A {\delta ({{\bf{x}}^{{\rm{(2)}}}},{{\bf{x}}^{{\rm{(1)}}}})d{A^{{\rm{(1)}}}}}  = \left\{ {\begin{array}{*{20}{c}}1&{{{\bf{x}}^{{\rm{(2)}}}} \in A}\\0&{{{\bf{x}}^{{\rm{(2)}}}} \notin A}\end{array}} \right.
 \end{equation}
 
-for an arbitrary function \emph{f}.~ {[}In equations and the integration is assumed to be over all possible values of either direction or position, so that the vectors \textbf{\emph{p}}\(^{(2)}\) and \textbf{\emph{x}}\(^{(2)}\) are necessarily within the domain of integration.{]}
+for an arbitrary function \emph{f}.~ {[}In Equations~\ref{eq:deltap2p1fp1dOmega1Equation} and~\ref{eq:deltap2p1dOmega1Integral}, the integration is assumed to be over all possible values of either direction or position, so that the vectors \textbf{\emph{p}}\(^{(2)}\) and \textbf{\emph{x}}\(^{(2)}\) are necessarily within the domain of integration.{]}
 
 \subparagraph{Physical Caveats}\label{physical-caveats}
 
-In equations and the functions T and R pertain to the overall glazing system, and are assumed to be averaged over both wavelength and polarization with appropriate weightings.~ {[}EnergyPlus considers wavelength only in that it distinguishes between radiation in the longwave thermal IR region and in the shortwave solar/visible region.~ (In considering daylighting, there is a further limitation to the visible region.)~ In this discussion we are concerned solely with the shortwave solar/visible region.{]}~ While fenestration properties may depend on both wavelength and polarization, for externally incident radiation this dependence is taken into account in the calculation and averaging of T and R.~ However, both the wavelength distribution (within the solar region) and the polarization state of the outgoing radiation will generally be different from that of the incident radiation.~ This is not a feature peculiar to non-specular fenestration systems; it is also true of specular ones, and may in fact be more important there.~ For most interior surfaces, where the radiation is either absorbed or diffusely reflected (and where both processes are assumed wavelength and polarization independent), this is of no importance, but in the case of either interior windows or the back-reflectance from exterior windows, it could in principle cause errors, unless proper account is taken in specifying T and R for these cases.
+In Equations~\ref{eq:SofptotheTIntegral} and~\ref{eq:SofptotheREquation}, the functions $\mathcal{T}$ and $\mathcal{R}$ pertain to the overall glazing system, and are assumed to be averaged over both wavelength and polarization with appropriate weightings.~ {[}EnergyPlus considers wavelength only in that it distinguishes between radiation in the longwave thermal IR region and in the shortwave solar/visible region.~ (In considering daylighting, there is a further limitation to the visible region.)~ In this discussion we are concerned solely with the shortwave solar/visible region.{]}~ While fenestration properties may depend on both wavelength and polarization, for externally incident radiation this dependence is taken into account in the calculation and averaging of $\mathcal{T}$ and $\mathcal{R}$.~ However, both the wavelength distribution (within the solar region) and the polarization state of the outgoing radiation will generally be different from that of the incident radiation.~ This is not a feature peculiar to non-specular fenestration systems; it is also true of specular ones, and may in fact be more important there.~ For most interior surfaces, where the radiation is either absorbed or diffusely reflected (and where both processes are assumed wavelength and polarization independent), this is of no importance, but in the case of either interior windows or the back-reflectance from exterior windows, it could in principle cause errors, unless proper account is taken in specifying $\mathcal{T}$ and $\mathcal{R}$ for these cases.
 
 \subparagraph{Discretization: The LBNL Method}\label{discretization-the-lbnl-method}
 
 A series of 6 papers (Papamichael, Klems et al. 1988; Klems 1994A; Klems 1994B; Klems and Warner 1995; Klems and Kelley 1996; Klems, Warner et al. 1996) formulated the LBNL method of characterizing scattering fenestration systems.~ The relevant aspects of that method will be summarized here.~ This method has been incorporated into the WINDOW (from LBNL 2012) computer program.
 
-The method begins by approximating the integrals in equations and by finite sums.~ It does this by defining a set of finite solid angle elements \{\(\Delta {\Omega_i}\) \} that covers the relevant solid angle hemisphere (whether incident, transmitted or reflected directions).~ Each solid angle element is characterized by a direction \textbf{\emph{p}}\emph{\(_{i}\)}, and it is assumed that this may be substituted for any direction within the solid angle element.~ This set of solid angle elements and corresponding directions is termed a basis.~ Note that, since \textbf{\emph{p}}\emph{\(_{i}\)} is a two-dimensional vector, enumerating the solid angle elements with a single index \emph{i} implicitly includes specifying an ordering of the direction vectors.~ Equation then becomes
+The method begins by approximating the integrals in Equations~\ref{eq:dEpIdAEquation} and~\ref{eq:E2p2Equation} by finite sums.~ It does this by defining a set of finite solid angle elements \{\(\Delta {\Omega_i}\)\} that covers the relevant solid angle hemisphere (whether incident, transmitted or reflected directions).~ Each solid angle element is characterized by a direction \textbf{\emph{p}}\emph{\(_{i}\)}, and it is assumed that this may be substituted for any direction within the solid angle element.~ This set of solid angle elements and corresponding directions is termed a basis.~ Note that, since \textbf{\emph{p}}\emph{\(_{i}\)} is a two-dimensional vector, enumerating the solid angle elements with a single index \emph{i} implicitly includes specifying an ordering of the direction vectors.~ Equation~\ref{eq:SofPtotheTEquation} then becomes:
 
 \begin{equation}
-S({{\bf{p}}_j}^{{\rm{(T)}}}) = \sum\limits_i {{\mathop{\rm T}\nolimits} ({{\bf{p}}_j}^{{\rm{(T)}}},{{\bf{p}}_i}^{{\rm{(I)}}}){S^{{\rm{(I)}}}}({{\bf{p}}_i}^{{\rm{(I)}}})\left( { - {{\bf{p}}_i}^{{\rm{(I)}}}\cdot {\bf{n}}} \right)\Delta {\Omega_i}^{{\rm{(I)}}}}
+S({{\bf{p}}_j}^{{\rm{(T)}}}) = \sum\limits_i {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}_j}^{{\rm{(T)}}},{{\bf{p}}_i}^{{\rm{(I)}}}){S^{{\rm{(I)}}}}({{\bf{p}}_i}^{{\rm{(I)}}})\left( { - {{\bf{p}}_i}^{{\rm{(I)}}}\cdot {\bf{n}}} \right)\Delta {\Omega_i}^{{\rm{(I)}}}}
+\label{eq:SofptotheTmodifiedEquation}
 \end{equation}
 
-and equation becomes
+and Equation~\ref{eq:E2p2Equation} becomes:
 
 \begin{equation}
-{E^{(2)}}({{\bf{p}}_j}^{{\rm{(2)}}}) = \sum\limits_i {\int\limits_{\Delta {\Omega_i}} {L({{\bf{x}}^{{\rm{(2)}}}},{{\bf{p}}_j}^{{\rm{(2)}}};{{\bf{x}}^{{\rm{(1)}}}},{{\bf{p}}_i}^{{\rm{(1)}}}){S^{{\rm{(1)}}}}({{\bf{p}}_i}^{{\rm{(1)}}})d{\Omega ^{{\rm{(1)}}}}} }
+{E^{(2)}}({{\bf{p}}_j}^{{\rm{(2)}}}) = \sum\limits_i {\int\limits_{\Delta {\Omega_i}} {\mathcal{L}({{\bf{x}}^{{\rm{(2)}}}},{{\bf{p}}_j}^{{\rm{(2)}}};{{\bf{x}}^{{\rm{(1)}}}},{{\bf{p}}_i}^{{\rm{(1)}}}){S^{{\rm{(1)}}}}({{\bf{p}}_i}^{{\rm{(1)}}})d{\Omega ^{{\rm{(1)}}}}} }
 \end{equation}
 
-Referring to the definition of the propagation function in equation and properties of the d-distribution in equation , we see that the integrals in the summation will all be zero, except when \textbf{\emph{p}}\emph{\(_{j}\)}\(^{(2)}\) is contained in the solid angle element DW\emph{\(_{i}\)}.~ In that case the integration produces \textbf{\emph{p}}\emph{\(_{i}\)}\(^{(1)}\) = \textbf{\emph{p}}\emph{\(_{j}\)}\(^{(2)}\).~ We can retain the formal summation by utilizing the finite-dimensional form of the d-distribution, known as the Kronicker delta, d\emph{\(_{ij}\)}:
+Referring to the definition of the propagation function in Equation~\ref{eq:ScriptLEquation} and properties of the \(\delta\)-distribution in Equation~\ref{eq:deltap2p1dOmega1Integral}, we see that the integrals in the summation will all be zero, except when \textbf{\emph{p}}\emph{\(_{j}\)}\(^{(2)}\) is contained in the solid angle element \(\Delta\)\(\Omega\)\emph{\(_{i}\)}.~ In that case the integration produces \textbf{\emph{p}}\emph{\(_{i}\)}\(^{(1)}\) = \textbf{\emph{p}}\emph{\(_{j}\)}\(^{(2)}\).~ We can retain the formal summation by utilizing the finite-dimensional form of the \(\delta\)-distribution, known as the Kronicker delta, \(\delta\)\emph{\(_{ij}\)}:
 
 \begin{equation}
 {\delta_{ij}} = \left\{ {\begin{array}{*{20}{c}}1&{i = j}\\0&{i \ne j}\end{array}} \right.
 \end{equation}
 
-Then the integral becomes
+Then, the integral becomes:
 
 \begin{equation}
-\int\limits_{\Delta {\Omega_i}} {L({{\bf{x}}^{{\rm{(2)}}}},{{\bf{p}}_j}^{{\rm{(2)}}};{{\bf{x}}^{{\rm{(1)}}}},{{\bf{p}}_i}^{{\rm{(1)}}}){S^{{\rm{(1)}}}}({{\bf{p}}_i}^{{\rm{(1)}}})d{\Omega ^{{\rm{(1)}}}}}  = \lambda ( - {{\bf{p}}_j}^{{\rm{(2)}}}){\delta_{ij}} \cdot \delta ({{\bf{x}}^{{\rm{(2)}}}},{{\bf{x}}^{{\rm{(1)}}}} + {\bf{r}})
+\int\limits_{\Delta {\Omega_i}} {\mathcal{L}({{\bf{x}}^{{\rm{(2)}}}},{{\bf{p}}_j}^{{\rm{(2)}}};{{\bf{x}}^{{\rm{(1)}}}},{{\bf{p}}_i}^{{\rm{(1)}}}){S^{{\rm{(1)}}}}({{\bf{p}}_i}^{{\rm{(1)}}})d{\Omega ^{{\rm{(1)}}}}}  = \lambda ( - {{\bf{p}}_j}^{{\rm{(2)}}}){\delta_{ij}} \cdot \delta ({{\bf{x}}^{{\rm{(2)}}}},{{\bf{x}}^{{\rm{(1)}}}} + {\bf{r}})
+\label{eq:ScriptLx2pj2x1pi1S1pi1Integral}
 \end{equation}
 
-where the function \emph{l} is defined as
+where the function \(\lamba\) is defined as:
 
 \begin{equation}
 {\lambda ^{{\rm{(s)}}}}({{\bf{p}}_j}) = \left( {{{\bf{p}}_j}\cdot {{\bf{n}}^{{\rm{(s)}}}}} \right)\Delta {\Omega_j}
+\label{eq:lambdaspjEquation}
 \end{equation}
 
 and the superscript (s) refers to the surface.
 
-The LBNL method, which focuses on glazing systems consisting of plane-parallel layers, makes particular assumptions that allow one to ignore the spatial dependence of L.~ Since the only effect of the function \(\delta ({{\bf{x}}^{{\rm{(2)}}}},{{\bf{x}}^{{\rm{(1)}}}} + {\bf{r}})\) ~in equation is to require that if the expression is formally integrated over two separate surface areas, only the parts of the integration that satisfy the geometric constraints will contribute (in effect, the integration is over only one of the surfaces), we will drop the spatial dependence in the present discussion and replace it later when we consider the total energy transfer between different surfaces.
+The LBNL method, which focuses on glazing systems consisting of plane-parallel layers, makes particular assumptions that allow one to ignore the spatial dependence of $\mathcal{L}$.~ Since the only effect of the function \(\delta ({{\bf{x}}^{{\rm{(2)}}}},{{\bf{x}}^{{\rm{(1)}}}} + {\bf{r}})\)~in Equation~\ref{eq:ScriptLEquation} is to require that if the expression is formally integrated over two separate surface areas, only the parts of the integration that satisfy the geometric constraints will contribute (in effect, the integration is over only one of the surfaces), we will drop the spatial dependence in the present discussion and replace it later when we consider the total energy transfer between different surfaces.
 
-Equations (without the delta distribution in \textbf{\emph{x}}) and are then considered to define the components of a diagonal matrix,
+Equations~\ref{eq:ScriptLx2pj2x1pi1S1pi1Integral} (without the delta distribution in \textbf{\emph{x}}) and~\ref{eq:lambdaspjEquation} are then considered to define the components of a diagonal matrix:
 
 \begin{equation}
 \begin{array}{*{20}{c}}{{\bf{\Lambda }^{{\rm{(s)}}}} = \left( {{\Lambda ^{{\rm{(s)}}}}_{ij}} \right)}&{{\rm{where}}}&{\Lambda_{ij}^{{\rm{(s)}}} = \left( {{{\bf{p}}_j}\cdot {{\bf{n}}^{{\rm{(s)}}}}} \right)\Delta {\Omega_j}{\delta_{ij}}}\end{array}
+\label{eq:LambdasEquation}
 \end{equation}
 
-Considering the radiance in the various basis directions to be the components of a vector,
+Considering the radiance in the various basis directions to be the components of a vector:
 
 \begin{equation}
 \bf{S} = \left( 
@@ -2116,23 +2132,24 @@ Considering the radiance in the various basis directions to be the components of
       S_1 \\ ... \\ S_j \\ ...
     \end{array}
   \right)
-  \text{where}
+  \text{where~}
   S_j = S(\bf{p}_j)
 \end{equation}
 
-equation becomes
+Equation~\ref{eq:SofPtotheTEquation} becomes:
 
 \begin{equation}
-\begin{array}{*{20}{c}}{{S^{{\rm{(T)}}}}_j = \sum\limits_i {{T_{ji}}} \sum\limits_k {{\Lambda_{ik}}} {S_k}}&{{\rm{where}}}&{{T_{ji}} = {\mathop{\rm T}\nolimits} ({{\bf{p}}_j}^{{\rm{(T)}}},{{\bf{p}}_i}^{{\rm{(I)}}})}\end{array}
+\begin{array}{*{20}{c}}{{S^{{\rm{(T)}}}}_j = \sum\limits_i {{T_{ji}}} \sum\limits_k {{\Lambda_{ik}}} {S_k}}&{{\rm{where}}}&{{T_{ji}} = {\mathcal{T}} ({{\bf{p}}_j}^{{\rm{(T)}}},{{\bf{p}}_i}^{{\rm{(I)}}})}\end{array}
 \end{equation}
 
-which has the obvious character of a series of matrix multiplications.~ (Note that the superscript (T) here means transmitted, not the matrix operation transpose.)~ Similarly, the reflectance matrix elements are
+which has the obvious character of a series of matrix multiplications.~ (Note that the superscript (T) here means transmitted, not the matrix operation transpose.)~ Similarly, the reflectance matrix elements are:
 
 \begin{equation}
-{R_{ij}} = {\mathop{\rm R}\nolimits} ({{\bf{p}}^{{\rm{(R)}}}},{{\bf{p}}^{{\rm{(I)}}}})
+{R_{ij}} = {\mathcal{R}} ({{\bf{p}}^{{\rm{(R)}}}},{{\bf{p}}^{{\rm{(I)}}}})
+\label{eq:RijEquation}
 \end{equation}
 
-The method then identifies the infinitesimal directional irradiances in equation with the components of an irradiance vector,
+The method then identifies the infinitesimal directional irradiances in Equation~\ref{eq:SofptotheTDiffEq} with the components of an irradiance vector:
 
 \begin{equation}
 E = \left( 
@@ -2141,10 +2158,10 @@ E = \left(
     \end{array}
   \right)
   \text{where}
-  E_i = \frac{dE(\bf{p}_j)}{d\Omega}
+  ~E_i = \frac{dE(\bf{p}_j)}{d\Omega}
 \end{equation}
 
-and equations - can be rewritten as matrix equations,
+and Equations~\ref{eq:SofptotheTDiffEq} -~\ref{eq:dEpIdAEquation} can be rewritten as matrix equations:
 
 \begin{equation}
 {{\bf{S}}^{{\rm{(T)}}}} = {\bf{T}} \cdot {{\bf{E}}^{{\rm{(I)}}}}
@@ -2166,83 +2183,37 @@ and equations - can be rewritten as matrix equations,
 
 In the LBNL method, these equations are used extensively to calculate the overall properties of a fenestration system from those of its component layers.~ Here we will assume that the components of the system property matrices are given at input.~ These may be from a calculation by WINDOW or determined by some other method.~ The quantities needed for each fenestration are:
 
-Table 34: Fenestration properties needed for the calculation
-
-Exterior Window
-
-\begin{equation}
-T_{ij}^F
-\end{equation}
-
-Front Transmittance~ matrix elements
-
-\begin{equation}
-R_{ij}^F
-\end{equation}
-
-Back Reflectance matrix elements
-
-\begin{equation}
-{\mathop{\rm A}\nolimits}_i^{F,n}
-\end{equation}
-
-In-situ absorptance of n\(^{th}\) layer for front incidence
-
-\begin{equation}
-{\mathop{\rm A}\nolimits}_i^{B,n}
-\end{equation}
-
-In-situ absorptance of n\(^{th}\) layer for back incidence
-
-Interior Window
+\begin{table}
+\caption{Fenestration properties needed for the calculation}
+\centering
+\begin{tabular} { | l | c | l | }
+\hline
+ & T_{ij}^F & Front Transmittance matrix elements \\
+ & R_{ij}^F & Back Reflectance matrix elements \\
+Exterior Window & \mathcal{A}_i^{F,n} & In-situ absorptance of n\(^{th}\) layer for front incidence \\
+ & \mathcal{A}_i^{B,n} & In-situ absorptance of n\(^{th}\) layer for back incidence \\
+\hline
+ & T_{ij}^F & Front Transmittance matrix elements \\
+ & T_{ij}^B & Back Transmittance matrix elements \\
+Interior Window & R_{ij}^F & Front Reflectance matrix elements \\
+ & R_{ij}^B & Back Reflectance matrix elements \\
+ & \mathcal{A}_i^{F,n} & In-situ absorptance of n\(^{th}\) layer for front incidence \\
+ & \mathcal{A}_i^{B,n} & In-situ absorptance of n\(^{th}\) layer for back incidence \\
+\hline
+\end{tabular}
+\end{table}
+ 
+The transmittance and reflectance are overall system properties.~ (For daylighting calculations, one also needs the transmittance and reflectance averaged over the visible spectrum only; the quantities indicated in the table pertain to the entire solar spectrum.)~ For the optical calculations we do not need to know anything about the individual layers making up the fenestration.~ However, the thermal calculation of heat flow through the fenestration requires knowledge of the amount of radiation absorbed in each of the fenestration layers.~ As indicated in the table, we therefore need the in-situ layer absorptance for each layer, referenced to the incident surface.~ This is denoted \(\(\mathcal{A}\)_i^{F,n}\)~for the fraction of the \emph{i\(^{th}\)} component of the irradiance incident on the front surface of the fenestration that is absorbed in layer \emph{n}, with a similar quantity, \(\(\mathcal{A}\)_i^{B,n}\), for irradiance incident on the back surface.~ The term ``in-situ layer absorptance'' is used because these are not simply the absorptance of the layer, but include the transmittance and interreflection by other layers of the system prior to the absorptance in layer \emph{n}.~ The absorptance is a row vector, having possibly a different value for each direction of the incident irradiance, so that for an irradiance \emph{E\(_{i}\)\(^{F}\)} on the front surface of a fenestration and \emph{E\(_{i}\)\(^{B}\)} on the back surface, the power \emph{Q\(^{n}\)} absorbed per unit area in layer \emph{n} would be:
 
 \begin{equation}
-T_{ij}^F
+{Q^n} = \sum\limits_i {{\mathop{\rm \mathcal{A}}\nolimits}_i^{F,n}E_i^F}  + \sum\limits_j {{\mathop{\rm \mathcal{A}}\nolimits}_j^{B,n}E_j^B}
 \end{equation}
 
-Front Transmittance matrix elements
-
-\begin{equation}
-T_{ij}^B
-\end{equation}
-
-Back Transmittance matrx elements
-
-\begin{equation}
-R_{ij}^F
-\end{equation}
-
-Front Reflectance matrix elements
-
-\begin{equation}
-R_{ij}^B
-\end{equation}
-
-Back Reflectance matrix elements
-
-\begin{equation}
-{\mathop{\rm A}\nolimits}_i^{F,n}
-\end{equation}
-
-In-situ absorptance of n\(^{th}\) layer for front incidence
-
-\begin{equation}
-{\mathop{\rm A}\nolimits}_i^{B,n}
-\end{equation}
-
-In-situ absorptance of n\(^{th}\) layer for back incidence
-
-The transmittance and reflectance are overall system properties.~ (For daylighting calculations, one also needs the transmittance and reflectance averaged over the visible spectrum only; the quantities indicated in the table pertain to the entire solar spectrum.)~ For the optical calculations we do not need to know anything about the individual layers making up the fenestration.~ However, the thermal calculation of heat flow through the fenestration requires knowledge of the amount of radiation absorbed in each of the fenestration layers.~ As indicated in the table, we therefore need the in-situ layer absorptance for each layer, referenced to the incident surface.~ This is denoted \({\mathop{\rm A}\nolimits}_i^{F,n}\) ~for the fraction of the \emph{i\(^{th}\)} component of the irradiance incident on the front surface of the fenestration that is absorbed in layer \emph{n}, with a similar quantity, \({\mathop{\rm A}\nolimits}_i^{B,n}\) , for irradiance incident on the back surface.~ The term ``in-situ layer absorptance'' is used because these are not simply the absorptance of the layer, but include the transmittance and interreflection by other layers of the system prior to the absorptance in layer \emph{n}.~ The absorptance is a row vector, having possibly a different value for each direction of the incident irradiance, so that for an irradiance \emph{E\(_{i}\)\(^{F}\)} on the front surface of a fenestration and \emph{E\(_{i}\)\(^{B}\)} on the back surface, the power \emph{Q\(^{n}\)} absorbed per unit area in layer \emph{n} would be
-
-\begin{equation}
-{Q^n} = \sum\limits_i {{\mathop{\rm A}\nolimits}_i^{F,n}E_i^F}  + \sum\limits_j {{\mathop{\rm A}\nolimits}_j^{B,n}E_j^B}
-\end{equation}
-
-(In the vector/matrix language, \({Q^n} = {\bf{A}^{F,n}} \cdot {{\bf{E}}^F} + {\bf{A}^{B,n}} \cdot {{\bf{E}}^B}\) )
+(In the vector/matrix language, \({Q^n} = {\bf{\mathcal{A}}^{F,n}} \cdot {{\bf{E}}^F} + {\bf{\mathcal{A}}^{B,n}} \cdot {{\bf{E}}^B}\) )
 
 \subparagraph{Bases and Coordinate Systems}\label{bases-and-coordinate-systems}
 
-The introduction of a basis or multiple bases is a bit more complicated than indicated in the text preceding equation .~ There for transmission we need coordinates describing incoming radiation on one surface of the physical layer and outgoing radiation at the second (opposite) surface, while reflection adds the need for coordinates describing outgoing radiation at the first surface.~ Back transmittance and reflectance add the requirement for coordinates describing incoming radiation at the second surface.~ The usual way of assigning coordinates to radiation involves specifying its line of propagation relative to the local surface normal. This means that there are separate coordinate systems for the first and second surfaces, and that, moreover, the description is different for incoming and outgoing radiation: for incoming radiation one is specifying a unit vector pointing toward the source of the radiation (\emph{i}.\emph{e}., antiparallel to the direction of propagation), while for outgoing radiation one is specifying a unit vector in the direction of propagation of the radiation.~ In principle, then, one needs four coordinate systems or bases (for each physical layer), and the process of transmission or reflection involves a discontinuous transition between an input basis and an output basis.
+The introduction of a basis or multiple bases is a bit more complicated than indicated in the text preceding Equation~\ref{eq:SofptotheTmodifiedEquation}.~ There for transmission we need coordinates describing incoming radiation on one surface of the physical layer and outgoing radiation at the second (opposite) surface, while reflection adds the need for coordinates describing outgoing radiation at the first surface.~ Back transmittance and reflectance add the requirement for coordinates describing incoming radiation at the second surface.~ The usual way of assigning coordinates to radiation involves specifying its line of propagation relative to the local surface normal. This means that there are separate coordinate systems for the first and second surfaces, and that, moreover, the description is different for incoming and outgoing radiation: for incoming radiation one is specifying a unit vector pointing toward the source of the radiation (\emph{i}.\emph{e}., antiparallel to the direction of propagation), while for outgoing radiation one is specifying a unit vector in the direction of propagation of the radiation.~ In principle, then, one needs four coordinate systems or bases (for each physical layer), and the process of transmission or reflection involves a discontinuous transition between an input basis and an output basis.
 
 The LBNL method used by WINDOW uses a particular choice of coordinate systems in which incoming radiation at the first surface and outgoing radiation at the second are described by one coordinate system, while the same coordinate system reflected through the layer is used to describe incoming radiation at the second surface and outgoing radiation at the first.~ The reason for this choice is that it greatly simplifies the matrix representations: specular transmittance or reflectance is always represented by a diagonal matrix, one can mix matrices representing forward or backward incidence processes, and all of the coordinate systems have propagation matrices with the same representation, so in effect there is one \emph{L} matrix rather than four.
 
@@ -2261,7 +2232,7 @@ In general, the basis appears to be reasonably matched to the calculation, with 
 \begin{figure}[hbtp] % fig 92
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1326.png}
-\caption{Transmitted Radiation in Three Directions for a Perimeter Office. (a) q = 0º; (b) q = 40º, f = 15º; (c) q = 70º, f = 67.5º.  q and f are the normal spherical angle coordinates in a right-handed coordinate system where y points up and z is normal to the window p \protect \label{fig:transmitted-radiation-in-three-directions-for}}
+\caption{Transmitted Radiation in Three Directions for a Perimeter Office. (a) \(\theta\) = 0\(^{o}\); (b) \(\theta\) = 40\(^{o}\), \(\phi\) = 15\(^{o}\); (c) \(\theta\) = 70\(^{o}\), \(\phi\) = 67.5\(^{o}\).  \(\theta\) and \(\phi\) are the normal spherical angle coordinates in a right-handed coordinate system where y points up and z is normal to the window p \protect \label{fig:transmitted-radiation-in-three-directions-for}}
 \end{figure}
 
 \subparagraph{Complex Fenestrations in EnergyPlus}\label{complex-fenestrations-in-energyplus}
@@ -2270,79 +2241,85 @@ Exterior
 
 EnergyPlus models the exterior radiance in two parts, a moving sun radiance \({S^{{\rm{(Sun)}}}}(t)\Delta {\Omega ^{{\rm{(Sun)}}}}\) ~and a constant-shape direction-dependent sky radiance \({S^{{\rm{(Sky)}}}}({\bf{p}},t)\) .~ The intensities of these vary with time.~ For the solar radiation there is a single sky radiance model.~ For daylight calculations the treatment is similar for exterior luminance, except that there are a number of user-selectable sky luminance models.~ Here we will discuss radiance; the treatment of luminance is analogous.
 
-The direct normal solar intensity (at a given time) is
+The direct normal solar intensity (at a given time) is:
 
 \begin{equation}
 {I^{{\rm{(D)}}}}(t) = {S^{{\rm{(Sun)}}}}(t)\Delta {\Omega ^{{\rm{(Sun)}}}}
 \end{equation}
 
-and if we let
+and if we let:
 
 \begin{equation}
 {S^{{\rm{(Sky)}}}}({\bf{p}},t) = {I^{{\rm{(Sky)}}}}(t)s({\bf{p}})
 \end{equation}
 
-where the shape function for the sky radiance model, \emph{s}, is defined so that
+where the shape function for the sky radiance model, \emph{s}, is defined so that:
 
 \begin{equation}
 \int\limits_{2\pi } {s({\bf{p}})d\Omega }  = 1
+\label{eq:spdOmegaIntegral}
 \end{equation}
 
-then the global solar irradiance on a horizontal surface at a given time is
+then the global solar irradiance on a horizontal surface at a given time is:
 
 \begin{equation}
 {I^{{\rm{(G)}}}}(t) = {I^{{\rm{(Sky)}}}}(t)\left( {1 - \int\limits_{\Delta {\Omega ^{{\rm{(Sun)}}}}} {s({\bf{p}})d\Omega } } \right) + {I^{{\rm{(D)}}}}(t)\cos {\theta ^{{\rm{(Sun)}}}}(t)
 \end{equation}
 
-It must be understood that in equation the integration region 2p means integration over the sky hemisphere, and that \emph{s(\textbf{p})} is zero for upward-going directions.
+It must be understood that in Equation~\ref{eq:spdOmegaIntegral} the integration region 2\(\pi\) means integration over the sky hemisphere and that \emph{s(\textbf{p})} is zero for upward-going directions.
 
-With the sky radiance shape \emph{s(\textbf{p})} specified in the EnergyPlus code, the angular size of the sun \(\Delta {\Omega ^{{\rm{(Sun)}}}}\) ~known, and the solar zenith angle \({\theta ^{{\rm{(Sun)}}}}(t)\) ~calculated in the code, the two hourly input quantities \emph{I}\(^{(D*)*}\)\emph{(t)} and \emph{I}\(^{(G)}\)\emph{(t)} determine the exterior radiance for any given hour.
+With the sky radiance shape \emph{s(\textbf{p})} specified in the EnergyPlus code, the angular size of the sun \(\Delta {\Omega ^{{\rm{(Sun)}}}}\) ~known, and the solar zenith angle \({\theta ^{{\rm{(Sun)}}}}(t)\) ~calculated in the code, the two hourly input quantities \emph{I}\(^{(D)}\)\emph{(t)} and \emph{I}\(^{(G)}\)\emph{(t)} determine the exterior radiance for any given hour.
 
-In this context, the transmitted radiance for a complex fenestration system given in equation becomes
+In this context, the transmitted radiance for a complex fenestration system given in Equation~\ref{eq:dEpIdAEquation} becomes:
 
 \begin{equation}
-\begin{array}{c}S({{\bf{p}}^{{\rm{(T)}}}}) = {I^{({\bf{Sky}})}}(t)\int\limits_{{\Omega ^{{\rm{(Sky)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})s({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \\ + \int\limits_{{\Omega ^{{\rm{(Gnd)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Gnd)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \\ + H\left( {\Delta {\Omega ^{{\rm{(Sun)}}}}(t) \not\subset {\Omega ^{{\rm{(Sf)}}}}} \right)\int\limits_{\Delta {\Omega ^{{\rm{(Sun)}}}}(t)} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \\ + \int\limits_{{\Omega ^{{\rm{(Sf)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Refl)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \end{array}
+\begin{array}{c}S({{\bf{p}}^{{\rm{(T)}}}}) = {I^{({\bf{Sky}})}}(t)\int\limits_{{\Omega ^{{\rm{(Sky)}}}}} {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})s({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \\ + \int\limits_{{\Omega ^{{\rm{(Gnd)}}}}} {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Gnd)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \\ + H\left( {\Delta {\Omega ^{{\rm{(Sun)}}}}(t) \not\subset {\Omega ^{{\rm{(Sf)}}}}} \right)\int\limits_{\Delta {\Omega ^{{\rm{(Sun)}}}}(t)} {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \\ + \int\limits_{{\Omega ^{{\rm{(Sf)}}}}} {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Refl)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \end{array}
 \end{equation}
 
-where the incoming hemisphere viewed by the fenestration has been broken up into four parts.~ The viewed sky (excluding the part containing the sun) is \({\Omega ^{{\rm{(Sky)}}}}\) , the viewed ground is \({\Omega ^{{\rm{(Gnd)}}}}\) , the part subtended by the sun is DW\(^{(Sun)}\), and the part subtended by one or more exterior surfaces (shading or reflecting objects) is W\(^{(Sf)}\).~ These solid angles must exclude the exterior surfaces.~ The symbol \emph{H} represents a Helmholtz function: Its value is one if its logical argument is true, zero otherwise.~ It has been inserted into the equation to account for those times when the sun is behind an exterior object.~ Where there are multiple exterior shading or reflecting objects, W\(^{(Sf)}\) may consist of several regions that may be disjoint or connected, depending on the exterior geometry.~ As indicated in the equation, DW\(^{(Sun)}\) is time-dependent, to account for the sun's movement; W\(^{(Gnd)}\) and W\(^{(Sf)}\)~ are fixed, but as written \({\Omega ^{{\rm{(Sky)}}}}\) ~has a time dependence induced by the exclusion of the solid angle subtended by the sun.~ So that we can discuss the parts separately, we break the outgoing radiance down by source:
+where the incoming hemisphere viewed by the fenestration has been broken up into four parts.~ The viewed sky (excluding the part containing the sun) is \({\Omega ^{{\rm{(Sky)}}}}\) , the viewed ground is \({\Omega ^{{\rm{(Gnd)}}}}\) , the part subtended by the sun is \(\Delta\Omega\)\(^{(Sun)}\), and the part subtended by one or more exterior surfaces (shading or reflecting objects) is \(\Omega\)\(^{(Sf)}\).~ These solid angles must exclude the exterior surfaces.~ The symbol \emph{H} represents a Helmholtz function: Its value is one if its logical argument is true, zero otherwise.~ It has been inserted into the equation to account for those times when the sun is behind an exterior object.~ Where there are multiple exterior shading or reflecting objects, \(\Omega\)\(^{(Sf)}\) may consist of several regions that may be disjoint or connected, depending on the exterior geometry.~ As indicated in the equation, \(\Delta\Omega\)\(^{(Sun)}\) is time-dependent, to account for the sun's movement; \(\Omega\)\(^{(Gnd)}\) and \(\Omega\)\(^{(Sf)}\)~ are fixed, but as written \({\Omega ^{{\rm{(Sky)}}}}\) ~has a time dependence induced by the exclusion of the solid angle subtended by the sun.~ So that we can discuss the parts separately, we break the outgoing radiance down by source:
 
 \begin{equation}
 S({{\bf{p}}^{{\rm{(T)}}}}) = {S^{{\rm{(Sky)}}}}({{\bf{p}}^{{\rm{(T)}}}}) + {S^{{\rm{(Gnd)}}}}({{\bf{p}}^{{\rm{(T)}}}}) + {S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(T)}}}}) + {S^{{\rm{(Sf)}}}}({{\bf{p}}^{{\rm{(T)}}}})
+\label{eq:SpTSkyGndSunSfEquation}
 \end{equation}
 
-By subtracting the radiation from the part of the sky hidden by the sun from \({S^{{\rm{(Sun)}}}}\) ~and adding it back into \emph{S}\(^{(Sky)}\) we can remove the time dependence of W\(^{(Sky)}\):
+By subtracting the radiation from the part of the sky hidden by the sun from \({S^{{\rm{(Sun)}}}}\) ~and adding it back into \emph{S}\(^{(Sky)}\) we can remove the time dependence of \(\Omega\)\(^{(Sky)}\):
 
 \begin{equation}
-\begin{array}{c}{S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = H\left( {\Delta {\Omega ^{{\rm{(Sun)}}}}(t) \not\subset {\Omega ^{{\rm{(Sf)}}}}} \right)\\ \times \int\limits_{\Delta {\Omega ^{{\rm{(Sun)}}}}(t)} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})\left[ {{S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(I)}}}},t) - {I^{({\bf{Sky}})}}(t)s({{\bf{p}}^{{\rm{(I)}}}})} \right]\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \end{array}
+\begin{array}{c}{S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = H\left( {\Delta {\Omega ^{{\rm{(Sun)}}}}(t) \not\subset {\Omega ^{{\rm{(Sf)}}}}} \right)\\ \times \int\limits_{\Delta {\Omega ^{{\rm{(Sun)}}}}(t)} {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})\left[ {{S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(I)}}}},t) - {I^{({\bf{Sky}})}}(t)s({{\bf{p}}^{{\rm{(I)}}}})} \right]\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}} \end{array}
+\label{eq:SSunpTEquation}
 \end{equation}
 
 \begin{equation}
-{S^{{\rm{(Sky)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = {I^{({\bf{Sky}})}}(t)\int\limits_{{\Omega ^{{\rm{(Sky)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})s({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}}
+{S^{{\rm{(Sky)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = {I^{({\bf{Sky}})}}(t)\int\limits_{{\Omega ^{{\rm{(Sky)}}}}} {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}})s({{\bf{p}}^{{\rm{(I)}}}})\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}}
+\label{eq:SSkypTEquation}
 \end{equation}
 
-Now in equation the integral is to be evaluated without regard to the sun position, and therefore \({\Omega ^{{\rm{(Sky)}}}}\) ~is time-independent.
+Now in Equation~\ref{eq:SSkypTEquation} the integral is to be evaluated without regard to the sun position, and therefore \({\Omega ^{{\rm{(Sky)}}}}\) ~is time-independent.
 
-We can further simplify equation by noting that the angular size of the sun is small, and both \emph{s}(\textbf{\emph{p}}\(^{(I)}\)) and T(\textbf{\emph{p}}\(^{(T)}\), \textbf{\emph{p}}\(^{(I)}\)) can be considered as constant over the range of directions in DW\(^{(Sun)}\).~ We can therefore evaluate them at the direction \textbf{\emph{p}}\(^{(Sun)}\)(t) of the center of the sun and move them out of the integration, resulting in
+We can further simplify Equation~\ref{eq:SpTSkyGndSunSfEquation} by noting that the angular size of the sun is small, and both \emph{s}(\textbf{\emph{p}}\(^{(I)}\)) and \(
+mathcal{T}\)(\textbf{\emph{p}}\(^{(T)}\), \textbf{\emph{p}}\(^{(I)}\)) can be considered as constant over the range of directions in DW\(^{(Sun)}\).~ We can therefore evaluate them at the direction \textbf{\emph{p}}\(^{(Sun)}\)(t) of the center of the sun and move them out of the integration, resulting in:
 
 \begin{equation}
-{S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = {\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(Sun)}}}})\left[ {{I^{{\rm{(D)}}}} - {I^{{\rm{(Sky)}}}}s({{\bf{p}}^{{\rm{(Sun)}}}})\Delta {\Omega ^{{\rm{(Sun)}}}}} \right]\cos {\theta ^{{\rm{(Sun)}}}}H\left( {{{\bf{p}}^{{\rm{(Sun)}}}} \not\subset {\Omega ^{{\rm{(Sf)}}}}} \right)
+{S^{{\rm{(Sun)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = {\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(Sun)}}}})\left[ {{I^{{\rm{(D)}}}} - {I^{{\rm{(Sky)}}}}s({{\bf{p}}^{{\rm{(Sun)}}}})\Delta {\Omega ^{{\rm{(Sun)}}}}} \right]\cos {\theta ^{{\rm{(Sun)}}}}H\left( {{{\bf{p}}^{{\rm{(Sun)}}}} \not\subset {\Omega ^{{\rm{(Sf)}}}}} \right)
 \end{equation}
 
-In this equation we have dropped the explicit time dependence, but \textbf{\emph{p}}\(^{(Sun)}\), \emph{q}\(^{(Sun)}\), \emph{I}\(^{(D)}\), and \emph{I}\(^{(Sky)}\) are time-varying, while DW\(^{(Sun)}\) is simply the constant angular size of the sun.
+In this equation we have dropped the explicit time dependence, but \textbf{\emph{p}}\(^{(Sun)}\), \emph{q}\(^{(Sun)}\), \emph{I}\(^{(D)}\), and \emph{I}\(^{(Sky)}\) are time-varying, while \(\Delta\Omega\)\(^{(Sun)}\) is simply the constant angular size of the sun.
 
-We separate the reflected radiance \emph{S}\(^{(Sf)}\) into separate components for each surface,
+We separate the reflected radiance \emph{S}\(^{(Sf)}\) into separate components for each surface:
 
 \begin{equation}
 {S^{{\rm{(Sf)}}}} = \sum\limits_n {{S^{{\rm{(Sf, n)}}}}}
 \end{equation}
 
-The individual shading surface reflected radiances are then
+The individual shading surface reflected radiances are then:
 
 \begin{equation}
-{S^{{\rm{(Sf, n)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = \int\limits_{{\Omega ^{{\rm{(Sf, n)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Refl, n)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}}
+{S^{{\rm{(Sf, n)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = \int\limits_{{\Omega ^{{\rm{(Sf, n)}}}}} {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Refl, n)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}}
+\label{eq:SSfnpTEquation}
 \end{equation}
 
-The solid angle of integration in this expression is subtended by the portion of the exterior reflecting surface \emph{n} viewed by the fenestration; if one surface lies behind another, the hidden part of its surface is removed from the solid angle it subtends.~ This is summarized by the requirement
+The solid angle of integration in this expression is subtended by the portion of the exterior reflecting surface \emph{n} viewed by the fenestration; if one surface lies behind another, the hidden part of its surface is removed from the solid angle it subtends.~ This is summarized by the requirement:
 
 \begin{equation}
 \begin{array}{l}{\Omega ^{{\rm{(Sf)}}}} = \bigcup\limits_n {{\Omega ^{{\rm{(Sf, n)}}}}} \\\bigcap\limits_n {{\Omega ^{{\rm{(Sf, n)}}}}}  = 0\end{array}
@@ -2350,27 +2327,28 @@ The solid angle of integration in this expression is subtended by the portion of
 
 (This requirement will need to be modified to handle the case of transmitting exterior surfaces.)
 
-\emph{S}\(^{(Refl,n)}\) is time dependent because the incident radiation on the surface depends on the sun position. \emph{~}Equation must be evaluated after the exterior surface shading or reflectance calculations, in order to enforce the requirement that
+\emph{S}\(^{(Refl,n)}\) is time dependent because the incident radiation on the surface depends on the sun position.~ Equation~\ref{eq:SSkypTEquation} must be evaluated after the exterior surface shading or reflectance calculations, in order to enforce the requirement that:
 
 \begin{equation}
 {\Omega ^{{\rm{(Sky)}}}} \cap {\Omega ^{{\rm{(Sf)}}}} = 0
 \end{equation}
 
-Finally, the transmitted radiance from the ground-reflected exterior radiation is
+Finally, the transmitted radiance from the ground-reflected exterior radiation is:
 
 \begin{equation}
-{S^{{\rm{(Gnd)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = \int\limits_{{\Omega ^{{\rm{(Gnd)}}}}} {{\mathop{\rm T}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Gnd)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}}
+{S^{{\rm{(Gnd)}}}}({{\bf{p}}^{{\rm{(T)}}}}) = \int\limits_{{\Omega ^{{\rm{(Gnd)}}}}} {{\mathop{\rm \mathcal{T}}\nolimits} ({{\bf{p}}^{{\rm{(T)}}}},{{\bf{p}}^{{\rm{(I)}}}}){S^{{\rm{(Gnd)}}}}({{\bf{p}}^{{\rm{(I)}}}},t)\left( { - {{\bf{p}}^{{\rm{(I)}}}}\cdot {\bf{n}}} \right)d{\Omega ^{{\rm{(I)}}}}}
+\label{eq:SGndpTEquation}
 \end{equation}
 
-Here, not only is there the requirement that
+Here, not only is there the requirement that:
 
 \begin{equation}
 {\Omega ^{{\rm{(Gnd)}}}} \cap {\Omega ^{{\rm{(Sf)}}}} = 0
 \end{equation}
 
-but also the incident radiation on the ground may be affected by shading or reflection from exterior surfaces.~ Since this is dependent on the sun position, \emph{S}\(^{(Gnd)}\) is time dependent, as indicated in equation .
+but also the incident radiation on the ground may be affected by shading or reflection from exterior surfaces.~ Since this is dependent on the sun position, \emph{S}\(^{(Gnd)}\) is time dependent, as indicated in Equation~\ref{eq:SGndpTEquation}.
 
-Applying the discretization of the previous section and the definitions in equations -, we can rewrite equation as
+Applying the discretization of the previous section and the definitions in Equations~\ref{eq:LambdasEquation} -~\ref{eq:RijEquation}, we can rewrite Equation~\ref{eq:SSkypTEquation} as:
 
 \begin{equation}
 {S_j}^{{\rm{(T,Sky)}}} = {I^{({\bf{Sky}})}}(t)\sum\limits_{i \in {\Omega ^{{\rm{(Sky)}}}}} {{T_{ji}}{\Lambda_{ii}}{s_i}}
@@ -2392,33 +2370,36 @@ V_i^{(Sky)} = \left\{
       0                      & \text{none of } \Delta\Omega_i \text{ views sky for any part of fenestration}
     \end{array}
   \right.
+\label{eq:ViSkyEquation}
 \end{equation}
 
-Then we can carry out the summation over all downward directions and write
+Then we can carry out the summation over all downward directions and write:
 
 \begin{equation}
   S_j^{(T,Sky)} = I^{Sky}(t)\sum_{i down} T_{ji} \Lambda_{ii} V_i^{(Sky)} {s_i}
+\label{eq:SjTSkyEquation}
 \end{equation}
 
-Similarly, equation becomes
+Similarly, Equation~\ref{eq:SSfnpTEquation} becomes:
 
 \begin{equation}
 {S_j}^{{\rm{(T, Sf, n)}}} = \sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}{S^{{\rm{(Refl, n)}}}}({{\bf{p}}_i}^{{\rm{(I)}}},t)}
+\label{eq:SjTSfnEquation}
 \end{equation}
 
-where \(V_{i}^{(Sf,\, n)}\) is another geometric view factor, defined analogously to equation , giving the fraction of the solid angle \(\Delta {\Omega_i}\) that views the exterior surface \emph{n}. Note that
+where \(V_{i}^{(Sf,\, n)}\) is another geometric view factor, defined analogously to Equation~\ref{eq:ViSkyEquation}, giving the fraction of the solid angle \(\Delta {\Omega_i}\) that views the exterior surface \emph{n}. Note that:
 
 \begin{equation}
 V_i^{{\rm{(Sky)}}} + \sum\limits_{\rm{n}} {V_i^{{\rm{(Sf, n)}}}}  = 1
 \end{equation}
 
-The quantity \(S^{(Refl,n)} (\bf{p}_i^{(I)},t)\) is in fact the reflected radiance at a particular location on the n\(^{th}\) exterior surface --- the location where the direction \textbf{\emph{p}}\emph{\(_{i}\)}\(^{(I)}\) intersects the surface. (This statement will become more precise when the spatial dependence dropped from equation is re-inserted.) This surface is assumed to have either a diffuse reflectance \emph{r}\(^{(n)}\) or a specular reflectance \emph{r}\(^{(sp,\\ n)}\). (Both properties are possible simultaneously, but EnergyPlus assumes that an exterior surface is either diffusing or specular, but not both.) The reflectance is assumed uniform over the surface, but the particular location (effectively, the image of the fenestration projected onto surface n) may or may not view the sky, or, at a particular time, the sun. We denote the incident irradiance of the surface n by \(E_i^n\). This irradiance pertains only to the surface n (in the present EnergyPlus calculation) and is independent of the fenestration or its basis.~ We attach the subscript i simply as a reminder that (2) the irradiance pertains to the portion of the surface that is viewed by the solid angle element \(\Delta {\Omega_i}\) of the fenestration f (which would become important if the EnergyPlus shading calculations were modified to relax the assumption of uniform incident irradiance on exterior surfaces) and that the irradiance pertains only to those surfaces n that are viewed by the solid angle element i. For specularly reflecting surfaces, we make the following definitions: First, within the set of basis solid angles \(\Delta {\Omega_i}\), let s(\emph{t}) identify the one containing the sun direction at time \emph{t}, and let r(\emph{t}) identify the one containing the specular reflection direction of the sun at time \emph{t}. We then define a contingent direct beam irradiance, which we denote by \(E_{i{\rm{ }}r(t)}^{(D,n)}\) . This irradiance is non-zero only if \(i = r(t)\) this direction is such that i is the specularly reflected direction for the surface n. If this is the case, then \(E_{i = r(t)}^{(D,n)}\) is the incident direct beam irradiance. With this definition,
+The quantity \(S^{(Refl,n)} (\bf{p}_i^{(I)},t)\) is in fact the reflected radiance at a particular location on the n\(^{th}\) exterior surface --- the location where the direction \textbf{\emph{p}}\emph{\(_{i}\)}\(^{(I)}\) intersects the surface. (This statement will become more precise when the spatial dependence dropped from Equation~\ref{eq:ScriptLx2pj2x1pi1S1pi1Integral} is re-inserted.) This surface is assumed to have either a diffuse reflectance \(\rho\)\(^{(n)}\) or a specular reflectance \(\rho\)\(^{(sp,\\ n)}\). (Both properties are possible simultaneously, but EnergyPlus assumes that an exterior surface is either diffusing or specular, but not both.) The reflectance is assumed uniform over the surface, but the particular location (effectively, the image of the fenestration projected onto surface n) may or may not view the sky, or, at a particular time, the sun. We denote the incident irradiance of the surface n by \(E_i^n\). This irradiance pertains only to the surface n (in the present EnergyPlus calculation) and is independent of the fenestration or its basis.~ We attach the subscript i simply as a reminder that the irradiance pertains to the portion of the surface that is viewed by the solid angle element \(\Delta {\Omega_i}\) of the fenestration f (which would become important if the EnergyPlus shading calculations were modified to relax the assumption of uniform incident irradiance on exterior surfaces) and that the irradiance pertains only to those surfaces n that are viewed by the solid angle element i. For specularly reflecting surfaces, we make the following definitions: First, within the set of basis solid angles \(\Delta {\Omega_i}\), let s(\emph{t}) identify the one containing the sun direction at time \emph{t}, and let r(\emph{t}) identify the one containing the specular reflection direction of the sun at time \emph{t}. We then define a contingent direct beam irradiance, which we denote by \(E_{i{\rm{ }}r(t)}^{(D,n)}\) . This irradiance is non-zero only if \(i = r(t)\) this direction is such that i is the specularly reflected direction for the surface n. If this is the case, then \(E_{i = r(t)}^{(D,n)}\) is the incident direct beam irradiance. With this definition:
 
 \begin{equation}
 {S^{{\rm{(Refl, n)}}}}({{\bf{p}}_i}^{{\rm{(I)}}},t) = {\rho ^{{\rm{(sp, n)}}}}E_{i{\rm{ }}r(t)}^{(D,n)} + {\rho ^{{\rm{(n)}}}}E_i^n
 \end{equation}
 
-If we then define normalized irradiance factors \emph{U} by \(E_i^n = U_i^{(Sky,n)}{I^{(Sky)}}(t) + U_{i{\rm{ }}Sun(tsh)}^{(D,n)}{I^{(D)}}(t)\) ~and \(E_{i{\rm{ }}r(t)}^{(D,n)} = U_{i{\rm{ }}r(t)}^{(D,n)}{I^{(D)}}(t)\) , where \(U_{i{\rm{ }}Sun(tsh)}^{(D,n)}\) ~denotes the fraction of the beam solar that irradiates the surface for a given sun direction.~ It is evaluated during the shading calculation, as indicated by the notation \emph{Sun(tsh)}.~ With these definitions we can rewrite the equation as
+If we then define normalized irradiance factors \emph{U} by \(E_i^n = U_i^{(Sky,n)}{I^{(Sky)}}(t) + U_{i{\rm{ }}Sun(tsh)}^{(D,n)}{I^{(D)}}(t)\) ~and \(E_{i{\rm{ }}r(t)}^{(D,n)} = U_{i{\rm{ }}r(t)}^{(D,n)}{I^{(D)}}(t)\) , where \(U_{i{\rm{ }}Sun(tsh)}^{(D,n)}\) ~denotes the fraction of the beam solar that irradiates the surface for a given sun direction.~ It is evaluated during the shading calculation, as indicated by the notation \emph{Sun(tsh)}.~ With these definitions we can rewrite the equation as:
 
 \begin{equation}
 S^{(Refl,n)}(\bf{p}_i^{(I)},t) = 
@@ -2427,7 +2408,7 @@ S^{(Refl,n)}(\bf{p}_i^{(I)},t) =
   I^{(sky)}(t) U_i^{(Sky,n)} \rho^{(n)}
 \end{equation}
 
-and equation becomes, in terms of the incident irradiances,
+and Equation~\ref{eq:SjTSfnEquation} becomes, in terms of the incident irradiances:
 
 \begin{equation}
 {S_j}^{{\rm{(T, Sf, n)}}} = \sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}\left( {{\rho ^{{\rm{(sp, n)}}}}E_{i{\rm{ }}r(t)}^{(D,n)} + {\rho ^{{\rm{(n)}}}}E_i^n} \right)}
@@ -2437,6 +2418,7 @@ and in terms of the normalized irradiance factors,
 
 \begin{equation}
 \begin{array}{c}{S_j}^{{\rm{(T, Sf, n)}}} = \sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}{I^{{\rm{(D)}}}}(t)U_{i{\rm{ r(}}t{\rm{)}}}^{{\rm{(D,n)}}}{\rho ^{{\rm{(sp, n)}}}}} \\ + \sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}\left[ {{I^{{\rm{(D)}}}}(t)U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D,n)}}}{\rho ^{{\rm{(n)}}}} + {I^{(Sky)}}(t)U_i^{{\rm{(Sky,n)}}}{\rho ^{{\rm{(n)}}}}} \right]} \end{array}
+\label{eq:SjTSfnidownEquation}
 \end{equation}
 
 The specularly reflected term can be removed from the sum, since only one value of i can contribute:
@@ -2455,31 +2437,33 @@ which separates specular and diffuse reflectance from the exterior surfaces.
 
 With respect to shading and reflection of exterior radiation into the fenestration, the exterior reveal surfaces can be treated as additional diffusely reflecting exterior surfaces.
 
-Ground radiation is treated in the same way as radiation reflected from interior surfaces, except that one sums only over upward-going incident directions, and the ground is assumed to be diffusely reflecting.~ The transmitted radiance from ground reflectance is
+Ground radiation is treated in the same way as radiation reflected from interior surfaces, except that one sums only over upward-going incident directions and the ground is assumed to be diffusely reflecting.~ The transmitted radiance from ground reflectance is:
 
 \begin{equation}
 {S_j}^{{\rm{(T, Gnd)}}} = {\rho ^{{\rm{(Gnd)}}}}\sum\limits_{i{\rm{ }}up} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Gnd)}}}E_i^{(Gnd)}}
+\label{eq:SjTGndEquation}
 \end{equation}
 
-In this equation, the symbol \(E_i^{(Gnd)}\) ~is shorthand for a spatial calculation.~ The solid angle region \(\Delta {\Omega_i}\) ~views (from various points over the fenestration area) some spatial region of the ground.~ The symbol \(E_i^{(Gnd)}\) ~denotes the incident irradiance on the ground over this spatial region.~ In the absence of shading, this would be simply \({I^{(G)}} = {I^{(Sky)}} + {I^{(D)}}\cos {\theta_{Sun}}\) ; shading requires a more complex calculation.~ Currently the EnergyPlus code does a Monte-Carlo calculation: rays are randomly generated from the window, when they strike the ground a calculation is made to determine whether that point receives direct solar radiation and what portion of the sky it views (reflected radiation from surfaces is neglected).~ Here we would perform that calculation for each region of the ground i viewed by a basis solid angle element, instead of generating random rays from the window.~ We denote the results of that calculation by \(E_i^{(Gnd)} = U_{i{\rm{ }}Sun(tsh)}^{(D,Gnd)}{I^{(D)}}(t) + U_i^{(Sky,Gnd)}{I^{(Sky)}}(t)\) , where the \emph{U}'s are average viewing factors for the sun and sky, calculated as part of the shading calculation (which is indicated by the subscript \emph{tsh}: \emph{Sun(tsh)} is the sun direction as specified by the shading calculation.~ This then gives
+In this equation, the symbol \(E_i^{(Gnd)}\) ~is shorthand for a spatial calculation.~ The solid angle region \(\Delta {\Omega_i}\) ~views (from various points over the fenestration area) some spatial region of the ground.~ The symbol \(E_i^{(Gnd)}\) ~denotes the incident irradiance on the ground over this spatial region.~ In the absence of shading, this would be simply \({I^{(G)}} = {I^{(Sky)}} + {I^{(D)}}\cos {\theta_{Sun}}\) ; shading requires a more complex calculation.~ Currently the EnergyPlus code does a Monte-Carlo calculation: rays are randomly generated from the window, when they strike the ground a calculation is made to determine whether that point receives direct solar radiation and what portion of the sky it views (reflected radiation from surfaces is neglected).~ Here we would perform that calculation for each region of the ground i viewed by a basis solid angle element, instead of generating random rays from the window.~ We denote the results of that calculation by \(E_i^{(Gnd)} = U_{i{\rm{ }}Sun(tsh)}^{(D,Gnd)}{I^{(D)}}(t) + U_i^{(Sky,Gnd)}{I^{(Sky)}}(t)\), where the \emph{U}'s are average viewing factors for the sun and sky, calculated as part of the shading calculation (which is indicated by the subscript \emph{tsh}: \emph{Sun(tsh)} is the sun direction as specified by the shading calculation.~ This then gives:
 
 \begin{equation}
 {S_j}^{{\rm{(T, Gnd)}}} = {\rho ^{{\rm{(Gnd)}}}}\sum\limits_{i{\rm{ }}up} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Gnd)}}}\left( {U_{i{\rm{ }}Sun(tsh)}^{(D,Gnd)}{I^{(D)}}(t) + U_i^{(Sky,Gnd)}{I^{(Sky)}}(t)} \right)}
 \end{equation}
 
-The transmitted radiance from direct beam radiation is
+The transmitted radiance from direct beam radiation is:
 
 \begin{equation}
 {S_j}^{{\rm{(T, Sun)}}} = {T_{j{\rm{ s}}(t)}}\cos {\theta ^{{\rm{(Sun)}}}}{I^{{\rm{(D)}}}}(t)V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}
+\label{eq:SjTSunEquation}
 \end{equation}
 
-This introduces yet one more geometric view factor: $V_{i s(t)}^{(D)}$ is zero if the sun direction s\emph{(t)} is not \emph{i}; if \emph{i} = s(\emph{t}) it is the fraction of the fenestration area irradiated by the direct sun.~ Equation uses the fact that the angular size of the sun is smaller than any basis solid angle element, and that EnergyPlus treats the sun and circumsolar region as a point source {[}hence the absence of the sky correction in equation {]}.
+This introduces yet one more geometric view factor: $V_{i s(t)}^{(D)}$ is zero if the sun direction s\emph{(t)} is not \emph{i}; if \emph{i} = s(\emph{t}) it is the fraction of the fenestration area irradiated by the direct sun.~ Equation~\ref{eq:SjTSunEquation} uses the fact that the angular size of the sun is smaller than any basis solid angle element, and that EnergyPlus treats the sun and circumsolar region as a point source {[}hence the absence of the sky correction in Equation~\ref{eq:SSunpTEquation}{]}.
 
 At this point we have developed separate expressions for a fenestration's~ transmitted radiance in a particular direction depending on the exterior source of the radiation.~ These expressions utilize the discretized BTDF of the fenestration in the form of transmittance matrix elements over an angular basis.~ The exterior geometry is re-expressed in the form of geometric view factors in this basis.~ In the process, the explicit time dependence of the exterior radiation has been reduced to the time-varying direct and diffuse solar intensities and the solar position.~ The time dependence of the solar position, however, consists merely in specifying, for a particular time, which of the basis solid angle elements contains the solar direction.~ The entire exterior geometry necessary for the fenestration transmittance calculation can therefore be pre-calculated.
 
 Interior
 
-We begin with the discretized form of equation , in which we also modify the surface notation.~ In that equation, the surfaces involved are termed (1) and (2), where radiation is outgoing from surface 1 and incoming to surface 2.~ Here radiation is outgoing from the inner surface of the fenestration, so we label that surface (f).~ The receiving surface is one of the surfaces of the zone in which the fenestration is located.~ We number those surfaces with the index \emph{k}, so the receiving surface is labeled (\emph{k}).~ Equation then becomes
+We begin with the discretized form of Equation~\ref{eq:E2pTdA2Equation}, in which we also modify the surface notation.~ In that equation, the surfaces involved are termed (1) and (2), where radiation is outgoing from surface 1 and incoming to surface 2.~ Here radiation is outgoing from the inner surface of the fenestration, so we label that surface (f).~ The receiving surface is one of the surfaces of the zone in which the fenestration is located.~ We number those surfaces with the index \emph{k}, so the receiving surface is labeled (\emph{k}).~ Equation~\ref{eq:E2pTdA2Equation} then becomes:
 
 \begin{equation}
 dW_j^{{\rm{(f}} \to k{\rm{)}}} = {E^{{\rm{(}}k{\rm{)}}}}({{\bf{p}}_j}^{{\rm{(T)}}})d{A^{{\rm{(}}k{\rm{)}}}} = {S_j}^{{\rm{(T)}}} \cdot \left( {{{\bf{n}}^{{\rm{(f)}}}} \cdot {{\bf{p}}_j}^{{\rm{(T)}}}} \right)\Delta {\Omega_j}^{{\rm{(T)}}}d{A^{{\rm{(f)}}}}
@@ -2491,19 +2475,19 @@ or, noting that \(\left(\bf{n}^{(f)}\cdot\bf{p}_j^{(T)}\right) \Delta\Omega^{(T)
 dW_j^{{\rm{(f}} \to k{\rm{)}}} = {E^{{\rm{(}}k{\rm{)}}}}({{\bf{p}}_j}^{{\rm{(T)}}})d{A^{{\rm{(}}k{\rm{)}}}} = {S_j}^{{\rm{(T)}}}\Lambda_{jj}^{{\rm{(T)}}}d{A^{{\rm{(f)}}}}
 \end{equation}
 
-If we integrate this expression over the fenestration area \emph{A}\(^{(f)}\) we obtain the total power leaving the fenestration surface in direction \emph{j}; however, all of that power may not reach surface \emph{k}: some may strike the inner window reveal or a different zone surface.~ If we define a spatial projection operator by
+If we integrate this expression over the fenestration area \emph{A}\(^{(f)}\) we obtain the total power leaving the fenestration surface in direction \emph{j}; however, all of that power may not reach surface \emph{k}: some may strike the inner window reveal or a different zone surface.~ If we define a spatial projection operator by:
 
 \begin{equation}
-{{\bf{x}}^{{\rm{(}}k{\rm{)}}}} = {{\mathop{\rm P}\nolimits} ^{{\rm{(}}k{\rm{)}}}}({\bf{p}}_j^{{\rm{(T)}}},{{\bf{x}}^{{\rm{(f)}}}}) \equiv {{\mathop{\rm P}\nolimits}_j}^{{\rm{(}}k{\rm{)}}}({{\bf{x}}^{{\rm{(f)}}}})
+{{\bf{x}}^{{\rm{(}}k{\rm{)}}}} = {{\mathop{\rm \mathcal{P}}\nolimits} ^{{\rm{(}}k{\rm{)}}}}({\bf{p}}_j^{{\rm{(T)}}},{{\bf{x}}^{{\rm{(f)}}}}) \equiv {{\mathop{\rm \mathcal{P}}\nolimits}_j}^{{\rm{(}}k{\rm{)}}}({{\bf{x}}^{{\rm{(f)}}}})
 \end{equation}
 
-where \textbf{\emph{x}}\(^{(*k*)}\) is in the plane of surface \emph{k}, and a geometric form factor by
+where \textbf{\emph{x}}\(^{(k)}\) is in the plane of surface \emph{k}, and a geometric form factor by:
 
 \begin{equation}
-F_j^{{\rm{(}}k{\rm{)}}} = \frac{1}{{{A^{{\rm{(f)}}}}}}\int\limits_{{{\mathop{\rm P}\nolimits}_j}^{{\rm{(}}k{\rm{)}}}({{\bf{x}}^{{\rm{(f)}}}}) \in {A^{{\rm{(}}k{\rm{)}}}}} {d{A^{{\rm{(f)}}}}}
+F_j^{{\rm{(}}k{\rm{)}}} = \frac{1}{{{A^{{\rm{(f)}}}}}}\int\limits_{{{\mathop{\rm \mathcal{P}}\nolimits}_j}^{{\rm{(}}k{\rm{)}}}({{\bf{x}}^{{\rm{(f)}}}}) \in {A^{{\rm{(}}k{\rm{)}}}}} {d{A^{{\rm{(f)}}}}}
 \end{equation}
 
-then
+then:
 
 \begin{equation}
 dW_j^{{\rm{(f}} \to k{\rm{)}}} = {S_j}^{{\rm{(T)}}}\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}{A^{{\rm{(f)}}}}
@@ -2513,9 +2497,10 @@ The total power leaving the fenestration (in any direction) and arriving at surf
 
 \begin{equation}
 W_j^{{\rm{(f}} \to k{\rm{)}}} = \sum\limits_j {{S_j}^{{\rm{(T)}}}\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}{A^{{\rm{(f)}}}}}
+\label{eq:WjftokEquation}
 \end{equation}
 
-Substituting equations , , , , into equation yields a series of expressions for the total power arriving at surface \emph{k} (by transmission through fenestration f) from each of the sources of exterior radiation.~ However, the equations for transmitted radiation describe an infinitesimal region, which means that the radiation in a given direction will always come from one source.~ When one integrates the transmitted power over the fenestration surface, one encounters the problem that for this direction different parts of the fenestration area may receive radiation from different sources.~ Also, for a given outgoing direction, the projection of a receiving surface back onto the fenestration may produce an image that covers only part of the fenestration area, and this image may not be identical with the part of the area that receives incident radiation from a particular source.~ The most important origin of this problem is the existence of inner and outer window reveals, as illustrated in Figure~\ref{fig:mismatch-of-irradiated-and-viewed}.
+Substituting Equations~\ref{eq:SSunpTEquation},~\ref{eq:SjTSkyEquation},~\ref{eq:SjTSfnidownEquation}, and~\ref{eq:SjTGndEquation} into Equation~\ref{eq:WjftokEquation} yields a series of expressions for the total power arriving at surface \emph{k} (by transmission through fenestration f) from each of the sources of exterior radiation.~ However, the equations for transmitted radiation describe an infinitesimal region, which means that the radiation in a given direction will always come from one source.~ When one integrates the transmitted power over the fenestration surface, one encounters the problem that for this direction different parts of the fenestration area may receive radiation from different sources.~ Also, for a given outgoing direction, the projection of a receiving surface back onto the fenestration may produce an image that covers only part of the fenestration area, and this image may not be identical with the part of the area that receives incident radiation from a particular source.~ The most important origin of this problem is the existence of inner and outer window reveals, as illustrated in Figure~\ref{fig:mismatch-of-irradiated-and-viewed}.
 
 \begin{figure}[hbtp] % fig 93
 \centering
@@ -2523,13 +2508,13 @@ Substituting equations , , , , into equation yields a series of expressions for 
 \caption{Mismatch of irradiated and viewed fenestration areas for different incident and outgoing directions \protect \label{fig:mismatch-of-irradiated-and-viewed}}
 \end{figure}
 
-In this figure, the portion of the fenestration area not viewed by the plane of surface \emph{k} is instead viewed by one or more of the inner window reveals.~ Similarly, the portion of the fenestration not irradiated in the figure is in fact irradiated by diffusely reflected radiation from the outer window reveals.~ We can account for this by replacing the area \emph{A}\(^{(f)}\) in equation with the overlap area \(A_{ji}^{{\rm{(f, Src), }}k}\) \emph{~}(dark shaded in the figure), where ``Src'' stands for the source of the incident radiation.~ This area is defined by
+In this figure, the portion of the fenestration area not viewed by the plane of surface \emph{k} is instead viewed by one or more of the inner window reveals.~ Similarly, the portion of the fenestration not irradiated in the figure is in fact irradiated by diffusely reflected radiation from the outer window reveals.~ We can account for this by replacing the area \emph{A}\(^{(f)}\) in Equation~\ref{eq:WjftokEquation} with the overlap area \(A_{ji}^{{\rm{(f, Src), }}k}\) \emph{~}(dark shaded in the figure), where ``Src'' stands for the source of the incident radiation.~ This area is defined by:
 
 \begin{equation}
 A_{ji}^{\left( {f,Src} \right),k} = \left. {A_i^{\left( {f,Src} \right)}} \right|A_j^{\left( f \right),k}
 \end{equation}
 
-The total power at the interior surface \emph{k} for each source of radiation then becomes
+The total power at the interior surface \emph{k} for each source of radiation then becomes:
 
 \begin{equation}
 {W^{{\rm{(Sky), }}k}} = {I^{({\bf{Sky}})}}(t)\sum\limits_j {\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}\sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sky)}}}A_{ji}^{{\rm{(f, Sky), }}k}{s_i}} }
