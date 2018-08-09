@@ -949,11 +949,11 @@ namespace SurfaceGeometry {
         int OpaqueHTSurfsWithWin; // Number of floors, walls and roofs with windows in a zone
         int InternalMassSurfs;    // Number of internal mass surfaces in a zone
         static bool RelWarning(false);
-        int ConstrNumSh;               // Shaded construction number for a window
-        int LayNumOutside;             // Outside material numbers for a shaded construction
-        int BlNum;                     // Blind number
-        int ShadingCtrl;               // WindowShadingControl number
-        int AddedSubSurfaces;          // Subsurfaces (windows) added when windows reference Window5 Data File
+        int ConstrNumSh;      // Shaded construction number for a window
+        int LayNumOutside;    // Outside material numbers for a shaded construction
+        int BlNum;            // Blind number
+        int ShadingCtrl;      // WindowShadingControl number
+        int AddedSubSurfaces; // Subsurfaces (windows) added when windows reference Window5 Data File
         // entries with two glazing systems
         int NeedToAddSurfaces;    // Surfaces that will be added due to "unentered" other zone surface
         int NeedToAddSubSurfaces; // SubSurfaces that will be added due to "unentered" other zone surface
@@ -1956,7 +1956,6 @@ namespace SurfaceGeometry {
 
             // associate fenestration surfaces referenced in WindowShadingControl
             AssociateWindowShadingControlFenestration(ErrorsFound);
-
         }
 
         // Check for zones with not enough surfaces
@@ -4117,27 +4116,6 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
 
-                // WSCO This would be were to insert SurfaceTmp( SurfNum ).HasShadeControl = true;
-                // WSCO if (!cAlphaArgs(6).empty()) {
-                // WSCO     if (TotWinShadingControl > 0) {
-                // WSCO         SurfaceTmp(SurfNum).WindowShadingControlPtr =
-                // WSCO             UtilityRoutines::FindItemInList(cAlphaArgs(6), WindowShadingControl, TotWinShadingControl);
-                // WSCO     }
-                // WSCO     if (SurfaceTmp(SurfNum).WindowShadingControlPtr == 0) {
-                // WSCO         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(6) + "=\""
-                // + WSCO                         cAlphaArgs(6) + "\"."); WSCO         ErrorsFound = true; WSCO     } WSCO WSCO     // Error if this
-                // is not an exterior window and shading device has been specified WSCO     // PETER: should doors be disallowed too? WSCO     if
-                // (SurfaceTmp(SurfNum).WindowShadingControlPtr > 0 && SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) { WSCO WSCO
-                // ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(6) + WSCO
-                // " because it is not an exterior window."); WSCO         ErrorsFound = true; WSCO WSCO     } else if
-                // (Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL && SurfaceTmp(SurfNum).WindowShadingControlPtr > 0) { WSCO WSCO
-                // ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(6) + "=\"" + WSCO
-                // cAlphaArgs(6) + "\"."); WSCO         ShowContinueError(".. equivalent layer window model does not use shading control object.");
-                // WSCO         ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
-                // WSCO         SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
-                // WSCO     }
-                // WSCO }
-
                 CheckWindowShadingControlFrameDivider("GetHTSubSurfaceData", ErrorsFound, SurfNum, 7);
 
                 if (SurfaceTmp(SurfNum).Sides == 3) { // Triangular window
@@ -4444,28 +4422,6 @@ namespace SurfaceGeometry {
                                         "\", Exterior boundary condition = Ground is not be allowed with windows.");
                         ErrorsFound = true;
                     }
-
-                    // WSCO This would be were to insert SurfaceTmp( SurfNum ).HasShadeControl = true;
-                    // WSCO if (!cAlphaArgs(WindowShadingField).empty()) {
-                    // WSCO     if (TotWinShadingControl > 0) {
-                    // WSCO         SurfaceTmp(SurfNum).WindowShadingControlPtr =
-                    // WSCO             UtilityRoutines::FindItemInList(cAlphaArgs(WindowShadingField), WindowShadingControl, TotWinShadingControl);
-                    // WSCO     }
-                    // WSCO     if (SurfaceTmp(SurfNum).WindowShadingControlPtr == 0) {
-                    // WSCO         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                    // WSCO                         cAlphaFieldNames(WindowShadingField) + "=\"" + cAlphaArgs(WindowShadingField) + "\".");
-                    // WSCO         ErrorsFound = true;
-                    // WSCO     }
-                    // WSCO
-                    // WSCO     // Error if this is not an exterior window and shading device has been specified
-                    // WSCO     // PETER: should doors be disallowed too?
-                    // WSCO     if (SurfaceTmp(SurfNum).WindowShadingControlPtr > 0 && SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
-                    // WSCO
-                    // WSCO         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                    // WSCO                         cAlphaFieldNames(WindowShadingField) + " because it is not an exterior window.");
-                    // WSCO         ErrorsFound = true;
-                    // WSCO     }
-                    // WSCO }
 
                     CheckWindowShadingControlFrameDivider("GetRectSubSurfaces", ErrorsFound, SurfNum, FrameField);
 
@@ -8204,10 +8160,29 @@ namespace SurfaceGeometry {
                 WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
                 if (Surface(fenestrationIndex).WindowShadingControlPtr == 0) {
                     Surface(fenestrationIndex).WindowShadingControlPtr = iShadeCtrl;
+                    Surface(fenestrationIndex).HasShadeControl = true;
+                    // check to make the window refenced is an exterior window
+                    if (SurfaceTmp(fenestrationIndex).ExtBoundCond != ExternalEnvironment) {
+                        ErrorsFound = true;
+                        ShowSevereError("AssociateWindowShadingControlFenestration: \"" + SurfaceTmp(fenestrationIndex).Name + "\", invalid " +
+                                        " because it is not an exterior window.");
+                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                    }
+                    // check to make sure the window is not using equivalent layer window construction
+                    if (Construct(SurfaceTmp(fenestrationIndex).Construction).WindowTypeEQL) {
+                        ErrorsFound = true;
+                        ShowSevereError("AssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(fenestrationIndex).Name + "\", invalid " + "\".");
+                        ShowContinueError(".. equivalent layer window model does not use shading control object.");
+                        ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
+                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                        SurfaceTmp(fenestrationIndex).WindowShadingControlPtr = 0;
+                    }
                 } else {
                     ErrorsFound = true;
-                    ShowSevereError("AssociateWindowShadingControlFenestration: Fenestration suface named \"" + Surface(fenestrationIndex).Name + "\" appears on more than one WindowShadingControl list.");
-                    ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name + "\" and another one.");
+                    ShowSevereError("AssociateWindowShadingControlFenestration: Fenestration suface named \"" + Surface(fenestrationIndex).Name +
+                                    "\" appears on more than one WindowShadingControl list.");
+                    ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
+                                      "\" and another one.");
                 }
             }
         }
