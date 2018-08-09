@@ -153,7 +153,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
         "12,                      !- End Month",
         "31,                      !- End Day of Month",
         ",                        !- End Year",
-        "Wednesday,               !- Day of Week for Start Day",
+        "Saturday,                !- Day of Week for Start Day",
         "Yes,                     !- Use Weather File Holidays and Special Days",
         "Yes,                     !- Use Weather File Daylight Saving Period",
         "No,                      !- Apply Weekend Holiday Rule",
@@ -194,7 +194,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
     EXPECT_EQ(2455427, WeatherManager::RunPeriodInput[4].startJulianDate);
     EXPECT_EQ(2455562, WeatherManager::RunPeriodInput[4].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Wednesday, WeatherManager::RunPeriodInput[5].startWeekDay);
+    EXPECT_EQ(WeatherManager::WeekDay::Saturday, WeatherManager::RunPeriodInput[5].startWeekDay);
     EXPECT_EQ(1992, WeatherManager::RunPeriodInput[5].startYear);
     EXPECT_EQ(2448682, WeatherManager::RunPeriodInput[5].startJulianDate);
     EXPECT_EQ(2448988, WeatherManager::RunPeriodInput[5].endJulianDate);

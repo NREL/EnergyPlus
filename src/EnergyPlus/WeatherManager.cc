@@ -5944,30 +5944,26 @@ namespace WeatherManager {
 
     static int findYearForWeekday(int const month, int const day, WeekDay const weekday)
     {
-        static std::map<WeekDay, int> defaultYear{{WeekDay::Sunday, 2017},
-                                                  {WeekDay::Monday, 2007},
-                                                  {WeekDay::Tuesday, 2013},
-                                                  {WeekDay::Wednesday, 2014},
-                                                  {WeekDay::Thursday, 2015},
-                                                  {WeekDay::Friday, 2010},
-                                                  {WeekDay::Saturday, 2011}};
+        // Find a year that goes with a month/day and a weekday. A lookup table is used with the most recent year that includes
+        // the date with the weekday specified.
+
+        // Tu, W, Th, F, Sa, Su, M, Tu, W, Th, F, Sa, Su
+        static std::array<int, 13> defaultYear{{2013, 2014, 2015, 2010, 2011, 2017, 2007, 2013, 2014, 2015, 2010, 2011, 2017}};
+
         int rem = calculateDayOfYear(month, day) % 7;
-        WeekDay firstWeekDay = static_cast<WeekDay>(static_cast<int>(weekday) - rem + 1);
-        return defaultYear[firstWeekDay];
+        return defaultYear[static_cast<int>(weekday) - rem + 5]; // static_cast<int>(weekday) - rem + 1 + 4
     }
 
     static int findLeapYearForWeekday(int const month, int const day, WeekDay const weekday)
     {
-        static std::map<WeekDay, int> defaultYear{{WeekDay::Sunday, 2012},
-                                                  {WeekDay::Monday, 1996},
-                                                  {WeekDay::Tuesday, 2008},
-                                                  {WeekDay::Wednesday, 1992},
-                                                  {WeekDay::Thursday, 2004},
-                                                  {WeekDay::Friday, 2016},
-                                                  {WeekDay::Saturday, 2000}};
+        // Find a leap year that goes with a month/day and a weekday. A lookup table is used with the most recent year that includes
+        // the date with the weekday specified.
+
+        // Tu, W, Th, F, Sa, Su, M, Tu, W, Th, F, Sa, Su
+        static std::array<int, 13> defaultLeapYear{{2008, 1992, 2004, 2016, 2000, 2012, 1996, 2008, 1992, 2004, 2016, 2000, 2012}};
+
         int rem = calculateDayOfYear(month, day, true) % 7;
-        WeekDay firstWeekDay = static_cast<WeekDay>(static_cast<int>(weekday) - rem + 1);
-        return defaultYear[firstWeekDay];
+        return defaultLeapYear[static_cast<int>(weekday) - rem + 5]; // static_cast<int>(weekday) - rem + 1 + 4
     }
 
     void GetRunPeriodData(int &TotRunPers, // Total number of Run Periods requested
