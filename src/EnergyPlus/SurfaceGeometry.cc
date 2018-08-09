@@ -952,7 +952,6 @@ namespace SurfaceGeometry {
         int ConstrNumSh;               // Shaded construction number for a window
         int LayNumOutside;             // Outside material numbers for a shaded construction
         int BlNum;                     // Blind number
-        bool WinShadingCtrlReferenced; // True if a WindowShadingControl is referenced by at least one window
         int ShadingCtrl;               // WindowShadingControl number
         int AddedSubSurfaces;          // Subsurfaces (windows) added when windows reference Window5 Data File
         // entries with two glazing systems
@@ -1956,26 +1955,8 @@ namespace SurfaceGeometry {
             } // End of surface loop
 
             // associate fenestration surfaces referenced in WindowShadingControl
-            for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
-                for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
-                    int fenestrationIndex =
-                        UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), Surface, TotSurfaces);
-                    WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
-                }
-            }
+            AssociateWindowShadingControlFenestration(ErrorsFound);
 
-            // WSCO // Warning if a WindowShadingControl is not referenced by any window; user may think
-            // WSCO // window shading is occurring when it really isn't
-            // WSCO for (ShadingCtrl = 1; ShadingCtrl <= TotWinShadingControl; ++ShadingCtrl) {
-            // WSCO     WinShadingCtrlReferenced = false;
-            // WSCO     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            // WSCO         if (Surface(SurfNum).WindowShadingControlPtr == ShadingCtrl) WinShadingCtrlReferenced = true;
-            // WSCO     }
-            // WSCO     if (!WinShadingCtrlReferenced) {
-            // WSCO         ShowWarningError(RoutineName + "WindowShadingControl: \"" + WindowShadingControl(ShadingCtrl).Name +
-            // WSCO                          "\" is not referenced by any window.");
-            // WSCO     }
-            // WSCO }
         }
 
         // Check for zones with not enough surfaces
@@ -4172,7 +4153,6 @@ namespace SurfaceGeometry {
             } // check on non-opaquedoor subsurfaces
 
             CheckSubSurfaceMiscellaneous("GetHTSubSurfaceData", ErrorsFound, SurfNum, cAlphaArgs(1), cAlphaArgs(3), AddedSubSurfaces);
-            AssociateWindowShadingControlFenestration(ErrorsFound);
 
         } // End of main loop over subsurfaces
     }
@@ -8217,8 +8197,19 @@ namespace SurfaceGeometry {
     void AssociateWindowShadingControlFenestration(bool &ErrorsFound)
     {
         // J.Glazer 2018
-        for (auto wsc : WindowShadingControl) {
-            for 
+        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
+                int fenestrationIndex =
+                    UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), Surface, TotSurfaces);
+                WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
+                if (Surface(fenestrationIndex).WindowShadingControlPtr == 0) {
+                    Surface(fenestrationIndex).WindowShadingControlPtr = iShadeCtrl;
+                } else {
+                    ErrorsFound = true;
+                    ShowSevereError("AssociateWindowShadingControlFenestration: Fenestration suface named \"" + Surface(fenestrationIndex).Name + "\" appears on more than one WindowShadingControl list.");
+                    ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name + "\" and another one.");
+                }
+            }
         }
     }
 
