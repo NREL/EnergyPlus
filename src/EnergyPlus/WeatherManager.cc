@@ -10324,9 +10324,9 @@ namespace WeatherManager {
 
         // Could probably do some bounds checking here, but for now assume the month is in [1, 12]
         if (leapYear) {
-            return daysbefore[Month - 1] + Day;
-        } else {
             return daysbeforeleap[Month - 1] + Day;
+        } else {
+            return daysbefore[Month - 1] + Day;
         }
     }
 
