@@ -357,6 +357,7 @@ namespace UnitarySystems {
         bool m_CoolCompNotSetYet;
         bool m_HeatCompNotSetYet;
         bool m_SuppCompNotSetYet;
+        bool m_OKToPrintSizing;
 
     public:
         // SZVAV variables
