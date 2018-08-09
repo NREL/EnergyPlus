@@ -2207,6 +2207,7 @@ The transmittance and reflectance are overall system properties.~ (For daylighti
 
 \begin{equation}
 {Q^n} = \sum\limits_i {{\mathop{\rm \mathcal{A}}\nolimits}_i^{F,n}E_i^F}  + \sum\limits_j {{\mathop{\rm \mathcal{A}}\nolimits}_j^{B,n}E_j^B}
+\label{eq:QnVectorMatrixEquation}
 \end{equation}
 
 (In the vector/matrix language, \({Q^n} = {\bf{\mathcal{A}}^{F,n}} \cdot {{\bf{E}}^F} + {\bf{\mathcal{A}}^{B,n}} \cdot {{\bf{E}}^B}\) )
@@ -2532,10 +2533,11 @@ The total power at the interior surface \emph{k} for each source of radiation th
 {W^{{\rm{(Sun)}},k}} = {I^{{\rm{(D)}}}}(t)\sum\limits_j {F_j^{{\rm{(}}k{\rm{)}}}\Lambda_{jj}^{{\rm{(T)}}}{T_{j{\rm{ s}}(t)}}\cos {\theta_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}}}V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}A_{j{\rm{ s(}}t{\rm{)}}}^{{\rm{(f, Sun), }}k}}
 \end{equation}
 
-If we define a series of solar irradiation factors, Z, that describe the fraction of the radiation incident on the fenestration due to a given exterior radiation source that is ultimately incident on the interior surface \emph{k},
+If we define a series of solar irradiation factors, Z, that describe the fraction of the radiation incident on the fenestration due to a given exterior radiation source that is ultimately incident on the interior surface \emph{k}:
 
 \begin{equation}
 {Z^{{\rm{(Sky), }}k}} = \sum\limits_j {\Lambda_{jj}^{{\rm{(T)}}}F_j^{{\rm{(}}k{\rm{)}}}\sum\limits_{i{\rm{ }}down} {{T_{ji}}{\Lambda_{ii}}V_i^{{\rm{(Sky)}}}A_{ji}^{{\rm{(f, Sky), }}k}{s_i}} }
+\label{eq:ZSkykEquation}
 \end{equation}
 
 \begin{equation}
@@ -2560,12 +2562,14 @@ If we define a series of solar irradiation factors, Z, that describe the fractio
 
 \begin{equation}
 {Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}},k} = \sum\limits_j {F_j^{{\rm{(}}k{\rm{)}}}\Lambda_{jj}^{{\rm{(T)}}}{T_{j{\rm{ s}}(t)}}\cos {\theta_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}}}V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}A_{j{\rm{ s(}}t{\rm{)}}}^{{\rm{(f, Sun), }}k}}
+\label{eq:ZstSunkEquation}
 \end{equation}
 
-then equations through become
+then Equations~\ref{eq:ZSkykEquation} through~\ref{eq:ZstSunkEquation} become:
 
 \begin{equation}
 {W^{{\rm{(Sky), }}k}} = {I^{({\bf{Sky}})}}(t){Z^{{\rm{(Sky), }}k}}
+\label{eq:WSkykEquation}
 \end{equation}
 
 \begin{equation}
@@ -2578,6 +2582,7 @@ then equations through become
 
 \begin{equation}
 {W^{{\rm{(Sun)}},k}} = {I^{{\rm{(D)}}}}(t){Z_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}},k}
+\label{eq:WSunkEquation}
 \end{equation}
 
 The notation s(\emph{t}) appearing in a subscript in several of the above equations refers to the basis direction for which the sun direction is contained in the basis solid angle element.~ This is of course time dependent.~ What is meant here is that at any given time the particular basis element containing the sun is to be picked out.~ (If no basis element for the fenestration contains the sun at a given time, then the corresponding view factor---and therefore irradiance or absorption factor---is zero.)~ It is therefore necessary to tabulate those quantities with an s(\emph{t}) subscript for all basis directions \emph{s} that could possibly contain the sun direction (and for \emph{r(t)}, all basis directions that could possibly contain the reflected sun angle for the surface n).~ This is a set considerably smaller than that of all incoming basis directions.~ Figure~\ref{fig:sun-paths-and-incident-basis-for-three-window} illustrates this point for direct irradiation of fenestrations in three different orientations in a building at a particular latitude, using the W6 full basis, which has 145 incoming directions.~ In the worst case (west-facing) one only needs to consider around 50 of these, with much fewer needed in other orientations.~ The specific numbers for a given fenestration will depend on the choice of basis, orientation and latitude.~ The basis direction values can of course be interpolated where greater directional resolution is warranted.~ In equation the specular direction r(\emph{t}) is uniquely determined by the sun direction s(\emph{t}), so the Z factor does not need an additional index for \emph{s}.
@@ -2585,10 +2590,10 @@ The notation s(\emph{t}) appearing in a subscript in several of the above equati
 \begin{figure}[hbtp] % fig 94
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1410.png}
-\caption{Sun Paths and Incident Basis for Three Window Orientations, 38º N. Latitude. The nodal positions (blue dots) for a W6 full basis are compared with the summer solstice (red curve) and winter solstice (green curve) solar paths. Solar paths for other days of the year will lie between these two extremes. (Note: the basis points are to be interpreted as the direction of a vector pointing from the fenestration to the sun.) (a) South facing. (b) West facing. (c) North facing (the winter path is off the figure (i.e., the window is shaded); allowed paths will be outside the red path. \protect \label{fig:sun-paths-and-incident-basis-for-three-window}}
+\caption{Sun Paths and Incident Basis for Three Window Orientations, 38\(^{o}\) N. Latitude. The nodal positions (blue dots) for a W6 full basis are compared with the summer solstice (red curve) and winter solstice (green curve) solar paths. Solar paths for other days of the year will lie between these two extremes. (Note: the basis points are to be interpreted as the direction of a vector pointing from the fenestration to the sun.) (a) South facing. (b) West facing. (c) North facing (the winter path is off the figure (i.e., the window is shaded); allowed paths will be outside the red path. \protect \label{fig:sun-paths-and-incident-basis-for-three-window}}
 \end{figure}
 
-The reason for the definition of the Z factors is that to a great extent they can be precalculated, so that within the hourly calculation only equations - need to be used.~ In addition, there are fewer Z factors to be stored than transmittance matrix elements.~ The storage determinants for the foregoing calculations are summarized in the following table.
+The reason for the definition of the Z factors is that to a great extent they can be precalculated, so that within the hourly calculation only Equations~\ref{eq:WSkykEquation} -~\ref{eq:WSunkEquation} need to be used.~ In addition, there are fewer Z factors to be stored than transmittance matrix elements.~ The storage determinants for the foregoing calculations are summarized in the following table.
 
 % table 35
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
@@ -2601,8 +2606,6 @@ The reason for the definition of the Z factors is that to a great extent they ca
 
 \caption[]{Determination of array sizes} \tabularnewline
 \toprule
-\multicolumn{2}{c}{Parameters} \tabularnewline
-\midrule
 \endhead
 
 N\(_{Basis}\) & Number of elements in the (incoming or outgoing) basis \tabularnewline
@@ -2613,8 +2616,10 @@ N\(^{(Sf,n)}_{Sun}\) & Number of time steps for which surface \emph{n} is sunlit
 N\(^{(Sf,n)}_{Refl}\) & Number of basis directions that may be reflected sun directions from surface \emph{n} (depends on orientation of fenestration and surface \emph{n}). \tabularnewline
 N\(_{IntSurf}\) & Number of interior surfaces in the zone containing the fenestration \tabularnewline
 N\(_{Layers}\) & Number of thermal layers in the fenestration system \tabularnewline
+\midrule
 \multicolumn{2}{c}{Arrays} \tabularnewline
-A\(^{F,l}_{i}\), A\(^{B,l}_{i}\) & Absorptance vector element; N\(_{Basis}\) \tabularnewline
+\midrule
+\(\mathcal{A}\)\(^{F,l}_{i}\), \(\mathcal{A}\)\(^{B,l}_{i}\) & Absorptance vector element; N\(_{Basis}\) \tabularnewline
 T\(_{ij}\) & Transmittance matrix element; N\(_{Basis}\) X N\(_{Basis}\) \tabularnewline
 V\(^{(Sky)}_{i}\) & Sky viewed fraction; one-dimensional, N\(_{Basis}\) \tabularnewline
 V\(^{(Sf,n)}_{i}\) & Fraction of surface \emph{n} viewed; N\(_{Basis}\) X N\(_{Sf}\) \tabularnewline
@@ -2644,10 +2649,10 @@ K\(^{(Sun),l}_{s(t)}\) & Direct sunlight absorption factor; N\(_{Sun}\) X N\(_{L
 
 \subparagraph{Absorption}\label{absorption}
 
-For thermal calculations it is necessary to know the energy absorbed in each layer of the fenestration.~ This depends only on the incident geometry, but otherwise is calculated in the same manner as the solar flux incident on interior surfaces. ~For a given layer l of a fenestration f, we define a source-referenced absorption factor, K(source),l.~ This is the amount of energy absorbed in layer l divided by the relevant solar intensity (which might be beam, diffuse, or reflected beam or diffuse, depending on the source of the radiation).~ These absorption factors and the resultant source-specific absorbed solar powers are calculated by the analogs {[}see equation of equations through :
+For thermal calculations, it is necessary to know the energy absorbed in each layer of the fenestration.~ This depends only on the incident geometry, but otherwise is calculated in the same manner as the solar flux incident on interior surfaces. ~For a given layer l of a fenestration f, we define a source-referenced absorption factor, K(source),l.~ This is the amount of energy absorbed in layer l divided by the relevant solar intensity (which might be beam, diffuse, or reflected beam or diffuse, depending on the source of the radiation).~ These absorption factors and the resultant source-specific absorbed solar powers are calculated by the analogs {[}see Equation~\ref{eq:QnVectorMatrixEquation} or Equations~\ref{eq:ZSkykEquation} through~\ref{eq:ZstSunkEquation}{]}:
 
 \begin{equation}
-{K^{{\rm{(Sky), }}l}} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}down} {{\mathop{\rm A}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Sky)}}}{s_i}}
+{K^{{\rm{(Sky), }}l}} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}down} {{\mathop{\rm \mathcal{A}}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Sky)}}}{s_i}}
 \end{equation}
 
 \begin{equation}
@@ -2655,15 +2660,15 @@ For thermal calculations it is necessary to know the energy absorbed in each lay
 \end{equation}
 
 \begin{equation}
-{K_{{\rm{r(}}t{\rm{)}}}}^{{\rm{(sp, Sf, n)}},l} = {A^{{\rm{(f)}}}}{\mathop{\rm A}\nolimits}_{r(t)}^{F,l}{\Lambda_{{\rm{ r(}}t{\rm{) r(}}t{\rm{)}}}}V_{{\rm{ r(}}t{\rm{)}}}^{{\rm{(Sf, n)}}}U_{{\rm{ r(}}t{\rm{) s(}}t{\rm{)}}}^{{\rm{(D,n)}}}
+{K_{{\rm{r(}}t{\rm{)}}}}^{{\rm{(sp, Sf, n)}},l} = {A^{{\rm{(f)}}}}{\mathop{\rm \mathcal{A}}\nolimits}_{r(t)}^{F,l}{\Lambda_{{\rm{ r(}}t{\rm{) r(}}t{\rm{)}}}}V_{{\rm{ r(}}t{\rm{)}}}^{{\rm{(Sf, n)}}}U_{{\rm{ r(}}t{\rm{) s(}}t{\rm{)}}}^{{\rm{(D,n)}}}
 \end{equation}
 
 \begin{equation}
-{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun, Sf, n)}},l} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}down} {{\mathop{\rm A}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D,n)}}}}
+{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun, Sf, n)}},l} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}down} {{\mathop{\rm \mathcal{A}}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D,n)}}}}
 \end{equation}
 
 \begin{equation}
-{K^{{\rm{(Sky, Sf, n)}},l}} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}down} {{\mathop{\rm A}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}U_i^{{\rm{(Sky, n)}}}}
+{K^{{\rm{(Sky, Sf, n)}},l}} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}down} {{\mathop{\rm \mathcal{A}}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Sf, n)}}}U_i^{{\rm{(Sky, n)}}}}
 \end{equation}
 
 \begin{equation}
@@ -2671,11 +2676,11 @@ For thermal calculations it is necessary to know the energy absorbed in each lay
 \end{equation}
 
 \begin{equation}
-{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(D, Gnd)}},l} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}up} {{\mathop{\rm A}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Gnd)}}}U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D, Gnd)}}}}
+{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(D, Gnd)}},l} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}up} {{\mathop{\rm \mathcal{A}}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Gnd)}}}U_{i{\rm{ }}Sun(tsh)}^{{\rm{(D, Gnd)}}}}
 \end{equation}
 
 \begin{equation}
-{K^{{\rm{(Sky, Gnd)}},l}} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}up} {{\mathop{\rm A}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Gnd)}}}U_i^{{\rm{(Sky, Gnd)}}}}
+{K^{{\rm{(Sky, Gnd)}},l}} = {A^{{\rm{(f)}}}}\sum\limits_{i{\rm{ }}up} {{\mathop{\rm \mathcal{A}}\nolimits}_i^{F,l}{\Lambda_{ii}}V_i^{{\rm{(Gnd)}}}U_i^{{\rm{(Sky, Gnd)}}}}
 \end{equation}
 
 \begin{equation}
@@ -2683,7 +2688,7 @@ For thermal calculations it is necessary to know the energy absorbed in each lay
 \end{equation}
 
 \begin{equation}
-{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}},l} = {A^{{\rm{(f)}}}}{\mathop{\rm A}\nolimits}_{{\rm{s}}(t)}^{F,l}\cos {\theta_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}}}V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}
+{K_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}},l} = {A^{{\rm{(f)}}}}{\mathop{\rm \mathcal{A}}\nolimits}_{{\rm{s}}(t)}^{F,l}\cos {\theta_{{\rm{s(}}t{\rm{)}}}}^{{\rm{(Sun)}}}V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}
 \end{equation}
 
 \begin{equation}
@@ -2696,13 +2701,13 @@ Use of the basis in the above discussion has been mostly implicit, but it should
 
 A related point concerns the specification of a basis for specular glazings, i.e., multiple layers of glass.~ These fenestrations are both specular (input direction = output direction) and axially symmetric.~ These properties have different effects on the calculation.
 
-The specular property means that one should not be using equation at all to describe the transmittance.~ Instead, one should use the equation
+The specular property means that one should not be using Equation~\ref{eq:SofptotheTDiffEq} at all to describe the transmittance.~ Instead, one should use the equation:
 
 \begin{equation}
 S({{\bf{p}}^{{\rm{(T)}}}}) = \tau ({{\bf{p}}^{{\rm{(T)}}}}) \cdot E({{\bf{p}}^{{\rm{(T)}}}})
 \end{equation}
 
-This equation is shoehorned into the integral calculation of equation through the use of a delta function in the incident direction vector, resulting (after the discretization) in a diagonal matrix for the transmittance (or reflectance).~ The outgoing radiance element on the diagonal would be calculated as \emph{T\(_{ii}\)}L\emph{\(_{ii}\)}, where multiplication by L\emph{\(_{ii}\)} substitutes for integration over the basis solid angle element. For a specular glazing, \(T_{ii} = \tau(\bf{p}_i^{(T)})/\Lambda_{ii}\), so one recovers the correct transmittance when one does the multiplication. However, there is still a problem in principle: For a specular fenestration, the angular spread of the outgoing radiation will be that of the source, which for direct sunlight is very small; the calculation, however, assumes the angular spread of the basis element. This problem disappears in the geometric approximation to be used in EnergyPlus: by considering only the central direction of each basis element, the outgoing radiation in that direction is essentially assumed to be specular, so the blurring in the discretization is undone.
+This equation is shoehorned into the integral calculation of equation through the use of a delta function in the incident direction vector, resulting (after the discretization) in a diagonal matrix for the transmittance (or reflectance).~ The outgoing radiance element on the diagonal would be calculated as \emph{T\(_{ii}\)}\emph{\(\Lambda\)\(_{ii}\)}, where multiplication by \emph{\(\Lambda\)\(_{ii}\)} substitutes for integration over the basis solid angle element. For a specular glazing, \(T_{ii} = \tau(\bf{p}_i^{(T)})/\Lambda_{ii}\), so one recovers the correct transmittance when one does the multiplication. However, there is still a problem in principle: For a specular fenestration, the angular spread of the outgoing radiation will be that of the source, which for direct sunlight is very small; the calculation, however, assumes the angular spread of the basis element. This problem disappears in the geometric approximation to be used in EnergyPlus: by considering only the central direction of each basis element, the outgoing radiation in that direction is essentially assumed to be specular, so the blurring in the discretization is undone.
 
 The axial symmetry of conventional glazings means that the transmittance (or reflectance) depends on only the incident angle, not the azimuthal angle about the normal to the fenestration plane.~ So if one specifies the diagonal elements of the matrix, all of the terms with the same incident angles but different azimuthal angles will be the same.~ One could alternatively specify only the specular transmittance at each of the incident angle values, provided one also indicated that it was for an axially symmetric fenestration.~ Since expanding this set of values to the equivalent diagonal elements is a trivial calculation, how one specifies a specular glazing is completely a question of user convenience.~ For example, if one were dealing with the WINDOW full basis, would it be more user-friendly to specify
 
@@ -2711,7 +2716,7 @@ The axial symmetry of conventional glazings means that the transmittance (or ref
 \item
   \(T_{ii} = \tau(\bf{p}_i^{(T)})/\Lambda_{ii}\) , for 145 values, 135 of which are repeats of the previous value
 \item
-  \(\tau ({\theta_i})\) ~for 9 values of incident angle, \emph{q\(_{i}\)} ?
+  \(\tau ({\theta_i})\) ~for 9 values of incident angle, \emph{\(\theta\)\(_{i}\)} ?
 \end{enumerate}
 
 \subparagraph{Interior Solar Radiation Transmitted by Complex Fenestration}\label{interior-solar-radiation-transmitted-by-complex-fenestration}
@@ -2720,7 +2725,7 @@ Diffuse Solar Radiation Transmitted by Complex Fenestration
 
 Distribution of solar radiation transmitted through exterior window is divided on diffuse and direct part.
 
-Diffuse solar transmitted through exterior complex fenestration and absorbed in interor walls is calculated and treated in same way as described in the section on Initial Distribution of Diffuse Solar Transmitted through Exterior and Interior Windows. Even though that BSDF is given for various directions, for purpose of diffuse solar radiation, transmittance and reflectances of fenestration system is integrated over incoming and outgoing hemisphere.~ Because incoming diffuse solar radiation is divided on ground and sky parts, integration of incoming hemisphere is also perfomed over ground and sky part (see equation .
+Diffuse solar transmitted through exterior complex fenestration and absorbed in interor walls is calculated and treated in same way as described in the section on Initial Distribution of Diffuse Solar Transmitted through Exterior and Interior Windows. Even though that BSDF is given for various directions, for purpose of diffuse solar radiation, transmittance and reflectances of fenestration system is integrated over incoming and outgoing hemisphere.~ Because incoming diffuse solar radiation is divided on ground and sky parts, integration of incoming hemisphere is also perfomed over ground and sky part (see Equation~\ref{eq:SSfnpTEquation}).
 
 Direct Solar Radiation Transmitted by Complex Fenestration
 
@@ -2731,6 +2736,7 @@ Direct solar (beam) transmitted through exterior window is using same overlap ca
 AISurf\left(SurfNum\right) =& \frac{AbsIntSurf\left(SurfNum\right)}{A\left(SurfNum\right)} \\
 &\cdot\sum_{i = 1}^{N_{extwin}} \left( \sum_{j = 1}^{N_{out}} TB{m_{k,j}} \cdot \Lambda_{k,j} \cdot \text{Aoverlap}_{k,j} \left( SurfNum \right)\right) \cdot \text{CosInc}_i
 \end{split}
+\label{eq:AISurfEquation}
 \end{equation}
 
 \emph{i} = exterior window number
@@ -2741,17 +2747,17 @@ AISurf\left(SurfNum\right) =& \frac{AbsIntSurf\left(SurfNum\right)}{A\left(SurfN
 
 \emph{CosInc\(_{i}\)} = cosine of angle of incidence of beam on exterior window \emph{i}
 
-\emph{TBm\(_{k,j}\)} = beam-to-beam transmittance of exterior window* i*at incidence direction k outgoing direction j
+\emph{TBm\(_{k,j}\)} = beam-to-beam transmittance of exterior window i at incidence direction k outgoing direction j
 
-\emph{Λ\(_{k,j}\)} = lambda value of exterior window* i*at incidence direction k for outgoing direction j
+\emph{Λ\(_{k,j}\)} = lambda value of exterior window i at incidence direction k for outgoing direction j
 
-\emph{Aoverlap\(_{k,j}\)(SurfNum)} = beam solar irradiated area of surface \emph{SurfNum} projected back onto the plane of exterior window* i* for incoming direction k and outgoing direction j (the \emph{Aoverlap}'s for an exterior window sum up to the glazed area of the window)
+\emph{Aoverlap\(_{k,j}\)(SurfNum)} = beam solar irradiated area of surface \emph{SurfNum} projected back onto the plane of exterior window i for incoming direction k and outgoing direction j (the \emph{Aoverlap}'s for an exterior window sum up to the glazed area of the window)
 
 \emph{AbsIntSurf(SurfNum)} = inside face solar absorptance of surface \emph{SurfNum}
 
 \emph{A(SurfNum)} = area of surface \emph{SurfNum} {[}m\(^{2}\){]}
 
-Equation is valid as long as surface which is hit by transmitted solar radiation is not another complex fenestration.~ In that case, for beam which is transmitted from other exterior window and reaches back surface of this window, angle of incidence needs to be taken into account.
+Equation~\ref{eq:AISurfEquation} is valid as long as surface which is hit by transmitted solar radiation is not another complex fenestration.~ In that case, for beam which is transmitted from other exterior window and reaches back surface of this window, angle of incidence needs to be taken into account.
 
 \subparagraph{Interior Solar Absorbed by Complex Fenestration}\label{interior-solar-absorbed-by-complex-fenestration}
 
@@ -2768,7 +2774,7 @@ Energy absorbed in the layers and which originates from diffuse radiation from s
 \end{split}
 \end{equation}
 
-where,
+where
 
 \emph{WinSkyFtAbs(Lay)} = front absorptance averaged over sky for layer (Lay) and window belonging to Surf
 
@@ -2786,7 +2792,7 @@ Energy absorbed in the layers and which originates from direct solar radiation i
 \text{QRadSWwinAbs}(SurfNum, Lay) = \text{AWinSurf}(SurfNum, Lay) \cdot \text{BeamSolar}
 \end{equation}
 
-where,
+where
 
 \emph{AWinSurf(SurfNum,Lay)} -- is time step value of factor for beam absorbed in fenestration glass layers
 
@@ -2801,7 +2807,7 @@ Factor for time step value is given by equation:
 \end{split}
 \end{equation}
 
-where,
+where
 
 \emph{WinBmFtAbs(Lay,HourOfDay,TimeStep)} -- is front directional absorptance for given layer and time
 
@@ -2813,13 +2819,14 @@ where,
 
 Direct Solar Radiation Coming from Sun and it is Transmitted Through Other Windows
 
-Direct solar radiation transmitted through other windows is using solar overlap calculations described in the section on Overlapping Shadows. Overlapping is used to determine amount of energy transferred through the window is hitting certain surface.~ That is used to calculate energy absorbed in walls and same approach will be used to calculate energy absorbed in window layers (equation ).~ In case when receiving surface is complex fenestration, it is not enought just to apply equation because factor AbsIntSurf is now depending of incoming angle which is defined through front and back directional absorptance matrices.~ It would mean that for each outgoing directions of transmitting complex fenestration, algorithm would need to determine what is best matching basis direction of receiving surface.~ Best receiving direction is used to determine absorptance factors which will be used in equation .~ It is important to understand that for basis definition, each unit vector defining one beam is going towards surface, which would mean that best matching directions from surface to surface will actually have minimal dot product.
+Direct solar radiation transmitted through other windows is using solar overlap calculations described in the section on Overlapping Shadows. Overlapping is used to determine amount of energy transferred through the window is hitting certain surface.~ That is used to calculate energy absorbed in walls and same approach will be used to calculate energy absorbed in window layers (Equation~\ref{eq:AISurfEquation}).~ In case when receiving surface is complex fenestration, it is not enough just to apply Equation~\ref{eq:AISurfEquation} because factor AbsIntSurf is now depending of incoming angle which is defined through front and back directional absorptance matrices.~ It would mean that for each outgoing directions of transmitting complex fenestration, algorithm would need to determine what is best matching basis direction of receiving surface.~ Best receiving direction is used to determine absorptance factors which will be used in Equation~\ref{eq:AISurfEquation}.~ It is important to understand that for basis definition, each unit vector defining one beam is going towards surface, which would mean that best matching directions from surface to surface will actually have minimal dot product.
 
 \begin{equation}
 Bes{t_{in}} = {\rm{min}}\left( {dot\left( {ou{t_p},i{n_1}} \right),dot\left( {ou{t_p},i{n_2}} \right), \ldots ,dot\left( {ou{t_p},i{n_N}} \right)} \right)
+\label{eq:BestinEquation}
 \end{equation}
 
-where,
+where
 
 Best\(_{in}\) -- is best matching receiving direction basis dot product (in\(_{k}\))
 
@@ -2827,7 +2834,7 @@ out\(_{p}\) -- current transmitting complex fenestration direction
 
 in\(_{1}\), \ldots{}, in\(_{N}\) -- set of receiving complex fenestration basis directions
 
-Result of equation is minimal dot product, which corresponds to best matching direction of receiving surface.~ If we mark that direction with index k, then equation becomes:
+Result of Equation~\ref{eq:BestinEquation} is minimal dot product, which corresponds to best matching direction of receiving surface.~ If we mark that direction with index k, then Equation~\ref{eq:AISurfEquation} becomes:
 
 \begin{equation}
   \begin{array}{l}
@@ -2838,11 +2845,11 @@ Result of equation is minimal dot product, which corresponds to best matching di
   \end{array}
 \end{equation}
 
-where,
+where
 
-\emph{AbsIntSurf\(_{k}\)(SurfNum)} -- directional absorptance for the receiving surface for the best matching direction
+\emph{AbsIntSurf\(_{k}\)(SurfNum)} -- directional absorptance for the receiving surface for the best matching direction.
 
-Everything else is same as described in equation .
+Everything else is same as described in Equation~\ref{eq:AISurfEquation}.
 
 \subsubsection{References}\label{references-1-018}
 
