@@ -57,9 +57,7 @@ namespace UnitarySystems {
 
     void clear_state();
 
-    // extern int numDesignSpecMultiSpeedHP;
     extern int numUnitarySystems;
-    // bool getInputFlag;
     extern bool economizerFlag;      // holds air loop economizer status
     extern bool SuppHeatingCoilFlag; // set to TRUE when simulating supplemental heating coil
 
@@ -115,27 +113,19 @@ namespace UnitarySystems {
     class UnitarySys
     {
 
-        // bool myOneTimeFlag;
-        // bool getInputOnceFlag;
-        Real64 fanSpeedRatio;
-        bool initUnitarySystemsErrFlag;
-        bool initUnitarySystemsErrorsFound;
-        Real64 initUnitarySystemsQActual;
-        Real64 initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax;
-        bool initLoadBasedControlFlowFracFlagReady;
         enum class ControlType : int
         {
             None,
             Load,
             Setpoint,
-            CCMASHRAE,
+            CCMASHRAE
         };
 
         enum class DehumCtrlType : int
         {
             None,
             CoolReheat,
-            Multimode,
+            Multimode
         };
 
         enum class FanPlace : int
@@ -154,7 +144,7 @@ namespace UnitarySystems {
         };
 
         friend class DesignSpecMSHP;
-        // UnitarySys *compPointer; // don't need this here
+
         int m_UnitarySysNum;
         int m_unitarySystemType_Num;
         bool m_ThisSysInputShouldBeGotten;
@@ -166,7 +156,6 @@ namespace UnitarySystems {
         bool m_ValidASHRAEHeatCoil;
         bool m_SimASHRAEModel; // flag denoting that ASHRAE model (SZVAV) should be used
         bool m_setFaultModelInput;
-        std::string m_FanName;
         int m_FanIndex;
         FanPlace m_FanPlace;
         int m_FanOpModeSchedPtr;
@@ -178,7 +167,6 @@ namespace UnitarySystems {
         Real64 m_DesignMassFlowRate;
         int m_FanAvailSchedPtr;
         int m_FanOpMode;
-        std::string m_ATMixerName;
         int m_ATMixerIndex;
         int m_ATMixerPriNode;
         int m_ATMixerSecNode;
@@ -186,8 +174,6 @@ namespace UnitarySystems {
         int m_ZoneInletNode;
         int m_ZoneSequenceCoolingNum;
         int m_ZoneSequenceHeatingNum;
-        std::string m_HeatingCoilName;
-        std::string m_HeatingCoilTypeName;
         bool m_HeatCoilExists;
         Real64 m_HeatingSizingRatio;
         int m_HeatingCoilType_Num;
@@ -214,15 +200,12 @@ namespace UnitarySystems {
         bool m_MultiSpeedCoolingCoil;
         bool m_VarSpeedCoolingCoil;
         int m_SystemCoolControlNodeNum;
-        std::string m_CoolingCoilName;
         int m_WaterCyclingMode;
         bool m_ISHundredPercentDOASDXCoil;
         bool m_RunOnSensibleLoad;
         bool m_RunOnLatentLoad;
         bool m_RunOnLatentOnlyWithSensible;
         int m_DehumidificationMode;
-        std::string m_SuppHeatCoilName;
-        std::string m_SuppHeatCoilTypeName;
         int m_SuppHeatCoilType_Num;
         bool m_SuppCoilExists;
         Real64 m_DesignSuppHeatingCapacity;
@@ -253,18 +236,8 @@ namespace UnitarySystems {
         bool m_HeatRecActive;
         int m_HeatRecoveryInletNodeNum;
         int m_HeatRecoveryOutletNodeNum;
-        std::string m_DesignSpecMultispeedHPType;
-        std::string m_DesignSpecMultispeedHPName;
         int m_DesignSpecMSHPIndex;
         Real64 m_NoLoadAirFlowRateRatio;
-        DesignSpecMSHP *m_CompPointerMSHP;
-        std::vector<Real64> m_CoolVolumeFlowRate;
-        std::vector<Real64> m_CoolMassFlowRate;
-        std::vector<Real64> m_MSCoolingSpeedRatio;
-        std::vector<Real64> m_HeatVolumeFlowRate;
-        std::vector<Real64> m_HeatMassFlowRate;
-        std::vector<Real64> m_MSHeatingSpeedRatio;
-        std::vector<Real64> m_HeatingVolFlowRatio;
         Real64 m_IdleMassFlowRate;
         Real64 m_IdleVolumeAirRate; // idle air flow rate [m3/s]
         Real64 m_IdleSpeedRatio;
@@ -368,7 +341,6 @@ namespace UnitarySystems {
         Real64 m_SensibleLoadMet;
         Real64 m_LatentLoadMet;
         bool m_MyStagedFlag;
-        std::vector<int> m_IterationMode; // array of operating mode each iteration
         Real64 m_SensibleLoadPredicted;
         Real64 m_MoistureLoadPredicted;
 
@@ -380,11 +352,14 @@ namespace UnitarySystems {
         int m_TESOpMode; // operating mode of TES DX cooling coil
         bool m_initLoadBasedControlAirLoopPass;
         int m_airLoopPassCounter;
+        int m_airLoopReturnCounter;
+        bool m_FanCompNotSetYet;
+        bool m_CoolCompNotSetYet;
+        bool m_HeatCompNotSetYet;
+        bool m_SuppCompNotSetYet;
 
     public:
         // SZVAV variables
-        std::string Name;
-        std::string UnitType;
         int UnitarySystemType_Num;
         int MaxIterIndex;
         int RegulaFalsiFailedIndex;
@@ -424,8 +399,30 @@ namespace UnitarySystems {
         int ATMixerType;                 // type of AT mixer, inlet-side or supply-side
         int ATMixerOutNode;              // AT mixer outlet node number
         Real64 ControlZoneMassFlowFrac;  // fraction of air flow to the control zone
+        std::string Name;
+        std::string UnitType;
 
     private:
+        // private members not initialized in constructor
+        std::string m_FanName;
+        std::string m_ATMixerName;
+        std::string m_HeatingCoilName;
+        std::string m_HeatingCoilTypeName;
+        std::string m_CoolingCoilName;
+        std::string m_SuppHeatCoilName;
+        std::string m_SuppHeatCoilTypeName;
+        std::string m_DesignSpecMultispeedHPType;
+        std::string m_DesignSpecMultispeedHPName;
+        std::vector<Real64> m_CoolVolumeFlowRate;
+        std::vector<Real64> m_CoolMassFlowRate;
+        std::vector<Real64> m_MSCoolingSpeedRatio;
+        std::vector<Real64> m_HeatVolumeFlowRate;
+        std::vector<Real64> m_HeatMassFlowRate;
+        std::vector<Real64> m_MSHeatingSpeedRatio;
+        std::vector<Real64> m_HeatingVolFlowRatio;
+        std::vector<int> m_IterationMode; // array of operating mode each iteration
+        DesignSpecMSHP *m_CompPointerMSHP;
+
         struct WarnMessages
         {
             // Warning message variables
@@ -663,11 +660,12 @@ namespace UnitarySystems {
 
         void controlHeatingSystemToSP(int const AirLoopNum,          // index to air loop
                                       bool const FirstHVACIteration, // First HVAC iteration flag
-                                      int &CompOn                    // compressor on/off control
+                                      int &CompOn,                   // compressor on/off control
+                                      Real64 &HeatCoilLoad           // load met by heating coil
         );
 
-        void controlSuppHeatSystem(int const AirLoopNum,         // index to air loop
-                                   bool const FirstHVACIteration // First HVAC iteration flag
+        void controlSuppHeatSystemToSP(int const AirLoopNum,         // index to air loop
+                                       bool const FirstHVACIteration // First HVAC iteration flag
         );
 
         void simMultiSpeedCoils(int const AirLoopNum,          // Index to air loop
@@ -742,7 +740,7 @@ namespace UnitarySystems {
 
     extern std::vector<UnitarySys> unitarySys;
     extern std::vector<DesignSpecMSHP> designSpecMSHP;
-    static int getDesignSpecMSHPIndex(std::string const &objectName);
+    int getDesignSpecMSHPIndex(std::string const &objectName);
     int getUnitarySystemIndex(std::string const &objectName);
 
 } // namespace UnitarySystems

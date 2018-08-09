@@ -1362,17 +1362,17 @@ namespace SZVAVModel {
     {
 
         // Using/Aliasing
-        //using HVACUnitarySystem::CalcUnitarySystemToLoad;
-        //using HVACUnitarySystem::CalcUnitarySystemWaterFlowResidual;
-        //using PlantUtilities::SetComponentFlowRate;
-        //using Psychrometrics::PsyHFnTdbW;
+        // using HVACUnitarySystem::CalcUnitarySystemToLoad;
+        // using HVACUnitarySystem::CalcUnitarySystemWaterFlowResidual;
+        // using PlantUtilities::SetComponentFlowRate;
+        // using Psychrometrics::PsyHFnTdbW;
         UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[SysIndex];
 
         int const MaxIter(100);    // maximum number of iterations
         int SolFlag(0);            // return flag from RegulaFalsi for sensible load
         std::string MessagePrefix; // label for warning reporting
 
-        std::vector<Real64> Par(17); // parameters passed to RegulaFalsi function
+        std::vector<Real64> Par(18); // parameters passed to RegulaFalsi function
         Real64 boundaryLoadMet(0.0);
         Real64 minHumRat(0.0);
         Real64 outletTemp(0.0);
@@ -1516,15 +1516,17 @@ namespace SZVAVModel {
         if (SZVAVModel.ATMixerExists) {
             if (SZVAVModel.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 // Air terminal supply side mixer
-                boundaryLoadMet =
-                    minAirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(SZVAVModel.ATMixerOutNode).Temp, ZoneHumRat) - Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat));
+                boundaryLoadMet = minAirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(SZVAVModel.ATMixerOutNode).Temp, ZoneHumRat) -
+                                                    Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat));
             } else {
                 // Air terminal inlet side mixer
-                boundaryLoadMet = minAirMassFlow * (Psychrometrics::PsyHFnTdbW(maxOutletTemp, ZoneHumRat) - Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat));
+                boundaryLoadMet =
+                    minAirMassFlow * (Psychrometrics::PsyHFnTdbW(maxOutletTemp, ZoneHumRat) - Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat));
             }
         } else {
             minHumRat = min(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(OutletNode).HumRat);
-            boundaryLoadMet = minAirMassFlow * (Psychrometrics::PsyHFnTdbW(maxOutletTemp, minHumRat) - Psychrometrics::PsyHFnTdbW(InletTemp, minHumRat));
+            boundaryLoadMet =
+                minAirMassFlow * (Psychrometrics::PsyHFnTdbW(maxOutletTemp, minHumRat) - Psychrometrics::PsyHFnTdbW(InletTemp, minHumRat));
         }
 
         if ((CoolingLoad && boundaryLoadMet < ZoneLoad) || (HeatingLoad && boundaryLoadMet > ZoneLoad)) { // in Region 1 of figure
@@ -1543,29 +1545,29 @@ namespace SZVAVModel {
                 // set the water flow ratio so water coil gets proper flow
                 SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
                 thisSys->calcUnitarySystemToLoad(AirLoopNum,
-                                        FirstHVACIteration,
-                                        PartLoadRatio,
-                                        0.0,
-                                        OnOffAirFlowRatio,
-                                        TempSensOutput,
-                                        TempLatOutput,
-                                        HXUnitOn,
-                                        HeatCoilLoad,
-                                        SupHeaterLoad,
-                                        CompressorONFlag);
+                                                 FirstHVACIteration,
+                                                 PartLoadRatio,
+                                                 0.0,
+                                                 OnOffAirFlowRatio,
+                                                 TempSensOutput,
+                                                 TempLatOutput,
+                                                 HXUnitOn,
+                                                 HeatCoilLoad,
+                                                 SupHeaterLoad,
+                                                 CompressorONFlag);
             } else {
                 SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                 thisSys->calcUnitarySystemToLoad(AirLoopNum,
-                                        FirstHVACIteration,
-                                        0.0,
-                                        PartLoadRatio,
-                                        OnOffAirFlowRatio,
-                                        TempSensOutput,
-                                        TempLatOutput,
-                                        HXUnitOn,
-                                        ZoneLoad,
-                                        SupHeaterLoad,
-                                        CompressorONFlag);
+                                                 FirstHVACIteration,
+                                                 0.0,
+                                                 PartLoadRatio,
+                                                 OnOffAirFlowRatio,
+                                                 TempSensOutput,
+                                                 TempLatOutput,
+                                                 HXUnitOn,
+                                                 ZoneLoad,
+                                                 SupHeaterLoad,
+                                                 CompressorONFlag);
             }
             coilActive = DataLoopNode::Node(coilAirInletNode).Temp - DataLoopNode::Node(coilAirOutletNode).Temp;
 
@@ -1573,12 +1575,12 @@ namespace SZVAVModel {
                 DataLoopNode::Node(coilFluidInletNode).MassFlowRate = 0.0;
                 if (coilLoopNum > 0)
                     PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(coilFluidInletNode).MassFlowRate,
-                                         coilFluidInletNode,
-                                         coilFluidOutletNode,
-                                         coilLoopNum,
-                                         coilLoopSide,
-                                         coilBranchNum,
-                                         coilCompNum);
+                                                         coilFluidInletNode,
+                                                         coilFluidOutletNode,
+                                                         coilLoopNum,
+                                                         coilLoopSide,
+                                                         coilBranchNum,
+                                                         coilCompNum);
                 return;
             }
 
@@ -1594,12 +1596,12 @@ namespace SZVAVModel {
 
                 if (coilLoopNum > 0)
                     PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(coilFluidInletNode).MassFlowRate,
-                                         coilFluidInletNode,
-                                         coilFluidOutletNode,
-                                         coilLoopNum,
-                                         coilLoopSide,
-                                         coilBranchNum,
-                                         coilCompNum);
+                                                         coilFluidInletNode,
+                                                         coilFluidOutletNode,
+                                                         coilLoopNum,
+                                                         coilLoopSide,
+                                                         coilBranchNum,
+                                                         coilCompNum);
             }
 
         } else {
@@ -1615,7 +1617,8 @@ namespace SZVAVModel {
                 minHumRat = DataLoopNode::Node(SZVAVModel.NodeNumOfControlledZone).HumRat;
                 if (outletTemp < ZoneTemp) minHumRat = DataLoopNode::Node(OutletNode).HumRat;
                 outletTemp = maxOutletTemp;
-                AirMassFlow = min(maxAirMassFlow, (ZoneLoad / (Psychrometrics::PsyHFnTdbW(outletTemp, minHumRat) - Psychrometrics::PsyHFnTdbW(ZoneTemp, minHumRat))));
+                AirMassFlow = min(maxAirMassFlow,
+                                  (ZoneLoad / (Psychrometrics::PsyHFnTdbW(outletTemp, minHumRat) - Psychrometrics::PsyHFnTdbW(ZoneTemp, minHumRat))));
                 AirMassFlow = max(minAirMassFlow, AirMassFlow);
                 SZVAVModel.FanPartLoadRatio = ((AirMassFlow - (maxAirMassFlow * lowSpeedFanRatio)) / ((1.0 - lowSpeedFanRatio) * maxAirMassFlow));
 
@@ -1645,41 +1648,41 @@ namespace SZVAVModel {
                     // set the water flow ratio so water coil gets proper flow
                     SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
                     thisSys->calcUnitarySystemToLoad(AirLoopNum,
-                                            FirstHVACIteration,
-                                            PartLoadRatio,
-                                            0.0,
-                                            OnOffAirFlowRatio,
-                                            TempSensOutput,
-                                            TempLatOutput,
-                                            HXUnitOn,
-                                            HeatCoilLoad,
-                                            SupHeaterLoad,
-                                            CompressorONFlag);
+                                                     FirstHVACIteration,
+                                                     PartLoadRatio,
+                                                     0.0,
+                                                     OnOffAirFlowRatio,
+                                                     TempSensOutput,
+                                                     TempLatOutput,
+                                                     HXUnitOn,
+                                                     HeatCoilLoad,
+                                                     SupHeaterLoad,
+                                                     CompressorONFlag);
                 } else {
                     SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                     thisSys->calcUnitarySystemToLoad(AirLoopNum,
-                                            FirstHVACIteration,
-                                            0.0,
-                                            PartLoadRatio,
-                                            OnOffAirFlowRatio,
-                                            TempSensOutput,
-                                            TempLatOutput,
-                                            HXUnitOn,
-                                            ZoneLoad,
-                                            SupHeaterLoad,
-                                            CompressorONFlag);
+                                                     FirstHVACIteration,
+                                                     0.0,
+                                                     PartLoadRatio,
+                                                     OnOffAirFlowRatio,
+                                                     TempSensOutput,
+                                                     TempLatOutput,
+                                                     HXUnitOn,
+                                                     ZoneLoad,
+                                                     SupHeaterLoad,
+                                                     CompressorONFlag);
                 }
                 coilActive = DataLoopNode::Node(coilAirInletNode).Temp - DataLoopNode::Node(coilAirOutletNode).Temp;
                 if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
                     DataLoopNode::Node(coilFluidInletNode).MassFlowRate = 0.0;
                     if (coilLoopNum > 0)
                         PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(coilFluidInletNode).MassFlowRate,
-                                             coilFluidInletNode,
-                                             coilFluidOutletNode,
-                                             coilLoopNum,
-                                             coilLoopSide,
-                                             coilBranchNum,
-                                             coilCompNum);
+                                                             coilFluidInletNode,
+                                                             coilFluidOutletNode,
+                                                             coilLoopNum,
+                                                             coilLoopSide,
+                                                             coilBranchNum,
+                                                             coilCompNum);
                     return;
                 }
 
@@ -1698,12 +1701,12 @@ namespace SZVAVModel {
 
             if (coilLoopNum > 0)
                 PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(coilFluidInletNode).MassFlowRate,
-                                     coilFluidInletNode,
-                                     coilFluidOutletNode,
-                                     coilLoopNum,
-                                     coilLoopSide,
-                                     coilBranchNum,
-                                     coilCompNum);
+                                                     coilFluidInletNode,
+                                                     coilFluidOutletNode,
+                                                     coilLoopNum,
+                                                     coilLoopSide,
+                                                     coilBranchNum,
+                                                     coilCompNum);
         }
 
         if (SolFlag < 0) {
@@ -1711,28 +1714,28 @@ namespace SZVAVModel {
                 // get capacity for warning
                 if (CoolingLoad) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                     thisSys->calcUnitarySystemToLoad(AirLoopNum,
-                                            FirstHVACIteration,
-                                            PartLoadRatio,
-                                            0.0,
-                                            OnOffAirFlowRatio,
-                                            TempSensOutput,
-                                            TempLatOutput,
-                                            HXUnitOn,
-                                            HeatCoilLoad,
-                                            SupHeaterLoad,
-                                            CompressorONFlag);
+                                                     FirstHVACIteration,
+                                                     PartLoadRatio,
+                                                     0.0,
+                                                     OnOffAirFlowRatio,
+                                                     TempSensOutput,
+                                                     TempLatOutput,
+                                                     HXUnitOn,
+                                                     HeatCoilLoad,
+                                                     SupHeaterLoad,
+                                                     CompressorONFlag);
                 } else {
                     thisSys->calcUnitarySystemToLoad(AirLoopNum,
-                                            FirstHVACIteration,
-                                            0.0,
-                                            PartLoadRatio,
-                                            OnOffAirFlowRatio,
-                                            TempSensOutput,
-                                            TempLatOutput,
-                                            HXUnitOn,
-                                            ZoneLoad,
-                                            SupHeaterLoad,
-                                            CompressorONFlag);
+                                                     FirstHVACIteration,
+                                                     0.0,
+                                                     PartLoadRatio,
+                                                     OnOffAirFlowRatio,
+                                                     TempSensOutput,
+                                                     TempLatOutput,
+                                                     HXUnitOn,
+                                                     ZoneLoad,
+                                                     SupHeaterLoad,
+                                                     CompressorONFlag);
                 }
 
                 if (abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
