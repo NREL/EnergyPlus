@@ -527,7 +527,6 @@
     Zn001:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn001:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Starting X Coordinate {m}
@@ -654,7 +653,6 @@
     Zn002:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Starting X Coordinate {m}
@@ -675,7 +673,6 @@
     Zn002:Wall001:Win002,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     10,                      !- Starting X Coordinate {m}
@@ -699,7 +696,6 @@
     Zn002:Wall002:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall002,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     9,                       !- Starting X Coordinate {m}
@@ -795,7 +791,6 @@
     Zn003:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn003:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     8,                       !- Starting X Coordinate {m}
@@ -892,7 +887,6 @@
     Zn004:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn004:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     8,                       !- Starting X Coordinate {m}

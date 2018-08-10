@@ -296,8 +296,10 @@
 ! =====================================================================
 ! Window shading control
 
-  WindowProperty:ShadingControl,
-    WinShadingControl,       !- Name
+  WindowShadingControl,
+    WinShadingControl-ZONE ONE,  !- Name
+    ZONE ONE,                !- Zone Name
+    1,                       !- Shading Control Sequence Number
     ExteriorShade,           !- Shading Type
     Double Pane Window Shaded,  !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
@@ -307,7 +309,12 @@
     Yes,                     !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ZONE ONE_DaylCtrl,       !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    ZONE SUBSURFACE 1 EAST WINDOW,  !- Fenestration Surface 1 Name
+    ZONE SUBSURFACE 2 WEST WINDOW;  !- Fenestration Surface 2 Name
 
 ! =====================================================================
 ! Material layer names follow: (from outside surface to zone side surface)
@@ -362,10 +369,10 @@
   Building,
     office zone,             !- Name
     0,                       !- North Axis {deg}
-    Country,                       !- Terrain // changed from '1', no enum indices allowed
+    Country,                 !- Terrain
     4.0000000E-02,           !- Loads Convergence Tolerance Value
     4.0000000E-01,           !- Temperature Convergence Tolerance Value {deltaC}
-    FullExteriorWithReflections,                       !- Solar Distribution // changed from '1', no enum indices allowed
+    FullExteriorWithReflections,  !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
@@ -436,7 +443,6 @@
     ZONE SURFACE EAST,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    WinShadingControl,       !- Shading Control Name
     WinFrameAndDivider,      !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -494,7 +500,6 @@
     ZONE SURFACE WEST,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    WinShadingControl,       !- Shading Control Name
     WinFrameAndDivider,      !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
