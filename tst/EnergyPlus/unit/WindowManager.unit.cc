@@ -2233,7 +2233,6 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Zn001:Wall001,           !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.5000000,               !- View Factor to Ground",
-        "!    WIN-CONTROL-GLARE,       !- Shading Control Name",
         "    TestFrameAndDivider,     !- Frame and Divider Name",
         "    1.0,                     !- Multiplier",
         "    4,                       !- Number of Vertices",
