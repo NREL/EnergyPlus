@@ -311,6 +311,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ENDDO
 
      ! Begin Pre-process fenestration surfaces for transition from WindowProperty:ShadingControl to WindowShadingControl
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(FenSurf)) DEALLOCATE(FenSurf)
+          IF(ALLOCATED(ShadeControls)) DEALLOCATE(ShadeControls)
           TotWinObjs = GetNumObjectsFound('FENESTRATIONSURFACE:DETAILED') + GetNumObjectsFound('WINDOW') + GetNumObjectsFound('GLAZEDDOOR')
           TotBaseSurfObjs = GetNumObjectsFound('BUILDINGSURFACE:DETAILED') + GetNumObjectsFound('WALL:DETAILED') + GetNumObjectsFound('ROOFCEILING:DETAILED') + GetNumObjectsFound('FLOOR:DETAILED')
           TotBaseSurfObjs = TotBaseSurfObjs + GetNumObjectsFound('WALL:EXTERIOR') + GetNumObjectsFound('WALL:ADIABATIC') + GetNumObjectsFound('WALL:UNDERGROUND') + GetNumObjectsFound('WALL:INTERZONE')
@@ -715,8 +718,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ObjectName = 'WindowShadingControl'
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
-                IF ( CurArgs .LT. 12) THEN
-                  OutArgs(CurArgs+1:13) = Blank
+                IF ( CurArgs .LT. 13) THEN
+                  OutArgs(CurArgs+1:14) = Blank
                 ENDIF
                 CurArgs = 13
                 DO shadeCtrlNum=1,TotOldShadeControls
@@ -726,14 +729,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      OutArgs(1) = TRIM(InArgs(1)) // '-' // TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum))
                      OutArgs(2) = TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum)) ! Zone Name
                      OutArgs(3) = RoundSigDigits(ShadeControls(shadeCtrlNum)%SequenceNum(newZoneNum),0) ! Shading Control Sequence Number
-                     OutArgs(14) = Blank ! Daylighting Control Name
-                      OutArgs(15) = 'Sequential' ! Multiple Surface Control Type
-                      CurArgs = 15
+                     OutArgs(15) = Blank ! Daylighting Control Name
+                      OutArgs(16) = 'Sequential' ! Multiple Surface Control Type
+                      CurArgs = 16
                       ! Find matching Daylighting control object, if any
                       DO daylightNum=1,GetNumObjectsFound('DAYLIGHTING:CONTROLS')
                         CALL GetObjectItem('DAYLIGHTING:CONTROLS',daylightNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
                         IF (.not. SameString(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum),Alphas(2))) CYCLE
-                        OutArgs(14) = TRIM(Alphas(1)) ! Daylighting Control Name
+                        OutArgs(15) = TRIM(Alphas(1)) ! Daylighting Control Name
                         EXIT
                       ENDDO
                       ! Add surface fields
@@ -753,9 +756,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     CALL ShowWarningError('WindowProperty:ShadingControl=""' // TRIM(InArgs(1)) // '" was not used by any surfaces, so it has not been written to the new idf.',Auditf)
                     !OutArgs(1) = InArgs(1)
                     !OutArgs(2) = Blank ! Zone Name (don't know that here)
-                    !OutArgs(14) = Blank ! Daylighting Control Name
-                    !OutArgs(15) = 'Sequential' ! Multiple Surface Control Type
-                    !CurArgs = 15
+                    !OutArgs(15) = Blank ! Daylighting Control Name
+                    !OutArgs(16) = 'Sequential' ! Multiple Surface Control Type
+                    !CurArgs = 16
                     nodiff = .false.
                     Written=.true.
                   ENDIF
