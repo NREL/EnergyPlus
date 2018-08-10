@@ -1470,7 +1470,6 @@ namespace Fans {
             ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Motor Efficiency []", Fan(FanNum).MotEff);
             ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Efficiency []", Fan(FanNum).VFDEff);
             ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Combined Efficiency []", Fan(FanNum).FanEff);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Point Fan Energy Index", Fan(FanNum).DesignPointFEI);
 
             // cpw31Aug2010 Temporary code for debugging fan component model
             //    WRITE(300,*) TRIM(RoundSigDigits(RhoAir,4))//','//TRIM(RoundSigDigits(FanVolFlow,4)) &

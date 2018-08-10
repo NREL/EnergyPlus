@@ -734,20 +734,29 @@ ANSI/AMCA Standard 208-18 defines the calculation method for FEI. The standard h
 
 FEI is defined as a ratio of the electrical input power of a reference fan to the electrical input power of the actual fan for which the FEI is calculated, both calculated at the same duty point, i, which is characterized by a value of airflow \((Q_i)\) and pressure (\(P_{t,i}\) or \(P_{s,i}\)). FEI can be calculated for each point on a fan curve.
 
-$$FEI_{t,i}\;or\;FEI_{s,i}=\frac{Reference Fan Electrical Input Power}{Actual Fan Electrical Input Power} = \frac{FEP_{ref,i}}{FEP_{act,i}} \quad (1) $$ 
+FEI is reported in the EquipmentSummary table report in the Fans subtable.
+
+\begin{equation}
+FEI_{t,i}\;or\;FEI_{s,i}=\frac{Reference Fan Electrical Input Power}{Actual Fan Electrical Input Power} = \frac{FEP_{ref,i}}{FEP_{act,i}}
+\label{eq:fei_calculation}
+\end{equation}
+
 Where,
 
 \(FEI_{t,i}\): FEI based on fan total pressure
 
 \(FEI_{s,i}\): FEI based on fan static pressure
 
-The FEI is reported for \emph{Fan:SystemModel}, \emph{Fan:ConstantVolume},\emph{Fan:OnOff}, \emph{Fan:VariableVolume}, and \emph{FanPerformance:NightVentilation} objects. User defined Fan objects are used to simulate the actual fan electrical input power \(FEP_{act,i}\) at the design operating point. The reference fan electrical input power \(FEP_{ref,i}\) is calculated using the following method.
+The FEI is reported for \emph{Fan:SystemModel}, \emph{Fan:ConstantVolume},\emph{Fan:OnOff}, \emph{Fan:VariableVolume}, \emph{Fan:ZoneExhaust}, and \emph{FanPerformance:NightVentilation} objects. User defined Fan objects are used to simulate the actual fan electrical input power \(FEP_{act,i}\) at the design operating point. The reference fan electrical input power \(FEP_{ref,i}\) is calculated using the following method.
 
 Reference fan shaft power (\(H_{i,ref}\)) is calculated on a fan total pressure basis or a static pressure basis, depending on the category of the reference fan to calculate FEI. However, in EnergyPlus \emph{Fan:SystemModel}, only total pressure is defined. So the FEI is reportable only for limited category of fans that are calculated based on the fan total pressure, namely Centrifugal Housed, Centrifugal Inline, Centrifugal PRV Supply, Axial Inline, Laboratory Exhaust, Jet Fan and Circulating. 
 
 The reference fan concept is used to normalize the FEI calculation to a consistent power level independent of fan type, fan drive components or any regulatory requirements. The reference fan electrical input power is a function of airflow and fan pressure. The reference fan is defined as one that requires a certain reference fan shaft power, uses a V-belt drive, has a motor efficiency based on the IE3 level for a four-pole 60 Hz motor and does not have a speed control.
 
-$$FEP_{ref,i}=H_{i,ref}(\frac{1}{\eta_{trans,ref}} )(\frac{1}{\eta_{mtr,ref}})(\frac{1}{\eta_{ctrl,ref}}) \quad (2) $$ 
+\begin{equation}
+FEP_{ref,i}=H_{i,ref}(\frac{1}{\eta_{trans,ref}} )(\frac{1}{\eta_{mtr,ref}})(\frac{1}{\eta_{ctrl,ref}}) 
+\label{eq:fep_calculation}
+\end{equation}
 
 Where,
 
@@ -763,8 +772,10 @@ Where,
 
 Reference fan shaft power (\(H_{i,ref}\)) is calculated on a fan total pressure basis:
 
-$$H_{i,ref}=\frac{(Q_i + Q_0)(P_{t,i} + P_0 \times \frac{\rho}{\rho_{std}} )}{1000 \times \eta_0} \quad (3) $$ 
-
+\begin{equation}
+H_{i,ref}=\frac{(Q_i + Q_0)(P_{t,i} + P_0 \times \frac{\rho}{\rho_{std}} )}{1000 \times \eta_0}
+\label{eq:Href_calculation}
+\end{equation}
 
 Where,
 
@@ -786,7 +797,10 @@ Where,
 
 For consistency, the reference fan is defined as one having a V-belt drive transmission, regardless of the drive arrangement of the actual fan for which the FEI is calculated. The reference fan transmission efficiency is calculated using the same equations as found in ANSI/AMCA Standard 207 for V-belt drives:
 
-$$eta_{trans,ref}=0.96(\frac{H_{i,ref}}{H_{i,ref}+1.64})^{.05} \quad (4) $$ 
+\begin{equation}
+eta_{trans,ref}=0.96(\frac{H_{i,ref}}{H_{i,ref}+1.64})^{.05}
+\label{eq:eta_trans_calculation}
+\end{equation}
 
 \emph{Reference fan motor efficiency}
 
@@ -794,11 +808,17 @@ The reference fan is defined as having a motor efficiency based on the IE3 level
 
 Reference fan motor output power:
 
-$$H_{t,ref}=\frac{H_{i,ref}}{\eta_{trans,ref}} \quad (5) $$ 
+\begin{equation}
+H_{t,ref}=\frac{H_{i,ref}}{\eta_{trans,ref}}
+\label{eq:eta_ref_calculation}
+\end{equation}
 
 The reference fan motor efficiency is calculated according to Equation (7) using the coefficients A–E found in Table 1:
 
-$$\eta_{mtr,ref} = A\cdot[log_{10} (H_{t,ref})]^4 + B\cdot[log_{10} (H_{t,ref})]^3 +C\cdot[log_{10} (H_{t,ref})]^2 +D\cdot[log_{10} (H_{t,ref})]^1 + E \quad (6) $$ 
+\begin{equation}
+\eta_{mtr,ref} = A\cdot[log_{10} (H_{t,ref})]^4 + B\cdot[log_{10} (H_{t,ref})]^3 +C\cdot[log_{10} (H_{t,ref})]^2 +D\cdot[log_{10} (H_{t,ref})]^1 + E
+\label{eq:eta_mtr_calculation}
+\end{equation}
 
 % table 73
 \begin{longtable}[c]{p{1.0in}p{1.0in}p{1.0in}}
@@ -824,9 +844,13 @@ E & 0.850274 & 0.962 \tabularnewline
 
 \emph{Reference fan motor controller efficiency}
 
-The reference fan is defined as a constant speed fan. Therefore, the motor controller efficiency is 100$\%$.
-$$\eta_{ctrl,ref} = 1 \quad (7) $$ 
 
+The reference fan is defined as a constant speed fan. Therefore, the motor controller efficiency is 100$\%$.
+
+\begin{equation}
+\eta_{ctrl,ref} = 1
+\label{eq:eta_ctrl_calculation}
+\end{equation}
 
 \subsection{References}\label{references-002}
 

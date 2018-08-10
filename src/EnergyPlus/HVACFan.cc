@@ -297,8 +297,6 @@ namespace HVACFan {
         Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
         m_designPointFEI = report_fei(designAirVolFlowRate, designElecPower, deltaPress, rhoAir);
 
-        ReportSizingManager::ReportSizingOutput(m_fanType, name, "Design Point Fan Energy Index", m_designPointFEI);
-
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanType, name, m_fanType);
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanTotEff, name, m_fanTotalEff);
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanDeltaP, name, deltaPress);
@@ -353,7 +351,7 @@ namespace HVACFan {
     FanSystem::FanSystem( // constructor
         std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
-          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), fanIsSecondaryDriver(false), m_designPointFEI(0.0), m_fanType_Num(0),
+          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), fanIsSecondaryDriver(false), m_fanType_Num(0),
           m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
           m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::powerSizingMethodNotSet), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
@@ -365,7 +363,7 @@ namespace HVACFan {
           m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0), m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0),
           m_faultyFilterFlag(false), m_faultyFilterIndex(0),
 
-          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0)
+          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0)
     // oneTimePowerCurveCheck_( true )
     {
 
