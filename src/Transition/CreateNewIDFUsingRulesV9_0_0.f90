@@ -615,6 +615,25 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 CurArgs = CurArgs + 1
 
               ! If your original object starts with A, insert the rules here
+              CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:OUTDOORAIRFLOW')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                ! Trusting that a previously working file only has one outdoor air mixer
+                CALL GetObjectItem('OUTDOORAIR:MIXER',1,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                OutArgs(2) = Alphas(1) ! Outdoor Air Mixer Name
+                OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
+                CurArgs = CurArgs + 1
+                nodiff = .false.
+
+              CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:RELIEFAIRFLOW')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                ! Trusting that a previously working file only has one outdoor air mixer
+                CALL GetObjectItem('OUTDOORAIR:MIXER',1,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                OutArgs(2) = Alphas(1) ! Outdoor Air Mixer Name
+                OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
+                CurArgs = CurArgs + 1
+                nodiff = .false.
 
               ! If your original object starts with B, insert the rules here
               CASE('BOILER:HOTWATER')
