@@ -278,8 +278,6 @@ namespace SurfaceGeometry {
 
     void GetWindowShadingControlData(bool &ErrorsFound); // If errors found in input
 
-    void AssociateWindowShadingControlFenestration(bool &ErrorsFound);
-
     void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound);
 
     void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound);

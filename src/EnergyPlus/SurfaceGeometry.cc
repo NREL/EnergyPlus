@@ -8153,45 +8153,6 @@ namespace SurfaceGeometry {
         } // End of loop over window shading controls
     }
 
-    // WSCO - can probaby delete this after splitting up the "initial" and "final" versions of this
-    void AssociateWindowShadingControlFenestration(bool &ErrorsFound)
-    {
-        // J.Glazer 2018
-        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
-            for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
-                int fenestrationIndex =
-                    UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), Surface, TotSurfaces);
-                WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
-                if (Surface(fenestrationIndex).WindowShadingControlPtr == 0) {
-                    Surface(fenestrationIndex).WindowShadingControlPtr = iShadeCtrl;
-                    Surface(fenestrationIndex).HasShadeControl = true;
-                    // check to make the window refenced is an exterior window
-                    if (Surface(fenestrationIndex).ExtBoundCond != ExternalEnvironment) {
-                        ErrorsFound = true;
-                        ShowSevereError("AssociateWindowShadingControlFenestration: \"" + Surface(fenestrationIndex).Name + "\", invalid " +
-                                        " because it is not an exterior window.");
-                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
-                    }
-                    // check to make sure the window is not using equivalent layer window construction
-                    if (Construct(Surface(fenestrationIndex).Construction).WindowTypeEQL) {
-                        ErrorsFound = true;
-                        ShowSevereError("AssociateWindowShadingControlFenestration: =\"" + Surface(fenestrationIndex).Name + "\", invalid " + "\".");
-                        ShowContinueError(".. equivalent layer window model does not use shading control object.");
-                        ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
-                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
-                        Surface(fenestrationIndex).WindowShadingControlPtr = 0;
-                    }
-                } else {
-                    ErrorsFound = true;
-                    ShowSevereError("AssociateWindowShadingControlFenestration: Fenestration suface named \"" + Surface(fenestrationIndex).Name +
-                                    "\" appears on more than one WindowShadingControl list.");
-                    ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
-                                      "\" and another one.");
-                }
-            }
-        }
-    }
-
     void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound)
     {
         // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows.
