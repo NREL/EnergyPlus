@@ -1643,13 +1643,30 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Messag
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
 
+    bool bNewMessageFound = true;
     for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(Message, MessageSearch(Loop))) ++MatchCounts(Loop);
+        if ( has( Message, MessageSearch( Loop ) ) ) {
+            ++MatchCounts( Loop );
+            bNewMessageFound = false;
+        }
+    }
+    if ( bNewMessageFound ) {
+        for (Loop = 1; Loop <= newMessageCount; ++Loop) {
+            if ( UtilityRoutines::SameString( Message, newMessages( Loop ) ) ) {
+                bNewMessageFound = false;
+                MsgIndex = Loop;
+                break;
+            }
+        }
+        if ( bNewMessageFound ) {
+            newMessages.redimension(++newMessageCount);
+            newMessages(newMessageCount) = Message;
+        }
     }
 
     ++TotalSevereErrors;
     StoreRecurringErrorMessage(
-        " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+        " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits, bNewMessageFound);
 }
 
 void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
@@ -1701,13 +1718,31 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Messa
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
 
+    bool bNewMessageFound = true;
     for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(Message, MessageSearch(Loop))) ++MatchCounts(Loop);
+        if ( has( Message, MessageSearch( Loop ) ) ) {
+            ++MatchCounts( Loop );
+            bNewMessageFound = false;
+            break;
+        }
+    }
+    if ( bNewMessageFound ) {
+        for (Loop = 1; Loop <= newMessageCount; ++Loop) {
+            if ( UtilityRoutines::SameString( Message, newMessages( Loop ) ) ) {
+                bNewMessageFound = false;
+                MsgIndex = Loop;
+                break;
+            }
+        }
+        if ( bNewMessageFound ) {
+            newMessages.redimension(++newMessageCount);
+            newMessages(newMessageCount) = Message;
+        }
     }
 
     ++TotalWarningErrors;
     StoreRecurringErrorMessage(
-        " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+        " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits, bNewMessageFound);
 }
 
 void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
@@ -1759,12 +1794,30 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Mess
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
 
+    bool bNewMessageFound = true;
     for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(Message, MessageSearch(Loop))) ++MatchCounts(Loop);
+        if ( has( Message, MessageSearch( Loop ) ) ) {
+            ++MatchCounts( Loop );
+            bNewMessageFound = false;
+            break;
+        }
+    }
+    if ( bNewMessageFound ) {
+        for (Loop = 1; Loop <= newMessageCount; ++Loop) {
+            if ( UtilityRoutines::SameString( Message, newMessages( Loop ) ) ) {
+                bNewMessageFound = false;
+                MsgIndex = Loop;
+                break;
+            }
+        }
+        if ( bNewMessageFound ) {
+            newMessages.redimension(++newMessageCount);
+            newMessages(newMessageCount) = Message;
+        }
     }
 
     StoreRecurringErrorMessage(
-        " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+        " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits, bNewMessageFound);
 }
 
 void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
@@ -1774,7 +1827,8 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Mess
                                 Optional<Real64 const> ErrorReportSumOf, // Track and report the sum of the values passed to this argument
                                 std::string const &ErrorReportMaxUnits,  // Units for "max" reporting
                                 std::string const &ErrorReportMinUnits,  // Units for "min" reporting
-                                std::string const &ErrorReportSumUnits   // Units for "sum" reporting
+                                std::string const &ErrorReportSumUnits,  // Units for "sum" reporting
+                                bool const &newMessage
 )
 {
 
@@ -1817,7 +1871,7 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Mess
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // If Index is zero, then assign next available index and reallocate array
-    if (ErrorMsgIndex == 0) {
+    if (ErrorMsgIndex == 0 || newMessage) {
         RecurringErrors.redimension(++NumRecurringErrors);
         ErrorMsgIndex = NumRecurringErrors;
         // The message string only needs to be stored once when a new recurring message is created

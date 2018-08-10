@@ -175,7 +175,8 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,             // 
                                 Optional<Real64 const> ErrorReportSumOf = _, // Track and report the sum of the values passed to this argument
                                 std::string const &ErrorReportMaxUnits = "", // Units for "max" reporting
                                 std::string const &ErrorReportMinUnits = "", // Units for "min" reporting
-                                std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
+                                std::string const &ErrorReportSumUnits = "", // Units for "sum" reporting
+                                bool const &newMessage = false
 );
 
 void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
