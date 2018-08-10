@@ -295,6 +295,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
         "  WindowShadingControl,",
         "    INCIDENT SOLAR ON BLIND, !- Name",
+        "    West Zone,               !- Zone Name",
         "    1,                       !- Shading Control Sequence Number ",
         "    SwitchableGlazing,       !- Shading Type",
         "    WIN-CON-DOUBLEPANE,      !- Construction with Shading Name",

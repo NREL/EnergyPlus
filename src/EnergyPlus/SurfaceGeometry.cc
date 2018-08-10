@@ -1954,8 +1954,8 @@ namespace SurfaceGeometry {
 
             } // End of surface loop
 
-            // associate fenestration surfaces referenced in WindowShadingControl
-            AssociateWindowShadingControlFenestration(ErrorsFound);
+            // associate fenestration surfaces referenced in WindowShadingControl - don't need it here anymore
+            //WSCO AssociateWindowShadingControlFenestration(ErrorsFound);
         }
 
         // Check for zones with not enough surfaces
@@ -4115,6 +4115,8 @@ namespace SurfaceGeometry {
                                     "\", Exterior boundary condition = Foundation is not be allowed with windows.");
                     ErrorsFound = true;
                 }
+
+                AssociateWindowShadingControlFenestration(ErrorsFound);
 
                 CheckWindowShadingControlFrameDivider("GetHTSubSurfaceData", ErrorsFound, SurfNum, 7);
 
@@ -8162,20 +8164,20 @@ namespace SurfaceGeometry {
                     Surface(fenestrationIndex).WindowShadingControlPtr = iShadeCtrl;
                     Surface(fenestrationIndex).HasShadeControl = true;
                     // check to make the window refenced is an exterior window
-                    if (SurfaceTmp(fenestrationIndex).ExtBoundCond != ExternalEnvironment) {
+                    if (Surface(fenestrationIndex).ExtBoundCond != ExternalEnvironment) {
                         ErrorsFound = true;
-                        ShowSevereError("AssociateWindowShadingControlFenestration: \"" + SurfaceTmp(fenestrationIndex).Name + "\", invalid " +
+                        ShowSevereError("AssociateWindowShadingControlFenestration: \"" + Surface(fenestrationIndex).Name + "\", invalid " +
                                         " because it is not an exterior window.");
                         ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
                     }
                     // check to make sure the window is not using equivalent layer window construction
-                    if (Construct(SurfaceTmp(fenestrationIndex).Construction).WindowTypeEQL) {
+                    if (Construct(Surface(fenestrationIndex).Construction).WindowTypeEQL) {
                         ErrorsFound = true;
-                        ShowSevereError("AssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(fenestrationIndex).Name + "\", invalid " + "\".");
+                        ShowSevereError("AssociateWindowShadingControlFenestration: =\"" + Surface(fenestrationIndex).Name + "\", invalid " + "\".");
                         ShowContinueError(".. equivalent layer window model does not use shading control object.");
                         ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
                         ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
-                        SurfaceTmp(fenestrationIndex).WindowShadingControlPtr = 0;
+                        Surface(fenestrationIndex).WindowShadingControlPtr = 0;
                     }
                 } else {
                     ErrorsFound = true;
