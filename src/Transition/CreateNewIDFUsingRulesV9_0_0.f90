@@ -505,7 +505,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ENDDO
             ENDDO
           ENDDO
-     ! Begin Pre-process fenestration surfaces for transition from WindowProperty:ShadingControl to WindowShadingControl
+     ! End Pre-process fenestration surfaces for transition from WindowProperty:ShadingControl to WindowShadingControl
 
           DO Num=1,NumIDFRecords
 
@@ -717,11 +717,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! lots of stuff . . . for transition, make a separate new WindowShadingControl object for each zone it is used in
                 ObjectName = 'WindowShadingControl'
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
-                IF ( CurArgs .LT. 13) THEN
-                  OutArgs(CurArgs+1:14) = Blank
+                OutArgs(4:CurArgs+2) = InArgs(2:CurArgs)
+                IF ( CurArgs .LT. 12) THEN
+                  OutArgs(CurArgs+3:14) = Blank
                 ENDIF
-                CurArgs = 13
+                CurArgs = 14
                 DO shadeCtrlNum=1,TotOldShadeControls
                   IF (.not. SameString(ShadeControls(shadeCtrlNum)%OldShadeControlName,InArgs(1))) CYCLE
                   IF (ShadeControls(shadeCtrlNum)%NumZones .GT. 0) THEN
