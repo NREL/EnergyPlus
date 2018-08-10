@@ -64,7 +64,6 @@ namespace DataErrorTracking {
 
     // MODULE PARAMETER DEFINITIONS:
     extern int const SearchCounts;
-    extern int newMessageCount;
     extern Array1D_string const MessageSearch;
     extern Array1D_string const Summaries;
     // in below -- simple line end <CR>.  End of Whole message <CRE>
@@ -150,7 +149,6 @@ namespace DataErrorTracking {
 
     // Object Data
     extern Array1D<RecurringErrorData> RecurringErrors;
-    extern Array1D_string newMessages;
 
     // Clears the global data in DataErrorTracking
     // Needed for unit tests, should not normally be called.

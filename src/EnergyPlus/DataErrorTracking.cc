@@ -80,7 +80,6 @@ namespace DataErrorTracking {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    int newMessageCount = 0;
     int const SearchCounts(20);
     Array1D_string const MessageSearch(SearchCounts,
                                        {"InterZone Surface Areas",
@@ -232,7 +231,6 @@ namespace DataErrorTracking {
 
     // Object Data
     Array1D<RecurringErrorData> RecurringErrors;
-    Array1D_string newMessages;
 
     // Clears the global data in DataErrorTracking
     // Needed for unit tests, should not normally be called.
