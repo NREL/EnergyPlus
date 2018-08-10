@@ -98,7 +98,6 @@
 #include <ScheduleManager.hh>
 #include <SingleDuct.hh>
 #include <SplitterComponent.hh>
-#include <SystemReports.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <ZoneDehumidifier.hh>
@@ -3780,8 +3779,6 @@ namespace AirflowNetworkBalanceManager {
                 }
                 // Get OA system inlet information 'OAMixerOutdoorAirStreamNode' was specified as an outdoor air node implicitly
                 if (UtilityRoutines::SameString(DisSysNodeData(i - NumOfNodesMultiZone).EPlusType, "OAMixerOutdoorAirStreamNode") ) {
-                    //				if ( SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) && j == 1 )
-                    //{
                     AirflowNetworkNodeData(i).EPlusTypeNum = EPlusTypeNum_EXT;
                     AirflowNetworkNodeData(i).ExtNodeNum = AirflowNetworkNumOfExtNode + 1;
                     AirflowNetworkNodeData(i).NodeTypeNum = 1;
@@ -10860,7 +10857,6 @@ namespace AirflowNetworkBalanceManager {
         using DataZoneEquipment::ReturnAirPath;
         using DataZoneEquipment::SupplyAirPath;
         using SingleDuct::GetHVACSingleDuctSysIndex;
-        using SystemReports::CreateEnergyReportStructure;
 
         // Return value
         int AirLoopNumber = 0;
@@ -10885,8 +10881,6 @@ namespace AirflowNetworkBalanceManager {
         std::string TypeOfComp;
         std::string NameOfComp;
         int NumOfSubSubComp;
-
-        //		CreateEnergyReportStructure( );
 
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             // Check OAMixer OA inlet node
