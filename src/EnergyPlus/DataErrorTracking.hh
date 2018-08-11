@@ -119,9 +119,6 @@ namespace DataErrorTracking {
     extern std::string LastSevereError;
 
     // Types
-
-    struct newMessageData {std::string Message;};
-
     struct RecurringErrorData
     {
         // Members
