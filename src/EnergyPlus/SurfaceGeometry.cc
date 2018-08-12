@@ -4116,7 +4116,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
 
-                InitialAssociateWindowShadingControlFenestration(ErrorsFound);
+                InitialAssociateWindowShadingControlFenestration(ErrorsFound, SurfNum);
 
                 CheckWindowShadingControlFrameDivider("GetHTSubSurfaceData", ErrorsFound, SurfNum, 7);
 
@@ -4410,7 +4410,7 @@ namespace SurfaceGeometry {
 
                 SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
                 SurfaceTmp(SurfNum).HasShadeControl = false;
-                InitialAssociateWindowShadingControlFenestration(ErrorsFound);
+                InitialAssociateWindowShadingControlFenestration(ErrorsFound, SurfNum);
 
                 if (!GettingIZSurfaces && (SurfaceTmp(SurfNum).Class == SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass_GlassDoor)) {
 
@@ -8153,13 +8153,14 @@ namespace SurfaceGeometry {
         } // End of loop over window shading controls
     }
 
-    void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound)
+    void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum)
     {
         // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows.
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 int fenestrationIndex =
                     UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), SurfaceTmp, TotSurfaces);
+                if (fenestrationIndex != SurfNum) break;
                 if (SurfaceTmp(fenestrationIndex).WindowShadingControlPtr == 0) {
                     SurfaceTmp(fenestrationIndex).WindowShadingControlPtr = iShadeCtrl;
                     SurfaceTmp(fenestrationIndex).HasShadeControl = true;

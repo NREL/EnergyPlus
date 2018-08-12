@@ -2288,6 +2288,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
         "  WindowShadingControl,",
         "    WIN-CONTROL-GLARE,       !- Name",
+        "    West Zone,               !- Zone Name",
         "    1,                       !- Shading Control Sequence Number ",
         "    SwitchableGlazing,       !- Shading Type",
         "    ELECTRO-CON-DARK,        !- Construction with Shading Name",
