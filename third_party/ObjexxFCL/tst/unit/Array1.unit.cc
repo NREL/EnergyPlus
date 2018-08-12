@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -753,54 +753,58 @@ TEST( Array1Test, Dimension )
 
 TEST( Array1Test, Redimension )
 {
-	Array1D_int A( 5, { 11, 22, 33, 44, 55 } );
+	{
+		Array1D_int A( 5, { 11, 22, 33, 44, 55 } );
 
-	EXPECT_EQ( 1, A.l() );
-	EXPECT_EQ( 5, A.u() );
-	EXPECT_EQ( 5u, A.size() );
-	EXPECT_EQ( 11, A( 1 ) );
-	EXPECT_EQ( 22, A( 2 ) );
-	EXPECT_EQ( 33, A( 3 ) );
-	EXPECT_EQ( 44, A( 4 ) );
-	EXPECT_EQ( 55, A( 5 ) );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 5, A.u() );
+		EXPECT_EQ( 5u, A.size() );
+		EXPECT_EQ( 11, A( 1 ) );
+		EXPECT_EQ( 22, A( 2 ) );
+		EXPECT_EQ( 33, A( 3 ) );
+		EXPECT_EQ( 44, A( 4 ) );
+		EXPECT_EQ( 55, A( 5 ) );
 
-	A.redimension( { 3, 7 } );
-	EXPECT_EQ( 3, A.l() );
-	EXPECT_EQ( 7, A.u() );
-	EXPECT_EQ( 5u, A.size() );
-	EXPECT_EQ( 33, A( 3 ) );
-	EXPECT_EQ( 44, A( 4 ) );
-	EXPECT_EQ( 55, A( 5 ) );
+		A.redimension( { 3, 7 } );
+		EXPECT_EQ( 3, A.l() );
+		EXPECT_EQ( 7, A.u() );
+		EXPECT_EQ( 5u, A.size() );
+		EXPECT_EQ( 33, A( 3 ) );
+		EXPECT_EQ( 44, A( 4 ) );
+		EXPECT_EQ( 55, A( 5 ) );
 
-	A.redimension( { 0, 4 }, 17 );
-	EXPECT_EQ( 0, A.l() );
-	EXPECT_EQ( 4, A.u() );
-	EXPECT_EQ( 5u, A.size() );
-	EXPECT_EQ( 17, A( 0 ) );
-	EXPECT_EQ( 17, A( 1 ) );
-	EXPECT_EQ( 17, A( 2 ) );
-	EXPECT_EQ( 33, A( 3 ) );
-	EXPECT_EQ( 44, A( 4 ) );
+		A.redimension( { 0, 4 }, 17 );
+		EXPECT_EQ( 0, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 5u, A.size() );
+		EXPECT_EQ( 17, A( 0 ) );
+		EXPECT_EQ( 17, A( 1 ) );
+		EXPECT_EQ( 17, A( 2 ) );
+		EXPECT_EQ( 33, A( 3 ) );
+		EXPECT_EQ( 44, A( 4 ) );
+	}
 
-	Array1D_int B( 5, { 11, 22, 33, 44, 55 } );
+	{
+		Array1D_int B( 5, { 11, 22, 33, 44, 55 } );
 
-	B.redimension( Array1D_int( { 3, 7 } ) );
-	EXPECT_EQ( 3, B.l() );
-	EXPECT_EQ( 7, B.u() );
-	EXPECT_EQ( 5u, B.size() );
-	EXPECT_EQ( 33, B( 3 ) );
-	EXPECT_EQ( 44, B( 4 ) );
-	EXPECT_EQ( 55, B( 5 ) );
+		B.redimension( Array1D_int( { 3, 7 } ) );
+		EXPECT_EQ( 3, B.l() );
+		EXPECT_EQ( 7, B.u() );
+		EXPECT_EQ( 5u, B.size() );
+		EXPECT_EQ( 33, B( 3 ) );
+		EXPECT_EQ( 44, B( 4 ) );
+		EXPECT_EQ( 55, B( 5 ) );
 
-	B.redimension( Array1D_int( { 0, 4 } ), 17 );
-	EXPECT_EQ( 0, B.l() );
-	EXPECT_EQ( 4, B.u() );
-	EXPECT_EQ( 5u, B.size() );
-	EXPECT_EQ( 17, B( 0 ) );
-	EXPECT_EQ( 17, B( 1 ) );
-	EXPECT_EQ( 17, B( 2 ) );
-	EXPECT_EQ( 33, B( 3 ) );
-	EXPECT_EQ( 44, B( 4 ) );
+		B.redimension( Array1D_int( { 0, 4 } ), 17 );
+		EXPECT_EQ( 0, B.l() );
+		EXPECT_EQ( 4, B.u() );
+		EXPECT_EQ( 5u, B.size() );
+		EXPECT_EQ( 17, B( 0 ) );
+		EXPECT_EQ( 17, B( 1 ) );
+		EXPECT_EQ( 17, B( 2 ) );
+		EXPECT_EQ( 33, B( 3 ) );
+		EXPECT_EQ( 44, B( 4 ) );
+	}
 
 	{
 		Array1D_int A( 5, 1 );
@@ -1082,6 +1086,8 @@ TEST( Array1Test, Push_Back_Aggregate )
 	EXPECT_EQ( 1u, A.size() );
 	EXPECT_EQ( 1u, A.capacity() );
 	EXPECT_EQ( 11, A[ 0 ].a );
+	EXPECT_EQ( 22, A[ 0 ].b );
+	EXPECT_EQ( 11, A( 1 ).a );
 	EXPECT_EQ( 22, A( 1 ).b );
 }
 
@@ -1690,7 +1696,7 @@ TEST( Array1Test, FunctionReshape )
 	EXPECT_TRUE( eq( E, reshape( A, std::array< int, 1 >{ { 5 } } ) ) );
 	EXPECT_TRUE( eq( E, reshape( { 1.0, 2.0, 3.0, 4.0, 5.0 }, std::array< int, 1 >{ { 5 } } ) ) );
 	EXPECT_TRUE( eq( E, reshape1( A, Array1D_int( 1, { 5 } ) ) ) );
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+#if defined(_MSC_VER) && _MSC_VER < 1900 && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
 	EXPECT_TRUE( eq( E, reshape1( A, std::initializer_list< int >( { 5 } ) ) ) );
 #else
 	EXPECT_TRUE( eq( E, reshape1( A, { 5 } ) ) );

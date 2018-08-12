@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -35,9 +35,9 @@ ITIME( Array1< std::int32_t > & timearray )
 	assert( timearray.u() >= 3 );
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	timearray( 1 ) = timeinfo->tm_hour;
-	timearray( 2 ) = timeinfo->tm_min;
-	timearray( 3 ) = timeinfo->tm_sec;
+	timearray( 1 ) = static_cast< std::int32_t >( timeinfo->tm_hour );
+	timearray( 2 ) = static_cast< std::int32_t >( timeinfo->tm_min );
+	timearray( 3 ) = static_cast< std::int32_t >( timeinfo->tm_sec );
 }
 
 // Current Time: HH, MM, SS, CC
@@ -51,10 +51,10 @@ GETTIM( std::int64_t & h, std::int64_t & m, std::int64_t & s, std::int64_t & c )
 	int const ms( static_cast< int >( duration_cast< milliseconds >( now.time_since_epoch() ).count() % 1000 ) ); // msec
 	std::time_t const current_time( system_clock::to_time_t( now ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	h = timeinfo->tm_hour;
-	m = timeinfo->tm_min;
-	s = timeinfo->tm_sec;
-	c = ms / 10;
+	h = static_cast< std::int64_t >( timeinfo->tm_hour );
+	m = static_cast< std::int64_t >( timeinfo->tm_min );
+	s = static_cast< std::int64_t >( timeinfo->tm_sec );
+	c = static_cast< std::int64_t >( ms / 10 );
 }
 
 // Current Time: HH, MM, SS, CC
@@ -68,10 +68,10 @@ GETTIM( std::int32_t & h, std::int32_t & m, std::int32_t & s, std::int32_t & c )
 	int const ms( static_cast< int >( duration_cast< milliseconds >( now.time_since_epoch() ).count() % 1000 ) ); // msec
 	std::time_t const current_time( system_clock::to_time_t( now ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	h = timeinfo->tm_hour;
-	m = timeinfo->tm_min;
-	s = timeinfo->tm_sec;
-	c = ms / 10;
+	h = static_cast< std::int32_t >( timeinfo->tm_hour );
+	m = static_cast< std::int32_t >( timeinfo->tm_min );
+	s = static_cast< std::int32_t >( timeinfo->tm_sec );
+	c = static_cast< std::int32_t >( ms / 10 );
 }
 
 // Current Time: HH, MM, SS, CC
@@ -85,10 +85,10 @@ GETTIM( std::int16_t & h, std::int16_t & m, std::int16_t & s, std::int16_t & c )
 	int const ms( static_cast< int >( duration_cast< milliseconds >( now.time_since_epoch() ).count() % 1000 ) ); // msec
 	std::time_t const current_time( system_clock::to_time_t( now ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	h = timeinfo->tm_hour;
-	m = timeinfo->tm_min;
-	s = timeinfo->tm_sec;
-	c = ms / 10;
+	h = static_cast< std::int16_t >( timeinfo->tm_hour );
+	m = static_cast< std::int16_t >( timeinfo->tm_min );
+	s = static_cast< std::int16_t >( timeinfo->tm_sec );
+	c = static_cast< std::int16_t >( ms / 10 );
 }
 
 // Time in Seconds Since Epoch
@@ -98,7 +98,7 @@ TIME()
 	using std::chrono::system_clock;
 	system_clock::time_point const now( system_clock::now() );
 	system_clock::duration const dur( now.time_since_epoch() );
-	return dur.count() * system_clock::period::num / system_clock::period::den;
+	return static_cast< std::int64_t >( dur.count() * system_clock::period::num / system_clock::period::den );
 }
 
 // Current Time: HH:MM:SS
@@ -261,12 +261,12 @@ IDATE( Array1< std::int32_t > & datearray )
 	assert( datearray.u() >= 3 );
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	datearray( 1 ) = timeinfo->tm_mday; // Day of month: 1-31
-	datearray( 2 ) = timeinfo->tm_mon + 1; // Month of year: 1-12
+	datearray( 1 ) = static_cast< std::int32_t >( timeinfo->tm_mday ); // Day of month: 1-31
+	datearray( 2 ) = static_cast< std::int32_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
 #ifdef OBJEXXFCL_IDATE_INTEL
-	datearray( 3 ) = std::max( timeinfo->tm_year, 1969 ) % 100; // Not Y2K safe (Intel)
+	datearray( 3 ) = static_cast< std::int32_t >( std::max( timeinfo->tm_year, 1969 ) % 100 ); // Not Y2K safe (Intel)
 #else
-	datearray( 3 ) = timeinfo->tm_year + 1900; // Year
+	datearray( 3 ) = static_cast< std::int32_t >( timeinfo->tm_year + 1900 ); // Year
 #endif
 }
 
@@ -276,12 +276,12 @@ IDATE( std::int64_t & month, std::int64_t & day, std::int64_t & year )
 {
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	month = timeinfo->tm_mon + 1; // Month of year: 1-12
+	month = static_cast< std::int64_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
 	day = timeinfo->tm_mday; // Day of month: 1-31
 #ifdef OBJEXXFCL_IDATE_PORTABILITY
-	year = timeinfo->tm_year; // Year offset from 1900 (portability)
+	year = static_cast< std::int64_t >( timeinfo->tm_year ); // Year offset from 1900 (portability)
 #else
-	year = timeinfo->tm_year % 100; // 2-Digit Year: 0-99 (original)
+	year = static_cast< std::int64_t >( timeinfo->tm_year % 100 ); // 2-Digit Year: 0-99 (original)
 #endif
 }
 
@@ -291,12 +291,12 @@ IDATE( std::int32_t & month, std::int32_t & day, std::int32_t & year )
 {
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	month = timeinfo->tm_mon + 1; // Month of year: 1-12
-	day = timeinfo->tm_mday; // Day of month: 1-31
+	month = static_cast< std::int32_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	day = static_cast< std::int32_t >( timeinfo->tm_mday ); // Day of month: 1-31
 #ifdef OBJEXXFCL_IDATE_PORTABILITY
-	year = timeinfo->tm_year; // Year offset from 1900 (portability)
+	year = static_cast< std::int32_t >( timeinfo->tm_year ); // Year offset from 1900 (portability)
 #else
-	year = timeinfo->tm_year % 100; // 2-Digit Year: 0-99 (original)
+	year = static_cast< std::int32_t >( timeinfo->tm_year % 100 ); // 2-Digit Year: 0-99 (original)
 #endif
 }
 
@@ -306,12 +306,12 @@ IDATE( std::int16_t & month, std::int16_t & day, std::int16_t & year )
 {
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	month = timeinfo->tm_mon + 1; // Month of year: 1-12
-	day = timeinfo->tm_mday; // Day of month: 1-31
+	month = static_cast< std::int16_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	day = static_cast< std::int16_t >( timeinfo->tm_mday ); // Day of month: 1-31
 #ifdef OBJEXXFCL_IDATE_PORTABILITY
-	year = timeinfo->tm_year; // Year offset from 1900 (portability)
+	year = static_cast< std::int16_t >( timeinfo->tm_year ); // Year offset from 1900 (portability)
 #else
-	year = timeinfo->tm_year % 100; // 2-Digit Year: 0-99 (original)
+	year = static_cast< std::int16_t >( timeinfo->tm_year % 100 ); // 2-Digit Year: 0-99 (original)
 #endif
 }
 
@@ -323,9 +323,9 @@ IDATE4( Array1< std::int32_t > & datearray )
 	assert( datearray.u() >= 3 );
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	datearray( 1 ) = timeinfo->tm_mday; // Day of month: 1-31
-	datearray( 2 ) = timeinfo->tm_mon + 1; // Month of year: 1-12
-	datearray( 3 ) = timeinfo->tm_year + ( timeinfo->tm_year >= 100 ? 1900 : 0 ); // Year if >= 2000 else 2-digit year offset from 1900
+	datearray( 1 ) = static_cast< std::int32_t >( timeinfo->tm_mday ); // Day of month: 1-31
+	datearray( 2 ) = static_cast< std::int32_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	datearray( 3 ) = static_cast< std::int32_t >( timeinfo->tm_year + ( timeinfo->tm_year >= 100 ? 1900 : 0 ) ); // Year if >= 2000 else 2-digit year offset from 1900
 }
 
 // Current Date: MM, DD, YYYY (Year is offset from 1900)
@@ -334,9 +334,9 @@ IDATE4( std::int64_t & month, std::int64_t & day, std::int64_t & year )
 {
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	month = timeinfo->tm_mon + 1; // Month of year: 1-12
-	day = timeinfo->tm_mday; // Day of month: 1-31
-	year = timeinfo->tm_year; // Year offset from 1900
+	month = static_cast< std::int64_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	day = static_cast< std::int64_t >( timeinfo->tm_mday ); // Day of month: 1-31
+	year = static_cast< std::int64_t >( timeinfo->tm_year ); // Year offset from 1900
 }
 
 // Current Date: MM, DD, YYYY (Year is offset from 1900)
@@ -345,9 +345,9 @@ IDATE4( std::int32_t & month, std::int32_t & day, std::int32_t & year )
 {
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	month = timeinfo->tm_mon + 1; // Month of year: 1-12
-	day = timeinfo->tm_mday; // Day of month: 1-31
-	year = timeinfo->tm_year; // Year offset from 1900
+	month = static_cast< std::int32_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	day = static_cast< std::int32_t >( timeinfo->tm_mday ); // Day of month: 1-31
+	year = static_cast< std::int32_t >( timeinfo->tm_year ); // Year offset from 1900
 }
 
 // Current Date: MM, DD, YYYY (Year is offset from 1900)
@@ -356,9 +356,9 @@ IDATE4( std::int16_t & month, std::int16_t & day, std::int16_t & year )
 {
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	month = timeinfo->tm_mon + 1; // Month of year: 1-12
-	day = timeinfo->tm_mday; // Day of month: 1-31
-	year = timeinfo->tm_year; // Year offset from 1900
+	month = static_cast< std::int16_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	day = static_cast< std::int16_t >( timeinfo->tm_mday ); // Day of month: 1-31
+	year = static_cast< std::int16_t >( timeinfo->tm_year ); // Year offset from 1900
 }
 
 // Current Date String: YYDDD (Not Y2K Compliant)
@@ -368,8 +368,8 @@ JDATE()
 	using std::setw;
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	std::int16_t const day( timeinfo->tm_yday + 1 ); // Day of year: 1-366
-	std::int16_t const year( timeinfo->tm_year % 100 ); // 2-Digit Year: 0-99
+	std::int16_t const day( static_cast< std::int16_t >( timeinfo->tm_yday + 1 ) ); // Day of year: 1-366
+	std::int16_t const year( static_cast< std::int16_t >( timeinfo->tm_year % 100 ) ); // 2-Digit Year: 0-99
 	std::stringstream s;
 	s << std::setfill( '0' ) << setw( 2 ) << year << setw( 3 ) << day;
 	return s.str();
@@ -382,8 +382,8 @@ jdate()
 	using std::setw;
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	std::int16_t const day( timeinfo->tm_yday + 1 ); // Day of year: 1-366
-	std::int16_t const year( timeinfo->tm_year % 100 ); // 2-Digit Year: 0-99
+	std::int16_t const day( static_cast< std::int16_t >( timeinfo->tm_yday + 1 ) ); // Day of year: 1-366
+	std::int16_t const year( static_cast< std::int16_t >( timeinfo->tm_year % 100 ) ); // 2-Digit Year: 0-99
 	std::stringstream s;
 	s << std::setfill( '0' ) << setw( 2 ) << year << setw( 3 ) << day;
 	return s.str();
@@ -396,8 +396,8 @@ JDATE4()
 	using std::setw;
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	std::int16_t const day( timeinfo->tm_yday + 1 ); // Day of year: 1-366
-	std::int16_t const year( timeinfo->tm_year + 1900 ); // Year
+	std::int16_t const day( static_cast< std::int16_t >( timeinfo->tm_yday + 1 ) ); // Day of year: 1-366
+	std::int16_t const year( static_cast< std::int16_t >( timeinfo->tm_year + 1900 ) ); // Year
 	std::stringstream s;
 	s << std::setfill( '0' ) << setw( 4 ) << year << setw( 3 ) << day;
 	return s.str();
@@ -410,8 +410,8 @@ jdate4()
 	using std::setw;
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	std::int16_t const day( timeinfo->tm_yday + 1 ); // Day of year: 1-366
-	std::int16_t const year( timeinfo->tm_year + 1900 ); // Year
+	std::int16_t const day( static_cast< std::int16_t >( timeinfo->tm_yday + 1 ) ); // Day of year: 1-366
+	std::int16_t const year( static_cast< std::int16_t >( timeinfo->tm_year + 1900 ) ); // Year
 	std::stringstream s;
 	s << std::setfill( '0' ) << setw( 4 ) << year << setw( 3 ) << day;
 	return s.str();
@@ -423,9 +423,9 @@ GETDAT( std::int64_t & year, std::int64_t & month, std::int64_t & day )
 {
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	year = timeinfo->tm_year + 1900; // Year
-	month = timeinfo->tm_mon + 1; // Month of year: 1-12
-	day = timeinfo->tm_mday; // Day of month: 1-31
+	year = static_cast< std::int64_t >( timeinfo->tm_year + 1900 ); // Year
+	month = static_cast< std::int64_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	day = static_cast< std::int64_t >( timeinfo->tm_mday ); // Day of month: 1-31
 }
 
 // Current Date: YYYY, MM, DD
@@ -434,9 +434,9 @@ GETDAT( std::int32_t & year, std::int32_t & month, std::int32_t & day )
 {
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	year = timeinfo->tm_year + 1900; // Year
-	month = timeinfo->tm_mon + 1; // Month of year: 1-12
-	day = timeinfo->tm_mday; // Day of month: 1-31
+	year = static_cast< std::int32_t >( timeinfo->tm_year + 1900 ); // Year
+	month = static_cast< std::int32_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	day = static_cast< std::int32_t >( timeinfo->tm_mday ); // Day of month: 1-31
 }
 
 // Current Date: YYYY, MM, DD
@@ -445,9 +445,9 @@ GETDAT( std::int16_t & year, std::int16_t & month, std::int16_t & day )
 {
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	year = timeinfo->tm_year + 1900; // Year
-	month = timeinfo->tm_mon + 1; // Month of year: 1-12
-	day = timeinfo->tm_mday; // Day of month: 1-31
+	year = static_cast< std::int16_t >( timeinfo->tm_year + 1900 ); // Year
+	month = static_cast< std::int16_t >( timeinfo->tm_mon + 1 ); // Month of year: 1-12
+	day = static_cast< std::int16_t >( timeinfo->tm_mday ); // Day of month: 1-31
 }
 
 // Month Name: MMM
@@ -492,9 +492,9 @@ DATE()
 	using std::setw;
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	std::int16_t const month( timeinfo->tm_mon + 1 ); // Month of year: 1-12
-	std::int16_t const day( timeinfo->tm_mday ); // Day of month: 1-31
-	std::int16_t const year( timeinfo->tm_year % 100 ); // 2-Digit Year: 0-99
+	std::int16_t const month( static_cast< std::int16_t >( timeinfo->tm_mon + 1 ) ); // Month of year: 1-12
+	std::int16_t const day( static_cast< std::int16_t >( timeinfo->tm_mday ) ); // Day of month: 1-31
+	std::int16_t const year( static_cast< std::int16_t >( timeinfo->tm_year % 100 ) ); // 2-Digit Year: 0-99
 	std::stringstream s;
 	s << std::setfill( '0' ) << setw( 2 ) << month << '/' << setw( 2 ) << day << '/' << setw( 2 ) << year;
 	return s.str();
@@ -507,9 +507,9 @@ date()
 	using std::setw;
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	std::int16_t const month( timeinfo->tm_mon + 1 ); // Month of year: 1-12
-	std::int16_t const day( timeinfo->tm_mday ); // Day of month: 1-31
-	std::int16_t const year( timeinfo->tm_year % 100 ); // 2-Digit Year: 0-99
+	std::int16_t const month( static_cast< std::int16_t >( timeinfo->tm_mon + 1 ) ); // Month of year: 1-12
+	std::int16_t const day( static_cast< std::int16_t >( timeinfo->tm_mday ) ); // Day of month: 1-31
+	std::int16_t const year( static_cast< std::int16_t >( timeinfo->tm_year % 100 ) ); // 2-Digit Year: 0-99
 	std::stringstream s;
 	s << std::setfill( '0' ) << setw( 2 ) << month << '/' << setw( 2 ) << day << '/' << setw( 2 ) << year;
 	return s.str();
@@ -522,9 +522,9 @@ DATE( std::string & date )
 	using std::setw;
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	std::int16_t const day( timeinfo->tm_mday ); // Day of month: 1-31
-	std::int16_t const month( timeinfo->tm_mon + 1 ); // Month of year: 1-12
-	std::int16_t const year( timeinfo->tm_year % 100 ); // 2-Digit Year: 0-99
+	std::int16_t const day( static_cast< std::int16_t >( timeinfo->tm_mday ) ); // Day of month: 1-31
+	std::int16_t const month( static_cast< std::int16_t >( timeinfo->tm_mon + 1 ) ); // Month of year: 1-12
+	std::int16_t const year( static_cast< std::int16_t >( timeinfo->tm_year % 100 ) ); // 2-Digit Year: 0-99
 	std::stringstream s;
 	s << std::setfill( '0' ) << setw( 2 ) << day << '-' << MMM( month ) << '-' << setw( 2 ) << year;
 	date = s.str();
@@ -537,9 +537,9 @@ DATE4( std::string & date )
 	using std::setw;
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
-	std::int16_t const day( timeinfo->tm_mday ); // Day of month: 1-31
-	std::int16_t const month( timeinfo->tm_mon + 1 ); // Month of year: 1-12
-	std::int16_t const year( timeinfo->tm_year + 1900 ); // Year
+	std::int16_t const day( static_cast< std::int16_t >( timeinfo->tm_mday ) ); // Day of month: 1-31
+	std::int16_t const month( static_cast< std::int16_t >( timeinfo->tm_mon + 1 ) ); // Month of year: 1-12
+	std::int16_t const year( static_cast< std::int16_t >( timeinfo->tm_year + 1900 ) ); // Year
 	std::stringstream s;
 	s << std::setfill( '0' ) << setw( 2 ) << day << '-' << MMM( month ) << '-' << setw( 4 ) << year;
 	date = s.str();

@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -35,10 +35,10 @@ std::locale const scientific_locale( std::locale(), scientific_num_put );
 std::istream &
 operator >>( std::istream & stream, Skip const & skip )
 {
-	static std::string const STOPPERS( "\r\n" + std::string( 1, std::istream::traits_type::eof() ) );
+	static std::string const STOPPERS( "\r\n" + std::string( 1, static_cast< char >( std::istream::traits_type::eof() ) ) );
 	char c;
 	Size i( 0 );
-	while ( ( i < skip.w_ ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
+	while ( ( i < skip.w_ ) && stream && not_any_of( static_cast< char >( stream.peek() ), STOPPERS ) ) {
 		stream.get( c );
 		++i;
 	}

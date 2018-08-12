@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -99,7 +99,6 @@ protected: // Types
 	using Super::move_if;
 	using Super::resize;
 	using Super::shift_set;
-	using Super::shift_only_set;
 	using Super::size_of;
 	using Super::swap3;
 
@@ -107,7 +106,6 @@ protected: // Types
 	using Super::I1_;
 	using Super::I2_;
 	using Super::I3_;
-	using Super::sdata_;
 	using Super::shift_;
 	using Super::size_;
 	using Super::z1_;
@@ -1057,7 +1055,7 @@ private: // Functions
 		z1_ = I1_.size();
 		z2_ = I2_.size();
 		z3_ = I3_.size();
-		shift_only_set( ( ( ( I1_.l() * z2_ ) + I2_.l() ) * z3_ ) + I3_.l() );
+		shift_set( ( ( ( I1_.l() * z2_ ) + I2_.l() ) * z3_ ) + I3_.l() );
 		return resize( size_of( z1_, z2_, z3_ ) );
 	}
 

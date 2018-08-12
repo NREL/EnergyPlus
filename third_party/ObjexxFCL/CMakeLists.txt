@@ -144,6 +144,7 @@ set(src
   src/ObjexxFCL/IOFlags.cc
   src/ObjexxFCL/IOFlags.fwd.hh
   src/ObjexxFCL/IOFlags.hh
+  src/ObjexxFCL/lock_guard.hh
   src/ObjexxFCL/MArray.all.fwd.hh
   src/ObjexxFCL/MArray.all.hh
   src/ObjexxFCL/MArray.functions.hh

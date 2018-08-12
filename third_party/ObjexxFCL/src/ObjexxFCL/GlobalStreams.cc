@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -56,8 +56,8 @@ namespace gio {
 		if ( i != usr_unit_streams_.end() ) {
 			return i->second;
 		} else {
-			auto i( fix_unit_streams_.find( unit ) );
-			return ( i != fix_unit_streams_.end() ? i->second : nullptr );
+			auto j( fix_unit_streams_.find( unit ) );
+			return ( j != fix_unit_streams_.end() ? j->second : nullptr );
 		}
 	}
 
@@ -69,8 +69,8 @@ namespace gio {
 		if ( i != usr_name_streams_.end() ) {
 			return i->second;
 		} else {
-			auto i( fix_name_streams_.find( name ) );
-			return ( i != fix_name_streams_.end() ? i->second : nullptr );
+			auto j( fix_name_streams_.find( name ) );
+			return ( j != fix_name_streams_.end() ? j->second : nullptr );
 		}
 	}
 
@@ -82,8 +82,8 @@ namespace gio {
 		if ( i != usr_unit_streams_.end() ) {
 			return true;
 		} else {
-			auto i( fix_unit_streams_.find( unit ) );
-			return ( i != fix_unit_streams_.end() );
+			auto j( fix_unit_streams_.find( unit ) );
+			return ( j != fix_unit_streams_.end() );
 		}
 	}
 
@@ -95,8 +95,8 @@ namespace gio {
 		if ( i != usr_name_streams_.end() ) {
 			return true;
 		} else {
-			auto i( fix_name_streams_.find( name ) );
-			return ( i != fix_name_streams_.end() );
+			auto j( fix_name_streams_.find( name ) );
+			return ( j != fix_name_streams_.end() );
 		}
 	}
 

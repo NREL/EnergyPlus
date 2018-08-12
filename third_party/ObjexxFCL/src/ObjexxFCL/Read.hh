@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -269,9 +269,9 @@ public: // Operators
 					active = active->next();
 				}
 				if ( stream_ && active && active->uses_arg() && format_->not_slash_terminated() && active->input( stream_, poa_, por_, t ) ) { // Input arg using active format
-					Format::Size const reverts( format_->reverts() );
+					Format::Size const reverts_arg( format_->reverts() );
 					active = active->next();
-					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts ) && format_->not_terminated() && active->input( stream_, poa_, por_ ) ) { // Inputs up to next arg-based format if not terminated
+					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_arg ) && format_->not_terminated() && active->input( stream_, poa_, por_ ) ) { // Inputs up to next arg-based format if not terminated
 						active = active->next();
 					}
 				}
@@ -840,6 +840,9 @@ private: // Methods
 private: // Data
 
 	std::istringstream * sstream_; // Internal stream for std::cin reads
+#ifdef OBJEXXFCL_THREADS
+	std::istringstream internal_stream_; // Internal stream
+#endif
 	std::istream & stream_; // Input stream
 	Format * format_; // Format expression
 	bool format_own_; // Own the Format?
@@ -849,7 +852,9 @@ private: // Data
 
 private: // Static Data
 
+#ifndef OBJEXXFCL_THREADS
 	static std::istringstream internal_stream_; // Internal stream
+#endif
 
 }; // ReadStream
 
@@ -1078,9 +1083,9 @@ public: // Operators
 					active = active->next();
 				}
 				if ( stream_ && active && active->uses_arg() && format_->not_slash_terminated() && active->input( stream_, pos_, t ) ) { // Input arg using active format
-					Format::Size const reverts( format_->reverts() );
+					Format::Size const reverts_arg( format_->reverts() );
 					active = active->next();
-					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts ) && format_->not_terminated() && active->input( stream_, pos_ ) ) { // Inputs up to next arg-based format if not terminated
+					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_arg ) && format_->not_terminated() && active->input( stream_, pos_ ) ) { // Inputs up to next arg-based format if not terminated
 						active = active->next();
 					}
 				}

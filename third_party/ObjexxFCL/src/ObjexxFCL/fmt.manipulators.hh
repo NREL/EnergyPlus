@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -285,10 +285,10 @@ private: // Methods
 					v *= T( 10.0 );
 					vexp -= 1;
 				} else { // Check for too few 0's
-					std::string const k_str( "0." + std::string( -k_, '0' ) );
-					std::ostringstream x;
-					x << std::fixed << std::setprecision( std::max( int( d_ ), -k_ + 1 ) ) << v;
-					if ( x.str().substr( 0, k_str.length() ) != k_str ) { // Rounding adjustment
+					std::string const mk_str( "0." + std::string( -k_, '0' ) );
+					std::ostringstream y;
+					y << std::fixed << std::setprecision( std::max( int( d_ ), -k_ + 1 ) ) << v;
+					if ( y.str().substr( 0, mk_str.length() ) != mk_str ) { // Rounding adjustment
 						v /= T( 10.0 );
 						vexp += 1;
 					}

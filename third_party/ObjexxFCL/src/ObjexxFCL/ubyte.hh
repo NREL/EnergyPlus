@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -118,7 +118,7 @@ public: // Assignment
 	ubyte &
 	operator +=( unsigned short int const i )
 	{
-		b_ += i;
+		b_ += static_cast< unsigned char >( i );
 		return *this;
 	}
 
@@ -126,7 +126,7 @@ public: // Assignment
 	ubyte &
 	operator -=( unsigned short int const i )
 	{
-		b_ -= i;
+		b_ -= static_cast< unsigned char >( i );
 		return *this;
 	}
 
@@ -134,7 +134,7 @@ public: // Assignment
 	ubyte &
 	operator *=( unsigned short int const i )
 	{
-		b_ *= i;
+		b_ *= static_cast< unsigned char >( i );
 		return *this;
 	}
 
@@ -143,7 +143,7 @@ public: // Assignment
 	operator /=( unsigned short int const i )
 	{
 		assert( i != 0u );
-		b_ /= i;
+		b_ /= static_cast< unsigned char >( i );
 		return *this;
 	}
 
@@ -196,7 +196,7 @@ public: // Math
 	ubyte
 	operator -() const
 	{
-		return ubyte( static_cast< unsigned char const >( -static_cast< short int const >( b_ ) ) );
+		return ubyte( static_cast< unsigned char >( -static_cast< short int >( b_ ) ) );
 	}
 
 	// ubyte + ubyte

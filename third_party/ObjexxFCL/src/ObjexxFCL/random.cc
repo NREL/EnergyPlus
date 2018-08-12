@@ -2,16 +2,17 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/random.hh>
+#include <ObjexxFCL/lock_guard.hh>
 
 // C++ Headers
 #include <cmath>
@@ -23,12 +24,16 @@ namespace ObjexxFCL {
 
 namespace { // Internal shared global
 std::default_random_engine random_generator;
+#ifdef OBJEXXFCL_THREADS
+std::mutex random_mutex;
+#endif
 }
 
 // Random float on [0,1)
 void
 RANDOM_NUMBER( float & harvest )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::uniform_real_distribution< float > distribution( 0.0f, 1.0f );
 	harvest = distribution( random_generator );
 }
@@ -37,6 +42,7 @@ RANDOM_NUMBER( float & harvest )
 void
 RANDOM_NUMBER( double & harvest )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::uniform_real_distribution< double > distribution( 0.0, 1.0 );
 	harvest = distribution( random_generator );
 }
@@ -59,6 +65,7 @@ RANDOM_NUMBER( Array< double > & harvest )
 void
 RANDOM( float & ranval )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::uniform_real_distribution< float > distribution( 0.0f, 1.0f );
 	ranval = distribution( random_generator );
 }
@@ -67,6 +74,7 @@ RANDOM( float & ranval )
 float
 RANDOM( int const iflag )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::uniform_real_distribution< float > distribution( 0.0f, 1.0f );
 	if ( iflag == 1 ) { // Reset distribution
 		distribution.reset();
@@ -81,6 +89,7 @@ RANDOM( int const iflag )
 float
 RANF( Optional< int const > iseed )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::uniform_real_distribution< float > distribution( 0.0f, std::pow( 2.0f, 31 ) - 1.0f );
 	if ( iseed.present() ) random_generator.seed( iseed() );
 	return distribution( random_generator );
@@ -90,6 +99,7 @@ RANF( Optional< int const > iseed )
 double
 DRANDM( int const iflag )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::uniform_real_distribution< double > distribution( 0.0, 1.0 );
 	if ( iflag == 1 ) { // Reset distribution
 		distribution.reset();
@@ -104,6 +114,7 @@ DRANDM( int const iflag )
 void
 RANDU( int const i1, int const i2, float & x )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::uniform_real_distribution< float > distribution( 0.0f, 1.0f );
 	random_generator.seed( i1 * i2 ); // This is not the infamous randu
 	x = distribution( random_generator );
@@ -113,6 +124,7 @@ RANDU( int const i1, int const i2, float & x )
 std::int32_t
 IRANDM()
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::uniform_int_distribution< std::int32_t > distribution( 0, 32767 );
 	return distribution( random_generator );
 }
@@ -121,6 +133,7 @@ IRANDM()
 std::int32_t
 IRANDM( int const iflag )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::uniform_int_distribution< std::int32_t > distribution( 0, 2147483647 );
 	if ( iflag == 1 ) { // Reset distribution
 		distribution.reset();
@@ -139,6 +152,7 @@ RANDOM_SEED(
  Optional< Array1D< int > > get
 )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	static std::vector< int > seed_vals{ int( std::time( NULL ) ), int( std::time( NULL ) ) }; // C++ doesn't provide access to the seed values so we cache them here
 	if ( size.present() ) {
 		assert( ( ! put.present() ) && ( ! get.present() ) ); // At most one arg allowed
@@ -163,6 +177,7 @@ RANDOM_SEED(
 void
 SRAND( int const iseed )
 {
+	OBJEXXFCL_LOCK_GUARD( random_mutex );
 	random_generator.seed( iseed );
 }
 

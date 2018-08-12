@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -19,9 +19,29 @@
 
 namespace ObjexxFCL {
 
+// Is an Input Stream a File Stream?
+bool
+is_fstream( std::istream const & stream );
+
 // Is an Output Stream a File Stream?
 bool
 is_fstream( std::ostream const & stream );
+
+// Is an Input/Output Stream a File Stream?
+bool
+is_fstream( std::iostream const & stream );
+
+// Is an Input Stream a String Stream?
+bool
+is_stringstream( std::istream const & stream );
+
+// Is an Output Stream a String Stream?
+bool
+is_stringstream( std::ostream const & stream );
+
+// Is an Input/Output Stream a String Stream?
+bool
+is_stringstream( std::iostream const & stream );
 
 // Read a Line from a Text Input Stream: Cross-Platform: Linux (\n) or Windows (\r\n)
 std::istream &

@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -14,15 +14,52 @@
 #include <ObjexxFCL/stream.functions.hh>
 
 // C++ Headers
+#include <cassert>
 #include <fstream>
+#include <sstream>
 
 namespace ObjexxFCL {
+
+// Is an Input Stream a File Stream?
+bool
+is_fstream( std::istream const & stream )
+{
+	return ( ( dynamic_cast< std::fstream const * >( &stream ) != nullptr ) || ( dynamic_cast< std::ifstream const * >( &stream ) != nullptr ) );
+}
 
 // Is an Output Stream a File Stream?
 bool
 is_fstream( std::ostream const & stream )
 {
 	return ( ( dynamic_cast< std::fstream const * >( &stream ) != nullptr ) || ( dynamic_cast< std::ofstream const * >( &stream ) != nullptr ) );
+}
+
+// Is an Input/Output Stream a File Stream?
+bool
+is_fstream( std::iostream const & stream )
+{
+	return ( ( dynamic_cast< std::fstream const * >( &stream ) != nullptr ) || ( dynamic_cast< std::ifstream const * >( &stream ) != nullptr ) || ( dynamic_cast< std::ofstream const * >( &stream ) != nullptr ) );
+}
+
+// Is an Input Stream a String Stream?
+bool
+is_stringstream( std::istream const & stream )
+{
+	return ( ( dynamic_cast< std::stringstream const * >( &stream ) != nullptr ) || ( dynamic_cast< std::istringstream const * >( &stream ) != nullptr ) );
+}
+
+// Is an Output Stream a String Stream?
+bool
+is_stringstream( std::ostream const & stream )
+{
+	return ( ( dynamic_cast< std::stringstream const * >( &stream ) != nullptr ) || ( dynamic_cast< std::ostringstream const * >( &stream ) != nullptr ) );
+}
+
+// Is an Input/Output Stream a String Stream?
+bool
+is_stringstream( std::iostream const & stream )
+{
+	return ( ( dynamic_cast< std::stringstream const * >( &stream ) != nullptr ) || ( dynamic_cast< std::istringstream const * >( &stream ) != nullptr ) || ( dynamic_cast< std::ostringstream const * >( &stream ) != nullptr ) );
 }
 
 // Read a Line from a Text Input Stream: Cross-Platform: Linux (\n) or Windows (\r\n)
@@ -116,12 +153,14 @@ cross_platform_get_line( std::istream & stream, std::string & line, char const d
 	}
 }
 
-// Auto-Detected Line Terminator from a Text Input Stream: Cross-Platform: Linux (\n) or Windows (\r\n)
+// Auto-Detected Line Terminator from a Text Input Stream: Cross-Platform: Linux/macOS (\n) or Windows (\r\n)
 std::string
 line_terminator( std::istream & stream )
 { // Assumes stream was opened in binary mode: C++ doesn't let us check that
-	std::streamoff const start_pos( stream.tellg() ); // Current position
 	stream.clear();
+	std::streampos const start_pos( stream.tellg() ); // Current position
+	assert( start_pos != std::streampos( -1 ) ); // Non-seekable stream
+	if ( start_pos == std::streampos( -1 ) ) return std::string(); // Non-seekable stream
 	stream.seekg( 0, std::ios::beg ); // Jump to beginning
 	std::string line;
 	std::string terminator;
@@ -134,7 +173,7 @@ line_terminator( std::istream & stream )
 	} else { // No terminators in file
 		// Terminator stays empty
 	}
-	stream.seekg( start_pos, std::ios::beg ); // Jump back to starting position
+	stream.seekg( start_pos ); // Jump back to starting position
 	stream.clear();
 	return terminator;
 }

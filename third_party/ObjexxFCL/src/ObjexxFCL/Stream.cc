@@ -2,17 +2,18 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Stream.hh>
 #include <ObjexxFCL/environment.hh>
+#include <ObjexxFCL/lock_guard.hh>
 #include <ObjexxFCL/stream.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -20,6 +21,12 @@
 #include <random>
 
 namespace ObjexxFCL {
+
+#ifdef OBJEXXFCL_THREADS
+namespace { // Internal shared global
+std::mutex scratch_name_mutex;
+}
+#endif
 
 // Stream
 
@@ -41,6 +48,7 @@ namespace ObjexxFCL {
 		}
 
 		// Name
+		OBJEXXFCL_LOCK_GUARD( scratch_name_mutex );
 		static std::random_device device;
 		static std::ranlux24_base generator( device() );
 		static std::uniform_int_distribution<> distribution( 1000000, 9999999 );

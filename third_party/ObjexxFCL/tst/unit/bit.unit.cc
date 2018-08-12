@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -156,14 +156,14 @@ TEST( BitTest, BitMaskr )
 
 TEST( BitTest, BitTest )
 {
-	EXPECT_TRUE( bit_test< uint8_t >( 0x88, 3 ) );
-	EXPECT_TRUE( bit_test< uint8_t >( 0x88, 7 ) );
-	EXPECT_TRUE( bit_test< uint16_t >( 0x8080, 7 ) );
-	EXPECT_TRUE( bit_test< uint16_t >( 0x8080, 15 ) );
-	EXPECT_TRUE( bit_test< uint32_t >( 0x80008000, 15 ) );
-	EXPECT_TRUE( bit_test< uint32_t >( 0x80008000, 31 ) );
-	EXPECT_TRUE( bit_test( uint64_t( 0x8000000080000000 ), uint64_t( 31 ) ) );
-	EXPECT_TRUE( bit_test( uint64_t( 0x8000000080000000 ), uint64_t( 63 ) ) );
+	EXPECT_TRUE( bit_test< uint8_t >( 0x88u, 3u ) );
+	EXPECT_TRUE( bit_test< uint8_t >( 0x88u, 7u ) );
+	EXPECT_TRUE( bit_test< uint16_t >( 0x8080u, 7u ) );
+	EXPECT_TRUE( bit_test< uint16_t >( 0x8080u, 15u ) );
+	EXPECT_TRUE( bit_test< uint32_t >( 0x80008000u, 15u ) );
+	EXPECT_TRUE( bit_test< uint32_t >( 0x80008000u, 31u ) );
+	EXPECT_TRUE( bit_test( uint64_t( 0x8000000080000000u ), uint64_t( 31u ) ) );
+	EXPECT_TRUE( bit_test( uint64_t( 0x8000000080000000u ), uint64_t( 63u ) ) );
 }
 
 TEST( BitTest, BitLt )
@@ -268,28 +268,30 @@ TEST( BitTest, BitGt )
 
 TEST( BitTest, BitSet )
 {
-	EXPECT_EQ( uint8_t( 0x01 ), bit_set( uint8_t( 0 ), uint8_t( 0 ) ) );
-	EXPECT_EQ( uint8_t( 0x80 ), bit_set( uint8_t( 0 ), uint8_t( 7 ) ) );
-	EXPECT_EQ( uint8_t( 0x01 ), bit_set< uint8_t >( 0, 0 ) );
-	EXPECT_EQ( uint8_t( 0x80 ), bit_set< uint8_t >( 0, 7 ) );
-	EXPECT_EQ( uint16_t( 0x0100 ), bit_set< uint16_t >( 0, 8 ) );
-	EXPECT_EQ( uint16_t( 0x8000 ), bit_set< uint16_t >( 0, 15 ) );
-	EXPECT_EQ( uint32_t( 0x00010000 ), bit_set< uint32_t >( 0, 16 ) );
-	EXPECT_EQ( uint32_t( 0x80000000 ), bit_set< uint32_t >( 0, 31 ) );
-	EXPECT_EQ( uint64_t( 0x0000000100000000 ), bit_set< uint64_t >( 0, 32 ) );
-	EXPECT_EQ( uint64_t( 0x8000000000000000 ), bit_set< uint64_t >( 0, 63 ) );
+	EXPECT_EQ( uint8_t( 0x01u ), bit_set( uint8_t( 0u ), uint8_t( 0u ) ) );
+	EXPECT_EQ( uint8_t( 0x80u ), bit_set( uint8_t( 0u ), uint8_t( 7u ) ) );
+	EXPECT_EQ( uint8_t( 0x01u ), bit_set< uint8_t >( 0u, 0u ) );
+	EXPECT_EQ( uint8_t( 0x80u ), bit_set< uint8_t >( 0u, 7u ) );
+	EXPECT_EQ( uint16_t( 0x0100u ), bit_set< uint16_t >( 0u, 8u ) );
+	EXPECT_EQ( uint16_t( 0x8000u ), bit_set< uint16_t >( 0u, 15u ) );
+	EXPECT_EQ( uint32_t( 0x00010000u ), bit_set< uint32_t >( 0u, 16u ) );
+	EXPECT_EQ( uint32_t( 0x80000000u ), bit_set< uint32_t >( 0u, 31u ) );
+	EXPECT_EQ( uint64_t( 0x0000000100000000u ), bit_set< uint64_t >( 0u, 32u ) );
+	EXPECT_EQ( uint64_t( 0x8000000000000000u ), bit_set< uint64_t >( 0u, 63u ) );
 }
 
 TEST( BitTest, BitClr )
 {
-	EXPECT_EQ( uint8_t( 0xFE ), bit_clr< uint8_t >( ~0, 0 ) );
-	EXPECT_EQ( uint8_t( 0x7F ), bit_clr< uint8_t >( ~0, 7 ) );
-	EXPECT_EQ( uint16_t( 0xFEFF ), bit_clr< uint16_t >( ~0, 8 ) );
-	EXPECT_EQ( uint16_t( 0x7FFF ), bit_clr< uint16_t >( ~0, 15 ) );
-	EXPECT_EQ( uint32_t( 0xFFFEFFFF ), bit_clr< uint32_t >( ~0, 16 ) );
-	EXPECT_EQ( uint32_t( 0x7FFFFFFF ), bit_clr< uint32_t >( ~0, 31 ) );
-	EXPECT_EQ( uint64_t( 0xFFFFFFFEFFFFFFFF ), bit_clr< uint64_t >( ~0, 32 ) );
-	EXPECT_EQ( uint64_t( 0x7FFFFFFFFFFFFFFF ), bit_clr< uint64_t >( ~0, 63 ) );
+	EXPECT_EQ( uint8_t( 0xFEu ), bit_clr( uint8_t( ~0 ), uint8_t( 0u ) ) );
+	EXPECT_EQ( uint8_t( 0x7Fu ), bit_clr( uint8_t( ~0 ), uint8_t( 7u ) ) );
+	EXPECT_EQ( uint8_t( 0xFEu ), bit_clr< uint8_t >( static_cast< uint8_t >( ~0 ), 0u ) );
+	EXPECT_EQ( uint8_t( 0x7Fu ), bit_clr< uint8_t >( static_cast< uint8_t >( ~0 ), 7u ) );
+	EXPECT_EQ( uint16_t( 0xFEFFu ), bit_clr< uint16_t >( static_cast< uint16_t >( ~0 ), 8u ) );
+	EXPECT_EQ( uint16_t( 0x7FFFu ), bit_clr< uint16_t >( static_cast< uint16_t >( ~0 ), 15u ) );
+	EXPECT_EQ( uint32_t( 0xFFFEFFFFu ), bit_clr< uint32_t >( static_cast< uint32_t >( ~0 ), 16u ) );
+	EXPECT_EQ( uint32_t( 0x7FFFFFFFu ), bit_clr< uint32_t >( static_cast< uint32_t >( ~0 ), 31u ) );
+	EXPECT_EQ( uint64_t( 0xFFFFFFFEFFFFFFFFu ), bit_clr< uint64_t >( static_cast< uint64_t >( ~0 ), 32u ) );
+	EXPECT_EQ( uint64_t( 0x7FFFFFFFFFFFFFFFu ), bit_clr< uint64_t >( static_cast< uint64_t >( ~0 ), 63u ) );
 }
 
 TEST( BitTest, BitNot )
@@ -297,38 +299,38 @@ TEST( BitTest, BitNot )
 	uint64_t const lo64( uint64_t( 1 ) << 32 );
 	uint64_t const hi64( uint64_t( 1 ) << 63 );
 
-	EXPECT_EQ( 0xFEu, bit_not< uint8_t >( 1 << 0 ) );
-	EXPECT_EQ( 0x7Fu, bit_not< uint8_t >( 1 << 7 ) );
-	EXPECT_EQ( 0xFEFFu, bit_not< uint16_t >( 1 << 8 ) );
-	EXPECT_EQ( 0x7FFFu, bit_not< uint16_t >( 1 << 15 ) );
-	EXPECT_EQ( 0xFFFEFFFFu, bit_not< uint32_t >( 1 << 16 ) );
-	EXPECT_EQ( 0x7FFFFFFFu, bit_not< uint32_t >( 1 << 31 ) );
-	EXPECT_EQ( uint64_t( 0xFFFFFFFEFFFFFFFF ), bit_not< uint64_t >( lo64 ) );
-	EXPECT_EQ( uint64_t( 0x7FFFFFFFFFFFFFFF ), bit_not< uint64_t >( hi64 ) );
+	EXPECT_EQ( 0xFEu, bit_not< uint8_t >( 1u << 0 ) );
+	EXPECT_EQ( 0x7Fu, bit_not< uint8_t >( 1u << 7 ) );
+	EXPECT_EQ( 0xFEFFu, bit_not< uint16_t >( 1u << 8 ) );
+	EXPECT_EQ( 0x7FFFu, bit_not< uint16_t >( 1u << 15 ) );
+	EXPECT_EQ( 0xFFFEFFFFu, bit_not< uint32_t >( 1u << 16 ) );
+	EXPECT_EQ( 0x7FFFFFFFu, bit_not< uint32_t >( 1u << 31 ) );
+	EXPECT_EQ( uint64_t( 0xFFFFFFFEFFFFFFFFu ), bit_not< uint64_t >( lo64 ) );
+	EXPECT_EQ( uint64_t( 0x7FFFFFFFFFFFFFFFu ), bit_not< uint64_t >( hi64 ) );
 }
 
 TEST( BitTest, BitAnd )
 {
-	EXPECT_EQ( 0xA0u, bit_and< uint8_t >( 0xF0, 0xAB ) );
-	EXPECT_EQ( 0xAB00u, bit_and< uint16_t >( 0xFF00, 0xABCD ) );
-	EXPECT_EQ( 0xABCD0000u, bit_and< uint32_t >( 0xFFFF0000, 0xABCD0123 ) );
-	EXPECT_EQ( uint64_t( 0xABCDABCD00000000 ), bit_and( uint64_t( 0xFFFFFFFF00000000 ), uint64_t( 0xABCDABCDABCDABCD ) ) );
+	EXPECT_EQ( 0xA0u, bit_and< uint8_t >( 0xF0u, 0xABu ) );
+	EXPECT_EQ( 0xAB00u, bit_and< uint16_t >( 0xFF00u, 0xABCDu ) );
+	EXPECT_EQ( 0xABCD0000u, bit_and< uint32_t >( 0xFFFF0000u, 0xABCD0123u ) );
+	EXPECT_EQ( uint64_t( 0xABCDABCD00000000u ), bit_and( uint64_t( 0xFFFFFFFF00000000u ), uint64_t( 0xABCDABCDABCDABCDu ) ) );
 }
 
 TEST( BitTest, BitOr )
 {
-	EXPECT_EQ( 0xFBu, bit_or< uint8_t >( 0xF0, 0xAB ) );
-	EXPECT_EQ( 0xFFCDu, bit_or< uint16_t >( 0xFF00, 0xABCD ) );
-	EXPECT_EQ( 0xFFFF0123u, bit_or< uint32_t >( 0xFFFF0000, 0xABCD0123 ) );
-	EXPECT_EQ( uint64_t( 0xFFFFFFFFABCDABCD ), bit_or( uint64_t( 0xFFFFFFFF00000000 ), uint64_t( 0xABCDABCDABCDABCD ) ) );
+	EXPECT_EQ( 0xFBu, bit_or< uint8_t >( 0xF0u, 0xABu ) );
+	EXPECT_EQ( 0xFFCDu, bit_or< uint16_t >( 0xFF00u, 0xABCDu ) );
+	EXPECT_EQ( 0xFFFF0123u, bit_or< uint32_t >( 0xFFFF0000u, 0xABCD0123u ) );
+	EXPECT_EQ( uint64_t( 0xFFFFFFFFABCDABCDu ), bit_or( uint64_t( 0xFFFFFFFF00000000u ), uint64_t( 0xABCDABCDABCDABCDu ) ) );
 }
 
 TEST( BitTest, BitXor )
 {
-	EXPECT_EQ( 0x0Fu, bit_xor< uint8_t >( 0xF0, 0xFF ) );
-	EXPECT_EQ( 0x0F0Fu, bit_xor< uint16_t >( 0xF0F0, 0xFFFF ) );
-	EXPECT_EQ( 0x0F0F0F0Fu, bit_xor< uint32_t >( 0xF0F0F0F0, 0xFFFFFFFF ) );
-	EXPECT_EQ( uint64_t( 0x0F0F0F0F0F0F0F0F ), bit_xor( uint64_t( 0xF0F0F0F0F0F0F0F0 ), uint64_t( 0xFFFFFFFFFFFFFFFF ) ) );
+	EXPECT_EQ( 0x0Fu, bit_xor< uint8_t >( 0xF0u, 0xFFu ) );
+	EXPECT_EQ( 0x0F0Fu, bit_xor< uint16_t >( 0xF0F0u, 0xFFFFu ) );
+	EXPECT_EQ( 0x0F0F0F0Fu, bit_xor< uint32_t >( 0xF0F0F0F0u, 0xFFFFFFFFu ) );
+	EXPECT_EQ( uint64_t( 0x0F0F0F0F0F0F0F0Fu ), bit_xor( uint64_t( 0xF0F0F0F0F0F0F0F0u ), uint64_t( 0xFFFFFFFFFFFFFFFFu ) ) );
 }
 
 TEST( BitTest, BitShift )
@@ -336,11 +338,11 @@ TEST( BitTest, BitShift )
 	// Signed: Explicit casts because bit patterns are unsigned
 	EXPECT_EQ( 0x02, bit_shift( int8_t( 1 ), 1 ) );
 	EXPECT_EQ( 0, bit_shift( int8_t( 1 ), -1 ) );
-	EXPECT_EQ( int8_t( 0xFE ), bit_shift( int8_t( -1 ), 1 ) );
+	EXPECT_EQ( int8_t( -2 ), bit_shift( int8_t( -1 ), 1 ) );
 	EXPECT_EQ( int8_t( 0x7F ), bit_shift( int8_t( -1 ), -1 ) );
 	EXPECT_EQ( 0x0002, bit_shift( int16_t( 1 ), 1 ) );
 	EXPECT_EQ( 0, bit_shift( int16_t( 1 ), -1 ) );
-	EXPECT_EQ( int16_t( 0xFFFE ), bit_shift( int16_t( -1 ), 1 ) );
+	EXPECT_EQ( int16_t( -2 ), bit_shift( int16_t( -1 ), 1 ) );
 	EXPECT_EQ( int16_t( 0x7FFF ), bit_shift( int16_t( -1 ), -1 ) );
 	EXPECT_EQ( 0x00000002, bit_shift( int32_t( 1 ), 1 ) );
 	EXPECT_EQ( 0, bit_shift( int32_t( 1 ), -1 ) );
@@ -366,19 +368,19 @@ TEST( BitTest, BitShift )
 	EXPECT_EQ( 0u, bit_shift( uint32_t( 1 ), -1 ) );
 	EXPECT_EQ( 0xFFFFFFFEu, bit_shift( uint32_t( -1 ), 1 ) );
 	EXPECT_EQ( 0x7FFFFFFFu, bit_shift( uint32_t( -1 ), -1 ) );
-	EXPECT_EQ( uint64_t( 0x0000000000000002 ), bit_shift( uint64_t( 1 ), 1 ) );
-	EXPECT_EQ( uint64_t( 0 )                 , bit_shift( uint64_t( 1 ), -1 ) );
-	EXPECT_EQ( uint64_t( 0xFFFFFFFFFFFFFFFE ), bit_shift( uint64_t( -1 ), 1 ) );
-	EXPECT_EQ( uint64_t( 0x7FFFFFFFFFFFFFFF ), bit_shift( uint64_t( -1 ), -1 ) );
+	EXPECT_EQ( uint64_t( 0x0000000000000002u ), bit_shift( uint64_t( 1 ), 1 ) );
+	EXPECT_EQ( uint64_t( 0u )                 , bit_shift( uint64_t( 1 ), -1 ) );
+	EXPECT_EQ( uint64_t( 0xFFFFFFFFFFFFFFFEu ), bit_shift( uint64_t( -1 ), 1 ) );
+	EXPECT_EQ( uint64_t( 0x7FFFFFFFFFFFFFFFu ), bit_shift( uint64_t( -1 ), -1 ) );
 }
 
 TEST( BitTest, BitShiftL )
 {
 	// Signed: Explicit casts because bit patterns are unsigned
 	EXPECT_EQ( 0x02, bit_shiftl( int8_t( 1 ), 1 ) );
-	EXPECT_EQ( int8_t( 0xFE ), bit_shiftl( int8_t( -1 ), 1 ) );
+	EXPECT_EQ( int8_t( -2 ), bit_shiftl( int8_t( -1 ), 1 ) );
 	EXPECT_EQ( 0x0002, bit_shiftl( int16_t( 1 ), 1 ) );
-	EXPECT_EQ( int16_t( 0xFFFE ), bit_shiftl( int16_t( -1 ), 1 ) );
+	EXPECT_EQ( int16_t( -2 ), bit_shiftl( int16_t( -1 ), 1 ) );
 	EXPECT_EQ( 0x00000002, bit_shiftl( int32_t( 1 ), 1 ) );
 	EXPECT_EQ( int32_t( 0xFFFFFFFE ), bit_shiftl( int32_t( -1 ), 1 ) );
 	EXPECT_EQ( int64_t( 0x0000000000000002 ), bit_shiftl( int64_t( 1 ), 1 ) );
@@ -392,8 +394,8 @@ TEST( BitTest, BitShiftL )
 	EXPECT_EQ( 0xFFFEu, bit_shiftl( uint16_t( -1 ), 1 ) );
 	EXPECT_EQ( 0x00000002u, bit_shiftl( uint32_t( 1 ), 1 ) );
 	EXPECT_EQ( 0xFFFFFFFEu, bit_shiftl( uint32_t( -1 ), 1 ) );
-	EXPECT_EQ( uint64_t( 0x0000000000000002 ), bit_shiftl( uint64_t( 1 ), 1 ) );
-	EXPECT_EQ( uint64_t( 0xFFFFFFFFFFFFFFFE ), bit_shiftl( uint64_t( -1 ), 1 ) );
+	EXPECT_EQ( uint64_t( 0x0000000000000002u ), bit_shiftl( uint64_t( 1 ), 1 ) );
+	EXPECT_EQ( uint64_t( 0xFFFFFFFFFFFFFFFEu ), bit_shiftl( uint64_t( -1 ), 1 ) );
 }
 
 TEST( BitTest, BitShiftR )
@@ -416,21 +418,21 @@ TEST( BitTest, BitShiftR )
 	EXPECT_EQ( 0x7FFFu, bit_shiftr( uint16_t( -1 ), 1 ) );
 	EXPECT_EQ( 0u, bit_shiftr( uint32_t( 1 ), 1 ) );
 	EXPECT_EQ( 0x7FFFFFFFu, bit_shiftr( uint32_t( -1 ), 1 ) );
-	EXPECT_EQ( uint64_t( 0 ), bit_shiftr( uint64_t( 1 ), 1 ) );
-	EXPECT_EQ( uint64_t( 0x7FFFFFFFFFFFFFFF ), bit_shiftr( uint64_t( -1 ), 1 ) );
+	EXPECT_EQ( uint64_t( 0u ), bit_shiftr( uint64_t( 1 ), 1 ) );
+	EXPECT_EQ( uint64_t( 0x7FFFFFFFFFFFFFFFu ), bit_shiftr( uint64_t( -1 ), 1 ) );
 }
 
 TEST( BitTest, BitCShift )
 {
 	// Signed: Explicit casts because bit patterns are unsigned
 	EXPECT_EQ( 0x02, bit_cshift( int8_t( 1 ), 1 ) );
-	EXPECT_EQ( int8_t( 0x80 ), bit_cshift( int8_t( 1 ), -1 ) );
-	EXPECT_EQ( int8_t( 0xFF ), bit_cshift( int8_t( -1 ), 1 ) );
-	EXPECT_EQ( int8_t( 0xFF ), bit_cshift( int8_t( -1 ), -1 ) );
+	EXPECT_EQ( int8_t( -128 ), bit_cshift( int8_t( 1 ), -1 ) );
+	EXPECT_EQ( int8_t( -1 ), bit_cshift( int8_t( -1 ), 1 ) );
+	EXPECT_EQ( int8_t( -1 ), bit_cshift( int8_t( -1 ), -1 ) );
 	EXPECT_EQ( 0x0002, bit_cshift( int16_t( 1 ), 1 ) );
-	EXPECT_EQ( int16_t( 0x8000 ), bit_cshift( int16_t( 1 ), -1 ) );
-	EXPECT_EQ( int16_t( 0xFFFF ), bit_cshift( int16_t( -1 ), 1 ) );
-	EXPECT_EQ( int16_t( 0xFFFF ), bit_cshift( int16_t( -1 ), -1 ) );
+	EXPECT_EQ( int16_t( -32768 ), bit_cshift( int16_t( 1 ), -1 ) );
+	EXPECT_EQ( int16_t( -1 ), bit_cshift( int16_t( -1 ), 1 ) );
+	EXPECT_EQ( int16_t( -1 ), bit_cshift( int16_t( -1 ), -1 ) );
 	EXPECT_EQ( 0x00000002, bit_cshift( int32_t( 1 ), 1 ) );
 	EXPECT_EQ( int32_t( 0x80000000 ), bit_cshift( int32_t( 1 ), -1 ) );
 	EXPECT_EQ( int32_t( 0xFFFFFFFF ), bit_cshift( int32_t( -1 ), 1 ) );
@@ -543,6 +545,7 @@ TEST( BitTest, BitMove )
 
 TEST( BitTest, BitTransfer )
 {
+#pragma warning( suppress : 4127 )
 	if ( sizeof( float ) == 4u ) {
 		int32_t i( 123 );
 		float x;

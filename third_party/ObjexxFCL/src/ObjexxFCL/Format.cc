@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -78,10 +78,10 @@ typedef  std::vector< Format * >  Formats;
 	void
 	Format::skip( std::istream & stream, Size const w )
 	{
-		static std::string const STOPPERS( "\r\n" + std::string( 1, std::istream::traits_type::eof() ) );
+		static std::string const STOPPERS( "\r\n" + std::string( 1, static_cast< char >( std::istream::traits_type::eof() ) ) );
 		char c;
 		Size i( 0 );
-		while ( ( i < w ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
+		while ( ( i < w ) && stream && not_any_of( static_cast< char >( stream.peek() ), STOPPERS ) ) {
 			stream.get( c );
 			++i;
 		}
@@ -92,10 +92,10 @@ typedef  std::vector< Format * >  Formats;
 	EntryFormatLD
 	Format::read_ld( std::istream & stream, bool const numeric, char const mode )
 	{
-		static char const eof( std::istream::traits_type::eof() );
+		static char const eof( static_cast< char >( std::istream::traits_type::eof() ) );
 		static std::string const STOPPERS( "\r\n" + std::string( 1, eof ) );
 		std::string s;
-		char c( '\0' ), q( '\0' ), peek( stream.peek() );
+		char c( '\0' ), q( '\0' ), peek( static_cast< char >( stream.peek() ) );
 		bool in_body( false );
 		bool in_quote( false );
 		bool has_repeat( false );
@@ -103,19 +103,19 @@ typedef  std::vector< Format * >  Formats;
 		while ( stream && ( s.empty() || ( peek != eof ) ) && ( ( ! numeric ) || ( peek != ')' ) ) ) {
 			stream.get( c );
 			if ( stream ) {
-				peek = stream.peek();
+				peek = static_cast< char >( stream.peek() );
 				if ( in_quote ) { // In quote-wrapped string
 					if ( c == q ) {
 						if ( ( mode == 'F' ) && ( peek == q ) ) { // Fortran-style escaped quote
 							stream.get( c );
-							peek = stream.peek();
+							peek = static_cast< char >( stream.peek() );
 							s += c; // Add the quote without the repeat
 						} else { // End of quote
 							break;
 						}
 					} else if ( ( c == '\\' ) && ( mode == 'C' ) && ( peek == q ) ) { // C-style escaped quote
 						stream.get( c );
-						peek = stream.peek();
+						peek = static_cast< char >( stream.peek() );
 						s += c; // Add the quote without escaping
 					} else if ( c == '\n' ) {
 						// Discard and keep going until quote is closed
@@ -159,7 +159,7 @@ typedef  std::vector< Format * >  Formats;
 		}
 		if ( stream && ( c != eof ) ) { // Remove trailing separators before next item
 			while ( stream && not_any_of( peek, STOPPERS ) ) {
-				peek = stream.peek();
+				peek = static_cast< char >( stream.peek() );
 				if ( is_space_ld( peek ) ) { // Separator
 					stream.ignore(); // Skip over separator
 				} else if ( peek == ',' ) { // Closing comma separator
@@ -198,14 +198,14 @@ typedef  std::vector< Format * >  Formats;
 	std::string
 	Format::read( std::istream & stream, Size const w )
 	{
-		static char const eof( std::istream::traits_type::eof() );
+		static char const eof( static_cast< char >( std::istream::traits_type::eof() ) );
 		static std::string const STOPPERS( "\r\n" + std::string( 1, eof ) );
 		std::string s;
 		if ( ! stream ) return s; // Leave stream state alone
 		if ( stream.peek() == eof ) return s; // At eof: Want eof bit set
 		char c;
 		Size i( 0 );
-		while ( ( ( w == NOSIZE ) || ( i < w ) ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
+		while ( ( ( w == NOSIZE ) || ( i < w ) ) && stream && not_any_of( static_cast< char >( stream.peek() ), STOPPERS ) ) {
 			stream.get( c );
 			if ( stream ) s += c;
 			++i;
@@ -218,13 +218,13 @@ typedef  std::vector< Format * >  Formats;
 	std::string
 	Format::read_float( std::istream & stream, Size const w )
 	{
-		static std::string const STOPPERS( "\r\n" + std::string( 1, std::istream::traits_type::eof() ) );
+		static std::string const STOPPERS( "\r\n" + std::string( 1, static_cast< char >( std::istream::traits_type::eof() ) ) );
 		static std::string const WHITE( " \t\0", 3 );
 		std::string s;
 		char c;
 		bool in_num( false ), in_E( false );
 		Size i( 0 );
-		while ( ( ( w == NOSIZE ) || ( i < w ) ) && stream && not_any_of( stream.peek(), STOPPERS ) ) {
+		while ( ( ( w == NOSIZE ) || ( i < w ) ) && stream && not_any_of( static_cast< char >( stream.peek() ), STOPPERS ) ) {
 			stream.get( c );
 			if ( c == 'D' ) {
 				c = 'E';
@@ -1198,24 +1198,24 @@ alpha_token( Tokens const & tokens )
 			FormatList * fl( new FormatList( p ) );
 			Formats formats;
 			for ( Tokens::size_type i = 0, e = tokens.size(); i < e; ++i ) {
-				Token const & token( tokens[ i ] );
-				if ( ( is_ulong( token ) || ( token == "*" ) ) && ( i + 2 < e ) ) { // Paren group with repeat count?
+				Token const & token_i( tokens[ i ] );
+				if ( ( is_ulong( token_i ) || ( token_i == "*" ) ) && ( i + 2 < e ) ) { // Paren group with repeat count?
 					if ( tokens[ i + 1 ] == "(" ) {
 						if ( tokens[ i + 2 ] == ")" ) { // Empty paren group
-							Size const r( is_ulong( token ) ? ulong_of( token ) : static_cast< Size >( -1 ) ); //Do Flag * as infinite repeat
+							Size const r( is_ulong( token_i ) ? ulong_of( token_i ) : static_cast< Size >( -1 ) ); //Do Flag * as infinite repeat
 							formats.push_back( new FormatGroupSub( fl, r ) );
 							i += 2;
 						} else if ( ( i + 3 < e ) && ( tokens[ i + 3 ] == ")" ) ) { // Paren group
-							Size const r( is_ulong( token ) ? ulong_of( token ) : static_cast< Size >( -1 ) ); //Do Flag * as infinite repeat
+							Size const r( is_ulong( token_i ) ? ulong_of( token_i ) : static_cast< Size >( -1 ) ); //Do Flag * as infinite repeat
 							FormatGroupSub * fg( new FormatGroupSub( fl, r ) );
 							fg->format( FormatFactory::create( tokens[ i + 2 ], fg ) );
 							formats.push_back( fg );
 							i += 3;
 						} else {
-							formats.push_back( FormatFactory::create( token, fl ) );
+							formats.push_back( FormatFactory::create( token_i, fl ) );
 						}
 					}
-				} else if ( ( token == "(" ) && ( i + 1 < e ) ) { // Paren group?
+				} else if ( ( token_i == "(" ) && ( i + 1 < e ) ) { // Paren group?
 					if ( tokens[ i + 1 ] == ")" ) { // Empty paren group
 						formats.push_back( new FormatGroupSub( fl ) );
 						i += 1;
@@ -1225,10 +1225,10 @@ alpha_token( Tokens const & tokens )
 						formats.push_back( fg );
 						i += 2;
 					} else {
-						formats.push_back( FormatFactory::create( token, fl ) );
+						formats.push_back( FormatFactory::create( token_i, fl ) );
 					}
 				} else {
-					formats.push_back( FormatFactory::create( token, fl ) );
+					formats.push_back( FormatFactory::create( token_i, fl ) );
 				}
 			}
 			fl->formats( formats );

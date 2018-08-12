@@ -10,10 +10,6 @@ This is the ObjexxFCL **C** variant, which uses a row-major array memory layout.
 This variant omits the optional automatic dimensioning system of the A variant for simplicity and performance.
 This variant omits the Fstring Fortran-style string type and is meant for use with code that has been migrated to std::string.
 
-## Version
-
-This is version **4.2**.
-
 ## Documentation
 
 See the [ObjexxFCL documentation](doc/ObjexxFCL.html) for library building and usage information.

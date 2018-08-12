@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -15,6 +15,7 @@
 #include <ObjexxFCL/Backspace.hh>
 #include <ObjexxFCL/GlobalStreams.hh>
 #include <ObjexxFCL/IOFlags.hh>
+#include <ObjexxFCL/lock_guard.hh>
 #include <ObjexxFCL/Stream.hh>
 #include <ObjexxFCL/stream.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -39,8 +40,14 @@
 namespace ObjexxFCL {
 namespace gio {
 
-// Data
+// Globals
 std::string const LF( "\n" ); // Linefeed
+
+#ifdef OBJEXXFCL_THREADS
+namespace { // Internal shared global
+std::mutex global_stream_mutex;
+}
+#endif
 
 // Streams Collection
 inline
@@ -57,12 +64,14 @@ streams()
 int
 get_unit()
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	return streams().next_unit(); // Negative Unit => failure
 }
 
 Name
 def_name( Unit const unit )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream const * const Stream_p( streams()[ unit ] );
 	if ( Stream_p && Stream_p->is_open() && ( ! Stream_p->name().empty() ) ) { // As-is behavior is the default
 		return Stream_p->name();
@@ -77,6 +86,7 @@ def_name( Unit const unit, IOFlags const & flags )
 	if ( flags.scratch() ) { // Scratch file name
 		return Name( Stream::scratch_name() );
 	} else if ( flags.asis() ) { // Same name if already connected
+		OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 		Stream const * const p( streams()[ unit ] );
 		if ( p && p->is_open() && ( ! p->name().empty() ) && p->asis_compatible( flags ) ) {
 			return p->name();
@@ -95,6 +105,7 @@ bool
 open( Unit const unit, Name const & name, IOFlags & flags )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	if ( flags.asis() ) {
 		Stream * const p( streams()[ unit ] );
 		if ( ( p != nullptr ) && p->is_open() && ( p->name() == name ) && p->asis_compatible( flags ) ) { // Case-sensitive name comparison used
@@ -171,6 +182,7 @@ open( Unit const unit )
 Unit
 open( Name const & name, IOFlags & flags )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Unit const unit( streams().next_unit() );
 	open( unit, name, flags );
 	return unit;
@@ -180,6 +192,7 @@ open( Name const & name, IOFlags & flags )
 Unit
 open( Name const & name, std::ios_base::openmode const mode )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Unit const unit( streams().next_unit() );
 	open( unit, name, mode );
 	return unit;
@@ -189,6 +202,7 @@ open( Name const & name, std::ios_base::openmode const mode )
 Unit
 open( Name const & name )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Unit const unit( streams().next_unit() );
 	open( unit, name );
 	return unit;
@@ -198,6 +212,7 @@ open( Name const & name )
 Unit
 open( IOFlags & flags )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Unit const unit( streams().next_unit() );
 	open( unit, def_name( unit ), flags );
 	return unit;
@@ -207,6 +222,7 @@ open( IOFlags & flags )
 Unit
 open()
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Unit const unit( streams().next_unit() );
 	open( unit, def_name( unit ) );
 	return unit;
@@ -218,6 +234,7 @@ open()
 ReadStream
 read( Unit const unit, std::string const & fmt, bool const beg )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -231,6 +248,7 @@ read( Unit const unit, std::string const & fmt, bool const beg )
 ReadStream
 read( Unit const unit, Fmt const & fmt, bool const beg )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -244,6 +262,7 @@ read( Unit const unit, Fmt const & fmt, bool const beg )
 ReadStream
 read( Unit const unit, Fmt & fmt, bool const beg )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -258,6 +277,7 @@ ReadStream
 read( Unit const unit, std::string const & fmt, IOFlags & flags, bool const beg )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -273,6 +293,7 @@ ReadStream
 read( Unit const unit, Fmt const & fmt, IOFlags & flags, bool const beg )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -288,6 +309,7 @@ ReadStream
 read( Unit const unit, Fmt & fmt, IOFlags & flags, bool const beg )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -344,6 +366,7 @@ read( Fmt & fmt, IOFlags & flags )
 void
 read_line( Unit const unit, std::string & line )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -357,6 +380,7 @@ void
 read_line( Unit const unit, IOFlags & flags, std::string & line )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -374,6 +398,7 @@ read_line( Unit const unit, IOFlags & flags, std::string & line )
 std::istream *
 inp_stream( Unit const unit )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	return ( Stream_p ? dynamic_cast< std::istream * >( &Stream_p->stream() ) : nullptr );
 }
@@ -384,6 +409,7 @@ inp_stream( Unit const unit )
 Write
 write( Unit const unit, std::string const & fmt )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -397,6 +423,7 @@ write( Unit const unit, std::string const & fmt )
 Write
 write( Unit const unit, Fmt const & fmt )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -410,6 +437,7 @@ write( Unit const unit, Fmt const & fmt )
 Write
 write( Unit const unit, Fmt & fmt )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -424,6 +452,7 @@ Write
 write( Unit const unit, std::string const & fmt, IOFlags & flags )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -442,6 +471,7 @@ Write
 write( Unit const unit, Fmt const & fmt, IOFlags & flags )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -460,6 +490,7 @@ Write
 write( Unit const unit, Fmt & fmt, IOFlags & flags )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -477,6 +508,7 @@ write( Unit const unit, Fmt & fmt, IOFlags & flags )
 void
 write( Unit const unit )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
@@ -531,6 +563,7 @@ write( Fmt & fmt, IOFlags & flags )
 std::ostream *
 out_stream( Unit const unit )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * const Stream_p( streams()[ unit ] );
 	return ( Stream_p ? dynamic_cast< std::ostream * >( &Stream_p->stream() ) : nullptr );
 }
@@ -571,6 +604,7 @@ print()
 void
 flush( Unit const unit )
 {
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * const Stream_p( streams()[ unit ] );
 	if ( ( Stream_p ) && ( Stream_p->write() ) ) { // Writeable global stream
 		if ( Stream_p->is_open() ) {
@@ -587,6 +621,7 @@ void
 inquire( Unit const unit, IOFlags & flags )
 {
 	flags.clear();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * const Stream_p( streams()[ unit ] );
 	if ( Stream_p ) { // Global stream
 		flags.unit( unit );
@@ -617,6 +652,7 @@ inquire( Name const & name, IOFlags & flags )
 {
 	flags.clear();
 	flags.name( name );
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * const Stream_p( streams()[ name ] );
 	if ( Stream_p ) { // Global stream
 		flags.unit( streams().unit( name ) );
@@ -689,6 +725,7 @@ void
 backspace( Unit const unit, IOFlags & flags )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * const Stream_p( streams()[ unit ] );
 	if ( Stream_p ) { // Global stream
 		if ( Stream_p->is_open() ) {
@@ -719,10 +756,11 @@ void
 rewind( Unit const unit, IOFlags & flags )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	auto Stream_p( dynamic_cast< Stream * >( streams()[ unit ] ) );
 	if ( Stream_p ) { // Global stream
 		if ( Stream_p->is_open() ) {
-			Stream_p->rewind( flags.truncate() );
+			if ( ! Stream_p->rewind( flags.truncate() ) ) flags.err( true ).ios( 20 );
 		} else {
 			flags.err( true ).ios( 11 );
 		}
@@ -755,6 +793,7 @@ void
 close( Unit const unit, IOFlags & flags )
 {
 	flags.clear_status();
+	OBJEXXFCL_LOCK_GUARD( global_stream_mutex );
 	Stream * const p( streams()[ unit ] );
 	if ( p ) {
 		p->close();

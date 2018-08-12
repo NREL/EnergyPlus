@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -37,7 +37,7 @@ TEST( ArraySTest, Array1SBasic )
 TEST( ArraySTest, Array1SSingleIndexSlice )
 {
 	Array1D_int a( 5, { 1, 2, 3, 4, 5 } );
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+#if defined(_MSC_VER) && _MSC_VER < 1900 && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
 	Array1S_int s( a( {2,_} ) ); // 2 acts as the lower index
 #else
 	Array1S_int s( a( {2} ) ); // 2 acts as the lower index

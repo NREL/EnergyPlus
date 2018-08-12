@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -23,6 +23,7 @@
 #include <ObjexxFCL/IOFlags.hh>
 
 // C++ Headers
+#include <cassert>
 #include <istream>
 #include <ostream>
 
@@ -34,6 +35,8 @@ Backspace( std::istream & stream )
 {
 	stream.clear();
 	std::streamoff g1( stream.tellg() ); // Current position
+	assert( g1 != std::streamoff( -1 ) ); // Non-seekable stream
+	if ( g1 == std::streamoff( -1 ) ) return; // Non-seekable stream
 	stream.seekg( 0, std::ios::beg ); // Beginning of file
 	std::streampos const g0( stream.tellg() );
 	stream.seekg( g1, std::ios::beg ); // Restore position
@@ -62,6 +65,8 @@ Backspace( std::ostream & stream )
 {
 	stream.clear();
 	std::streamoff p1( stream.tellp() ); // Current position
+	assert( p1 != std::streamoff( -1 ) ); // Non-seekable stream
+	if ( p1 == std::streamoff( -1 ) ) return; // Non-seekable stream
 	stream.seekp( 0, std::ios::beg ); // Beginning of file
 	std::streampos const p0( stream.tellp() );
 	stream.seekp( p1, std::ios::beg ); // Restore position

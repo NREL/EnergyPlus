@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -117,13 +117,13 @@ protected: // Creation
 	// Star Constructor
 	Format( Format * p, char const star ) :
 	 p_( p ),
-	 r_( -1 ),
+	 r_( Size( -1 ) ),
 	 u_( true ),
 	 i_( 0ul )
 	{
 		assert( star == '*' );
 #ifdef NDEBUG
-		static_cast< void const >( star ); // Suppress unused warning
+		static_cast< void >( star ); // Suppress unused warning
 #endif
 	}
 
@@ -3142,36 +3142,82 @@ protected: // Methods
 	}
 
 	// Read Integer from String and Reinterpret as Type T
-	template< typename T >
+	template< typename T, typename std::enable_if< ( sizeof( T ) < sizeof( int ) ), int >::type = 0 >
 	void
 	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
 	{
 		if ( is_int_base( s ) ) {
 			long int const l( read_int_base( stream, s ) );
-			bool ok( true );
-			if ( sizeof( T ) < sizeof( int ) ) {
-				ok = ( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
-				int const v( l );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
-			} else if ( sizeof( T ) == sizeof( int ) ) {
-				ok = ( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
-				int const v( l );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else if ( sizeof( T ) == sizeof( long int ) ) {
-				void const * vp( &l );
-				t = *reinterpret_cast< T const * >( vp );
-			} else if ( sizeof( T ) == sizeof( long long int ) ) {
-				long long int const v( l );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else {
-				long long int const v( l );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
-			}
+			bool const ok( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
+			int const v( l );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
 			if ( ! ok ) io_err( stream );
+		} else { // Bad input
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Integer from String and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) == sizeof( int ) ), int >::type = 0 >
+	void
+	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
+	{
+		if ( is_int_base( s ) ) {
+			long int const l( read_int_base( stream, s ) );
+			bool const ok( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
+			int const v( l );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+			if ( ! ok ) io_err( stream );
+		} else { // Bad input
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Integer from String and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( int ) ) && ( sizeof( T ) <= sizeof( long int ) ), int >::type = 0 >
+	void
+	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
+	{
+		if ( is_int_base( s ) ) {
+			long int const l( read_int_base( stream, s ) );
+			void const * vp( &l );
+			t = *reinterpret_cast< T const * >( vp );
+		} else { // Bad input
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Integer from String and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( long int ) ) && ( sizeof( T ) <= sizeof( long long int ) ), int >::type = 0 >
+	void
+	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
+	{
+		if ( is_int_base( s ) ) {
+			long int const l( read_int_base( stream, s ) );
+			long long int const v( l );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+		} else { // Bad input
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Integer from String and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( long long int ) ), int >::type = 0 >
+	void
+	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
+	{
+		if ( is_int_base( s ) ) {
+			long int const l( read_int_base( stream, s ) );
+			long long int const v( l );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
 		} else { // Bad input
 			t = T( 0 );
 			io_err( stream );
@@ -3968,39 +4014,88 @@ protected: // Methods
 	}
 
 	// Read Value from Stream and Reinterpret as Type T
-	template< typename T >
+	template< typename T, typename std::enable_if< ( sizeof( T ) < sizeof( float ) ), int >::type = 0 >
 	void
 	read_val_reinterpret( std::istream & stream, T & t ) const
 	{
 		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
 		if ( s.length() > 0 ) {
-			bool ok( true );
-			if ( sizeof( T ) < sizeof( float ) ) {
-				ok = is_type< float >( s );
-				float const v( val_of< float >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
-			} else if ( sizeof( T ) == sizeof( float ) ) {
-				ok = is_type< float >( s );
-				float const v( val_of< float >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else if ( sizeof( T ) == sizeof( double ) ) {
-				ok = is_type< double >( s );
-				double const v( val_of< double >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else if ( sizeof( T ) == sizeof( long double ) ) {
-				ok = is_type< long double >( s );
-				long double const v( val_of< long double >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else {
-				ok = is_type< long double >( s );
-				long double const v( val_of< long double >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
-			}
+			bool const ok( is_type< float >( s ) );
+			float const v( val_of< float >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) == sizeof( float ) ), int >::type = 0 >
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
+		if ( s.length() > 0 ) {
+			bool const ok( is_type< float >( s ) );
+			float const v( val_of< float >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( float ) ) && ( sizeof( T ) <= sizeof( double ) ), int >::type = 0 >
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
+		if ( s.length() > 0 ) {
+			bool const ok( is_type< double >( s ) );
+			double const v( val_of< double >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( double ) ) && ( sizeof( T ) <= sizeof( long double ) ), int >::type = 0 >
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
+		if ( s.length() > 0 ) {
+			bool const ok( is_type< long double >( s ) );
+			long double const v( val_of< long double >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( long double ) ), int >::type = 0 >
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
+		if ( s.length() > 0 ) {
+			bool const ok( is_type< long double >( s ) );
+			long double const v( val_of< long double >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
 			if ( ! ok ) io_err( stream );
 		} else { // Nothing read
 			t = T( 0 );

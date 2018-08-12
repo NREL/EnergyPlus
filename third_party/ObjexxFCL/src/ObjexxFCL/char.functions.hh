@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -68,7 +68,7 @@ bool
 is_consonant( char const c )
 {
 	static std::string const vowels( "aeiou" );
-	return ( ( std::isalpha( c ) != 0 ) && ( vowels.find( std::tolower( c ) ) == std::string::npos ) );
+	return ( ( std::isalpha( c ) != 0 ) && ( vowels.find( static_cast< char >( std::tolower( c ) ) ) == std::string::npos ) );
 }
 
 // char is a Vowel?
@@ -77,7 +77,7 @@ bool
 is_vowel( char const c )
 {
 	static std::string const vowels( "aeiou" );
-	return ( vowels.find( std::tolower( c ) ) != std::string::npos );
+	return ( vowels.find( static_cast< char >( std::tolower( c ) ) ) != std::string::npos );
 }
 
 // char is Alphanumeric?
@@ -320,7 +320,7 @@ char
 to_lower( char const c )
 {
 	int const i( static_cast< int >( c ) );
-	return ( ( ( 65 <= i ) && ( i <= 90 ) ) || ( ( 192 <= i ) && ( i <= 223 ) ) ? i + 32 : i );
+	return static_cast< char >( ( ( 65 <= i ) && ( i <= 90 ) ) || ( ( 192 <= i ) && ( i <= 223 ) ) ? i + 32 : i );
 }
 
 // Uppercased 8-bit ASCII char
@@ -329,7 +329,7 @@ char
 to_upper( char const c )
 {
 	int const i( static_cast< int >( c ) );
-	return ( ( ( 97 <= i ) && ( i <= 122 ) ) || ( ( 224 <= i ) && ( i <= 255 ) ) ? i - 32 : i );
+	return static_cast< char >( ( ( 97 <= i ) && ( i <= 122 ) ) || ( ( 224 <= i ) && ( i <= 255 ) ) ? i - 32 : i );
 }
 
 } // ObjexxFCL

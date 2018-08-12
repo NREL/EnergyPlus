@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -2343,6 +2343,8 @@ TEST( Array2Test, Transpose )
 		EXPECT_EQ( A( 2, 1 ), B( 1, 2 ) );
 		EXPECT_EQ( A( 2, 2 ), B( 2, 2 ) );
 		EXPECT_EQ( A( 2, 3 ), B( 3, 2 ) );
+		Array2D_int C( transpose( B ) );
+		EXPECT_TRUE( eq( A, C ) );
 	}
 	{
 		Array2D_int A( 2, {-1,1} );

@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -376,21 +376,14 @@ public: // Properties
 	Size
 	size() const
 	{
-		std::istream & s( const_cast< std::istream & >( stream_ ) );
-		std::streamoff const pc( s.tellg() ); // Current position
-		s.seekg( 0, std::ios::beg ); // Beginning of file
-		std::streampos const pb( s.tellg() );
-		s.seekg( 0, std::ios::end ); // End of file
-		std::streampos const pe( s.tellg() );
-		s.seekg( pc, std::ios::beg ); // Restore position
-		return pe - pb;
+		return 0;
 	}
 
 	// Position
 	Pos
 	pos() const
 	{
-		return const_cast< std::istream & >( stream_ ).tellg();
+		return 0;
 	}
 
 public: // Operators
@@ -419,17 +412,6 @@ public: // Operators
 	operator ()()
 	{
 		return stream_;
-	}
-
-public: // Methods
-
-	// Rewind
-	bool
-	rewind( bool const = true )
-	{
-		stream_.clear();
-		stream_.seekg( 0, std::ios::beg );
-		return true;
 	}
 
 private: // Data
@@ -506,21 +488,14 @@ public: // Properties
 	Size
 	size() const
 	{
-		std::ostream & s( const_cast< std::ostream & >( stream_ ) );
-		std::streamoff const pc( s.tellp() ); // Current position
-		s.seekp( 0, std::ios::beg ); // Beginning of file
-		std::streampos const pb( s.tellp() );
-		s.seekp( 0, std::ios::end ); // End of file
-		std::streampos const pe( s.tellp() );
-		s.seekp( pc, std::ios::beg ); // Restore position
-		return pe - pb;
+		return 0;
 	}
 
 	// Position
 	Pos
 	pos() const
 	{
-		return const_cast< std::ostream & >( stream_ ).tellp();
+		return 0;
 	}
 
 public: // Operators
@@ -549,17 +524,6 @@ public: // Operators
 	operator ()()
 	{
 		return stream_;
-	}
-
-public: // Methods
-
-	// Rewind
-	bool
-	rewind( bool const = true )
-	{
-		stream_.clear();
-		stream_.seekp( 0, std::ios::beg );
-		return true;
 	}
 
 private: // Data
@@ -636,21 +600,14 @@ public: // Properties
 	Size
 	size() const
 	{
-		std::iostream & s( const_cast< std::iostream & >( stream_ ) );
-		std::streamoff const pc( s.tellg() ); // Current position
-		s.seekg( 0, std::ios::beg ); // Beginning of file
-		std::streampos const pb( s.tellg() );
-		s.seekg( 0, std::ios::end ); // End of file
-		std::streampos const pe( s.tellg() );
-		s.seekg( pc, std::ios::beg ); // Restore position
-		return pe - pb;
+		return 0;
 	}
 
 	// Position
 	Pos
 	pos() const
 	{
-		return const_cast< std::iostream & >( stream_ ).tellg();
+		return 0;
 	}
 
 public: // Operators
@@ -679,18 +636,6 @@ public: // Operators
 	operator ()()
 	{
 		return stream_;
-	}
-
-public: // Methods
-
-	// Rewind
-	bool
-	rewind( bool const = true )
-	{
-		stream_.clear();
-		stream_.seekg( 0, std::ios::beg );
-		stream_.seekp( 0, std::ios::beg );
-		return true;
 	}
 
 private: // Data
@@ -1145,12 +1090,12 @@ public: // Properties
 	{
 		if ( stream_.is_open() ) {
 			std::ifstream & s( const_cast< std::ifstream & >( stream_ ) );
-			std::streamoff const pc( s.tellg() ); // Current position
+			std::streampos const pc( s.tellg() ); // Current position
 			s.seekg( 0, std::ios::beg ); // Beginning of file
 			std::streampos const pb( s.tellg() );
 			s.seekg( 0, std::ios::end ); // End of file
 			std::streampos const pe( s.tellg() );
-			s.seekg( pc, std::ios::beg ); // Restore position
+			s.seekg( pc ); // Restore position
 			return pe - pb;
 		} else if ( ! name().empty() ) {
 			struct stat fs;
@@ -1320,12 +1265,12 @@ public: // Properties
 	{
 		if ( stream_.is_open() ) {
 			std::ofstream & s( const_cast< std::ofstream & >( stream_ ) );
-			std::streamoff const pc( s.tellp() ); // Current position
+			std::streampos const pc( s.tellp() ); // Current position
 			s.seekp( 0, std::ios::beg ); // Beginning of file
 			std::streampos const pb( s.tellp() );
 			s.seekp( 0, std::ios::end ); // End of file
 			std::streampos const pe( s.tellp() );
-			s.seekp( pc, std::ios::beg ); // Restore position
+			s.seekp( pc ); // Restore position
 			return pe - pb;
 		} else if ( ! name().empty() ) {
 			struct stat fs;
@@ -1510,12 +1455,12 @@ public: // Properties
 	{
 		if ( stream_.is_open() ) {
 			std::fstream & s( const_cast< std::fstream & >( stream_ ) );
-			std::streamoff const pc( s.tellg() ); // Current position
+			std::streampos const pc( s.tellg() ); // Current position
 			s.seekg( 0, std::ios::beg ); // Beginning of file
 			std::streampos const pb( s.tellg() );
 			s.seekg( 0, std::ios::end ); // End of file
 			std::streampos const pe( s.tellg() );
-			s.seekg( pc, std::ios::beg ); // Restore position
+			s.seekg( pc ); // Restore position
 			return pe - pb;
 		} else if ( ! name().empty() ) {
 			struct stat fs;

@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -93,14 +93,12 @@ protected: // Types
 	using Super::move_or_copy_backward;
 	using Super::resize;
 	using Super::shift_set;
-	using Super::shift_only_set;
 	using Super::size_of;
 	using Super::swap1;
 
 	using Super::capacity_;
 	using Super::data_;
 	using Super::I_;
-	using Super::sdata_;
 	using Super::shift_;
 	using Super::size_;
 
@@ -109,7 +107,7 @@ public: // Creation
 	// Default Constructor
 	Array1D()
 	{
-		shift_ = 1; // For std::vector-like API
+		shift_ = 1; // For std::vector-like API: E.g., push_back on empty array needs 0-based indexing
 	}
 
 	// Copy Constructor
@@ -1259,7 +1257,7 @@ public: // Subscript
 	a( int const i ) const
 	{
 		assert( contains( i ) );
-		return Tail( static_cast< T const * >( sdata_ + i ), size_ - ( i - shift_ ) );
+		return Tail( static_cast< T const * >( data_ + i - shift_ ), size_ - ( i - shift_ ) );
 	}
 
 	// Tail Starting at array( i )
@@ -1267,7 +1265,7 @@ public: // Subscript
 	a( int const i )
 	{
 		assert( contains( i ) );
-		return Tail( sdata_ + i, size_ - ( i - shift_ ) );
+		return Tail( data_ + i - shift_, size_ - ( i - shift_ ) );
 	}
 
 public: // Predicate
@@ -1853,7 +1851,7 @@ private: // Functions
 	size_real( IR const & I )
 	{
 		I_.assign( I );
-		shift_only_set( I_.l() );
+		shift_set( I_.l() );
 		return resize( size_of( I_ ) );
 	}
 

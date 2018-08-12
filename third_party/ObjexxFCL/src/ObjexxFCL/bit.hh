@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -238,7 +238,7 @@ inline
 I
 bit_and( I const & i, J const & j )
 {
-	return ( i & j );
+	return static_cast< I >( i & j );
 }
 
 // Bitwise Inclusive Or
@@ -247,7 +247,7 @@ inline
 I
 bit_or( I const & i, J const & j )
 {
-	return ( i | j );
+	return static_cast< I >( i | j );
 }
 
 // Bitwise Exclusive Or
@@ -256,7 +256,7 @@ inline
 I
 bit_xor( I const & i, J const & j )
 {
-	return ( i ^ j );
+	return static_cast< I >( i ^ j );
 }
 
 // Bit Shifted
@@ -439,7 +439,7 @@ bit_dshiftr( I const & i, J const & j, S const & shift )
 	assert( shift >= S( 0 ) );
 	if ( shift == S( 0 ) ) return I( j );
 	auto const i_bits( bit_size( i ) );
-	I const ones( -1 );
+	I const ones( static_cast< I >( -1 ) );
 	return bit_or( ones & bit_shiftl( i, i_bits - shift ), bit_shiftr( j, shift ) );
 }
 

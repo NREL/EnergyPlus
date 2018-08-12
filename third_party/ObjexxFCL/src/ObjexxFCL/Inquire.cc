@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -41,12 +41,13 @@ std::streamsize
 size( std::istream const & stream )
 {
 	std::istream & s( const_cast< std::istream & >( stream ) );
-	std::streamoff const pc( s.tellg() ); // Current position
+	std::streampos const pc( s.tellg() ); // Current position
+	if ( pc == std::streampos( -1 ) ) return 0; // Non-seekable stream
 	s.seekg( 0, std::ios::beg ); // Beginning of file
 	std::streampos const pb( s.tellg() );
 	s.seekg( 0, std::ios::end ); // End of file
 	std::streampos const pe( s.tellg() );
-	s.seekg( pc, std::ios::beg ); // Restore position
+	s.seekg( pc ); // Restore position
 	return pe - pb;
 }
 
@@ -56,12 +57,13 @@ std::streamsize
 size( std::ostream const & stream )
 {
 	std::ostream & s( const_cast< std::ostream & >( stream ) );
-	std::streamoff const pc( s.tellp() ); // Current position
+	std::streampos const pc( s.tellp() ); // Current position
+	if ( pc == std::streampos( -1 ) ) return 0; // Non-seekable stream
 	s.seekp( 0, std::ios::beg ); // Beginning of file
 	std::streampos const pb( s.tellp() );
 	s.seekp( 0, std::ios::end ); // End of file
 	std::streampos const pe( s.tellp() );
-	s.seekp( pc, std::ios::beg ); // Restore position
+	s.seekp( pc ); // Restore position
 	return pe - pb;
 }
 
@@ -123,7 +125,8 @@ Inquire( std::istream const & stream, IOFlags & flags )
 	flags.open( true );
 	flags.read_on();
 	flags.size( size( stream ) );
-	flags.pos( const_cast< std::istream & >( stream ).tellg() );
+	std::streampos const pos( const_cast< std::istream & >( stream ).tellg() );
+	flags.pos( pos == std::streampos( -1 ) ? std::streampos( 0 ) : pos );
 }
 
 // Inquire by ostream
@@ -135,7 +138,8 @@ Inquire( std::ostream const & stream, IOFlags & flags )
 	flags.open( true );
 	flags.write_on();
 	flags.size( size( stream ) );
-	flags.pos( const_cast< std::ostream & >( stream ).tellp() );
+	std::streampos const pos( const_cast< std::ostream & >( stream ).tellp() );
+	flags.pos( pos == std::streampos( -1 ) ? std::streampos( 0 ) : pos );
 }
 
 // Inquire by iostream
@@ -147,7 +151,8 @@ Inquire( std::iostream const & stream, IOFlags & flags )
 	flags.open( true );
 	flags.readwrite_on();
 	flags.size( size( stream ) );
-	flags.pos( const_cast< std::iostream & >( stream ).tellg() );
+	std::streampos const pos( const_cast< std::iostream & >( stream ).tellg() );
+	flags.pos( pos == std::streampos( -1 ) ? std::streampos( 0 ) : pos );
 }
 
 // Inquire by ifstream

@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -88,6 +88,7 @@ public: // Types
 	using Super::npos;
 	using Super::overlap;
 	using Super::size;
+	using Super::size_bounded;
 
 protected: // Types
 
@@ -98,7 +99,6 @@ protected: // Types
 
 	using Super::capacity_;
 	using Super::data_;
-	using Super::sdata_;
 	using Super::shift_;
 	using Super::size_;
 
@@ -1162,7 +1162,7 @@ public: // Subscript
 	operator ()( int const i ) const
 	{
 		assert( contains( i ) );
-		return sdata_[ i ];
+		return data_[ i - shift_ ];
 	}
 
 	// array( i )
@@ -1170,7 +1170,7 @@ public: // Subscript
 	operator ()( int const i )
 	{
 		assert( contains( i ) );
-		return sdata_[ i ];
+		return data_[ i - shift_ ];
 	}
 
 	// Linear Index
@@ -1185,7 +1185,7 @@ public: // Subscript
 	a( int const i ) const
 	{
 		assert( contains( i ) );
-		return Tail( static_cast< T const * >( sdata_ + i ), ( size_ != npos ? size_ - ( i - shift_ ) : npos ) );
+		return Tail( static_cast< T const * >( data_ + i - shift_ ), ( size_ != npos ? size_ - ( i - shift_ ) : npos ) );
 	}
 
 	// Tail Starting at array( i )
@@ -1193,7 +1193,7 @@ public: // Subscript
 	a( int const i )
 	{
 		assert( contains( i ) );
-		return Tail( sdata_ + i, ( size_ != npos ? size_ - ( i - shift_ ) : npos ) );
+		return Tail( data_ + i - shift_, ( size_ != npos ? size_ - ( i - shift_ ) : npos ) );
 	}
 
 public: // Slice Proxy Generators
@@ -1214,7 +1214,7 @@ public: // Slice Proxy Generators
 		return Array1S< T >( data_, -shift_, d );
 	}
 
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
+#if defined(_MSC_VER) && _MSC_VER < 1900 && !defined(__INTEL_COMPILER) // VC++2013 bug work-around
 
 	// array( {s} ) const
 	Array1S< T >
@@ -1449,9 +1449,10 @@ public: // Inspector
 	T
 	length() const
 	{
+		assert( size_bounded() );
 		T length_sq( T( 0 ) );
-		for ( int i = l(), e = u(); i <= e; ++i ) {
-			T const length_i( sdata_[ i ] );
+		for ( size_type i = 0; i < size_; ++i ) {
+			T const length_i( data_[ i ] );
 			length_sq += length_i * length_i;
 		}
 		return std::sqrt( length_sq );
@@ -1461,9 +1462,10 @@ public: // Inspector
 	T
 	length_squared() const
 	{
+		assert( size_bounded() );
 		T length_sq( T( 0 ) );
-		for ( int i = l(), e = u(); i <= e; ++i ) {
-			T const length_i( sdata_[ i ] );
+		for ( size_type i = 0; i < size_; ++i ) {
+			T const length_i( data_[ i ] );
 			length_sq += length_i * length_i;
 		}
 		return length_sq;

@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -115,8 +115,7 @@ protected: // Creation
 	 size_( 0u ),
 	 mem_( nullptr ),
 	 data_( nullptr ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{}
 
 	// Copy Constructor
@@ -127,8 +126,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( a.data_ != nullptr ? Aligned::allocate_zero( capacity_ ) : nullptr ),
 	 data_( a.data_ != nullptr ? Aligned::data( mem_ ) : nullptr ),
-	 shift_( a.shift_ ),
-	 sdata_( data_ - shift_ )
+	 shift_( a.shift_ )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			new ( data_ + i ) T( a.data_[ i ] );
@@ -143,11 +141,10 @@ protected: // Creation
 	 size_( a.size_ ),
 	 mem_( a.mem_ ),
 	 data_( a.data_ ),
-	 shift_( a.shift_ ),
-	 sdata_( a.sdata_ )
+	 shift_( a.shift_ )
 	{
 		a.capacity_ = a.size_ = 0u;
-		a.mem_ = a.data_ = a.sdata_ = nullptr;
+		a.mem_ = a.data_ = nullptr;
 		a.shift_ = 0;
 	}
 
@@ -160,8 +157,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( a.data_ != nullptr ? Aligned::allocate_zero( capacity_ ) : nullptr ),
 	 data_( a.data_ != nullptr ? Aligned::data( mem_ ) : nullptr ),
-	 shift_( a.shift_ ),
-	 sdata_( data_ - shift_ )
+	 shift_( a.shift_ )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			new ( data_ + i ) T( a.data_[ i ] );
@@ -177,8 +173,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{}
 
 	// MArray Constructor Template
@@ -190,8 +185,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{}
 
 	// Size Constructor
@@ -202,8 +196,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
 		T const fill( Traits::initial_array_value() );
@@ -224,8 +217,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{}
 
 	// Initializer List Constructor Template
@@ -236,8 +228,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{
 		auto il( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++il ) {
@@ -253,8 +244,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{
 		auto ia( a.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++ia ) {
@@ -270,8 +260,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{
 		auto iv( v.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++iv ) {
@@ -287,8 +276,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{
 		new ( &data_[ 0 ] ) T( v.x );
 		new ( &data_[ 1 ] ) T( v.y );
@@ -302,8 +290,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{
 		new ( &data_[ 0 ] ) T( v.x );
 		new ( &data_[ 1 ] ) T( v.y );
@@ -318,8 +305,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{
 		new ( &data_[ 0 ] ) T( v.x );
 		new ( &data_[ 1 ] ) T( v.y );
@@ -335,8 +321,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( Aligned::allocate_zero( capacity_ ) ),
 	 data_( Aligned::data( mem_ ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{
 		size_type i( 0u );
 		for ( Iterator ii = beg; ii != end; ++ii, ++i ) {
@@ -351,8 +336,7 @@ protected: // Creation
 	 size_( 0u ),
 	 mem_( nullptr ),
 	 data_( nullptr ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{}
 
 	// Array Proxy Constructor
@@ -362,8 +346,7 @@ protected: // Creation
 	 size_( a.size_ ),
 	 mem_( nullptr ),
 	 data_( a.data_ ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{}
 
 	// Slice Proxy Constructor
@@ -373,8 +356,7 @@ protected: // Creation
 	 size_( a.size() ),
 	 mem_( nullptr ),
 	 data_( a.data_beg_ ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{
 		assert( a.contiguous() );
 	}
@@ -386,8 +368,7 @@ protected: // Creation
 	 size_( capacity_ ),
 	 mem_( nullptr ),
 	 data_( s.data_ ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{}
 
 	// Value Proxy Constructor
@@ -397,8 +378,7 @@ protected: // Creation
 	 size_( npos ), // Unbounded
 	 mem_( nullptr ),
 	 data_( const_cast< T * >( &t ) ),
-	 shift_( 0 ),
-	 sdata_( nullptr )
+	 shift_( 0 )
 	{}
 
 public: // Creation
@@ -445,9 +425,8 @@ protected: // Assignment: Array
 		mem_ = a.mem_;
 		data_ = a.data_;
 		shift_ = a.shift_;
-		sdata_ = a.sdata_;
 		a.capacity_ = a.size_ = 0u;
-		a.mem_ = a.data_ = a.sdata_ = nullptr;
+		a.mem_ = a.data_ = nullptr;
 		a.shift_ = 0;
 	}
 
@@ -1539,7 +1518,7 @@ public: // Modifier
 	{
 		if ( owner_ ) destroy();
 		capacity_ = size_ = 0u;
-		mem_ = data_ = sdata_ = nullptr;
+		mem_ = data_ = nullptr;
 		shift_ = 0;
 		return *this;
 	}
@@ -1591,7 +1570,6 @@ public: // Modifier
 		swap( mem_, v.mem_ );
 		swap( data_, v.data_ );
 		swap( shift_, v.shift_ );
-		swap( sdata_, v.sdata_ );
 	}
 
 public: // Comparison: Predicate
@@ -2556,14 +2534,6 @@ protected: // Methods
 	shift_set( difference_type const shift )
 	{
 		shift_ = shift;
-		sdata_ = data_ - shift_;
-	}
-
-	// Shift Setup Without Setting Shifted Data Pointer
-	void
-	shift_only_set( difference_type const shift )
-	{
-		shift_ = shift;
 	}
 
 	// Active Array Size Setup
@@ -2585,7 +2555,6 @@ protected: // Methods
 			capacity_ = size_ = size;
 			mem_ = Aligned::allocate_zero( capacity_ );
 			data_ = Aligned::data( mem_ );
-			sdata_ = data_ - shift_;
 			return true; // Reallocated: Elements not constructed
 		} else {
 			size_type i( size_ );
@@ -2593,7 +2562,6 @@ protected: // Methods
 				data_[ --i ].~T();
 			}
 			size_ = size;
-			sdata_ = data_ - shift_;
 			return false; // Not reallocated
 		}
 	}
@@ -2612,7 +2580,6 @@ protected: // Methods
 			capacity_ = n;
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 		}
 	}
 
@@ -2629,7 +2596,6 @@ protected: // Methods
 			capacity_ = size_;
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 		}
 	}
 
@@ -2650,7 +2616,6 @@ protected: // Methods
 			destroy();
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 		} else {
 			new ( &data_[ size_ ] ) T( t );
 		}
@@ -2674,7 +2639,6 @@ protected: // Methods
 			destroy();
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 		} else {
 			new ( &data_[ size_ ] ) T( std::move( t ) );
 		}
@@ -2715,7 +2679,6 @@ protected: // Methods
 			size_ = new_size;
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 			return new_pos;
 		} else {
 			if ( pos == old_end ) {
@@ -2755,7 +2718,6 @@ protected: // Methods
 			size_ = new_size;
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 			return new_pos;
 		} else {
 			if ( pos == old_end ) {
@@ -2794,7 +2756,6 @@ protected: // Methods
 			size_ = new_size;
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 			return new_pos;
 		} else {
 			if ( pos == old_end ) {
@@ -2844,7 +2805,6 @@ protected: // Methods
 			size_ = new_size;
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 			return new_pos;
 		} else {
 			if ( pos == old_end ) {
@@ -2887,7 +2847,6 @@ protected: // Methods
 			size_ = new_size;
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 			return new_pos;
 		} else {
 			if ( pos == old_end ) {
@@ -2930,7 +2889,6 @@ protected: // Methods
 			size_ = new_size;
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 			return new_pos;
 		} else {
 			if ( pos == old_end ) {
@@ -2963,7 +2921,6 @@ protected: // Methods
 			destroy();
 			mem_ = new_mem;
 			data_ = new_data;
-			sdata_ = data_ - shift_;
 		} else {
 			new ( &data_[ size_ ] ) T( std::forward< Args >( args )... );
 		}
@@ -3014,7 +2971,6 @@ protected: // Methods
 		size_ = a.size_;
 		data_ = a.data_;
 		shift_ = a.shift_;
-		sdata_ = data_ - shift_;
 	}
 
 	// Attach Proxy/Argument Array to Array of Same Rank
@@ -3026,7 +2982,6 @@ protected: // Methods
 		size_ = a.size_;
 		data_ = a.data_;
 		shift_ = a.shift_;
-		sdata_ = data_ - shift_;
 	}
 
 	// Attach Proxy/Argument Array to Const Array
@@ -3039,7 +2994,6 @@ protected: // Methods
 		size_ = a.size_;
 		data_ = a.data_;
 		shift_ = shift;
-		sdata_ = data_ - shift_;
 	}
 
 	// Attach Proxy/Argument Array to Array
@@ -3052,7 +3006,6 @@ protected: // Methods
 		size_ = a.size_;
 		data_ = a.data_;
 		shift_ = shift;
-		sdata_ = data_ - shift_;
 	}
 
 	// Attach Proxy/Argument Array to Const Tail
@@ -3065,7 +3018,6 @@ protected: // Methods
 		size_ = capacity_;
 		data_ = s.data_;
 		shift_ = shift;
-		sdata_ = data_ - shift_;
 	}
 
 	// Attach Proxy/Argument Array to Tail
@@ -3077,7 +3029,6 @@ protected: // Methods
 		capacity_ = size_ = s.size();
 		data_ = s.data_;
 		shift_ = shift;
-		sdata_ = data_ - shift_;
 	}
 
 	// Attach Proxy/Argument Array to Const Value
@@ -3089,7 +3040,6 @@ protected: // Methods
 		capacity_ = size_ = npos; // Unbounded
 		data_ = const_cast< T * >( &t );
 		shift_ = shift;
-		sdata_ = data_ - shift_;
 	}
 
 	// Attach Proxy/Argument Array to Value
@@ -3101,7 +3051,6 @@ protected: // Methods
 		capacity_ = size_ = npos; // Unbounded
 		data_ = &t;
 		shift_ = shift;
-		sdata_ = data_ - shift_;
 	}
 
 	// Detach Proxy/Argument Array
@@ -3110,7 +3059,7 @@ protected: // Methods
 	{
 		assert( ! owner_ );
 		capacity_ = size_ = 0u;
-		data_ = sdata_ = nullptr;
+		data_ = nullptr;
 		shift_ = 0;
 	}
 
@@ -3125,7 +3074,6 @@ protected: // Methods
 		std::swap( mem_, v.mem_ );
 		std::swap( data_, v.data_ );
 		std::swap( shift_, v.shift_ );
-		std::swap( sdata_, v.sdata_ );
 	}
 
 	// Initialize to Intializer
@@ -3243,9 +3191,8 @@ protected: // Methods
 		capacity_ = a.capacity_;
 		mem_ = a.mem_;
 		data_ = a.data_;
-		sdata_ = data_ - shift_;
 		a.capacity_ = a.size_ = 0u;
-		a.mem_ = a.data_ = a.sdata_ = nullptr;
+		a.mem_ = a.data_ = nullptr;
 		a.shift_ = 0;
 	}
 
@@ -3490,7 +3437,6 @@ protected: // Data
 	void * mem_; // Pointer to raw memory
 	T * data_; // Pointer to data array
 	difference_type shift_; // Array shift
-	T * sdata_; // Shifted pointer to data array
 
 }; // Array
 

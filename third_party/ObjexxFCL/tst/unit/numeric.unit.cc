@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -509,15 +509,15 @@ TEST( NumericTest, SCALE )
 TEST( NumericTest, FRACTION )
 {
 	EXPECT_EQ( 0, FRACTION( float() ) );
-	EXPECT_FLOAT_EQ( 0.5, FRACTION( float_min ) );
-	EXPECT_FLOAT_EQ( 0.5, FRACTION( float_max ) );
+	EXPECT_FLOAT_EQ( 0.5f, FRACTION( float_min ) );
+	EXPECT_FLOAT_EQ( 0.5f, FRACTION( float_max ) );
 	EXPECT_EQ( 0, FRACTION( double() ) );
 	EXPECT_DOUBLE_EQ( 0.5, FRACTION( double_min ) );
 	EXPECT_DOUBLE_EQ( 0.5, FRACTION( double_max ) );
 	EXPECT_EQ( 0, FRACTION( longdouble() ) );
-#ifndef __INTEL_COMPILER
-	EXPECT_DOUBLE_EQ( 0.5, FRACTION( longdouble_min ) );
-	EXPECT_DOUBLE_EQ( 0.5, FRACTION( longdouble_max ) );
+#ifndef __INTEL_COMPILER // Avoid exception
+	EXPECT_DOUBLE_EQ( 0.5, static_cast< double >( FRACTION( longdouble_min ) ) );
+	EXPECT_DOUBLE_EQ( 0.5, static_cast< double >( FRACTION( longdouble_max ) ) );
 #endif
 	EXPECT_EQ( 0, FRACTION( float() ) );
 	EXPECT_EQ( 0, FRACTION( double() ) );

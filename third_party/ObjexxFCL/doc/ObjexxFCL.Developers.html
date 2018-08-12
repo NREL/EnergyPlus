@@ -5,7 +5,7 @@
 	<title>ObjexxFCL Developers Guide</title>
 	<meta name="description" content="Objexx Fortran-C++ Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<meta name="copyright" content="Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.">
 	<link rel="icon" type="image/png" href="img/favicon.png">
 	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
 </head>
@@ -16,7 +16,7 @@
 		<td></td>
 		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
 		<td></td>
-		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.3</div></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -385,6 +385,9 @@
 			</ul>
 			<p><span class="source">ChunkVector::resize</span> was written to take advantage of the ability to swap the old Chunks into the new outer std::vector instead of expensively copying each Chunk as <span class="source">std::vector::resize</span> would do.</p>
 			<hr />
+			<h3>Multithreading</h3>
+			<p class="body">The ObjexxFCL uses a few non-const global and class or function local static variables where needed. These can be protected for use in a multithreading environment by defining <span class="source">OBJEXXFCL_THREADS</span> when compiling ObjexxFCL and application code.</p>
+			<hr />
 		</td>
 		<td></td>
 		<td width="100%" valign="top">
@@ -410,7 +413,7 @@
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2018 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>

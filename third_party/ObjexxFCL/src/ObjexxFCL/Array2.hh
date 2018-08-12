@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2018 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -92,7 +92,6 @@ protected: // Types
 	using Super::swapB;
 
 	using Super::data_;
-	using Super::sdata_;
 	using Super::shift_;
 	using Super::size_;
 
@@ -857,7 +856,7 @@ public: // Subscript
 	operator ()( int const i1, int const i2 ) const
 	{
 		assert( contains( i1, i2 ) );
-		return sdata_[ ( i1 * z2_ ) + i2 ];
+		return data_[ ( i1 * z2_ ) + i2 - shift_ ];
 	}
 
 	// array( i1, i2 )
@@ -865,7 +864,7 @@ public: // Subscript
 	operator ()( int const i1, int const i2 )
 	{
 		assert( contains( i1, i2 ) );
-		return sdata_[ ( i1 * z2_ ) + i2 ];
+		return data_[ ( i1 * z2_ ) + i2 - shift_ ];
 	}
 
 	// Linear Index
