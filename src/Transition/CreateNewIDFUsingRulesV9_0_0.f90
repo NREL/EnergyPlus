@@ -311,6 +311,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ENDDO
 
      ! Begin Pre-process fenestration surfaces for transition from WindowProperty:ShadingControl to WindowShadingControl
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(FenSurf)) DEALLOCATE(FenSurf)
+          IF(ALLOCATED(ShadeControls)) DEALLOCATE(ShadeControls)
           TotWinObjs = GetNumObjectsFound('FENESTRATIONSURFACE:DETAILED') + GetNumObjectsFound('WINDOW') + GetNumObjectsFound('GLAZEDDOOR')
           TotBaseSurfObjs = GetNumObjectsFound('BUILDINGSURFACE:DETAILED') + GetNumObjectsFound('WALL:DETAILED') + GetNumObjectsFound('ROOFCEILING:DETAILED') + GetNumObjectsFound('FLOOR:DETAILED')
           TotBaseSurfObjs = TotBaseSurfObjs + GetNumObjectsFound('WALL:EXTERIOR') + GetNumObjectsFound('WALL:ADIABATIC') + GetNumObjectsFound('WALL:UNDERGROUND') + GetNumObjectsFound('WALL:INTERZONE')
@@ -502,7 +505,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ENDDO
             ENDDO
           ENDDO
-     ! Begin Pre-process fenestration surfaces for transition from WindowProperty:ShadingControl to WindowShadingControl
+     ! End Pre-process fenestration surfaces for transition from WindowProperty:ShadingControl to WindowShadingControl
 
           DO Num=1,NumIDFRecords
 
@@ -615,6 +618,25 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 CurArgs = CurArgs + 1
 
               ! If your original object starts with A, insert the rules here
+              CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:OUTDOORAIRFLOW')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                ! Trusting that a previously working file only has one outdoor air mixer
+                CALL GetObjectItem('OUTDOORAIR:MIXER',1,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                OutArgs(2) = Alphas(1) ! Outdoor Air Mixer Name
+                OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
+                CurArgs = CurArgs + 1
+                nodiff = .false.
+
+              CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:RELIEFAIRFLOW')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                ! Trusting that a previously working file only has one outdoor air mixer
+                CALL GetObjectItem('OUTDOORAIR:MIXER',1,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                OutArgs(2) = Alphas(1) ! Outdoor Air Mixer Name
+                OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
+                CurArgs = CurArgs + 1
+                nodiff = .false.
 
               ! If your original object starts with B, insert the rules here
               CASE('BOILER:HOTWATER')
@@ -695,11 +717,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! lots of stuff . . . for transition, make a separate new WindowShadingControl object for each zone it is used in
                 ObjectName = 'WindowShadingControl'
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
+                OutArgs(4:CurArgs+2) = InArgs(2:CurArgs)
                 IF ( CurArgs .LT. 12) THEN
-                  OutArgs(CurArgs+1:13) = Blank
+                  OutArgs(CurArgs+3:14) = Blank
                 ENDIF
-                CurArgs = 13
+                CurArgs = 14
                 DO shadeCtrlNum=1,TotOldShadeControls
                   IF (.not. SameString(ShadeControls(shadeCtrlNum)%OldShadeControlName,InArgs(1))) CYCLE
                   IF (ShadeControls(shadeCtrlNum)%NumZones .GT. 0) THEN
@@ -707,14 +729,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      OutArgs(1) = TRIM(InArgs(1)) // '-' // TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum))
                      OutArgs(2) = TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum)) ! Zone Name
                      OutArgs(3) = RoundSigDigits(ShadeControls(shadeCtrlNum)%SequenceNum(newZoneNum),0) ! Shading Control Sequence Number
-                     OutArgs(14) = Blank ! Daylighting Control Name
-                      OutArgs(15) = 'Sequential' ! Multiple Surface Control Type
-                      CurArgs = 15
+                     OutArgs(15) = Blank ! Daylighting Control Name
+                      OutArgs(16) = 'Sequential' ! Multiple Surface Control Type
+                      CurArgs = 16
                       ! Find matching Daylighting control object, if any
                       DO daylightNum=1,GetNumObjectsFound('DAYLIGHTING:CONTROLS')
                         CALL GetObjectItem('DAYLIGHTING:CONTROLS',daylightNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
                         IF (.not. SameString(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum),Alphas(2))) CYCLE
-                        OutArgs(14) = TRIM(Alphas(1)) ! Daylighting Control Name
+                        OutArgs(15) = TRIM(Alphas(1)) ! Daylighting Control Name
                         EXIT
                       ENDDO
                       ! Add surface fields
@@ -734,9 +756,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     CALL ShowWarningError('WindowProperty:ShadingControl=""' // TRIM(InArgs(1)) // '" was not used by any surfaces, so it has not been written to the new idf.',Auditf)
                     !OutArgs(1) = InArgs(1)
                     !OutArgs(2) = Blank ! Zone Name (don't know that here)
-                    !OutArgs(14) = Blank ! Daylighting Control Name
-                    !OutArgs(15) = 'Sequential' ! Multiple Surface Control Type
-                    !CurArgs = 15
+                    !OutArgs(15) = Blank ! Daylighting Control Name
+                    !OutArgs(16) = 'Sequential' ! Multiple Surface Control Type
+                    !CurArgs = 16
                     nodiff = .false.
                     Written=.true.
                   ENDIF

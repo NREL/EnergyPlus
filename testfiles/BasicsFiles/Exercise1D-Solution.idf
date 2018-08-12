@@ -106,7 +106,6 @@
     ZONE SURFACE EAST,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -122,7 +121,6 @@
     ZONE SURFACE WEST,       !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices

@@ -1029,7 +1029,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:20,1,           !- Field 6
     Until: 22:00,0,          !- Field 8
@@ -1041,7 +1041,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:30,1,           !- Field 6
     Until: 22:00,0,          !- Field 8
@@ -1053,7 +1053,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:20,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1065,7 +1065,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:30,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1077,7 +1077,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:20,1,           !- Field 6
     Until: 7:00,0,           !- Field 8
@@ -1089,7 +1089,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:30,1,           !- Field 6
     Until: 7:00,0,           !- Field 8
@@ -1101,7 +1101,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:20,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1113,7 +1113,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:30,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1125,7 +1125,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:20,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1137,7 +1137,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:30,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1149,7 +1149,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 5:20,0,           !- Field 4
     Until: 5:40,1,           !- Field 6
     Until: 22:30,0,          !- Field 8
@@ -1161,7 +1161,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 5:20,0,           !- Field 4
     Until: 5:50,1,           !- Field 6
     Until: 22:30,0,          !- Field 8
@@ -1173,7 +1173,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 6:20,0,           !- Field 4
     Until: 6:50,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1185,7 +1185,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 6:20,0,           !- Field 4
     Until: 7:00,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1197,7 +1197,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 0:20,0,           !- Field 4
     Until: 0:40,1,           !- Field 6
     Until: 7:40,0,           !- Field 8
@@ -1209,7 +1209,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 0:20,0,           !- Field 4
     Until: 0:50,1,           !- Field 6
     Until: 7:40,0,           !- Field 8
@@ -1221,7 +1221,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 1:20,0,           !- Field 4
     Until: 1:40,1,           !- Field 6
     Until: 8:40,0,           !- Field 8
@@ -1233,7 +1233,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 1:20,0,           !- Field 4
     Until: 1:50,1,           !- Field 6
     Until: 8:40,0,           !- Field 8
@@ -1245,7 +1245,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 2:40,1,           !- Field 6
     Until: 9:40,0,           !- Field 8
@@ -1257,7 +1257,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 2:50,1,           !- Field 6
     Until: 9:40,0,           !- Field 8
@@ -1269,7 +1269,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:30,1,           !- Field 6
     Until: 10:00,0,          !- Field 8
@@ -1285,7 +1285,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:40,1,           !- Field 6
     Until: 10:00,0,          !- Field 8
@@ -1301,7 +1301,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:30,1,           !- Field 6
     Until: 11:00,0,          !- Field 8
@@ -1317,7 +1317,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:40,1,           !- Field 6
     Until: 11:00,0,          !- Field 8
@@ -1333,7 +1333,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:30,1,           !- Field 6
     Until: 7:01,0,           !- Field 8
@@ -1349,7 +1349,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:40,1,           !- Field 6
     Until: 7:01,0,           !- Field 8
@@ -1365,7 +1365,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:30,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1381,7 +1381,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:40,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1397,7 +1397,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:30,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1413,7 +1413,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:40,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1429,7 +1429,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 5:30,0,           !- Field 4
     Until: 6:00,1,           !- Field 6
     Until: 10:30,0,          !- Field 8
@@ -1445,7 +1445,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 5:30,0,           !- Field 4
     Until: 6:10,1,           !- Field 6
     Until: 10:30,0,          !- Field 8
@@ -1461,7 +1461,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 1:30,0,           !- Field 4
     Until: 2:00,1,           !- Field 6
     Until: 4:30,0,           !- Field 8
@@ -1483,7 +1483,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 1:30,0,           !- Field 4
     Until: 2:10,1,           !- Field 6
     Until: 4:30,0,           !- Field 8
@@ -1505,7 +1505,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 2:50,1,           !- Field 6
     Until: 5:20,0,           !- Field 8
@@ -1529,7 +1529,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 3:00,1,           !- Field 6
     Until: 5:20,0,           !- Field 8
@@ -1552,7 +1552,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 3:30,0,           !- Field 4
     Until: 4:00,1,           !- Field 6
     Until: 6:30,0,           !- Field 8
@@ -1574,7 +1574,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 3:30,0,           !- Field 4
     Until: 4:10,1,           !- Field 6
     Until: 6:30,0,           !- Field 8
@@ -3268,7 +3268,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3284,7 +3283,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3300,7 +3298,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3316,7 +3313,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3332,7 +3328,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3348,7 +3343,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3364,7 +3358,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3380,7 +3373,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3396,7 +3388,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3412,7 +3403,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3428,7 +3418,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3444,7 +3433,6 @@
     Dock_Wall_3_Subsurface3, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3460,7 +3448,6 @@
     Office1_Upper_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3476,7 +3463,6 @@
     Office1_Upper_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3492,7 +3478,6 @@
     Office1_Upper_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3508,7 +3493,6 @@
     Office1_Upper_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3524,7 +3508,6 @@
     Office1_Lower_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3540,7 +3523,6 @@
     Office1_Lower_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3556,7 +3538,6 @@
     Office1_Lower_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3572,7 +3553,6 @@
     Office1_Lower_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3588,7 +3568,6 @@
     Office1_Upper_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3604,7 +3583,6 @@
     Office1_Upper_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3620,7 +3598,6 @@
     Office1_Upper_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3636,7 +3613,6 @@
     Office1_Upper_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3652,7 +3628,6 @@
     Office1_Lower_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3668,7 +3643,6 @@
     Office1_Lower_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3684,7 +3658,6 @@
     Office1_Lower_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3700,7 +3673,6 @@
     Office1_Lower_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3716,7 +3688,6 @@
     Office1_Lower_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3732,7 +3703,6 @@
     Office1_Lower_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3748,7 +3718,6 @@
     Office1_Lower_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3764,7 +3733,6 @@
     Office1_Lower_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3780,7 +3748,6 @@
     Office1_Upper_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3796,7 +3763,6 @@
     Office1_Upper_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3812,7 +3778,6 @@
     Office1_Upper_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3828,7 +3793,6 @@
     Office1_Upper_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3844,7 +3808,6 @@
     Office2_Upper_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3860,7 +3823,6 @@
     Office2_Upper_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3876,7 +3838,6 @@
     Office2_Upper_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3892,7 +3853,6 @@
     Office2_Upper_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3908,7 +3868,6 @@
     Office2_Lower_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3924,7 +3883,6 @@
     Office2_Lower_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3940,7 +3898,6 @@
     Office2_Lower_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3956,7 +3913,6 @@
     Office2_Lower_Wall_3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3972,7 +3928,6 @@
     Office2_Upper_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -3988,7 +3943,6 @@
     Office2_Upper_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4004,7 +3958,6 @@
     Office2_Upper_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4020,7 +3973,6 @@
     Office2_Upper_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4036,7 +3988,6 @@
     Office2_Lower_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4052,7 +4003,6 @@
     Office2_Lower_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4068,7 +4018,6 @@
     Office2_Lower_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4084,7 +4033,6 @@
     Office2_Lower_Wall_2,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4100,7 +4048,6 @@
     Office2_Upper_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4116,7 +4063,6 @@
     Office2_Upper_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4132,7 +4078,6 @@
     Office2_Upper_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4148,7 +4093,6 @@
     Office2_Upper_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4164,7 +4108,6 @@
     Office2_Lower_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4180,7 +4123,6 @@
     Office2_Lower_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4196,7 +4138,6 @@
     Office2_Lower_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -4212,7 +4153,6 @@
     Office2_Lower_Wall_4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     ,                        !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     ,                        !- Multiplier
     4,                       !- Number of Vertices
@@ -14412,7 +14352,7 @@
     AllSummary;              !- Report 1 Name
 
   Output:Diagnostics,
-    DisplayUnusedSchedules;  !- Key 2
+    DisplayUnusedSchedules;  !- Key 1
 
   Output:Diagnostics,
     DisplayZoneAirHeatBalanceOffBalance;  !- Key 1

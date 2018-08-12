@@ -1189,7 +1189,6 @@
     Front_Entry_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1205,7 +1204,6 @@
     Front_Retail_Wall_South, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1221,7 +1219,6 @@
     Point_Of_Sale_Wall_South,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -5891,8 +5888,8 @@
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
     ,                        !- Minimum Value of X6
-    ,                        !- Maximum Value of X6 
-	0.5,                     !- Minimum Table Output
+    ,                        !- Maximum Value of X6
+    0.5,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
     Temperature,             !- Input Unit Type for X2
