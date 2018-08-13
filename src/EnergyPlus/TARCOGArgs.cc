@@ -422,24 +422,9 @@ namespace TARCOGArgs {
                 ErrorMessage = "Layer width is less than (or equal to) zero. Layer #" + a;
                 return ArgCheck;
             }
-            if ((i < nlayer) && (LayerType(i) == VENETBLIND_HORIZ) && (LayerType(i + 1) == VENETBLIND_HORIZ)) {
+            if ((i < nlayer) && IsShadingLayer(LayerType(i)) && IsShadingLayer(LayerType(i + 1))) {
                 ArgCheck = 37;
-                ErrorMessage = "Cannot handle two consecutive venetian blinds.";
-                return ArgCheck;
-            }
-            if ((i < nlayer) && (LayerType(i) == WOVSHADE) && (LayerType(i + 1) == WOVSHADE)) {
-                ArgCheck = 43;
-                ErrorMessage = "Cannot handle two consecutive woven shades.";
-                return ArgCheck;
-            }
-            if ((i < nlayer) && (LayerType(i) == VENETBLIND_HORIZ) && (LayerType(i + 1) == WOVSHADE)) {
-                ArgCheck = 44;
-                ErrorMessage = "Cannot handle consecutive venetian blind and woven shade.";
-                return ArgCheck;
-            }
-            if ((i < nlayer) && (LayerType(i) == WOVSHADE) && (LayerType(i + 1) == VENETBLIND_HORIZ)) {
-                ArgCheck = 44;
-                ErrorMessage = "Cannot handle consecutive venetian blind and woven shade.";
+                ErrorMessage = "Cannot handle two consecutive shading layers.";
                 return ArgCheck;
             }
             // Deflection cannot be calculated with IGU containing shading layer. This error check is to be

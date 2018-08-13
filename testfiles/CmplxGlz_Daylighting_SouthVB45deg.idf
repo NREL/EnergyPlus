@@ -353,7 +353,7 @@
   WindowMaterial:Glazing,
     Glass_103_Layer,         !- Name
     BSDF,                    !- Optical Data Type
-    Glass_103_Layer_SpecDat, !- Window Glass Spectral Data Set Name
+    ,                        !- Window Glass Spectral Data Set Name
     0.005715,                !- Thickness {m}
     ,                        !- Solar Transmittance at Normal Incidence
     ,                        !- Front Side Solar Reflectance at Normal Incidence

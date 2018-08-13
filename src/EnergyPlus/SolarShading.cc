@@ -9461,9 +9461,6 @@ namespace SolarShading {
         for (ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
             SurfaceWindow(ISurf).ExtIntShadePrevTS = SurfaceWindow(ISurf).ShadingFlag;
 
-            // Avoid update of NoShade flag to BSDF window type. That flag is set only once in case of
-            // BSDF window type (during reading input file) (Simon)
-            // if (SurfaceWindow(ISurf).WindowModelType != WindowBSDFModel) SurfaceWindow(ISurf).ShadingFlag = NoShade;
             SurfaceWindow(ISurf).ShadingFlag = NoShade;
             SurfaceWindow(ISurf).FracTimeShadingDeviceOn = 0.0;
             if (SurfaceWindow(ISurf).WindowModelType == WindowEQLModel) {
