@@ -345,7 +345,11 @@ namespace HVACFan {
 
         Real64 refFanElecPower = refFanShaftPower / (refFanTransEff * refFanMotorEff * refFanMotorCtrlEff);
 
-        return refFanElecPower * 1000 / designElecPower;
+        if (designElecPower > 0.0) {
+            return refFanElecPower * 1000 / designElecPower;
+        } else {
+            return 0.0;
+        }
     }
 
     FanSystem::FanSystem( // constructor
@@ -1031,7 +1035,6 @@ namespace HVACFan {
         if (DataContaminantBalance::Contaminant.GenericContamSimulation) {
             DataLoopNode::Node(outletNodeNum).GenContam = DataLoopNode::Node(inletNodeNum).GenContam;
         }
-
     }
 
     void FanSystem::report()
