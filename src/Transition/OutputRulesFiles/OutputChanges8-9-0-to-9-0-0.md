@@ -11,5 +11,5 @@ This will eventually become a more structured file, but currently it isn't clear
 
 A new column "Fan Energy Index" has been added to the Equipment Summary:Fans report
 
-See [6812](https://github.com/NREL/EnergyPlus/pull/6812
+See [6812](https://github.com/NREL/EnergyPlus/pull/6812)
 
