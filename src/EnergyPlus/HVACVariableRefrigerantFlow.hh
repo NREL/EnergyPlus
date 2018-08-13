@@ -118,9 +118,6 @@ namespace HVACVariableRefrigerantFlow {
     extern int const FuelTypeOtherFuel1; // Fuel type for other fuel #1
     extern int const FuelTypeOtherFuel2; // Fuel type for other fuel #2
 
-    // curve type for equivalent piping losses (not necessarily the same value used in CurveManager)
-    extern int const BiQuadratic;
-
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
@@ -233,12 +230,10 @@ namespace HVACVariableRefrigerantFlow {
         bool HeatRecoveryUsed;               // .TRUE. = heat recovery used
         Real64 VertPipeLngth;                // vertical piping length (m)
         int PCFLengthCoolPtr;                // piping correction factor for length in cooling mode curve index
-        int PCFLengthCoolPtrType;            // PCF for length curve type
         Real64 PCFHeightCool;                // piping correction factor for height in cooling mode
         Real64 EquivPipeLngthCool;           // equivalent piping length for cooling
         Real64 PipingCorrectionCooling;      // piping correction factor for cooling
         int PCFLengthHeatPtr;                // piping correction factor for length in heating mode curve index
-        int PCFLengthHeatPtrType;            // PCF for length curve type
         Real64 PCFHeightHeat;                // piping correction factor for height in heating mode
         Real64 EquivPipeLngthHeat;           // equivalent piping length for heating
         Real64 PipingCorrectionHeating;      // piping correction factor for heating
@@ -291,22 +286,18 @@ namespace HVACVariableRefrigerantFlow {
         Real64 MaxOATHeatRecovery;   // Maximum outdoor air temperature for heat recovery operation (C)
         int HRCAPFTCool;             // Index to cool capacity as a function of temperature curve for heat recovery
         Real64 HRCAPFTCoolConst;     // constant used if curve is blank
-        int HRCAPFTCoolType;         // Curve type for HRCAPFTCool
         Real64 HRInitialCoolCapFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HRCoolCapTC;          // Time constant used to recover from intial degratation in cooling heat recovery
         int HREIRFTCool;             // Index to cool EIR as a function of temperature curve for heat recovery
         Real64 HREIRFTCoolConst;     // constant used if curve is blank
-        int HREIRFTCoolType;         // Curve type for HREIRFTCool
         Real64 HRInitialCoolEIRFrac; // Fractional EIR degradation at the start of heat recovery from cooling mode
         Real64 HRCoolEIRTC;          // Time constant used to recover from intial degratation in cooling heat recovery
         int HRCAPFTHeat;             // Index to heat capacity as a function of temperature curve for heat recovery
         Real64 HRCAPFTHeatConst;     // constant used if curve is blank
-        int HRCAPFTHeatType;         // Curve type for HRCAPFTHeat
         Real64 HRInitialHeatCapFrac; // Fractional heating degradation at the start of heat recovery from heating mode
         Real64 HRHeatCapTC;          // Time constant used to recover from intial degratation in heating heat recovery
         int HREIRFTHeat;             // Index to heat EIR as a function of temperature curve for heat recovery
         Real64 HREIRFTHeatConst;     // constant used if curve is blank
-        int HREIRFTHeatType;         // Curve type for HREIRFTHeat
         Real64 HRInitialHeatEIRFrac; // Fractional EIR degradation at the start of heat recovery from heating mode
         Real64 HRHeatEIRTC;          // Time constant used to recover from intial degratation in heating heat recovery
         bool HRCoolingActive;        // heat recovery mode active in cooling mode
@@ -418,8 +409,8 @@ namespace HVACVariableRefrigerantFlow {
               HeatBoundaryCurvePtr(0), EIRCoolBoundaryCurvePtr(0), CoolEIRFPLR1(0), CoolEIRFPLR2(0), CoolCapFTHi(0), CoolEIRFTHi(0), HeatCapFTHi(0),
               HeatEIRFTHi(0), EIRHeatBoundaryCurvePtr(0), HeatEIRFPLR1(0), HeatEIRFPLR2(0), CoolPLFFPLR(0), HeatPLFFPLR(0),
               HeatingPerformanceOATType(0), MinPLR(0.0), MasterZonePtr(0), MasterZoneTUIndex(0), ThermostatPriority(0), SchedPriorityPtr(0),
-              ZoneTUListPtr(0), HeatRecoveryUsed(false), VertPipeLngth(0.0), PCFLengthCoolPtr(0), PCFLengthCoolPtrType(0), PCFHeightCool(0.0),
-              EquivPipeLngthCool(0.0), PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFLengthHeatPtrType(0), PCFHeightHeat(0.0),
+              ZoneTUListPtr(0), HeatRecoveryUsed(false), VertPipeLngth(0.0), PCFLengthCoolPtr(0), PCFHeightCool(0.0),
+              EquivPipeLngthCool(0.0), PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFHeightHeat(0.0),
               EquivPipeLngthHeat(0.0), PipingCorrectionHeating(1.0), CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0),
               MaxOATCCHeater(0.0), DefrostEIRPtr(0), DefrostFraction(0.0), DefrostStrategy(0), DefrostControl(0), DefrostCapacity(0.0),
               DefrostPower(0.0), DefrostConsumption(0.0), MaxOATDefrost(0.0), CondenserType(0), CondenserNodeNum(0), SkipCondenserNodeNumCheck(false),
@@ -429,9 +420,9 @@ namespace HVACVariableRefrigerantFlow {
               EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0), HRMaxTempLimitIndex(0),
               CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0), FuelType(0), SUMultiplier(0.0), TUCoolingLoad(0.0), TUHeatingLoad(0.0),
               SwitchedMode(false), OperatingCOP(0.0), MinOATHeatRecovery(0.0), MaxOATHeatRecovery(0.0), HRCAPFTCool(0), HRCAPFTCoolConst(0.9),
-              HRCAPFTCoolType(0), HRInitialCoolCapFrac(0.5), HRCoolCapTC(0.15), HREIRFTCool(0), HREIRFTCoolConst(1.1), HREIRFTCoolType(0),
-              HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRCAPFTHeatType(0), HRInitialHeatCapFrac(1.0),
-              HRHeatCapTC(0.0), HREIRFTHeat(0), HREIRFTHeatConst(1.1), HREIRFTHeatType(0), HRInitialHeatEIRFrac(1.0), HRHeatEIRTC(0.0),
+              HRInitialCoolCapFrac(0.5), HRCoolCapTC(0.15), HREIRFTCool(0), HREIRFTCoolConst(1.1),
+              HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0),
+              HRHeatCapTC(0.0), HREIRFTHeat(0), HREIRFTHeatConst(1.1), HRInitialHeatEIRFrac(1.0), HRHeatEIRTC(0.0),
               HRCoolingActive(false), HRHeatingActive(false), ModeChange(false), HRModeChange(false), HRTimer(0.0), HRTime(0.0),
               EIRFTempCoolErrorIndex(0), EIRFTempHeatErrorIndex(0), DefrostHeatErrorIndex(0), EvapWaterSupplyMode(WaterSupplyFromMains),
               EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),

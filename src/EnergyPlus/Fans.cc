@@ -2593,7 +2593,7 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::LoopOnOffFanRTF;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2616,7 +2616,9 @@ namespace Fans {
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
-            LoopOnOffFanRTF = Fan(FanNum).FanRuntimeFraction;
+            if (Fan(FanNum).AirLoopNum > 0) {
+                AirLoopAFNInfo(Fan(FanNum).AirLoopNum).AFNLoopOnOffFanRTF = Fan(FanNum).FanRuntimeFraction;
+            }
         }
     }
 
@@ -3221,7 +3223,6 @@ namespace Fans {
         // REFERENCES: EnergyPlus Engineering Reference
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DataSizing::CurSysNum;
 
         // Return value
@@ -3274,6 +3275,11 @@ namespace Fans {
         NightVentPerf.deallocate();
         FanNumericFields.deallocate();
         UniqueFanNames.clear();
+    }
+
+    void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum)
+    {
+        Fan(FanIndex).AirLoopNum = AirLoopNum;
     }
 
     // End of Utility subroutines for the Fan Module

@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirflowNetwork.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -243,10 +244,14 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 {
     // Test passing variables between Furnace and AirflowNetwork #5134
 
-    using DataAirLoop::LoopFanOperationMode;
-    using DataAirLoop::LoopOnOffFanPartLoadRatio;
-    using DataAirLoop::LoopSystemOffMassFlowrate;
-    using DataAirLoop::LoopSystemOnMassFlowrate;
+    using DataAirflowNetwork::AirflowNetworkControlMultiADS;
+    using DataAirflowNetwork::SimulateAirflowNetwork;
+    using DataAirLoop::AirLoopAFNInfo;
+//    using DataAirLoop::LoopOnOffFanPartLoadRatio;
+//    using DataAirLoop::LoopSystemOffMassFlowrate;
+
+    AirLoopAFNInfo.allocate(1);
+//    LoopOnOffFanPartLoadRatio.allocate(1);
 
     int FurnaceNum;
 
@@ -262,12 +267,13 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
     Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
 
-    ReportFurnace(FurnaceNum);
+    SimulateAirflowNetwork = AirflowNetworkControlMultiADS;
+    ReportFurnace(FurnaceNum, 1);
 
-    EXPECT_EQ(2.0, LoopSystemOnMassFlowrate);
-    EXPECT_EQ(0.0, LoopSystemOffMassFlowrate);
-    EXPECT_EQ(1.0, LoopFanOperationMode);
-    EXPECT_EQ(1.0, LoopOnOffFanPartLoadRatio);
+    EXPECT_EQ(2.0, AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
+    EXPECT_EQ(0.0, AirLoopAFNInfo(1).LoopSystemOffMassFlowrate);
+    EXPECT_EQ(1.0, AirLoopAFNInfo(1).LoopFanOperationMode);
+    EXPECT_EQ(1.0, AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
     Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatCool;
     Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
@@ -275,10 +281,11 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     Furnace(FurnaceNum).MaxCoolAirMassFlow = 2.2;
     Furnace(FurnaceNum).MaxHeatAirMassFlow = 2.0;
 
-    ReportFurnace(FurnaceNum);
+    ReportFurnace(FurnaceNum, 1);
 
-    EXPECT_EQ(1.0, LoopOnOffFanPartLoadRatio);
+    EXPECT_EQ(1.0, AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
+    SimulateAirflowNetwork = 0;
     Furnace.deallocate();
 }
 
