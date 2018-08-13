@@ -1985,15 +1985,17 @@ If coordinate system is set as shown in Figure~\ref{fig:deflection-coordinate-sy
 
 \begin{equation}
 {L_{D\left( i \right)}}\left( {x,y} \right) = \frac{{16\cdot \Delta {P_{\left( i \right)}}}}{{{\pi ^6}\cdot {D_{\left( i \right)}}}}\mathop \sum \limits_{m = 1,3,5 \ldots }^\infty  \mathop \sum \limits_{n = 1,3,5 \ldots }^\infty  \frac{{\sin \frac{{m\pi x}}{W}\sin \frac{{n\pi y}}{H}}}{{mn{{\left( {{{\left( {\frac{m}{W}} \right)}^2} + {{\left( {\frac{n}{H}} \right)}^2}} \right)}^2}}}
+\label{eq:IGUDeflection}
 \end{equation}
 
-Where,
+where
 
 \begin{equation}
 {D_{\left( i \right)}} = \frac{{E\cdot t_{\left( i \right)}^3}}{{12\cdot \left( {1 - {\nu ^2}} \right)}}
+\label{eq:IGUDiDeflection}
 \end{equation}
 
-Where,
+and
 
 \emph{E} = Young's modulus (7.2 x 10\(^{10}\)) {[}Force per unit Area; SI: Pa, IP: psi{]}
 
@@ -2007,13 +2009,22 @@ $\nu$ = poison's ratio (0.22 for glass) {[}Non-Dimensional{]}
 \caption{Deflection Coordinate System - 3D \protect \label{fig:deflection-coordinate-system-3d}}
 \end{figure}
 
-Δ\emph{P\(_{i}\)} = \emph{P\(_{gap(i)}\)} - \emph{P\(_{gap(i-1)}\)} (for i-th pane) {[}Force per unit Area; SI: Pa, IP: psi{]}
+\begin{equation}
+\emph{\(\Delta\)P\(_{i}\)} = \emph{P\(_{gap(i)}\)} - \emph{P\(_{gap(i-1)}\)} (for~i-th~pane) {~~[}Force~per~unit~Area;~SI:~Pa,~IP:~psi{]}
+\label{eq:IGUdPiIthPane}
+\end{equation}
 
-Δ\emph{P\(_{i}\)} = \emph{P\(_{gap(1)}\)} - \emph{P\(_{a}\)} (first pane) {[}Force per unit Area; SI: Pa, IP: psi{]}\emph{~~~~~~~~~~~~~~~~~~}
+\begin{equation}
+\emph{\(\Delta\)P\(_{i}\)} = \emph{P\(_{gap(1)}\)} - \emph{P\(_{a}\)} (first~pane) {~~[}Force~per~unit~Area;~SI:~Pa,~IP:~psi{]}
+\label{eq:IGUdPiFirstPane}
+\end{equation}
 
-Δ\emph{P\(_{i}\)} = \emph{P\(_{a}\) - P\(_{gap(n-1)}\)} (last pane) {[}Force per unit Area; SI: Pa, IP: psi{]}
+\begin{equation}
+\emph{\(\Delta\)P\(_{i}\)} = \emph{P\(_{a}\) - P\(_{gap(n-1)}\)} (last~pane) {~~[}Force~per~unit~Area;~SI:~Pa,~IP:~psi{]}
+\label{eq:IGUdPiLastPane}
+\end{equation}
 
-Where,
+where
 
 \emph{P\(_{a}\) =} atmospheric pressure. {[}Force per unit Area; SI: Pa, IP: psi{]}
 
@@ -2021,7 +2032,7 @@ Where,
 {P_{gap\left( i \right)}} = \frac{{{P_{ini}}{V_{ini\left( i \right)}}{T_{gap\left( i \right)}}}}{{{T_{ini}}{V_{gap\left( i \right)}}}}
 \end{equation}
 
-Where,
+where
 
 \emph{P\(_{ini}\)} = Initial pressure. Applies to all gaps as a single value (input data - measured or otherwise) {[}Force per unit Area; SI: Pa, IP: psi{]}
 
@@ -2033,7 +2044,7 @@ Where,
 {V_{ini\left( i \right)}} = {L_i}\cdot W\cdot H
 \end{equation}
 
-Where,
+where
 
 \emph{L\(_{i}\)} = non-deflected glazing gap width (for i-th gap) {[}Length; SI: m, IP: in.{]}
 
@@ -2047,13 +2058,14 @@ Where,
 
 \begin{equation}
 {V_{gap\left( i \right)}} = {V_{ini\left( i \right)}} + W\cdot H\cdot \left( {\overline {{L_{D,i}}}  - \overline {{L_{D,i + 1}}} } \right)
+\label{eq:IGUGapVolume}
 \end{equation}
 
-Where,
+where
 
 \(\overline {{L_{D,i}}}\) ~is mean deflection value for i-th pane. {[}Length; SI: m, IP: in.{]}
 
-Deflection of each pane can be positive or negative and is done solely to establish reference. Current frame of reference is that positive deflection means that pane is deflecting towards left side, while negative deflection means that pane is deflecting towards right side . Whether the deflection is in the direction of reducing the gap width or increasing it, it will be the result of pressure difference, as described in . When pressure in the glazing unit is higher than surrounding environmental pressure, the deflection will be towards increasing gap width (i.e., ballooning), while the opposite situation will result in decreasing gap width (i.e., vacuuming)
+Deflection of each pane can be positive or negative and is done solely to establish reference. Current frame of reference is that positive deflection means that pane is deflecting towards left side, while negative deflection means that pane is deflecting towards right side (see Equation~\ref{eq:IGUGapVolume}). Whether the deflection is in the direction of reducing the gap width or increasing it, it will be the result of pressure difference, as described in Equation~\ref{eq:IGUDeflection}. When pressure in the glazing unit is higher than surrounding environmental pressure, the deflection will be towards increasing gap width (i.e., ballooning), while the opposite situation will result in decreasing gap width (i.e., vacuuming)
 
 \begin{figure}[hbtp] % fig 111
 \centering
@@ -2061,48 +2073,50 @@ Deflection of each pane can be positive or negative and is done solely to establ
 \caption{Deflection Direction Convention \protect \label{fig:deflection-direction-convention}}
 \end{figure}
 
-The important part of calculating deflection of the IGU is to determine mean deflection value for each glazing pane. Mean deflection value is used to calculate gap volume in deflected state . Mean deflection of glazing pane can be calculated by integrating :
+The important part of calculating deflection of the IGU is to determine mean deflection value for each glazing pane. Mean deflection value is used to calculate gap volume in deflected state (see Equation~\ref{eq:IGUGapVolume}). Mean deflection of glazing pane can be calculated by integrating Equation~\ref{eq:IGUDeflection}:
 
 \begin{equation}
 \overline {{L_{D\left( i \right)}}}  = \mathop \smallint \limits_{x = 0}^W \mathop \smallint \limits_{y = 0}^H \frac{{16\cdot \Delta {P_{\left( i \right)}}}}{{{\pi ^6}\cdot {D_{\left( i \right)}}}}\mathop \sum \limits_{m = 1,3,5 \ldots }^\infty  \mathop \sum \limits_{n = 1,3,5 \ldots }^\infty  \frac{{\sin \frac{{m\pi x}}{W}\sin \frac{{n\pi y}}{H}}}{{mn{{\left( {{{\left( {\frac{m}{W}} \right)}^2} + {{\left( {\frac{n}{H}} \right)}^2}} \right)}^2}}}
 \end{equation}
 
-Which is identical with the following expression:
+This is identical to the following expression:
 
 \begin{equation}
 \overline {{L_{D\left( i \right)}}}  = \frac{{16\cdot \Delta {P_{\left( i \right)}}}}{{{\pi ^6}\cdot {D_{\left( i \right)}}}}\mathop \sum \limits_{m = 1,3,5 \ldots }^\infty  \mathop \sum \limits_{n = 1,3,5 \ldots }^\infty  \frac{{\mathop \smallint \nolimits_{x = 0}^W \mathop \smallint \nolimits_{y = 0}^H \sin \frac{{m\pi x}}{W}\sin \frac{{n\pi y}}{H}}}{{mn{{\left( {{{\left( {\frac{m}{W}} \right)}^2} + {{\left( {\frac{n}{H}} \right)}^2}} \right)}^2}}}
 \end{equation}
 
-and because integral of sin(x) is equal with --cos(x), above equation will become:
+and because the integral of sin(x) is equal to --cos(x), the above equation will become:
 
 \begin{equation}
 \overline {{L_{D\left( i \right)}}}  = \frac{{16\cdot \Delta {P_{\left( i \right)}}}}{{{\pi ^6}\cdot {D_{\left( i \right)}}}}\mathop \sum \limits_{m = 1,3,5 \ldots }^\infty  \mathop \sum \limits_{n = 1,3,5 \ldots }^\infty  \frac{{\left( {1 - cos\left( {m\pi } \right)} \right)\left( {1 - cos\left( {n\pi } \right)} \right)}}{{mn{{\left( {{{\left( {\frac{m}{W}} \right)}^2} + {{\left( {\frac{n}{H}} \right)}^2}} \right)}^2}}}
 \end{equation}
 
-Finally, because \(cos\left( {m\pi } \right)\) ~and \(cos\left( {n\pi } \right)\) ~values are always equal to -1 for the given range of m and n, above equation will became:
+Finally, because \(cos\left( {m\pi } \right)\)~and \(cos\left( {n\pi } \right)\)~values are always equal to -1 for the given range of m and n, the above equation will became:
 
 \begin{equation}
 \overline {{L_{D\left( i \right)}}}  = \frac{{16\cdot \Delta {P_{\left( i \right)}}}}{{{\pi ^6}\cdot {D_{\left( i \right)}}}}\mathop \sum \limits_{m = 1,3,5 \ldots }^\infty  \mathop \sum \limits_{n = 1,3,5 \ldots }^\infty  \frac{4}{{{m^2}{n^2}{\pi ^2}{{\left( {{{\left( {\frac{m}{W}} \right)}^2} + {{\left( {\frac{n}{H}} \right)}^2}} \right)}^2}}}
 \end{equation}
 
-After calculating mean pane deflection the following equation is used to calculate mean gap width:
+After calculating the mean pane deflection, the following equation is used to the calculate mean gap width:
 
 \begin{equation}
 {L_{r\left( i \right)}} = L + \left( {\overline {{L_{D,\left( i \right)}}}  - \overline {{L_{D,\left( {i + 1} \right)}}} } \right)
+\label{eq:IGUMeanPaneDeflection}
 \end{equation}
 
-\emph{Where,}
+where
 
-\emph{L\(_{r(i)}\) = Mean gap ``i'' width after incorporating glazing deflection. This mean gap width is used to recalculate thermal performance of deflected IGU.}
+\emph{L\(_{r(i)}\)} = Mean gap ``i'' width after incorporating glazing deflection. This mean gap width is used to recalculate thermal performance of deflected IGU.}
 
-\(\overline {{L_{D,i}}}\) \textbf{\emph{~}}* = mean glazing deflection for each pane ``i''.*
+\(\overline {{L_{D,i}}}\) = mean glazing deflection for each pane ``i''.
 
-Calculation of the deflection at the center of glazing and mean glazing deflection for each pane is an iterative process, where the initial temperature distribution is calculated for non-deflected state, then deflection is calculated based on this temperature distribution, new temperature distribution is calculated for this deflected state, then temperatures from previous iteration are compared to the current iteration and the process is repeated until the difference is no larger than 0.1 ºC.
+Calculation of the deflection at the center of glazing and mean glazing deflection for each pane is an iterative process, where the initial temperature distribution is calculated for non-deflected state, then deflection is calculated based on this temperature distribution, new temperature distribution is calculated for this deflected state, then temperatures from previous iteration are compared to the current iteration and the process is repeated until the difference is no larger than 0.1\(^{o}\)C.
 
-At the end of calculations, program will calculate and return maximum deflection value for each pane (i.e., center of glazing deflection). If we label maximum deflection of each pane as \emph{L\(_{D(i),max}\)}, we can calculate this value by substituting \emph{x} = \emph{W}/2 and \emph{y} = \emph{H}/2 in equation to determine deflection at the center point. Therefore,
+At the end of calculations, program will calculate and return maximum deflection value for each pane (i.e., center of glazing deflection). If we label maximum deflection of each pane as \emph{L\(_{D(i),max}\)}, we can calculate this value by substituting \emph{x} = \emph{W}/2 and \emph{y} = \emph{H}/2 in Equation~\ref{eq:IGUDeflection} to determine deflection at the center point. Therefore:
 
 \begin{equation}
 {L_{D\left( i \right),max}} = \frac{{16\cdot \Delta {P_{\left( i \right)}}}}{{{\pi ^6}\cdot {D_{\left( i \right)}}}}\mathop \sum \limits_{m = 1,3,5 \ldots }^\infty  \mathop \sum \limits_{n = 1,3,5 \ldots }^\infty  \frac{{\sin \frac{{m\pi }}{2}\sin \frac{{n\pi }}{2}}}{{mn{{\left( {{{\left( {\frac{m}{2}} \right)}^2} + {{\left( {\frac{n}{2}} \right)}^2}} \right)}^2}}}
+\label{eq:IGULDimaxDeflection}
 \end{equation}
 
 For glazing systems with more than two glazing layers, meaning multiple gas filled gaps, the deflection will be calculated for each glazing pane assuming that the pressure in a gap is independent from each other and calculated separately, unless spaces are ``linked'' together (e.g., stretched film middle glazing that has hole for equalizing pressure).
@@ -2113,7 +2127,7 @@ The procedure shown above generally applies to the 3 or more layer glazing syste
 
 \subsubsection{Linked Gaps in 3 or more glazing layer system:}\label{linked-gaps-in-3-or-more-glazing-layer-system}
 
-When one or more gaps are linked together, their pressure is assumed to be identical (e.g., in triple glazing IGU \emph{P\(_{gap,1}\)} = \emph{P\(_{gap,2}\)}.)~ This pressure is calculated from temperatures of bounding glazing for linked gaps (e.g., for triple glazing IGU, glazing 1 and 3) and using neighboring pressures outside of those bounding glazing (e.g., for triple glazed IGU, \emph{P\(_{a}\)} on both sides).
+When one or more gaps are linked together, their pressure is assumed to be identical (e.g., in triple glazing IGU \emph{P\(_{gap,1}\)} = \emph{P\(_{gap,2}\)}).~ This pressure is calculated from temperatures of bounding glazing for linked gaps (e.g., for triple glazing IGU, glazing 1 and 3) and using neighboring pressures outside of those bounding glazing (e.g., for triple glazed IGU, \emph{P\(_{a}\)} on both sides).
 
 \emph{Note: This feature is not implemented in WINDOW 7.1. It is considered for future enhancements to the program.}
 
@@ -2123,12 +2137,13 @@ If one or more glazing gaps are linked to either indoor or outdoor environment i
 
 \subsubsection{Calculation of the thermal performance caused by measured deflection}\label{calculation-of-the-thermal-performance-caused-by-measured-deflection}
 
-When deflection is measured, it is normally measured at the point of maximum deflection. Maximum deflection occurs at center of the IGU (at \emph{W}/2 and \emph{H}/2).
+When deflection is measured, it is normally measured at the point of maximum deflection. Maximum deflection occurs at the center of the IGU (at \emph{W}/2 and \emph{H}/2).
 
-Measured value is typically gap width at the point of maximum deflection, which we can label \emph{L\(_{G(i)}\)}. For i-th measured gap the width is equal to:
+Measured value is typically gap width at the point of maximum deflection, which we can label \emph{L\(_{G(i)}\)}. For the i-th measured gap, the width is equal to:
 
 \begin{equation}
 {L_{G\left( i \right)}} = {L_{\left( i \right)}} + \left( {{L_{D\left( i \right),max}} - {L_{D\left( {i + 1} \right),max}}} \right)
+\label{eq:IGULGiDeflection}
 \end{equation}
 
 \begin{figure}[hbtp] % fig 112
@@ -2137,57 +2152,61 @@ Measured value is typically gap width at the point of maximum deflection, which 
 \caption{Sketch of the non-symetrically Deflected Glazing Panes \protect \label{fig:sketch-of-the-non-symetrically-deflected}}
 \end{figure}
 
-If we label ratio of mean deflection and maximum deflection as R\(_{(i)}\), then:
+If we label the ratio of mean deflection and maximum deflection as R\(_{(i)}\), then:
 
 \begin{equation}
 {R_{(i)}} = \frac{{\overline {{L_{D(i)}}} }}{{{L_{D(i)}}_{,\max }}} = \sum\limits_{m = 1,3,5,...}^\infty  {\sum\limits_{n = 1,3,5,...}^\infty  {\frac{4}{{{m^2}{n^2}{\pi ^2}{{\left( {{{(\frac{m}{W})}^2} + {{(\frac{n}{H})}^2}} \right)}^2}}}} }
+\label{eq:IGUDeflectionRatioi}
 \end{equation}
 
-Important thing to note is that ratios $\PB{R_{\PB{i}}}$\ for all gaps in glazing system are equal.
+An important thing to note is that the ratios $\PB{R_{\PB{i}}}$\ for all gaps in glazing system are equal.
 
 \begin{equation}
 {R_{\left( 1 \right)}} = {R_{\left( 2 \right)}} =  \ldots  = {R_{\left( i \right)}} =  \ldots  = {R_{\left( {n - 1} \right)}} = R
+\label{eq:IGUDefletionRatioEquivalency}
 \end{equation}
 
-Replacing and into the following equation is obtained:
+Substituting Equations~\ref{eq:IGUDeflectionRatioi} and~\ref{eq:IGUDefletionRatioEquivalency} into Equation~\ref{eq:IGUMeanPaneDeflection}, the following equation is obtained:
 
 \begin{equation}
 {L_{r\left( i \right)}} = {L_{\left( i \right)}} + R\left( {{L_{D\left( i \right),max}} - {L_{D\left( {i + 1} \right),max}}} \right)
+\label{eq:IGULriDeflection}
 \end{equation}
 
-Combining with we get the following expression for the mean gap width:
+Combining Equation~\ref{eq:IGULriDeflection} with Equation~\ref{eq:IGULGiDeflection}, we get the following expression for the mean gap width:
 
 \begin{equation}
 {L_{r\left( i \right)}} = {L_{\left( i \right)}} + R\left( {{L_{G\left( i \right)}} - {L_{\left( i \right)}}} \right)
 \end{equation}
 
-Number of equations given in expression is equal to n-1, where n is number of panes. Therefore, we need one more equation to complete the system of equations that would allow us to solve for all independent variables. To get the last equation we can rewrite in slightly different manner:
+The number of equations given in Equation~\ref{eq:IGULGiDeflection} is equal to n-1, where n is number of panes. Therefore, we need one more equation to complete the system of equations that would allow us to solve for all independent variables. To get the last equation, we can rewrite Equation~\ref{eq:IGULDimaxDeflection} in slightly different manner:
 
 \begin{equation}
 {L_{D\left( i \right),max}} = \frac{{\Delta {P_{\left( i \right)}}}}{{{D_{\left( i \right)}}}}\cdot K
 \end{equation}
 
-Where coefficient K combines all constant terms, while \({D_{\left( i \right)}}\) ~is given by and \(\Delta {P_{\left( i \right)}}\) ~is calculated by, and . Summing over all deflections, \({L_{D\left( i \right),max}}\) ~the following equation is obtained:
+where coefficient K combines all constant terms, while \({D_{\left( i \right)}}\) is given by Equation~\ref{eq:IGUDiDeflection} and \(\Delta {P_{\left( i \right)}}\) is calculated by Equations~\ref{eq:IGUdPiIthPane},~\ref{eq:IGUdPiFirstPane} and~\ref{eq:IGUdPiLastPane}. Summing over all deflections, \({L_{D\left( i \right),max}}\), the following equation is obtained:
 
 \begin{equation}
 \mathop \sum \limits_{i = 1}^n \frac{{{D_{\left( i \right)}}}}{K}\cdot {L_{D\left( i \right),max}} = \mathop \sum \limits_{i = 1}^n \Delta {P_{\left( i \right)}} = 0
 \end{equation}
 
-Note that sum of all \(\Delta {P_{\left( i \right)}}\) ~is equal to zero since outside pressure is equal to inside. Therefore, the remaining equation that completes the set of equations is:
+Note that sum of all \(\Delta {P_{\left( i \right)}}\) ~is equal to zero since the outside pressure is equal to the inside pressure. Therefore, the remaining equation that completes the set of equations is:
 
 \begin{equation}
 \mathop \sum \limits_{i = 1}^n {D_{\left( i \right)}}\cdot {L_{D\left( i \right),max}} = 0
+\label{eq:IGUSumDiLDiEq0}
 \end{equation}
 
 \subsubsection{Solving system of equations}\label{solving-system-of-equations}
 
-In order to solve system of equations we will present in slightly different manner:
+In order to solve this system of equations, we will present Equation~\ref{eq:IGULGiDeflection} in a slightly different manner:
 
 \begin{equation}
 0 = {L_{\left( i \right)}} - {L_{G\left( i \right)}} + {L_{D\left( i \right),max}} - {L_{D\left( {i + 1} \right),max}}
 \end{equation}
 
-Which in developed form will look like this:
+which in developed form will look like this:
 
 \begin{equation}
 0 = {L_{\left( 1 \right)}} - {L_{G\left( 1 \right)}} + {L_{D\left( 1 \right),max}} - {L_{D\left( 2 \right),max}}
@@ -2205,10 +2224,11 @@ Which in developed form will look like this:
 0 = {L_{\left( {n - 1} \right)}} - {L_{G\left( {n - 1} \right)}} + {L_{D\left( {n - 1} \right),max}} - {L_{D\left( n \right),max}}
 \end{equation}
 
-In order to express each \({L_{D\left( i \right),max}}\) ~as dependence from \({L_{D\left( n \right),max}}\) ~(deflection of inside/last pane) we will need to make sum from first to last, then from second to last, third to last and so on. This procedure will create following set of equations:
+In order to express each \({L_{D\left( i \right),max}}\) and its dependence on \({L_{D\left( n \right),max}}\) (deflection of inside/last pane), we will need to make the sum from first to last, then from second to last, third to last and so on. This procedure will create the following set of equations:
 
 \begin{equation}
 {L_{D\left( 1 \right),max}} = \mathop \sum \limits_{k = 1}^{k = n - 1} \left( {{L_{G\left( k \right)}} - {L_{\left( k \right)}}} \right) + {L_{D\left( n \right),max}}
+\label{eq:IGULD1max}
 \end{equation}
 
 \begin{equation}
@@ -2221,21 +2241,22 @@ In order to express each \({L_{D\left( i \right),max}}\) ~as dependence from \({
 
 \begin{equation}
 {L_{D\left( {n - 1} \right),max}} = \mathop \sum \limits_{k = n - 1}^{k = n - 1} \left( {{L_{G\left( k \right)}} - {L_{\left( k \right)}}} \right) + {L_{D\left( n \right),max}}
+\label{eq:IGULDn-1max}
 \end{equation}
 
-Now replacing this set of equations back to :
+Now substituting this set of equations back into Equation~\ref{eq:IGUSumDiLDiEq0}:
 
 \begin{equation}
 \mathop \sum \limits_{i = 1}^{n - 1} {D_{\left( i \right)}}\cdot \left( {\mathop \sum \limits_{k = i}^{k = n - 1} \left( {{L_{G\left( k \right)}} - {L_{\left( k \right)}}} \right) + {L_{D\left( n \right),max}}} \right) + {D_{\left( n \right)}}\cdot {L_{D\left( n \right),max}} = 0
 \end{equation}
 
-Which solving by \({L_{D\left( n \right),max}}\) ~leads to the following equation:
+Solving for \({L_{D\left( n \right),max}}\) leads to the following equation:
 
 \begin{equation}
 {L_{D\left( n \right),max}} = \frac{{\mathop \sum \nolimits_{i = 1}^{n - 1} ({D_{\left( i \right)}}\cdot \mathop \sum \nolimits_{k = i}^{k = n - 1} \left( {{L_{\left( k \right)}} - {L_{G\left( k \right)}}} \right))}}{{\mathop \sum \nolimits_{i = 1}^n {D_{\left( i \right)}}}}
 \end{equation}
 
-Calculating \({L_{D\left( n \right),max}}\) ~value from this equation and substituting it in will enable calculation of the deflection of remaining panes.
+Calculating \({L_{D\left( n \right),max}}\) from this equation and substituting it into Equations~\ref{eq:IGULD1max} -~\ref{eq:IGULDn-1max} will enable calculation of the deflection of the remaining panes.
 
 \subsubsection{References}\label{references-1-019}
 
@@ -2295,12 +2316,6 @@ Equivalent layer fenestration model uses two-step analysis. First, the flux of a
 
 The multilayer optical model is based on an algorithm originally developed by Edwards (1977) and extended by Wright and Kotey (2006). The algorithm models the interaction of incident solar radiation with a glazing system composed of any number of parallel, planar, specular glazing layers. The shading layers scatter portion of the incident solar radiation diffusely, and the model tracks the beam and diffuse components of solar radiation as they interact with a multi-layer system of glazing and shading layers. The conceptual arrangement for tracking beam and diffuse solar flux components is illustrated in Figure~\ref{fig:solar-analysis-of-the-multi-layer}.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image1828.svg.png}
-\caption{}
-\end{figure}
-
 Analysis yields beam-beam, beam-diffuse and diffuse-diffuse fluxes, providing full detail concerning the quantities of reflected, transmitted and absorbed radiation.
 
 \begin{figure}[hbtp] % fig 114
@@ -2309,9 +2324,9 @@ Analysis yields beam-beam, beam-diffuse and diffuse-diffuse fluxes, providing fu
 \caption{Solar analysis of the multi-layer glazing/shading system showing beam and diffuse fluxes (ASHRAE 1311-RP) \protect \label{fig:solar-analysis-of-the-multi-layer}}
 \end{figure}
 
-The beam and diffuse characterization of solar radiation demands an expanded set of solar optical properties (Wright and Kotey 2006). The quantities of interest for single layer are shown inFigure~\ref{fig:twelve-solar-properties-assigned-at-each}.
+The beam and diffuse characterization of solar radiation demands an expanded set of solar optical properties (Wright and Kotey 2006). The quantities of interest for single layer are shown in Figure~\ref{fig:twelve-solar-properties-assigned-at-each}.
 
-Where,
+where
 
 $\tau$ ~~~ = ~~~~~~~~~ transmittance of a glazing or a shading layer, (-)
 
@@ -2375,7 +2390,7 @@ The Equivalent-Layer window model allows a wide range of options regarding the s
 
 \subsubsection{Gap Layer Analysis}\label{gap-layer-analysis}
 
-Gaps can be specified as sealed, vented indoors or vented outdoors. The sealed gap is considered as enclosed cavity. Vented gaps is specified for inner and outer most gaps only and when the gas type is AIR. The vented gap model assumes that air flow at the perimeter of the window is not restricted. Any fill gas can be specified by molecular mass and thermo-physical properties of viscosity, specific heat and thermal conductivity. This is done by providing ``a'', ``b'' and ``c'' coefficients of the quadratic equation of the form, p = a + bT + cT\(^{2}\), where the T (K) is temperature and p is the property being evaluated. EnergyPlus has builtin-data available for common fill gas components including Air, Argon, Krypton and Xenon. Users specify CUSTOM gas by defining the coefficients as an input.
+Gaps can be specified as sealed, vented indoors or vented outdoors. The sealed gap is considered as enclosed cavity. Vented gaps is specified for inner and outer most gaps only and when the gas type is AIR. The vented gap model assumes that air flow at the perimeter of the window is not restricted. Any fill gas can be specified by molecular mass and thermo-physical properties of viscosity, specific heat and thermal conductivity. This is done by providing ``a'', ``b'' and ``c'' coefficients of the quadratic equation of the form, p = a + bT + cT\(^{2}\), where the T(K) is temperature and p is the property being evaluated. EnergyPlus has builtin-data available for common fill gas components including Air, Argon, Krypton and Xenon. Users specify CUSTOM gas by defining the coefficients as an input.
 
 \subsubsection{Shade Layer Analysis}\label{shade-layer-analysis}
 
@@ -2455,18 +2470,12 @@ The solar diffuse-diffuse and long-wave effective properties of the pleated drap
 
 \subsubsection{Venetian Blinds}\label{venetian-blinds}
 
-The effective shortwave optical and longwave optical properties of venetian blind layer is estimated using analytical models (Yahoda and Wright 2004, 2005; Kotey et al. 2008). The model requires properties of venetian blind slats and geometry of the slats shown in Figure~\ref{fig:likewise-the-effective-longwave-properties}.
-
-\begin{figure}[hbtp] % fig 1118
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1845.svg.png}
-\caption{Likewise, the effective longwave properties are obtained for the layer knowing longwave properties of the slats. \protect \label{fig:likewise-the-effective-longwave-properties}}
-\end{figure}
+The effective shortwave optical and longwave optical properties of venetian blind layer is estimated using analytical models (Yahoda and Wright 2004, 2005; Kotey et al. 2008). The model requires properties of venetian blind slats and geometry of the slats shown in Figure~\ref{fig:geometry-and-properties-used-for-venetian}.
 
 \begin{figure}[hbtp] % fig 118
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image1846.svg.png}
-\caption{Geometry and properties used for venetian blind analysis \protect \label{fig:geometry-and-properties-used-for-venetian}}
+\caption{Geometry and properties used for venetian blind analysis.~ The effective longwave properties are obtained for the layer knowing longwave properties of the slats. \protect \label{fig:geometry-and-properties-used-for-venetian}}
 \end{figure}
 
 The model assumes that venetian blind slats reflect and transmit solar radiation diffusely (ASHRAE 1311-RP). The same assumption is made regarding thermal radiation. The input data required to characterize a venetian blind are: front and back side reflectance and transmittance of the slat, geometry and infrared emissivity and transmittance of the slate. The effective optical properties of the venetian blind are determined by tracking beam and diffuse solar radiation through various interactions with slats positioned at a given slat angle. The model uses simple four-surface model if the slats are fully sunlit and a six-surface model if the slats are partially sunlit (ASHRAE 1311-RP). Slats are assumed to be thin and flat but a correction is applied to account for slat curvature effect (Kotey et al. 2008).
@@ -2505,7 +2514,7 @@ b = \left\{
 \end{equation}
 
 \begin{equation}
-{\rm{\tau bt}}\left( {\rm{\theta }} \right) = {\rm{\tau bd}}\left( {\rm{\theta }} \right) + {\rm{\tau bb}}\left( {\rm{\theta }} \right)
+{\rm{\tau_{bt}}}\left( {\rm{\theta }} \right) = {\rm{\tau_{bd}}}\left( {\rm{\theta }} \right) + {\rm{\tau_{bb}}}\left( {\rm{\theta }} \right)
 \end{equation}
 
 The off-normal solar property calculation of roller blind is based on a set of correlations developed from measurement data using samples of commonly used commercially produced roller blind material openness range of 0.0 -- 0.14. Thus, these correlations are not applicable for shades with materials openness fraction exceeding 0.20. The mean solar reflectance of a roller blind material was found to be purely diffuse and unaffected by incidence angle and is given by:
@@ -2632,11 +2641,11 @@ where
 
 \emph{T\(^{eff}\)}~ = ~~~~~~~~~ inside surface temperature of the composite layer, °C (°F)
 
-\emph{Q\(_{lw}\)}~ = ~~~~~~~~~ infrared radiant gain from zone, W/m2 (Btu/h-ft2)
+\emph{Q\(_{lw}\)}~~ = ~~~~~~~~~ infrared radiant gain from zone, W/m\(^{2}\) (Btu/h-ft\(^{2}\))
 
-\emph{$\sigma$}~~~ = ~~~~~~~~~ Stefan-Boltzmann constant, W/m2-K4 (Btu/h-ft2-R4)
+\emph{$\sigma$}~~~~ = ~~~~~~~~~ Stefan-Boltzmann constant, W/m\(^{2}\)-K\(^{4}\) (Btu/h-ft\(^{2}\)-R\(^{4}\))
 
-\emph{T\(_{0}\)}~~ = ~~~~~~~~~ Temperature of absolute zero, -273.15 °C (-459.67 °F)
+\emph{T\(_{0}\)}~~~ = ~~~~~~~~~ Temperature of absolute zero, -273.15^{\circ}C (-459.67^{\circ}F)
 
 Recalculating effective inside face window temperature may result in extra convection flux. The~ ``extra'' (Other) convective flux is computed; this is the gain in excess of that resulting from the standard surface heat balance model. The net other convection term \emph{QX} calculated below is added to the zone air heat balance (ASHRAE 1311-RP).
 
@@ -2646,11 +2655,11 @@ QX = {Q_{conv}} - hc \cdot ({T^{eff}} - {T_a})
 
 Where,
 
-\emph{h\(_{c}\)~~ = ~~~~~~~~~} inside convective coefficient of the fenestration, W/m\(^{2}\)-K (Btu/h-ft\(^{2}\)-F)
+\emph{h\(_{c}\)~~~~ = ~~~~~~~~~} inside convective coefficient of the fenestration, W/m\(^{2}\)-K (Btu/h-ft\(^{2}\)-F)
 
-\emph{Q\(_{conv}\)~~~~~~~~~~~ = ~~~~~~~~~} total convective heat flux to zone from equivalent layer window thermal model, W/m\(^{2}\) (Btu/h-ft\(^{2}\)); includes open-channel gains and impact of inside surface convective coefficient
+\emph{Q\(_{conv}\)~= ~~~~~~~~~} total convective heat flux to zone from equivalent layer window thermal model, W/m\(^{2}\) (Btu/h-ft\(^{2}\)); includes open-channel gains and impact of inside surface convective coefficient
 
-\emph{T\(_{a}\)~~ = ~~~~~~~~~} zone air temperature, °C (°F)
+\emph{T\(_{a}\)~~~~ = ~~~~~~~~~} zone air temperature, °C (°F)
 
 \subsubsection{References:}\label{references-2-009}
 
