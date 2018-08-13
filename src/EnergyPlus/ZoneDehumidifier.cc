@@ -271,7 +271,6 @@ namespace ZoneDehumidifier {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using NodeInputManager::GetOnlySingleNode;
         using WaterManager::SetupTankSupplyComponent;
 
@@ -282,10 +281,6 @@ namespace ZoneDehumidifier {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetZoneDehumidifierInput");
         static std::string const CurrentModuleObject("ZoneHVAC:Dehumidifier:DX");
-        // Curve Types
-        int const Quadratic(1);
-        int const BiQuadratic(2);
-        int const Cubic(3);
         Real64 const RatedInletAirTemp(26.7);
         Real64 const RatedInletAirRH(60.0);
 
@@ -404,23 +399,20 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex));
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveType = BiQuadratic;
-                        CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, RatedInletAirTemp, RatedInletAirRH);
-                        if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(cAlphaFields(5) + " output is not equal to 1.0");
-                            ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError("Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                        }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex,   // Curve index
+                    {2},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    ZoneDehumid(ZoneDehumidIndex).Name,   // Object Name
+                    cAlphaFields(5));  // Field Name
 
-                    } else {
-                        ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + ZoneDehumid(ZoneDehumidIndex).Name + "\" illegal " +
-                                        cAlphaFields(5) +
-                                        " type for this object = " + GetCurveType(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex));
-                        ShowContinueError("Curve type must be BiQuadratic.");
-                        ErrorsFound = true;
+                if (!ErrorsFound) {
+                    CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, RatedInletAirTemp, RatedInletAirRH);
+                    if (CurveVal > 1.10 || CurveVal < 0.90) {
+                        ShowWarningError(cAlphaFields(5) + " output is not equal to 1.0");
+                        ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
+                        ShowContinueError("Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                     }
                 }
             }
@@ -438,23 +430,20 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex));
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveType = BiQuadratic;
-                        CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, RatedInletAirTemp, RatedInletAirRH);
-                        if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(cAlphaFields(6) + " output is not equal to 1.0");
-                            ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError("Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                        }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex,   // Curve index
+                    {2},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    ZoneDehumid(ZoneDehumidIndex).Name,   // Object Name
+                    cAlphaFields(6));  // Field Name
 
-                    } else {
-                        ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + ZoneDehumid(ZoneDehumidIndex).Name + "\" illegal " +
-                                        cAlphaFields(6) +
-                                        " type for this object = " + GetCurveType(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex));
-                        ShowContinueError("Curve type must be BiQuadratic.");
-                        ErrorsFound = true;
+                if (!ErrorsFound) {
+                    CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, RatedInletAirTemp, RatedInletAirRH);
+                    if (CurveVal > 1.10 || CurveVal < 0.90) {
+                        ShowWarningError(cAlphaFields(6) + " output is not equal to 1.0");
+                        ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
+                        ShowContinueError("Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                     }
                 }
             }
@@ -472,22 +461,13 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, legal types are Quadratic and Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex));
-                    if (SELECT_CASE_var == "QUADRATIC") {
-                        ZoneDehumid(ZoneDehumidIndex).PartLoadCurveType = Quadratic;
-
-                    } else if (SELECT_CASE_var == "CUBIC") {
-                        ZoneDehumid(ZoneDehumidIndex).PartLoadCurveType = Cubic;
-
-                    } else {
-                        ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + ZoneDehumid(ZoneDehumidIndex).Name + "\" illegal " +
-                                        cAlphaFields(7) +
-                                        " type for this object = " + GetCurveType(ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    ZoneDehumid(ZoneDehumidIndex).Name,   // Object Name
+                    cAlphaFields(7));  // Field Name
             }
 
             // N4,  \field Minimum Dry-Bulb Temperature for Dehumidifier Operation
