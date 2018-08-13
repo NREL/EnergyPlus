@@ -5874,7 +5874,7 @@
     CoolCharge-Charge-Cap-fT,!- Name
     LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
     4,                       !- Number of Interpolation Points
-    TriQuadratic,            !- Curve Type
+    ,                        !- Curve Type
     SingleLineIndependentVariableWithMatrix,  !- Table Data Format
     ,                        !- External File Name
     Ascending,               !- X1 Sort Order
@@ -6427,7 +6427,7 @@
     CoolCharge-Charge-EIR-fT,!- Name
     LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
     4,                       !- Number of Interpolation Points
-    TriQuadratic,            !- Curve Type
+    ,                        !- Curve Type
     SingleLineIndependentVariableWithMatrix,  !- Table Data Format
     ,                        !- External File Name
     Ascending,               !- X1 Sort Order
