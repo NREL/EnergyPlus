@@ -8154,42 +8154,42 @@ namespace SurfaceGeometry {
 
     void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum)
     {
-        // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows.
+        // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows and sets the WindowShadingControlPtr
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
-                int fenestrationIndex =
-                    UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), SurfaceTmp, TotSurfaces);
-                if (fenestrationIndex != SurfNum) break;
-                if (SurfaceTmp(fenestrationIndex).WindowShadingControlPtr == 0) {
-                    SurfaceTmp(fenestrationIndex).WindowShadingControlPtr = iShadeCtrl;
-                    SurfaceTmp(fenestrationIndex).HasShadeControl = true;
-                    // check to make the window refenced is an exterior window
-                    if (SurfaceTmp(fenestrationIndex).ExtBoundCond != ExternalEnvironment) {
+                if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), SurfaceTmp(SurfNum).Name)) {
+                    if (SurfaceTmp(SurfNum).WindowShadingControlPtr == 0) {
+                        SurfaceTmp(SurfNum).WindowShadingControlPtr = iShadeCtrl;
+                        SurfaceTmp(SurfNum).HasShadeControl = true;
+                        // check to make the window refenced is an exterior window
+                        if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
+                            ErrorsFound = true;
+                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: \"" + SurfaceTmp(SurfNum).Name +
+                                            "\", invalid " + " because it is not an exterior window.");
+                            ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                        }
+                        // check to make sure the window is not using equivalent layer window construction
+                        if (Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
+                            ErrorsFound = true;
+                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(SurfNum).Name +
+                                            "\", invalid " + "\".");
+                            ShowContinueError(".. equivalent layer window model does not use shading control object.");
+                            ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
+                            ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                            SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
+                        }
+                    } else {
                         ErrorsFound = true;
-                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: \"" + SurfaceTmp(fenestrationIndex).Name + "\", invalid " +
-                                        " because it is not an exterior window.");
-                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: Fenestration surface named \"" +
+                                        SurfaceTmp(SurfNum).Name + "\" appears on more than one WindowShadingControl list.");
+                        ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
+                                          "\" and another one.");
                     }
-                    // check to make sure the window is not using equivalent layer window construction
-                    if (Construct(SurfaceTmp(fenestrationIndex).Construction).WindowTypeEQL) {
-                        ErrorsFound = true;
-                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(fenestrationIndex).Name + "\", invalid " +
-                                        "\".");
-                        ShowContinueError(".. equivalent layer window model does not use shading control object.");
-                        ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
-                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
-                        SurfaceTmp(fenestrationIndex).WindowShadingControlPtr = 0;
-                    }
-                } else {
-                    ErrorsFound = true;
-                    ShowSevereError("InitialAssociateWindowShadingControlFenestration: Fenestration suface named \"" + SurfaceTmp(fenestrationIndex).Name +
-                                    "\" appears on more than one WindowShadingControl list.");
-                    ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
-                                      "\" and another one.");
                 }
             }
         }
     }
+
 
     void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound)
     {
@@ -8200,13 +8200,13 @@ namespace SurfaceGeometry {
                     UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), Surface, TotSurfaces);
                 if (Surface(fenestrationIndex).WindowShadingControlPtr == iShadeCtrl) {
                     WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
-                } else { 
+                } else {
                     // this error condition should not occur since the rearrangement of Surface() from SurfureTmp() is reliable.
                     ErrorsFound = true;
-                    ShowSevereError("FinalAssociateWindowShadingControlFenestration: Fenestration suface named \"" + Surface(fenestrationIndex).Name +
+                    ShowSevereError("FinalAssociateWindowShadingControlFenestration: Fenestration surface named \"" + Surface(fenestrationIndex).Name +
                                     "\" has WindowShadingContol index that does not match the initial index assigned.");
                     ShowContinueError("This occurs while WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
-                                      "\" is being evalulated. ");
+                                      "\" is being evaluated. ");
                 }
             }
         }
