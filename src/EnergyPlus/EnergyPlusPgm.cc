@@ -225,10 +225,10 @@
 
 void EnergyPlusPgm(std::string const &filepath)
 {
-    std::exit(EnergyPlusPgmReturnCodes(filepath));
+    std::exit(RunEnergyPlus(filepath));
 }
 
-int EnergyPlusPgmReturnCodes(std::string const & filepath)
+int RunEnergyPlus(std::string const & filepath)
 {
     // Using/Aliasing
     using namespace EnergyPlus;

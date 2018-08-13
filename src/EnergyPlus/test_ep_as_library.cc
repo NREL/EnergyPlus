@@ -69,12 +69,12 @@ int main(int argc, char *argv[])
         std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
         return EXIT_FAILURE;
     } else {
-        status = EnergyPlusPgmReturnCodes(argv[1]);
+        status = RunEnergyPlus(argv[1]);
     }
     if (!std::cin.good()) std::cin.clear();
     if (!std::cerr.good()) std::cerr.clear();
     if (!std::cout.good()) std::cout.clear();
-    std::cerr << "THIS LINE SHOULD DISPLAY." << std::endl;
-    std::cout << "THIS LINE SHOULD DISPLAY, TOO." << std::endl;
+    std::cerr << "Standard error is still available for use" << std::endl;
+    std::cout << "Standard output is still available for use" << std::endl;
     return status;
 }
