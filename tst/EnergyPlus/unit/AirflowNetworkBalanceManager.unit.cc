@@ -5167,7 +5167,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
                         "  0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
                         "  12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
                         "  12.19200,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
-                        /*"FenestrationSurface:Detailed,",
+                        "FenestrationSurface:Detailed,",
                         "  WINDOW11,                !- Name",
                         "  WINDOW,                  !- Surface Type",
                         "  WIN-CON-LIGHT,           !- Construction Name",

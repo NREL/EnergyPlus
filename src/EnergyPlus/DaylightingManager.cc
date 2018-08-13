@@ -532,7 +532,6 @@ namespace DaylightingManager {
         Real64 DFOcSky2;
         Real64 SlatAngle;
         int ISA;
-        int ICtrl;
         int ISlatAngle;
 
         static bool CreateDFSReportFile(true);
@@ -5641,7 +5640,7 @@ namespace DaylightingManager {
             for (int jZone = 1; jZone <= NumOfZones; ++jZone) {
                 if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).DaylightingControlName, ZoneDaylight(jZone).Name)) {
                     found = jZone;
-                    exit;
+                    break;
                 }
             }
             if (found > 0) {
