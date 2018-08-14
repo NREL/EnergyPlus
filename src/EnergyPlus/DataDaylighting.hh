@@ -166,9 +166,6 @@ namespace DataDaylighting {
         int NumOfDayltgExtWins;           // Number of associated exterior windows providing daylight to this zone
         Array1D_int DayltgExtWinSurfNums; // List of surface numbers of zone's exterior windows or
         // exterior windows in adjacent zones sharing interior windows with the zone
-        Array1D_int DayltgFacPtrsForExtWins; // Zone's daylighting factor pointers.
-        // Entries in this list have a one-to-one
-        // correspondence with the DayltgExtWinSurfNums list
         Real64 MinIntWinSolidAng;     // Minimum solid angle subtended by an interior window in a zone
         Real64 TotInsSurfArea;        // Total inside surface area of a daylit zone (m2)
         Real64 FloorVisRefl;          // Area-weighted visible reflectance of floor of a daylit zone

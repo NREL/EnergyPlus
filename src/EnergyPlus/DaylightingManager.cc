@@ -10311,7 +10311,6 @@ namespace DaylightingManager {
         int IntWinIndex;
         int ZoneAdjLoop;
         int NumOfIntWindowsCount;
-        int DayltgFacPtr;  // Daylighting factor pointer
         int ZoneExtWinCtr; // Exterior window counter
         int SurfNum;       // Surface number
         int loop;          // DO loop index
@@ -10498,7 +10497,6 @@ namespace DaylightingManager {
             } // End of check if a Daylighting:Detailed zone
         }     // End of primary zone loop
 
-        DayltgFacPtr = 0;
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             ZoneDaylight(ZoneNum).NumOfDayltgExtWins = 0;
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
@@ -10508,8 +10506,6 @@ namespace DaylightingManager {
                 if (ZoneExtWin(ZoneNum) == 0) continue;
                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums.allocate(ZoneExtWin(ZoneNum));
                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums = 0;
-                ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins.allocate(ZoneExtWin(ZoneNum));
-                ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins = 0;
 
                 ZoneDaylight(ZoneNum).SolidAngAtRefPt.allocate(ZoneExtWin(ZoneNum), ZoneDaylight(ZoneNum).TotalDaylRefPoints);
                 ZoneDaylight(ZoneNum).SolidAngAtRefPt = 0.0;
@@ -10546,9 +10542,7 @@ namespace DaylightingManager {
                     if ((Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).ExtBoundCond == ExternalEnvironment) ||
                         SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
                         ++ZoneExtWinCtr;
-                        ++DayltgFacPtr;
                         ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = SurfNum;
-                        ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins(ZoneExtWinCtr) = DayltgFacPtr;
                     }
                 }
 
@@ -10562,9 +10556,7 @@ namespace DaylightingManager {
                             if ((Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
                                 SurfaceWindow(SurfNumAdj).OriginalClass == SurfaceClass_TDD_Diffuser) {
                                 ++ZoneExtWinCtr;
-                                ++DayltgFacPtr;
                                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = SurfNumAdj;
-                                ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins(ZoneExtWinCtr) = DayltgFacPtr;
 
                                 // If no daylighting in that zone, set up variables anyway:
                                 if (ZoneDaylight(ZoneNumAdj).TotalDaylRefPoints == 0) {
