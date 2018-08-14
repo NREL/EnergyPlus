@@ -3621,7 +3621,7 @@ namespace HeatBalanceSurfaceManager {
                         TotGlassLayers = Construct(ConstrNum).TotGlassLayers;
                     }
                     ShadeFlag = SurfaceWindow(SurfNum).ShadingFlag;
-                    if (ShadeFlag <= 0) { // No window shading
+                    if (ShadeFlag <= 0 || SurfaceWindow(SurfNum).WindowModelType == WindowBSDFModel) { // No window shading
                         for (IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                             // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                             InitialDifSolInAbsReport(SurfNum) += InitialDifSolwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
