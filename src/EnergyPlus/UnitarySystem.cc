@@ -175,28 +175,27 @@ namespace UnitarySystems {
           m_CoolingCoilAvailSchPtr(0), m_DesignCoolingCapacity(0.0), m_MaxCoolAirVolFlow(0.0), m_CondenserNodeNum(0), m_CondenserType(0),
           m_CoolingCoilIndex(0), m_HeatPump(false), m_ActualDXCoilIndexForHXAssisted(0), m_MultiSpeedCoolingCoil(false), m_VarSpeedCoolingCoil(false),
           m_SystemCoolControlNodeNum(0), m_WaterCyclingMode(0), m_ISHundredPercentDOASDXCoil(false), m_RunOnSensibleLoad(false),
-          m_RunOnLatentLoad(false), m_RunOnLatentOnlyWithSensible(false), m_DehumidificationMode(0), m_SuppHeatCoilType_Num(0), m_SuppCoilExists(0),
-          m_DesignSuppHeatingCapacity(0.0), m_SuppCoilAirInletNode(0), m_SuppCoilAirOutletNode(0), m_SuppCoilFluidInletNode(0),
-          m_MaxSuppCoilFluidFlow(0.0), m_SuppHeatCoilIndex(0), m_SuppHeatControlNodeNum(0), m_SupHeaterLoad(0.0), m_CoolingSAFMethod(0),
-          m_HeatingSAFMethod(0), m_NoCoolHeatSAFMethod(0), m_MaxNoCoolHeatAirVolFlow(0.0), m_AirFlowControl(UseCompFlow::FlowNotYetSet),
-          m_CoolingCoilUpstream(true), m_MaxOATSuppHeat(0.0), m_MinOATCompressorCooling(0.0), m_MinOATCompressorHeating(0.0),
-          m_MaxONOFFCyclesperHour(0.0), m_HPTimeConstant(0.0), m_OnCyclePowerFraction(0.0), m_FanDelayTime(0.0), m_AncillaryOnPower(0.0),
-          m_AncillaryOffPower(0.0), m_DesignHRWaterVolumeFlow(0.0), m_MaxHROutletWaterTemp(0.0), m_HeatRecActive(false),
+          m_RunOnLatentLoad(false), m_RunOnLatentOnlyWithSensible(false), m_DehumidificationMode(0), m_SuppHeatCoilType_Num(0),
+          m_SuppCoilExists(false), m_DesignSuppHeatingCapacity(0.0), m_SuppCoilAirInletNode(0), m_SuppCoilAirOutletNode(0),
+          m_SuppCoilFluidInletNode(0), m_MaxSuppCoilFluidFlow(0.0), m_SuppHeatCoilIndex(0), m_SuppHeatControlNodeNum(0), m_SupHeaterLoad(0.0),
+          m_CoolingSAFMethod(0), m_HeatingSAFMethod(0), m_NoCoolHeatSAFMethod(0), m_MaxNoCoolHeatAirVolFlow(0.0),
+          m_AirFlowControl(UseCompFlow::FlowNotYetSet), m_CoolingCoilUpstream(true), m_MaxOATSuppHeat(0.0), m_MinOATCompressorCooling(0.0),
+          m_MinOATCompressorHeating(0.0), m_MaxONOFFCyclesperHour(0.0), m_HPTimeConstant(0.0), m_OnCyclePowerFraction(0.0), m_FanDelayTime(0.0),
+          m_AncillaryOnPower(0.0), m_AncillaryOffPower(0.0), m_DesignHRWaterVolumeFlow(0.0), m_MaxHROutletWaterTemp(0.0), m_HeatRecActive(false),
           m_HeatRecoveryInletNodeNum(0), m_HeatRecoveryOutletNodeNum(0), m_DesignSpecMSHPIndex(-1), m_NoLoadAirFlowRateRatio(1.0),
-          m_CompPointerMSHP(nullptr), m_IdleMassFlowRate(0.0), m_IdleVolumeAirRate(0.0), m_IdleSpeedRatio(0.0), m_SingleMode(0),
-          m_MultiOrVarSpeedHeatCoil(false), m_MultiOrVarSpeedCoolCoil(false), m_PartLoadFrac(0.0), m_CoolingPartLoadFrac(0.0),
-          m_HeatingPartLoadFrac(0.0), m_SuppHeatPartLoadFrac(0.0), m_HeatCompPartLoadRatio(0.0), m_CoolCompPartLoadRatio(0.0), m_SpeedRatio(0.0),
-          m_CycRatio(0.0), m_MyEnvrnFlag(true), m_MyEnvrnFlag2(true), m_MyPlantScanFlag(true), m_MySuppCoilPlantScanFlag(true),
-          m_MySetPointCheckFlag(true), m_MySizingCheckFlag(true), m_InitHeatPump(false), m_HRLoopNum(0), m_HRLoopSideNum(0), m_HRBranchNum(0),
-          m_HRCompNum(0), m_SuppCoilLoopNum(0), m_SuppCoilLoopSide(0), m_SuppCoilBranchNum(0), m_SuppCoilCompNum(0), m_SuppCoilFluidOutletNodeNum(0),
-          m_WSHPRuntimeFrac(0.0), m_CompPartLoadRatio(0.0), m_CoolingCoilSensDemand(0.0), m_CoolingCoilLatentDemand(0.0),
-          m_HeatingCoilSensDemand(0.0), m_SenLoadLoss(0.0), m_LatLoadLoss(0.0), m_DesignHeatRecMassFlowRate(0.0), m_HeatRecoveryMassFlowRate(0.0),
-          m_HeatRecoveryRate(0.0), m_HeatRecoveryEnergy(0.0), m_HeatRecoveryInletTemp(0.0), m_HeatRecoveryOutletTemp(0.0), m_IterationCounter(0),
-          m_DesiredOutletTemp(0.0), m_DesiredOutletHumRat(0.0), m_FrostControlStatus(0), m_CoolingCycRatio(0.0), m_CoolingSpeedRatio(0.0),
-          m_CoolingSpeedNum(0), m_HeatingCycRatio(0.0), m_HeatingSpeedRatio(0.0), m_HeatingSpeedNum(0), m_SpeedNum(0),
-          m_DehumidInducedHeatingDemandRate(0.0), m_TotalAuxElecPower(0.0), m_HeatingAuxElecConsumption(0.0), m_CoolingAuxElecConsumption(0.0),
-          m_ElecPower(0.0), m_ElecPowerConsumption(0.0), m_LastMode(0), m_FirstPass(true), m_TotCoolEnergyRate(0.0), m_SensCoolEnergyRate(0.0),
-          m_LatCoolEnergyRate(0.0), m_TotHeatEnergyRate(0.0), m_SensHeatEnergyRate(0.0), m_LatHeatEnergyRate(0.0),
+          m_IdleMassFlowRate(0.0), m_IdleVolumeAirRate(0.0), m_IdleSpeedRatio(0.0), m_SingleMode(0), m_MultiOrVarSpeedHeatCoil(false),
+          m_MultiOrVarSpeedCoolCoil(false), m_PartLoadFrac(0.0), m_CoolingPartLoadFrac(0.0), m_HeatingPartLoadFrac(0.0), m_SuppHeatPartLoadFrac(0.0),
+          m_HeatCompPartLoadRatio(0.0), m_CoolCompPartLoadRatio(0.0), m_SpeedRatio(0.0), m_CycRatio(0.0), m_MyEnvrnFlag(true), m_MyEnvrnFlag2(true),
+          m_MyPlantScanFlag(true), m_MySuppCoilPlantScanFlag(true), m_MySetPointCheckFlag(true), m_MySizingCheckFlag(true), m_InitHeatPump(false),
+          m_HRLoopNum(0), m_HRLoopSideNum(0), m_HRBranchNum(0), m_HRCompNum(0), m_SuppCoilLoopNum(0), m_SuppCoilLoopSide(0), m_SuppCoilBranchNum(0),
+          m_SuppCoilCompNum(0), m_SuppCoilFluidOutletNodeNum(0), m_WSHPRuntimeFrac(0.0), m_CompPartLoadRatio(0.0), m_CoolingCoilSensDemand(0.0),
+          m_CoolingCoilLatentDemand(0.0), m_HeatingCoilSensDemand(0.0), m_SenLoadLoss(0.0), m_LatLoadLoss(0.0), m_DesignHeatRecMassFlowRate(0.0),
+          m_HeatRecoveryMassFlowRate(0.0), m_HeatRecoveryRate(0.0), m_HeatRecoveryEnergy(0.0), m_HeatRecoveryInletTemp(0.0),
+          m_HeatRecoveryOutletTemp(0.0), m_IterationCounter(0), m_DesiredOutletTemp(0.0), m_DesiredOutletHumRat(0.0), m_FrostControlStatus(0),
+          m_CoolingCycRatio(0.0), m_CoolingSpeedRatio(0.0), m_CoolingSpeedNum(0), m_HeatingCycRatio(0.0), m_HeatingSpeedRatio(0.0),
+          m_HeatingSpeedNum(0), m_SpeedNum(0), m_DehumidInducedHeatingDemandRate(0.0), m_TotalAuxElecPower(0.0), m_HeatingAuxElecConsumption(0.0),
+          m_CoolingAuxElecConsumption(0.0), m_ElecPower(0.0), m_ElecPowerConsumption(0.0), m_LastMode(0), m_FirstPass(true), m_TotCoolEnergyRate(0.0),
+          m_SensCoolEnergyRate(0.0), m_LatCoolEnergyRate(0.0), m_TotHeatEnergyRate(0.0), m_SensHeatEnergyRate(0.0), m_LatHeatEnergyRate(0.0),
           m_DesignFanVolFlowRateEMSOverrideOn(false), m_MaxHeatAirVolFlowEMSOverrideOn(false), m_MaxCoolAirVolFlowEMSOverrideOn(false),
           m_MaxNoCoolHeatAirVolFlowEMSOverrideOn(false), m_DesignFanVolFlowRateEMSOverrideValue(0.0), m_MaxHeatAirVolFlowEMSOverrideValue(0.0),
           m_MaxCoolAirVolFlowEMSOverrideValue(0.0), m_MaxNoCoolHeatAirVolFlowEMSOverrideValue(0.0), m_EMSOverrideSensZoneLoadRequest(false),
@@ -212,7 +211,7 @@ namespace UnitarySystems {
           CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0),
           CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0),
           HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0),
-          ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0)
+          ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr)
     {
     }
 
@@ -280,20 +279,22 @@ namespace UnitarySystems {
         Real64 tempMassFlowRateMaxAvail = DataLoopNode::Node(this->AirInNode).MassFlowRateMaxAvail;
         DataLoopNode::Node(this->AirInNode).MassFlowRateMaxAvail = this->m_DesignMassFlowRate;
 
-        bool HXUnitOn = false;
-        {
-            auto const SELECT_CASE_var(this->m_ControlType);
-            if (SELECT_CASE_var == ControlType::Setpoint) {
-                if (ZoneEquipment) {
-                    this->controlUnitarySystemtoSP(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
-                } else {
-                    this->controlUnitarySystemtoSP(AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
-                }
-            } else if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
-                if (ZoneEquipment) {
-                    this->controlUnitarySystemtoLoad(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
-                } else {
-                    this->controlUnitarySystemtoLoad(AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+        if (this->m_OKToPrintSizing) {
+            bool HXUnitOn = false;
+            {
+                auto const SELECT_CASE_var(this->m_ControlType);
+                if (SELECT_CASE_var == ControlType::Setpoint) {
+                    if (ZoneEquipment) {
+                        this->controlUnitarySystemtoSP(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                    } else {
+                        this->controlUnitarySystemtoSP(AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                    }
+                } else if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
+                    if (ZoneEquipment) {
+                        this->controlUnitarySystemtoLoad(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                    } else {
+                        this->controlUnitarySystemtoLoad(AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                    }
                 }
             }
         }
@@ -452,15 +453,12 @@ namespace UnitarySystems {
     {
         if (UnitarySystems::getInputOnceFlag) {
             UnitarySys::getUnitarySystemInput(objectName, ZoneEquipment, ZoneOAUnitNum);
+            UnitarySystems::getInputOnceFlag = false;
         }
         int sysNum = -1;
         for (auto &sys : unitarySys) {
             ++sysNum;
-            if (sys.m_ThisSysInputShouldBeGotten) {
-                UnitarySys::getUnitarySystemInput(objectName, ZoneEquipment, ZoneOAUnitNum);
-                UnitarySystems::getInputOnceFlag = false;
-            }
-            if (UtilityRoutines::SameString(sys.Name, objectName) && sys.UnitarySystemType_Num == object_type_of_num) {
+            if (UtilityRoutines::SameString(sys.Name, objectName)) {
                 unitarySys[sysNum].m_UnitarySysNum = sysNum;
                 return &sys;
             }
@@ -2724,6 +2722,7 @@ namespace UnitarySystems {
                 thisSys.UnitType = cCurrentModuleObject;
                 if (ZoneEquipment) {
                     thisSys.UnitarySystemType_Num = DataZoneEquipment::ZoneUnitarySys_Num;
+                    thisSys.m_OKToPrintSizing = true;
                 } else {
                     thisSys.UnitarySystemType_Num = SimAirServingZones::UnitarySystemModel;
                 }
@@ -2811,10 +2810,10 @@ namespace UnitarySystems {
                 bool ZoneEquipmentFound = false;
                 bool ZoneInletNodeFound = false;
 
-                if (sysNum == -1) {
-                    // Early calls to ATMixer doesn't have enough info to pass GetInput. Need to push_back here, and protect against the next time
+                if (sysNum == -1 || !DataZoneEquipment::ZoneEquipInputsFilled) {
+                    // Early calls to ATMixer doesn't have enough info to pass GetInput. Need push_back here, and protect against the next time
                     // through.
-                    unitarySys.push_back(thisSys);
+                    if (sysNum == -1) unitarySys.push_back(thisSys);
                     continue;
                 }
 
@@ -3131,6 +3130,7 @@ namespace UnitarySystems {
                     continue; // will this do the trick and avoid protecting everything below here?
                 } else {
                     thisSys.m_ThisSysInputShouldBeGotten = false;
+                    if (AirLoopFound && thisSys.m_ZoneInletNode > 0) thisSys.m_OKToPrintSizing = true;
                 }
 
                 if (AirLoopNumber == 0 && !ZoneEquipmentFound &&
@@ -8395,6 +8395,12 @@ namespace UnitarySystems {
                     this->m_OKToPrintSizing = true;            // hope first time back through finds the data, else multiple prints to the eio
                     this->m_airLoopReturnCounter += 1;
                     if (this->m_airLoopReturnCounter < 3) return;
+                    //} else {
+                    //    this->m_ThisSysInputShouldBeGotten = true; // need to find zone inlet node once data is available
+                    //    this->m_MySizingCheckFlag = true;          // need to resize after getInput is read in again
+                    //    this->m_OKToPrintSizing = true;            // hope first time back through finds the data, else multiple prints to the eio
+                    //    this->m_airLoopReturnCounter += 1;
+                    //    if (this->m_airLoopReturnCounter < 3) return;
                 }
                 int coolingPriority = 0;
                 int heatingPriority = 0;
@@ -9710,7 +9716,7 @@ namespace UnitarySystems {
                                               Real64 const PartLoadRatio,     // coil operating part-load ratio
                                               int const CompOn,               // compressor control (0=off, 1=on)
                                               Real64 const OnOffAirFlowRatio, // ratio of on to off flow rate
-                                              Real64 const HeatCoilLoad       // adjusted heating coil load if outlet temp exceeds max (W)
+                                              Real64 HeatCoilLoad             // adjusted heating coil load if outlet temp exceeds max (W)
     )
     {
 
@@ -9774,6 +9780,7 @@ namespace UnitarySystems {
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
+                HeatCoilLoad = PartLoadRatio * m_DesignHeatingCapacity;
                 HeatingCoils::SimulateHeatingCoilComponents(
                     CompName, FirstHVACIteration, HeatCoilLoad, this->m_HeatingCoilIndex, _, false, this->m_FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {
@@ -12487,19 +12494,22 @@ namespace UnitarySystems {
         this->m_ElecPowerConsumption = 0.0;
 
         int OutletNode = this->AirOutNode;
-        Real64 AirMassFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
 
-        {
-            auto const SELECT_CASE_var(this->m_ControlType);
-            if (SELECT_CASE_var == ControlType::Setpoint) {
+        Real64 AirMassFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
+        auto const SELECT_CASE_var(this->m_ControlType);
+        // Noticed that these are calculated differently.
+        // That doesn't make sense except that NodeNumOfControlledZone = 0 for set point control because the control zone name is not required.
+        if (SELECT_CASE_var == ControlType::Setpoint) {
+            if (OutletNode > 0) {
                 int InletNode = this->AirInNode;
                 Real64 MinHumRatio = DataLoopNode::Node(InletNode).HumRat;
                 QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
                                               Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, MinHumRatio)) -
                                this->m_SenLoadLoss;
                 QTotUnitOut = AirMassFlow * (DataLoopNode::Node(OutletNode).Enthalpy - DataLoopNode::Node(InletNode).Enthalpy);
-
-            } else {
+            }
+        } else {
+            if (OutletNode > 0 && this->NodeNumOfControlledZone > 0) {
                 Real64 MinHumRatio = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
                 QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
                                               Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, MinHumRatio)) -
@@ -12547,7 +12557,7 @@ namespace UnitarySystems {
             }
         }
 
-        if (this->m_FanExists) {
+        if (this->m_FanExists && OutletNode > 0) {
             if (CompOnMassFlow > 0.0) {
                 this->FanPartLoadRatio = DataLoopNode::Node(OutletNode).MassFlowRate / CompOnMassFlow;
             } else {

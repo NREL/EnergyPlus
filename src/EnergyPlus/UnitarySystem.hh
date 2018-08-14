@@ -400,6 +400,7 @@ namespace UnitarySystems {
         int ATMixerType;                 // type of AT mixer, inlet-side or supply-side
         int ATMixerOutNode;              // AT mixer outlet node number
         Real64 ControlZoneMassFlowFrac;  // fraction of air flow to the control zone
+        DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
 
@@ -422,7 +423,6 @@ namespace UnitarySystems {
         std::vector<Real64> m_MSHeatingSpeedRatio;
         std::vector<Real64> m_HeatingVolFlowRatio;
         std::vector<int> m_IterationMode; // array of operating mode each iteration
-        DesignSpecMSHP *m_CompPointerMSHP;
 
         struct WarnMessages
         {
@@ -642,7 +642,7 @@ namespace UnitarySystems {
                                       Real64 const PartLoadRatio,     // coil operating part-load ratio
                                       int const CompOn,               // comrpressor control (0=off, 1=on)
                                       Real64 const OnOffAirFlowRatio, // ratio of on to off flow rate
-                                      Real64 const HeatCoilLoad       // adjusted heating coil load if outlet temp exceeds max (W)
+                                      Real64 HeatCoilLoad             // adjusted heating coil load if outlet temp exceeds max (W)
         );
 
         void calcUnitarySuppHeatingSystem(bool const FirstHVACIteration, // True when first HVAC iteration

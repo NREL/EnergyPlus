@@ -1107,6 +1107,7 @@ namespace MixedAir {
                     OutsideAirSys(OASysNum).ComponentType.allocate(NumInList);
                     OutsideAirSys(OASysNum).ComponentType_Num.dimension(NumInList, 0);
                     OutsideAirSys(OASysNum).ComponentIndex.dimension(NumInList, 0);
+                    OutsideAirSys(OASysNum).compPointer.resize(NumInList + 1, nullptr);
                     for (InListNum = 1; InListNum <= NumInList; ++InListNum) {
                         OutsideAirSys(OASysNum).ComponentName(InListNum) = AlphArray(InListNum * 2 + 1);
                         OutsideAirSys(OASysNum).ComponentType(InListNum) = AlphArray(InListNum * 2);
@@ -1215,6 +1216,7 @@ namespace MixedAir {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = DXHeatPumpSystem;
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystemModel;
+                        OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
                         UnitarySystems::UnitarySys thisSys;
                         OutsideAirSys(OASysNum).compPointer[CompNum] =
                             thisSys.factory(SimAirServingZones::UnitarySystemModel, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
