@@ -1,0 +1,1591 @@
+!-Generator IDFEditor 1.50
+!-Option SortedOrder UseSpecialFormat
+
+!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
+
+
+!-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
+
+! Name of file: HAMT_HourlyProfileReport.idf
+!
+! Basic file description:
+! Single zone single story lightweight building.
+! The building is orientated with its long axis east-west. Windows are on the south wall.
+!
+! Highlights:
+! To demonstrate the use of the HAMT solution algorithm,
+! including the use of fixed vapor transfer coefficients
+!
+! Simulation Location/Run:
+! autosizing using Denver winter & summer design days;
+! simulation; 1 winter, 1 summer day.
+!
+! Location: Chicago, IL
+! Run Period (Weather File): 1 months, USA_IL_Chicago-OHare_TMY2
+! Timestep: 20 per hour.
+!
+! Building:
+!    ______________________
+!   |\                    /|
+!   | \                  / |     NORTH
+!   |  \________________/  |      ^
+!   |  |                |  |     /|\
+!   |  |                |  |      |
+!   |  |                |  |6 m   |
+!   |  |                |  |      |
+!   |  |                |  |      |
+!   |  |________________|  |
+!   |  / ____     ____  \  |
+!   | / /____\   /____\  \ |
+!   |/____________________\|
+!             8 m
+!     ______________________
+!    |  _____       _____   |
+!    | |     |     |     |  | 2.7m
+!    | |_____|     |_____|  |
+!    |______________________|
+!
+! Both windows are 2m high and 3m wide,
+! separated by 1m, 0.5m from the roof
+! and 0.5m from either side of the building.
+!
+! Floor area: 48 m2
+! Dimensions: 8 m x 6 m
+! Floor height: 2.7 m
+! conditioned floor. No basement
+! Number of Stories: 1
+!
+! Shell characteristics:
+! Roof construction: Flat roof, plywood, insulation, spruce panel
+! Wall construction:  spruce siding, conctete, cellulose insulation, spruce panel
+! Floor construction: Glass fibre insulation, spruce flooring
+!
+! Windows
+! The area of each window is 6 m2 , giving a total glazed area of 12 m2
+! The windows were double glazed with an air gap:
+!
+! Glass:
+! Pane Thickness: 0.003175 m
+! Solar Transmittance at normal incidence: 0.86156
+! Solar reflectance at normal incidence: Front side: 0.07846
+! Solar reflectance at normal incidence: Back side: 0.07846
+! Visible transmittance at normal incidence: 0.91325
+! Visible reflectance at normal incidence: Front side: 0.082
+! Visible reflectance at normal incidence: Back side: 0.082
+! IR Transmittance at Normal Incidence: 0
+! IR Hemispherical Emissivity: Front Side 0.84
+! IR Hemishpherical Emissivity: Back Side 0.84
+! Conductivity 1.06 W/mK
+!
+! Air Gap:
+! Air Gap thickness: 0.013 m
+!
+! All other material properties are set to use the HAMT solutions algorithm
+!
+! Infiltration:
+! All hours: 0.5 ACH
+!
+! Internal Loads:
+! The  same internal load schedule is used for every day of the simulation year:
+! Sensible:
+! 800 watts all day
+! Latent:
+! 0 watts between 0 and 0900 hours and between 1700 and 2400 hours
+! 352.6 watts between 0900 hours and 1700 hours.
+!
+! System controls are:
+! Heating  20.0 C
+! Cooling 27.0 C
+!
+! HVAC:
+! 100% convective air system, thermostat on room temperature, no latent load,
+! Compact FanCoil system is used. System is autosized.
+!
+! Reporting:
+!      Outdoor Dry Bulb,                 daily;
+!      Outdoor Relative Humidity,        daily;
+!      Zone Mean Air Temperature,        daily;
+!      Zone Air Relative Humidity,       daily;
+!      Zone/Sys Sensible Heating Rate,   daily;
+!      Zone/Sys Sensible Cooling Rate,   daily;
+!
+!      The following report variables are selected as an example for
+!      east wall only
+!      HAMT-Surface Water Content ,      daily;
+!
+!      HAMT-Profile Construction 1 Cell 1 Temperature,  daily;
+!            .. through to ..
+!      HAMT-Profile Construction 1 Cell 22 Temperature, daily;
+!
+!      HAMT-Profile Construction 1 Cell 1 Water,        daily;
+!            .. through to ..
+!      HAMT-Profile Construction 1 Cell 22 Water,       daily;
+!
+!      HAMT-Profile Construction 1 Cell 1 RH,           daily;
+!            .. through to ..
+!      HAMT-Profile Construction 1 Cell 22 RH,          daily;
+!
+!
+Version,8.9;
+
+!-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
+
+
+SimulationControl,
+    Yes,                     !- Do Zone Sizing Calculation
+    Yes,                     !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
+
+
+!-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
+
+Building,
+    HAMT test 1,             !- Name
+    0,                       !- North Axis {deg}
+    ,                        !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value
+    0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+    MinimalShadowing,        !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+
+!-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+!-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:OUTSIDE ===========
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+!-   ===========  ALL OBJECTS IN CLASS: HEATBALANCEALGORITHM ===========
+
+HeatBalanceAlgorithm,CombinedHeatAndMoistureFiniteElement,200;
+
+!-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
+
+Timestep,20;
+
+!-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
+
+
+SizingPeriod:DesignDay,
+    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    270,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.0;                     !- Sky Clearness
+
+SizingPeriod:DesignDay,
+    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    31.5,                    !- Maximum Dry-Bulb Temperature {C}
+    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.0;                     !- Sky Clearness
+
+
+!-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
+
+RunPeriod,
+    ,                        !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    1,                       !- End Month
+    31,                      !- End Day of Month
+    UseWeatherFile,          !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    Yes,                     !- Apply Weekend Holiday Rule
+    No,                      !- Use Weather File Rain Indicators
+    No,                      !- Use Weather File Snow Indicators
+    1;                       !- Number of Times Runperiod to be Repeated
+
+
+!-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:BUILDINGSURFACE ===========
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+!-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPELIMITS ===========
+
+
+ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+ScheduleTypeLimits,
+    Any Number;              !- Name
+
+ScheduleTypeLimits,
+    Temperature,             !- Name
+    -60,                     !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    CONTINUOUS,              !- Numeric Type
+    Temperature;             !- Unit Type
+
+ScheduleTypeLimits,
+    Control Type,            !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+ScheduleTypeLimits,
+    FlowRate,                !- Name
+    0.0,                     !- Lower Limit Value
+    10,                      !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+
+!-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:DAY:HOURLY ===========
+
+Schedule:Day:Hourly,
+    On,                      !- Name
+    Fraction,                !- Schedule Type Limits Name
+    1,                       !- Hour 1
+    1,                       !- Hour 2
+    1,                       !- Hour 3
+    1,                       !- Hour 4
+    1,                       !- Hour 5
+    1,                       !- Hour 6
+    1,                       !- Hour 7
+    1,                       !- Hour 8
+    1,                       !- Hour 9
+    1,                       !- Hour 10
+    1,                       !- Hour 11
+    1,                       !- Hour 12
+    1,                       !- Hour 13
+    1,                       !- Hour 14
+    1,                       !- Hour 15
+    1,                       !- Hour 16
+    1,                       !- Hour 17
+    1,                       !- Hour 18
+    1,                       !- Hour 19
+    1,                       !- Hour 20
+    1,                       !- Hour 21
+    1,                       !- Hour 22
+    1,                       !- Hour 23
+    1;                       !- Hour 24
+
+Schedule:Day:Hourly,
+    Moisture annex 41,       !- Name
+    Fraction,                !- Schedule Type Limits Name
+    0,                       !- Hour 1
+    0,                       !- Hour 2
+    0,                       !- Hour 3
+    0,                       !- Hour 4
+    0,                       !- Hour 5
+    0,                       !- Hour 6
+    0,                       !- Hour 7
+    0,                       !- Hour 8
+    0,                       !- Hour 9
+    1,                       !- Hour 10
+    1,                       !- Hour 11
+    1,                       !- Hour 12
+    1,                       !- Hour 13
+    1,                       !- Hour 14
+    1,                       !- Hour 15
+    1,                       !- Hour 16
+    1,                       !- Hour 17
+    0,                       !- Hour 18
+    0,                       !- Hour 19
+    0,                       !- Hour 20
+    0,                       !- Hour 21
+    0,                       !- Hour 22
+    0,                       !- Hour 23
+    0;                       !- Hour 24
+
+
+!-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:WEEK:DAILY ===========
+
+Schedule:Week:Daily,
+    WeekOn,                  !- Name
+    On,                      !- Sunday Schedule:Day Name
+    On,                      !- Monday Schedule:Day Name
+    On,                      !- Tuesday Schedule:Day Name
+    On,                      !- Wednesday Schedule:Day Name
+    On,                      !- Thursday Schedule:Day Name
+    On,                      !- Friday Schedule:Day Name
+    On,                      !- Saturday Schedule:Day Name
+    On,                      !- Holiday Schedule:Day Name
+    On,                      !- SummerDesignDay Schedule:Day Name
+    On,                      !- WinterDesignDay Schedule:Day Name
+    On,                      !- CustomDay1 Schedule:Day Name
+    On;                      !- CustomDay2 Schedule:Day Name
+
+Schedule:Week:Daily,
+    Weekon moisture,         !- Name
+    Moisture annex 41,       !- Sunday Schedule:Day Name
+    Moisture annex 41,       !- Monday Schedule:Day Name
+    Moisture annex 41,       !- Tuesday Schedule:Day Name
+    Moisture annex 41,       !- Wednesday Schedule:Day Name
+    Moisture annex 41,       !- Thursday Schedule:Day Name
+    Moisture annex 41,       !- Friday Schedule:Day Name
+    Moisture annex 41,       !- Saturday Schedule:Day Name
+    Moisture annex 41,       !- Holiday Schedule:Day Name
+    Moisture annex 41,       !- SummerDesignDay Schedule:Day Name
+    Moisture annex 41,       !- WinterDesignDay Schedule:Day Name
+    Moisture annex 41,       !- CustomDay1 Schedule:Day Name
+    Moisture annex 41;       !- CustomDay2 Schedule:Day Name
+
+
+!-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:YEAR ===========
+
+Schedule:Year,
+    On,                      !- Name
+    Fraction,                !- Schedule Type Limits Name
+    WeekOn,                  !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+
+Schedule:Year,
+    Moisture on,             !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Weekon moisture,         !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+
+
+!-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:COMPACT ===========
+
+Schedule:Compact,
+    Htg-SetP-Sch,            !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: WeekDays CustomDay1 CustomDay2 Sunday Saturday Holiday SummerDesignDay WinterDesignDay",  !- Field 2
+    Until: 24:00, 20;        !- Field 4
+
+Schedule:Compact,
+    Clg-SetP-Sch,            !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: WeekDays CustomDay1 CustomDay2 Sunday Saturday Holiday SummerDesignDay WinterDesignDay",  !- Field 2
+    Until: 24:00, 20;        !- Field 4
+
+Schedule:Compact,
+    FanAvailSched,           !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: WeekDays CustomDay1 CustomDay2 Sunday Saturday Holiday SummerDesignDay WinterDesignDay",  !- Field 2
+    Until: 24:00, 1;         !- Field 4
+
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
+
+Material,
+    Concrete,                !- Name
+    Rough,                   !- Roughness
+    0.1,                     !- Thickness {m}
+    1.6,                     !- Conductivity {W/m-K}
+    2300,                    !- Density {kg/m3}
+    850,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+Material,
+    Spruce,                  !- Name
+    Rough,                   !- Roughness
+    0.012,                   !- Thickness {m}
+    0.09,                    !- Conductivity {W/m-K}
+    455,                     !- Density {kg/m3}
+    1500,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+Material,
+    Plywood,                 !- Name
+    Rough,                   !- Roughness
+    0.025,                   !- Thickness {m}
+    0.14,                    !- Conductivity {W/m-K}
+    530,                     !- Density {kg/m3}
+    1880,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+Material,
+    Cellulose ins,           !- Name
+    Rough,                   !- Roughness
+    0.066,                   !- Thickness {m}
+    0.04,                    !- Conductivity {W/m-K}
+    55,                      !- Density {kg/m3}
+    1880,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+Material,
+    Glass Fibre ins,         !- Name
+    Rough,                   !- Roughness
+    1.003,                   !- Thickness {m}
+    0.04,                    !- Conductivity {W/m-K}
+    80,                      !- Density {kg/m3}
+    840,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+Material,
+    Cellulose ins 1cm,       !- Name
+    Rough,                   !- Roughness
+    0.01,                    !- Thickness {m}
+    0.04,                    !- Conductivity {W/m-K}
+    55,                      !- Density {kg/m3}
+    1880,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+
+!-   ===========  ALL OBJECTS IN CLASS: WINDOWMATERIAL:GLAZING ===========
+
+WindowMaterial:Glazing,
+    Glass,                   !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.003175,                !- Thickness {m}
+    0.86156,                 !- Solar Transmittance at Normal Incidence
+    0.07846,                 !- Front Side Solar Reflectance at Normal Incidence
+    0.07846,                 !- Back Side Solar Reflectance at Normal Incidence
+    0.91325,                 !- Visible Transmittance at Normal Incidence
+    0.082,                   !- Front Side Visible Reflectance at Normal Incidence
+    0.082,                   !- Back Side Visible Reflectance at Normal Incidence
+    0,                       !- Infrared Transmittance at Normal Incidence
+    0.84,                    !- Front Side Infrared Hemispherical Emissivity
+    0.84,                    !- Back Side Infrared Hemispherical Emissivity
+    1.06;                    !- Conductivity {W/m-K}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: WINDOWMATERIAL:GAS ===========
+
+WindowMaterial:Gas,
+    Air,                     !- Name
+    Air,                     !- Gas Type
+    0.013;                   !- Thickness {m}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIALPROPERTY:HEATANDMOISTURETRANSFER:SETTINGS ===========
+
+MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Concrete,                !- Material Name
+    0.76,                    !- Porosity {m3/m3}
+    0.01;                    !- Initial Water Content Ratio {kg/kg}
+
+MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Spruce,                  !- Material Name
+    0.73,                    !- Porosity {m3/m3}
+    0.05;                    !- Initial Water Content Ratio {kg/kg}
+
+MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Plywood,                 !- Material Name
+    0.5,                     !- Porosity {m3/m3}
+    0.05;                    !- Initial Water Content Ratio {kg/kg}
+
+MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Cellulose ins,           !- Material Name
+    0.95,                    !- Porosity {m3/m3}
+    0.001;                   !- Initial Water Content Ratio {kg/kg}
+
+MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Glass Fibre ins,         !- Material Name
+    0.95,                    !- Porosity {m3/m3}
+    0.1;                     !- Initial Water Content Ratio {kg/kg}
+
+MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Cellulose ins 1cm,       !- Material Name
+    0.95,                    !- Porosity {m3/m3}
+    0.001;                   !- Initial Water Content Ratio {kg/kg}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIALPROPERTY:HEATANDMOISTURETRANSFER:SORPTIONISOTHERM ===========
+
+MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Cellulose ins,           !- Material Name
+    5,                       !- Number of Isotherm Coordinates
+    0.25,                    !- Relative Humidity Fraction 1 {dimensionless}
+    2.365,                   !- Moisture Content 1 {kg/m3}
+    0.44,                    !- Relative Humidity Fraction 2 {dimensionless}
+    4.62,                    !- Moisture Content 2 {kg/m3}
+    0.66,                    !- Relative Humidity Fraction 3 {dimensionless}
+    6.655,                   !- Moisture Content 3 {kg/m3}
+    0.86,                    !- Relative Humidity Fraction 4 {dimensionless}
+    11.4125,                 !- Moisture Content 4 {kg/m3}
+    1,                       !- Relative Humidity Fraction 5 {dimensionless}
+    13;                      !- Moisture Content 5 {kg/m3}
+
+MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Glass Fibre ins,         !- Material Name
+    6,                       !- Number of Isotherm Coordinates
+    0.202,                   !- Relative Humidity Fraction 1 {dimensionless}
+    0.748,                   !- Moisture Content 1 {kg/m3}
+    0.4325,                  !- Relative Humidity Fraction 2 {dimensionless}
+    1.04,                    !- Moisture Content 2 {kg/m3}
+    0.6465,                  !- Relative Humidity Fraction 3 {dimensionless}
+    1.24,                    !- Moisture Content 3 {kg/m3}
+    0.8465,                  !- Relative Humidity Fraction 4 {dimensionless}
+    1.56,                    !- Moisture Content 4 {kg/m3}
+    0.948,                   !- Relative Humidity Fraction 5 {dimensionless}
+    1.92,                    !- Moisture Content 5 {kg/m3}
+    0.978,                   !- Relative Humidity Fraction 6 {dimensionless}
+    2.72;                    !- Moisture Content 6 {kg/m3}
+
+MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Spruce,                  !- Material Name
+    7,                       !- Number of Isotherm Coordinates
+    0.205,                   !- Relative Humidity Fraction 1 {dimensionless}
+    25.935,                  !- Moisture Content 1 {kg/m3}
+    0.4465,                  !- Relative Humidity Fraction 2 {dimensionless}
+    44.3625,                 !- Moisture Content 2 {kg/m3}
+    0.6515,                  !- Relative Humidity Fraction 3 {dimensionless}
+    61.99375,                !- Moisture Content 3 {kg/m3}
+    0.6545,                  !- Relative Humidity Fraction 4 {dimensionless}
+    61.99375,                !- Moisture Content 4 {kg/m3}
+    0.83,                    !- Relative Humidity Fraction 5 {dimensionless}
+    87.1325,                 !- Moisture Content 5 {kg/m3}
+    0.9525,                  !- Relative Humidity Fraction 6 {dimensionless}
+    119.665,                 !- Moisture Content 6 {kg/m3}
+    0.956,                   !- Relative Humidity Fraction 7 {dimensionless}
+    120.12;                  !- Moisture Content 7 {kg/m3}
+
+MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Plywood,                 !- Material Name
+    12,                      !- Number of Isotherm Coordinates
+    0.2015,                  !- Relative Humidity Fraction 1 {dimensionless}
+    3.7125,                  !- Moisture Content 1 {kg/m3}
+    0.203,                   !- Relative Humidity Fraction 2 {dimensionless}
+    3.74,                    !- Moisture Content 2 {kg/m3}
+    0.435,                   !- Relative Humidity Fraction 3 {dimensionless}
+    5.8025,                  !- Moisture Content 3 {kg/m3}
+    0.439,                   !- Relative Humidity Fraction 4 {dimensionless}
+    5.83,                    !- Moisture Content 4 {kg/m3}
+    0.6495,                  !- Relative Humidity Fraction 5 {dimensionless}
+    7.7825,                  !- Moisture Content 5 {kg/m3}
+    0.6515,                  !- Relative Humidity Fraction 6 {dimensionless}
+    7.81,                    !- Moisture Content 6 {kg/m3}
+    0.8215,                  !- Relative Humidity Fraction 7 {dimensionless}
+    10.3675,                 !- Moisture Content 7 {kg/m3}
+    0.825,                   !- Relative Humidity Fraction 8 {dimensionless}
+    10.3675,                 !- Moisture Content 8 {kg/m3}
+    0.9215,                  !- Relative Humidity Fraction 9 {dimensionless}
+    13.1175,                 !- Moisture Content 9 {kg/m3}
+    0.925,                   !- Relative Humidity Fraction 10 {dimensionless}
+    13.1175,                 !- Moisture Content 10 {kg/m3}
+    0.9575,                  !- Relative Humidity Fraction 11 {dimensionless}
+    14.7125,                 !- Moisture Content 11 {kg/m3}
+    0.9605,                  !- Relative Humidity Fraction 12 {dimensionless}
+    15.345;                  !- Moisture Content 12 {kg/m3}
+
+MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Concrete,                !- Material Name
+    10,                      !- Number of Isotherm Coordinates
+    0.202,                   !- Relative Humidity Fraction 1 {dimensionless}
+    19.665,                  !- Moisture Content 1 {kg/m3}
+    0.2205,                  !- Relative Humidity Fraction 2 {dimensionless}
+    22.31,                   !- Moisture Content 2 {kg/m3}
+    0.449,                   !- Relative Humidity Fraction 3 {dimensionless}
+    38.4675,                 !- Moisture Content 3 {kg/m3}
+    0.454,                   !- Relative Humidity Fraction 4 {dimensionless}
+    38.4675,                 !- Moisture Content 4 {kg/m3}
+    0.6506,                  !- Relative Humidity Fraction 5 {dimensionless}
+    54.165,                  !- Moisture Content 5 {kg/m3}
+    0.655,                   !- Relative Humidity Fraction 6 {dimensionless}
+    54.165,                  !- Moisture Content 6 {kg/m3}
+    0.824,                   !- Relative Humidity Fraction 7 {dimensionless}
+    72.565,                  !- Moisture Content 7 {kg/m3}
+    0.8725,                  !- Relative Humidity Fraction 8 {dimensionless}
+    85.1,                    !- Moisture Content 8 {kg/m3}
+    0.924,                   !- Relative Humidity Fraction 9 {dimensionless}
+    91.08,                   !- Moisture Content 9 {kg/m3}
+    0.964,                   !- Relative Humidity Fraction 10 {dimensionless}
+    100.28;                  !- Moisture Content 10 {kg/m3}
+
+MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Cellulose ins 1cm,       !- Material Name
+    5,                       !- Number of Isotherm Coordinates
+    0.25,                    !- Relative Humidity Fraction 1 {dimensionless}
+    2.365,                   !- Moisture Content 1 {kg/m3}
+    0.44,                    !- Relative Humidity Fraction 2 {dimensionless}
+    4.62,                    !- Moisture Content 2 {kg/m3}
+    0.66,                    !- Relative Humidity Fraction 3 {dimensionless}
+    6.655,                   !- Moisture Content 3 {kg/m3}
+    0.86,                    !- Relative Humidity Fraction 4 {dimensionless}
+    11.4125,                 !- Moisture Content 4 {kg/m3}
+    1,                       !- Relative Humidity Fraction 5 {dimensionless}
+    13;                      !- Moisture Content 5 {kg/m3}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIALPROPERTY:HEATANDMOISTURETRANSFER:SUCTION ===========
+
+MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Concrete,                !- Material Name
+    5,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    72,                      !- Moisture Content 2 {kg/m3}
+    0.0000000000741,         !- Liquid Transport Coefficient 2 {m2/s}
+    85,                      !- Moisture Content 3 {kg/m3}
+    0.000000000253,          !- Liquid Transport Coefficient 3 {m2/s}
+    100,                     !- Moisture Content 4 {kg/m3}
+    0.00000000101,           !- Liquid Transport Coefficient 4 {m2/s}
+    118,                     !- Moisture Content 5 {kg/m3}
+    0.00000000128;           !- Liquid Transport Coefficient 5 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Spruce,                  !- Material Name
+    3,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    20,                      !- Moisture Content 2 {kg/m3}
+    0.00000000000032,        !- Liquid Transport Coefficient 2 {m2/s}
+    600,                     !- Moisture Content 3 {kg/m3}
+    0.0000000000092;         !- Liquid Transport Coefficient 3 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Plywood,                 !- Material Name
+    1,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Cellulose ins,           !- Material Name
+    1,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Glass Fibre ins,         !- Material Name
+    1,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Cellulose ins 1cm,       !- Material Name
+    1,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIALPROPERTY:HEATANDMOISTURETRANSFER:REDISTRIBUTION ===========
+
+MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Concrete,                !- Material Name
+    5,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    72,                      !- Moisture Content 2 {kg/m3}
+    0.00000000000741,        !- Liquid Transport Coefficient 2 {m2/s}
+    85,                      !- Moisture Content 3 {kg/m3}
+    0.0000000000253,         !- Liquid Transport Coefficient 3 {m2/s}
+    100,                     !- Moisture Content 4 {kg/m3}
+    0.000000000101,          !- Liquid Transport Coefficient 4 {m2/s}
+    118,                     !- Moisture Content 5 {kg/m3}
+    0.000000000128;          !- Liquid Transport Coefficient 5 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Spruce,                  !- Material Name
+    3,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    20,                      !- Moisture Content 2 {kg/m3}
+    0.00000000000032,        !- Liquid Transport Coefficient 2 {m2/s}
+    600,                     !- Moisture Content 3 {kg/m3}
+    0.0000000000092;         !- Liquid Transport Coefficient 3 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Plywood,                 !- Material Name
+    1,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Cellulose ins,           !- Material Name
+    1,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Glass Fibre ins,         !- Material Name
+    1,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Cellulose ins 1cm,       !- Material Name
+    1,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIALPROPERTY:HEATANDMOISTURETRANSFER:DIFFUSION ===========
+
+MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Concrete,                !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    180;                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Spruce,                  !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    130;                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Plywood,                 !- Material Name
+    3,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    700,                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+    0.5,                     !- Relative Humidity Fraction 2 {dimensionless}
+    200,                     !- Water Vapor Diffusion Resistance Factor 2 {dimensionless}
+    1,                       !- Relative Humidity Fraction 3 {dimensionless}
+    20;                      !- Water Vapor Diffusion Resistance Factor 3 {dimensionless}
+
+MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Cellulose ins,           !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    1.5;                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Glass Fibre ins,         !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    1.2543;                  !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Cellulose ins 1cm,       !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    1.5;                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIALPROPERTY:HEATANDMOISTURETRANSFER:THERMALCONDUCTIVITY ===========
+
+MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Concrete,                !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    1.6,                     !- Thermal Conductivity 1 {W/m-K}
+    180,                     !- Moisture Content 2 {kg/m3}
+    2.602;                   !- Thermal Conductivity 2 {W/m-K}
+
+MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Spruce,                  !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.09,                    !- Thermal Conductivity 1 {W/m-K}
+    730,                     !- Moisture Content 2 {kg/m3}
+    0.278;                   !- Thermal Conductivity 2 {W/m-K}
+
+MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Plywood,                 !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.1,                     !- Thermal Conductivity 1 {W/m-K}
+    500,                     !- Moisture Content 2 {kg/m3}
+    0.25;                    !- Thermal Conductivity 2 {W/m-K}
+
+MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Cellulose ins,           !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.04,                    !- Thermal Conductivity 1 {W/m-K}
+    950,                     !- Moisture Content 2 {kg/m3}
+    0.583;                   !- Thermal Conductivity 2 {W/m-K}
+
+MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Glass Fibre ins,         !- Material Name
+    1,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.04;                    !- Thermal Conductivity 1 {W/m-K}
+
+MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Cellulose ins 1cm,       !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.04,                    !- Thermal Conductivity 1 {W/m-K}
+    950,                     !- Moisture Content 2 {kg/m3}
+    0.583;                   !- Thermal Conductivity 2 {W/m-K}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
+
+Construction,
+    Exterior wall,           !- Name
+    Spruce,                  !- Outside Layer
+    Concrete,                !- Layer 2
+    Cellulose ins 1cm,       !- Layer 3
+    Cellulose ins,           !- Layer 4
+    Spruce;                  !- Layer 5
+
+Construction,
+    Floor,                   !- Name
+    Glass Fibre ins,         !- Outside Layer
+    Spruce;                  !- Layer 2
+
+Construction,
+    Roof,                    !- Name
+    Plywood,                 !- Outside Layer
+    Cellulose ins,           !- Layer 2
+    Spruce;                  !- Layer 3
+
+Construction,
+    Window,                  !- Name
+    Glass,                   !- Outside Layer
+    Air,                     !- Layer 2
+    Glass;                   !- Layer 3
+
+
+!-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION:INTERNALMOISTURESOURCE ===========
+
+Construction:InternalMoistureSource,
+    InternalMoistureSourceEast,  !- Name
+    East wall,               !- Surface Name
+    3,                       !- Source Present In Layer Number
+    3;                       !- Source Type
+
+
+!-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========
+
+GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    World;                   !- Coordinate System
+
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
+
+Zone,
+    Test room,               !- Name
+    0,                       !- Direction of Relative North {deg}
+    0, 0, 0,                            !- X,Y,Z  {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    2.7,                     !- Ceiling Height {m}
+    129.6;                   !- Volume {m3}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: BUILDINGSURFACE:DETAILED ===========
+
+BuildingSurface:Detailed,
+    South wall,              !- Name
+    WALL,                    !- Surface Type
+    Exterior wall,           !- Construction Name
+    Test room,               !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0, 0, 2.7,                          !- X,Y,Z  1 {m}
+    0, 0, 0,                            !- X,Y,Z  2 {m}
+    8, 0, 0,                            !- X,Y,Z  3 {m}
+    8, 0, 2.7;                          !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    East wall,               !- Name
+    WALL,                    !- Surface Type
+    Exterior wall,           !- Construction Name
+    Test room,               !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    4,                       !- Number of Vertices
+    8, 0, 2.7,                          !- X,Y,Z  1 {m}
+    8, 0, 0,                            !- X,Y,Z  2 {m}
+    8, 6, 0,                            !- X,Y,Z  3 {m}
+    8, 6, 2.7;                          !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    North wall,              !- Name
+    WALL,                    !- Surface Type
+    Exterior wall,           !- Construction Name
+    Test room,               !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    4,                       !- Number of Vertices
+    8, 6, 2.7,                          !- X,Y,Z  1 {m}
+    8, 6, 0,                            !- X,Y,Z  2 {m}
+    0, 6, 0,                            !- X,Y,Z  3 {m}
+    0, 6, 2.7;                          !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    West wall,               !- Name
+    WALL,                    !- Surface Type
+    Exterior wall,           !- Construction Name
+    Test room,               !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0, 6, 2.7,                          !- X,Y,Z  1 {m}
+    0, 6, 0,                            !- X,Y,Z  2 {m}
+    0, 0, 0,                            !- X,Y,Z  3 {m}
+    0, 0, 2.7;                          !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    Floor,                   !- Name
+    FLOOR,                   !- Surface Type
+    Floor,                   !- Construction Name
+    Test room,               !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    ,                        !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0, 0, 0,                            !- X,Y,Z  1 {m}
+    0, 6, 0,                            !- X,Y,Z  2 {m}
+    8, 6, 0,                            !- X,Y,Z  3 {m}
+    8, 0, 0;                            !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    Roof,                    !- Name
+    ROOF,                    !- Surface Type
+    Roof,                    !- Construction Name
+    Test room,               !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0, 0, 2.7,                          !- X,Y,Z  1 {m}
+    8, 0, 2.7,                          !- X,Y,Z  2 {m}
+    8, 6, 2.7,                          !- X,Y,Z  3 {m}
+    0, 6, 2.7;                          !- X,Y,Z  4 {m}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: FENESTRATIONSURFACE:DETAILED ===========
+
+FenestrationSurface:Detailed,
+    South window_west,       !- Name
+    WINDOW,                  !- Surface Type
+    Window,                  !- Construction Name
+    South wall,              !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    ,                        !- View Factor to Ground
+    ,                        !- Shading Control Name
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    4,                       !- Number of Vertices
+    0.5, 0, 2.2,                        !- X,Y,Z  1 {m}
+    0.5, 0, 0.2,                        !- X,Y,Z  2 {m}
+    3.5, 0, 0.2,                        !- X,Y,Z  3 {m}
+    3.5, 0, 2.2;                        !- X,Y,Z  4 {m}
+
+FenestrationSurface:Detailed,
+    South window_east,       !- Name
+    WINDOW,                  !- Surface Type
+    Window,                  !- Construction Name
+    South wall,              !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    ,                        !- View Factor to Ground
+    ,                        !- Shading Control Name
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    4,                       !- Number of Vertices
+    4.5, 0, 2.2,                        !- X,Y,Z  1 {m}
+    4.5, 0, 0.2,                        !- X,Y,Z  2 {m}
+    7.5, 0, 0.2,                        !- X,Y,Z  3 {m}
+    7.5, 0, 2.2;                        !- X,Y,Z  4 {m}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: SURFACEPROPERTY:CONVECTIONCOEFFICIENTS ===========
+
+SurfaceProperty:ConvectionCoefficients,
+    South wall,              !- Surface Name
+    Outside,                 !- Convection Coefficient 1 Location
+    value,                   !- Convection Coefficient 1 Type
+    29.3,                    !- Convection Coefficient 1 {W/m2-K}
+    ,                        !- Convection Coefficient 1 Schedule Name
+    ,                        !- Convection Coefficient 1 User Curve Name
+    Inside,                  !- Convection Coefficient 2 Location
+    value,                   !- Convection Coefficient 2 Type
+    8.29;                    !- Convection Coefficient 2 {W/m2-K}
+
+SurfaceProperty:ConvectionCoefficients,
+    East wall,               !- Surface Name
+    Outside,                 !- Convection Coefficient 1 Location
+    value,                   !- Convection Coefficient 1 Type
+    29.3,                    !- Convection Coefficient 1 {W/m2-K}
+    ,                        !- Convection Coefficient 1 Schedule Name
+    ,                        !- Convection Coefficient 1 User Curve Name
+    Inside,                  !- Convection Coefficient 2 Location
+    value,                   !- Convection Coefficient 2 Type
+    8.29;                    !- Convection Coefficient 2 {W/m2-K}
+
+SurfaceProperty:ConvectionCoefficients,
+    North wall,              !- Surface Name
+    Outside,                 !- Convection Coefficient 1 Location
+    value,                   !- Convection Coefficient 1 Type
+    29.3,                    !- Convection Coefficient 1 {W/m2-K}
+    ,                        !- Convection Coefficient 1 Schedule Name
+    ,                        !- Convection Coefficient 1 User Curve Name
+    Inside,                  !- Convection Coefficient 2 Location
+    value,                   !- Convection Coefficient 2 Type
+    8.29;                    !- Convection Coefficient 2 {W/m2-K}
+
+SurfaceProperty:ConvectionCoefficients,
+    West wall,               !- Surface Name
+    Outside,                 !- Convection Coefficient 1 Location
+    value,                   !- Convection Coefficient 1 Type
+    29.3,                    !- Convection Coefficient 1 {W/m2-K}
+    ,                        !- Convection Coefficient 1 Schedule Name
+    ,                        !- Convection Coefficient 1 User Curve Name
+    Inside,                  !- Convection Coefficient 2 Location
+    value,                   !- Convection Coefficient 2 Type
+    8.29;                    !- Convection Coefficient 2 {W/m2-K}
+
+SurfaceProperty:ConvectionCoefficients,
+    Roof,                    !- Surface Name
+    Outside,                 !- Convection Coefficient 1 Location
+    value,                   !- Convection Coefficient 1 Type
+    29.3,                    !- Convection Coefficient 1 {W/m2-K}
+    ,                        !- Convection Coefficient 1 Schedule Name
+    ,                        !- Convection Coefficient 1 User Curve Name
+    Inside,                  !- Convection Coefficient 2 Location
+    value,                   !- Convection Coefficient 2 Type
+    8.29;                    !- Convection Coefficient 2 {W/m2-K}
+
+SurfaceProperty:ConvectionCoefficients,
+    Floor,                   !- Surface Name
+    Outside,                 !- Convection Coefficient 1 Location
+    value,                   !- Convection Coefficient 1 Type
+    29.3,                    !- Convection Coefficient 1 {W/m2-K}
+    ,                        !- Convection Coefficient 1 Schedule Name
+    ,                        !- Convection Coefficient 1 User Curve Name
+    Inside,                  !- Convection Coefficient 2 Location
+    value,                   !- Convection Coefficient 2 Type
+    8.29;                    !- Convection Coefficient 2 {W/m2-K}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: SURFACEPROPERTIES:VAPORCOEFFICIENTS ===========
+
+SurfaceProperties:VaporCoefficients,
+    South wall,              !- Surface Name
+    Yes,                     !- Constant External Vapor Transfer Coefficient
+    0.0000000625,            !- External Vapor Coefficient Value {kg/Pa-s-m2}
+    Yes,                     !- Constant Internal vapor Transfer Coefficient
+    0.00000002;              !- Internal Vapor Coefficient Value {kg/Pa-s-m2}
+
+SurfaceProperties:VaporCoefficients,
+    East wall,               !- Surface Name
+    Yes,                     !- Constant External Vapor Transfer Coefficient
+    0.0000000625,            !- External Vapor Coefficient Value {kg/Pa-s-m2}
+    Yes,                     !- Constant Internal vapor Transfer Coefficient
+    0.00000002;              !- Internal Vapor Coefficient Value {kg/Pa-s-m2}
+
+SurfaceProperties:VaporCoefficients,
+    North wall,              !- Surface Name
+    Yes,                     !- Constant External Vapor Transfer Coefficient
+    0.0000000625,            !- External Vapor Coefficient Value {kg/Pa-s-m2}
+    Yes,                     !- Constant Internal vapor Transfer Coefficient
+    0.00000002;              !- Internal Vapor Coefficient Value {kg/Pa-s-m2}
+
+SurfaceProperties:VaporCoefficients,
+    West wall,               !- Surface Name
+    Yes,                     !- Constant External Vapor Transfer Coefficient
+    0.0000000625,            !- External Vapor Coefficient Value {kg/Pa-s-m2}
+    Yes,                     !- Constant Internal vapor Transfer Coefficient
+    0.00000002;              !- Internal Vapor Coefficient Value {kg/Pa-s-m2}
+
+SurfaceProperties:VaporCoefficients,
+    Floor,                   !- Surface Name
+    Yes,                     !- Constant External Vapor Transfer Coefficient
+    0.0000000625,            !- External Vapor Coefficient Value {kg/Pa-s-m2}
+    Yes,                     !- Constant Internal vapor Transfer Coefficient
+    0.00000002;              !- Internal Vapor Coefficient Value {kg/Pa-s-m2}
+
+SurfaceProperties:VaporCoefficients,
+    Roof,                    !- Surface Name
+    Yes,                     !- Constant External Vapor Transfer Coefficient
+    0.0000000625,            !- External Vapor Coefficient Value {kg/Pa-s-m2}
+    Yes,                     !- Constant Internal vapor Transfer Coefficient
+    0.00000002;              !- Internal Vapor Coefficient Value {kg/Pa-s-m2}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: OTHEREQUIPMENT ===========
+
+OtherEquipment,
+    latent,                  !- Name
+    None,                    !- Fuel Type
+    Test room,               !- Zone or ZoneList Name
+    Moisture on,             !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    352.6,                   !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    ,                        !- Power per Person {W/person}
+    1,                       !- Fraction Latent
+    0,                       !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+OtherEquipment,
+    Other,                   !- Name
+    None,                    !- Fuel Type
+    Test room,               !- Zone or ZoneList Name
+    On,                      !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    800,                     !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    ,                        !- Power per Person {W/person}
+    0,                       !- Fraction Latent
+    0,                       !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:SIMULATIONCONTROL ===========
+
+AirflowNetwork:SimulationControl,
+    AirFlowModel,            !- Name
+    NoMultizoneOrDistribution,  !- AirflowNetwork Control
+    SurfaceAverageCalculation,  !- Wind Pressure Coefficient Type
+    OpeningHeight,           !- Height Selection for Local Wind Pressure Calculation
+    LowRise,                 !- Building Type
+    500,                     !- Maximum Number of Iterations {dimensionless}
+    ZeroNodePressures,       !- Initialization Type
+    0.0001,                  !- Relative Airflow Convergence Tolerance {dimensionless}
+    0.000001,                !- Absolute Airflow Convergence Tolerance {kg/s}
+    -.5,                     !- Convergence Acceleration Limit {dimensionless}
+    ,                        !- Azimuth Angle of Long Axis of Building {deg}
+    1,                       !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    No,                      !- Height Dependence of External Node Temperature
+    SkylineLU;               !- Solver
+
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:ZONE ===========
+
+AirflowNetwork:MultiZone:Zone,
+    Test room,               !- Zone Name
+    NoVent,                  !- Ventilation Control Mode
+    On,                      !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    ,                        !- Minimum Venting Open Factor {dimensionless}
+    ,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
+    100,                     !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
+    ,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
+    300000,                  !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
+    ,                        !- Venting Availability Schedule Name
+    Standard,                !- Single Sided Wind Pressure Coefficient Algorithm
+    10;                      !- Facade Width {m}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:SURFACE ===========
+
+AirflowNetwork:MultiZone:Surface,
+    South wall,              !- Surface Name
+    WallELA,                 !- Leakage Component Name
+    ,                        !- External Node Name
+    1,                       !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+    ZoneLevel,               !- Ventilation Control Mode
+    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    ,                        !- Minimum Venting Open Factor {dimensionless}
+    ,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
+    100,                     !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
+    ,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
+    300000,                  !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
+    ,                        !- Venting Availability Schedule Name
+    ,                        !- Occupant Ventilation Control Name
+    PolygonHeight,           !- Equivalent Rectangle Method
+    1;                       !- Equivalent Rectangle Aspect Ratio {dimensionless}
+
+AirflowNetwork:MultiZone:Surface,
+    East wall,               !- Surface Name
+    WallELA,                 !- Leakage Component Name
+    ,                        !- External Node Name
+    1,                       !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+    ZoneLevel,               !- Ventilation Control Mode
+    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    ,                        !- Minimum Venting Open Factor {dimensionless}
+    ,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
+    100,                     !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
+    ,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
+    300000,                  !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
+    ,                        !- Venting Availability Schedule Name
+    ,                        !- Occupant Ventilation Control Name
+    PolygonHeight,           !- Equivalent Rectangle Method
+    1;                       !- Equivalent Rectangle Aspect Ratio {dimensionless}
+
+AirflowNetwork:MultiZone:Surface,
+    North wall,              !- Surface Name
+    WallELA,                 !- Leakage Component Name
+    ,                        !- External Node Name
+    1,                       !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+    ZoneLevel,               !- Ventilation Control Mode
+    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    ,                        !- Minimum Venting Open Factor {dimensionless}
+    ,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
+    100,                     !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
+    ,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
+    300000,                  !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
+    ,                        !- Venting Availability Schedule Name
+    ,                        !- Occupant Ventilation Control Name
+    PolygonHeight,           !- Equivalent Rectangle Method
+    1;                       !- Equivalent Rectangle Aspect Ratio {dimensionless}
+
+AirflowNetwork:MultiZone:Surface,
+    West wall,               !- Surface Name
+    WallELA,                 !- Leakage Component Name
+    ,                        !- External Node Name
+    1,                       !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+    ZoneLevel,               !- Ventilation Control Mode
+    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    ,                        !- Minimum Venting Open Factor {dimensionless}
+    ,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
+    100,                     !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
+    ,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
+    300000,                  !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
+    ,                        !- Venting Availability Schedule Name
+    ,                        !- Occupant Ventilation Control Name
+    PolygonHeight,           !- Equivalent Rectangle Method
+    1;                       !- Equivalent Rectangle Aspect Ratio {dimensionless}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:SURFACE:EFFECTIVELEAKAGEAREA ===========
+
+AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
+    WallELA,                 !- Name
+    0.01,                    !- Effective Leakage Area {m2}
+    0.7,                     !- Discharge Coefficient {dimensionless}
+    4,                       !- Reference Pressure Difference {Pa}
+    0.65;                    !- Air Mass Flow Exponent {dimensionless}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: HVACTEMPLATE:THERMOSTAT ===========
+
+HVACTemplate:Thermostat,
+    All Zones,               !- Name
+    Htg-SetP-Sch,            !- Heating Setpoint Schedule Name
+    ,                        !- Constant Heating Setpoint {C}
+    Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name
+    ;                        !- Constant Cooling Setpoint {C}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: HVACTEMPLATE:ZONE:FANCOIL ===========
+
+HVACTemplate:Zone:FanCoil,
+    Test room,               !- Zone Name
+    All Zones,               !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    flow/zone,               !- Outdoor Air Method
+    0,                       !- Outdoor Air Flow Rate per Person {m3/s}
+    0.00944,                 !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0,                       !- Outdoor Air Flow Rate per Zone {m3/s}
+    FanAvailSched,           !- System Availability Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    14,                      !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    50,                      !- Heating Coil Design Setpoint {C}
+    ,                        !- Dedicated Outdoor Air System Name
+    ,                        !- Zone Cooling Design Supply Air Temperature Input Method
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Zone Heating Design Supply Air Temperature Input Method
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Capacity Control Method
+    ,                        !- Low Speed Supply Air Flow Ratio
+    ,                        !- Medium Speed Supply Air Flow Ratio
+    ,                        !- Outdoor Air Schedule Name
+    ,                        !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    ;                        !- Baseboard Heating Capacity {W}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: HVACTEMPLATE:PLANT:CHILLEDWATERLOOP ===========
+
+HVACTemplate:Plant:ChilledWaterLoop,
+    Chilled Water Loop,      !- Name
+    ,                        !- Pump Schedule Name
+    INTERMITTENT,            !- Pump Control Type
+    Default,                 !- Chiller Plant Operation Scheme Type
+    ,                        !- Chiller Plant Equipment Operation Schemes Name
+    ,                        !- Chilled Water Setpoint Schedule Name
+    7.22,                    !- Chilled Water Design Setpoint {C}
+    ConstantPrimaryNoSecondary,  !- Chilled Water Pump Configuration
+    179352,                  !- Primary Chilled Water Pump Rated Head {Pa}
+    179352,                  !- Secondary Chilled Water Pump Rated Head {Pa}
+    Default,                 !- Condenser Plant Operation Scheme Type
+    ,                        !- Condenser Equipment Operation Schemes Name
+    ,                        !- Condenser Water Temperature Control Type
+    ,                        !- Condenser Water Setpoint Schedule Name
+    29.4,                    !- Condenser Water Design Setpoint {C}
+    179352,                  !- Condenser Water Pump Rated Head {Pa}
+    OutdoorAirTemperatureReset,  !- Chilled Water Setpoint Reset Type
+    12.2,                    !- Chilled Water Setpoint at Outdoor Dry-Bulb Low {C}
+    15.6,                    !- Chilled Water Reset Outdoor Dry-Bulb Low {C}
+    6.7,                     !- Chilled Water Setpoint at Outdoor Dry-Bulb High {C}
+    26.7;                    !- Chilled Water Reset Outdoor Dry-Bulb High {C}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: HVACTEMPLATE:PLANT:CHILLER ===========
+
+HVACTemplate:Plant:Chiller,
+    Main Chiller,            !- Name
+    ElectricReciprocatingChiller,  !- Chiller Type
+    autosize,                !- Capacity {W}
+    3.2,                     !- Nominal COP {W/W}
+    WaterCooled,             !- Condenser Type
+    1,                       !- Priority
+    ;                        !- Sizing Factor
+
+
+!-   ===========  ALL OBJECTS IN CLASS: HVACTEMPLATE:PLANT:TOWER ===========
+
+HVACTemplate:Plant:Tower,
+    Main Tower,              !- Name
+    SingleSpeed,             !- Tower Type
+    autosize,                !- High Speed Nominal Capacity {W}
+    autosize,                !- High Speed Fan Power {W}
+    autosize,                !- Low Speed Nominal Capacity {W}
+    autosize,                !- Low Speed Fan Power {W}
+    autosize,                !- Free Convection Capacity {W}
+    1,                       !- Priority
+    ;                        !- Sizing Factor
+
+
+!-   ===========  ALL OBJECTS IN CLASS: HVACTEMPLATE:PLANT:HOTWATERLOOP ===========
+
+HVACTemplate:Plant:HotWaterLoop,
+    Hot Water Loop,          !- Name
+    ,                        !- Pump Schedule Name
+    INTERMITTENT,            !- Pump Control Type
+    Default,                 !- Hot Water Plant Operation Scheme Type
+    ,                        !- Hot Water Plant Equipment Operation Schemes Name
+    ,                        !- Hot Water Setpoint Schedule Name
+    82,                      !- Hot Water Design Setpoint {C}
+    ConstantFlow,            !- Hot Water Pump Configuration
+    179352,                  !- Hot Water Pump Rated Head {Pa}
+    OutdoorAirTemperatureReset,  !- Hot Water Setpoint Reset Type
+    82.2,                    !- Hot Water Setpoint at Outdoor Dry-Bulb Low {C}
+    -6.7,                    !- Hot Water Reset Outdoor Dry-Bulb Low {C}
+    65.6,                    !- Hot Water Setpoint at Outdoor Dry-Bulb High {C}
+    10;                      !- Hot Water Reset Outdoor Dry-Bulb High {C}
+
+
+!-   ===========  ALL OBJECTS IN CLASS: HVACTEMPLATE:PLANT:BOILER ===========
+
+HVACTemplate:Plant:Boiler,
+    Main Boiler,             !- Name
+    HotWaterBoiler,          !- Boiler Type
+    autosize,                !- Capacity {W}
+    0.8,                     !- Efficiency
+    NaturalGas,              !- Fuel Type
+    1,                       !- Priority
+    ;                        !- Sizing Factor
+
+
+!-   ===========  ALL OBJECTS IN CLASS: SIZING:PARAMETERS ===========
+
+Sizing:Parameters,
+    1,                       !- Heating Sizing Factor
+    1;                       !- Cooling Sizing Factor
+
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
+
+Output:VariableDictionary,Regular;
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:TABLE:SUMMARYREPORTS ===========
+
+
+Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUTCONTROL:TABLE:STYLE ===========
+
+OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
+
+Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+Output:Variable,*,Site Outdoor Air Relative Humidity,hourly;
+Output:Variable,*,Zone Mean Air Temperature,hourly;
+Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
+Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
+Output:Variable,*,HAMT Surface Average Water Content Ratio,hourly;
+Output:Variable,*,Zone Air Relative Humidity,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 1,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 2,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 3,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 4,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 5,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 6,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 7,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 8,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 9,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 10,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 11,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 12,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 13,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 14,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 15,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 16,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 17,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 18,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 19,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 20,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 21,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 22,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 23,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 24,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 25,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 26,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 27,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 28,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 29,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 30,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 31,hourly;
+Output:Variable,east wall,HAMT Surface Water Content Cell 32,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 1,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 2,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 3,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 4,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 5,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 6,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 7,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 8,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 9,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 10,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 11,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 12,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 13,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 14,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 15,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 16,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 17,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 18,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 19,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 20,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 21,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 22,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 23,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 24,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 25,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 26,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 27,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 28,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 29,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 30,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 31,hourly;
+Output:Variable,east wall,HAMT Surface Temperature Cell 32,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 1,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 2,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 3,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 4,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 5,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 6,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 7,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 8,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 9,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 10,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 11,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 12,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 13,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 14,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 15,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 16,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 17,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 18,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 19,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 20,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 21,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 22,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 23,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 24,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 25,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 26,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 27,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 28,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 29,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 30,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 31,hourly;
+Output:Variable,east wall,HAMT Surface Relative Humidity Cell 32,hourly;
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
+
+Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
+Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
+Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
+Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
+Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
+Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
+Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
