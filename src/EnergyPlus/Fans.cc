@@ -68,6 +68,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HVACFan.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -1506,12 +1507,16 @@ namespace Fans {
         PreDefTableEntry(pdchFanDeltaP, equipName, Fan(FanNum).DeltaPress);
         PreDefTableEntry(pdchFanVolFlow, equipName, FanVolFlow);
         RatedPower = FanVolFlow * Fan(FanNum).DeltaPress / Fan(FanNum).FanEff; // total fan power
+        if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
+            Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, StdRhoAir);
+        }
         PreDefTableEntry(pdchFanPwr, equipName, RatedPower);
         if (FanVolFlow != 0.0) {
             PreDefTableEntry(pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
         }
         PreDefTableEntry(pdchFanMotorIn, equipName, Fan(FanNum).MotInAirFrac);
         PreDefTableEntry(pdchFanEndUse, equipName, Fan(FanNum).EndUseSubcategoryName);
+        PreDefTableEntry(OutputReportPredefined::pdchFanEnergyIndex, equipName, Fan(FanNum).DesignPointFEI);
 
         NVPerfNum = Fan(FanNum).NVPerfNum;
         if (NVPerfNum > 0) {
