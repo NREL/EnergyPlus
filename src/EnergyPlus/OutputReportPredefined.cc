@@ -102,6 +102,7 @@ namespace OutputReportPredefined {
     int pdchFanDeltaP;
     int pdchFanVolFlow;
     int pdchFanMotorIn;
+    int pdchFanEnergyIndex;
     int pdchFanEndUse;
     int pdchFanPwr;
     int pdchFanPwrPerFlow;
@@ -918,6 +919,7 @@ namespace OutputReportPredefined {
         pdchFanDeltaP = 0;
         pdchFanVolFlow = 0;
         pdchFanMotorIn = 0;
+        pdchFanEnergyIndex = 0;
         pdchFanEndUse = 0;
         pdchFanPwr = 0;
         pdchFanPwrPerFlow = 0;
@@ -1871,6 +1873,7 @@ namespace OutputReportPredefined {
         pdchFanPwr = newPreDefColumn(pdstFan, "Rated Electric Power [W]");
         pdchFanPwrPerFlow = newPreDefColumn(pdstFan, "Rated Power Per Max Air Flow Rate [W-s/m3]");
         pdchFanMotorIn = newPreDefColumn(pdstFan, "Motor Heat In Air Fraction");
+        pdchFanEnergyIndex = newPreDefColumn(pdstFan, "Fan Energy Index");
         pdchFanEndUse = newPreDefColumn(pdstFan, "End Use");
         pdchFanDesDay = newPreDefColumn(pdstFan, "Design Day Name for Fan Sizing Peak");
         pdchFanPkTime = newPreDefColumn(pdstFan, "Date/Time for Fan Sizing Peak");

@@ -461,6 +461,14 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
     EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
 }
 
+TEST_F(EnergyPlusFixture, SystemFanObj_FanEnergyIndex)
+{
+    // this unit test checks the functions calculating FEI
+    DataEnvironment::StdRhoAir = 1.2;
+    Real64 testFEI = HVACFan::FanSystem::report_fei(1.0, 1000.0, 100.0, 1.2);
+    EXPECT_NEAR(testFEI, 0.4917, 0.001);
+}
+
 TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_noPowerFFlowCurve)
 {
     // this unit test checks the power averaging when cycling between a hi and low speed

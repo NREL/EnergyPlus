@@ -92,11 +92,12 @@ namespace TARCOGParams {
 
     //  Layer types:
     extern int const SPECULAR;
-    extern int const VENETBLIND;
+    extern int const VENETBLIND_VERT;
     extern int const WOVSHADE;
     extern int const PERFORATED;
     extern int const DIFFSHADE;
     extern int const BSDF;
+    extern int const VENETBLIND_HORIZ;
 
     extern int const MinLayType;
     extern int const MaxLayType;
@@ -154,10 +155,15 @@ namespace TARCOGParams {
 
     extern Real64 const TemperatureQuessDiff; // in case outside and inside temperatures are identical
 
-    extern Real64 const C1_VENET;
-    extern Real64 const C2_VENET;
-    extern Real64 const C3_VENET;
-    extern Real64 const C4_VENET;
+    extern Real64 const C1_VENET_HORIZONTAL;
+    extern Real64 const C2_VENET_HORIZONTAL;
+    extern Real64 const C3_VENET_HORIZONTAL;
+    extern Real64 const C4_VENET_HORIZONTAL;
+
+    extern Real64 const C1_VENET_VERTICAL;
+    extern Real64 const C2_VENET_VERTICAL;
+    extern Real64 const C3_VENET_VERTICAL;
+    extern Real64 const C4_VENET_VERTICAL;
 
     extern Real64 const C1_SHADE;
     extern Real64 const C2_SHADE;
