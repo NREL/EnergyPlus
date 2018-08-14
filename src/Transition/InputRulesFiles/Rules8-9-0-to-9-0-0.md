@@ -15,6 +15,11 @@ Move up all later numeric fields by one (old N4-N10 become new N3-N9).
 
 (Developer note: to avoid merge conflicts, please choose a random line in the file below (there are like 20 blank lines initially).
  This will reduce the effect of all the rules being written on the same line, causing conflicts.)
+ 
+ # Object Change: 'WindowMaterial:ComplexShade'
+ 
+ The only change is for field A2 (Layer Type). Logic to apply:
+ If field contains value Venetian then change it to VenetianHorizontal.
 
 
 

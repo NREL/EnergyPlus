@@ -459,6 +459,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with V, insert the rules here
 
               ! If your original object starts with W, insert the rules here
+              CASE ('WINDOWMATERIAL:COMPLEXSHADE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs = InArgs
+                IF (SameString(InArgs(2), "VENETIAN")) THEN
+                  OutArgs(2) = "VenetianHorizontal"
+                  nodiff = .FALSE.
+                END IF 
 
               ! If your original object starts with Z, insert the rules here
 
