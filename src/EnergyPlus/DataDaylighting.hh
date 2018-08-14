@@ -166,6 +166,9 @@ namespace DataDaylighting {
         int NumOfDayltgExtWins;           // Number of associated exterior windows providing daylight to this zone
         Array1D_int DayltgExtWinSurfNums; // List of surface numbers of zone's exterior windows or
         // exterior windows in adjacent zones sharing interior windows with the zone
+        std::vector<std::vector<int>> ShadeDeployOrderExtWins; // describes how the fenestration surfaces should deploy the shades. 
+        // It is a list of lists. Each sublist is a group of fenestration surfaces that should be deployed together. Many times the 
+        // sublists a just a single index to a fenestration surface if they are deployed one at a time.
         Real64 MinIntWinSolidAng;     // Minimum solid angle subtended by an interior window in a zone
         Real64 TotInsSurfArea;        // Total inside surface area of a daylit zone (m2)
         Real64 FloorVisRefl;          // Area-weighted visible reflectance of floor of a daylit zone
