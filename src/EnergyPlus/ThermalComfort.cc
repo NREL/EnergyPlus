@@ -103,13 +103,6 @@ namespace ThermalComfort {
     using namespace DataGlobals;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
-    using DataHeatBalFanSys::MAT;
-    using DataHeatBalFanSys::ZTAV;
-    using DataHeatBalFanSys::ZTAVComf;
-    using DataHeatBalFanSys::ZoneAirHumRat;
-    using DataHeatBalFanSys::ZoneAirHumRatAvg;
-    using DataHeatBalFanSys::ZoneAirHumRatAvgComf;
-    using DataHeatBalFanSys::ZoneComfortControlsFanger;
     using DataHeatBalance::AngleFactor;
     using DataHeatBalance::MRT;
     using DataHeatBalance::People;
@@ -118,6 +111,13 @@ namespace ThermalComfort {
     using DataHeatBalance::TotPeople;
     using DataHeatBalance::Zone;
     using DataHeatBalance::ZoneAveraged;
+    using DataHeatBalFanSys::MAT;
+    using DataHeatBalFanSys::ZoneAirHumRat;
+    using DataHeatBalFanSys::ZoneAirHumRatAvg;
+    using DataHeatBalFanSys::ZoneAirHumRatAvgComf;
+    using DataHeatBalFanSys::ZoneComfortControlsFanger;
+    using DataHeatBalFanSys::ZTAV;
+    using DataHeatBalFanSys::ZTAVComf;
     using DataRoomAirModel::IsZoneCV;
     using DataRoomAirModel::IsZoneDV;
     using DataRoomAirModel::IsZoneUI;
@@ -126,9 +126,9 @@ namespace ThermalComfort {
     using DataRoomAirModel::Urec;
     using DataRoomAirModel::VComfort_Jet;
     using DataRoomAirModel::VComfort_Recirculation;
+    using DataRoomAirModel::ZoneUCSDCV;
     using DataRoomAirModel::ZTJET;
     using DataRoomAirModel::ZTREC;
-    using DataRoomAirModel::ZoneUCSDCV;
     using Psychrometrics::PsyRhFnTdbWPb;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -421,61 +421,141 @@ namespace ThermalComfort {
 
             // CurrentModuleObject='People'
             if (People(Loop).Fanger) {
-                SetupOutputVariable("Zone Thermal Comfort Fanger Model PMV", OutputProcessor::Unit::None, ThermalComfortData(Loop).FangerPMV, "Zone",
-                                    "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort Fanger Model PPD", OutputProcessor::Unit::Perc, ThermalComfortData(Loop).FangerPPD, "Zone",
-                                    "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort Clothing Surface Temperature", OutputProcessor::Unit::C,
-                                    ThermalComfortData(Loop).CloSurfTemp, "Zone", "State", People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Fanger Model PMV",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).FangerPMV,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Fanger Model PPD",
+                                    OutputProcessor::Unit::Perc,
+                                    ThermalComfortData(Loop).FangerPPD,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Clothing Surface Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).CloSurfTemp,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
             }
 
             if (People(Loop).Pierce) {
-                SetupOutputVariable("Zone Thermal Comfort Pierce Model Effective Temperature PMV", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).PiercePMVET, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).PiercePMVSET, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort Pierce Model Discomfort Index", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).PierceDISC, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort Pierce Model Thermal Sensation Index", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).PierceTSENS, "Zone", "State", People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Pierce Model Effective Temperature PMV",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).PiercePMVET,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).PiercePMVSET,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Pierce Model Discomfort Index",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).PierceDISC,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Pierce Model Thermal Sensation Index",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).PierceTSENS,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
             }
 
             if (People(Loop).KSU) {
-                SetupOutputVariable("Zone Thermal Comfort KSU Model Thermal Sensation Vote", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).KsuTSV, "Zone", "State", People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort KSU Model Thermal Sensation Vote",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).KsuTSV,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
             }
 
             if ((People(Loop).Fanger) || (People(Loop).Pierce) || (People(Loop).KSU)) {
-                SetupOutputVariable("Zone Thermal Comfort Mean Radiant Temperature", OutputProcessor::Unit::C,
-                                    ThermalComfortData(Loop).ThermalComfortMRT, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort Operative Temperature", OutputProcessor::Unit::C,
-                                    ThermalComfortData(Loop).ThermalComfortOpTemp, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort Clothing Value", OutputProcessor::Unit::clo, ThermalComfortData(Loop).ClothingValue, "Zone",
-                                    "State", People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Mean Radiant Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).ThermalComfortMRT,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Operative Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).ThermalComfortOpTemp,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Clothing Value",
+                                    OutputProcessor::Unit::clo,
+                                    ThermalComfortData(Loop).ClothingValue,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
             }
 
             if (People(Loop).AdaptiveASH55) {
-                SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Adaptive Model 90% Acceptability Status", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).ThermalComfortAdaptiveASH5590, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).ThermalComfortAdaptiveASH5580, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature", OutputProcessor::Unit::C,
-                                    ThermalComfortData(Loop).ASHRAE55RunningMeanOutdoorTemp, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature", OutputProcessor::Unit::C,
-                                    ThermalComfortData(Loop).TComfASH55, "Zone", "State", People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Adaptive Model 90% Acceptability Status",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).ThermalComfortAdaptiveASH5590,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).ThermalComfortAdaptiveASH5580,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).ASHRAE55RunningMeanOutdoorTemp,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).TComfASH55,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
             }
 
             if (People(Loop).AdaptiveCEN15251) {
-                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).ThermalComfortAdaptiveCEN15251CatI, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).ThermalComfortAdaptiveCEN15251CatII, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status", OutputProcessor::Unit::None,
-                                    ThermalComfortData(Loop).ThermalComfortAdaptiveCEN15251CatIII, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature", OutputProcessor::Unit::C,
-                                    ThermalComfortData(Loop).CEN15251RunningMeanOutdoorTemp, "Zone", "State", People(Loop).Name);
-                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Temperature", OutputProcessor::Unit::C,
-                                    ThermalComfortData(Loop).TComfCEN15251, "Zone", "State", People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).ThermalComfortAdaptiveCEN15251CatI,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).ThermalComfortAdaptiveCEN15251CatII,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status",
+                                    OutputProcessor::Unit::None,
+                                    ThermalComfortData(Loop).ThermalComfortAdaptiveCEN15251CatIII,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).CEN15251RunningMeanOutdoorTemp,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort CEN 15251 Adaptive Model Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).TComfCEN15251,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
             }
         }
         ThermalComfortInASH55.allocate(NumOfZones);
@@ -489,38 +569,86 @@ namespace ThermalComfort {
 
         // CurrentModuleObject='Zone'
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
-            SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time", OutputProcessor::Unit::hr,
-                                ThermalComfortInASH55(Loop).timeNotSummer, "Zone", "Sum", Zone(Loop).Name);
-            SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Simple Model Winter Clothes Not Comfortable Time", OutputProcessor::Unit::hr,
-                                ThermalComfortInASH55(Loop).timeNotWinter, "Zone", "Sum", Zone(Loop).Name);
+            SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time",
+                                OutputProcessor::Unit::hr,
+                                ThermalComfortInASH55(Loop).timeNotSummer,
+                                "Zone",
+                                "Sum",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Simple Model Winter Clothes Not Comfortable Time",
+                                OutputProcessor::Unit::hr,
+                                ThermalComfortInASH55(Loop).timeNotWinter,
+                                "Zone",
+                                "Sum",
+                                Zone(Loop).Name);
             SetupOutputVariable("Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time",
-                                OutputProcessor::Unit::hr, ThermalComfortInASH55(Loop).timeNotEither, "Zone", "Sum", Zone(Loop).Name);
+                                OutputProcessor::Unit::hr,
+                                ThermalComfortInASH55(Loop).timeNotEither,
+                                "Zone",
+                                "Sum",
+                                Zone(Loop).Name);
         }
-        SetupOutputVariable("Facility Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time", OutputProcessor::Unit::hr,
-                            AnyZoneTimeNotSimpleASH55Summer, "Zone", "Sum", "Facility");
-        SetupOutputVariable("Facility Thermal Comfort ASHRAE 55 Simple Model Winter Clothes Not Comfortable Time", OutputProcessor::Unit::hr,
-                            AnyZoneTimeNotSimpleASH55Winter, "Zone", "Sum", "Facility");
+        SetupOutputVariable("Facility Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time",
+                            OutputProcessor::Unit::hr,
+                            AnyZoneTimeNotSimpleASH55Summer,
+                            "Zone",
+                            "Sum",
+                            "Facility");
+        SetupOutputVariable("Facility Thermal Comfort ASHRAE 55 Simple Model Winter Clothes Not Comfortable Time",
+                            OutputProcessor::Unit::hr,
+                            AnyZoneTimeNotSimpleASH55Winter,
+                            "Zone",
+                            "Sum",
+                            "Facility");
         SetupOutputVariable("Facility Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time",
-                            OutputProcessor::Unit::hr, AnyZoneTimeNotSimpleASH55Either, "Zone", "Sum", "Facility");
+                            OutputProcessor::Unit::hr,
+                            AnyZoneTimeNotSimpleASH55Either,
+                            "Zone",
+                            "Sum",
+                            "Facility");
 
         ThermalComfortSetPoint.allocate(NumOfZones);
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
-            SetupOutputVariable("Zone Heating Setpoint Not Met Time", OutputProcessor::Unit::hr, ThermalComfortSetPoint(Loop).notMetHeating, "Zone",
-                                "Sum", Zone(Loop).Name);
-            SetupOutputVariable("Zone Heating Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr,
-                                ThermalComfortSetPoint(Loop).notMetHeatingOccupied, "Zone", "Sum", Zone(Loop).Name);
-            SetupOutputVariable("Zone Cooling Setpoint Not Met Time", OutputProcessor::Unit::hr, ThermalComfortSetPoint(Loop).notMetCooling, "Zone",
-                                "Sum", Zone(Loop).Name);
-            SetupOutputVariable("Zone Cooling Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr,
-                                ThermalComfortSetPoint(Loop).notMetCoolingOccupied, "Zone", "Sum", Zone(Loop).Name);
+            SetupOutputVariable("Zone Heating Setpoint Not Met Time",
+                                OutputProcessor::Unit::hr,
+                                ThermalComfortSetPoint(Loop).notMetHeating,
+                                "Zone",
+                                "Sum",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Heating Setpoint Not Met While Occupied Time",
+                                OutputProcessor::Unit::hr,
+                                ThermalComfortSetPoint(Loop).notMetHeatingOccupied,
+                                "Zone",
+                                "Sum",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Cooling Setpoint Not Met Time",
+                                OutputProcessor::Unit::hr,
+                                ThermalComfortSetPoint(Loop).notMetCooling,
+                                "Zone",
+                                "Sum",
+                                Zone(Loop).Name);
+            SetupOutputVariable("Zone Cooling Setpoint Not Met While Occupied Time",
+                                OutputProcessor::Unit::hr,
+                                ThermalComfortSetPoint(Loop).notMetCoolingOccupied,
+                                "Zone",
+                                "Sum",
+                                Zone(Loop).Name);
         }
 
         SetupOutputVariable("Facility Heating Setpoint Not Met Time", OutputProcessor::Unit::hr, AnyZoneNotMetHeating, "Zone", "Sum", "Facility");
         SetupOutputVariable("Facility Cooling Setpoint Not Met Time", OutputProcessor::Unit::hr, AnyZoneNotMetCooling, "Zone", "Sum", "Facility");
-        SetupOutputVariable("Facility Heating Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, AnyZoneNotMetHeatingOccupied, "Zone",
-                            "Sum", "Facility");
-        SetupOutputVariable("Facility Cooling Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, AnyZoneNotMetCoolingOccupied, "Zone",
-                            "Sum", "Facility");
+        SetupOutputVariable("Facility Heating Setpoint Not Met While Occupied Time",
+                            OutputProcessor::Unit::hr,
+                            AnyZoneNotMetHeatingOccupied,
+                            "Zone",
+                            "Sum",
+                            "Facility");
+        SetupOutputVariable("Facility Cooling Setpoint Not Met While Occupied Time",
+                            OutputProcessor::Unit::hr,
+                            AnyZoneNotMetCoolingOccupied,
+                            "Zone",
+                            "Sum",
+                            "Facility");
 
         GetAngleFactorList();
 
@@ -671,7 +799,12 @@ namespace ThermalComfort {
                     }
                     ShowRecurringWarningErrorAtEnd("PEOPLE=\"" + People(PeopleNum).Name +
                                                        "\",Air velocity is still beyond the reasonable range (0.1,0.5)",
-                                                   People(PeopleNum).AirVelErrIndex, AirVel, AirVel, _, "[m/s]", "[m/s]");
+                                                   People(PeopleNum).AirVelErrIndex,
+                                                   AirVel,
+                                                   AirVel,
+                                                   _,
+                                                   "[m/s]",
+                                                   "[m/s]");
                 }
             }
 
@@ -1726,8 +1859,17 @@ namespace ThermalComfort {
             AllAngleFacSummed = 0.0;
             auto &thisAngFacList(AngleFactorList(Item));
 
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             thisAngFacList.Name = cAlphaArgs(1); // no need for verification/uniqueness.
             thisAngFacList.ZoneName = cAlphaArgs(2);
@@ -1817,8 +1959,8 @@ namespace ThermalComfort {
         //     MODIFIED       November 2017 (R Strand): Added fourth power and emissivity to calculation
 
         // Using/Aliasing
-        using DataHeatBalSurface::TH;
         using DataHeatBalance::Construct;
+        using DataHeatBalSurface::TH;
         using DataSurfaces::Surface;
 
         // Return value
@@ -1867,8 +2009,8 @@ namespace ThermalComfort {
         //          the modified zone MRT.
 
         // Using/Aliasing
-        using DataHeatBalSurface::TH;
         using DataHeatBalance::Construct;
+        using DataHeatBalSurface::TH;
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
 
@@ -2259,12 +2401,12 @@ namespace ThermalComfort {
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using namespace OutputReportPredefined;
+        using DataHVACGlobals::deviationFromSetPtThresholdClg;
+        using DataHVACGlobals::deviationFromSetPtThresholdHtg;
         using DataHVACGlobals::DualSetPointWithDeadBand;
         using DataHVACGlobals::SingleCoolingSetPoint;
         using DataHVACGlobals::SingleHeatCoolSetPoint;
         using DataHVACGlobals::SingleHeatingSetPoint;
-        using DataHVACGlobals::deviationFromSetPtThresholdClg;
-        using DataHVACGlobals::deviationFromSetPtThresholdHtg;
         using DataRoomAirModel::AirModel;
         using DataRoomAirModel::RoomAirModel_Mixing;
 

@@ -201,6 +201,10 @@ LOGICAL :: iddCanBeRead =.FALSE.
 REAL :: startTime=0.0
 REAL :: endTime=0.0
 
+REAL :: heatingSpds=0.0
+REAL :: coolingSpds=0.0
+REAL :: maxSpd=0.0
+
 !Arrays related to reading the IDD file
 
 TYPE iddObjType
@@ -750,6 +754,7 @@ INTEGER,PARAMETER :: ptaczDesSpecOADistNameOff = 36
 INTEGER,PARAMETER :: ptaczBaseboardTypeOff = 37
 INTEGER,PARAMETER :: ptaczBaseboardAvailSchedNameOff = 38
 INTEGER,PARAMETER :: ptaczBaseboardCapOff = 39
+INTEGER,PARAMETER :: ptaczCapCtrlTypeOff = 40
 
 INTEGER,PARAMETER :: pthpzNameOff = 1
 INTEGER,PARAMETER :: pthpzTStatNameOff = 2
@@ -800,6 +805,7 @@ INTEGER,PARAMETER :: pthpzDesSpecOADistNameOff = 46
 INTEGER,PARAMETER :: pthpzBaseboardTypeOff = 47
 INTEGER,PARAMETER :: pthpzBaseboardAvailSchedNameOff = 48
 INTEGER,PARAMETER :: pthpzBaseboardCapOff = 49
+INTEGER,PARAMETER :: pthpzCapCtrlTypeOff = 50
 
 INTEGER,PARAMETER :: vrfzNameOff = 1
 INTEGER,PARAMETER :: vrfzSystemNameOff = 2
@@ -1496,9 +1502,9 @@ INTEGER,PARAMETER :: gndTempSurfDecOff = 12
 
   ! Boiler:HotWater (for use with HVACTemplate:Plant:Boiler:ObjectReference)
 INTEGER,PARAMETER :: blrhwNameOff = 1
-INTEGER,PARAMETER :: blrhwInletNodeOff = 12
-INTEGER,PARAMETER :: blrhwOutletNodeOff = 13
-INTEGER,PARAMETER :: blrhwLastFieldOff = 18
+INTEGER,PARAMETER :: blrhwInletNodeOff = 11
+INTEGER,PARAMETER :: blrhwOutletNodeOff = 12
+INTEGER,PARAMETER :: blrhwLastFieldOff = 17
 
   ! Chiller:Electric:EIR (for use with HVACTemplate:Plant:Chiller:ObjectReference)
 INTEGER,PARAMETER :: chleirNameOff = 1
@@ -2282,8 +2288,8 @@ CALL AddObjToProcess('HVACTemplate:System:DualDuct',.TRUE.,         ddsAirHandle
 CALL AddObjToProcess('HVACTemplate:Zone:FanCoil',.TRUE.,            fczNameOff,                  fczBaseboardCapOff,        34)
 CALL AddObjToProcess('HVACTemplate:Zone:IdealLoadsAirSystem',.TRUE.,pazNameOff,                  pazHeatRecLatEffOff,        2)
 CALL AddObjToProcess('HVACTemplate:Zone:BaseboardHeat',.TRUE.,      bbzNameOff,                  bbzDesSpecOADistNameOff,   11)
-CALL AddObjToProcess('HVACTemplate:Zone:PTAC',.TRUE.,               ptaczTStatNameOff,           ptaczBaseboardCapOff,      39)
-CALL AddObjToProcess('HVACTemplate:Zone:PTHP',.TRUE.,               pthpzTStatNameOff,           pthpzBaseboardCapOff,      49)
+CALL AddObjToProcess('HVACTemplate:Zone:PTAC',.TRUE.,               ptaczTStatNameOff,           ptaczCapCtrlTypeOff,       40)
+CALL AddObjToProcess('HVACTemplate:Zone:PTHP',.TRUE.,               pthpzTStatNameOff,           pthpzCapCtrlTypeOff,       50)
 CALL AddObjToProcess('HVACTemplate:Plant:ChilledWaterLoop',.TRUE.,  cwpNameOff,                  cwpCndLdDistSchmOff,       33)
 CALL AddObjToProcess('HVACTemplate:Plant:Chiller',.TRUE.,           chlPriorityOff,              chlLeavingLowLimOff,       12)
 CALL AddObjToProcess('HVACTemplate:Plant:Chiller:ObjectReference',.TRUE.,  chlorPriorityOff,     chlorPriorityOff,           4)
@@ -6755,7 +6761,7 @@ actCount = 0
 DO iZone= 1, prelimCount
   CALL NextOldObj(ptCompactPTAC,fldValStart,fldValEnd)
   ! test to make sure object is valid
-  IF (fldValEnd - fldValStart .EQ. ptaczBaseboardCapOff) THEN
+  IF (fldValEnd - fldValStart .EQ. ptaczCapCtrlTypeOff) THEN
     actCount = actCount + 1
     compactPTACBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
@@ -6786,6 +6792,7 @@ DO iZone= 1, prelimCount
     CALL SetIfBlank(fldValStart + ptaczCoolDesignTempDiffOff,   '30.0')
     CALL SetIfBlank(fldValStart + ptaczBaseboardTypeOff, 'None')
     CALL SetIfBlank(fldValStart + ptaczBaseboardCapOff, 'autosize')
+    CALL SetIfBlank(fldValStart + ptaczCapCtrlTypeOff, 'None')
   END IF
 END DO
 numCompactPTAC = actCount
@@ -6837,7 +6844,7 @@ actCount = 0
 DO iZone= 1, prelimCount
   CALL NextOldObj(ptCompactPTHP,fldValStart,fldValEnd)
   ! test to make sure object is valid
-  IF (fldValEnd - fldValStart .EQ. pthpzBaseboardCapOff) THEN
+  IF (fldValEnd - fldValStart .EQ. pthpzCapCtrlTypeOff) THEN
     actCount = actCount + 1
     compactPTHPBase(actCount) = fldValStart
     foundCompactObject = .TRUE.
@@ -6877,6 +6884,7 @@ DO iZone= 1, prelimCount
     CALL SetIfBlank(fldValStart + pthpzCoolDesignTempDiffOff,   '30.0')
     CALL SetIfBlank(fldValStart + pthpzBaseboardTypeOff, 'None')
     CALL SetIfBlank(fldValStart + pthpzBaseboardCapOff, 'autosize')
+    CALL SetIfBlank(fldValStart + pthpzCapCtrlTypeOff, 'None')
   END IF
 END DO
 numCompactPTHP = actCount
@@ -16073,7 +16081,10 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
     CALL AddToObjStr('Single Mode Operation', 'No')
-    CALL AddToObjStr('No Load Supply Air Flow Rate Ratio', '')
+    heatingSpds = StringToReal(FldVal(base + ussHeatCoilNumSpeedOff))
+    coolingSpds = StringToReal(FldVal(base + ussCoolCoilNumSpeedOff))
+    maxSpd = max(heatingSpds, coolingSpds)
+    CALL AddToObjStr('No Load Supply Air Flow Rate Ratio', RealToStr(1.0/maxSpd))
     CALL AddToObjStr('Heating Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Cooling Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Heating Speed 2 Supply Air Flow Ratio', 'autosize')
@@ -23382,7 +23393,7 @@ INTEGER, PARAMETER :: capctrlCyclFan          = 2
 INTEGER, PARAMETER :: capctrlVarFanVarFlow    = 3
 INTEGER, PARAMETER :: capctrlVarFanConstFlow  = 4
 INTEGER, PARAMETER :: capctrlMultiSpeedFan    = 5
-INTEGER, PARAMETER :: capctrlASHRAE90VariableFan = 6
+INTEGER, PARAMETER :: capctrlASHRAE90VarFan   = 6
 
           ! INTERFACE BLOCK SPECIFICATIONS
           !    na
@@ -23472,7 +23483,7 @@ DO iZone = 1, numCompactFanCoil
 !  ELSEIF (SameString(FldVal(base +  fczCapCtrlTypeOff),'MultiSpeedFan')) THEN
 !    capacityControlKind = capctrlMultiSpeedFan
   ELSEIF (SameString(FldVal(base +  fczCapCtrlTypeOff),'ASHRAE90VariableFan')) THEN
-    capacityControlKind = capctrlASHRAE90VariableFan
+    capacityControlKind = capctrlASHRAE90VarFan
   ELSE
     CALL WriteError('Invalid choice in HVACTemplate:Zone:FanCoil "'//TRIM(FldVal(base + fczNameOff))//'"'// &
                     ' in the Capacity Control Method field: '//TRIM(FldVal(base + fczCapCtrlTypeOff)))
@@ -23646,7 +23657,11 @@ DO iZone = 1, numCompactFanCoil
   !CR8001
   !CALL AddToObjFld('maximum air flow rate {m3/s}', base + fczSupplyMaxRateOff,'')
   CALL AddToObjStr('Maximum Supply Air Flow Rate {m3/s}', 'autosize')
-  CALL AddToObjFld('Low Speed Supply Air Flow Ratio', base + fczLowSpdSupplyRatioOff,'')
+  IF (capacityControlKind == capctrlASHRAE90VarFan) THEN
+    CALL AddToObjStr('Low Speed Supply Air Flow Ratio','0.5')
+  ELSE
+    CALL AddToObjFld('Low Speed Supply Air Flow Ratio', base + fczLowSpdSupplyRatioOff,'')
+  END IF
   CALL AddToObjFld('Medium Speed Supply Air Flow Ratio', base + fczMedSpdSupplyRatioOff,'')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Maximum Outdoor Air Flow Rate {m3/s}','autosize')
@@ -23661,7 +23676,7 @@ DO iZone = 1, numCompactFanCoil
 !  CALL AddToObjFld('Relief Air Node Name', base + fczNameOff,' Relief Air Outlet')
   CALL AddToObjStr('Outdoor Air Mixer Object Type', 'OutdoorAir:Mixer')
   CALL AddToObjFld('Outdoor Air Mixer Name', base + fczNameOff,' OA Mixing Box')
-  IF (capacityControlKind == capctrlConstFanVarFlow .OR. capacityControlKind==capctrlASHRAE90VariableFan) THEN
+  IF (capacityControlKind == capctrlConstFanVarFlow .OR. capacityControlKind==capctrlASHRAE90VarFan) THEN
     CALL AddToObjStr('Supply Air Fan Object Type', 'Fan:ConstantVolume')
   ELSEIF (capacityControlKind == capctrlCyclFan) THEN
     CALL AddToObjStr('Supply Air Fan Object Type', 'Fan:OnOff')
@@ -23682,11 +23697,20 @@ DO iZone = 1, numCompactFanCoil
   CALL AddToObjFld('Heating Coil Name', base + fczNameOff,' Heating Coil')
   CALL AddToObjStr('Maximum Hot Water Flow Rate {m3/s}','autosize')
   CALL AddToObjStr('Minimum Hot Water Flow Rate{m3/s}','0')
-  CALL AddToObjStr('Heating Convergence Tolerance','0.001',.true.)
+  IF (capacityControlKind == capctrlASHRAE90VarFan) THEN
+    CALL AddToObjStr('Heating Convergence Tolerance','0.001')
+    CALL AddToObjStr('Availability Manager List Name','')
+    CALL AddToObjStr('Design Specification ZoneHVAC Sizing Object Name','')
+    CALL AddToObjStr('Supply Air Fan Operating Mode Schedule Name','HVACTemplate-Always 1')
+    CALL AddToObjStr('Minimum Supply Air Temperature in Cooling Mode {C}','autosize')
+    CALL AddToObjStr('Maximum Supply Air Temperature in Heating Mode {C}','autosize',.true.)
+  ELSE
+    CALL AddToObjStr('Heating Convergence Tolerance','0.001',.true.)
+  END IF
 
   ! Supply fan
   SELECT CASE (capacityControlKind)
-  CASE (capctrlConstFanVarFlow,capctrlASHRAE90VariableFan)
+  CASE (capctrlConstFanVarFlow,capctrlASHRAE90VarFan)
     CALL CreateNewObj('Fan:ConstantVolume')
     CALL AddToObjFld('Name', base + fczNameOff,' Supply Fan')
     IF (.NOT. isSysAvailSchedBlank) THEN
@@ -23697,7 +23721,6 @@ DO iZone = 1, numCompactFanCoil
     CALL AddToObjFld('Fan Efficiency', base + fczSupplyEfficiencyOff,'')
     CALL AddToObjFld('Pressure Rise {Pa}', base + fczSupplyPressureOff,'')
     CALL AddToObjStr('Maximum Flow Rate {m3/s}','autosize')
-	if ( capacityControlKind .EQ. capctrlASHRAE90VariableFan ) CALL AddToObjStr('Low Speed Supply Air Flow Ratio','autosize')
     CALL AddToObjFld('Motor Efficiency', base + fczSupplyFanMotorEffOff,'')
     CALL AddToObjFld('Motor in Airstream Fraction', base + fczSupplyFanMotorFracOff,'')
     CALL AddToObjFld('Air Inlet Node Name', base + fczNameOff,' Mixed Air Outlet')
@@ -24488,6 +24511,9 @@ INTEGER, PARAMETER :: fmNeither = 3
 INTEGER, PARAMETER :: baseboardNone           = 1
 INTEGER, PARAMETER :: baseboardHotWater       = 2
 INTEGER, PARAMETER :: baseboardElectric       = 3
+          ! parameters for capacity control
+INTEGER, PARAMETER :: capctrlNone             = 1
+INTEGER, PARAMETER :: capctrlASHRAE90VarFan   = 2
 
           ! INTERFACE BLOCK SPECIFICATIONS
           !    na
@@ -24511,6 +24537,7 @@ LOGICAL :: isDedOutAirNameBlank
 LOGICAL :: isOATypeDetailed = .FALSE.
 LOGICAL :: isBaseboardNone = .FALSE.
 INTEGER :: baseboardKind = 0
+INTEGER :: capacityControlKind = 0
 CHARACTER(len=1) :: NextSequenceNumber = '1'
 
 DO iZone = 1, numCompactPTAC
@@ -24568,6 +24595,11 @@ DO iZone = 1, numCompactPTAC
   ELSE
     CALL WriteError('Invalid choice in HVACTemplate:Zone:PTAC "'//TRIM(FldVal(base + ptaczNameOff))//'"'// &
                     ' in the Baseboard Heating Type field: '//TRIM(FldVal(base + ptaczBaseboardTypeOff)))
+  END IF
+  IF (SameString(FldVal(base +  ptaczCapCtrlTypeOff),'SingleZoneVAV')) THEN
+    capacityControlKind = capctrlASHRAE90VarFan
+  ELSE IF (SameString(FldVal(base +  ptaczCapCtrlTypeOff),'None')) THEN
+    capacityControlKind = capctrlNone
   END IF
 
   !repeat per zone - only if pazTStatNameOff is not blank
@@ -24723,7 +24755,7 @@ DO iZone = 1, numCompactPTAC
     CALL AddToObjStr('Design Specification Outdoor Air Object Name','',.TRUE.)
   ENDIF
   !ZoneHVAC:PackagedTerminalAirConditioner ~ line 61
-  IF (isDedOutAirNameBlank) THEN
+  IF (.NOT. isDedOutAirNameBlank) THEN
     CALL WriteComment('Set PTAC outdoor air to zero, because zone is served by dedicated outdoor air system (DOAS)')
   END IF
   CALL CreateNewObj('ZoneHVAC:PackagedTerminalAirConditioner')
@@ -24741,8 +24773,12 @@ DO iZone = 1, numCompactPTAC
   !CALL AddToObjFld('Supply air volumetric flow rate during heating operation {m3/s}',   &
   !   base + ptaczSupplyHeatFlowRateOff,'')
   CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}','autosize')
-  CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
+  IF (capacityControlKind == capctrlASHRAE90VarFan) THEN
+    CALL AddToObjStr('No Load Supply Air Flow Rate {m3/s}','autosize')
+  ELSE
+    CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + ptaczSupplyNoLoadFlowRateOff,'')
+  END IF
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
@@ -24766,14 +24802,23 @@ DO iZone = 1, numCompactPTAC
   CALL AddToObjStr('Cooling Coil Object Type','Coil:Cooling:DX:SingleSpeed')
   CALL AddToObjFld('Cooling Coil Name', base + ptaczNameOff,' PTAC Cooling Coil')
   CALL AddToObjFld('Fan Placement', base + ptaczFanPlacementOff,'')
-  SELECT CASE (fanMode)
-    CASE (fmCycling)
-      CALL AddToObjStr('Supply Air Fan Operating Mode Schedule Name','HVACTemplate-Always 0',.TRUE.)
-    CASE (fmNeither)
-      CALL AddToObjFld('Supply Air Fan Operating Mode Schedule Name', base + ptaczFanModeOff,'',.TRUE.)
-  END SELECT
-  IF (fanMode .EQ. fmCycling) THEN
-    CALL AddAlwaysSchedule('0')
+  IF (capacityControlKind == capctrlASHRAE90VarFan) THEN
+    CALL AddToObjStr('Supply Air Fan Operating Mode Schedule Name','HVACTemplate-Always 1')
+    CALL AddToObjStr('Availability Manager List Name','')
+    CALL AddToObjStr('Design Specification ZoneHVAC Sizing Object Name','')
+    CALL AddToObjStr('Capacity Control Method','SingleZoneVAV')
+    CALL AddToObjStr('Minimum Supply Air Temperature in Cooling Mode {C}','autosize')
+    CALL AddToObjStr('Maximum Supply Air Temperature in Heating Mode {C}','autosize',.true.)
+  ELSE
+    SELECT CASE (fanMode)
+      CASE (fmCycling)
+        CALL AddToObjStr('Supply Air Fan Operating Mode Schedule Name','HVACTemplate-Always 0',.TRUE.)
+      CASE (fmNeither)
+        CALL AddToObjFld('Supply Air Fan Operating Mode Schedule Name', base + ptaczFanModeOff,'',.TRUE.)
+    END SELECT
+    IF (fanMode .EQ. fmCycling) THEN
+      CALL AddAlwaysSchedule('0')
+    END IF
   END IF
   !FAN:SIMPLE:CONSTVOLUME ~ line 87
   CALL CreateNewObj('Fan:OnOff')
@@ -25061,6 +25106,9 @@ INTEGER, PARAMETER :: fmNeither = 3
 INTEGER, PARAMETER :: baseboardNone           = 1
 INTEGER, PARAMETER :: baseboardHotWater       = 2
 INTEGER, PARAMETER :: baseboardElectric       = 3
+          ! parameters for capacity control
+INTEGER, PARAMETER :: capctrlNone             = 1
+INTEGER, PARAMETER :: capctrlASHRAE90VarFan   = 2
 
           ! INTERFACE BLOCK SPECIFICATIONS
           !    na
@@ -25086,6 +25134,7 @@ LOGICAL :: isOATypeDetailed = .FALSE.
 LOGICAL :: isBaseboardNone = .FALSE.
 INTEGER :: baseboardKind = 0
 CHARACTER(len=1) :: NextSequenceNumber = '1'
+INTEGER :: capacityControlKind = 0
 
 DO iZone = 1, numCompactPTHP
   base =  compactPTHPBase(iZone)
@@ -25141,6 +25190,11 @@ DO iZone = 1, numCompactPTHP
   ELSE
     CALL WriteError('Invalid choice in HVACTemplate:Zone:PTHP "'//TRIM(FldVal(base + pthpzNameOff))//'"'// &
                     ' in the Baseboard Heating Type field: '//TRIM(FldVal(base + pthpzBaseboardTypeOff)))
+  END IF
+  IF (SameString(FldVal(base +  pthpzCapCtrlTypeOff),'SingleZoneVAV')) THEN
+    capacityControlKind = capctrlASHRAE90VarFan
+  ELSE IF (SameString(FldVal(base +  pthpzCapCtrlTypeOff),'None')) THEN
+    capacityControlKind = capctrlNone
   END IF
 
   !repeat per zone - only if pthpzTStatNameOff is not blank
@@ -25314,8 +25368,12 @@ DO iZone = 1, numCompactPTHP
   !CALL AddToObjFld('Supply air volumetric flow rate during heating operation {m3/s}',   &
   !   base + pthpzSupplyHeatFlowRateOff,'')
   CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}','autosize')
-  CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
+  IF (capacityControlKind == capctrlASHRAE90VarFan) THEN
+    CALL AddToObjStr('No Load Supply Air Flow Rate {m3/s}','autosize')
+  ELSE
+    CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + pthpzSupplyNoLoadFlowRateOff,'')
+  END IF
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
@@ -25347,13 +25405,26 @@ DO iZone = 1, numCompactPTHP
      base + pthpzSuppHeatMaxODBOff,'')
   CALL AddToObjFld('Fan Placement', base + pthpzFanPlacementOff,'')
   SchType=' '
-  SELECT CASE (fanMode)
-    CASE (fmCycling)
-      CALL AddToObjStr('Supply Air Fan Operating Mode Schedule Name','HVACTemplate-Always 0',.TRUE.)
-      SchType='0'
-    CASE (fmNeither)
-      CALL AddToObjFld('Supply Air Fan Operating Mode Schedule Name', base + pthpzFanModeOff,'',.TRUE.)
-  END SELECT
+  IF (capacityControlKind == capctrlASHRAE90VarFan) THEN
+    CALL AddToObjStr('Supply Air Fan Operating Mode Schedule Name','HVACTemplate-Always 1')
+      SchType='1'
+    CALL AddToObjStr('Availability Manager List Name','')
+    CALL AddToObjStr('Design Specification ZoneHVAC Sizing Object Name','')
+    CALL AddToObjStr('Capacity Control Method','SingleZoneVAV')
+    CALL AddToObjStr('Minimum Supply Air Temperature in Cooling Mode {C}','autosize')
+    CALL AddToObjStr('Maximum Supply Air Temperature in Heating Mode {C}','autosize',.true.)
+  ELSE
+    SELECT CASE (fanMode)
+      CASE (fmCycling)
+        CALL AddToObjStr('Supply Air Fan Operating Mode Schedule Name','HVACTemplate-Always 0',.TRUE.)
+        SchType='0'
+      CASE (fmNeither)
+        CALL AddToObjFld('Supply Air Fan Operating Mode Schedule Name', base + pthpzFanModeOff,'',.TRUE.)
+    END SELECT
+    IF (fanMode .EQ. fmCycling) THEN
+      CALL AddAlwaysSchedule('0')
+    END IF
+  END IF
   IF (SchType /= ' ') CALL AddAlwaysSchedule(SchType)
 !end LKL changes
   !FAN:SIMPLE:ONOFF ~ line 95
@@ -25819,11 +25890,9 @@ DO iBoiler = 1, numCompactBoiler
     IF (isBoilerCondHotWater) THEN
       CALL AddToObjStr('Efficiency Curve Temperature Evaluation Variable', 'EnteringBoiler ')
       CALL AddToObjFld('Normalized Boiler Efficiency Curve Name', base + blrNameOff,' Condensing Boiler Efficiency Curve')
-      CALL AddToObjStr('Design Boiler Water Outlet Temp {C}','75')
     ELSE
       CALL AddToObjStr('Efficiency Curve Temperature Evaluation Variable', 'LeavingBoiler')
       CALL AddToObjFld('Normalized Boiler Efficiency Curve Name', base + blrNameOff,' Efficiency Curve')
-      CALL AddToObjStr('Design Boiler Water Outlet Temp {C}','81')
     END IF
     CALL AddToObjStr('Max Design Boiler Water Flow Rate {m3/s}','autosize')
     CALL AddToObjFld('Minimum Part Load Ratio',base + blrMinPLROff,'')

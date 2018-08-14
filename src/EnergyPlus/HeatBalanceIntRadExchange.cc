@@ -254,7 +254,8 @@ namespace HeatBalanceIntRadExchange {
         }
 
         for (int ZoneNum = (PartialResimulate ? ZoneToResimulate() : 1), ZoneNum_end = (PartialResimulate ? ZoneToResimulate() : NumOfZones);
-             ZoneNum <= ZoneNum_end; ++ZoneNum) {
+             ZoneNum <= ZoneNum_end;
+             ++ZoneNum) {
 
             auto const &zone(Zone(ZoneNum));
             auto &zone_info(ZoneInfo(ZoneNum));
@@ -613,15 +614,23 @@ namespace HeatBalanceIntRadExchange {
 
             if (NumZonesWithUserFbyS > 0) {
 
-                GetInputViewFactorsbyName(ZoneInfo(ZoneNum).Name, NumOfZoneSurfaces, ZoneInfo(ZoneNum).F, ZoneInfo(ZoneNum).SurfacePtr, NoUserInputF,
+                GetInputViewFactorsbyName(ZoneInfo(ZoneNum).Name,
+                                          NumOfZoneSurfaces,
+                                          ZoneInfo(ZoneNum).F,
+                                          ZoneInfo(ZoneNum).SurfacePtr,
+                                          NoUserInputF,
                                           ErrorsFound); // Obtains user input view factors from input file
             }
 
             if (NoUserInputF) {
 
                 // Calculate the view factors and make sure they satisfy reciprocity
-                CalcApproximateViewFactors(NumOfZoneSurfaces, ZoneInfo(ZoneNum).Area, ZoneInfo(ZoneNum).Azimuth, ZoneInfo(ZoneNum).Tilt,
-                                           ZoneInfo(ZoneNum).F, ZoneInfo(ZoneNum).SurfacePtr);
+                CalcApproximateViewFactors(NumOfZoneSurfaces,
+                                           ZoneInfo(ZoneNum).Area,
+                                           ZoneInfo(ZoneNum).Azimuth,
+                                           ZoneInfo(ZoneNum).Tilt,
+                                           ZoneInfo(ZoneNum).F,
+                                           ZoneInfo(ZoneNum).SurfacePtr);
             }
 
             if (ViewFactorReport) { // Allocate and save user or approximate view factors for reporting.
@@ -629,8 +638,15 @@ namespace HeatBalanceIntRadExchange {
                 SaveApproximateViewFactors = ZoneInfo(ZoneNum).F;
             }
 
-            FixViewFactors(NumOfZoneSurfaces, ZoneInfo(ZoneNum).Area, ZoneInfo(ZoneNum).F, ZoneNum, CheckValue1, CheckValue2, FinalCheckValue,
-                           NumIterations, FixedRowSum);
+            FixViewFactors(NumOfZoneSurfaces,
+                           ZoneInfo(ZoneNum).Area,
+                           ZoneInfo(ZoneNum).F,
+                           ZoneNum,
+                           CheckValue1,
+                           CheckValue2,
+                           FinalCheckValue,
+                           NumIterations,
+                           FixedRowSum);
 
             // Calculate the script F factors
             CalcScriptF(NumOfZoneSurfaces, ZoneInfo(ZoneNum).Area, ZoneInfo(ZoneNum).F, ZoneInfo(ZoneNum).Emissivity, ZoneInfo(ZoneNum).ScriptF);
@@ -812,8 +828,17 @@ namespace HeatBalanceIntRadExchange {
         if (UserFZoneIndex > 0) {
             NoUserInputF = false;
 
-            inputProcessor->getObjectItem("ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem("ZoneProperty:UserViewFactors",
+                                          UserFZoneIndex,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             if (NumNums < 3 * pow_2(N)) {
                 ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
@@ -878,8 +903,17 @@ namespace HeatBalanceIntRadExchange {
             }
             NoUserInputF = false;
 
-            inputProcessor->getObjectItem("ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
-                                          IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem("ZoneProperty:UserViewFactors:bySurfaceName",
+                                          UserFZoneIndex,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             if (NumNums < pow_2(N)) {
                 ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
@@ -1493,4 +1527,4 @@ namespace HeatBalanceIntRadExchange {
 
 } // namespace HeatBalanceIntRadExchange
 
-} // EnergyPlus
+} // namespace EnergyPlus

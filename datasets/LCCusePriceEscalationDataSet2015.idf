@@ -17,7 +17,7 @@
 ! which is available upon request.
 
 !  Version,
-!    8.8;                    !- Version Identifier
+!    9.0;                    !- Version Identifier
 
   LifeCycleCost:UsePriceEscalation,
     NorthEast  Residential-Electricity,  !- Name
