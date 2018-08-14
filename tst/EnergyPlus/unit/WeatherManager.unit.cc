@@ -490,7 +490,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
-TEST_F(EnergyPlusFixture, ASHRAE_TauModelTest)
+TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
 {
     std::string const idf_objects = delimited_string({
         "  Version,9.0;",
@@ -516,7 +516,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_TauModelTest)
         "    No,                      !- Rain Indicator",
         "    No,                      !- Snow Indicator",
         "    No,                      !- Daylight Saving Time Indicator",
-        "    ASHRAETau,               !- Solar Model Indicator",
+        "    ASHRAETau2017,           !- Solar Model Indicator",
         "    ,                        !- Beam Solar Day Schedule Name",
         "    ,                        !- Diffuse Solar Day Schedule Name",
         "    0.325,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_TauModelTest)
         "    No,                      !- Rain Indicator",
         "    No,                      !- Snow Indicator",
         "    No,                      !- Daylight Saving Time Indicator",
-        "    ASHRAETau,               !- Solar Model Indicator",
+        "    ASHRAETau2017,           !- Solar Model Indicator",
         "    ,                        !- Beam Solar Day Schedule Name",
         "    ,                        !- Diffuse Solar Day Schedule Name",
         "    .556,                    !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
@@ -561,6 +561,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_TauModelTest)
     Environment(2).DesignDayNum = 2;
     GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+
     // init local variables
     Real64 ETR = 1367.0;
     Real64 BeamRad(0.0);
@@ -573,6 +574,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_TauModelTest)
     Real64 TauB = DesDayInput(EnvrnNum).TauB;
     Real64 TauD = DesDayInput(EnvrnNum).TauD;
     // check tau values
+    EXPECT_EQ(4, DesDayInput(EnvrnNum).SolarModel);
     EXPECT_EQ(0.325, TauB);
     EXPECT_EQ(2.461, TauD);
     // calc expected values for environment 1
@@ -583,7 +585,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_TauModelTest)
     Real64 expectedIDifH = ETR * std::exp(-TauD * std::pow(M, AD));
     Real64 expectedIGlbH = expectedIDirN * CosZenith + expectedIDifH;
     // calc TauModel
-    ASHRAETauModel(ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
+    ASHRAETauModel(DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
     // check the coefficients are correctly applied
     EXPECT_EQ(expectedIDirN, BeamRad);
     EXPECT_EQ(expectedIDifH, DiffRad);
@@ -609,7 +611,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_TauModelTest)
     DiffRad = 0.0;
     GloHorzRad = 0.0;
     // calc TauModel
-    ASHRAETauModel(ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
+    ASHRAETauModel(DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
     // check the coefficients are correctly applied
     EXPECT_EQ(expectedIDirN, BeamRad);
     EXPECT_EQ(expectedIDifH, DiffRad);

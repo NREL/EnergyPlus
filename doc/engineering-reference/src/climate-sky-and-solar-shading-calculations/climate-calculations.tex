@@ -191,7 +191,17 @@ $\tau$\(_{b}\) and $\tau$\(_{d}\) = beam and diffuse optical depths (from ASHRAE
 
 Values of $\tau$\(_{b}\) and $\tau$\(_{d}\) are location-specific and vary during the year. They embody the dependence of clear sky solar radiation upon local conditions, such as elevation, precipitable water content, and aerosols.
 
-The air mass exponents \(ab\) ~and \(ad\) ~were correlated to $\tau$\(_{b}\) and $\tau$\(_{d}\) through the following empirical relationships (ASHRAE 2017 HOF):
+The air mass exponents \(ab\) ~and \(ad\) ~were correlated to $\tau$\(_{b}\) and $\tau$\(_{d}\) through the following empirical relationships. If solar model indicator selected is ASHRAETau, then the $\tau$\(_{b}\) and $\tau$\(_{d}\) values and the empirical equations coefficients should be based on the 2009 ASHRAE HOF as shown below:
+
+\begin{equation}
+ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} \cdot {\tau_d}
+\end{equation}
+
+\begin{equation}
+ad = 0.202 + 0.852 \cdot {\tau_b} - 0.007 \cdot {\tau_d} - 0.357 \cdot {\tau_b} \cdot {\tau_d}
+\end{equation}
+
+Else if solar model indicator selected is ASHRAETau2017, then the $\tau$\(_{b}\) and $\tau$\(_{d}\) values and the empirical equations coefficients should be based on the 2017 ASHRAE HOF as shown below:
 
 \begin{equation}
 ab = 1.454 - 0.406 \cdot {\tau_b} - 0.268 \cdot {\tau_d} + 0.021 \cdot {\tau_b} \cdot {\tau_d}
@@ -200,6 +210,8 @@ ab = 1.454 - 0.406 \cdot {\tau_b} - 0.268 \cdot {\tau_d} + 0.021 \cdot {\tau_b} 
 \begin{equation}
 ad = 0.507 + 0.205 \cdot {\tau_b} - 0.080 \cdot {\tau_d} - 0.190 \cdot {\tau_b} \cdot {\tau_d}
 \end{equation}
+
+The empirical equations coefficients of the 2017 ASHRAE HOF are also valid for the 2013 ASHRAE HOF hence the $\tau$\(_{b}\) and $\tau$\(_{d}\) values from the 2013 ASHRAE HOF can be used with ASHRAETau2017 solar model indicator if needed. 
 
 Studies done as part of ASHRAE research projects show that the revised tau model produces more physically plausible irradiance values than does the traditional clear sky model.~ In particular, diffuse irradiance values are more realistic.
 
