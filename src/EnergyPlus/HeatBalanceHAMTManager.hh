@@ -159,27 +159,27 @@ namespace HeatBalanceHAMTManager {
     // structure internal moisture source
     struct s_ims
     {
-        int imsid;
-        int sid;
-        int lid;
+        int imsid;   // Internal moisture source id
+        int sid;     // Surface id
+        int lid;     // Layer id
 
         int SourceType;   // (1 = air flow input; 2 = infiltration model (Kuenzel); 3 = multi zone air flow model)
 
         // SourceType == 1: Air Flow input
-        Real64 moistairflow_Input;
+        Real64 moistairflow_Input;  // moist air flow input for source type 1 in m3 / m2 s
 
         // Source Type == 2: Air infiltration model
-        Real64 StackHeight;
-        Real64 ComponentAirPermeance;
-        Real64 MechanicalVentilationOverpressure;
-        Real64 DeltaPressure;
+        Real64 StackHeight;                         // Stack height in m to create pressure difference for source type 2
+        Real64 ComponentAirPermeance;               // Component air permeance in 
+        Real64 MechanicalVentilationOverpressure;   // Additional mechanical ventilation overpressure in Pa
+        Real64 DeltaPressure;                       // Pressure difference over component in Pa
 
         // Source Type == 3: Air flow network
-        int AirflowNetworkid;
+        int AirflowNetworkid;                       // Id of the component element in the airflow network
 
         Real64 moistairflow;
 
-        s_ims() : imsid(-1), sid(-1), lid(-1), SourceType(0), moistairflow_Input(0.0), StackHeight(0.0), ComponentAirPermeance(0.0), 
+        s_ims() : imsid(-1), sid(-1), lid(-1), SourceType(-1), moistairflow_Input(0.0), StackHeight(0.0), ComponentAirPermeance(0.0), 
             MechanicalVentilationOverpressure(0.0), DeltaPressure(0.0), AirflowNetworkid(0), moistairflow(0.0)
         {
         }
