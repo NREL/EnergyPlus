@@ -10072,8 +10072,11 @@ namespace UnitarySystems {
         Real64 DesOutTemp = this->m_DesiredOutletTemp;
         Real64 DesOutHumRat = this->m_DesiredOutletHumRat;
         int CoilType_Num = this->m_CoolingCoilType_Num;
-        Real64 LoopDXCoilMaxRTFSave = DataAirLoop::LoopDXCoilRTF;
-        DataAirLoop::LoopDXCoilRTF = 0.0;
+        Real64 LoopDXCoilMaxRTFSave = 0.0;
+        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+            LoopDXCoilMaxRTFSave =  DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
+        }
 
         std::string CompName = this->m_CoolingCoilName;
         int FanOpMode = this->m_FanOpMode;
@@ -11245,7 +11248,9 @@ namespace UnitarySystems {
         this->m_CoolingCycRatio = CycRatio;
         this->m_DehumidificationMode = DehumidMode;
 
-        DataAirLoop::LoopDXCoilRTF = max(DataAirLoop::LoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = max(DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        }
 
         if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
             this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
@@ -11307,10 +11312,15 @@ namespace UnitarySystems {
         int FanOpMode = this->m_FanOpMode;
         Real64 DesOutTemp = this->m_DesiredOutletTemp;
 
-        Real64 LoopHeatingCoilMaxRTFSave = DataAirLoop::LoopHeatingCoilMaxRTF;
-        DataAirLoop::LoopHeatingCoilMaxRTF = 0.0;
-        Real64 LoopDXCoilMaxRTFSave = DataAirLoop::LoopDXCoilRTF;
-        DataAirLoop::LoopDXCoilRTF = 0.0;
+        Real64 LoopHeatingCoilMaxRTFSave = 0.0;
+        Real64 LoopDXCoilMaxRTFSave = 0.0;
+        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+            LoopHeatingCoilMaxRTFSave = DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
+            LoopDXCoilMaxRTFSave = DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
+        }
+
         Real64 PartLoadFrac = 0.0;
         Real64 SpeedRatio = 0.0;
         Real64 CycRatio = 0.0;
@@ -11855,8 +11865,10 @@ namespace UnitarySystems {
         this->m_HeatingSpeedRatio = SpeedRatio;
         this->m_HeatingCycRatio = CycRatio;
 
-        DataAirLoop::LoopHeatingCoilMaxRTF = max(DataAirLoop::LoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
-        DataAirLoop::LoopDXCoilRTF = max(DataAirLoop::LoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = max(DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        }
 
         if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater || this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
             mdot = PartLoadFrac * this->MaxHeatCoilFluidFlow;
@@ -11916,10 +11928,14 @@ namespace UnitarySystems {
         int CompIndex = this->m_SuppHeatCoilIndex;
         int FanOpMode = this->m_FanOpMode;
 
-        Real64 LoopHeatingCoilMaxRTFSave = DataAirLoop::LoopHeatingCoilMaxRTF;
-        DataAirLoop::LoopHeatingCoilMaxRTF = 0.0;
-        Real64 LoopDXCoilMaxRTFSave = DataAirLoop::LoopDXCoilRTF;
-        DataAirLoop::LoopDXCoilRTF = 0.0;
+        Real64 LoopHeatingCoilMaxRTFSave = 0.0;
+        Real64 LoopDXCoilMaxRTFSave = 0.0;
+        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+            LoopHeatingCoilMaxRTFSave = DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
+            LoopDXCoilMaxRTFSave = DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
+        }
 
         // IF there is a fault of coil SAT Sensor (zrp_Nov2016)
         if (this->m_FaultyCoilSATFlag) {
@@ -12204,8 +12220,10 @@ namespace UnitarySystems {
         this->m_SuppHeatPartLoadFrac = PartLoadFrac;
 
         // LoopHeatingCoilMaxRTF used for AirflowNetwork gets set in child components (gas and fuel)
-        DataAirLoop::LoopHeatingCoilMaxRTF = max(DataAirLoop::LoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
-        DataAirLoop::LoopDXCoilRTF = max(DataAirLoop::LoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        if (DataAirflowNetwork::SimulateAirflowNetwork > DataAirflowNetwork::AirflowNetworkControlMultizone) {
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = max(DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        }
 
         if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater ||
             this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
@@ -12662,11 +12680,13 @@ namespace UnitarySystems {
             }
         }
 
-        DataAirLoop::LoopSystemOnMassFlowrate = CompOnMassFlow;
-        DataAirLoop::LoopSystemOffMassFlowrate = CompOffMassFlow;
-        DataAirLoop::LoopFanOperationMode = this->m_FanOpMode;
-        DataAirLoop::LoopOnOffFanPartLoadRatio = this->FanPartLoadRatio;
-        DataAirLoop::LoopCompCycRatio = this->m_CycRatio;
+        if (DataAirflowNetwork::SimulateAirflowNetwork == DataAirflowNetwork::AirflowNetworkControlMultiADS || DataAirflowNetwork::SimulateAirflowNetwork == DataAirflowNetwork::AirflowNetworkControlSimpleADS) {
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = CompOnMassFlow;
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = CompOffMassFlow;
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = this->m_FanOpMode;
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio = this->FanPartLoadRatio;
+            DataAirLoop::AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio = this->m_CycRatio;
+        }
 
         if (this->m_FirstPass) {
 
