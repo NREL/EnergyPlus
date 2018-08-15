@@ -286,7 +286,7 @@ This field specifies whether to consider this day to be a Daylight Saving Day. Y
 
 \paragraph{Field: Solar Model Indicator}\label{field-solar-model-indicator}
 
-This field allows the user to select \textbf{ASHRAE\-Clear\-Sky, ASHRAE\-Tau, Zhang\-Huang, or Sche\-dule} for solar modeling in the calculation of the solar radiation in the design day. ASHRAE\-Clear\-Sky and Zhang\-Huang use the Clearness value as part of their calculations. ASHRAE\-Tau invokes the revised model specified in Chapter 14 of the ASHRAE 2009 HOF and uses Taub and Taud values (below). Technical details of the models are described in the Engineering Reference. The \textbf{Schedule} choice allows you to enter schedule values for the day's profile (use the next two fields for the names).
+This field allows the user to select \textbf{ASHRAE\-Clear\-Sky, ASHRAE\-Tau, ASHRAE\-Tau2017, Zhang\-Huang, or Sche\-dule} for solar modeling in the calculation of the solar radiation in the design day. ASHRAE\-Clear\-Sky and Zhang\-Huang use the Clearness value as part of their calculations. ASHRAE\-Tau invokes the revised model specified in Chapter 14 of the ASHRAE 2009 HOF and uses Taub and Taud values (below) and ASHRAE\-Tau2017 invokes the revised model specified in Chapter 14 of the ASHRAE 2017 HOF and uses Taub and Taud values (below). Technical details of the models are described in the Engineering Reference. The \textbf{Schedule} choice allows you to enter schedule values for the day's profile (use the next two fields for the names).
 
 \paragraph{Field: Beam Solar Day Schedule Name}\label{field-beam-solar-day-schedule-name}
 
@@ -298,11 +298,12 @@ This field allows the option for you to put in your own day profile of diffuse s
 
 \paragraph{Field: ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)}\label{field-ashrae-clear-sky-optical-depth-for-beam-irradiance-taub}
 
-Optical depth for beam radiation, used only when Solar Model Indicator is ASHRAETau. See next field.
+Optical depth for beam radiation, used only when Solar Model Indicator is ASHRAETau or ASHRAETau2017. See next field.
 
 \paragraph{Field: ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)}\label{field-ashrae-clear-sky-optical-depth-for-diffuse-irradiance-taud}
 
-Optical depth for diffuse radiation, used only when Solar Model Indicator is ASHRAETau. Taub and Taud values are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE 2009 HOF.
+Optical depth for diffuse radiation, used only when Solar Model Indicator is ASHRAETau or ASHRAETau2017. Taub and Taud values are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE HOF. 
+ASHRAETau model Taub and Taud values are used from the 2009 ASHRAE HOF and ASHRAETau2017 model Taub and Taud values are used from either 2013 or 2017 ASHRAE HOF as needed.
 
 \paragraph{Field: Sky Clearness}\label{field-sky-clearness}
 

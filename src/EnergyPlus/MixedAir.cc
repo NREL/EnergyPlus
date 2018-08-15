@@ -1314,7 +1314,6 @@ namespace MixedAir {
         // Using/Aliasing
         using namespace DataDefineEquip;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneList;
         using DataZoneEquipment::NumOfZoneEquipLists;
@@ -2254,7 +2253,6 @@ namespace MixedAir {
         // Using/Aliasing
         using namespace DataDefineEquip;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneList;
         using DataZoneEquipment::NumOfZoneEquipLists;
@@ -2386,19 +2384,13 @@ namespace MixedAir {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic and Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(OAController(OutAirNum).EnthalpyCurvePtr));
-
-                    if (SELECT_CASE_var == "QUADRATIC") {
-
-                    } else if (SELECT_CASE_var == "CUBIC") {
-
-                    } else {
-                        ShowSevereError(CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(8) + "=\"" + AlphArray(8) + "\".");
-                        ShowContinueError("...must be Quadratic or Cubic curve.");
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    OAController(OutAirNum).EnthalpyCurvePtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    OAController(OutAirNum).Name,   // Object Name
+                    cAlphaFields(8));               // Field Name
             }
         }
 
@@ -6464,6 +6456,30 @@ namespace MixedAir {
         return OACompTypeNum;
     }
 
+    int GetOAMixerNumber(std::string const &OAMixerName // must match OA mixer names for the OA mixer type
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   Feb. 2018
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given OA mixer and returns the OAMixer number.  If
+        // incorrect OA mixer name is given, ErrorsFound is returned as true
+
+        int WhichOAMixer;
+
+        // Obtains and Allocates OA mixer related parameters from input file
+        if (GetOAMixerInputFlag) { // First time subroutine has been entered
+            GetOAMixerInputs();
+            GetOAMixerInputFlag = false;
+        }
+
+        WhichOAMixer = UtilityRoutines::FindItemInList(OAMixerName, OAMixer);
+
+        return WhichOAMixer;
+    }
     // End of Utility Section of the Module
     //******************************************************************************
 

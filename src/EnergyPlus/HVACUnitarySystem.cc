@@ -10680,15 +10680,16 @@ namespace HVACUnitarySystem {
         //  Meet moisture load if required to do so.
 
         // Using/Aliasing
-        using DataAirLoop::LoopDXCoilRTF;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
+        using DataAirflowNetwork::AirflowNetworkControlMultizone;
+        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiMode;
         using DXCoils::SimDXCoilMultiSpeed;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::KickOffSimulation;
+        using DataGlobals::WarmupFlag;
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -10769,8 +10770,10 @@ namespace HVACUnitarySystem {
         DesOutTemp = UnitarySystem(UnitarySysNum).DesiredOutletTemp;
         DesOutHumRat = UnitarySystem(UnitarySysNum).DesiredOutletHumRat;
         CoilType_Num = UnitarySystem(UnitarySysNum).CoolingCoilType_Num;
-        LoopDXCoilMaxRTFSave = LoopDXCoilRTF;
-        LoopDXCoilRTF = 0.0;
+        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+            LoopDXCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
+        }
 
         CompName = UnitarySystem(UnitarySysNum).CoolingCoilName;
         FanOpMode = UnitarySystem(UnitarySysNum).FanOpMode;
@@ -11966,7 +11969,9 @@ namespace HVACUnitarySystem {
         UnitarySystem(UnitarySysNum).CoolingCycRatio = CycRatio;
         UnitarySystem(UnitarySysNum).DehumidificationMode = DehumidMode;
 
-        LoopDXCoilRTF = max(LoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        }
 
         if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_CoolingWater ||
             UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_CoolingWaterDetailed) {
@@ -12000,15 +12005,15 @@ namespace HVACUnitarySystem {
         //  Calculate operating PLR and adjust speed when using multispeed coils.
 
         // Using/Aliasing
-        using DataAirLoop::LoopDXCoilRTF;
-        using DataAirLoop::LoopHeatingCoilMaxRTF;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
+        using DataAirflowNetwork::AirflowNetworkControlMultizone;
+        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiSpeed;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::KickOffSimulation;
+        using DataGlobals::WarmupFlag;
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -12077,10 +12082,12 @@ namespace HVACUnitarySystem {
         OutletNode = UnitarySystem(UnitarySysNum).HeatCoilOutletNodeNum;
         ControlNode = UnitarySystem(UnitarySysNum).SystemHeatControlNodeNum;
         DesOutTemp = UnitarySystem(UnitarySysNum).DesiredOutletTemp;
-        LoopHeatingCoilMaxRTFSave = LoopHeatingCoilMaxRTF;
-        LoopHeatingCoilMaxRTF = 0.0;
-        LoopDXCoilMaxRTFSave = LoopDXCoilRTF;
-        LoopDXCoilRTF = 0.0;
+        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+            LoopHeatingCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
+            LoopDXCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
+        }
 
         CompName = UnitarySystem(UnitarySysNum).HeatingCoilName;
         CompIndex = UnitarySystem(UnitarySysNum).HeatingCoilIndex;
@@ -12645,8 +12652,10 @@ namespace HVACUnitarySystem {
         UnitarySystem(UnitarySysNum).HeatingSpeedRatio = SpeedRatio;
         UnitarySystem(UnitarySysNum).HeatingCycRatio = CycRatio;
 
-        LoopHeatingCoilMaxRTF = max(LoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
-        LoopDXCoilRTF = max(LoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        }
 
         if (UnitarySystem(UnitarySysNum).HeatingCoilType_Num == Coil_HeatingWater ||
             UnitarySystem(UnitarySysNum).HeatingCoilType_Num == Coil_HeatingSteam) {
@@ -12679,8 +12688,8 @@ namespace HVACUnitarySystem {
         //  Data is moved from the System data structure to the System outlet nodes.
 
         // Using/Aliasing
-        using DataAirLoop::LoopDXCoilRTF;
-        using DataAirLoop::LoopHeatingCoilMaxRTF;
+        using DataAirflowNetwork::AirflowNetworkControlMultizone;
+        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -12744,10 +12753,12 @@ namespace HVACUnitarySystem {
 
         SensibleLoad = false;
 
-        LoopHeatingCoilMaxRTFSave = LoopHeatingCoilMaxRTF;
-        LoopHeatingCoilMaxRTF = 0.0;
-        LoopDXCoilMaxRTFSave = LoopDXCoilRTF;
-        LoopDXCoilRTF = 0.0;
+        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+            LoopHeatingCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
+            LoopDXCoilMaxRTFSave = AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
+        }
 
         // IF there is a fault of coil SAT Sensor (zrp_Nov2016)
         if (UnitarySystem(UnitarySysNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
@@ -13035,9 +13046,10 @@ namespace HVACUnitarySystem {
 
         UnitarySystem(UnitarySysNum).SuppHeatPartLoadFrac = PartLoadFrac;
 
-        // LoopHeatingCoilMaxRTF used for AirflowNetwork gets set in child components (gas and fuel)
-        LoopHeatingCoilMaxRTF = max(LoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
-        LoopDXCoilRTF = max(LoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
+            AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = max(AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
+        }
 
         if (UnitarySystem(UnitarySysNum).SuppHeatCoilType_Num == Coil_HeatingWater ||
             UnitarySystem(UnitarySysNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
@@ -13861,12 +13873,11 @@ namespace HVACUnitarySystem {
         // This subroutine updates the report variable for the coils.
 
         // Using/Aliasing
+        using DataAirflowNetwork::AirflowNetworkControlMultiADS;
+        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
+        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataAirLoop::AirLoopFlow;
-        using DataAirLoop::LoopCompCycRatio;
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
         using Psychrometrics::PsyHFnTdbW;
 
         // Locals
@@ -14073,11 +14084,13 @@ namespace HVACUnitarySystem {
             }
         }
 
-        LoopSystemOnMassFlowrate = CompOnMassFlow;
-        LoopSystemOffMassFlowrate = CompOffMassFlow;
-        LoopFanOperationMode = UnitarySystem(UnitarySysNum).FanOpMode;
-        LoopOnOffFanPartLoadRatio = UnitarySystem(UnitarySysNum).FanPartLoadRatio;
-        LoopCompCycRatio = UnitarySystem(UnitarySysNum).CycRatio;
+        if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+            AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = CompOnMassFlow;
+            AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = CompOffMassFlow;
+            AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = UnitarySystem(UnitarySysNum).FanOpMode;
+            AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio = UnitarySystem(UnitarySysNum).FanPartLoadRatio;
+            AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio = UnitarySystem(UnitarySysNum).CycRatio;
+        }
 
         if (UnitarySystem(UnitarySysNum).FirstPass) {
 
