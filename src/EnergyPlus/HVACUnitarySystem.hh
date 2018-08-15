@@ -492,14 +492,14 @@ namespace HVACUnitarySystem {
         // Default Constructor
         UnitarySystemData()
             : UnitarySystemType_Num(0), HeatPump(false), SysAvailSchedPtr(0), CondenserType(0), AirLoopEquipment(true), ZoneSequenceCoolingNum(0),
-              ZoneSequenceHeatingNum(0), ZoneInletNode(0), ControlZoneMassFlowFrac(0.0), Humidistat(false), CondenserNodeNum(0),
+              ZoneSequenceHeatingNum(0), ZoneInletNode(0), Humidistat(false), CondenserNodeNum(0),
               DehumidControlType_Num(0), AirFlowControl(1), ControlType(0), validASHRAECoolCoil(false), validASHRAEHeatCoil(false),
               simASHRAEModel(false), CapacityControlType(0), RequestAutoSize(false), RunOnSensibleLoad(true), RunOnLatentLoad(false),
               RunOnLatentOnlyWithSensible(false), DehumidificationMode(0), FanOpMode(0), LastMode(0), AncillaryOnPower(0.0), AncillaryOffPower(0.0),
               CoolingCoilType_Num(0), CoolingCoilIndex(0), DesignCoolingCapacity(0.0), CoolingCoilAvailSchPtr(0), ActualDXCoilIndexForHXAssisted(0),
-              ISHundredPercentDOASDXCoil(false), CoolCoilExists(false), FrostControlStatus(0), CoolingCoilUpstream(true), CoolCompPartLoadRatio(0.0),
-              HeatingCoilType_Num(0), HeatingCoilIndex(0), DesignHeatingCapacity(0.0), HeatingSizingRatio(1.0), DXHeatingCoil(false),
-              HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), HeatingCoilPLFCurveIndex(0), HeatingCoilAvailSchPtr(0), HeatCoilExists(false),
+              ISHundredPercentDOASDXCoil(false), CoolCoilExists(false), FrostControlStatus(0), CoolingCoilUpstream(true),
+              CoolCompPartLoadRatio(0.0), HeatingCoilType_Num(0), HeatingCoilIndex(0), DesignHeatingCapacity(0.0), HeatingSizingRatio(1.0),
+              DXHeatingCoil(false), HeatingCoilPLFCurveIndex(0), HeatingCoilAvailSchPtr(0), HeatCoilExists(false),
               HeatCompPartLoadRatio(0.0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0), DesignSuppHeatingCapacity(0.0), SuppCoilFluidInletNode(0),
               SuppCoilFluidOutletNodeNum(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppCoilAvailSchPtr(0),
               MaxSuppCoilFluidFlow(AutoSize), MaxOATSuppHeat(21.0), SuppCoilExists(false), SuppCoilLoopNum(0), SuppCoilLoopSide(0),
@@ -519,10 +519,10 @@ namespace HVACUnitarySystem {
               CoolingFanSpeedRatio(1.0), HeatingSpeedRatio(1.0), HeatingFanSpeedRatio(1.0), CoolingCycRatio(0.0), HeatingCycRatio(0.0),
               PartLoadFrac(0.0), CompPartLoadRatio(0.0), ElecPower(0.0), ElecPowerConsumption(0.0), TotCoolEnergyRate(0.0), SensCoolEnergyRate(0.0),
               LatCoolEnergyRate(0.0), TotHeatEnergyRate(0.0), SensHeatEnergyRate(0.0), LatHeatEnergyRate(0.0), TotalAuxElecPower(0.0),
-              HeatingAuxElecConsumption(0.0), CoolingAuxElecConsumption(0.0), HeatRecoveryRate(0.0), HeatRecoveryEnergy(0.0),
-              HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0), DehumidInducedHeatingDemandRate(0.0),
-              EMSSensibleZoneLoadValue(0.0), EMSMoistureZoneLoadValue(0.0), SpeedNum(0), SpeedRatio(0.0), CycRatio(0.0), TESOpMode(0),
-              HXAssistedSensPLRIter(0), HXAssistedSensPLRIterIndex(0), HXAssistedSensPLRFail(0), HXAssistedSensPLRFailIndex(0),
+              SensibleLoadPredicted(0.0), MoistureLoadPredicted(0.0), HeatingAuxElecConsumption(0.0), CoolingAuxElecConsumption(0.0), HeatRecoveryRate(0.0),
+              HeatRecoveryEnergy(0.0), HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0),
+              DehumidInducedHeatingDemandRate(0.0), EMSSensibleZoneLoadValue(0.0), EMSMoistureZoneLoadValue(0.0), SpeedNum(0), SpeedRatio(0.0), CycRatio(0.0),
+              TESOpMode(0), HXAssistedSensPLRIter(0), HXAssistedSensPLRIterIndex(0), HXAssistedSensPLRFail(0), HXAssistedSensPLRFailIndex(0),
               HXAssistedSensPLRFail2(0), HXAssistedSensPLRFailIndex2(0), HXAssistedLatPLRIter(0), HXAssistedLatPLRIterIndex(0),
               HXAssistedLatPLRFail(0), HXAssistedLatPLRFailIndex(0), HXAssistedCRLatPLRIter(0), HXAssistedCRLatPLRIterIndex(0),
               HXAssistedCRLatPLRFail(0), HXAssistedCRLatPLRFailIndex(0), HXAssistedCRLatPLRFail2(0), HXAssistedCRLatPLRFailIndex2(0), SensPLRIter(0),
@@ -536,8 +536,7 @@ namespace HVACUnitarySystem {
               DesignFanVolFlowRateEMSOverrideValue(0.0), MaxHeatAirVolFlowEMSOverrideValue(0.0), MaxCoolAirVolFlowEMSOverrideValue(0.0),
               MaxNoCoolHeatAirVolFlowEMSOverrideValue(0.0), EMSOverrideSensZoneLoadRequest(false), EMSOverrideMoistZoneLoadRequest(false),
               StageNum(0), Staged(false), CoolCountAvail(0), CoolIndexAvail(0), HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true), SingleMode(0),
-              iterationCounter(0), iterationMode(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
-              ATMixerOutNode(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
+              iterationCounter(0), ATMixerIndex(0), ATMixerPriNode(0), ATMixerSecNode(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
 
               // SZVAV variables
               MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsiFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
@@ -546,7 +545,8 @@ namespace HVACUnitarySystem {
               LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(AutoSize), MaxHeatCoilFluidFlow(AutoSize), CoolCoilInletNodeNum(0),
               CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0),
               CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0),
-              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0)
+              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0),
+              ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0) 
         {
         }
     };

@@ -586,6 +586,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     int compTypeOfNum = DataZoneEquipment::ZoneUnitarySys_Num;
     mySys = thisSys.factory(compTypeOfNum, compName, zoneEquipment, 0);
 
+    DataZoneEquipment::ZoneEquipInputsFilled = true; // indicate zone data is available
     mySys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
 
     EXPECT_FALSE(ErrorsFound);              // expect no errors

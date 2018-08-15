@@ -3129,8 +3129,16 @@ namespace UnitarySystems {
                     if (sysNum == -1) unitarySys.push_back(thisSys);
                     continue; // will this do the trick and avoid protecting everything below here?
                 } else {
-                    thisSys.m_ThisSysInputShouldBeGotten = false;
-                    if (AirLoopFound && thisSys.m_ZoneInletNode > 0) thisSys.m_OKToPrintSizing = true;
+                    if (AirLoopFound && (thisSys.m_ZoneInletNode > 0 || thisSys.m_ControlType == ControlType::Setpoint)) {
+                        thisSys.m_OKToPrintSizing = true;
+                        thisSys.m_ThisSysInputShouldBeGotten = false;
+                    } else if (ZoneEquipmentFound) {
+                        thisSys.m_OKToPrintSizing = true;
+                        thisSys.m_ThisSysInputShouldBeGotten = false;
+                    } else if (OASysFound) {
+                        thisSys.m_OKToPrintSizing = true;
+                        thisSys.m_ThisSysInputShouldBeGotten = false;
+                    }
                 }
 
                 if (AirLoopNumber == 0 && !ZoneEquipmentFound &&
