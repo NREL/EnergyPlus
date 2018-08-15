@@ -1219,7 +1219,7 @@ namespace MixedAir {
                         OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
                         UnitarySystems::UnitarySys thisSys;
                         OutsideAirSys(OASysNum).compPointer[CompNum] =
-                            thisSys.factory(SimAirServingZones::UnitarySystemModel, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
+                            thisSys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystemHVAC;
                     } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
@@ -2384,13 +2384,12 @@ namespace MixedAir {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    OAController(OutAirNum).EnthalpyCurvePtr,   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    OAController(OutAirNum).Name,   // Object Name
-                    cAlphaFields(8));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(OAController(OutAirNum).EnthalpyCurvePtr, // Curve index
+                                                            {1},                                      // Valid dimensions
+                                                            RoutineName,                              // Routine name
+                                                            CurrentModuleObject,                      // Object Type
+                                                            OAController(OutAirNum).Name,             // Object Name
+                                                            cAlphaFields(8));                         // Field Name
             }
         }
 

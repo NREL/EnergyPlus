@@ -700,7 +700,7 @@ namespace UnitarySystems {
 
         static void getUnitarySystemInputData(std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool errorsFound);
 
-        static UnitarySys *factory(int object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
+        static UnitarySys *factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
         void simulate(std::string const &Name,
                       bool const firstHVACIteration,

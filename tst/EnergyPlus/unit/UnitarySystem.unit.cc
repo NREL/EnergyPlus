@@ -183,7 +183,7 @@ protected:
         DataPlant::TotNumLoops = 2;
         DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
         DataSizing::PlantSizData.allocate(DataPlant::TotNumLoops);
-        //int NumPltSizInput = DataPlant::TotNumLoops;
+        // int NumPltSizInput = DataPlant::TotNumLoops;
 
         for (int loopindex = 1; loopindex <= DataPlant::TotNumLoops; ++loopindex) {
             auto &loop(DataPlant::PlantLoop(loopindex));
@@ -415,13 +415,13 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     UnitarySys mySys;
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    int compTypeOfNum = DataZoneEquipment::ZoneUnitarySys_Num;
+    int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
     bool FirstHVACIteration = true;
     UnitarySys *thisSys;
     thisSys = mySys.factory(compTypeOfNum, compName, zoneEquipment, 0);
 
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-                                                                            // verify the size of the vector and the processed names
+                                                                                 // verify the size of the vector and the processed names
     // 2 UnitarySystem objects
     EXPECT_EQ(1u, unitarySys.size());
 
@@ -466,7 +466,6 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     EXPECT_EQ(compName, thisSys->Name);
     thisSys->simulate(compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, ZoneEquipFlag);
     EXPECT_EQ(compName, thisSys->Name);
-
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
@@ -568,7 +567,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
         "  East Zone Supply Inlet,         !- Air Outlet Node Name",
         "  ;                               !- Temperature Setpoint Node Name",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
@@ -584,19 +583,18 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     std::string compName = "EAST ZONE UNITARY SYSTEM";
     bool zoneEquipment = true;
     int compTypeOfNum = DataZoneEquipment::ZoneUnitarySys_Num;
-    mySys = thisSys.factory(compTypeOfNum, compName, zoneEquipment, 0);
+    mySys = thisSys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // indicate zone data is available
-    mySys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    DataZoneEquipment::ZoneEquipInputsFilled = true;                           // indicate zone data is available
+    mySys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input
 
-    EXPECT_FALSE(ErrorsFound);              // expect no errors
+    EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_FALSE(mySys->ATMixerExists);
     EXPECT_EQ(1, mySys->ControlZoneNum);
     EXPECT_EQ(DataLoopNode::NodeID(2), "EAST ZONE UNITARY SYSTEM INLET");
-    EXPECT_EQ(2, mySys->AirInNode );
+    EXPECT_EQ(2, mySys->AirInNode);
     EXPECT_EQ(DataLoopNode::NodeID(3), "EAST ZONE SUPPLY INLET");
-    EXPECT_EQ(3, mySys->AirOutNode );
+    EXPECT_EQ(3, mySys->AirOutNode);
     EXPECT_EQ(DataLoopNode::NodeID(5), "HEATING COIL AIR INLET NODE");
     EXPECT_EQ(5, mySys->HeatCoilInletNodeNum);
-
 }

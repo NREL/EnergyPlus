@@ -859,7 +859,7 @@ namespace OutdoorAirUnit {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystemModel;
                                 UnitarySystems::UnitarySys thisSys;
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(
-                                    SimAirServingZones::UnitarySystemModel, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, false, OAUnitNum);
+                                    DataHVACGlobals::UnitarySys_AnyCoilType, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, false, OAUnitNum);
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer->checkUnitarySysCoilInOASysExists(
                                     OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, OAUnitNum);
 
