@@ -146,6 +146,7 @@ namespace WeatherManager {
     int const Zhang_Huang(1);         // Design Day solar model Zhang Huang
     int const SolarModel_Schedule(2); // Design Day solar model (beam and diffuse) from user entered schedule
     int const ASHRAE_Tau(3);          // Design Day solar model ASHRAE tau (per 2009 HOF)
+    int const ASHRAE_Tau2017(4);      // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
 
     int const DDHumIndType_WetBulb(0);   // Design Day Humidity Indicating Type = Wetbulb (default)
     int const DDHumIndType_DewPoint(1);  // Design Day Humidity Indicating Type = Dewpoint
@@ -4400,6 +4401,8 @@ namespace WeatherManager {
                 StringOut = "User supplied beam/diffuse from schedules";
             } else if (DesDayInput(EnvrnNum).SolarModel == ASHRAE_Tau) {
                 StringOut = "ASHRAETau";
+            } else if (DesDayInput(EnvrnNum).SolarModel == ASHRAE_Tau2017) {
+                StringOut = "ASHRAETau2017";
             } else {
                 StringOut = "unknown";
             }
@@ -4604,9 +4607,16 @@ namespace WeatherManager {
                                 DiffRad = max(0.0, DiffRad);
                                 BeamRad = max(0.0, BeamRad);
 
-                            } else if (SELECT_CASE_var == ASHRAE_Tau) {
+                            } else if (SELECT_CASE_var == ASHRAE_Tau || SELECT_CASE_var == ASHRAE_Tau2017) {
                                 ETR = GlobalSolarConstant * AVSC; // extraterrestrial normal irrad, W/m2
-                                ASHRAETauModel(ETR, CosZenith, DesDayInput(EnvrnNum).TauB, DesDayInput(EnvrnNum).TauD, BeamRad, DiffRad, GloHorzRad);
+                                ASHRAETauModel(DesDayInput(EnvrnNum).SolarModel,
+                                               ETR,
+                                               CosZenith,
+                                               DesDayInput(EnvrnNum).TauB,
+                                               DesDayInput(EnvrnNum).TauD,
+                                               BeamRad,
+                                               DiffRad,
+                                               GloHorzRad);
 
                             } else if (SELECT_CASE_var == Zhang_Huang) {
                                 Hour3Ago = mod(Hour + 20, 24) + 1; // hour 3 hours before
@@ -4759,13 +4769,14 @@ namespace WeatherManager {
 
     //------------------------------------------------------------------------------
 
-    void ASHRAETauModel(Real64 const ETR,    // extraterrestrial normal irradiance, W/m2
-                        Real64 const CosZen, // COS( solar zenith angle), 0 - 1
-                        Real64 const TauB,   // beam tau factor
-                        Real64 const TauD,   // dif tau factor
-                        Real64 &IDirN,       // returned: direct (beam) irradiance on normal surface, W/m2
-                        Real64 &IDifH,       // returned: diffuse irradiance on horiz surface, W/m2
-                        Real64 &IGlbH        // returned: global irradiance on horiz surface, W/m2
+    void ASHRAETauModel(int const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+                        Real64 const ETR,       // extraterrestrial normal irradiance, W/m2
+                        Real64 const CosZen,    // COS( solar zenith angle), 0 - 1
+                        Real64 const TauB,      // beam tau factor
+                        Real64 const TauD,      // dif tau factor
+                        Real64 &IDirN,          // returned: direct (beam) irradiance on normal surface, W/m2
+                        Real64 &IDifH,          // returned: diffuse irradiance on horiz surface, W/m2
+                        Real64 &IGlbH           // returned: global irradiance on horiz surface, W/m2
     )
     {
 
@@ -4780,6 +4791,7 @@ namespace WeatherManager {
 
         // METHODOLOGY EMPLOYED:
         // Eqns (17-18), ASHRAE HOF 2009, p. 14.9
+        // Eqns (19-20), ASHRAE HOF 2013 p. 14.9 and 2017 p. 14.10
 
         // REFERENCES:
         // ASHRAE HOF 2009 Chapter 14
@@ -4810,8 +4822,14 @@ namespace WeatherManager {
             IDifH = 0.0;
             IGlbH = 0.0;
         } else {
-            AB = 1.219 - 0.043 * TauB - 0.151 * TauD - 0.204 * TauB * TauD;
-            AD = 0.202 + 0.852 * TauB - 0.007 * TauD - 0.357 * TauB * TauD;
+            if (TauModelType == ASHRAE_Tau) {
+                AB = 1.219 - 0.043 * TauB - 0.151 * TauD - 0.204 * TauB * TauD;
+                AD = 0.202 + 0.852 * TauB - 0.007 * TauD - 0.357 * TauB * TauD;
+            } else {
+                // TauModelType == ASHRAE_Tau2017
+                AB = 1.454 - 0.406 * TauB - 0.268 * TauD + 0.021 * TauB * TauD;
+                AD = 0.507 + 0.205 * TauB - 0.080 * TauD - 0.190 * TauB * TauD;
+            }
             M = AirMass(CosZen);
             IDirN = ETR * std::exp(-TauB * std::pow(M, AB));
             IDifH = ETR * std::exp(-TauD * std::pow(M, AD));
@@ -7586,6 +7604,8 @@ namespace WeatherManager {
                 DesDayInput(EnvrnNum).SolarModel = Zhang_Huang;
             } else if (UtilityRoutines::SameString(cAlphaArgs(10), "ASHRAETau")) {
                 DesDayInput(EnvrnNum).SolarModel = ASHRAE_Tau;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(10), "ASHRAETau2017")) {
+                DesDayInput(EnvrnNum).SolarModel = ASHRAE_Tau2017;
             } else if (UtilityRoutines::SameString(cAlphaArgs(10), "Schedule")) {
                 DesDayInput(EnvrnNum).SolarModel = SolarModel_Schedule;
             } else {
