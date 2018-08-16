@@ -420,9 +420,10 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     UnitarySys *thisSys;
     thisSys = mySys.factory(compTypeOfNum, compName, zoneEquipment, 0);
 
+    DataZoneEquipment::ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
                                                                                  // verify the size of the vector and the processed names
-    // 2 UnitarySystem objects
+    // 1 UnitarySystem objects
     EXPECT_EQ(1u, unitarySys.size());
 
     // test the object name
@@ -582,7 +583,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     UnitarySys *mySys;
     std::string compName = "EAST ZONE UNITARY SYSTEM";
     bool zoneEquipment = true;
-    int compTypeOfNum = DataZoneEquipment::ZoneUnitarySys_Num;
     mySys = thisSys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;                           // indicate zone data is available

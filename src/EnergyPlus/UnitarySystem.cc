@@ -2462,6 +2462,21 @@ namespace UnitarySystems {
                     ++numUnitarySystems;
                 } else {
                     thisSys = unitarySys[sysNum];
+                    // *************** used only to eliminate unused object warning when using only Json type getInput **********
+                    int TotalArgs = 0;
+                    int NumAlphas = 0;
+                    int NumNumbers = 0;
+                    inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+                    int IOStatus = 0;
+                    Array1D_string Alphas(NumAlphas);
+                    Array1D<Real64> Numbers(NumNumbers, 0.0);
+                    Array1D_bool lNumericBlanks(NumNumbers, true);
+                    Array1D_bool lAlphaBlanks(NumAlphas, true);
+                    Array1D_string cAlphaFields(NumAlphas);
+                    Array1D_string cNumericFields(NumNumbers);
+                    inputProcessor->getObjectItem(cCurrentModuleObject, sysNum + 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks,
+                        cAlphaFields, cNumericFields);
+                    // **********************************************************************************************************
                 }
 
                 auto const &fields = instance.value();
