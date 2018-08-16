@@ -87,6 +87,7 @@ namespace WeatherManager {
     extern int const Zhang_Huang;         // Design Day solar model Zhang Huang
     extern int const SolarModel_Schedule; // Design Day solar model (beam and diffuse) from user entered schedule
     extern int const ASHRAE_Tau;          // Design Day solar model ASHRAE tau (per 2009 HOF)
+    extern int const ASHRAE_Tau2017;      // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
 
     extern int const DDHumIndType_WetBulb;   // Design Day Humidity Indicating Type = Wetbulb (default)
     extern int const DDHumIndType_DewPoint;  // Design Day Humidity Indicating Type = Dewpoint
@@ -763,13 +764,14 @@ namespace WeatherManager {
 
     //------------------------------------------------------------------------------
 
-    void ASHRAETauModel(Real64 const ETR,    // extraterrestrial normal irradiance, W/m2
-                        Real64 const CosZen, // COS( solar zenith angle), 0 - 1
-                        Real64 const TauB,   // beam tau factor
-                        Real64 const TauD,   // dif tau factor
-                        Real64 &IDirN,       // returned: direct (beam) irradiance on normal surface, W/m2
-                        Real64 &IDifH,       // returned: diffuse irradiance on horiz surface, W/m2
-                        Real64 &IGlbH        // returned: global irradiance on horiz surface, W/m2
+    void ASHRAETauModel(int const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+                        Real64 const ETR,       // extraterrestrial normal irradiance, W/m2
+                        Real64 const CosZen,    // COS( solar zenith angle), 0 - 1
+                        Real64 const TauB,      // beam tau factor
+                        Real64 const TauD,      // dif tau factor
+                        Real64 &IDirN,          // returned: direct (beam) irradiance on normal surface, W/m2
+                        Real64 &IDifH,          // returned: diffuse irradiance on horiz surface, W/m2
+                        Real64 &IGlbH           // returned: global irradiance on horiz surface, W/m2
     );
 
     void AllocateWeatherData();
