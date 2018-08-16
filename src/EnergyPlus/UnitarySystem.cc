@@ -378,8 +378,35 @@ namespace UnitarySystems {
         if (instances == inputProcessor->epJSON.end()) {
             errorsFound = true;
         } else {
+            int designSpecNum = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+
+                // *************** used only to eliminate unused object warning when using only Json type getInput **********
+                int TotalArgs = 0;
+                int NumAlphas = 0;
+                int NumNumbers = 0;
+                inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+                int IOStatus = 0;
+                Array1D_string Alphas(NumAlphas);
+                Array1D<Real64> Numbers(NumNumbers, 0.0);
+                Array1D_bool lNumericBlanks(NumNumbers, true);
+                Array1D_bool lAlphaBlanks(NumAlphas, true);
+                Array1D_string cAlphaFields(NumAlphas);
+                Array1D_string cNumericFields(NumNumbers);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              ++designSpecNum,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
+                // **********************************************************************************************************
+
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 DesignSpecMSHP thisDesignSpec;
@@ -2474,8 +2501,17 @@ namespace UnitarySystems {
                     Array1D_bool lAlphaBlanks(NumAlphas, true);
                     Array1D_string cAlphaFields(NumAlphas);
                     Array1D_string cNumericFields(NumNumbers);
-                    inputProcessor->getObjectItem(cCurrentModuleObject, sysNum + 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks,
-                        cAlphaFields, cNumericFields);
+                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                                                  sysNum + 1,
+                                                  Alphas,
+                                                  NumAlphas,
+                                                  Numbers,
+                                                  NumNumbers,
+                                                  IOStatus,
+                                                  lNumericBlanks,
+                                                  lAlphaBlanks,
+                                                  cAlphaFields,
+                                                  cNumericFields);
                     // **********************************************************************************************************
                 }
 
@@ -2772,9 +2808,10 @@ namespace UnitarySystems {
                 std::string loc_sysAvailSched("");
                 if (fields.find("availability_schedule_name") != fields.end()) { // not required field
                     loc_sysAvailSched = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
+                    thisSys.m_SysAvailSchedPtr = ScheduleManager::GetScheduleIndex(loc_sysAvailSched);
+                } else {
+                    thisSys.m_SysAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
                 }
-
-                thisSys.m_SysAvailSchedPtr = ScheduleManager::GetScheduleIndex(loc_sysAvailSched);
 
                 std::string loc_m_ControlType = fields.at("control_type");
 
