@@ -440,14 +440,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! spend some time mining out the state of the run period object
                 RunPeriodStartYear%wasSet = .FALSE.
                 IF (CurArgs >= 14) THEN
-                  IF (TRIM(InArgs(14)) .NE. Blank) THEN
+                  IF (TRIM(InArgs(14)) /= Blank) THEN
                     RunPeriodStartYear%wasSet = .TRUE.
                     RunPeriodStartYear%originalValue = InArgs(14)
                   END IF
                 END IF
                 RunPeriodRepeated%wasSet = .FALSE.
                 IF (CurArgs >= 12) THEN
-                  IF (TRIM(InArgs(12)) .NE. Blank) THEN
+                  IF (TRIM(InArgs(12)) /= Blank) THEN
                     RunPeriodRepeated%wasSet = .TRUE.
                     RunPeriodRepeated%originalValue = InArgs(12)
                   END IF
@@ -459,10 +459,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 IF (RunPeriodStartYear%wasSet) THEN
                   OutArgs(4) = RunPeriodStartYear%originalValue
                 ELSE IF (RunPeriodRepeated%wasSet) THEN
-                  IF (TRIM(InArgs(6)) .NE. Blank) THEN
-                    YearNumber = GetYearFromStartDayString(InArgs(6))
+                  IF (TRIM(InArgs(6)) /= Blank) THEN
+                    IF (TRIM(InArgs(2))=="2".AND.TRIM(InArgs(3))=="29") THEN
+                      YearNumber = GetLeapYearFromStartDayString(InArgs(6))
+                    ELSE
+                      YearNumber = GetYearFromStartDayString(InArgs(6))
+                    END IF
                   ELSE
-                    YearNumber = GetYearFromStartDayString("SUNDAY")
+                    IF (TRIM(InArgs(2))=="2".AND.TRIM(InArgs(3))=="29") THEN
+                      YearNumber = GetLeapYearFromStartDayString("SUNDAY")
+                    ELSE
+                      YearNumber = GetYearFromStartDayString("SUNDAY")
+                    END IF
                   END IF
                   WRITE(OutArgs(4), *) YearNumber
                 ELSE
@@ -473,14 +481,19 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! End year is weird
                 IF (RunPeriodRepeated%wasSet) THEN
                   ! What if start year turns out to be blank above?
-                  READ(RunPeriodRepeated%originalValue, *) RepeatedCount
-                  YearNumber = YearNumber + RepeatedCount
-                  WRITE(OutArgs(7), *) YearNumber
-                  IF (TRIM(InArgs(4)).EQ."2".AND.TRIM(InArgs(5)).EQ."29") THEN
-                    ! We should have a leap year end year
-                    IF (.NOT.IsYearNumberALeapYear(YearNumber)) THEN
-                      ! Warning about bad end year/end date combination
-                      OutArgs(6) = "28"
+                  IF (TRIM(OutArgs(4)) == Blank) THEN
+                    OutArgs(7) = Blank
+                  ELSE
+                    READ(RunPeriodRepeated%originalValue, *) RepeatedCount
+                    READ(OutArgs(4), *) YearNumber
+                    YearNumber = YearNumber + RepeatedCount
+                    WRITE(OutArgs(7), *) YearNumber
+                    IF (TRIM(InArgs(4))=="2".AND.TRIM(InArgs(5))=="29") THEN
+                      ! We should have a leap year end year
+                      IF (.NOT.IsYearNumberALeapYear(YearNumber)) THEN
+                        ! Warning about bad end year/end date combination
+                        OutArgs(6) = "28"
+                      END IF
                     END IF
                   END IF
                 ELSE
@@ -511,7 +524,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 END IF
                 ! InArgs(14): Start year moved to above
                 OutArgs(14) = Blank ! new Treat weather as actual field?
-
+                nodiff = .false.
               ! If your original object starts with S, insert the rules here
 
               ! If your original object starts with T, insert the rules here
