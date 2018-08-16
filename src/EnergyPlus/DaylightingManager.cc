@@ -10609,38 +10609,7 @@ namespace DaylightingManager {
 
             } // End of check if a Daylighting:Detailed zone
 
-            // create sorted list for shade deployment order
-            // first step is to create a sortable list of WindowShadingControl objects by sequence
-            std::vector<std::pair<int, int>> shadeControlSequence; // sequence, WindowShadingControl
-            for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
-                if (WindowShadingControl(iShadeCtrl).ZoneIndex == ZoneNum) {
-                    shadeControlSequence.push_back(std::make_pair(WindowShadingControl(iShadeCtrl).SequenceNumber, iShadeCtrl));
-                }
-            }
-            // sort the WindowShadingControl objects based on sequence number
-            sort(shadeControlSequence.begin(), shadeControlSequence.end());
-            // now make the deployment list of lists. 
-            // each sublist is a group of surfaces that should be deployed together
-            // often the sublist is just a single item.
-            for (auto sequence : shadeControlSequence) {
-                int curShadeControl = sequence.second;
-                if (WindowShadingControl(curShadeControl).MultiSurfaceCtrlIsGroup) {  
-                    // add a group of surfaces since they should be deployed as a group
-                    std::vector<int> group;
-                    for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
-                        group.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
-                    }
-                    ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(group);
-                } else {
-                    // add each individial surface as a separate list so they are deployed individually
-                    for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
-                        std::vector<int> singleMemberVector;
-                        singleMemberVector.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
-                        ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(singleMemberVector);
-                    }
-                }
-            }
-
+            CreateShadeDeploymentOrder(ZoneNum);
 
         } // End of primary zone loop
 
@@ -10663,6 +10632,41 @@ namespace DaylightingManager {
         }
 
         ZoneExtWin.deallocate();
+    }
+
+    void CreateShadeDeploymentOrder(int &ZoneNum)
+    {
+        // create sorted list for shade deployment order
+        // first step is to create a sortable list of WindowShadingControl objects by sequence
+        std::vector<std::pair<int, int>> shadeControlSequence; // sequence, WindowShadingControl
+        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            if (WindowShadingControl(iShadeCtrl).ZoneIndex == ZoneNum) {
+                shadeControlSequence.push_back(std::make_pair(WindowShadingControl(iShadeCtrl).SequenceNumber, iShadeCtrl));
+            }
+        }
+        // sort the WindowShadingControl objects based on sequence number
+        sort(shadeControlSequence.begin(), shadeControlSequence.end());
+        // now make the deployment list of lists.
+        // each sublist is a group of surfaces that should be deployed together
+        // often the sublist is just a single item.
+        for (auto sequence : shadeControlSequence) {
+            int curShadeControl = sequence.second;
+            if (WindowShadingControl(curShadeControl).MultiSurfaceCtrlIsGroup) {
+                // add a group of surfaces since they should be deployed as a group
+                std::vector<int> group;
+                for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
+                    group.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
+                }
+                ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(group);
+            } else {
+                // add each individial surface as a separate list so they are deployed individually
+                for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
+                    std::vector<int> singleMemberVector;
+                    singleMemberVector.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
+                    ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(singleMemberVector);
+                }
+            }
+        }
     }
 
     void DayltgInterReflIllFrIntWins(int &ZoneNum) // Zone number
