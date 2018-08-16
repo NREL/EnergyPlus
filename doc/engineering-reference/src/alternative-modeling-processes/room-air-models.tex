@@ -397,7 +397,7 @@ The calculation of subzone temperatures follows the method used in the \textbf{\
 
 {\scriptsize
 \begin{equation}
-T_{fl} = (C_{air,fl} \cdot (3 \cdot T_{ - 1,fl} - (3/2) \cdot T_{ - 2,fl} + (1/3) \cdot T_{ - 3,fl}) + HAT_{fl} + MCPT_{tot} + 0.6 \cdot T_{oc} \cdot MCPT_{tot})  / ((11/6) \cdot C_{air,fl} + HA_{fl} + 1.6 \cdot MCP_{tot})
+T_{fl} = (C_{air,fl} \cdot (3 \cdot T_{ - 1,fl} - (3/2) \cdot T_{ - 2,fl} + (1/3) \cdot T_{ - 3,fl}) + HAT_{fl} + MCPT_{tot} + 0.6 \cdot T_{oc} \cdot MCP_{tot})  / ((11/6) \cdot C_{air,fl} + HA_{fl} + 1.6 \cdot MCP_{tot})
 \end{equation}}
 
 {\scriptsize
@@ -1608,16 +1608,16 @@ When the incoming wind is not normal to the façade the jet enters the room at a
 \begin{figure}[hbtp] % fig 143
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2659.png}
-\caption{Schematic of jet resulting from wind at angle φ to façade. \protect \label{fig:schematic-of-jet-resulting-from-wind-at-angle}}
+\caption{Schematic of jet resulting from wind at angle \(\phi\) to façade. \protect \label{fig:schematic-of-jet-resulting-from-wind-at-angle}}
 \end{figure}
 
 This oblique geometry has two main effects on the flow and consequent correlation predictions:
 
-The inflow area is reduced, creating a larger inflow velocity for the same flow rate.
-
-The room flow path length is increased, from \emph{D} to \emph{D}*, resulting in a larger apparent depth.
-
-The first effect increases indoor velocities while the second effect decreases the velocities.
+\begin{itemize}
+\item The inflow area is reduced, creating a larger inflow velocity for the same flow rate.
+\item The room flow path length is increased, from \emph{D} to \emph{D}*, resulting in a larger apparent depth.
+\item The first effect increases indoor velocities while the second effect decreases the velocities.
+\end{itemize}
 
 \subsubsection{Multiple apertures}\label{multiple-apertures}
 
@@ -1639,11 +1639,11 @@ CFD simulations for rooms with more than one inflow aperture show that the model
 
 In most cross ventilation flows with recirculations the mixing between recirculation and inflow jet is only partial. Figure~\ref{fig:top-view-of-the-flow-structure-in-case-r.} shows a schematic representation of the heat transfer process (showing a top view of one half of a symmetrical room). The flow is divided into three distinct streams with connected temperature variations:
 
-The main jet (labeled J in the figure).
-
-The part of the recirculation flow that exchanges heat with the jet (label R).
-
-The wall boundary layer part of the recirculation flow (label W).
+\begin{itemize}
+\item The main jet (labeled J in the figure).
+\item The part of the recirculation flow that exchanges heat with the jet (label R).
+\item The wall boundary layer part of the recirculation flow (label W).
+\end{itemize}
 
 \begin{figure}[hbtp] % fig 146
 \centering
@@ -1657,7 +1657,17 @@ The light gray arrows show flow direction. The dark gray arrows show heat transf
 
 It is possible to use a formulation with a heat transfer area, a convection heat transfer coefficient and an average shear layer temperature difference to model the heat exchange between jet and recirculation flows:
 
-\({Q_{y = 0}} = {A_{SL}}\,{h_{SL}}\,\Delta {T_{SL}}\) , \({A_{SL}} = L\,\,P\,,\,\,{h_{SL}} = \frac{{\rho \,{C_P}\,F}}{{{C_D}\,\,{A_{IN}}\,\,4\,\sigma \,\sqrt \pi }}\)
+\begin{equation}
+{Q_{y = 0}} = {A_{SL}}{h_{SL}}\Delta {T_{SL}}
+\end{equation}
+
+\begin{equation}
+{A_{SL}} = L P
+\end{equation}
+
+\begin{equation}
+{h_{SL}} = \frac{{\rho \,{C_P}\,F}}{{{C_D}\,\,{A_{IN}}\,\,4\,\sigma \,\sqrt \pi }}
+\end{equation}
 
 Locally, the heat transfer process is driven by the variable, local, temperature difference:
 
@@ -1673,8 +1683,9 @@ An accurate representation of system behavior must consider both the local heat 
   \begin{array}{rl}
     \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} & = \frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
-    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_R\left(x\right) - T_J \left(x\right)\right) 
   \end{array}
+  \label{eq:DiffEqForTWrTRxTJx}
 \end{equation}
 
 The relevant boundary conditions are:
@@ -1683,7 +1694,7 @@ The relevant boundary conditions are:
 {T_W}({L_{}}) = {T_R}(0)\,,\,{T_W}(0) = {T_R}(L)\,,\,\,{T_J}(0) = {T_{IN}}
 \end{equation}
 
-The first equation in models heat transfer in the wall layer. The second models the temperature variation of the portion of the recirculation flow that is in contact with the jet, it differs from the third equation only in a sign (the temperature variation in \emph{T\(_{R}\)} is symmetric to the variation in \emph{T\(_{J}\)}) and the flow rate (\emph{F.R} for the recirculation and \emph{F} for the main jet). The temperature in the recirculation region is given by:
+The first equation in Equation~\ref{eq:DiffEqForTWrTRxTJx} models heat transfer in the wall layer. The second models the temperature variation of the portion of the recirculation flow that is in contact with the jet, it differs from the third equation only in a sign (the temperature variation in \emph{T\(_{R}\)} is symmetric to the variation in \emph{T\(_{J}\)}) and the flow rate (\emph{F\(\cdot\)R} for the recirculation and \emph{F} for the main jet). The temperature in the recirculation region is given by:
 
 \begin{equation}
 {T_W}(r) = {T_S} - ({T_S} - {T_{IN}})\,\frac{{{e^{\frac{{{h_S}\,{A_S}}}{{\rho \,{C_P}\,R\,F}}\frac{r}{{{L_{}}}}}}\,({e^{ - \frac{{{A_{SL}}\,{h_{SL}}\,(1 + R)}}{{\rho \,{C_P}\,R\,F}}}} - 1)}}{{{e^{ - \frac{{{A_{SL}}\,{h_{SL}}\,(1 + R)}}{{\rho \,{C_P}\,R\,F}}}} - {e^{\frac{{{h_S}\,{A_S}}}{{\rho \,{C_P}\,R\,F}}}}\,(1 + R) + R}}
@@ -1701,6 +1712,7 @@ For gains occurring in the jet region (between the inlet and the room outlet) a 
 
 \begin{equation}
 {T_{ING}} = {T_{IN}} + \frac{{{G_J}}}{{\rho {C_P}F}}
+\label{eq:AlteredInflowTempEquation}
 \end{equation}
 
 Gains occurring in the jet region, close to the outlet can be ignored in a first order accuracy model.
@@ -1717,11 +1729,12 @@ In the case of a flow in a room with adiabatic surfaces and heat gains in the re
   \begin{array}{rl}
     \rho C_p F R \left(T_R\left(0\right) - T_R\left(L\right)\right) & = G_R \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
-    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right)
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_R\left(x\right) - T_J \left(x\right)\right)
   \end{array}
+  \label{eq:TRoTRLdTRxdTJxSystem}
 \end{equation}
 
-This system of equations differs from system F16 in several ways. Because there is no wall heat transfer there is no need to split the recirculation flow in two parts (\emph{R} and \emph{W}). The temperature increase in the recirculation flow is simply defined by the internal gains (first equation in ). The second and third equations in model shear layer heat transfer are similar in the two cases ( and ).
+This system of equations differs from the system shown in Equation~\ref{eq:DiffEqForTWrTRxTJx} in several ways. Because there is no wall heat transfer there is no need to split the recirculation flow in two parts (\emph{R} and \emph{W}). The temperature increase in the recirculation flow is simply defined by the internal gains (first equation in Equation~\ref{eq:TRoTRLdTRxdTJxSystem}). The second and third equations in Equation~\ref{eq:TRoTRLdTRxdTJxSystem} model shear layer heat transfer and are similar in the two cases (Equation~\ref{eq:DiffEqForTWrTRxTJx} and Equation~\ref{eq:TRoTRLdTRxdTJxSystem}).
 
 The recirculation flow temperature at \emph{x} = 0 is given by:
 
@@ -1729,7 +1742,7 @@ The recirculation flow temperature at \emph{x} = 0 is given by:
 {T_R}(0) = {T_{IN}} + \left( {\frac{1}{{{e^{\frac{{{A_{SL}}{h_{SL}}\,(1 + R)}}{{\rho \,{C_P}F\,R}}}} - 1}} + 1} \right)\frac{{{G_R}(1 + R)}}{{\rho \,{C_P}F\,R}}
 \end{equation}
 
-The temperature in the recirculation is inversely proportional to the recirculation flow ratio (\emph{R}) and the shear layer area (measured by the product: \emph{A\(_{SL}\) h\(_{SL}\)}). As both of these parameters increase this expression becomes similar to . The recirculation flow temperature at \emph{x = L} is given by:
+The temperature in the recirculation is inversely proportional to the recirculation flow ratio (\emph{R}) and the shear layer area (measured by the product: \emph{A\(_{SL}\) h\(_{SL}\)}). As both of these parameters increase this expression becomes similar to Equation~\ref{eq:AlteredInflowTempEquation}. The recirculation flow temperature at \emph{x = L} is given by:
 
 \begin{equation}
 {T_R}(L) = {T_R}(0) + \Delta {T_R}
@@ -1749,7 +1762,7 @@ In this case, the following system of equations must be solved:
 \begin{array}{rl}
     \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} & = -\frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) - \frac{G_R}{L_R} \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
-    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_R\left(x\right) - T_J \left(x\right)\right) 
   \end{array}
 \end{equation}
 
@@ -1806,7 +1819,7 @@ Z & m & Vertical coordinate \tabularnewline
 $\Delta$T\(_{J}\) & °C & Average jet temperature variation \tabularnewline
 $\Delta$T\(_{R}\) & °C & Average recirculation region temperature variation \tabularnewline
 r & kg/m\(^3\) & Density of air \tabularnewline
-$\varphi$ & ° & Wind direction relative to façade normal \tabularnewline
+$\phi$ & ° & Wind direction relative to façade normal \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1837,9 +1850,9 @@ where:
 
 F\(_{i}\) = Fraction of zone air volume for the ith node, defined in the Fraction of Zone Air Volume field of the RoomAir:Node:Airflownetwork
 
-C\(_{z,i}\) = Volumetric heat capacity for the ith node: ρ\(_{air,i}\)V C\(_{p}\)C\(_{T}\)
+C\(_{z,i}\) = Volumetric heat capacity for the ith node: \(\rho_{air,i}\)V C\(_{p}\)C\(_{T}\)
 
-ρ\(_{air,i}\) = Dry air density at the ith zone node
+\(\rho_{air,i}\) = Dry air density at the ith zone node
 
 C\(_{p}\) = zone dry air specific heat
 
@@ -1859,13 +1872,13 @@ F\(_{gain,j}\) = Fraction of internal gain from jth internal gain object defined
 
 N\(_{i,sur}\) = The number of adjacent surface with convective heat transfer for the ith node, defined in the RoomAir:Node:Airflownetwork:AdjacentSurfaceList object
 
-h\(_{j}\) = Heat transfer coefficient between the jth adjacent surface and ith node
+h\(_{i,j}\) = Heat transfer coefficient between the jth adjacent surface and ith node
 
 A\(_{j}\) = Area of the jth adjacent surface
 
 T\(_{s,j}\) = Inside temperature at the jth adjacent surface
 
-\({\sum\limits_{j = 1}^{N_{i,sur}} h_{j} A_j \left( T_{s,j} - T_{z,i}\right)}\) = The total amount of convective gains from adjacent surfaces attached to the ith node
+\({\sum\limits_{j = 1}^{N_{i,sur}} h_{i,j} A_j \left( T_{s,j} - T_{z,i}\right)}\) = The total amount of convective gains from adjacent surfaces attached to the ith node
 
 N\(_{i,AFN}\) = The number of RoomAir:Node:Airflownetwork objects connected to the ith node. The links are defined in AirflowNetwork:IntraZone:Linkage objects.
 
@@ -1898,9 +1911,9 @@ where:
 
 Fi = Fraction of zone air volume for the ith node, defined in the Fraction of Zone Air Volume of the RoomAir:Node:Airflownetwork
 
-M\(_{z,i}\) = Mass for the ith node: ρ\(_{air,i}\)V\(_{Cp}\)C\(_{T}\)
+M\(_{z,i}\) = Mass for the ith node: \(\rho_{air,i}\)V\(_{Cp}\)C\(_{T}\)
 
-ρ\(_{air,i}\) = Dry air density at the ith zone RoomAir node
+\(\rho_{air,i}\) = Dry air density at the ith zone RoomAir node
 
 V = Zone air volume
 
