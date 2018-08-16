@@ -131,39 +131,73 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
         "No,                      !- Apply Weekend Holiday Rule",
         "Yes,                     !- Use Weather File Rain Indicators",
         "Yes;                     !- Use Weather File Snow Indicators",
+        "RunPeriod,",
+        "RP5,                     !- Name",
+        "8,                       !- Begin Month",
+        "18,                      !- Begin Day of Month",
+        ",                        !- Begin Year",
+        "12,                      !- End Month",
+        "31,                      !- End Day of Month",
+        ",                        !- End Year",
+        "Wednesday,               !- Day of Week for Start Day",
+        "Yes,                     !- Use Weather File Holidays and Special Days",
+        "Yes,                     !- Use Weather File Daylight Saving Period",
+        "No,                      !- Apply Weekend Holiday Rule",
+        "Yes,                     !- Use Weather File Rain Indicators",
+        "Yes;                     !- Use Weather File Snow Indicators",
+        "RunPeriod,",
+        "RP6,                     !- Name",
+        "2,                       !- Begin Month",
+        "29,                      !- Begin Day of Month",
+        ",                        !- Begin Year",
+        "12,                      !- End Month",
+        "31,                      !- End Day of Month",
+        ",                        !- End Year",
+        "Saturday,                !- Day of Week for Start Day",
+        "Yes,                     !- Use Weather File Holidays and Special Days",
+        "Yes,                     !- Use Weather File Daylight Saving Period",
+        "No,                      !- Apply Weekend Holiday Rule",
+        "Yes,                     !- Use Weather File Rain Indicators",
+        "Yes;                     !- Use Weather File Snow Indicators",
         "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
 
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);
-    int totalrps(4);
+    int totalrps(6);
     WeatherManager::GetRunPeriodData(totalrps, errors_in_input);
     EXPECT_FALSE(errors_in_input);
 
     EXPECT_EQ(WeatherManager::WeekDay::Monday, WeatherManager::RunPeriodInput[0].startWeekDay);
-    EXPECT_EQ(2016, WeatherManager::RunPeriodInput[0].startYear);
     EXPECT_EQ(2016, WeatherManager::RunPeriodInput[0].startYear);
     EXPECT_EQ(2457448, WeatherManager::RunPeriodInput[0].startJulianDate);
     EXPECT_EQ(2457451, WeatherManager::RunPeriodInput[0].endJulianDate);
 
     EXPECT_EQ(WeatherManager::WeekDay::Wednesday, WeatherManager::RunPeriodInput[1].startWeekDay);
     EXPECT_EQ(2012, WeatherManager::RunPeriodInput[1].startYear);
-    EXPECT_EQ(2012, WeatherManager::RunPeriodInput[1].startYear);
     EXPECT_EQ(2455987, WeatherManager::RunPeriodInput[1].startJulianDate);
     EXPECT_EQ(2455990, WeatherManager::RunPeriodInput[1].endJulianDate);
 
     EXPECT_EQ(WeatherManager::WeekDay::Thursday, WeatherManager::RunPeriodInput[2].startWeekDay);
-    EXPECT_EQ(2015, WeatherManager::RunPeriodInput[2].startYear);
     EXPECT_EQ(2015, WeatherManager::RunPeriodInput[2].startYear);
     EXPECT_EQ(2457024, WeatherManager::RunPeriodInput[2].startJulianDate);
     EXPECT_EQ(2457388, WeatherManager::RunPeriodInput[2].endJulianDate);
 
     EXPECT_EQ(WeatherManager::WeekDay::Sunday, WeatherManager::RunPeriodInput[3].startWeekDay);
     EXPECT_EQ(2017, WeatherManager::RunPeriodInput[3].startYear);
-    EXPECT_EQ(2017, WeatherManager::RunPeriodInput[3].startYear);
     EXPECT_EQ(2457755, WeatherManager::RunPeriodInput[3].startJulianDate);
     EXPECT_EQ(2458119, WeatherManager::RunPeriodInput[3].endJulianDate);
+
+    EXPECT_EQ(WeatherManager::WeekDay::Wednesday, WeatherManager::RunPeriodInput[4].startWeekDay);
+    EXPECT_EQ(2010, WeatherManager::RunPeriodInput[4].startYear);
+    EXPECT_EQ(2455427, WeatherManager::RunPeriodInput[4].startJulianDate);
+    EXPECT_EQ(2455562, WeatherManager::RunPeriodInput[4].endJulianDate);
+
+    EXPECT_EQ(WeatherManager::WeekDay::Saturday, WeatherManager::RunPeriodInput[5].startWeekDay);
+    EXPECT_EQ(1992, WeatherManager::RunPeriodInput[5].startYear);
+    EXPECT_EQ(2448682, WeatherManager::RunPeriodInput[5].startJulianDate);
+    EXPECT_EQ(2448988, WeatherManager::RunPeriodInput[5].endJulianDate);
 }
 
 TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
