@@ -469,7 +469,7 @@ namespace DaylightingManager {
     void DayltgSetupAdjZoneListsAndPointers();
 
     void CreateShadeDeploymentOrder(int &ZoneNum);
-        
+
     void DayltgInterReflIllFrIntWins(int &ZoneNum); // Zone number
 
     void CalcMinIntWinSolidAngs();
