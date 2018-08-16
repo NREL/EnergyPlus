@@ -10507,6 +10507,8 @@ namespace DaylightingManager {
                 if (ZoneExtWin(ZoneNum) == 0) continue;
                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums.allocate(ZoneExtWin(ZoneNum));
                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums = 0;
+                ZoneDaylight(ZoneNum).MapShdOrdToLoopNum.allocate(ZoneExtWin(ZoneNum));
+                ZoneDaylight(ZoneNum).MapShdOrdToLoopNum = 0;
 
                 ZoneDaylight(ZoneNum).SolidAngAtRefPt.allocate(ZoneExtWin(ZoneNum), ZoneDaylight(ZoneNum).TotalDaylRefPoints);
                 ZoneDaylight(ZoneNum).SolidAngAtRefPt = 0.0;
@@ -10610,6 +10612,7 @@ namespace DaylightingManager {
             } // End of check if a Daylighting:Detailed zone
 
             CreateShadeDeploymentOrder(ZoneNum);
+            MapShadeDeploymentOrderToLoopNumber(ZoneNum);
 
         } // End of primary zone loop
 
@@ -10636,6 +10639,7 @@ namespace DaylightingManager {
 
     void CreateShadeDeploymentOrder(int &ZoneNum)
     {
+        // J. Glazer - 2018
         // create sorted list for shade deployment order
         // first step is to create a sortable list of WindowShadingControl objects by sequence
         std::vector<std::pair<int, int>> shadeControlSequence; // sequence, WindowShadingControl
@@ -10664,6 +10668,24 @@ namespace DaylightingManager {
                     std::vector<int> singleMemberVector;
                     singleMemberVector.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
                     ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(singleMemberVector);
+                }
+            }
+        }
+    }
+
+    void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum)
+    {
+        // J. Glazer - 2018
+        int count = 0;
+        for (auto listOfExtWin : ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins) {
+            for (auto IWinShdOrd : listOfExtWin) {
+                ++count;
+                for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
+                    int IWinLoop = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
+                    if (IWinShdOrd == IWinLoop) {
+                        ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count) = loop;
+                        break;
+                    }
                 }
             }
         }

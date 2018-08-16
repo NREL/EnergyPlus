@@ -470,6 +470,8 @@ namespace DaylightingManager {
 
     void CreateShadeDeploymentOrder(int &ZoneNum);
 
+    void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum);
+
     void DayltgInterReflIllFrIntWins(int &ZoneNum); // Zone number
 
     void CalcMinIntWinSolidAngs();

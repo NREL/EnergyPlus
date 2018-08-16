@@ -169,6 +169,7 @@ namespace DataDaylighting {
         std::vector<std::vector<int>> ShadeDeployOrderExtWins; // describes how the fenestration surfaces should deploy the shades. 
         // It is a list of lists. Each sublist is a group of fenestration surfaces that should be deployed together. Many times the 
         // sublists a just a single index to a fenestration surface if they are deployed one at a time.
+        Array1D_int MapShdOrdToLoopNum;  // list that maps back the original loop order when using ShadeDeployOrderExtWins for shade deployment
         Real64 MinIntWinSolidAng;     // Minimum solid angle subtended by an interior window in a zone
         Real64 TotInsSurfArea;        // Total inside surface area of a daylit zone (m2)
         Real64 FloorVisRefl;          // Area-weighted visible reflectance of floor of a daylit zone
