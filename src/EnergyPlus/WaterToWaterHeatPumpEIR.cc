@@ -61,6 +61,7 @@
 #include <PlantUtilities.hh>
 #include <UtilityRoutines.hh>
 #include <WaterToWaterHeatPumpEIR.hh>
+#include "CurveManager.hh"
 
 namespace EnergyPlus {
 namespace EIRWaterToWaterHeatPumps {
@@ -74,17 +75,37 @@ namespace EIRWaterToWaterHeatPumps {
         eir_wwhp.clear();
     }
 
+    Real64 EIRWaterToWaterHeatPump::getEvapOutletSetpoint()
+    {
+        auto & thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
+        auto & thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
+        auto & thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
+        auto & thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
+        if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::SingleSetPoint)
+        {
+            if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
+                // there will be a valid setpoint on outlet
+                return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPoint;
+            } else { // use plant loop overall setpoint
+                return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
+            }
+        } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::DualSetPointDeadBand) {
+            if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
+                // there will be a valid setpoint on outlet
+                return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPointHi;
+            } else { // use plant loop overall setpoint
+                return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
+            }
+        }
+    }
+
+    
     void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
                                            bool const FirstHVACIteration,
                                            Real64 &CurLoad,
                                            bool const RunFlag)
     {
         std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
-
-        // std::cout << RunFlag << ", " << CurLoad << std::endl;
-        //			if (!DataGlobals::KickOffSimulation) {
-        //				int i = 1;
-        //			}
 
         if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
             PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
@@ -191,7 +212,13 @@ namespace EIRWaterToWaterHeatPumps {
         this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
 
         if (this->loadSideMassFlowRate > 0 && this->sourceSideMassFlowRate > 0) {
-            // for today, assume the heat transfer could be rejected perfectly and in full
+
+            Real64 evapOutletSetpointTemp = this->getEvapOutletSetpoint();
+            Real64 const sourceInletNodeTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
+            Real64 chillerModifierFuncTemp = CurveManager::CurveValue(
+                    this->capFuncTempCurveIndex, evapOutletSetpointTemp, sourceInletNodeTemp
+            );
+
             this->loadSideHeatTransfer = CurLoad;
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                                DataGlobals::CWInitConvTemp,
@@ -363,20 +390,25 @@ namespace EIRWaterToWaterHeatPumps {
             if (!thisHP.companionCoilName.empty()) {
                 auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
                 auto & thisCoilGender = thisHP.plantTypeOfNum;
-                auto companionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
+                auto targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
                 for (auto &potentialMate : eir_wwhp) {
                     auto & potentialMateGender = potentialMate.plantTypeOfNum;
                     auto potentialMateName = UtilityRoutines::MakeUPPERCase(potentialMate.name);
                     if (potentialMateName == thisCoilName) {
                         continue;
                     }
-                    if (potentialMateName == companionName) {
+                    if (potentialMateName == targetCompanionName) {
                         if (thisCoilGender == potentialMateGender) {
                             ShowFatalError("I'm sorry, I don't really feel comfortable pairing up coils of the same type.");
                         }
                         thisHP.companionHeatPumpCoil = &potentialMate;
                         break;
                     }
+                }
+                if (!thisHP.companionHeatPumpCoil) {
+                    ShowSevereError("Could not find matching companion heat pump coil.");
+                    ShowContinueError("Base coil: " + thisCoilName);
+                    ShowContinueError("Looking for companion coil named: " + targetCompanionName);
                 }
             }
         }
@@ -414,6 +446,9 @@ namespace EIRWaterToWaterHeatPumps {
                 thisWWHP.referenceCOP = fields.at("reference_cop");
                 thisWWHP.referenceLeavingLoadSideTemp = fields.at("reference_leaving_load_side_water_temperature");
                 thisWWHP.referenceEnteringSourceSideTemp = fields.at("reference_entering_source_side_fluid_temperature");
+                thisWWHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(fields.at("heating_capacity_function_of_temperature_curve_name")));
+                thisWWHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(fields.at("electric_input_to_heating_output_ratio_function_of_temperature_curve_name")));
+                thisWWHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(fields.at("electric_input_to_heating_output_ratio_function_of_temperature_curve_name")));
 
                 int const flowPath1 = 1, flowPath2 = 2;
                 thisWWHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(loadSideInletNodeName,
@@ -491,6 +526,9 @@ namespace EIRWaterToWaterHeatPumps {
                 thisWWHP.referenceCOP = fields.at("reference_cop");
                 thisWWHP.referenceLeavingLoadSideTemp = fields.at("reference_leaving_load_side_water_temperature");
                 thisWWHP.referenceEnteringSourceSideTemp = fields.at("reference_entering_source_side_fluid_temperature");
+                thisWWHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(fields.at("cooling_capacity_function_of_temperature_curve_name"));
+                thisWWHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(fields.at("electric_input_to_cooling_output_ratio_function_of_temperature_curve_name"));
+                thisWWHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(fields.at("electric_input_to_cooling_ratio_function_of_temperature_curve_name"));
 
                 int const flowPath1 = 1, flowPath2 = 2;
                 thisWWHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(loadSideInletNodeName,

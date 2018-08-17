@@ -197,7 +197,54 @@
     1000,                    !- Reference Capacity
     3.5,  !- Reference COP
     25.56, !- Reference Leaving Load Side Water Temperature
-    42.0;  !- Reference Entering Source Side Fluid Temperature
+    42.0,  !- Reference Entering Source Side Fluid Temperature
+    CapCurveFuncTemp, !-
+    EIRCurveFuncTemp, !-
+    EIRCurveFuncPLR; !-
+
+ Curve:Biquadratic,
+    CapCurveFuncTemp,        !- Name
+    0.257896E+00,            !- Coefficient1 Constant
+    0.389016E-01,            !- Coefficient2 x
+    -0.217080E-03,           !- Coefficient3 x**2
+    0.468684E-01,            !- Coefficient4 y
+    -0.942840E-03,           !- Coefficient5 y**2
+    -0.343440E-03,           !- Coefficient6 x*y
+    5.0,                     !- Minimum Value of x
+    10.0,                    !- Maximum Value of x
+    24.0,                    !- Minimum Value of y
+    35.0,                    !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    EIRCurveFuncTemp,        !- Name
+    0.933884E+00,            !- Coefficient1 Constant
+    -0.582120E-01,           !- Coefficient2 x
+    0.450036E-02,            !- Coefficient3 x**2
+    0.243000E-02,            !- Coefficient4 y
+    0.486000E-03,            !- Coefficient5 y**2
+    -0.121500E-02,           !- Coefficient6 x*y
+    5.0,                     !- Minimum Value of x
+    10.0,                    !- Maximum Value of x
+    24.0,                    !- Minimum Value of y
+    35.0,                    !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    EIRCurveFuncPLR,      !- Name
+    0.222903,                !- Coefficient1 Constant
+    0.313387,                !- Coefficient2 x
+    0.463710,                !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
 
   BranchList,
     Plant Demand Branches,   !- Name

@@ -83,6 +83,11 @@ namespace EIRWaterToWaterHeatPumps {
         Real64 referenceLeavingLoadSideTemp = 0.0;
         Real64 referenceEnteringSourceSideTemp = 0.0;
 
+        // curve references
+        int capFuncTempCurveIndex = 0;
+        int powerRatioFuncTempCurveIndex = 0;
+        int powerRatioFuncPLRCurveIndex = 0;
+
         // flow rate terms
         Real64 loadSideDesignVolFlowRate = 0.0;
         Real64 sourceSideDesignVolFlowRate = 0.0;
@@ -121,6 +126,8 @@ namespace EIRWaterToWaterHeatPumps {
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
 		void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+		Real64 getEvapOutletSetpoint();
 
 		static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
 
