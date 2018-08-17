@@ -165,9 +165,8 @@ namespace HeatingCoils {
         bool FaultyCoilSATFlag;              // True if the coil has SAT sensor fault
         int FaultyCoilSATIndex;              // Index of the fault object corresponding to the coil
         Real64 FaultyCoilSATOffset;          // Coil SAT sensor offset
-
         bool reportCoilFinalSizes; // one time report of sizes to coil report
-
+        int AirLoopNum;                      // Airloop number
         // Default Constructor
         HeatingCoilEquipConditions()
             : HCoilType_Num(0), FuelType_Num(0), SchedPtr(0), InsuffTemperatureWarn(0), InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),
@@ -177,8 +176,7 @@ namespace HeatingCoils {
               TempSetPointNodeNum(0), Control(0), PLFCurveIndex(0), ParasiticElecLoad(0.0), ParasiticFuelLoad(0.0), ParasiticFuelRate(0.0),
               ParasiticFuelCapacity(0.0), RTF(0.0), RTFErrorIndex(0), RTFErrorCount(0), PLFErrorIndex(0), PLFErrorCount(0),
               ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(0), NumOfStages(0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
-              FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true)
-
+              FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), AirLoopNum(0)
         {
         }
     };
@@ -351,6 +349,8 @@ namespace HeatingCoils {
                             Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
                             Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used
     );
+
+    void SetHeatingCoilAirLoopNumber(std::string const &HeatingCoilName, int AirLoopNum, bool &ErrorsFound);
 
     //        End of Utility subroutines for the HeatingCoil Module
 

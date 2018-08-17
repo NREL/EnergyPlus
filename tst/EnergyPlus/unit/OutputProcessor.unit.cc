@@ -3756,6 +3756,75 @@ namespace OutputProcessor {
         compare_err_stream(errMsg);
     }
 
+    TEST_F(EnergyPlusFixture, OutputProcessor_fullOutputVariableKeyComparisonWithRegex)
+    {
+        std::string const idf_objects = delimited_string({
+            "Output:Variable,Air Loop 1|AirSupply InletNode,System Node Setpoint Temperature,Hourly;",
+            "Output:Variable,Air Loop 1|AirSupply InletNode,System Node Temperature,Hourly;",
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        DataGlobals::DayOfSim = 365;
+        DataGlobals::DayOfSimChr = "365";
+        DataEnvironment::Month = 12;
+        DataEnvironment::DayOfMonth = 31;
+        DataEnvironment::DSTIndicator = 0;
+        DataEnvironment::DayOfWeek = 3;
+        DataEnvironment::HolidayIndex = 0;
+        DataGlobals::HourOfDay = 24;
+        DataGlobals::NumOfDayInEnvrn = 365;
+        DataGlobals::MinutesPerTimeStep = 10;
+
+        if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
+            DataGlobals::EndHourFlag = true;
+            if (DataGlobals::HourOfDay == 24) {
+                DataGlobals::EndDayFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    DataGlobals::EndEnvrnFlag = true;
+                }
+            }
+        }
+
+        if (DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth(DataEnvironment::Month)) {
+            DataEnvironment::EndMonthFlag = true;
+        }
+
+        TimeValue.allocate(2);
+
+        auto timeStep = 1.0 / 6;
+
+        SetupTimePointers("Zone", timeStep);
+        SetupTimePointers("HVAC", timeStep);
+
+        TimeValue(1).CurMinute = 50;
+        TimeValue(2).CurMinute = 50;
+
+        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::InitializeTabularMonthly();
+
+        GetReportVariableInput();
+        SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
+                            "Environment");
+        Real64 light_consumption = 999;
+        SetupOutputVariable("Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _,
+                            "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1);
+        UpdateMeterReporting();
+        UpdateDataandReport(DataGlobals::ZoneTSReporting);
+
+        NumExtraVars = 0;
+        BuildKeyVarList("Air Loop 1|AirSupply InletNode", "SYSTEM NODE SETPOINT TEMPERATURE", 1, 2);
+        EXPECT_EQ(1, NumExtraVars);
+
+        NumExtraVars = 0;
+        BuildKeyVarList("Air Loop 1|AirSupply InletNode", "SYSTEM NODE TEMPERATURE", 1, 2);
+        EXPECT_EQ(1, NumExtraVars);
+
+        GenOutputVariablesAuditReport();
+
+        compare_err_stream("");
+    }
+
     TEST_F(EnergyPlusFixture, OutputProcessor_DuplicateMeterCustom)
     {
         std::string const idf_objects = delimited_string(

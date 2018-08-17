@@ -337,9 +337,9 @@ namespace ReportSizingManager {
         using DataGlobals::DisplayExtraWarnings;
         using namespace DataSizing;
         using namespace DataHVACGlobals;
+        using DXCoils::ValidateADP;
         using DataPlant::PlantLoop;
         using DesiccantDehumidifiers::DesicDehum;
-        using DXCoils::ValidateADP;
         using Fans::FanDesDT;
         using Fans::FanDesHeatGain;
         using FluidProperties::GetDensityGlycol;
@@ -1280,7 +1280,8 @@ namespace ReportSizingManager {
                     }
                 } else if (SizingType == CoolingWaterflowSizing) {
                     CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
-                    Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                    Cp = GetSpecificHeatGlycol(
+                        PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     rho = GetDensityGlycol(
                         PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
@@ -1309,7 +1310,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         DesCoilLoad = AutosizeDes * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -1320,7 +1321,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         DesCoilLoad = AutosizeDes * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -1351,7 +1352,7 @@ namespace ReportSizingManager {
                                                        PlantLoop(DataWaterLoopNum).FluidIndex,
                                                        CallingRoutine);
                             rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                                   DataGlobals::CWInitConvTemp,
+                                                   DataGlobals::HWInitConvTemp,
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                             AutosizeDes = DesCoilLoad / (DataWaterCoilSizHeatDeltaT * Cp * rho);
@@ -1363,8 +1364,13 @@ namespace ReportSizingManager {
                 } else if (SizingType == HeatingWaterDesAirInletTempSizing) {
                     if (TermUnitPIU && (CurTermUnitSizingNum > 0)) {
                         MinFlowFrac = TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac;
-                        AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
-                                      FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
+                        if (TermUnitSizing(CurTermUnitSizingNum).InducesPlenumAir) {
+                            AutosizeDes = (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac) +
+                                          (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneRetTempAtHeatPeak * (1.0 - MinFlowFrac));
+                        } else {
+                            AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
+                                          FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
+                        }
                     } else if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
                         AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                     } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
@@ -1436,8 +1442,10 @@ namespace ReportSizingManager {
                     bCheckForZero = false;
                 } else if (SizingType == CoolingWaterDesAirOutletTempSizing) {
                     if (TermUnitIU) {
-                        Cp =
-                            GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::CWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
                                                DataGlobals::CWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
@@ -1522,9 +1530,9 @@ namespace ReportSizingManager {
                         // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
                         // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
                         // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
-                        // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
-                        // of flow/capacity ratio vs SHR for several actual coils.
+                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
+                        // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
+                        // regression of flow/capacity ratio vs SHR for several actual coils.
                         RatedVolFlowPerRatedTotCap = DataFlowUsedForSizing / DataCapacityUsedForSizing;
                         if (DXCT == RegularDXCoil) {
                             if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
@@ -1761,7 +1769,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         NominalCapacityDes = DesMassFlow * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -1772,7 +1780,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         NominalCapacityDes = DesMassFlow * DataWaterCoilSizHeatDeltaT * Cp * rho;
@@ -2296,8 +2304,10 @@ namespace ReportSizingManager {
                         CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
                     }
                     if (DataCapacityUsedForSizing >= SmallLoad) {
-                        Cp =
-                            GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::CWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
                                                DataGlobals::CWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
@@ -2315,7 +2325,7 @@ namespace ReportSizingManager {
                                                    PlantLoop(DataWaterLoopNum).FluidIndex,
                                                    CallingRoutine);
                         rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobals::HWInitConvTemp,
                                                PlantLoop(DataWaterLoopNum).FluidIndex,
                                                CallingRoutine);
                         AutosizeDes = DataCapacityUsedForSizing / (DataWaterCoilSizHeatDeltaT * Cp * rho);
@@ -2495,9 +2505,9 @@ namespace ReportSizingManager {
                         // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
                         // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
                         // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
-                        // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
-                        // of flow/capacity ratio vs SHR for several actual coils.
+                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
+                        // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
+                        // regression of flow/capacity ratio vs SHR for several actual coils.
                         RatedVolFlowPerRatedTotCap = DataFlowUsedForSizing / DataCapacityUsedForSizing;
                         if (DXCT == RegularDXCoil) {
                             if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {

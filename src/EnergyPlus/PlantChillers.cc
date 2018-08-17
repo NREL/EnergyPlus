@@ -3172,7 +3172,7 @@ namespace PlantChillers {
 
             if (ElectricChiller(ChillNum).HeatRecActive) {
                 rho = GetDensityGlycol(PlantLoop(ElectricChiller(ChillNum).HRLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(ElectricChiller(ChillNum).HRLoopNum).FluidIndex,
                                        RoutineName);
                 ElectricChiller(ChillNum).DesignHeatRecMassFlowRate = rho * ElectricChiller(ChillNum).DesignHeatRecVolFlowRate;
@@ -3564,7 +3564,7 @@ namespace PlantChillers {
 
             if (EngineDrivenChiller(ChillNum).HeatRecActive) {
                 rho = GetDensityGlycol(PlantLoop(EngineDrivenChiller(ChillNum).HRLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(EngineDrivenChiller(ChillNum).HRLoopNum).FluidIndex,
                                        RoutineName);
                 EngineDrivenChiller(ChillNum).DesignHeatRecMassFlowRate = rho * EngineDrivenChiller(ChillNum).DesignHeatRecVolFlowRate;
@@ -3904,7 +3904,7 @@ namespace PlantChillers {
 
             if (GTChiller(ChillNum).HeatRecActive) {
                 rho = GetDensityGlycol(PlantLoop(GTChiller(ChillNum).HRLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(GTChiller(ChillNum).HRLoopNum).FluidIndex,
                                        RoutineName);
                 GTChiller(ChillNum).DesignHeatRecMassFlowRate = rho * GTChiller(ChillNum).DesignHeatRecVolFlowRate;

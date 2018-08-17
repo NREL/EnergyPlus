@@ -157,6 +157,7 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
+  SZVAVModel.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
@@ -172,6 +173,7 @@ set( test_src
   WaterToAirHeatPumpSimple.unit.cc
   WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
+  WinCalcEngine.unit.cc
   WindowAC.unit.cc
   WindowEquivalentLayer.unit.cc
   WindowLayerEffectiveMultipliers.unit.cc

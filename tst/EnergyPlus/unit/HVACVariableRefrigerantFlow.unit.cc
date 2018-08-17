@@ -2191,7 +2191,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
 
     // Inputs: parameters
     PerfCurve(CurveNum).CurveType = CurveManager::BiQuadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_BiQuadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
     PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x

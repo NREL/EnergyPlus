@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <ConfiguredFunctions.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 
@@ -323,6 +324,80 @@ TEST_F(InputProcessorFixture, parse_empty_fields)
     }
 }
 
+TEST_F(InputProcessorFixture, parse_two_RunPeriod)
+{
+    std::string const idf(delimited_string({
+        "  RunPeriod,",
+        "    ,                        !- Name",
+        "    1,                       !- Begin Month",
+        "    1,                       !- Begin Day of Month",
+        "    1,                       !- End Month",
+        "    31,                      !- End Day of Month",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+        "",
+        "  RunPeriod,",
+        "    ,                        !- Name",
+        "    7,                       !- Begin Month",
+        "    1,                       !- Begin Day of Month",
+        "    7,                       !- End Month",
+        "    31,                      !- End Day of Month",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+    }));
+
+    json expected = {
+      {"RunPeriod", {
+        {"RunPeriod 1", {
+          {"apply_weekend_holiday_rule", "No"},
+          {"begin_day_of_month", 1},
+          {"begin_month", 1},
+          {"day_of_week_for_start_day", "Tuesday"},
+          {"end_day_of_month", 31},
+          {"end_month", 1},
+          {"use_weather_file_daylight_saving_period", "Yes"},
+          {"use_weather_file_holidays_and_special_days", "Yes"},
+          {"use_weather_file_rain_indicators", "Yes"},
+          {"use_weather_file_snow_indicators", "Yes"}
+        }},
+        {"RunPeriod 2", {
+          {"apply_weekend_holiday_rule", "No"},
+          {"begin_day_of_month", 1},
+          {"begin_month", 7},
+          {"day_of_week_for_start_day", "Tuesday"},
+          {"end_day_of_month", 31},
+          {"end_month", 7},
+          {"use_weather_file_daylight_saving_period", "Yes"},
+          {"use_weather_file_holidays_and_special_days", "Yes"},
+          {"use_weather_file_rain_indicators", "Yes"},
+          {"use_weather_file_snow_indicators", "Yes"}
+        }}
+      }}
+    };
+
+    ASSERT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+    json tmp;
+    for (auto it = expected.begin(); it != expected.end(); ++it) {
+        ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+        for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+            ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+            for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+                ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+            }
+        }
+    }
+}
+
 TEST_F(InputProcessorFixture, parse_idf_and_validate_two_non_extensible_objects)
 {
     std::string const idf(delimited_string({
@@ -394,6 +469,172 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_non_extensible_objects)
 }
 
 TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
+{
+
+    std::string const idf(delimited_string(
+        {"EnergyManagementSystem:Program,",
+          "    ER_Main,                 !- Name",
+          "    IF ER_Humidifier_Status > 0,  !- Program Line 1",
+          "    SET ER_ExtraElecHeatC_Status = 1,  !- Program Line 2",
+          "    SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4,  !- <none>",
+          "    ELSE,                    !- <none>",
+          "    SET ER_ExtraElecHeatC_Status = 0,  !- <none>",
+          "    SET ER_ExtraElecHeatC_SP = NULL,  !- <none>",
+          "    ENDIF,                   !- <none>",
+          "    IF T_OA < 10,            !- <none>",
+          "    ,                        !- <none>",
+          "    SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118,  !- <none>",
+          "    SET FlowRate = (ER_FanMassFlow/1.2)*2118,  !- <none>",
+          "    SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001)),  !- <none>",
+          "    SET ER_ExtraWaterHeatC_Status = 1,  !- <none>",
+          "    SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT,  !- <none>",
+          "    ELSE,                    !- <none>",
+          "    SET ER_ExtraWaterHeatC_Status = 0,  !- <none>",
+          "    SET ER_ExtraWaterHeatC_SP = NULL,  !- <none>",
+          "    ENDIF;                   !- <none>"}));
+
+    json expected = {
+      {"EnergyManagementSystem:Program",
+       {{"ER_Main",
+          {{"lines",
+            {
+              {{"program_line", "IF ER_Humidifier_Status > 0"}},
+              {{"program_line", "SET ER_ExtraElecHeatC_Status = 1"}},
+              {{"program_line", "SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4"}},
+              {{"program_line", "ELSE"}},
+              {{"program_line", "SET ER_ExtraElecHeatC_Status = 0"}},
+              {{"program_line", "SET ER_ExtraElecHeatC_SP = NULL"}},
+              {{"program_line", "ENDIF"}},
+              {{"program_line", "IF T_OA < 10"}},
+              {{}},
+              {{"program_line", "SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118"}},
+              {{"program_line", "SET FlowRate = (ER_FanMassFlow/1.2)*2118"}},
+              {{"program_line", "SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001))"}},
+              {{"program_line", "SET ER_ExtraWaterHeatC_Status = 1"}},
+              {{"program_line", "SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT"}},
+              {{"program_line", "ELSE"}},
+              {{"program_line", "SET ER_ExtraWaterHeatC_Status = 0"}},
+              {{"program_line", "SET ER_ExtraWaterHeatC_SP = NULL"}},
+              {{"program_line", "ENDIF"}},
+            }
+          }}
+        }}
+      },
+      {"GlobalGeometryRules",
+        {{"",
+          {
+            {"starting_vertex_position", "UpperLeftCorner"},
+            {"vertex_entry_direction", "Counterclockwise"},
+            {"coordinate_system", "Relative"},
+            {"daylighting_reference_point_coordinate_system", "Relative"},
+            {"rectangular_surface_coordinate_system", "Relative"}
+          }
+        }}
+      },
+      {"Building",
+        {{"Bldg",
+          {
+            {"north_axis", 0.0},
+            {"terrain", "Suburbs"},
+            {"loads_convergence_tolerance_value", 0.04},
+            {"temperature_convergence_tolerance_value", 0.4000},
+            {"solar_distribution", "FullExterior"},
+            {"maximum_number_of_warmup_days", 25},
+            {"minimum_number_of_warmup_days", 6}
+          }
+        }}
+      }
+    };
+
+    auto const expected_idf(delimited_string({"Building,",
+                                              "  Bldg,",
+                                              "  0.0,",
+                                              "  Suburbs,",
+                                              "  0.04,",
+                                              "  0.4,",
+                                              "  FullExterior,",
+                                              "  25.0,",
+                                              "  6.0;",
+                                              "",
+                                              "EnergyManagementSystem:Program,",
+                                              "  ER_Main,",
+                                              "  IF ER_Humidifier_Status > 0,",
+                                              "  SET ER_ExtraElecHeatC_Status = 1,",
+                                              "  SET ER_ExtraElecHeatC_SP = ER_AfterHumidifier_Temp + 1.4,",
+                                              "  ELSE,",
+                                              "  SET ER_ExtraElecHeatC_Status = 0,",
+                                              "  SET ER_ExtraElecHeatC_SP = NULL,",
+                                              "  ENDIF,",
+                                              "  IF T_OA < 10,",
+                                              "  ,",
+                                              "  SET HeatGain = 0 * (ER_FanDesignMass/1.2) *2118,",
+                                              "  SET FlowRate = (ER_FanMassFlow/1.2)*2118,",
+                                              "  SET ER_PreheatDeltaT = HeatGain/(1.08*(FLOWRATE+0.000001)),",
+                                              "  SET ER_ExtraWaterHeatC_Status = 1,",
+                                              "  SET ER_ExtraWaterHeatC_SP = ER_AfterElecHeatC_Temp + ER_PreheatDeltaT,",
+                                              "  ELSE,",
+                                              "  SET ER_ExtraWaterHeatC_Status = 0,",
+                                              "  SET ER_ExtraWaterHeatC_SP = NULL,",
+                                              "  ENDIF;",
+                                              "",
+                                              "GlobalGeometryRules,",
+                                              "  UpperLeftCorner,",
+                                              "  Counterclockwise,",
+                                              "  Relative,",
+                                              "  Relative,",
+                                              "  Relative;",
+                                              ""}));
+
+    EXPECT_TRUE(process_idf(idf));
+    json &epJSON = getEpJSON();
+    json tmp;
+
+    std::string encoded = encodeIDF();
+    EXPECT_EQ(expected_idf, encoded);
+
+    for (auto it = expected.begin(); it != expected.end(); ++it) {
+        ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+        for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+            ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+            for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+                ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+                if (!tmp.is_array()) {
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                } else {
+                    for (size_t i = 0; i < it_in_in.value().size(); i++) {
+                      for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
+                          if (it_ext.value().empty()) {
+                            EXPECT_EQ(epJSON[it.key()][it_in.key()][it_in_in.key()][i].empty(), it_ext.value().empty());
+                            continue;
+                          }
+                          ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+                          EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                      }
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST_F(InputProcessorFixture, parse_idf_EMSProgram_required_prop_extensible)
+{
+
+    std::string const idf(delimited_string(
+        {"EnergyManagementSystem:Program,",
+          "    ER_Main;                 !- Name"}));
+
+    EXPECT_FALSE(process_idf(idf, false));
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** <root>[EnergyManagementSystem:Program][ER_Main] - Missing required property 'lines'.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
+
+TEST_F(InputProcessorFixture, parse_idf_extensible_blank_required_extensible_fields)
 {
 
     std::string const idf(delimited_string(
@@ -2891,6 +3132,33 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                                               false, false, false, false, false, true,  false, false, false, false, false, true}),
                            lNumericBlanks));
     EXPECT_EQ(1, IOStatus);
+    // test logical return for ValidateComponent
+    bool IsNotOK = false;
+    ValidateComponent(CurrentModuleObject, "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
+    EXPECT_FALSE(IsNotOK);
+    ValidateComponent(CurrentModuleObject, "Furnace ACDXCoil 2", IsNotOK, CurrentModuleObject);
+    EXPECT_TRUE(IsNotOK);
+    IsNotOK = false;
+    ValidateComponent(CurrentModuleObject + "x", "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
+    EXPECT_TRUE(IsNotOK);
+
+    // test int return for getObjectItemNum
+    int ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, "Furnace ACDXCoil 1");
+    EXPECT_GT(ItemNum, 0); // object type and name are correct, ItemNum is > 0
+    // corrupt object type
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject + "x", "Furnace ACDXCoil 1");
+    EXPECT_EQ(ItemNum, -1); // object type is invalid, ItemNum = -1
+    // corrupt object name
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, "Furnace ACDXCoil 2");
+    EXPECT_EQ(ItemNum, 0); // object name is invalid, ItemNum = 0
+
+    std::string CompValType = "x";
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, CompValType, "Furnace ACDXCoil 1");
+    EXPECT_EQ(ItemNum, 0); // developer error, CompValType is invalid, ItemNum = 0
+
+    CompValType = "indoor_air_inlet_node_name";
+    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, CompValType, "DX Cooling Coil Air Inlet Node");
+    EXPECT_GT(ItemNum, 0); // Object type is valid, CompValType is valid, CompValType name is valid, ItemNum > 0
 }
 
 TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)

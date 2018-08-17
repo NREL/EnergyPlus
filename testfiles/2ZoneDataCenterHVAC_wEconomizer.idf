@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,4;
 
@@ -1719,7 +1719,7 @@
     99.0,                    !- Maximum Supply Air Temperature {C}
     East Zone,               !- Control Zone Name
     East Zone Air Node,      !- Zone Node Name
-    West Zone Inlets,        !- Zone Inlet Node Name
+    East Zone Inlets,        !- Zone Inlet Node Name
     East Sys Setpoint nodes; !- Setpoint Node or NodeList Name
 
   NodeList,
