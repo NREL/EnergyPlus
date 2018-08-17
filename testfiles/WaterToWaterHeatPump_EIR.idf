@@ -191,16 +191,16 @@
     Plant Supply Outlet Node,  !- Load Side Outlet Node Name
     Condenser Demand Inlet Node,  !- Source Side Inlet Node Name
     Condenser Demand Outlet Node,  !- Source Side Outlet Node Name
-    asd,                        !- Companion Coil Name
+    ,                        !- Companion Coil Name
     0.003,                   !- Load Side Design Volume Flow Rate {m3/s}
     0.003,                   !- Source Side Design Volume Flow Rate {m3/s}
-    1000,                    !- Reference Capacity
-    3.5,  !- Reference COP
-    25.56, !- Reference Leaving Load Side Water Temperature
-    42.0,  !- Reference Entering Source Side Fluid Temperature
-    CapCurveFuncTemp, !-
-    EIRCurveFuncTemp, !-
-    EIRCurveFuncPLR; !-
+    32000,                   !- Reference Capacity
+    3.5,                     !- Reference COP
+    25.56,                   !- Reference Leaving Load Side Water Temperature
+    42.0,                    !- Reference Entering Source Side Fluid Temperature
+    CapCurveFuncTemp,        !- Heating Capacity Function of Temperature Curve Name
+    EIRCurveFuncTemp,        !- Electric Input to Heating Output Ratio Function of Temperature Curve Name
+    EIRCurveFuncPLR;         !- Electric Input to Heating Output Ratio Function of Part Load Ratio Curve Name
 
  Curve:Biquadratic,
     CapCurveFuncTemp,        !- Name
