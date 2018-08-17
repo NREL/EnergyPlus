@@ -144,10 +144,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   END TYPE FieldFlagAndValue
   TYPE (FieldFlagAndValue) :: RunPeriodStartYear
   TYPE (FieldFlagAndValue) :: RunPeriodRepeated
-  INTEGER :: YearNumber, RepeatedCount
+  INTEGER :: MonthNumber, DayNumber, YearNumber, RepeatedCount
   INTEGER, EXTERNAL :: GetYearFromStartDayString
   LOGICAL, EXTERNAL :: IsYearNumberALeapYear
   INTEGER, EXTERNAL :: GetLeapYearFromStartDayString
+  INTEGER, EXTERNAL :: FindYearForWeekDay
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -459,18 +460,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 IF (RunPeriodStartYear%wasSet) THEN
                   OutArgs(4) = RunPeriodStartYear%originalValue
                 ELSE IF (RunPeriodRepeated%wasSet) THEN
+                  READ(OutArgs(2), *) MonthNumber
+                  READ(OutArgs(3), *) DayNumber
                   IF (TRIM(InArgs(6)) /= Blank) THEN
-                    IF (TRIM(InArgs(2))=="2".AND.TRIM(InArgs(3))=="29") THEN
-                      YearNumber = GetLeapYearFromStartDayString(InArgs(6))
-                    ELSE
-                      YearNumber = GetYearFromStartDayString(InArgs(6))
-                    END IF
+                    YearNumber = FindYearForWeekDay(MonthNumber, DayNumber, InArgs(6))
                   ELSE
-                    IF (TRIM(InArgs(2))=="2".AND.TRIM(InArgs(3))=="29") THEN
-                      YearNumber = GetLeapYearFromStartDayString("SUNDAY")
-                    ELSE
-                      YearNumber = GetYearFromStartDayString("SUNDAY")
-                    END IF
+                    YearNumber = FindYearForWeekDay(MonthNumber, DayNumber, "SUNDAY")
                   END IF
                   WRITE(OutArgs(4), *) YearNumber
                 ELSE
