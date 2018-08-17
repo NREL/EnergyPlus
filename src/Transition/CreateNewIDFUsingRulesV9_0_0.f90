@@ -455,6 +455,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with P, insert the rules here
 
               ! If your original object starts with R, insert the rules here
+              CASE('RUNPERIOD:CUSTOMRANGE')
+                ! Just change the type to RunPeriod and copy all of the arguments
+                ObjectName = 'RunPeriod'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                Written=.true.
+                nodiff = .false.
+
               CASE('RUNPERIOD')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! spend some time mining out the state of the run period object
@@ -538,7 +547,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 END IF
                 ! InArgs(14): Start year moved to above
                 OutArgs(14) = Blank ! new Treat weather as actual field?
+                CurArgs = 14
                 nodiff = .false.
+
               ! If your original object starts with S, insert the rules here
 
               ! If your original object starts with T, insert the rules here
