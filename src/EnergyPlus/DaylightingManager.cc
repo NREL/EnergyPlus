@@ -10684,8 +10684,10 @@ namespace DaylightingManager {
 
             } // End of check if a Daylighting:Detailed zone
 
-            CreateShadeDeploymentOrder(ZoneNum);
-            MapShadeDeploymentOrderToLoopNumber(ZoneNum);
+            if (TotWinShadingControl > 0) {
+                CreateShadeDeploymentOrder(ZoneNum);
+                MapShadeDeploymentOrderToLoopNumber(ZoneNum);
+            }
 
         } // End of primary zone loop
 

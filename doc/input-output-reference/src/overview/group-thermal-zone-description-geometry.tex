@@ -2253,15 +2253,15 @@ Option & Object/Field or Output Variable & Input File (distributed with install)
 
 Build up a window from \textbf{layers} & Window\-Material:\-Glazing, Window\-Material:-Gas, Window\-Material:\-Shade, Window\-Material:\-Screen, Window\-Material:\-Blind, Construction & Window\-Tests.idf \tabularnewline
 Add an \textbf{overhang} & Shading:\-Zone:\-Detailed & 5Zone\-Air\-Cooled.idf \tabularnewline
-Add a \textbf{shading device} & Window\-Material:\-Shade, Window\-Material:\-Screen or Window\-Material:\-Blind; Window\-Property:\-Shading\-Control & Window\-Tests.idf, Purch\-Air\-Window\-Blind.idf \tabularnewline
-\textbf{Control} a shading device & Window\-Property:\-Shading\-Control & Purch\-Air\-WindowBlind.idf \tabularnewline
+Add a \textbf{shading device} & Window\-Material:\-Shade, Window\-Material:\-Screen or Window\-Material:\-Blind; Window\-Shading\-Control & Window\-Tests.idf, Purch\-Air\-Window\-Blind.idf \tabularnewline
+\textbf{Control} a shading device & Window:\-Shading\-Control & Purch\-Air\-WindowBlind.idf \tabularnewline
 Determine when a shading device is on in a particular timestep & Print the variable ``Surface Shading Device Is On Time Fraction'' & Purch\-Air\-Window\-Blind.idf \tabularnewline
-Control the \textbf{slat angle} of a blind & Window\-Property:\-Shading\-Control & Purch\-Air\-Window\-Blind.idf \tabularnewline
+Control the \textbf{slat angle} of a blind & Window\-Shading\-Control & Purch\-Air\-Window\-Blind.idf \tabularnewline
 Add a \textbf{frame} & Window\-Property:\-FrameAndDivider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Add a \textbf{divider} & Window\-Property:\-Frame\-And\-Divider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Allow window to \textbf{daylight} a zone & Day\-lighting:Controls & Purch\-Air\-With\-Day\-lighting.idf, DElight-\-Detailed-\-Comparison.idf \tabularnewline
 Find \textbf{solar reflected} onto window from neighboring buildings & Building/\-Solar\-Distribution field – uses ``WithReflections'' & Reflective\-Adjacent\-Building.idf \tabularnewline
-Model \textbf{switchable glazing} (e.g., electrochromic glass) & Window\-Property:\-Shading\-Control & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
+Model \textbf{switchable glazing} (e.g., electrochromic glass) & Window\-Shading\-Control & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Add an \textbf{interior window} & Define two Fenestration\-Surface:\-Detailed's, one for each associated interior wall & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
 \textbf{Track} how beam solar falls on interior surfaces & Building/\-Solar Distribution = Full\-Interior\-And\-Exterior & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
 \textbf{Track} beam solar transmitted through interior windows & Building/Solar Distribution = Full\-Interior\-And\-Exterior & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
@@ -3996,7 +3996,7 @@ Shading:Site:Detailed,
 
 Window shading with coverings like drapes, blinds, screens or pull-down shades can be used to reduce the amount of solar radiation entering the window or reduce daylighting glare. It can also be used to reduce heat loss through the window (movable insulation). Leaving the window covering open in the winter can maximize solar heat gain and thereby reduce heating loads.
 
-With WindowShadingControl you specify the type and location of the shading device, what variable or combination of variables controls deployment of the shading device, and what the control setpoint is. If the shading device is a blind, you also specify how the slat angle is controlled. Each WindowShadingContro object is associated with a zone and has a list of one or more windows and glass doors to which the shading control is applied (ref: FenestrationSurface:Detailed with Type = Window or GlassDoor, Window, and GlazedDoor).
+With WindowShadingControl you specify the type and location of the shading device, what variable or combination of variables controls deployment of the shading device, and what the control setpoint is. If the shading device is a blind, you also specify how the slat angle is controlled. Each WindowShadingControl object is associated with a zone and has a list of one or more windows and glass doors to which the shading control is applied (ref: FenestrationSurface:Detailed with Type = Window or GlassDoor, Window, and GlazedDoor).
 
 NOTE: WindowShadingControl does not work with complex fenestration systems. Controlled complex fenestration systems can be made only with Energy Management Systems objects. Refrencing a FenestrationSurface:Detailed in a WindowShadingControl while using complex fenestration systems will be ignored by program.
 
@@ -4062,7 +4062,7 @@ Name of the window shading control.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-29-001}
 
-Name of the zone for the surfaces referenced by this shading control.
+Name of the zone where this shading control is used.
 
 \paragraph{Field: Shading Control Sequence Number}\label{shading-control-sequence-number}
 
@@ -4227,7 +4227,7 @@ The field can have one of two options:
 
 \paragraph{Field: Fenestration Surface <n> Name}\label{field-fenestration-surface1-name}
 
-The name of a FenestrationSurface:Detailed, Window, or GlazedDoor object controlled by this WindowShadingControl. This field can be repeated to apply the same shading control to more than one fenestration surface. When Multiple Surface Control Type is set to Sequential, the order of the Fenestration Surface Names is the order that the shades will be deployed. The object is extensible so that additional fields of fenestration surface names can be added to the object. All of the fenestration surfaces must be in the zone specified in the Zone Name field.
+The name of a FenestrationSurface:Detailed, Window, or GlazedDoor object controlled by this WindowShadingControl. This field can be repeated to apply the same shading control to more than one fenestration surface. When Multiple Surface Control Type is set to Sequential, the order of the Fenestration Surface Names is the order that the shades will be deployed. The object is extensible so that additional fields of fenestration surface names can be added to the object. All of the fenestration surfaces must be either in the zone specified in the Zone Name field or in an adjacent zone connected by an interior window.
 
 An IDF example: window with interior roll shade that is deployed when solar incident on the window exceeds 50 W/m\(^{2}\).
 
