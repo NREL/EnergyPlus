@@ -74,11 +74,6 @@ namespace EIRWaterToWaterHeatPumps {
         eir_wwhp.clear();
     }
 
-    int EIRWaterToWaterHeatPump::add(int a, int b)
-    {
-        return a + b;
-    }
-
     void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
                                            bool const FirstHVACIteration,
                                            Real64 &CurLoad,
@@ -243,7 +238,6 @@ namespace EIRWaterToWaterHeatPumps {
             SetupOutputVariable(
                 "EIR WWHP Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
             SetupOutputVariable("EIR WWHP Power Usage", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
-            //SetupOutputVariable("EIR WWHP Running", OutputProcessor::Unit::None, this->running, "System", "Average", this->name);
 
             // find this component on the plant
             bool errFlag = false;
@@ -349,6 +343,7 @@ namespace EIRWaterToWaterHeatPumps {
         if (getInputsWWHP) {
             EIRWaterToWaterHeatPump::processInputForEIRWWHPHeating();
             EIRWaterToWaterHeatPump::processInputForEIRWWHPCooling();
+            EIRWaterToWaterHeatPump::pairUpCompanionCoils();
             getInputsWWHP = false;
         }
 
@@ -360,6 +355,31 @@ namespace EIRWaterToWaterHeatPumps {
 
         ShowFatalError("EIR_WWHP factory: Error getting inputs for wwhp named: " + objectName);
         return nullptr;
+    }
+
+    void EIRWaterToWaterHeatPump::pairUpCompanionCoils()
+    {
+        for (auto &thisHP : eir_wwhp) {
+            if (!thisHP.companionCoilName.empty()) {
+                auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
+                auto & thisCoilGender = thisHP.plantTypeOfNum;
+                auto companionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
+                for (auto &potentialMate : eir_wwhp) {
+                    auto & potentialMateGender = potentialMate.plantTypeOfNum;
+                    auto potentialMateName = UtilityRoutines::MakeUPPERCase(potentialMate.name);
+                    if (potentialMateName == thisCoilName) {
+                        continue;
+                    }
+                    if (potentialMateName == companionName) {
+                        if (thisCoilGender == potentialMateGender) {
+                            ShowFatalError("I'm sorry, I don't really feel comfortable pairing up coils of the same type.");
+                        }
+                        thisHP.companionHeatPumpCoil = &potentialMate;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     void EIRWaterToWaterHeatPump::processInputForEIRWWHPHeating()
@@ -387,6 +407,7 @@ namespace EIRWaterToWaterHeatPumps {
                 std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_outlet_node_name"));
                 std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name"));
                 std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name"));
+                thisWWHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_cooling_coil_name"));
                 thisWWHP.loadSideDesignVolFlowRate = fields.at("load_side_reference_flow_rate");
                 thisWWHP.sourceSideDesignVolFlowRate = fields.at("source_side_reference_flow_rate");
                 thisWWHP.referenceCapacity = fields.at("reference_capacity");
@@ -463,6 +484,7 @@ namespace EIRWaterToWaterHeatPumps {
                 std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_outlet_node_name"));
                 std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name"));
                 std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name"));
+                thisWWHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_heating_coil_name"));
                 thisWWHP.loadSideDesignVolFlowRate = fields.at("load_side_reference_flow_rate");
                 thisWWHP.sourceSideDesignVolFlowRate = fields.at("source_side_reference_flow_rate");
                 thisWWHP.referenceCapacity = fields.at("reference_capacity");

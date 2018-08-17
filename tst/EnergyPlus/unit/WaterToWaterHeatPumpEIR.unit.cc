@@ -60,11 +60,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRWaterToWaterHeatPumps;
 
-TEST_F(EnergyPlusFixture, TestAddFunction) {
-    EIRWaterToWaterHeatPump wwhp;
-    EXPECT_EQ(2, wwhp.add(1, 1));
-}
-
 TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstruction) {
     std::string const idf_objects =
             delimited_string(

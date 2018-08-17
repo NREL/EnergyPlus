@@ -74,6 +74,8 @@ namespace EIRWaterToWaterHeatPumps {
 		// fixed configuration parameters
         std::string name = "";
         int plantTypeOfNum = -1;
+        std::string companionCoilName = "";
+        EIRWaterToWaterHeatPump * companionHeatPumpCoil = nullptr;
 
         // reference data
         Real64 referenceCapacity = 0.0;
@@ -116,13 +118,13 @@ namespace EIRWaterToWaterHeatPumps {
 
         EIRWaterToWaterHeatPump()=default;
 
-        int add(int a, int b);
-
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
 		void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
+		static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
+
+        static void pairUpCompanionCoils();
 
         static void processInputForEIRWWHPHeating();
 
