@@ -52,15 +52,8 @@
     99063.,                  !- Barometric Pressure {Pa}
     5.3,                     !- Wind Speed {m/s}
     230,                     !- Wind Direction {deg}
-    No,                      !- Rain Indicator
-    No,                      !- Snow Indicator
-    No,                      !- Daylight Saving Time Indicator
-    ASHRAEClearSky,          !- Solar Model Indicator
-    ,                        !- Beam Solar Day Schedule Name
-    ,                        !- Diffuse Solar Day Schedule Name
-    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
-    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    1.00;                    !- Sky Clearness
+    ,,,,,,,,                 !- 8 skipped fields
+    1.0;                     !- Sky Clearness
 
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
@@ -79,12 +72,12 @@
     Discrete;                !- Numeric Type
 
   Schedule:Constant,
-    Plant Loop Temp Sch,     !- Name
+    Heating Coil Load Loop Setpoint Temperature Schedule,     !- Name
     Any Number,              !- Schedule Type Limits Name
     65.0;                    !- Value
     
   Schedule:Constant,
-    Condenser Loop Temp Sch, !- Name
+    Heating Coil Source Loop Setpoint Temperature Schedule, !- Name
     Any Number,              !- Schedule Type Limits Name
     40.0;                    !- Value
     
@@ -94,7 +87,7 @@
     1;                       !- Value
 
   Schedule:Compact,
-    Load Profile 1 Load Schedule,  !- Name
+    Heating Coil Load Profile Load Schedule,  !- Name
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
@@ -105,74 +98,74 @@
     UNTIL: 24:00,40000;      !- Field 11
     
   Schedule:Constant,
-    Load Profile 1 Flow Frac Schedule,  !- Name
+    Heating Coil Load Profile Flow Frac Schedule,  !- Name
     Any Number,              !- Schedule Type Limits Name
     1.0;                     !- Value
 
   PlantLoop,
-    Plant Loop,              !- Name
+    Heating Coil Load Loop,  !- Name
     WATER,                   !- Fluid Type
     ,                        !- User Defined Fluid Type
-    Plant Loop Operation,    !- Plant Equipment Operation Scheme Name
-    Plant Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
+    Heating Coil Load Loop Operation,    !- Plant Equipment Operation Scheme Name
+    Heating Coil Load Loop Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
     100,                     !- Maximum Loop Temperature {C}
     3,                       !- Minimum Loop Temperature {C}
     0.003,                   !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     1,                       !- Plant Loop Volume {m3}
-    Plant Supply Inlet Node,  !- Plant Side Inlet Node Name
-    Plant Supply Outlet Node,  !- Plant Side Outlet Node Name
-    Plant Supply Branches,   !- Plant Side Branch List Name
+    Heating Coil Load Loop Supply Inlet Node,  !- Plant Side Inlet Node Name
+    Heating Coil Load Loop Supply Outlet Node,  !- Plant Side Outlet Node Name
+    Heating Coil Load Loop Supply Branches,   !- Plant Side Branch List Name
     ,                        !- Plant Side Connector List Name
-    Plant Demand Inlet Node,  !- Demand Side Inlet Node Name
-    Plant Demand Outlet Node,  !- Demand Side Outlet Node Name
-    Plant Demand Branches,   !- Demand Side Branch List Name
+    Heating Coil Load Loop Demand Inlet Node,  !- Demand Side Inlet Node Name
+    Heating Coil Load Loop Demand Outlet Node,  !- Demand Side Outlet Node Name
+    Heating Coil Load Loop Demand Branches,   !- Demand Side Branch List Name
     ,                        !- Demand Side Connector List Name
     Optimal;                 !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
-    Plant Loop Setpoint Manager,  !- Name
+    Heating Coil Load Loop Setpoint Manager,  !- Name
     Temperature,             !- Control Variable
-    Plant Loop Temp Sch,     !- Schedule Name
-    Plant Supply Outlet Node;  !- Setpoint Node or NodeList Name
+    Heating Coil Load Loop Setpoint Temperature Schedule,     !- Schedule Name
+    Heating Coil Load Loop Supply Outlet Node;  !- Setpoint Node or NodeList Name
 
   PlantEquipmentOperationSchemes,
-    Plant Loop Operation,    !- Name
+    Heating Coil Load Loop Operation,    !- Name
     PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type
-    Plant Heating Operation,  !- Control Scheme 1 Name
+    Heating Coil Load Loop Heating Operation,  !- Control Scheme 1 Name
     AlwaysOnSchedule;        !- Control Scheme 1 Schedule Name
 
   PlantEquipmentOperation:HeatingLoad,
-    Plant Heating Operation,  !- Name
+    Heating Coil Load Loop Heating Operation,  !- Name
     0,                       !- Load Range 1 Lower Limit {W}
     10000000,                !- Load Range 1 Upper Limit {W}
-    Plant Heating Equipment;  !- Range 1 Equipment List Name
+    Heating Coil Load Loop Heating Equipment;  !- Range 1 Equipment List Name
 
   PlantEquipmentList,
-    Plant Heating Equipment,  !- Name
+    Heating Coil Load Loop Heating Equipment,  !- Name
     HeatPump:WaterToWater:EIR:Heating,  !- Equipment 1 Object Type
-    Plant Heat Pump;         !- Equipment 1 Name
+    Heating Coil;         !- Equipment 1 Name
 
   BranchList,
-    Plant Supply Branches,   !- Name
-    Plant Supply Branch;     !- Branch 1 Name
+    Heating Coil Load Loop Supply Branches,   !- Name
+    Heating Coil Load Loop Supply Branch;     !- Branch 1 Name
 
   Branch,
-    Plant Supply Branch,     !- Name
+    Heating Coil Load Loop Supply Branch,     !- Name
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
-    Plant Pump,              !- Component 1 Name
-    Plant Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Plant Supply Intermediate Node,  !- Component 1 Outlet Node Name
+    Heating Coil Load Loop Pump,              !- Component 1 Name
+    Heating Coil Load Loop Supply Inlet Node,  !- Component 1 Inlet Node Name
+    Heating Coil Load Loop Intermediate Node,  !- Component 1 Outlet Node Name
     HeatPump:WaterToWater:EIR:Heating,  !- Component 1 Object Type
-    Plant Heat Pump,         !- Component 1 Name
-    Plant Supply Intermediate Node,  !- Component 1 Inlet Node Name
-    Plant Supply Outlet Node;  !- Component 1 Outlet Node Name
+    Heating Coil,         !- Component 1 Name
+    Heating Coil Load Loop Intermediate Node,  !- Component 1 Inlet Node Name
+    Heating Coil Load Loop Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
-    Plant Pump,              !- Name
-    Plant Supply Inlet Node,  !- Inlet Node Name
-    Plant Supply Intermediate Node,!- Outlet Node Name
+    Heating Coil Load Loop Pump,              !- Name
+    Heating Coil Load Loop Supply Inlet Node,  !- Inlet Node Name
+    Heating Coil Load Loop Intermediate Node,!- Outlet Node Name
     0.005,                   !- Design Maximum Flow Rate {m3/s}
     300000,                  !- Design Pump Head {Pa}
     2250,                    !- Design Power Consumption {W}
@@ -186,11 +179,11 @@
     INTERMITTENT;            !- Pump Control Type
 
   HeatPump:WaterToWater:EIR:Heating,
-    Plant Heat Pump,         !- Name
-    Plant Supply Intermediate Node, !- Load Side Inlet Node Name
-    Plant Supply Outlet Node,  !- Load Side Outlet Node Name
-    Condenser Demand Inlet Node,  !- Source Side Inlet Node Name
-    Condenser Demand Outlet Node,  !- Source Side Outlet Node Name
+    Heating Coil,         !- Name
+    Heating Coil Load Loop Intermediate Node, !- Load Side Inlet Node Name
+    Heating Coil Load Loop Supply Outlet Node,  !- Load Side Outlet Node Name
+    Heating Coil Source Loop Demand Inlet Node,  !- Source Side Inlet Node Name
+    Heating Coil Source Loop Demand Outlet Node,  !- Source Side Outlet Node Name
     ,                        !- Companion Coil Name
     0.003,                   !- Load Side Design Volume Flow Rate {m3/s}
     0.003,                   !- Source Side Design Volume Flow Rate {m3/s}
@@ -239,7 +232,7 @@
     Dimensionless;           !- Output Unit Type
 
   Curve:Quadratic,
-    EIRCurveFuncPLR,      !- Name
+    EIRCurveFuncPLR,         !- Name
     0.222903,                !- Coefficient1 Constant
     0.313387,                !- Coefficient2 x
     0.463710,                !- Coefficient3 x**2
@@ -247,89 +240,89 @@
     1.0;                     !- Maximum Value of x
 
   BranchList,
-    Plant Demand Branches,   !- Name
-    Plant Demand Branch;     !- Branch 1 Name
+    Heating Coil Load Loop Demand Branches,   !- Name
+    Heating Coil Load Loop Demand Branch;     !- Branch 1 Name
 
   Branch,
-    Plant Demand Branch,     !- Name
+    Heating Coil Load Loop Demand Branch,     !- Name
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
-    Load Profile 1,          !- Component 1 Name
-    Plant Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Plant Demand Outlet Node;  !- Component 1 Outlet Node Name
+    Heating Coil Load Profile,          !- Component 1 Name
+    Heating Coil Load Loop Demand Inlet Node,  !- Component 1 Inlet Node Name
+    Heating Coil Load Loop Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
-    Load Profile 1,          !- Name
-    Plant Demand Inlet Node,  !- Inlet Node Name
-    Plant Demand Outlet Node,  !- Outlet Node Name
-    Load Profile 1 Load Schedule,  !- Load Schedule Name
+    Heating Coil Load Profile,          !- Name
+    Heating Coil Load Loop Demand Inlet Node,  !- Inlet Node Name
+    Heating Coil Load Loop Demand Outlet Node,  !- Outlet Node Name
+    Heating Coil Load Profile Load Schedule,  !- Load Schedule Name
     0.002,                   !- Peak Flow Rate {m3/s}
-    Load Profile 1 Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name
+    Heating Coil Load Profile Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name
 
   PlantLoop,
-    Condenser Loop,          !- Name
+    Heating Coil Source Loop,  !- Name
     WATER,                   !- Fluid Type
     ,                        !- User Defined Fluid Type
-    Condenser Loop Operation,  !- Plant Equipment Operation Scheme Name
-    Condenser Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
+    Heating Coil Source Loop Operation,  !- Plant Equipment Operation Scheme Name
+    Heating Coil Source Loop Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
     100,                     !- Maximum Loop Temperature {C}
     3,                       !- Minimum Loop Temperature {C}
     0.003,                   !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     1,                       !- Plant Loop Volume {m3}
-    Condenser Supply Inlet Node,  !- Plant Side Inlet Node Name
-    Condenser Supply Outlet Node,  !- Plant Side Outlet Node Name
-    Condenser Supply Branches,  !- Plant Side Branch List Name
+    Heating Coil Source Loop Supply Inlet Node,  !- Plant Side Inlet Node Name
+    Heating Coil Source Loop Supply Outlet Node,  !- Plant Side Outlet Node Name
+    Heating Coil Source Loop Supply Branches,  !- Plant Side Branch List Name
     ,                        !- Plant Side Connector List Name
-    Condenser Demand Inlet Node,  !- Demand Side Inlet Node Name
-    Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
-    Condenser Demand Branches,    !- Demand Side Branch List Name
+    Heating Coil Source Loop Demand Inlet Node,  !- Demand Side Inlet Node Name
+    Heating Coil Source Loop Demand Outlet Node,  !- Demand Side Outlet Node Name
+    Heating Coil Source Loop Demand Branches,    !- Demand Side Branch List Name
     ,                        !- Demand Side Connector List Name
     Optimal;                 !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
-    Condenser Loop Setpoint Manager,  !- Name
+    Heating Coil Source Loop Setpoint Manager,  !- Name
     Temperature,             !- Control Variable
-    Condenser Loop Temp Sch,  !- Schedule Name
-    Condenser Supply Outlet Node;  !- Setpoint Node or NodeList Name
+    Heating Coil Source Loop Setpoint Temperature Schedule,  !- Schedule Name
+    Heating Coil Source Loop Supply Outlet Node;  !- Setpoint Node or NodeList Name
 
   PlantEquipmentOperationSchemes,
-    Condenser Loop Operation,  !- Name
+    Heating Coil Source Loop Operation,  !- Name
     PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type
-    Condenser Heating Operation,  !- Control Scheme 1 Name
+    Heating Coil Source Loop Heating Operation,  !- Control Scheme 1 Name
     AlwaysOnSchedule;        !- Control Scheme 1 Schedule Name
 
   PlantEquipmentOperation:HeatingLoad,
-    Condenser Heating Operation,  !- Name
+    Heating Coil Source Loop Heating Operation,  !- Name
     0,                       !- Load Range 1 Lower Limit {W}
     1000000000,              !- Load Range 1 Upper Limit {W}
-    Condenser Heating Equipment;  !- Range 1 Equipment List Name
+    Heating Coil Source Loop Heating Equipment;  !- Range 1 Equipment List Name
 
   PlantEquipmentList,
-    Condenser Heating Equipment,  !- Name
+    Heating Coil Source Loop Heating Equipment,  !- Name
     DistrictHeating,         !- Equipment 1 Object Type
-    Condenser Purchased Heating;  !- Equipment 1 Name
+    Heating Coil Source Loop Purchased Heating;  !- Equipment 1 Name
 
   BranchList,
-    Condenser Supply Branches,  !- Name
-    Condenser Supply Branch;  !- Branch 1 Name
+    Heating Coil Source Loop Supply Branches,  !- Name
+    Heating Coil Source Loop Supply Branch;  !- Branch 1 Name
 
   Branch,
-    Condenser Supply Branch, !- Name
+    Heating Coil Source Loop Supply Branch, !- Name
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
-    Condenser Pump,          !- Component 1 Name
-    Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Supply Intermediate Node,!- Component 1 Outlet Node Name
+    Heating Coil Source Loop Pump,          !- Component 1 Name
+    Heating Coil Source Loop Supply Inlet Node,  !- Component 1 Inlet Node Name
+    Heating Coil Source Loop Supply Intermediate Node,!- Component 1 Outlet Node Name
     DistrictHeating,         !- Component 1 Object Type
-    Condenser Purchased Heating,  !- Component 1 Name
-    Condenser Supply Intermediate Node,  !- Component 1 Inlet Node Name
-    Condenser Supply Outlet Node;  !- Component 1 Outlet Node Name
+    Heating Coil Source Loop Purchased Heating,  !- Component 1 Name
+    Heating Coil Source Loop Supply Intermediate Node,  !- Component 1 Inlet Node Name
+    Heating Coil Source Loop Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
-    Condenser Pump,          !- Name
-    Condenser Supply Inlet Node,  !- Inlet Node Name
-    Condenser Supply Intermediate Node,  !- Outlet Node Name
+    Heating Coil Source Loop Pump,          !- Name
+    Heating Coil Source Loop Supply Inlet Node,  !- Inlet Node Name
+    Heating Coil Source Loop Supply Intermediate Node,  !- Outlet Node Name
     0.005,                   !- Design Maximum Flow Rate {m3/s}
     30000,                   !- Design Pump Head {Pa}
     225,                     !- Design Power Consumption {W}
@@ -343,22 +336,22 @@
     Intermittent;            !- Pump Control Type
 
   DistrictHeating,
-    Condenser Purchased Heating,  !- Name
-    Condenser Supply Intermediate Node,  !- Hot Water Inlet Node Name
-    Condenser Supply Outlet Node,  !- Hot Water Outlet Node Name
+    Heating Coil Source Loop Purchased Heating,  !- Name
+    Heating Coil Source Loop Supply Intermediate Node,  !- Hot Water Inlet Node Name
+    Heating Coil Source Loop Supply Outlet Node,  !- Hot Water Outlet Node Name
     100000000;               !- Nominal Capacity {W}
 
   BranchList,
-    Condenser Demand Branches,  !- Name
-    Condenser Demand Branch;  !- Branch 1 Name
+    Heating Coil Source Loop Demand Branches,  !- Name
+    Heating Coil Source Loop Demand Branch;  !- Branch 1 Name
 
   Branch,
-    Condenser Demand Branch,  !- Name
+    Heating Coil Source Loop Demand Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     HeatPump:WaterToWater:EIR:Heating,  !- Component 1 Object Type
-    Plant Heat Pump,         !- Component 1 Name
-    Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Outlet Node;  !- Component 1 Outlet Node Name
+    Heating Coil,         !- Component 1 Name
+    Heating Coil Source Loop Demand Inlet Node,  !- Component 1 Inlet Node Name
+    Heating Coil Source Loop Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Output:VariableDictionary,IDF;
   Output:Diagnostics,ReportDuringWarmup;
