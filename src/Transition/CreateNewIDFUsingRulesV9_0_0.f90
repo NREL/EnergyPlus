@@ -733,11 +733,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   IF (.not. SameString(ShadeControls(shadeCtrlNum)%OldShadeControlName,InArgs(1))) CYCLE
                   IF (ShadeControls(shadeCtrlNum)%NumZones .GT. 0) THEN
                     DO newZoneNum=1,ShadeControls(shadeCtrlNum)%NumZones
-                     OutArgs(1) = TRIM(InArgs(1)) // '-' // TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum))
-                     OutArgs(2) = TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum)) ! Zone Name
-                     OutArgs(3) = RoundSigDigits(ShadeControls(shadeCtrlNum)%SequenceNum(newZoneNum),0) ! Shading Control Sequence Number
-                     OutArgs(15) = Blank ! Daylighting Control Name
-                      OutArgs(16) = 'Sequential' ! Multiple Surface Control Type
+                      OutArgs(1) = TRIM(InArgs(1)) // '-' // TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum))
+                      OutArgs(2) = TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum)) ! Zone Name
+                      OutArgs(3) = RoundSigDigits(ShadeControls(shadeCtrlNum)%SequenceNum(newZoneNum),0) ! Shading Control Sequence Number
+                      OutArgs(15) = Blank ! Daylighting Control Name
+                      IF (SameString('SwitchableGlazing',InArgs(2)) .AND. SameString('MeetDaylightIlluminanceSetpoint',InArgs(4))) THEN
+                        OutArgs(16) = 'Group' ! Multiple Surface Control Type
+                      ELSE
+                        OutArgs(16) = 'Sequential' ! Multiple Surface Control Type
+                      ENDIF
                       CurArgs = 16
                       ! Find matching Daylighting control object, if any
                       DO daylightNum=1,GetNumObjectsFound('DAYLIGHTING:CONTROLS')
