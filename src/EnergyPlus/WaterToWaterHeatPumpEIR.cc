@@ -74,7 +74,7 @@ namespace EnergyPlus {
             eir_wwhp.clear();
         }
 
-        Real64 EIRWaterToWaterHeatPump::getEvapOutletSetpoint() {
+        Real64 EIRWaterToWaterHeatPump::getLoadSideOutletSetpointTemp() {
             auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
             auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
             auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
@@ -209,10 +209,10 @@ namespace EnergyPlus {
 
             if (this->loadSideMassFlowRate > 0 && this->sourceSideMassFlowRate > 0) {
 
-                Real64 evapOutletSetpointTemp = this->getEvapOutletSetpoint();
+                Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetpointTemp();
                 Real64 const sourceInletNodeTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
                 Real64 capacityModifierFuncTemp = CurveManager::CurveValue(
-                        this->capFuncTempCurveIndex, evapOutletSetpointTemp, sourceInletNodeTemp
+                        this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, sourceInletNodeTemp
                 );
                 Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
                 Real64 partLoadRatio = 0.0;
@@ -236,8 +236,11 @@ namespace EnergyPlus {
                     Real64 const loadMCp = this->loadSideMassFlowRate * Cp;
                     this->loadSideOutletTemp = this->loadSideInletTemp + this->loadSideHeatTransfer / loadMCp;
 
-                    // assume a dummy value for power usage TODO: Calculate this properly
-                    this->powerUsage = this->loadSideHeatTransfer / 10.0;
+                    // calculate power usage from EIR curves
+                    Real64 eirModifierFuncTemp = CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+                    Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex, partLoadRatio);
+                    Real64 ReferenceCOP = 3.14;  // use proper value
+                    this->powerUsage = (availableCapacity / ReferenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
 
                     // energy balance on coil
                     this->sourceSideHeatTransfer = this->loadSideHeatTransfer - this->powerUsage;
@@ -252,8 +255,11 @@ namespace EnergyPlus {
                     Real64 const loadMCp = this->loadSideMassFlowRate * Cp;
                     this->loadSideOutletTemp = this->loadSideInletTemp - this->loadSideHeatTransfer / loadMCp;
 
-                    // assume a dummy value for power usage TODO: Calculate this properly
-                    this->powerUsage = this->loadSideHeatTransfer / 10.0;
+                    // calculate power usage from EIR curves
+                    Real64 eirModifierFuncTemp = CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+                    Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex, partLoadRatio);
+                    Real64 ReferenceCOP = 3.14;  // use proper value
+                    this->powerUsage = (availableCapacity / ReferenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
 
                     // energy balance on coil
                     this->sourceSideHeatTransfer = this->loadSideHeatTransfer + this->powerUsage;

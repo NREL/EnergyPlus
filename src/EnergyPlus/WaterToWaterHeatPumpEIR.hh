@@ -127,7 +127,7 @@ namespace EIRWaterToWaterHeatPumps {
 
 		void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-		Real64 getEvapOutletSetpoint();
+		Real64 getLoadSideOutletSetpointTemp();
 
 		static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
 
