@@ -215,7 +215,6 @@ namespace EnergyPlus {
                         this->capFuncTempCurveIndex, evapOutletSetpointTemp, sourceInletNodeTemp
                 );
                 Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
-
                 Real64 partLoadRatio = 0.0;
                 if (availableCapacity > 0) {
                     partLoadRatio = max(0.0, min(std::abs(CurLoad) / availableCapacity, 1.0));
@@ -231,17 +230,39 @@ namespace EnergyPlus {
 
                 this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
 
-                this->loadSideOutletTemp =
-                        this->loadSideInletTemp + this->loadSideHeatTransfer / (this->loadSideMassFlowRate * Cp);
+                if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
 
-                // assume a dummy value for power usage
-                this->powerUsage = this->loadSideHeatTransfer / 10.0;
+                    // calculate load side
+                    Real64 const loadMCp = this->loadSideMassFlowRate * Cp;
+                    this->loadSideOutletTemp = this->loadSideInletTemp + this->loadSideHeatTransfer / loadMCp;
 
-                // then you can calculate source side impacts
-                this->sourceSideHeatTransfer = this->loadSideHeatTransfer - this->powerUsage;
-                this->sourceSideOutletTemp =
-                        this->sourceSideInletTemp - this->sourceSideHeatTransfer / (this->sourceSideMassFlowRate * Cp);
+                    // assume a dummy value for power usage TODO: Calculate this properly
+                    this->powerUsage = this->loadSideHeatTransfer / 10.0;
 
+                    // energy balance on coil
+                    this->sourceSideHeatTransfer = this->loadSideHeatTransfer - this->powerUsage;
+
+                    // calculate source side
+                    Real64 const sourceMCp = this->sourceSideMassFlowRate * Cp;
+                    this->sourceSideOutletTemp = this->sourceSideInletTemp - this->sourceSideHeatTransfer / sourceMCp;
+
+                } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) {
+
+                    // calculate load side
+                    Real64 const loadMCp = this->loadSideMassFlowRate * Cp;
+                    this->loadSideOutletTemp = this->loadSideInletTemp - this->loadSideHeatTransfer / loadMCp;
+
+                    // assume a dummy value for power usage TODO: Calculate this properly
+                    this->powerUsage = this->loadSideHeatTransfer / 10.0;
+
+                    // energy balance on coil
+                    this->sourceSideHeatTransfer = this->loadSideHeatTransfer + this->powerUsage;
+
+                    // calculate source side
+                    Real64 const sourceMCp = this->sourceSideMassFlowRate * Cp;
+                    this->sourceSideOutletTemp = this->sourceSideInletTemp + this->sourceSideHeatTransfer / sourceMCp;
+
+                }
             } else {
                 this->loadSideHeatTransfer = 0.0;
                 this->loadSideOutletTemp = this->loadSideInletTemp;
@@ -473,7 +494,6 @@ namespace EnergyPlus {
                                 fields.at("companion_cooling_coil_name")
                         );
                     }
-
                     thisWWHP.loadSideDesignVolFlowRate = fields.at("load_side_reference_flow_rate");
                     thisWWHP.sourceSideDesignVolFlowRate = fields.at("source_side_reference_flow_rate");
                     thisWWHP.referenceCapacity = fields.at("reference_capacity");
@@ -555,15 +575,22 @@ namespace EnergyPlus {
                     thisWWHP.plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
                     thisWWHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                     std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(
-                            fields.at("load_side_inlet_node_name"));
+                            fields.at("load_side_inlet_node_name")
+                    );
                     std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(
-                            fields.at("load_side_outlet_node_name"));
+                            fields.at("load_side_outlet_node_name")
+                    );
                     std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(
-                            fields.at("source_side_inlet_node_name"));
+                            fields.at("source_side_inlet_node_name")
+                    );
                     std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(
-                            fields.at("source_side_outlet_node_name"));
-                    thisWWHP.companionCoilName = UtilityRoutines::MakeUPPERCase(
-                            fields.at("companion_heating_coil_name"));
+                            fields.at("source_side_outlet_node_name")
+                    );
+                    if (fields.find("companion_heating_coil_name") != fields.end()) {  // optional field
+                        thisWWHP.companionCoilName = UtilityRoutines::MakeUPPERCase(
+                                fields.at("companion_heating_coil_name")
+                        );
+                    }
                     thisWWHP.loadSideDesignVolFlowRate = fields.at("load_side_reference_flow_rate");
                     thisWWHP.sourceSideDesignVolFlowRate = fields.at("source_side_reference_flow_rate");
                     thisWWHP.referenceCapacity = fields.at("reference_capacity");
@@ -571,12 +598,12 @@ namespace EnergyPlus {
                     thisWWHP.referenceLeavingLoadSideTemp = fields.at("reference_leaving_load_side_water_temperature");
                     thisWWHP.referenceEnteringSourceSideTemp = fields.at(
                             "reference_entering_source_side_fluid_temperature");
-                    thisWWHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(
-                            fields.at("cooling_capacity_function_of_temperature_curve_name"));
-                    thisWWHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(
-                            fields.at("electric_input_to_cooling_output_ratio_function_of_temperature_curve_name"));
-                    thisWWHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(
-                            fields.at("electric_input_to_cooling_ratio_function_of_temperature_curve_name"));
+                    thisWWHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(
+                            fields.at("cooling_capacity_function_of_temperature_curve_name")));
+                    thisWWHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(
+                            fields.at("electric_input_to_cooling_output_ratio_function_of_temperature_curve_name")));
+                    thisWWHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(
+                            fields.at("electric_input_to_cooling_output_ratio_function_of_temperature_curve_name")));
 
                     int const flowPath1 = 1, flowPath2 = 2;
                     thisWWHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(loadSideInletNodeName,
