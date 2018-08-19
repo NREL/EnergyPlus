@@ -93,6 +93,8 @@ namespace EnergyPlus {
                 } else { // use plant loop overall setpoint
                     return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
                 }
+            } else {
+                assert(false);
             }
         }
 
