@@ -824,3 +824,75 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     compare6.push_back(7);
     EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[5], compare6);
 }
+
+TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
+{
+    TotWinShadingControl = 3;
+    WindowShadingControl.allocate(TotWinShadingControl);
+    int zn = 1;
+ 
+    WindowShadingControl(1).Name = "WSC1";
+    WindowShadingControl(1).ZoneIndex = zn;
+    WindowShadingControl(1).SequenceNumber = 2;
+    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(1).FenestrationCount = 3;
+    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
+    WindowShadingControl(1).FenestrationIndex(1) = 1;
+    WindowShadingControl(1).FenestrationIndex(2) = 2;
+    WindowShadingControl(1).FenestrationIndex(3) = 3;
+
+    WindowShadingControl(2).Name = "WSC2";
+    WindowShadingControl(2).ZoneIndex = zn;
+    WindowShadingControl(2).SequenceNumber = 3;
+    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    WindowShadingControl(2).FenestrationCount = 4;
+    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
+    WindowShadingControl(2).FenestrationIndex(1) = 4;
+    WindowShadingControl(2).FenestrationIndex(2) = 5;
+    WindowShadingControl(2).FenestrationIndex(3) = 6;
+    WindowShadingControl(2).FenestrationIndex(4) = 7;
+
+    WindowShadingControl(3).Name = "WSC3";
+    WindowShadingControl(3).ZoneIndex = zn;
+    WindowShadingControl(3).SequenceNumber = 1;
+    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(3).FenestrationCount = 2;
+    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
+    WindowShadingControl(3).FenestrationIndex(1) = 8;
+    WindowShadingControl(3).FenestrationIndex(2) = 9;
+
+    DataGlobals::NumOfZones = zn;
+    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+
+    CreateShadeDeploymentOrder(zn);
+
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6);
+
+    ZoneDaylight(zn).NumOfDayltgExtWins = 9;
+    ZoneDaylight(zn).MapShdOrdToLoopNum.allocate(ZoneDaylight(zn).NumOfDayltgExtWins);
+    ZoneDaylight(zn).DayltgExtWinSurfNums.allocate(ZoneDaylight(zn).NumOfDayltgExtWins);
+    ZoneDaylight(zn).DayltgExtWinSurfNums(1) = 1;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(2) = 2;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(3) = 3;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(4) = 4;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(5) = 5;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(6) = 6;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(7) = 7;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(8) = 8;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(9) = 9;
+
+
+    MapShadeDeploymentOrderToLoopNumber(zn);
+
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(1), 8);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(2), 9);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(3), 1);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(4), 2);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(5), 3);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(6), 4);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(7), 5);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(8), 6);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(9), 7);
+
+
+}
