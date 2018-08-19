@@ -185,6 +185,10 @@ namespace EnergyPlus {
                                                bool const RunFlag) {
             std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
 
+            this->setRunStateAndFlowRates(RunFlag);
+            this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
+            this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
+
             if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
                 PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
                                                                     this->sourceSideLocation.loopSideNum,
@@ -198,10 +202,6 @@ namespace EnergyPlus {
                                                                     FirstHVACIteration);
                 return;
             }
-
-            this->setRunStateAndFlowRates(RunFlag);
-            this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
-            this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
 
             if (this->running) {
 

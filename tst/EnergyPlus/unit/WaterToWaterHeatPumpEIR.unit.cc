@@ -584,7 +584,123 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSetRunStateAndFlowWorker) {
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingWWHP->onInitLoopEquip(myLocation);
 
-    // now call the run state worker with no load, to try to turn it off
+    // call with run flag off, loose limits on node min/max
     thisCoolingWWHP->setRunStateAndFlowRates(false);
     EXPECT_FALSE(thisCoolingWWHP->running);
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingWWHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingWWHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag off, nonzero minimums
+    DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
+    DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.2;
+    thisCoolingWWHP->setRunStateAndFlowRates(false);
+    EXPECT_FALSE(thisCoolingWWHP->running);
+    EXPECT_NEAR(
+            0.1,
+            thisCoolingWWHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.2,
+            thisCoolingWWHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag off, load side flow locked
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).MassFlowRate = 0.24;
+    DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.0;
+    thisCoolingWWHP->setRunStateAndFlowRates(false);
+    EXPECT_FALSE(thisCoolingWWHP->running);
+    EXPECT_NEAR(
+            0.24,
+            thisCoolingWWHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingWWHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag ON, flow locked at zero on load side
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).MassFlowRate = 0.0;
+    DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).MassFlowRate = 0.2;
+    thisCoolingWWHP->setRunStateAndFlowRates(true);
+    EXPECT_FALSE(thisCoolingWWHP->running);
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingWWHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.2,
+            thisCoolingWWHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag ON, flow locked at zero on source side
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).MassFlowRate = 0.2;
+    DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
+    thisCoolingWWHP->setRunStateAndFlowRates(true);
+    EXPECT_FALSE(thisCoolingWWHP->running);
+    EXPECT_NEAR(
+            0.2,
+            thisCoolingWWHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingWWHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag ON, flow locked at zero on both sides
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).MassFlowRate = 0.0;
+    DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
+    thisCoolingWWHP->setRunStateAndFlowRates(true);
+    EXPECT_FALSE(thisCoolingWWHP->running);
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingWWHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingWWHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag ON, flow locked at nonzero both
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).MassFlowRate = 0.14;
+    DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).MassFlowRate = 0.13;
+    thisCoolingWWHP->setRunStateAndFlowRates(true);
+    EXPECT_TRUE(thisCoolingWWHP->running);
+    EXPECT_NEAR(
+            0.14,
+            thisCoolingWWHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.13,
+            thisCoolingWWHP->sourceSideMassFlowRate,
+            0.001
+    );
+
 }
