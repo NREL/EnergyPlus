@@ -96,7 +96,6 @@ namespace EnergyPlus {
             }
         }
 
-
         void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
                                                bool const FirstHVACIteration,
                                                Real64 &CurLoad,
@@ -558,7 +557,6 @@ namespace EnergyPlus {
                 }
             }
         }
-
 
         void EIRWaterToWaterHeatPump::processInputForEIRWWHPCooling() {
             using namespace DataIPShortCuts;
