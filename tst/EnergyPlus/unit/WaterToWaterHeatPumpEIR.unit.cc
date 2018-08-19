@@ -318,7 +318,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPInitialization) {
     wwhpPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
-    PlantLocation myLocation = PlantLocation(1, 1, 1, 1);
+    PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -410,4 +410,102 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPInitialization) {
             flowTol
     );
 
+}
+
+TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingOutletSetpointWorker) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  0.001,",
+                            "  0.001,",
+                            "  1000,",
+                            "  3.14,",
+                            "  25.56,",
+                            "  40.0,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up two nodes: component outlet and loop setpoint
+    DataLoopNode::Node.allocate(2);
+
+    // set up the plant loops
+    // first the load side
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop.allocate(1);
+    auto & wwhpPlantLoadSideLoop = DataPlant::PlantLoop(1);
+    wwhpPlantLoadSideLoop.TempSetPointNodeNum = 2;
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &wwhpPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    wwhpPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_wwhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+
+    // do a little setup here
+    thisCoolingWWHP->loadSideLocation.loopNum = 1;
+    thisCoolingWWHP->loadSideLocation.loopSideNum = 2;
+    thisCoolingWWHP->loadSideLocation.branchNum = 1;
+    thisCoolingWWHP->loadSideLocation.compNum = 1;
+    thisCoolingWWHP->loadSideNodes.outlet = 1;
+
+    // set up the plant setpoint conditions and test for single setpoint operation
+    wwhpPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    wwhpPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    DataLoopNode::Node(1).TempSetPoint = 3.141;
+    DataLoopNode::Node(2).TempSetPoint = 2.718;
+    EXPECT_NEAR(
+            3.141,
+            thisCoolingWWHP->getLoadSideOutletSetpointTemp(),
+            0.001
+    );
+    wwhpPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
+    EXPECT_NEAR(
+            2.718,
+            thisCoolingWWHP->getLoadSideOutletSetpointTemp(),
+            0.001
+    );
+
+    // test for dual setpoint operation
+    wwhpPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::DualSetPointDeadBand;
+    wwhpPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    DataLoopNode::Node(1).TempSetPointHi = 6.282;
+    DataLoopNode::Node(2).TempSetPointHi = 5.436;
+    EXPECT_NEAR(
+            6.282,
+            thisCoolingWWHP->getLoadSideOutletSetpointTemp(),
+            0.001
+    );
+    wwhpPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
+    EXPECT_NEAR(
+            5.436,
+            thisCoolingWWHP->getLoadSideOutletSetpointTemp(),
+            0.001
+    );
 }
