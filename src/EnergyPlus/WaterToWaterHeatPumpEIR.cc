@@ -94,31 +94,14 @@ namespace EnergyPlus {
                     return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
                 }
             } else {
-                assert(false);
+                ShowFatalError("Unsupported loop demand calculation scheme in EIR heat pump");
+                return -999; // not actually returned with Fatal Error call above
             }
         }
 
-        void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
-                                               bool const FirstHVACIteration,
-                                               Real64 &CurLoad,
-                                               bool const RunFlag) {
-            std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
-
-            if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
-                PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
-                                                                    this->sourceSideLocation.loopSideNum,
-                                                                    this->plantTypeOfNum,
-                                                                    this->sourceSideNodes.inlet,
-                                                                    this->sourceSideNodes.outlet,
-                                                                    this->sourceSideHeatTransfer,
-                                                                    this->sourceSideInletTemp,
-                                                                    this->sourceSideOutletTemp,
-                                                                    this->sourceSideMassFlowRate,
-                                                                    FirstHVACIteration);
-                return;
-            }
-
-            this->running = RunFlag;
+        void EIRWaterToWaterHeatPump::setRunStateAndFlowRates(bool const runFlag)
+        {
+            this->running = runFlag;
             if (!this->running) {
                 this->loadSideMassFlowRate = 0.0;
                 this->sourceSideMassFlowRate = 0.0;
@@ -166,11 +149,9 @@ namespace EnergyPlus {
 
                 // if there's no flow in one, try to turn the entire heat pump off
                 if (this->loadSideMassFlowRate <= 0.0 || this->sourceSideMassFlowRate <= 0.0) {
-
                     this->loadSideMassFlowRate = 0.0;
                     this->sourceSideMassFlowRate = 0.0;
                     this->running = false;
-
                     PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
                                                          this->loadSideNodes.inlet,
                                                          this->loadSideNodes.outlet,
@@ -185,15 +166,6 @@ namespace EnergyPlus {
                                                          this->sourceSideLocation.loopSideNum,
                                                          this->sourceSideLocation.branchNum,
                                                          this->sourceSideLocation.compNum);
-                    PlantUtilities::PullCompInterconnectTrigger(this->loadSideLocation.loopNum,
-                                                                this->loadSideLocation.loopSideNum,
-                                                                this->loadSideLocation.branchNum,
-                                                                this->loadSideLocation.compNum,
-                                                                this->condMassFlowRateTriggerIndex,
-                                                                this->sourceSideLocation.loopNum,
-                                                                this->sourceSideLocation.loopSideNum,
-                                                                DataPlant::CriteriaType_MassFlowRate,
-                                                                this->sourceSideMassFlowRate);
                 }
                 PlantUtilities::PullCompInterconnectTrigger(this->loadSideLocation.loopNum,
                                                             this->loadSideLocation.loopSideNum,
@@ -205,10 +177,33 @@ namespace EnergyPlus {
                                                             DataPlant::CriteriaType_MassFlowRate,
                                                             this->sourceSideMassFlowRate);
             }
+        }
+
+        void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
+                                               bool const FirstHVACIteration,
+                                               Real64 &CurLoad,
+                                               bool const RunFlag) {
+            std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
+
+            if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
+                PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
+                                                                    this->sourceSideLocation.loopSideNum,
+                                                                    this->plantTypeOfNum,
+                                                                    this->sourceSideNodes.inlet,
+                                                                    this->sourceSideNodes.outlet,
+                                                                    this->sourceSideHeatTransfer,
+                                                                    this->sourceSideInletTemp,
+                                                                    this->sourceSideOutletTemp,
+                                                                    this->sourceSideMassFlowRate,
+                                                                    FirstHVACIteration);
+                return;
+            }
+
+            this->setRunStateAndFlowRates(RunFlag);
             this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
             this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
 
-            if (this->loadSideMassFlowRate > 0 && this->sourceSideMassFlowRate > 0) {
+            if (this->running) {
 
                 Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetpointTemp();
                 Real64 const sourceInletNodeTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;

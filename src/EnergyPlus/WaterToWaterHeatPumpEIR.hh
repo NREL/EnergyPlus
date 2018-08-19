@@ -129,6 +129,8 @@ namespace EIRWaterToWaterHeatPumps {
 
 		Real64 getLoadSideOutletSetpointTemp();
 
+		void setRunStateAndFlowRates(bool const runFlag);
+
 		static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
 
         static void pairUpCompanionCoils();
