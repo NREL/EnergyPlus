@@ -236,8 +236,11 @@ namespace EnergyPlus {
                     this->loadSideOutletTemp = this->loadSideInletTemp + this->loadSideHeatTransfer / loadMCp;
 
                     // calculate power usage from EIR curves
-                    Real64 eirModifierFuncTemp = CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
-                    Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex, partLoadRatio);
+                    Real64 eirModifierFuncTemp = CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex,
+                                                                          this->loadSideOutletTemp,
+                                                                          this->sourceSideInletTemp);
+                    Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex,
+                                                                         partLoadRatio);
                     Real64 ReferenceCOP = 3.14;  // use proper value
                     this->powerUsage = (availableCapacity / ReferenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
 
@@ -255,8 +258,11 @@ namespace EnergyPlus {
                     this->loadSideOutletTemp = this->loadSideInletTemp - this->loadSideHeatTransfer / loadMCp;
 
                     // calculate power usage from EIR curves
-                    Real64 eirModifierFuncTemp = CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
-                    Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex, partLoadRatio);
+                    Real64 eirModifierFuncTemp = CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex,
+                                                                          this->loadSideOutletTemp,
+                                                                          this->sourceSideInletTemp);
+                    Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex,
+                                                                         partLoadRatio);
                     Real64 ReferenceCOP = 3.14;  // use proper value
                     this->powerUsage = (availableCapacity / ReferenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
 

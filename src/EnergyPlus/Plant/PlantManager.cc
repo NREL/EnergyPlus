@@ -1132,7 +1132,7 @@ namespace PlantManager {
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             }
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WaterToWater:EIR:Heating")) {
-							this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(TypeOf_HeatPumpEIRHeating, CompNames(CompNum));
+                            this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(TypeOf_HeatPumpEIRHeating, CompNames(CompNum));
                             this_comp.TypeOf_Num = TypeOf_HeatPumpEIRHeating;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                             if (LoopSideNum == DemandSide) {
@@ -1141,7 +1141,7 @@ namespace PlantManager {
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             }
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WaterToWater:EIR:Cooling")) {
-							this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(TypeOf_HeatPumpEIRCooling, CompNames(CompNum));
+                            this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(TypeOf_HeatPumpEIRCooling, CompNames(CompNum));
                             this_comp.TypeOf_Num = TypeOf_HeatPumpEIRCooling;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                             if (LoopSideNum == DemandSide) {
