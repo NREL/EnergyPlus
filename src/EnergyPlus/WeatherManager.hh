@@ -76,8 +76,9 @@ namespace WeatherManager {
     extern int const NthDayInMonth;
     extern int const LastDayInMonth;
 
-    extern int const ScheduleMethod;    // Constant for water mains temperatures calculation methods
-    extern int const CorrelationMethod; // Constant for water mains temperatures calculation methods
+    extern int const ScheduleMethod;                   // Constant for water mains temperatures calculation methods
+    extern int const CorrelationMethod;                // Constant for water mains temperatures calculation methods
+    extern int const CorrelationFromWeatherFileMethod; // Constant for water mains temperatures calculation methods
 
     extern int const InvalidWeatherFile;
     extern int const EPlusWeatherFile;
@@ -86,6 +87,7 @@ namespace WeatherManager {
     extern int const Zhang_Huang;         // Design Day solar model Zhang Huang
     extern int const SolarModel_Schedule; // Design Day solar model (beam and diffuse) from user entered schedule
     extern int const ASHRAE_Tau;          // Design Day solar model ASHRAE tau (per 2009 HOF)
+    extern int const ASHRAE_Tau2017;      // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
 
     extern int const DDHumIndType_WetBulb;   // Design Day Humidity Indicating Type = Wetbulb (default)
     extern int const DDHumIndType_DewPoint;  // Design Day Humidity Indicating Type = Dewpoint
@@ -148,6 +150,7 @@ namespace WeatherManager {
     extern int WaterMainsTempsSchedule;                // Water mains temperature schedule
     extern Real64 WaterMainsTempsAnnualAvgAirTemp;     // Annual average outdoor air temperature (C)
     extern Real64 WaterMainsTempsMaxDiffAirTemp;       // Maximum difference in monthly average outdoor air temperatures (deltaC)
+    extern std::string WaterMainsTempsScheduleName;    // water mains tempeature schedule name
     extern bool wthFCGroundTemps;
     extern Real64 RainAmount;
     extern Real64 SnowAmount;
@@ -761,13 +764,14 @@ namespace WeatherManager {
 
     //------------------------------------------------------------------------------
 
-    void ASHRAETauModel(Real64 const ETR,    // extraterrestrial normal irradiance, W/m2
-                        Real64 const CosZen, // COS( solar zenith angle), 0 - 1
-                        Real64 const TauB,   // beam tau factor
-                        Real64 const TauD,   // dif tau factor
-                        Real64 &IDirN,       // returned: direct (beam) irradiance on normal surface, W/m2
-                        Real64 &IDifH,       // returned: diffuse irradiance on horiz surface, W/m2
-                        Real64 &IGlbH        // returned: global irradiance on horiz surface, W/m2
+    void ASHRAETauModel(int const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+                        Real64 const ETR,       // extraterrestrial normal irradiance, W/m2
+                        Real64 const CosZen,    // COS( solar zenith angle), 0 - 1
+                        Real64 const TauB,      // beam tau factor
+                        Real64 const TauD,      // dif tau factor
+                        Real64 &IDirN,          // returned: direct (beam) irradiance on normal surface, W/m2
+                        Real64 &IDifH,          // returned: diffuse irradiance on horiz surface, W/m2
+                        Real64 &IGlbH           // returned: global irradiance on horiz surface, W/m2
     );
 
     void AllocateWeatherData();
@@ -838,6 +842,11 @@ namespace WeatherManager {
 
     void CalcWaterMainsTemp();
 
+    Real64
+    WaterMainsTempFromCorrelation(Real64 const AnnualOAAvgDryBulbTemp,        // annual average OA drybulb temperature
+                                  Real64 const MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
+    );
+
     void GetWeatherStation(bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
@@ -868,6 +877,27 @@ namespace WeatherManager {
     );
 
     int CalculateDayOfWeek(int const JulianDate); // from JGDate calculation
+
+    struct AnnualMonthlyDryBulbWeatherData // derived type for processing and storing Dry-bulb weather or stat file
+    {
+        // Members
+        bool OADryBulbWeatherDataProcessed;             // if false stat or weather file OA Dry-bulb temp is not processed yet
+        Real64 AnnualAvgOADryBulbTemp;                  // annual average outdoor air temperature (C)
+        Real64 MonthlyAvgOADryBulbTempMaxDiff;          // monthly daily average OA drybulb temperature maximum difference (deltaC)
+        Array1D<Real64> MonthlyDailyAverageDryBulbTemp; // monthly-daily average outdoor air temperatures (C)
+
+        // Default Constructor
+        AnnualMonthlyDryBulbWeatherData()
+            : OADryBulbWeatherDataProcessed(false), AnnualAvgOADryBulbTemp(0.0), MonthlyAvgOADryBulbTempMaxDiff(0.0),
+              MonthlyDailyAverageDryBulbTemp(12, 0.0)
+        {
+        }
+        void CalcAnnualAndMonthlyDryBulbTemp(); // true if this is CorrelationFromWeatherFile
+    };
+
+    extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
+
+    void ReportWaterMainsTempParameters();
 
 } // namespace WeatherManager
 

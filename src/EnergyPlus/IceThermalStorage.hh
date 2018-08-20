@@ -209,14 +209,12 @@ namespace IceThermalStorage {
         int PlantCompNum;
         Real64 DesignMassFlowRate;
         int MapNum;                     // Number to Map structure
-        std::string DischargeCurveType; // Type of discharging equation entered by user (QuadraticLinear or CubicLinear)
-        int DischargeCurveTypeNum;      // Integer version of discharging curve type
         std::string DischargeCurveName; // Curve name for discharging (used to find the curve index)
         int DischargeCurveNum;          // Curve index for discharging
-        std::string ChargeCurveType;    // Type of charging equation entered by user (QuadraticLinear or CubicLinear)
-        int ChargeCurveTypeNum;         // Integer version of charging curve type
+        int DischargeCurveTypeNum;      // Integer version of discharging curve type
         std::string ChargeCurveName;    // Curve name for charging (used to find the curve index)
         int ChargeCurveNum;             // Curve index for charging
+        int ChargeCurveTypeNum;         // Integer version of charging curve type
         Real64 CurveFitTimeStep;        // Time step used to generate performance data [hours]
         Real64 DischargeParaElecLoad;   // Parasitic electric load duing discharging [dimensionless]
         // (This is multiplied by the tank capacity to obtain elec consump)
