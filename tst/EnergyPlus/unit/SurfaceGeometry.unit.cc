@@ -3252,40 +3252,146 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_FALSE(Err);
 
     surfNum = 3;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_FALSE(Err);
 
     surfNum = 4;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    EXPECT_FALSE(Err);
 
     surfNum = 5;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    EXPECT_FALSE(Err);
 
     surfNum = 6;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    EXPECT_FALSE(Err);
 
     surfNum = 7;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_FALSE(Err);
 
     surfNum = 8;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 3);
-    
+    EXPECT_FALSE(Err);
+
     surfNum = 9;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 3);
+    EXPECT_FALSE(Err);
+}
+
+TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
+{
+    TotWinShadingControl = 3;
+    WindowShadingControl.allocate(TotWinShadingControl);
+    int zn = 1;
+
+    WindowShadingControl(1).Name = "WSC1";
+    WindowShadingControl(1).ZoneIndex = zn;
+    WindowShadingControl(1).SequenceNumber = 2;
+    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(1).FenestrationCount = 3;
+    WindowShadingControl(1).FenestrationName.allocate(WindowShadingControl(1).FenestrationCount);
+    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
+    WindowShadingControl(1).FenestrationName(1) = "Fene-01";
+    WindowShadingControl(1).FenestrationName(2) = "Fene-02";
+    WindowShadingControl(1).FenestrationName(3) = "Fene-03";
+
+    WindowShadingControl(2).Name = "WSC2";
+    WindowShadingControl(2).ZoneIndex = zn;
+    WindowShadingControl(2).SequenceNumber = 3;
+    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    WindowShadingControl(2).FenestrationCount = 4;
+    WindowShadingControl(2).FenestrationName.allocate(WindowShadingControl(2).FenestrationCount);
+    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
+    WindowShadingControl(2).FenestrationName(1) = "Fene-04";
+    WindowShadingControl(2).FenestrationName(2) = "Fene-05";
+    WindowShadingControl(2).FenestrationName(3) = "Fene-06";
+    WindowShadingControl(2).FenestrationName(4) = "Fene-07";
+
+    WindowShadingControl(3).Name = "WSC3";
+    WindowShadingControl(3).ZoneIndex = zn;
+    WindowShadingControl(3).SequenceNumber = 1;
+    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(3).FenestrationCount = 2;
+    WindowShadingControl(3).FenestrationName.allocate(WindowShadingControl(3).FenestrationCount);
+    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
+    WindowShadingControl(3).FenestrationName(1) = "Fene-08";
+    WindowShadingControl(3).FenestrationName(2) = "Fene-09";
+
+
+    TotSurfaces = 12;
+    Surface.allocate(TotSurfaces);
+
+    Surface(1).Name = "Fene-07";
+    Surface(1).WindowShadingControlPtr = 2;
+
+    Surface(2).Name = "Fene-01";
+    Surface(2).WindowShadingControlPtr = 1;
+
+    Surface(3).Name = "Fene-08";
+    Surface(3).WindowShadingControlPtr = 3;
+
+    Surface(4).Name = "Fene-02";
+    Surface(4).WindowShadingControlPtr = 1;
+
+    Surface(5).Name = "Fene-10";
+    Surface(5).WindowShadingControlPtr = 0;
+
+    Surface(6).Name = "Fene-03";
+    Surface(6).WindowShadingControlPtr = 1;
+
+    Surface(7).Name = "Fene-09";
+    Surface(7).WindowShadingControlPtr = 3;
+
+    Surface(8).Name = "Fene-04";
+    Surface(8).WindowShadingControlPtr = 2;
+
+    Surface(9).Name = "Fene-10";
+    Surface(9).WindowShadingControlPtr = 0;
+
+    Surface(10).Name = "Fene-05";
+    Surface(10).WindowShadingControlPtr = 2;
+
+    Surface(11).Name = "Fene-11";
+    Surface(11).WindowShadingControlPtr = 0;
+
+    Surface(12).Name = "Fene-06";
+    Surface(12).WindowShadingControlPtr = 2;
+
+
+    bool Err = false;
+
+    FinalAssociateWindowShadingControlFenestration(Err);
+    EXPECT_FALSE(Err);
+
+    EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(1), 2);
+    EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(2), 4);
+    EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(3), 6);
+
+    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(1), 8);
+    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(2), 10);
+    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(3), 12);
+    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(4), 1);
+
+    EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(1), 3);
+    EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(2), 7);
 
 }
