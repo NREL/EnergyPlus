@@ -6744,8 +6744,8 @@ namespace DaylightingManager {
             previously_shaded = false;
 
             int count = 0;
-            for (std::size_t igroup = 1; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
-                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup];
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
                 for (auto IWin : listOfExtWin) {
                     ++count;
                     // need to map back to the original order of the "loop" to not change all the other data structures
@@ -6771,10 +6771,10 @@ namespace DaylightingManager {
             } // End of third window loop, IWin
 
             Array1D<Real64> ASETIL; // Illuminance ratio (lux)
-            DILLSW.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
+            ASETIL.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
 
             // Transmittance multiplier
-            for (std::size_t igroup = 1; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
                 ASETIL(igroup) = (SetPnt(1) - DILLUN(igroup)) / (DILLSW(igroup) + 0.00001);
             }
 
@@ -6783,9 +6783,9 @@ namespace DaylightingManager {
             // Fourth loop over windows to determine which to switch
             // iterate in the order that the shades are specified in WindowShadeControl
             count = 0;
-            for (std::size_t igroup = 1; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
-                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup];
+                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
 
                 for (auto IWin : listOfExtWin) {
                     ++count;
@@ -6892,10 +6892,10 @@ namespace DaylightingManager {
         if (GlareFlag) {
             // Glare is too high at a ref pt.  Loop through windows.
             int count = 0;
-            
-            for (std::size_t igroup = 1; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
-                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup];
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+
+                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
 
                 int countBeforeListOfExtWinLoop = count;
                 bool atLeastOneGlareControlIsActive = false;
@@ -10753,29 +10753,31 @@ namespace DaylightingManager {
         // J. Glazer - 2018
         // Allow a way to map back to the original "loop" index that is used in many other places in the
         // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
-        int count = 0;
-        for (auto listOfExtWin : ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins) {
-            for (auto IWinShdOrd : listOfExtWin) {
-                ++count;
-                if (count > ZoneDaylight(ZoneNum).NumOfDayltgExtWins)
-                    ShowWarningError("MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in zone " + Zone(ZoneNum).Name);
-                bool found = false;
-                for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
-                    int IWinLoop = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
-                    if (IWinShdOrd == IWinLoop) {
-                        ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count) = loop;
-                        found = true;
-                        break;
+        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 && ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
+            int count = 0;
+            for (auto listOfExtWin : ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins) {
+                for (auto IWinShdOrd : listOfExtWin) {
+                    ++count;
+                    if (count > ZoneDaylight(ZoneNum).NumOfDayltgExtWins)
+                        ShowWarningError("MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in zone " + Zone(ZoneNum).Name);
+                    bool found = false;
+                    for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
+                        int IWinLoop = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
+                        if (IWinShdOrd == IWinLoop) {
+                            ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count) = loop;
+                            found = true;
+                            break;
+                        }
                     }
+                    // this should never occur.
+                    if (!found) ShowWarningError("MapShadeDeploymentOrderToLoopNumber: found unassociated window for zone " + Zone(ZoneNum).Name);
                 }
-                // this should never occur.
-                if (!found) ShowWarningError("MapShadeDeploymentOrderToLoopNumber: found unassociated window for zone " + Zone(ZoneNum).Name);
             }
-        }
-        // double check MapShdOrdToLoopNum array, this should be unnessary but..
-        for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
-            if (ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(loop) == 0) {
-                ShowWarningError("MapShadeDeploymentOrderToLoopNumber: found empty map for window in zone " + Zone(ZoneNum).Name);
+            // double check MapShdOrdToLoopNum array, this should be unnessary but..
+            for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
+                if (ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(loop) == 0) {
+                    ShowWarningError("MapShadeDeploymentOrderToLoopNumber: found empty map for window in zone " + Zone(ZoneNum).Name);
+                }
             }
         }
     }
