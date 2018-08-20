@@ -185,7 +185,6 @@ namespace PackagedThermalStorageCoil {
         int CoolingAndChargeChargingPLFFPLRObjectNum;
         int CoolingAndChargeSHRFTempCurve; // curve index for sensible heat ratio modifier curve
         // (function of entering wetbulb and drybulb)
-        int CoolingAndChargeSHRFTempObjectNum;
         int CoolingAndChargeSHRFFlowCurve; // curve index for sensible heat ratio modifer curve
         // (function of actual supply air flow vs rated air flow)
         int CoolingAndChargeSHRFFlowObjectNum;
@@ -371,7 +370,7 @@ namespace PackagedThermalStorageCoil {
               CoolingAndChargeChargingCapFTempObjectNum(0), CoolingAndChargeChargingCapFEvapPLRCurve(0),
               CoolingAndChargeChargingCapFEvapPLRObjectNum(0), CoolingAndChargeChargingEIRFTempCurve(0), CoolingAndChargeChargingEIRFTempObjectNum(0),
               CoolingAndChargeChargingEIRFFLowCurve(0), CoolingAndChargeChargingEIRFFLowObjectNum(0), CoolingAndChargeChargingPLFFPLRCurve(0),
-              CoolingAndChargeChargingPLFFPLRObjectNum(0), CoolingAndChargeSHRFTempCurve(0), CoolingAndChargeSHRFTempObjectNum(0),
+              CoolingAndChargeChargingPLFFPLRObjectNum(0), CoolingAndChargeSHRFTempCurve(0),
               CoolingAndChargeSHRFFlowCurve(0), CoolingAndChargeSHRFFlowObjectNum(0), CoolingAndDischargeModeAvailable(false),
               CoolingAndDischargeRatedTotCap(0.0), CoolingAndDischargeRatedTotCapSizingFactor(0.0), CoolingAndDischargeRatedDischargeCap(0.0),
               CoolingAndDischargeRatedDischargeCapSizingFactor(0.0), CoolingAndDischargeRatedSHR(0.0), CoolingAndDischargeCoolingRatedCOP(0.0),
