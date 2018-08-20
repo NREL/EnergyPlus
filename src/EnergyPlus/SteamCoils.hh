@@ -317,6 +317,8 @@ namespace SteamCoils {
                           Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used
     );
 
+    void clear_state();
+
     // End of Utility subroutines for the SteamCoil Module
 
 } // namespace SteamCoils

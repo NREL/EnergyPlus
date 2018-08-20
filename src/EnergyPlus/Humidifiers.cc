@@ -262,7 +262,6 @@ namespace Humidifiers {
         using WaterManager::SetupTankSupplyComponent;
         using namespace DataIPShortCuts;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetHumidifierInputs: "); // include trailing blank space
@@ -402,21 +401,13 @@ namespace Humidifiers {
 
             Humidifier(HumNum).EfficiencyCurvePtr = GetCurveIndex(Alphas(3));
             if (Humidifier(HumNum).EfficiencyCurvePtr > 0) {
-                {
-                    auto const SELECT_CASE_var(GetCurveType(Humidifier(HumNum).EfficiencyCurvePtr));
-                    if (SELECT_CASE_var == "LINEAR") {
-                        Humidifier(HumNum).EfficiencyCurveType = Linear;
-                    } else if (SELECT_CASE_var == "QUADRATIC") {
-                        Humidifier(HumNum).EfficiencyCurveType = Quadratic;
-                    } else if (SELECT_CASE_var == "CUBIC") {
-                        Humidifier(HumNum).EfficiencyCurveType = Cubic;
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\",");
-                        ShowContinueError("Invalid " + cAlphaFields(3) + '=' + Alphas(3));
-                        ShowContinueError("...Curve type for " + cAlphaFields(3) + " = " + GetCurveType(Humidifier(HumNum).EfficiencyCurvePtr));
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    Humidifier(HumNum).EfficiencyCurvePtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    Humidifier(HumNum).Name,        // Object Name
+                    cAlphaFields(3));               // Field Name
             } else if (!lAlphaBlanks(3)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\",");
                 ShowContinueError("Invalid " + cAlphaFields(3) + '=' + Alphas(3));
@@ -1270,9 +1261,7 @@ namespace Humidifiers {
             }
             PartLoadRatio = GasUseRateAtRatedEff / NomPower;
             if (EfficiencyCurvePtr > 0) { // calculate normalized thermal efficiency based on curve object type
-                if (EfficiencyCurveType == Linear || EfficiencyCurveType == Quadratic || EfficiencyCurveType == Cubic) {
-                    ThermEffCurveOutput = CurveValue(EfficiencyCurvePtr, PartLoadRatio);
-                }
+                ThermEffCurveOutput = CurveValue(EfficiencyCurvePtr, PartLoadRatio);
             } else {
                 ThermEffCurveOutput = 1.0;
             }
