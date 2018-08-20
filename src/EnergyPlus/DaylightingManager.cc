@@ -6744,7 +6744,7 @@ namespace DaylightingManager {
             previously_shaded = false;
 
             int count = 0;
-            for (std::size_t igroup = 0; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+            for (std::size_t igroup = 1; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup];
                 for (auto IWin : listOfExtWin) {
                     ++count;
@@ -6774,7 +6774,7 @@ namespace DaylightingManager {
             DILLSW.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
 
             // Transmittance multiplier
-            for (std::size_t igroup = 0; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+            for (std::size_t igroup = 1; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
                 ASETIL(igroup) = (SetPnt(1) - DILLUN(igroup)) / (DILLSW(igroup) + 0.00001);
             }
 
@@ -6783,7 +6783,7 @@ namespace DaylightingManager {
             // Fourth loop over windows to determine which to switch
             // iterate in the order that the shades are specified in WindowShadeControl
             count = 0;
-            for (std::size_t igroup = 0; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+            for (std::size_t igroup = 1; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup];
 
@@ -6892,8 +6892,8 @@ namespace DaylightingManager {
         if (GlareFlag) {
             // Glare is too high at a ref pt.  Loop through windows.
             int count = 0;
-
-            for (std::size_t igroup = 0; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+            
+            for (std::size_t igroup = 1; igroup != ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup];
 
