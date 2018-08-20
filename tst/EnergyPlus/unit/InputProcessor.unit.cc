@@ -261,8 +261,7 @@ TEST_F(InputProcessorFixture, decode_encode_2)
                                           "  Counterclockwise,",
                                           "  Relative,",
                                           "  Relative,",
-                                          "  Relative;"
-                                          "",
+                                          "  Relative;",
                                           "",
                                           "Zone,",
                                           "  Core_mid,",
