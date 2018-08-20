@@ -460,6 +460,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ObjectName = 'RunPeriod'
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                IF (SameString(TRIM(OutArgs(8)), "USEWEATHERFILE")) THEN
+                    CALL ShowWarningError('Run period start day of week USEWEATHERFILE option has been removed, start week day is set by the input start date.',Auditf)
+                    OutArgs(8) = Blank
+                END IF
                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
                 Written=.true.
                 nodiff = .false.
@@ -527,9 +531,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ! Throw warning saying the start of the week has been specified by the year
                   OutArgs(8) = Blank  ! But why is this field even staying?
                 ELSE
-                  IF (TRIM(InArgs(6))=="USEWEATHERFILE") THEN
-                    ! Throw warning...
-                    OutArgs(8) = "Sunday"
+                  IF (SameString(TRIM(InArgs(6)), "USEWEATHERFILE")) THEN
+                    CALL ShowWarningError('Run period start day of week USEWEATHERFILE option has been removed, start week day is set by the input start date.',Auditf)
+                    OutArgs(8) = BLANK
                   ELSE
                     ! Copy it over unchanged?
                     OutArgs(8) = InArgs(6)
