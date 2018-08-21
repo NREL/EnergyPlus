@@ -716,8 +716,8 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSimulate) {
                             "  node 3,",
                             "  node 4,",
                             "  ,",
-                            "  0.001,",
-                            "  0.001,",
+                            "  0.0001,",
+                            "  0.0001,",
                             "  1000,",
                             "  3.14,",
                             "  25.56,",
@@ -740,12 +740,14 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSimulate) {
     DataPlant::TotNumLoops = 2;
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
     DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &wwhpPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     wwhpPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    wwhpPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
     DataPlant::PlantLoop(2).LoopSide.allocate(2);
     DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -757,7 +759,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSimulate) {
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
-    // PlantLocation mySourceLocation = PlantLocation(2, 1, 1, 1);
+    PlantLocation mySourceLocation = PlantLocation(2, 1, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -779,11 +781,66 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSimulate) {
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingWWHP->onInitLoopEquip(myLoadLocation);
 
-    // call from load side location, firsthvac, no load, not running
+    // call from load side location, firsthvac, no load, not running, verify the unit doesn't have any values lingering
+    thisCoolingWWHP->loadSideHeatTransfer = 1000;
+    thisCoolingWWHP->loadSideInletTemp = 23.0;
+    thisCoolingWWHP->loadSideOutletTemp = 42.0;
+    thisCoolingWWHP->powerUsage = 4.0;
+    thisCoolingWWHP->sourceSideHeatTransfer = 60.0;
+    thisCoolingWWHP->sourceSideInletTemp = 43.0;
+    thisCoolingWWHP->sourceSideOutletTemp = 83.0;
     bool firstHVAC = true;
     Real64 curLoad = 0.0;
     bool runFlag = false;
     thisCoolingWWHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
-    EXPECT_TRUE(true);
+    EXPECT_NEAR(0.0, thisCoolingWWHP->loadSideHeatTransfer, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingWWHP->sourceSideHeatTransfer, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingWWHP->powerUsage, 0.001);
+    EXPECT_NEAR(thisCoolingWWHP->loadSideInletTemp, thisCoolingWWHP->loadSideOutletTemp, 0.001);
+    EXPECT_NEAR(thisCoolingWWHP->sourceSideInletTemp, thisCoolingWWHP->sourceSideOutletTemp, 0.001);
+
+    // call from source side location, firsthvac, no load, not running, connected loop should be triggered to resimulate
+    DataPlant::PlantLoop(1).LoopSide(2).SimLoopSideNeeded = false;
+    DataPlant::PlantLoop(2).LoopSide(1).SimLoopSideNeeded = false;
+    thisCoolingWWHP->simulate(mySourceLocation, firstHVAC, curLoad, runFlag);
+    EXPECT_TRUE(DataPlant::PlantLoop(2).LoopSide(1).SimLoopSideNeeded);
+
+    // now we can call it again from the load side, but this time there is load (still firsthvac, unit can meet load)
+    {
+        firstHVAC = true;
+        curLoad = 800;
+        runFlag = true;
+        Real64 const expectedLoadMassFlowRate = 0.09999;
+        Real64 const expectedCp = 4183;
+        Real64 const specifiedLoadSetpoint = 15;
+        Real64 const calculatedLoadInletTemp =
+                specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
+        DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).Temp = 30;
+        thisCoolingWWHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to meet setpoint and have some pre-evaluated conditions
+        EXPECT_NEAR(specifiedLoadSetpoint, thisCoolingWWHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(curLoad, thisCoolingWWHP->loadSideHeatTransfer, 0.001);
+    }
+
+    // now we can call it again from the load side, but this time there is load (still firsthvac, unit cannot meet load)
+    {
+        firstHVAC = true;
+        curLoad = 1200;
+        Real64 availableCapacity = 950.0;
+        runFlag = true;
+        Real64 const expectedLoadMassFlowRate = 0.09999;
+        Real64 const expectedCp = 4183;
+        Real64 const specifiedLoadSetpoint = 15;
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
+        DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).Temp = 30;
+        thisCoolingWWHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to miss setpoint and be at max capacity
+        EXPECT_NEAR(15.597, thisCoolingWWHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(availableCapacity, thisCoolingWWHP->loadSideHeatTransfer, 0.001);
+    }
 
 }
