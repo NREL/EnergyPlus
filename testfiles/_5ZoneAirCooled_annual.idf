@@ -3254,6 +3254,8 @@
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
+  Output:Variable,*,Site Day Type Index,hourly;
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;

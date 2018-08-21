@@ -27924,6 +27924,8 @@
 
   Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
 
+  Output:Variable,*,Site Day Type Index,hourly;
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,HOURLY;
 
   Output:Variable,*,Site Outdoor Air Humidity Ratio,HOURLY;
