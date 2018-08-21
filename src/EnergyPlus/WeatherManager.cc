@@ -1111,9 +1111,10 @@ namespace WeatherManager {
                                     RunStJDay = DataPeriods(Loop).DataStJDay;
                                     RunEnJDay = DataPeriods(Loop).DataEnJDay;
                                     if (!DataPeriods(Loop).HasYearData) {
-                                        ShowSevereError("GetNextEnvironment: Runperiod has been entered but weatherfile DATA PERIOD does not have "
-                                                        "year included in start/end date.");
-                                        ShowContinueError("...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both.");
+                                        ShowSevereError("GetNextEnvironment: Actual weather runperiod has been entered but weatherfile DATA PERIOD "
+                                                        "does not have year included in start/end date.");
+                                        ShowContinueError("...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
+                                        ShowContinueError("...set \"Treat Weather as Actual\" to \"No\".");
                                     }
                                     if (!BetweenDates(Environment(Envrn).StartDate, RunStJDay, RunEnJDay)) continue;
                                     if (!BetweenDates(Environment(Envrn).EndDate, RunStJDay, RunEnJDay)) continue;
