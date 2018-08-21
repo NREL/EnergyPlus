@@ -132,6 +132,17 @@ foreach( i RANGE 1 ${end} )
 
 endforeach()
 
+# Temporary conversion of old Table:* to new Table:Lookup
+set(SRC
+  Transition.f90
+  CreateNewIDFUsingRulesTableLookup.f90
+  )
+
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Transition-TableLookup )
+add_executable( "Transition-TableLookup" ${SRC} )
+target_link_libraries( Transition-TableLookup TransitionLib )
+
+
 # then install all the support files
 install( FILES "SupportFiles/Report Variables 7-2-0-006 to 8-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
 install( FILES "SupportFiles/Report Variables 8-0-0-007 to 8-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
