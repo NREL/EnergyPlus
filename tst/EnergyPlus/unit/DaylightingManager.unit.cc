@@ -866,7 +866,7 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
 
     CreateShadeDeploymentOrder(zn);
 
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6);
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
 
     ZoneDaylight(zn).TotalDaylRefPoints = 1;
     ZoneDaylight(zn).NumOfDayltgExtWins = 9;
