@@ -845,11 +845,23 @@ independent variables that comprise the dimensions of the tabular data.
 
 \paragraph{Field: Normalize Output}\label{field-normalize-output}
 
-Determines whether or not this output will be automatically normalized
-to 1.0 at the normalized reference conditions defined by each
-independent variable in the associated independent variable list.
+Determines whether or not this output will be normalized, either through:
+
+\begin{enumerate}
+  \item automatic normalization to 1.0 at the normalized reference conditions defined by each
+  independent variable in the associated independent variable list, or
+  \item use of the Normalization Value field, below.
+\end{enumerate}
+
+If both methods are defined, the automatic normalization will take precedence.
+
 Normalization applies to the Output Value fields as well as the Minimum
-and Maximum Output fields Choices are: \emph{Yes} or \emph{No}.
+and Maximum Output fields. Choices are: \emph{Yes} or \emph{No}.
+
+\paragraph{Field: Normalization Value}\label{field-normalization-value}
+
+Defines a value by which output values are normalized if the Normalize Output
+field is set to \emph{Yes}. Default is 1.0.
 
 \paragraph{Field: Minimum Output}\label{field-minimum-output}
 
@@ -1273,7 +1285,10 @@ The value of this independent variable where nominal or rated output is
 defined. This will be used to normalize the data so that the outputs of
 any Table:Lookup at this value (and the corresponding Normalization
 Values of the other independent variables described in the same
-Table:IndependentVariableList object) are equal to 1.0.
+Table:IndependentVariableList object) are equal to 1.0. If left blank, no
+normalization will be calculated. If this field is left blank all other
+Table:IndependentVariable objects within the same Table:IndependentVariableList
+must also be left blank.
 
 \paragraph{Field: External File
 Name}\label{field-external-file-name-1}

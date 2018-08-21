@@ -201,13 +201,13 @@ namespace CurveManager {
         int CurveType;                                    // Curve type (see parameter definitions above)
         int InterpolationType;                            // table interpolation method
         int DataFormat;                                   // format of tabular data
-        int TableIndex;                                   // Index to tablular data (0 if a standard curve object)
+        int TableIndex;                                   // Index to tablular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
         int NumDims;                                      // Number of dimensions (AKA, independent variables)
         int NumIVLowErrorIndex;                           // Index to table object error message for too few IV's
         int NumIVHighErrorIndex;                          // Index to table object error message for too many IV's
         int X1SortOrder;                                  // sort order for table data for X1
         int X2SortOrder;                                  // sort order for table data for X2
-        int GridValueIndex;
+        int GridValueIndex;                               // Index of output within RGI for new Table:Lookup
         Real64 Coeff1;                                    // constant coefficient
         Real64 Coeff2;                                    // linear coeff (1st independent variable)
         Real64 Coeff3;                                    // quadratic coeff (1st independent variable)
