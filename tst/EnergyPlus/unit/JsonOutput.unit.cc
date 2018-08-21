@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -110,24 +111,24 @@ TEST_F(EnergyPlusFixture, JsonOutput_SimInfo)
 
     json result = OutputSchema->SimulationInformation.getJSON();
     json expectedResult = R"( {
-					"ErrorSummary": {
-						"NumSevere": "2",
-								"NumWarnings": "1"
-					},
-					"ErrorSummarySizing": {
-						"NumSevere": "0",
-								"NumWarnings": "0"
-					},
-					"ErrorSummaryWarmup": {
-						"NumSevere": "2",
-								"NumWarnings": "0"
-					},
-					"InputModelURI": "",
-					"ProgramVersion": "EnergyPlus, Version 8.6.0-0f5a10914b",
-					"RunTime": "00hr 08min  6.67sec",
-					"SimulationEnvironment": "",
-					"StartDateTimeStamp": "2017.03.22 11:03"
-		} )"_json;
+            "ErrorSummary": {
+                "NumSevere": "2",
+                "NumWarnings": "1"
+            },
+            "ErrorSummarySizing": {
+                "NumSevere": "0",
+                "NumWarnings": "0"
+            },
+            "ErrorSummaryWarmup": {
+                "NumSevere": "2",
+                "NumWarnings": "0"
+            },
+            "InputModelURI": "",
+            "ProgramVersion": "EnergyPlus, Version 8.6.0-0f5a10914b",
+            "RunTime": "00hr 08min  6.67sec",
+            "SimulationEnvironment": "",
+            "StartDateTimeStamp": "2017.03.22 11:03"
+        } )"_json;
     EXPECT_EQ(result.dump(), expectedResult.dump());
 }
 
@@ -150,19 +151,19 @@ TEST_F(EnergyPlusFixture, JsonOutput_SimInfo_String)
         "\"NumWarnings\": \"0\"\n    },\n    \"InputModelURI\": \"\",\n    \"ProgramVersion\": \"EnergyPlus, Version 8.6.0-0f5a10914b\",\n    "
         "\"RunTime\": \"00hr 08min  6.67sec\",\n    \"SimulationEnvironment\": \"\",\n    \"StartDateTimeStamp\": \"2017.03.22 11:03\"\n}";
     EXPECT_EQ(result.dump(4), expectedResult);
-};
+}
 
 TEST_F(EnergyPlusFixture, JsonOutput_VariableInfo)
 {
 
-    //		std::string const idf_objects = delimited_string({
-    //		                                                         "Output:Variable,SalesFloor Inlet Node,System Node Temperature,timestep;",
-    //		                                                         "Output:Variable,SalesFloor Inlet Node,System Node Mass Flow Rate,timestep;",
-    //		                                                 });
-    //		ASSERT_TRUE( process_idf( idf_objects ) );
-    //		//OutputSchema->setupOutputOptions();
+    //      std::string const idf_objects = delimited_string({
+    //                                                               "Output:Variable,SalesFloor Inlet Node,System Node Temperature,timestep;",
+    //                                                               "Output:Variable,SalesFloor Inlet Node,System Node Mass Flow Rate,timestep;",
+    //                                                       });
+    //      ASSERT_TRUE( process_idf( idf_objects ) );
+    //      //OutputSchema->setupOutputOptions();
     //
-    //		EXPECT_EQ( (int)OutputVariablesForSimulation.size(), 2 );
+    //      EXPECT_EQ( (int)OutputVariablesForSimulation.size(), 2 );
     // SetupNodeVarsForReporting();
     // EXPECT_EQ( "SALESFLOOR INLET NODE:System Node Temperature", RVariableTypes( 1 ).VarName );
     // EXPECT_EQ( "SALESFLOOR INLET NODE:System Node Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
@@ -178,13 +179,13 @@ TEST_F(EnergyPlusFixture, JsonOutput_VariableInfo)
     EXPECT_EQ(expected_result, var.getJSON().dump('\t'));
 
     json expectedObject = R"( {
-					"Frequency": "Timestep",
-					"Name": "SALESFLOOR INLET NODE:System Node Temperature",
-					"Units": "C"
-		} )"_json;
+            "Frequency": "Timestep",
+            "Name": "SALESFLOOR INLET NODE:System Node Temperature",
+            "Units": "C"
+        } )"_json;
 
     EXPECT_EQ(expectedObject, var.getJSON());
-};
+}
 
 TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo1)
 {
@@ -203,22 +204,22 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo1)
     OutputVars["Timestep"] = OutputSchema->RITimestepTSData.getVariablesJSON();
 
     json expectedObject = R"( {
-				"Timestep": [
-					 {
-						"Frequency": "Timestep",
-						"Name": "SALESFLOOR INLET NODE:System Node Humidity Ratio",
-						"Units": "kgWater/kgDryAir"
-					},
-					{
-						"Frequency": "Timestep",
-						"Name": "SALESFLOOR INLET NODE:System Node Temperature",
-						"Units": "C"
-					}]
-		} )"_json;
+            "Timestep": [
+                 {
+                    "Frequency": "Timestep",
+                    "Name": "SALESFLOOR INLET NODE:System Node Humidity Ratio",
+                    "Units": "kgWater/kgDryAir"
+                },
+                {
+                    "Frequency": "Timestep",
+                    "Name": "SALESFLOOR INLET NODE:System Node Temperature",
+                    "Units": "C"
+                }]
+        } )"_json;
 
     // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
     // EXPECT_EQ( expectedObject.dump(), OutputVars.dump());
-};
+}
 
 TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
 {
@@ -244,24 +245,24 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
     OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
     json expectedObject = R"( {
-				"Timestep": {
-					"Cols":[
-						{
-							"Units" : "kgWater/kgDryAir",
-							"Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
-						},
-						{
-							"Units" : "C",
-							"Variable":"SALESFLOOR INLET NODE:System Node Temperature"
-						}
-					],
-					"ReportFrequency" : "Timestep",
-					"Rows":[
-						{ "2/25 14:40:00" : [3.0,1.0] },
-						{ "2/25 14:45:00" : [4.0,2.0] }
-					]
-				}
-		} )"_json;
+            "Timestep": {
+                "Cols":[
+                    {
+                        "Units" : "kgWater/kgDryAir",
+                        "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
+                    },
+                    {
+                        "Units" : "C",
+                        "Variable":"SALESFLOOR INLET NODE:System Node Temperature"
+                    }
+                ],
+                "ReportFrequency" : "Timestep",
+                "Rows":[
+                    { "2/25 14:40:00" : [3.0,1.0] },
+                    { "2/25 14:45:00" : [4.0,2.0] }
+                ]
+            }
+        } )"_json;
 
     // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
     // EXPECT_EQ( expectedObject.dump(), OutputData.dump());
@@ -275,32 +276,32 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
     OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
     expectedObject = R"( {
-				"Timestep": {
-					"Cols":[
-						{
-			                "Units": "C",
-							"Variable" : "SALESFLOOR OUTLET NODE:System Node Temperature"
-			            },
-						{
-							"Units" : "kgWater/kgDryAir",
-							"Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
-						},
-						{
-							"Units" : "C",
-							"Variable":"SALESFLOOR INLET NODE:System Node Temperature"
-						}
-					],
-					"ReportFrequency" : "Timestep",
-					"Rows":[
-						{ "2/25 14:40:00" : [5.0,3.0,1.0] },
-						{ "2/25 14:45:00" : [6.0,4.0,2.0] }
-					]
-				}
-		} )"_json;
+            "Timestep": {
+                "Cols":[
+                    {
+                        "Units": "C",
+                        "Variable" : "SALESFLOOR OUTLET NODE:System Node Temperature"
+                    },
+                    {
+                        "Units" : "kgWater/kgDryAir",
+                        "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
+                    },
+                    {
+                        "Units" : "C",
+                        "Variable":"SALESFLOOR INLET NODE:System Node Temperature"
+                    }
+                ],
+                "ReportFrequency" : "Timestep",
+                "Rows":[
+                    { "2/25 14:40:00" : [5.0,3.0,1.0] },
+                    { "2/25 14:45:00" : [6.0,4.0,2.0] }
+                ]
+            }
+        } )"_json;
 
     // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
     // EXPECT_EQ( expectedObject.dump(), OutputData.dump());
-};
+}
 
 TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
 {
@@ -324,23 +325,23 @@ TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
 
     json result = tbl.getJSON();
     json expectedResult = R"( {
-				"Cols": [
-                        "User-Specified Maximum Air Flow Rate [m3/s]"
-                    ],
-                "Footnote": "User-Specified values were used. Design Size values were used if no User-Specified values were provided.",
-                "Rows": {
-                "ZONE1DIRECTAIR": [
-                       "5.22"
-                    ],
-                    "ZONE2DIRECTAIR": [
-                       "0.275000"
-                    ]
-                },
-                "TableName": "AirTerminal:SingleDuct:Uncontrolled"
-		} )"_json;
+            "Cols": [
+                    "User-Specified Maximum Air Flow Rate [m3/s]"
+            ],
+            "Footnote": "User-Specified values were used. Design Size values were used if no User-Specified values were provided.",
+            "Rows": {
+            "ZONE1DIRECTAIR": [
+                   "5.22"
+                ],
+                "ZONE2DIRECTAIR": [
+                   "0.275000"
+                ]
+            },
+            "TableName": "AirTerminal:SingleDuct:Uncontrolled"
+        } )"_json;
 
     EXPECT_EQ(result.dump(), expectedResult.dump());
-};
+}
 
 TEST_F(EnergyPlusFixture, JsonOutput_ReportInfo)
 {
@@ -390,7 +391,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_ReportInfo)
 
     json result = report.getJSON();
     json expectedResult = R"( {
-				"For": "Entire Facility",
+            "For": "Entire Facility",
             "ReportName": "Component Sizing Summary",
             "Tables": [
                 {
@@ -424,9 +425,10 @@ TEST_F(EnergyPlusFixture, JsonOutput_ReportInfo)
                     },
                     "TableName": "Coil:Cooling:DX:SingleSpeed"
                 }
-			]
-		} )"_json;
+            ]
+        } )"_json;
 
     EXPECT_EQ(result.dump(), expectedResult.dump());
-};
+}
+
 } // namespace EnergyPlus
