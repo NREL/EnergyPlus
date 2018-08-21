@@ -4117,12 +4117,12 @@ namespace SurfaceGeometry {
 
                 InitialAssociateWindowShadingControlFenestration(ErrorsFound, SurfNum);
 
-                CheckWindowShadingControlFrameDivider("GetHTSubSurfaceData", ErrorsFound, SurfNum, 7);
+                CheckWindowShadingControlFrameDivider("GetHTSubSurfaceData", ErrorsFound, SurfNum, 6);
 
                 if (SurfaceTmp(SurfNum).Sides == 3) { // Triangular window
                     if (!cAlphaArgs(6).empty()) {
-                        ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(7) + "=\"" +
-                                         cAlphaArgs(7) + "\".");
+                        ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(6) + "=\"" +
+                                         cAlphaArgs(6) + "\".");
                         ShowContinueError(".. because it is a triangular window and cannot have a frame or divider or reveal reflection.");
                         ShowContinueError("Frame, divider and reveal reflection will be ignored for this window.");
                     }
