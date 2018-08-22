@@ -576,7 +576,11 @@ temperatures based on air temperature calculations. The RunPeriod object allows 
 of both the Daylight Saving Period (i.e. use or ignore) and holidays that are embedded within the weather
 file. The object also describes the elements necessary to use a specially crafted (likely multiple year)
 weather file in a simulation. These kinds of weather files and simulations might be useful for matching
-utility periods or simulating several years of differing weather data. 
+utility periods or simulating several years of differing weather data. Leap days are required when using
+actual weather (see ``Treat as Actual Weather'' below), but will be processed and used during leap years
+when the days are present in the weather file and enabled in the weather file header. Note that when the
+weather is treated as non-actual, the leap day will be skipped if it is not present, resulting in incorrect
+day types for the remainder of the year.
 
 \subsubsection{Inputs}\label{inputs-5-016}
 
@@ -618,7 +622,7 @@ annual run period desired.
 This optional numeric field should contain the end year for the range. It is only allowed to be specified
 when the \textbf{Begin Year} is given and must be after the \textbf{Begin Year}. If it is not specified,
 it will be set to be the first occurrence of \textbf{End Month/End Day of Month} after the start date. Note
-that this could be several years after the start date (e.g. if the end date is specified as a leap day 2/28).
+that this could be several years after the start date (e.g. if the end date is specified as a leap day 2/29).
 
 \paragraph{Field: Day of Week for Start Day}\label{field-day-of-week-for-start-day-3}
 
@@ -687,9 +691,10 @@ use this to be able to compare two ``same location'' weather files of different 
 \paragraph{Field: Treat Weather as Actual}\label{field-treat-weather-as-actual}
 
 This field determines how stringent date matching between this object and the weather file is. Though all
-EnergyPlus (EPW) weather files contain a year/year field, this data is not typically used. Specifying
+EnergyPlus (EPW) weather files contain a year field, this data is not typically used. Specifying
 ``\textbf{Yes}'' in this field causes the program to look specifically for the begin date (i.e. Begin Month,
-Begin Day of Month, Begin Year) and for the end date (i.e. End Month, End Day of Month, End Year).
+Begin Day of Month, Begin Year) and for the end date (i.e. End Month, End Day of Month, End Year) and require
+that leap days be present for leap years.
 
 And, as shown in an IDF:
 

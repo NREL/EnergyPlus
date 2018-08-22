@@ -857,7 +857,6 @@ namespace WeatherManager {
         int RunStJDay;
         int RunEnJDay;
         bool OkRun;
-        int ThisWeekDay;
         int TWeekDay;
         Array1D_int MonWeekDay(12);
         Array1D_int ActEndDayOfMonth(12);
@@ -1092,40 +1091,40 @@ namespace WeatherManager {
                             }
 
                             OkRun = false;
-                            ThisWeekDay = 0;
-                            for (Loop = 1; Loop <= NumDataPeriods; ++Loop) {
-                                if (!Environment(Envrn).ActualWeather) {
-                                    RunStJDay = General::OrdinalDay(DataPeriods(Loop).StMon, DataPeriods(Loop).StDay, LeapYearAdd);
-                                    RunEnJDay = General::OrdinalDay(DataPeriods(Loop).EnMon, DataPeriods(Loop).EnDay, LeapYearAdd);
-                                    if (!BetweenDates(Environment(Envrn).StartJDay, RunStJDay, RunEnJDay)) continue;
-                                    if (!BetweenDates(Environment(Envrn).EndJDay, RunStJDay, RunEnJDay)) continue;
-                                    OkRun = true;
-                                    if (RunStJDay > Environment(Envrn).StartJDay) {
-                                        NumDays = RunStJDay - Environment(Envrn).StartJDay;
-                                    } else {
-                                        NumDays = Environment(Envrn).StartJDay - RunStJDay;
-                                    }
-                                    ThisWeekDay = mod(DataPeriods(Loop).WeekDay + NumDays - 1, 7) + 1;
-                                    break;
-                                } else { // Actual Weather
-                                    RunStJDay = DataPeriods(Loop).DataStJDay;
-                                    RunEnJDay = DataPeriods(Loop).DataEnJDay;
-                                    if (!DataPeriods(Loop).HasYearData) {
+
+                            if (Environment(Envrn).ActualWeather) {
+                                // Actual weather
+                                for (auto &dataperiod : DataPeriods) {
+                                    int runStartJulian = dataperiod.DataStJDay;
+                                    int runEndJulian = dataperiod.DataEnJDay;
+                                    if (!dataperiod.HasYearData) {
                                         ShowSevereError("GetNextEnvironment: Actual weather runperiod has been entered but weatherfile DATA PERIOD "
                                                         "does not have year included in start/end date.");
                                         ShowContinueError("...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
                                         ShowContinueError("...set \"Treat Weather as Actual\" to \"No\".");
                                     }
-                                    if (!BetweenDates(Environment(Envrn).StartDate, RunStJDay, RunEnJDay)) continue;
-                                    if (!BetweenDates(Environment(Envrn).EndDate, RunStJDay, RunEnJDay)) continue;
+                                    if (!BetweenDates(Environment(Envrn).StartDate, runStartJulian, runEndJulian)) continue;
+                                    if (!BetweenDates(Environment(Envrn).EndDate, runStartJulian, runEndJulian)) continue;
                                     OkRun = true;
-                                    if (RunStJDay > Environment(Envrn).StartDate) {
-                                        NumDays = RunStJDay - Environment(Envrn).StartDate;
-                                    } else {
-                                        NumDays = Environment(Envrn).StartDate - RunStJDay;
-                                    }
-                                    ThisWeekDay = mod(DataPeriods(Loop).WeekDay + NumDays - 1, 7) + 1;
                                     break;
+                                }
+                            } else {
+                                // Typical (or just non-actual) weather
+                                for (auto &dataperiod : DataPeriods) {
+                                    // Since this is not actual weather, there may be issues with this calculation
+                                    // Assume the weather data starts the same year as the simulation, so LeapYearAdd is what
+                                    // should be used.
+                                    int runStartOrdinal = General::OrdinalDay(dataperiod.StMon, dataperiod.StDay, LeapYearAdd);
+                                    // This one is harder, leave as is for now. What about multiple years of data?
+                                    int runEndOrdinal = General::OrdinalDay(dataperiod.EnMon, dataperiod.EnDay, LeapYearAdd);
+                                    if (runStartOrdinal == 1 && (runEndOrdinal == 366 || runEndOrdinal == 365)) {
+                                        // Complete year(s) of weather data, will wrap around
+                                        OkRun = true;
+                                        break;
+                                    }
+                                    if (!BetweenDates(Environment(Envrn).StartJDay, runStartOrdinal, runEndOrdinal)) continue;
+                                    if (!BetweenDates(Environment(Envrn).EndJDay, runStartOrdinal, runEndOrdinal)) continue;
+                                    OkRun = true;
                                 }
                             }
 
@@ -1186,6 +1185,14 @@ namespace WeatherManager {
                             }
                             EnvironmentStartEnd = StDate + " - " + EnDate;
 
+                            if (Environment(Envrn).DayOfWeek == 0) { // Use Sunday
+                                TWeekDay = 1;
+                                MonWeekDay = DataPeriods(Loop).MonWeekDay;
+                            } else {
+                                TWeekDay = Environment(Envrn).DayOfWeek;
+                                MonWeekDay = Environment(Envrn).MonWeekDay;
+                            }
+
                             if (DoWeatherInitReporting) {
                                 if (Environment(Envrn).UseDST) {
                                     AlpUseDST = "Yes";
@@ -1213,28 +1220,12 @@ namespace WeatherManager {
                                     AlpUseSnow = "No";
                                 }
                                 cTotalEnvDays = RoundSigDigits(Environment(Envrn).TotalDays);
-                                if (Environment(Envrn).DayOfWeek == 0) { // Uses Weather file start
-                                    gio::write(OutputFileInits, EnvNameFormat)
-                                        << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate << ValidDayNames(ThisWeekDay)
-                                        << cTotalEnvDays << "UseWeatherFile" << AlpUseDST << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
-                                    TWeekDay = ThisWeekDay;
-                                    MonWeekDay = DataPeriods(Loop).MonWeekDay;
-                                } else {
-                                    gio::write(OutputFileInits, EnvNameFormat)
-                                        << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate
-                                        << ValidDayNames(Environment(Envrn).DayOfWeek) << cTotalEnvDays << "Use RunPeriod Specified Day" << AlpUseDST
-                                        << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
-                                    TWeekDay = Environment(Envrn).DayOfWeek;
-                                    MonWeekDay = Environment(Envrn).MonWeekDay;
-                                }
-                            } else {                                     // just in case
-                                if (Environment(Envrn).DayOfWeek == 0) { // Uses Weather file start
-                                    TWeekDay = ThisWeekDay;
-                                    MonWeekDay = DataPeriods(Loop).MonWeekDay;
-                                } else {
-                                    TWeekDay = Environment(Envrn).DayOfWeek;
-                                    MonWeekDay = Environment(Envrn).MonWeekDay;
-                                }
+                
+                                gio::write(OutputFileInits, EnvNameFormat)
+                                    << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate << ValidDayNames(TWeekDay)
+                                    << cTotalEnvDays << "Use RunPeriod Specified Day" << AlpUseDST
+                                    << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
+ 
                             }
 
                             if (!DoingSizing && !KickOffSimulation) {

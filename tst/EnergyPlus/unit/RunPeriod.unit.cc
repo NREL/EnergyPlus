@@ -159,13 +159,27 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
         "No,                      !- Apply Weekend Holiday Rule",
         "Yes,                     !- Use Weather File Rain Indicators",
         "Yes;                     !- Use Weather File Snow Indicators",
+        "RunPeriod,",
+        "RP7,                     !- Name",
+        "1,                       !- Begin Month",
+        "1,                       !- Begin Day of Month",
+        "2016,                    !- Begin Year",
+        "3,                       !- End Month",
+        "31,                      !- End Day of Month",
+        "2020,                    !- End Year",
+        ",                        !- Day of Week for Start Day",
+        "Yes,                     !- Use Weather File Holidays and Special Days",
+        "Yes,                     !- Use Weather File Daylight Saving Period",
+        "No,                      !- Apply Weekend Holiday Rule",
+        "Yes,                     !- Use Weather File Rain Indicators",
+        "Yes;                     !- Use Weather File Snow Indicators",
         "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
 
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);
-    int totalrps(6);
+    int totalrps(7);
     WeatherManager::GetRunPeriodData(totalrps, errors_in_input);
     EXPECT_FALSE(errors_in_input);
 
@@ -198,6 +212,11 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
     EXPECT_EQ(1992, WeatherManager::RunPeriodInput[5].startYear);
     EXPECT_EQ(2448682, WeatherManager::RunPeriodInput[5].startJulianDate);
     EXPECT_EQ(2448988, WeatherManager::RunPeriodInput[5].endJulianDate);
+
+    EXPECT_EQ(WeatherManager::WeekDay::Friday, WeatherManager::RunPeriodInput[6].startWeekDay);
+    EXPECT_EQ(2016, WeatherManager::RunPeriodInput[6].startYear);
+    EXPECT_EQ(2457389, WeatherManager::RunPeriodInput[6].startJulianDate);
+    EXPECT_EQ(2458940, WeatherManager::RunPeriodInput[6].endJulianDate);
 }
 
 TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
