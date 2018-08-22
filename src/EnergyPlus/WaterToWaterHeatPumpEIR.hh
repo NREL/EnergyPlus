@@ -68,11 +68,13 @@ namespace EnergyPlus {
         };
 
         struct EIRWaterToWaterHeatPump : public EnergyPlus::BaseWaterToWaterHeatPump {
+
             // fixed configuration parameters
             std::string name = "";
             int plantTypeOfNum = -1;
             std::string companionCoilName = "";
             EIRWaterToWaterHeatPump *companionHeatPumpCoil = nullptr;
+            Real64 sizingFactor = 1.0;
 
             // reference data
             Real64 referenceCapacity = 0.0;
@@ -124,6 +126,13 @@ namespace EnergyPlus {
                           bool RunFlag) override;
 
             void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+            void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                     Real64 &EP_UNUSED(MaxLoad),
+                                     Real64 &EP_UNUSED(MinLoad),
+                                     Real64 &EP_UNUSED(OptLoad)) override;
+
+            void size();
 
             Real64 getLoadSideOutletSetpointTemp();
 

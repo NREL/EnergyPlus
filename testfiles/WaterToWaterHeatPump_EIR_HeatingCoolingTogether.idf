@@ -191,6 +191,7 @@
     3.5,                     !- Reference COP
     25.56,                   !- Reference Leaving Load Side Water Temperature
     42.0,                    !- Reference Entering Source Side Fluid Temperature
+    ,                        !- Sizing Factor
     CapCurveFuncTemp,        !- Heating Capacity Function of Temperature Curve Name
     EIRCurveFuncTemp,        !- Electric Input to Heating Output Ratio Function of Temperature Curve Name
     EIRCurveFuncPLR;         !- Electric Input to Heating Output Ratio Function of Part Load Ratio Curve Name

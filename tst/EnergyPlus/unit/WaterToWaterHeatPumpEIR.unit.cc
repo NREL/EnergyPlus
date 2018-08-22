@@ -77,6 +77,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsHeatingAndCoo
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
+                            "  ,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -93,6 +94,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsHeatingAndCoo
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
+                            "  2,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -168,6 +170,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsHeatingNoComp
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
+                            "  ,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -226,6 +229,66 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsCoolingNoComp
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
+                            "  ,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_wwhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+
+    // validate the cooling side
+    EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingWWHP->plantTypeOfNum);
+    EXPECT_EQ(nullptr, thisCoolingWWHP->companionHeatPumpCoil);
+    EXPECT_EQ(1, thisCoolingWWHP->capFuncTempCurveIndex);
+    EXPECT_EQ(1, thisCoolingWWHP->powerRatioFuncTempCurveIndex);
+    EXPECT_EQ(1, thisCoolingWWHP->powerRatioFuncPLRCurveIndex);
+
+    // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
+    EXPECT_THROW(
+            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
+            std::runtime_error
+    );
+    EXPECT_THROW(
+            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
+            std::runtime_error
+    );
+}
+
+TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullyAutoSized) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  25.56,",
+                            "  40.0,",
+                            "  ,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -284,6 +347,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPInitialization) {
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
+                            "  ,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -306,7 +370,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPInitialization) {
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto & wwhpPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &wwhpPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     wwhpPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
     // then the source side
     DataPlant::PlantLoop(2).LoopSide.allocate(2);
@@ -314,7 +378,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPInitialization) {
     DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    auto & wwhpPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    auto &wwhpPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     wwhpPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
@@ -429,6 +493,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingOutletSetpointWorker) {
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
+                            "  ,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -446,7 +511,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingOutletSetpointWorker) {
     // first the load side
     DataPlant::TotNumLoops = 1;
     DataPlant::PlantLoop.allocate(1);
-    auto & wwhpPlantLoadSideLoop = DataPlant::PlantLoop(1);
+    auto &wwhpPlantLoadSideLoop = DataPlant::PlantLoop(1);
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
     DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
     DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
@@ -528,6 +593,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSetRunStateAndFlowWorker) {
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
+                            "  ,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -722,6 +788,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSimulate) {
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
+                            "  ,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -833,7 +900,8 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSimulate) {
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4183;
         Real64 const specifiedLoadSetpoint = 15;
-        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
+        Real64 const calculatedLoadInletTemp =
+                specifiedLoadSetpoint + curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingWWHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingWWHP->sourceSideNodes.inlet).Temp = 30;

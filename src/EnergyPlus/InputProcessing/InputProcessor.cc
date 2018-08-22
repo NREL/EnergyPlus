@@ -453,6 +453,30 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
     return false;
 }
 
+Real64 InputProcessor::getDefaultRealValue(std::string const &objectWord, std::string const &fieldName)
+{
+    int adjustedNumber = getJSONObjNum(objectWord, 1); // TODO: There must be a better way to get this, we don't need an index for this operation, just looking up schema
+    auto find_iterators = objectCacheMap.find(objectWord);
+    if (find_iterators == objectCacheMap.end()) {
+        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectWord));
+        if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
+            return -1;
+        }
+        find_iterators = objectCacheMap.find(tmp_umit->second);
+    }
+    auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
+    auto const &epJSON_schema_it_val = epJSON_schema_it.value();
+    auto const &schema_obj_props = epJSON_schema_it_val["patternProperties"][".*"]["properties"];
+    auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
+    Real64 defaultValue = 0.0;
+    bool defaultFound = findDefault(defaultValue, sizing_factor_schema_field_obj);
+    if (defaultFound) {
+        return defaultValue;
+    } else {
+        return -1; // TODO: What to return here I wonder?  Just raise a developer-oriented exception?
+    }
+}
+
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)
 {
     std::pair<std::string, bool> output;

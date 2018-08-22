@@ -50,9 +50,11 @@
 
 #include <BranchNodeConnections.hh>
 #include <DataGlobals.hh>
+#include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
+#include <DataSizing.hh>
 #include <FluidProperties.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -99,8 +101,7 @@ namespace EnergyPlus {
             }
         }
 
-        void EIRWaterToWaterHeatPump::setRunStateAndFlowRates(bool const runFlag)
-        {
+        void EIRWaterToWaterHeatPump::setRunStateAndFlowRates(bool const runFlag) {
             this->running = runFlag;
             if (!this->running) {
                 this->loadSideMassFlowRate = 0.0;
@@ -238,8 +239,7 @@ namespace EnergyPlus {
                                                                           this->sourceSideInletTemp);
                     Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex,
                                                                          partLoadRatio);
-                    Real64 ReferenceCOP = 3.14;  // use proper value
-                    this->powerUsage = (availableCapacity / ReferenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
+                    this->powerUsage = (availableCapacity / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
 
                     // energy balance on coil
                     this->sourceSideHeatTransfer = this->loadSideHeatTransfer - this->powerUsage;
@@ -260,8 +260,7 @@ namespace EnergyPlus {
                                                                           this->sourceSideInletTemp);
                     Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex,
                                                                          partLoadRatio);
-                    Real64 ReferenceCOP = 3.14;  // use proper value
-                    this->powerUsage = (availableCapacity / ReferenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
+                    this->powerUsage = (availableCapacity / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
 
                     // energy balance on coil
                     this->sourceSideHeatTransfer = this->loadSideHeatTransfer + this->powerUsage;
@@ -415,6 +414,45 @@ namespace EnergyPlus {
             }
         }
 
+        void EIRWaterToWaterHeatPump::getDesignCapacities(const PlantLocation &calledFromLocation,
+                                                          Real64 &MaxLoad,
+                                                          Real64 &MinLoad,
+                                                          Real64 &OptLoad) {
+            if (calledFromLocation.loopNum == this->loadSideLocation.loopNum) {
+                this->size();
+                MinLoad = 0.0;
+                MaxLoad = this->referenceCapacity;
+                OptLoad = this->referenceCapacity;
+            } else {
+                MinLoad = 0.0;
+                MaxLoad = 0.0;
+                OptLoad = 0.0;
+            }
+        }
+
+        void EIRWaterToWaterHeatPump::size() {
+            auto & tmpCapacity = this->referenceCapacity;
+            auto & tmpVolFlow = this->loadSideDesignVolFlowRate;
+            int pltLoadSizNum = DataPlant::PlantLoop(this->loadSideLocation.loopNum).PlantSizNum;
+            if (pltLoadSizNum > 0) {
+                if (DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+                    tmpVolFlow = DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
+                }
+            }
+            if(this->loadSideDesignVolFlowRate == DataSizing::AutoSize) {
+                this->loadSideDesignVolFlowRate = 1.0;
+            }
+            if(this->sourceSideDesignVolFlowRate == DataSizing::AutoSize) {
+                this->sourceSideDesignVolFlowRate = 1.0;
+            }
+            if(this->referenceCapacity == DataSizing::AutoSize) {
+                this->referenceCapacity = 1000;
+            }
+            if(this->referenceCOP == DataSizing::AutoSize) {
+                this->referenceCOP = 3.14;
+            }
+        }
+
         PlantComponent *EIRWaterToWaterHeatPump::factory(int plantTypeOfNum, std::string objectName) {
             if (getInputsWWHP) {
                 EIRWaterToWaterHeatPump::processInputForEIRWWHPHeating();
@@ -468,9 +506,9 @@ namespace EnergyPlus {
         void EIRWaterToWaterHeatPump::processInputForEIRWWHPHeating() {
             using namespace DataIPShortCuts;
 
-            bool errorsFound = false;
-
             cCurrentModuleObject = "HeatPump:WaterToWater:EIR:Heating";
+
+            bool errorsFound = false;
             int numWWHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             if (numWWHP > 0) {
                 auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -502,13 +540,40 @@ namespace EnergyPlus {
                                 fields.at("companion_cooling_coil_name")
                         );
                     }
-                    thisWWHP.loadSideDesignVolFlowRate = fields.at("load_side_reference_flow_rate");
-                    thisWWHP.sourceSideDesignVolFlowRate = fields.at("source_side_reference_flow_rate");
-                    thisWWHP.referenceCapacity = fields.at("reference_capacity");
-                    thisWWHP.referenceCOP = fields.at("reference_cop");
+                    auto tmpFlowRate = fields.at("load_side_reference_flow_rate");
+                    if (tmpFlowRate == "Autosize") {
+                        thisWWHP.loadSideDesignVolFlowRate = DataSizing::AutoSize;
+                    } else {
+                        thisWWHP.loadSideDesignVolFlowRate = tmpFlowRate;
+                    }
+                    auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
+                    if (tmpSourceFlowRate == "Autosize") {
+                        thisWWHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
+                    } else {
+                        thisWWHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate;
+                    }
+                    auto tmpRefCapacity = fields.at("reference_capacity");
+                    if (tmpRefCapacity == "Autosize") {
+                        thisWWHP.referenceCapacity = DataSizing::AutoSize;
+                    } else {
+                        thisWWHP.referenceCapacity = tmpRefCapacity;
+                    }
+                    auto tmpRefCOP = fields.at("reference_cop");
+                    if (tmpRefCOP == "Autosize") {
+                        thisWWHP.referenceCOP = DataSizing::AutoSize;
+                    } else {
+                        thisWWHP.referenceCOP = tmpRefCOP;
+                    }
                     thisWWHP.referenceLeavingLoadSideTemp = fields.at("reference_leaving_load_side_water_temperature");
                     thisWWHP.referenceEnteringSourceSideTemp = fields.at(
                             "reference_entering_source_side_fluid_temperature");
+
+                    try {
+                        thisWWHP.sizingFactor = fields.at("sizing_factor");
+                    } catch (...) {
+                        thisWWHP.sizingFactor = inputProcessor->getDefaultRealValue(cCurrentModuleObject, "sizing_factor");
+                    }
+
                     thisWWHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(
                             fields.at("heating_capacity_function_of_temperature_curve_name")));
                     thisWWHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(
@@ -598,13 +663,40 @@ namespace EnergyPlus {
                                 fields.at("companion_heating_coil_name")
                         );
                     }
-                    thisWWHP.loadSideDesignVolFlowRate = fields.at("load_side_reference_flow_rate");
-                    thisWWHP.sourceSideDesignVolFlowRate = fields.at("source_side_reference_flow_rate");
-                    thisWWHP.referenceCapacity = fields.at("reference_capacity");
-                    thisWWHP.referenceCOP = fields.at("reference_cop");
+                    auto tmpFlowRate = fields.at("load_side_reference_flow_rate");
+                    if (tmpFlowRate == "Autosize") {
+                        thisWWHP.loadSideDesignVolFlowRate = DataSizing::AutoSize;
+                    } else {
+                        thisWWHP.loadSideDesignVolFlowRate = tmpFlowRate;
+                    }
+                    auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
+                    if (tmpSourceFlowRate == "Autosize") {
+                        thisWWHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
+                    } else {
+                        thisWWHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate;
+                    }
+                    auto tmpRefCapacity = fields.at("reference_capacity");
+                    if (tmpRefCapacity == "Autosize") {
+                        thisWWHP.referenceCapacity = DataSizing::AutoSize;
+                    } else {
+                        thisWWHP.referenceCapacity = tmpRefCapacity;
+                    }
+                    auto tmpRefCOP = fields.at("reference_cop");
+                    if (tmpRefCOP == "Autosize") {
+                        thisWWHP.referenceCOP = DataSizing::AutoSize;
+                    } else {
+                        thisWWHP.referenceCOP = tmpRefCOP;
+                    }
                     thisWWHP.referenceLeavingLoadSideTemp = fields.at("reference_leaving_load_side_water_temperature");
                     thisWWHP.referenceEnteringSourceSideTemp = fields.at(
                             "reference_entering_source_side_fluid_temperature");
+
+                    try {
+                        thisWWHP.sizingFactor = fields.at("sizing_factor");
+                    } catch (...) {
+                        thisWWHP.sizingFactor = inputProcessor->getDefaultRealValue(cCurrentModuleObject, "sizing_factor");
+                    }
+
                     thisWWHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(
                             fields.at("cooling_capacity_function_of_temperature_curve_name")));
                     thisWWHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(
