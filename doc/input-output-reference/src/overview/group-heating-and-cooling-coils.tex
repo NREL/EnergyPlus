@@ -4953,13 +4953,20 @@ CoilSystem:Cooling:DX,
   HVAC,Average,Coil System Frost Control Status
 \end{itemize}
 
-\textbf{\emph{Coil Type = Coil:Cooling:DX:TwoStageWithHumidityControlMode}}
+\textbf{\emph{Coil Type = Coil:Cooling:DX:TwoStageWithHumidityControlMode \& Coil:Cooling:DX:VariableSpeed}}
 
 \begin{itemize}
 \item
   HVAC,Average,Coil System Cycling Ratio
 \item
   HVAC,Average,Coil System Compressor Speed Ratio
+\end{itemize}
+
+\textbf{\emph{Coil:Cooling:DX:VariableSpeed}}
+
+\begin{itemize}
+\item
+  HVAC,Average,Coil System Compressor Speed Number
 \end{itemize}
 
 \textbf{\emph{Coil types = Coil:Cooling:DX:SingleSpeed \& CoilSystem:Cooling:DX:HeatExchangerAssisted}}
@@ -4972,15 +4979,19 @@ CoilSystem:Cooling:DX,
 
 \paragraph{Coil System Cycling Ratio}\label{coil-system-cycling-ratio}
 
-The system may operate for the entire system timestep, but to meet the load the compressor can cycle on and off. This reports the fraction of the system timestep that the compressor is operating. (1.0 is continuous, 0.0 is off).
+The system may operate for the entire system timestep, but to meet the load the compressor can cycle on and off. This reports the fraction of the system timestep that the compressor is operating. (1.0 is continuous, 0.0 is off). For Coil:Cooling:VariableSpeed this description is true when compressor speed = 1. At higher compressor speeds Coil System Cycling Ratio = 1.
 
 \paragraph{Coil System Compressor Speed Ratio}\label{coil-system-compressor-speed-ratio}
 
-This is the ratio of time in a system timestep that the compressor is at rated speed. The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep.
+This is the ratio of time in a system timestep that the compressor is at rated speed. The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. This report is a duplicate of the report in Coil:Cooling:DX:VaraibleSpeed named Cooling Coil Neighboring Speed Levels Ratio.
+
+\paragraph{Coil System Compressor Speed Number}\label{coil-system-compressor-speed-ratio}
+
+This is the stage number that the compressor is operating at in a system timestep. The compressor speed number (from 1 to number of speeds) is reported and averaged over the timestep. This report is a duplicate of the report in Coil:Cooling:DX:VaraibleSpeed named Cooling Coil Upper Speed Level.
 
 \paragraph{Coil System Part Load Ratio}\label{coil-system-part-load-ratio}
 
-The DX system can operate with a cycling compressor or a varying speed compressor, This variable reports the fraction of the Full Load that is met during the system timestep. This can differ from the cycling part load ratio or the compressor speed ratio. (1.0 is Full Load and 0.0 is no load)
+The DX system can operate with a cycling compressor or a varying speed compressor. This variable reports the fraction of the Full Load that is met during the system timestep. This can differ from the cycling part load ratio or the compressor speed ratio. (1.0 is Full Load and 0.0 is no load)
 
 \paragraph{Coil System Frost Control Status}\label{coil-system-frost-control-status}
 
