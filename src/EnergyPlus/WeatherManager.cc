@@ -849,7 +849,6 @@ namespace WeatherManager {
         std::string EnDate;
         std::string string;
         std::string cTotalEnvDays;
-        int NumDays;
         int DSTActStMon;
         int DSTActStDay;
         int DSTActEnMon;
