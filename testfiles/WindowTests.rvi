@@ -10,6 +10,11 @@ TPW,Zone Mean Air Temperature
 QPW,Zone Mean Air Temperature
 DPM,Zone Mean Air Temperature
 SCWINDOW,Zone Mean Air Temperature
+DPSG,Zone Mean Air Temperature
+Surface Window Transmitted Solar Radiation Rate
+Surface Window Switchable Glazing Switching Factor
+Surface Window Switchable Glazing Visible Transmittance
+Daylighting Reference Point 1 Illuminance
 SPHW,Electricity:Building
 DPW,Electricity:Building
 DPWB,Electricity:Building
@@ -19,4 +24,6 @@ TPW,Electricity:Building
 QPW,Electricity:Building
 DPM,Electricity:Building
 SCWINDOW,Electricity:Building
+DPSG,Electricity:Building
+
 0
