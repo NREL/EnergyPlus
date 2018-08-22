@@ -1172,17 +1172,8 @@ namespace WeatherManager {
                             // Following builds Environment start/end for ASHRAE 55 warnings
                             gio::write(StDate, DateFormat) << Environment(Envrn).StartMonth << Environment(Envrn).StartDay;
                             gio::write(EnDate, DateFormat) << Environment(Envrn).EndMonth << Environment(Envrn).EndDay;
-                            if (Environment(Envrn).ActualWeather) {
-                                string = RoundSigDigits(Environment(Envrn).StartYear);
-                                StDate += "/" + string;
-                                string = RoundSigDigits(Environment(Envrn).EndYear);
-                                EnDate += "/" + string;
-                            } else if (Environment(Envrn).CurrentYear > 0 && Environment(Envrn).TreatYearsAsConsecutive) {
-                                string = RoundSigDigits(Environment(Envrn).CurrentYear);
-                                StDate += "/" + string;
-                                string = RoundSigDigits(Environment(Envrn).CurrentYear + Environment(Envrn).NumSimYears);
-                                EnDate += "/" + string;
-                            }
+                            StDate += "/" + RoundSigDigits(Environment(Envrn).StartYear);
+                            EnDate += "/" + RoundSigDigits(Environment(Envrn).EndYear);
                             EnvironmentStartEnd = StDate + " - " + EnDate;
 
                             if (Environment(Envrn).DayOfWeek == 0) { // Use Sunday
@@ -2479,6 +2470,7 @@ namespace WeatherManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static char time_stamp[10];
         static char day_stamp[6];
+        static char day_year_stamp[11];
         static std::string const RoutineName("SetCurrentWeather");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2504,6 +2496,8 @@ namespace WeatherManager {
         CurMnDyHr = time_stamp;
         std::sprintf(day_stamp, "%02d/%02d", Month, DayOfMonth);
         CurMnDy = day_stamp;
+        std::sprintf(day_year_stamp, "%02d/%02d/%04d", Month, DayOfMonth, DataGlobals::CalendarYear);
+        DataEnvironment::CurMnDyYr = day_year_stamp;
 
         WeightNow = Interpolation(TimeStep);
         WeightPreviousHour = 1.0 - WeightNow;
@@ -2533,9 +2527,9 @@ namespace WeatherManager {
         OutDewPointTemp = TodayOutDewPointTemp(TimeStep, HourOfDay);
         if (EMSOutDewPointTempOverrideOn) OutDewPointTemp = EMSOutDewPointTempOverrideValue;
         OutRelHum = TodayOutRelHum(TimeStep, HourOfDay);
-        OutRelHumValue = OutRelHum / 100.0;
+        OutRelHumValue = OutRelHum * 1.0e-2;
         if (EMSOutRelHumOverrideOn) {
-            OutRelHumValue = EMSOutRelHumOverrideValue / 100.0;
+            OutRelHumValue = EMSOutRelHumOverrideValue * 1.0e-2;
             OutRelHum = EMSOutRelHumOverrideValue;
         }
 
@@ -2596,7 +2590,7 @@ namespace WeatherManager {
         if (EMSDifSolarRadOverrideOn) DifSolarRad = EMSDifSolarRadOverrideValue;
         BeamSolarRad = TodayBeamSolarRad(TimeStep, HourOfDay);
         if (EMSBeamSolarRadOverrideOn) BeamSolarRad = EMSBeamSolarRadOverrideValue;
-        LiquidPrecipitation = TodayLiquidPrecip(TimeStep, HourOfDay) / 1000.0; // convert from mm to m
+        LiquidPrecipitation = TodayLiquidPrecip(TimeStep, HourOfDay) * 1.0e-3; // convert from mm to m
 
         if (UseRainValues) {
             IsRain = TodayIsRain(TimeStep, HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
@@ -9998,32 +9992,28 @@ namespace WeatherManager {
                     env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
                     env.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, runPer.isLeapYear ? 1 : 0);
                     env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, isLeapYear(runPer.endYear) ? 1 : 0);
-                    env.TotalDays = 0;
-                    for (Loop1 = 1; Loop1 <= env.NumSimYears; ++Loop1) {
-                        if (!isLeapYear(runPer.startYear - 1 + Loop1) || !WFAllowsLeapYears) {
-                            JDay1 = General::OrdinalDay(runPer.startMonth, runPer.startDay, 0);
-                            JDay2 = General::OrdinalDay(runPer.endMonth, runPer.endDay, 0);
-                            if (JDay1 <= JDay2) {
-                                if (Loop1 == 1) {
-                                    env.RawSimDays = (JDay2 - JDay1 + 1);
-                                }
-                                env.TotalDays += (JDay2 - JDay1 + 1);
-                            } else {
-                                if (Loop1 == 1) {
-                                    env.RawSimDays = General::OrdinalDay(12, 31, 0) - JDay1 + 1 + JDay2;
-                                }
-                                env.TotalDays += General::OrdinalDay(12, 31, 0) - JDay1 + 1 + JDay2;
+                    env.TotalDays = 366 - env.StartJDay + env.EndJDay + 365 * std::max(env.NumSimYears - 2, 0);
+                    if (WFAllowsLeapYears) {
+                        // First year
+                        if (env.StartJDay < 28) {
+                            if (isLeapYear(env.StartYear)) {
+                                ++env.TotalDays;
                             }
-                        } else { // Leap Year
-                            JDay1 = General::OrdinalDay(runPer.startMonth, runPer.startDay, 1);
-                            JDay2 = General::OrdinalDay(runPer.endMonth, runPer.endDay, 1);
-                            if (JDay1 <= JDay2) {
-                                env.TotalDays += (JDay2 - JDay1 + 1);
-                            } else {
-                                env.TotalDays += General::OrdinalDay(12, 31, 1) - JDay1 + 1 + JDay2;
+                        }
+                        // Middle years
+                        for (int yr = env.StartYear + 1; yr < env.EndYear; ++yr) {
+                            if (isLeapYear(yr)) {
+                                ++env.TotalDays;
+                            }
+                        }
+                        // Last year
+                        if (env.EndJDay > 28) {
+                            if (isLeapYear(env.EndYear)) {
+                                ++env.TotalDays;
                             }
                         }
                     }
+                    env.RawSimDays = env.TotalDays;
                 }
             }
             env.UseDST = runPer.useDST;
