@@ -795,7 +795,7 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 
     CreateShadeDeploymentOrder(zn);
 
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6);
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
 
     std::vector<int> compare1;
     compare1.push_back(8);
