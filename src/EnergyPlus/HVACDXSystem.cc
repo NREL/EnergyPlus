@@ -2595,7 +2595,7 @@ namespace HVACDXSystem {
         DXCoolingSystem(DXSystemNum).CycRatio = CycRatio;
         DXCoolingSystem(DXSystemNum).DehumidificationMode = DehumidMode;
         DXCoolingSystem(DXSystemNum).SpeedNum = SpeedNum;
-    } // namespace HVACDXSystem
+    }
 
     Real64 DXCoilVarSpeedResidual(Real64 const SpeedRatio,  // compressor speed ratio (1.0 is max, 0.0 is min)
                                   Array1<Real64> const &Par // par(1) = DX coil number

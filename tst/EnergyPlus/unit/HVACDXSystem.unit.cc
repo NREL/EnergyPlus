@@ -562,7 +562,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
 
     // system over cools past temperature set point
     EXPECT_GT(HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp, DataLoopNode::Node(ControlNode).Temp);
-    // system does not meet humidity ratio set point
+    // system does meet humidity ratio set point
     EXPECT_NEAR(DataLoopNode::Node(ControlNode).HumRat, DataLoopNode::Node(ControlNode).HumRatMax, 0.0000001);
 }
 
