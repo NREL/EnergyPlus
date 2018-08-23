@@ -522,8 +522,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     bool FirstHVACIteration = true;
     bool HXUnitOn = false;
     int InletNode = 1;
-    int OutletNode = 2;
-    int ControlNode = 2;
+    int ControlNode = 2; // same as outlet node number
 
     HVACDXSystem::GetDXCoolingSystemInput();
     EXPECT_EQ(HVACDXSystem::DXCoolingSystem(DXSystemNum).Name, "DX COOLING COIL SYSTEM");
@@ -553,8 +552,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     HVACDXSystem::ControlDXSystem(DXSystemNum, FirstHVACIteration, HXUnitOn);
     // system meets temperature set point
     EXPECT_NEAR(HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp, DataLoopNode::Node(ControlNode).Temp, 0.00001);
-    // system does not meet humidity ratio set point
+    // system was not told to meet humidity ratio set point (since DesiredOutletHumRat = 1.0)
     EXPECT_GT(DataLoopNode::Node(ControlNode).HumRat, DataLoopNode::Node(ControlNode).HumRatMax);
+    // sensible load met by compressor speed 3
+    EXPECT_EQ(3, HVACDXSystem::DXCoolingSystem(DXSystemNum).SpeedNum);
 
     // test latent control
     HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = RHControlHumRat;
@@ -564,6 +565,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     EXPECT_GT(HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp, DataLoopNode::Node(ControlNode).Temp);
     // system does meet humidity ratio set point
     EXPECT_NEAR(DataLoopNode::Node(ControlNode).HumRat, DataLoopNode::Node(ControlNode).HumRatMax, 0.0000001);
+    // latent load needed to increase compressor speed to speed 4
+    EXPECT_EQ(4, HVACDXSystem::DXCoolingSystem(DXSystemNum).SpeedNum);
 }
 
 } // namespace EnergyPlus
