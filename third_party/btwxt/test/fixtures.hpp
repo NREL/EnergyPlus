@@ -53,8 +53,13 @@ protected:
     TwoDFixture() {
         std::vector<std::vector<double> > grid = {{0, 10, 15},
                                                   {4, 6}};
-        values = {{6,  3, 2, 8,  4, 2},
-                 {12, 6, 4, 16, 8, 4}};
+               //  4   6
+        values = {{6,  3,  // 0
+                   2,  8,  // 10
+                   4,  2}, // 15
+                  {12, 6,
+                   4,  16,
+                   8,  4}};
         target = {12, 5};
         test_gridded_data = GriddedData(grid, values);
         test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
@@ -72,8 +77,16 @@ protected:
         std::vector<std::vector<double> > grid = {{6, 10, 15, 20},
                                                   {2, 4,  6,  8}};
         std::vector<std::vector<double> > values =
-                {{4,  3,  1.5, 1, 5,  4,  2, 1, 8,  6,  3, 2, 10, 8,  4,  2},
-                 {12, 10, 4,   4, 16, 12, 6, 4, 20, 16, 8, 4, 25, 20, 10, 5}};
+              //  2   4   6    8
+                {{4,  3,  1.5, 1,  // 6
+                  5,  4,  2,   1,  // 10
+                  8,  6,  3,   2,  // 15
+                  10, 8,  4,   2}, // 20
+
+                 {12, 10, 4,   4,   // 6
+                  16, 12, 6,   4,   // 10
+                  20, 16, 8,   4,   // 15
+                  25, 20, 10,  5}}; // 20
 
         target = {12, 4.5};
         test_gridded_data = GriddedData(grid, values);

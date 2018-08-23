@@ -105,8 +105,8 @@ TEST_F(CubicFixture, hypercube_calculations) {
     my_hypercube.collect_things(the_locator);
 
     Eigen::ArrayXd result = my_hypercube.all_the_calculations(test_gridded_data);
-    EXPECT_NEAR(result[0], 3.5315, 0.0001);
-    EXPECT_NEAR(result[1], 10.2091, 0.0001);
+    EXPECT_NEAR(result[0], 4.1953, 0.0001);
+    EXPECT_NEAR(result[1], 11.9271, 0.0001);
 }
 
 TEST_F(OneDFixture, hypercube_calculations) {

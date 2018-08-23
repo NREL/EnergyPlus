@@ -74,6 +74,7 @@ protected:
 
         // target = {2.5, 3.5, 1.4, 4.0};
         target = {2.2, 3.3, 1.4, 4.1};
+        //target = {0.0, 0.0, 0.0, 0.0};
         test_gridded_data = GriddedData(grid, values);
 //        test_gridded_data.set_axis_interp_method(0, Method::CUBIC);
 //        test_gridded_data.set_axis_interp_method(1, Method::CUBIC);
@@ -95,9 +96,8 @@ TEST_F(LargeFixture, calculate) {
 
     Btwxt::LOG_LEVEL = 0;
     std::vector<double> result = test_rgi.calculate_all_values_at_target();
-    // note: fn0(2.2, 3.3, 1.4, 4.1) evaluates to 0.003.
-    EXPECT_NEAR(result[0], -0.0109, 0.0001);
-    EXPECT_DOUBLE_EQ(result[1], 11);
+    EXPECT_NEAR(result[0], fn0(target[0], target[1], target[2], target[3]), 0.02);
+    EXPECT_DOUBLE_EQ(result[1], fn1(target[0], target[1], target[2], target[3]));
     Btwxt::LOG_LEVEL = 1;
 };
 

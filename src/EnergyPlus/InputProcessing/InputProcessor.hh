@@ -170,7 +170,7 @@ public:
 
     void reportOrphanRecordObjects();
 
-    const json getObjectInstances(std::string const &ObjType);
+    const json& getObjectInstances(std::string const &ObjType);
 
     json epJSON;
 

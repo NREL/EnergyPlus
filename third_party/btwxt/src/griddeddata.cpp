@@ -333,7 +333,8 @@ namespace Btwxt {
     ) {
         std::size_t index = 0;
         std::size_t panel_size = 1;
-        for (std::size_t dim = 0; dim < dimension_lengths.size(); dim++) {
+        std::size_t ndims = dimension_lengths.size();
+        for (std::size_t dim = ndims - 1; /* dim >= 0 */ dim < ndims; --dim) {
             if (coords[dim] >= (T)dimension_lengths[dim]) {
                 showMessage(MsgLevel::MSG_ERR, stringify("Overran dimension ", dim));
             } else if (coords[dim] < 0) {

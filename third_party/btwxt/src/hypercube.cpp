@@ -24,7 +24,7 @@ namespace Btwxt {
         sivor = { {-1,0},{-1,1},{1,0},{1,1} };
     };
 
-    void Hypercube::collect_things(WhereInTheGridIsThisPoint &the_locator) {
+    void Hypercube::collect_things(PointLocator &the_locator) {
         point_floor = the_locator.get_floor();
         interp_coeffs = the_locator.get_interp_coeffs();
         cubic_slope_coeffs = the_locator.get_cubic_slope_coeffs();

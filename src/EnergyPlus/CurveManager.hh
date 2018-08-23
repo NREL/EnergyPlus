@@ -62,9 +62,12 @@
 #include <ObjexxFCL/Array6D.hh>
 #include <ObjexxFCL/Optional.hh>
 
+#include <nlohmann/json.hpp>
+
 // Btwxt Headers
 #include <btwxt.h>
 #include <griddeddata.h>
+#include <error.h>
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
@@ -106,6 +109,7 @@ namespace CurveManager {
     extern int const LinearInterpolationOfTable;
     extern int const LagrangeInterpolationLinearExtrapolation;
     extern int const EvaluateCurveToLimits;
+    extern int const BtwxtMethod;
 
     // Data Format
     extern int const SINGLELINEINDEPENDENTVARIABLEWITHMATRIX;
@@ -305,7 +309,7 @@ namespace CurveManager {
     class BtwxtContainer
     {
     public:
-
+        using json = nlohmann::json;
         static std::map<std::string, Btwxt::Method> interpMethods;
         static std::map<std::string, Btwxt::Method> extrapMethods;
         // Map RGI collection to string name of independent variable list
@@ -316,6 +320,9 @@ namespace CurveManager {
         int addOutputValues(int gridIndex, std::vector<double> values);
         int getGridIndex(std::string indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
+        std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
+        double getGridValue(int gridIndex, int outputIndex, const std::vector<double> target);
+        std::map<std::string, const json&> independentVarRefs;
     private:
         std::map<std::string, std::size_t> gridMap;
         std::vector<Btwxt::RegularGridInterpolator> grids;

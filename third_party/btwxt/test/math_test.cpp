@@ -48,7 +48,7 @@ TEST(GriddedData, locate_coords) {
     coords = {2, 3, 2};
     dimension_lengths = {5, 7, 3};
     index = locate_coords(coords, dimension_lengths);
-    EXPECT_EQ(index, 87u);
+    EXPECT_EQ(index, 53u);
 }
 
 TEST(GridPoint, locate_in_dim) {
@@ -110,13 +110,6 @@ TEST(GridPoint, compute_fraction) {
     double edge[2] = {4, 6};
     double weight = compute_fraction(x, edge);
     EXPECT_DOUBLE_EQ(weight, 0.15);
-}
-
-TEST(Btwxt, pow) {
-    std::size_t base = 2;
-    std::size_t power = 4;
-    std::size_t result = pow(base, power);
-    EXPECT_EQ(result, 16u);
 }
 
 TEST(Hypercube, make_origin_hypercube) {

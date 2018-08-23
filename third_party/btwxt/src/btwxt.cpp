@@ -16,7 +16,7 @@ namespace Btwxt {
     RegularGridInterpolator::RegularGridInterpolator() = default;;
 
     RegularGridInterpolator::RegularGridInterpolator(GriddedData &the_blob) :
-            the_blob(the_blob),
+            grid_data(the_blob),
             cgp_exists(false),
             current_grid_point()  // instantiates an empty GridPoint
     {
@@ -29,12 +29,12 @@ namespace Btwxt {
             const std::vector<std::vector<double> > &grid,
             const std::vector<std::vector<double> > &values
     ) :
-            the_blob(grid, values),
+            grid_data(grid, values),
             cgp_exists(false),
             current_grid_point()  // instantiates an empty GridPoint
     {
         std::size_t ndims{get_ndims()};
-        hypercube = Hypercube(ndims, the_blob.get_interp_methods());
+        hypercube = Hypercube(ndims, grid_data.get_interp_methods());
         showMessage(MsgLevel::MSG_DEBUG, "RGI constructed from vectors!");
     };
 
@@ -76,7 +76,7 @@ namespace Btwxt {
         RegularGridInterpolator::check_target_dimensions(target);
         current_grid_point = GridPoint(target);
         cgp_exists = true;
-        the_locator = WhereInTheGridIsThisPoint(current_grid_point, the_blob);
+        the_locator = PointLocator(current_grid_point, grid_data);
     };
 
     std::vector<double> RegularGridInterpolator::get_current_grid_point() {
@@ -90,14 +90,18 @@ namespace Btwxt {
     void RegularGridInterpolator::clear_current_grid_point() {
         current_grid_point = GridPoint();
         cgp_exists = false;
-        the_locator = WhereInTheGridIsThisPoint();
+        the_locator = PointLocator();
     };
 
-    std::size_t RegularGridInterpolator::get_ndims() { return the_blob.get_ndims(); };
+    std::size_t RegularGridInterpolator::get_ndims() { return grid_data.get_ndims(); };
+
+    std::pair<double, double> RegularGridInterpolator::get_axis_limits(int dim) {
+        return grid_data.get_extrap_limits(dim);
+    }
 
     void RegularGridInterpolator::check_target_dimensions(
             const std::vector<double> &target) {
-        std::size_t ndims = the_blob.get_ndims();
+        std::size_t ndims = grid_data.get_ndims();
         if (ndims == target.size()) {
             showMessage(MsgLevel::MSG_DEBUG, stringify(
                     "Target and GridSpace dimensions match: ", target.size()));
@@ -111,16 +115,16 @@ namespace Btwxt {
     std::vector<double> RegularGridInterpolator::interpolation_wrapper() {
         std::size_t ndims = get_ndims();
         std::vector<Method> methods = the_locator.get_methods();
-        std::vector<Method> base_methods = the_blob.get_interp_methods();
+        std::vector<Method> base_methods = grid_data.get_interp_methods();
         Eigen::ArrayXd result;
 
         if (std::equal(methods.begin(), methods.end(), base_methods.begin())) {
             hypercube.collect_things(the_locator);
-            result = hypercube.all_the_calculations(the_blob);
+            result = hypercube.all_the_calculations(grid_data);
         } else {
             Hypercube new_hypercube(ndims, methods);
             new_hypercube.collect_things(the_locator);
-            result = new_hypercube.all_the_calculations(the_blob);
+            result = new_hypercube.all_the_calculations(grid_data);
         }
         showMessage(MsgLevel::MSG_DEBUG, stringify("results\n", result));
         return eigen_to_vector(result);

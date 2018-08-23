@@ -41,12 +41,12 @@ TEST_F(TwoDFixture, construct_from_axes) {
     test_gridded_data.add_value_table(values[0]);
     EXPECT_EQ(test_gridded_data.get_num_tables(), 1u);
     std::vector<std::size_t> coords{1, 1};
-    EXPECT_THAT(test_gridded_data.get_values(coords), testing::ElementsAre(4));
+    EXPECT_THAT(test_gridded_data.get_values(coords), testing::ElementsAre(8));
 
     test_gridded_data = GriddedData(test_axes, values);
     EXPECT_EQ(test_gridded_data.get_ndims(), 2u);
     EXPECT_EQ(test_gridded_data.get_num_tables(), 2u);
-    EXPECT_THAT(test_gridded_data.get_values(coords), testing::ElementsAre(4, 8));
+    EXPECT_THAT(test_gridded_data.get_values(coords), testing::ElementsAre(8, 16));
 };
 
 TEST_F(TwoDFixture, get_grid_vector) {
@@ -57,11 +57,11 @@ TEST_F(TwoDFixture, get_grid_vector) {
 TEST_F(TwoDFixture, get_values) {
     std::vector<std::size_t> coords = {0, 1};
     std::vector<double> returned_vec = test_gridded_data.get_values(coords);
-    EXPECT_THAT(returned_vec, testing::ElementsAre(8, 16));
+    EXPECT_THAT(returned_vec, testing::ElementsAre(3, 6));
 
     coords = {1, 0};
     returned_vec = test_gridded_data.get_values(coords);
-    EXPECT_THAT(returned_vec, testing::ElementsAre(3, 6));
+    EXPECT_THAT(returned_vec, testing::ElementsAre(2, 4));
 
     coords = {7, 0};
     EXPECT_THROW(returned_vec = test_gridded_data.get_values(coords);,
@@ -72,7 +72,7 @@ TEST_F(TwoDFixture, get_column) {
     std::vector<int> coords = {0, 1};
     Eigen::ArrayXd returned_col = test_gridded_data.get_column(coords);
     std::vector<double> returned_vec = eigen_to_vector(returned_col);
-    EXPECT_THAT(returned_vec, testing::ElementsAre(8, 16));
+    EXPECT_THAT(returned_vec, testing::ElementsAre(3, 6));
 
     coords = {0, -1};
     EXPECT_THROW(returned_col = test_gridded_data.get_column(coords);,

@@ -20,7 +20,7 @@ namespace Btwxt {
 
         Hypercube(const std::size_t &ndims, const std::vector<Method> &methods);
 
-        void collect_things(WhereInTheGridIsThisPoint &);
+        void collect_things(PointLocator &);
 
         std::size_t ndims;
         std::vector<std::vector<int> > vertices;

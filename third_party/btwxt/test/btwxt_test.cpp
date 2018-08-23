@@ -87,7 +87,7 @@ TEST_F(CubicFixture, interpolate) {
     showMessage(MsgLevel::MSG_INFO, stringify("Time to do cubic interpolation: ",
                                     duration.count(), " microseconds"));
     Btwxt::LOG_LEVEL = 1;
-    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(3.584), testing::DoubleEq(10.304)));
+    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(4.158), testing::DoubleEq(11.836)));
 }
 
 TEST_F(TwoDFixture, interpolate) {
@@ -96,19 +96,19 @@ TEST_F(TwoDFixture, interpolate) {
 
     // All values, current target
     std::vector<double> result = test_rgi.calculate_all_values_at_target();
-    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(2.9), testing::DoubleEq(5.8)));
+    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(4.2), testing::DoubleEq(8.4)));
     Btwxt::LOG_LEVEL = 1;
     // Single value, current target
     double d_result = test_rgi.calculate_value_at_target(0);
-    EXPECT_DOUBLE_EQ(d_result, 2.9);
+    EXPECT_DOUBLE_EQ(d_result, 4.2);
 
     std::vector<double> another_target = {8.1, 4.2};
     // All values, fresh target
     result = test_rgi.calculate_all_values_at_target(another_target);
-    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(3.689), testing::DoubleEq(7.378)));
+    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(3.189), testing::DoubleEq(6.378)));
     // Single value, fresh target
     d_result = test_rgi.calculate_value_at_target(another_target, 1);
-    EXPECT_DOUBLE_EQ(d_result, 7.378);
+    EXPECT_DOUBLE_EQ(d_result, 6.378);
 };
 
 TEST_F(TwoDFixture, extrapolate) {
@@ -116,14 +116,14 @@ TEST_F(TwoDFixture, extrapolate) {
     std::vector<double> const_extr_target = {10, 3};
     Btwxt::LOG_LEVEL = 0;
     std::vector<double> result = test_rgi(const_extr_target);
-    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(3), testing::DoubleEq(6)));
+    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(2), testing::DoubleEq(4)));
     Btwxt::LOG_LEVEL = 1;
 
     // axis0 is designated linear extrapolation
     std::vector<double> lin_extr_target = {18, 5};
     Btwxt::LOG_LEVEL = 0;
     result = test_rgi(lin_extr_target);
-    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(1.1), testing::DoubleEq(2.2)));
+    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(1.8), testing::DoubleEq(3.6)));
     Btwxt::LOG_LEVEL = 1;
 
 };
@@ -165,6 +165,6 @@ TEST_F(TwoDFixture, cubic_interpolate) {
 
     // All values, current target
     std::vector<double> result = test_rgi.calculate_all_values_at_target();
-    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(2.876), testing::DoubleEq(5.752)));
+    EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(4.416), testing::DoubleEq(8.832)));
     Btwxt::LOG_LEVEL = 1;
 }

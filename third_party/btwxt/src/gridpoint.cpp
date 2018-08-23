@@ -20,9 +20,9 @@ namespace Btwxt {
     };
 
 
-    WhereInTheGridIsThisPoint::WhereInTheGridIsThisPoint() {};
+    PointLocator::PointLocator() {};
 
-    WhereInTheGridIsThisPoint::WhereInTheGridIsThisPoint(
+    PointLocator::PointLocator(
             GridPoint &current_grid_point, GriddedData &the_blob
     ) :
             ndims(the_blob.get_ndims()),
@@ -38,19 +38,19 @@ namespace Btwxt {
         calculate_interp_coeffs();
     };
 
-    std::vector<std::size_t> WhereInTheGridIsThisPoint::get_floor() { return point_floor; }
+    std::vector<std::size_t> PointLocator::get_floor() { return point_floor; }
 
-    std::vector<double> WhereInTheGridIsThisPoint::get_weights() { return weights; }
+    std::vector<double> PointLocator::get_weights() { return weights; }
 
-    std::vector<Bounds> WhereInTheGridIsThisPoint::get_is_inbounds() { return is_inbounds; }
+    std::vector<Bounds> PointLocator::get_is_inbounds() { return is_inbounds; }
 
-    std::vector<Method> WhereInTheGridIsThisPoint::get_methods() { return methods; }
+    std::vector<Method> PointLocator::get_methods() { return methods; }
 
-    std::vector<std::vector<double> > WhereInTheGridIsThisPoint::get_interp_coeffs() { return interp_coeffs; }
+    std::vector<std::vector<double> > PointLocator::get_interp_coeffs() { return interp_coeffs; }
 
-    std::vector<std::vector<double> > WhereInTheGridIsThisPoint::get_cubic_slope_coeffs() { return cubic_slope_coeffs; }
+    std::vector<std::vector<double> > PointLocator::get_cubic_slope_coeffs() { return cubic_slope_coeffs; }
 
-    void WhereInTheGridIsThisPoint::find_floor(
+    void PointLocator::find_floor(
             GridPoint &current_grid_point, GriddedData &the_blob) {
         for (std::size_t dim = 0; dim < ndims; dim += 1) {
             double value {current_grid_point.target[dim]};
@@ -60,7 +60,7 @@ namespace Btwxt {
         }
     }
 
-    void WhereInTheGridIsThisPoint::calculate_weights(
+    void PointLocator::calculate_weights(
             GridPoint &current_grid_point, GriddedData &the_blob) {
         for (std::size_t dim = 0; dim < ndims; dim += 1) {
             std::vector<double> grid_vector = the_blob.get_grid_vector(dim);
@@ -69,7 +69,7 @@ namespace Btwxt {
         }
     }
 
-    void WhereInTheGridIsThisPoint::consolidate_methods(
+    void PointLocator::consolidate_methods(
             const std::vector<Method> &interp_methods,
             const std::vector<Method> &extrap_methods)
     // If out of bounds, extrapolate according to prescription
@@ -87,7 +87,7 @@ namespace Btwxt {
         }
     }
 
-    void WhereInTheGridIsThisPoint::calculate_interp_coeffs() {
+    void PointLocator::calculate_interp_coeffs() {
         for (std::size_t dim = 0; dim < ndims; dim++) {
             double mu = weights[dim];
             if (methods[dim] == Method::CUBIC) {

@@ -27,11 +27,11 @@ namespace Btwxt {
     };
 
 
-    class WhereInTheGridIsThisPoint {
+    class PointLocator {
     public:
-        WhereInTheGridIsThisPoint();
+        PointLocator();
 
-        WhereInTheGridIsThisPoint(GridPoint &, GriddedData &);
+        PointLocator(GridPoint &, GriddedData &);
 
         std::vector<std::size_t> get_floor();
 

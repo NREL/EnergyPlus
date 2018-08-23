@@ -32,7 +32,7 @@ namespace Btwxt {
 
         // Add value table to GriddedData
         std::size_t add_value_table(std::vector<double>& value_vector) {
-            return the_blob.add_value_table(value_vector);
+            return grid_data.add_value_table(value_vector);
         }
 
         // GridPoint gets instantiated inside calculate_value_at_target
@@ -68,11 +68,13 @@ namespace Btwxt {
 
         std::size_t get_ndims();
 
+        std::pair<double, double> get_axis_limits(int dim);
+
     private:
-        GriddedData the_blob;
+        GriddedData grid_data;
         bool cgp_exists;
         GridPoint current_grid_point;
-        WhereInTheGridIsThisPoint the_locator;
+        PointLocator the_locator;
         Hypercube hypercube;
 
         void check_target_dimensions(const std::vector<double> &target);
