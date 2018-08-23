@@ -85377,7 +85377,6 @@
     ExtWall,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     Win_421_Frame,           !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices

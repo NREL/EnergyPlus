@@ -557,7 +557,7 @@
     GLASS - CLEAR SHEET 1 / 8 IN;  !- Layer 3
 
   Construction,
-    DOUBLE PANE DARKENED,      !- Name
+    DOUBLE PANE DARKENED,    !- Name
     ELECTRO GLASS DARK 1 / 8 IN,  !- Outside Layer
     WinAirB1 - AIRSPACE RESISTANCE,  !- Layer 2
     GLASS - CLEAR SHEET 1 / 8 IN;  !- Layer 3
@@ -592,8 +592,10 @@
     WinAirB1 - AIRSPACE RESISTANCE,  !- Layer 2
     SCGLAS;                  !- Layer 3
 
-  WindowProperty:ShadingControl,
-    DOUBLE PANE WITH SCREEN, !- Name
+  WindowShadingControl,
+    DOUBLE PANE WITH SCREEN-DPWB,  !- Name
+    DPWB,                    !- Zone Name
+    1,                       !- Shading Control Sequence Number
     ExteriorScreen,          !- Shading Type
     DOUBLE PANE WITH SCREEN, !- Construction with Shading Name
     OnIfScheduleAllows,      !- Shading Control Type
@@ -603,7 +605,14 @@
     NO,                      !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn003:Wall001:Win001,    !- Fenestration Surface 1 Name
+    Zn003:Wall002:Win001,    !- Fenestration Surface 2 Name
+    Zn003:Wall003:Win001,    !- Fenestration Surface 3 Name
+    Zn003:Wall004:Win001;    !- Fenestration Surface 4 Name
 
   Schedule:Compact,
     ScreenSchedule,          !- Name
@@ -624,8 +633,10 @@
     1.0,                     !- Upper Limit Value
     DISCRETE;                !- Numeric Type
 
-  WindowProperty:ShadingControl,
-    DOUBLE PANE WITH DRAPES, !- Name
+  WindowShadingControl,
+    DOUBLE PANE WITH DRAPES-DPWD,  !- Name
+    DPWD,                    !- Zone Name
+    1,                       !- Shading Control Sequence Number
     InteriorShade,           !- Shading Type
     DOUBLE PANE WITH DRAPES, !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
@@ -635,10 +646,19 @@
     NO,                      !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn004:Wall001:Win001,    !- Fenestration Surface 1 Name
+    Zn004:Wall002:Win001,    !- Fenestration Surface 2 Name
+    Zn004:Wall003:Win001,    !- Fenestration Surface 3 Name
+    Zn004:Wall004:Win001;    !- Fenestration Surface 4 Name
 
-  WindowProperty:ShadingControl,
-    DOUBLE PANE WITH SHADE,  !- Name
+  WindowShadingControl,
+    DOUBLE PANE WITH SHADE-DPWS,  !- Name
+    DPWS,                    !- Zone Name
+    1,                       !- Shading Control Sequence Number
     InteriorShade,           !- Shading Type
     DOUBLE PANE WITH SHADE,  !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
@@ -648,20 +668,36 @@
     NO,                      !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn005:Wall001:Win001,    !- Fenestration Surface 1 Name
+    Zn005:Wall002:Win001,    !- Fenestration Surface 2 Name
+    Zn005:Wall003:Win001,    !- Fenestration Surface 3 Name
+    Zn005:Wall004:Win001;    !- Fenestration Surface 4 Name
 
-  WindowProperty:ShadingControl,
-    DOUBLE PANE WITH SWITCHABLE GLAZING, !- Name
+  WindowShadingControl,
+    DOUBLE PANE WITH SWITCHABLE GLAZING-DPSG,  !- Name
+    DPSG,                    !- Zone Name
+    1,                       !- Shading Control Sequence Number
     SwitchableGlazing,       !- Shading Type
     DOUBLE PANE DARKENED,    !- Construction with Shading Name
-    MeetDaylightIlluminanceSetpoint, !- Shading Control Type
+    MeetDaylightIlluminanceSetpoint,  !- Shading Control Type
     ,                        !- Schedule Name
     20.0,                    !- Setpoint {W/m2, W or deg C}
     NO,                      !- Shading Control Is Scheduled
     NO,                      !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    DPSG Daylighting Ctrl,   !- Daylighting Control Object Name
+    Group,                   !- Multiple Surface Control Type
+    Zn010:Wall001:Win001,    !- Fenestration Surface 1 Name
+    Zn010:Wall002:Win001,    !- Fenestration Surface 2 Name
+    Zn010:Wall003:Win001,    !- Fenestration Surface 3 Name
+    Zn010:Wall004:Win001;    !- Fenestration Surface 4 Name
 
   Daylighting:Controls,
     DPW Daylighting Ctrl,    !- Name
@@ -866,7 +902,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -898,7 +933,6 @@
     Zn001:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -930,7 +964,6 @@
     Zn001:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -962,7 +995,6 @@
     Zn001:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1026,7 +1058,6 @@
     Zn002:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1058,7 +1089,6 @@
     Zn002:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1090,7 +1120,6 @@
     Zn002:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1122,7 +1151,6 @@
     Zn002:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1186,7 +1214,6 @@
     Zn003:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SCREEN, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1218,7 +1245,6 @@
     Zn003:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SCREEN, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1250,7 +1276,6 @@
     Zn003:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SCREEN, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1282,7 +1307,6 @@
     Zn003:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SCREEN, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1346,7 +1370,6 @@
     Zn004:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH DRAPES, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1378,7 +1401,6 @@
     Zn004:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH DRAPES, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1410,7 +1432,6 @@
     Zn004:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH DRAPES, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1442,7 +1463,6 @@
     Zn004:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH DRAPES, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1506,7 +1526,6 @@
     Zn005:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SHADE,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1538,7 +1557,6 @@
     Zn005:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SHADE,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1570,7 +1588,6 @@
     Zn005:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SHADE,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1602,7 +1619,6 @@
     Zn005:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SHADE,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1666,7 +1682,6 @@
     Zn006:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1698,7 +1713,6 @@
     Zn006:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1730,7 +1744,6 @@
     Zn006:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1762,7 +1775,6 @@
     Zn006:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1826,7 +1838,6 @@
     Zn007:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1858,7 +1869,6 @@
     Zn007:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1890,7 +1900,6 @@
     Zn007:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1922,7 +1931,6 @@
     Zn007:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1986,7 +1994,6 @@
     Zn008:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2018,7 +2025,6 @@
     Zn008:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2050,7 +2056,6 @@
     Zn008:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2082,7 +2087,6 @@
     Zn008:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2146,7 +2150,6 @@
     Zn009:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2178,7 +2181,6 @@
     Zn009:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2210,7 +2212,6 @@
     Zn009:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2242,7 +2243,6 @@
     Zn009:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2306,7 +2306,6 @@
     Zn010:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SWITCHABLE GLAZING,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2338,7 +2337,6 @@
     Zn010:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SWITCHABLE GLAZING,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2370,7 +2368,6 @@
     Zn010:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SWITCHABLE GLAZING,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2402,7 +2399,6 @@
     Zn010:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SWITCHABLE GLAZING,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2446,18 +2442,30 @@
   Lights,
     DPW Lights,              !- Name
     DPW,                     !- Zone or ZoneList Name
-    On,                        !- Schedule Name
+    On,                      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
-    100;                     !- Lighting Level {W}
+    100,                     !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    ,                        !- Return Air Fraction
+    ,                        !- Fraction Radiant
+    ,                        !- Fraction Visible
+    ;                        !- Fraction Replaceable
 
   Lights,
-    DPSG Lights,              !- Name
-    DPSG,                     !- Zone or ZoneList Name
-    On,                        !- Schedule Name
+    DPSG Lights,             !- Name
+    DPSG,                    !- Zone or ZoneList Name
+    On,                      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
-    100;                     !- Lighting Level {W}
+    100,                     !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    ,                        !- Return Air Fraction
+    ,                        !- Fraction Radiant
+    ,                        !- Fraction Visible
+    ;                        !- Fraction Replaceable
 
-  Schedule:Constant, On, Integer, 1.0;
+  Schedule:Constant,On,Integer,1.0;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 

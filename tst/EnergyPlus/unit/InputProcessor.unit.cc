@@ -1807,7 +1807,6 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
         "123456E,           !- Building Surface Name",
         ",                        !- Outside Boundary Condition Object",
         "0.5000000,               !- View Factor to Ground",
-        ",                        !- Shading Control Name",
         ",                        !- Frame and Divider Name",
         "1.0,                     !- Multiplier",
         "4,                       !- Number of Vertices",
@@ -1840,9 +1839,9 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
     inputProcessor->getObjectItem(CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus,
                                   lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
-    EXPECT_EQ(7, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "123456E", "", "", ""}), Alphas));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true, true}), lAlphaBlanks));
+    EXPECT_EQ(6, NumAlphas);
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "123456E", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(15, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<Real64>({0.5000000, 1.0, 4, 0.548000, 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5, 5.548, 0, 2.5}), Numbers));
@@ -1863,7 +1862,6 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
         "E123,           !- Building Surface Name",
         ",                        !- Outside Boundary Condition Object",
         "0.5000000,               !- View Factor to Ground",
-        ",                        !- Shading Control Name",
         ",                        !- Frame and Divider Name",
         "1.0,                     !- Multiplier",
         "4,                       !- Number of Vertices",
@@ -1896,9 +1894,9 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
     inputProcessor->getObjectItem(CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus,
                                   lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
-    EXPECT_EQ(7, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "E123", "", "", ""}), Alphas));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true, true}), lAlphaBlanks));
+    EXPECT_EQ(6, NumAlphas);
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "E123", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(15, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<Real64>({0.5000000, 1.0, 4, 0.548000, 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5, 5.548, 0, 2.5}), Numbers));

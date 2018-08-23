@@ -847,7 +847,7 @@
   ElectricEquipment:ITE:AirCooled,
     Data Center Servers,     !- Name
     Main Zone,               !- Zone Name
-    FlowControlWithApproachTemperatures,
+    FlowControlWithApproachTemperatures,  !- Air Flow Calculation Method
     Watts/Unit,              !- Design Power Input Calculation Method
     500,                     !- Watts per Unit {W}
     100,                     !- Number of Units
@@ -873,11 +873,10 @@
     ITE-CPU,                 !- CPU End-Use Subcategory
     ITE-Fans,                !- Fan End-Use Subcategory
     ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
-    2,                       !- field Supply Approach Temperature
-    ,                        !- field Supply Approach Temperature Schedule
-    -1,                      !- field Return Approach Temperature 
-    ;                        !- field Return Approach Temperature Schedule
-
+    2,                       !- Supply Temperature Difference {deltaC}
+    ,                        !- Supply Temperature Difference Schedule
+    -1,                      !- Return Temperature Difference {deltaC}
+    ;                        !- Return Temperature Difference Schedule
 
   Curve:Quadratic,
     ECM FanPower fFlow,      !- Name
@@ -1135,7 +1134,7 @@
   Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,Hourly;
 
   Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,Hourly;
- 
+
   Output:Variable,*,Zone ITE Adjusted Return Air Temperature,Hourly;
 
   Output:Variable,*,Zone Air Temperature,Hourly;

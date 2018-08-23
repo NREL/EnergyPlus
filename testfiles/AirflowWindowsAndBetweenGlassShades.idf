@@ -398,8 +398,10 @@
     No,                      !- Airflow Is Scheduled
     ;                        !- Airflow Multiplier Schedule Name
 
-  WindowProperty:ShadingControl,
-    Double Pane Between-Glass Shade,  !- Name
+  WindowShadingControl,
+    Double Pane Between-Glass Shade-West Zone,  !- Name
+    West Zone,               !- Zone Name
+    1,                       !- Shading Control Sequence Number
     BetweenGlassShade,       !- Shading Type
     WIN-CON-DOUBLEPANE WITH BETWEEN-GLASS Shade,  !- Construction with Shading Name
     AlwaysOn,                !- Shading Control Type
@@ -409,10 +411,17 @@
     NO,                      !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn001:Wall001:Win003,    !- Fenestration Surface 1 Name
+    Zn001:Wall001:Win004;    !- Fenestration Surface 2 Name
 
-  WindowProperty:ShadingControl,
-    Triple Pane Between-Glass Shade,  !- Name
+  WindowShadingControl,
+    Triple Pane Between-Glass Shade-West Zone,  !- Name
+    West Zone,               !- Zone Name
+    2,                       !- Shading Control Sequence Number
     BetweenGlassShade,       !- Shading Type
     WIN-CON-TRIPLEPANE WITH BETWEEN-GLASS Shade,  !- Construction with Shading Name
     AlwaysOn,                !- Shading Control Type
@@ -422,7 +431,12 @@
     NO,                      !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn001:Wall001:Win007,    !- Fenestration Surface 1 Name
+    Zn001:Wall001:Win008;    !- Fenestration Surface 2 Name
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -714,7 +728,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -730,7 +743,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -746,7 +758,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE BETWEEN-GLASS Shade,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -762,7 +773,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE BETWEEN-GLASS Shade,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -778,7 +788,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -794,7 +803,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -810,7 +818,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    TRIPLE PANE BETWEEN-GLASS Shade,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -826,7 +833,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    TRIPLE PANE BETWEEN-GLASS Shade,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
