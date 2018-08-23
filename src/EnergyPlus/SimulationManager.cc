@@ -537,12 +537,8 @@ namespace SimulationManager {
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
                     DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
-                    //DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " (" + DayOfSimChr + "/" +
-                    //              std::to_string(NumOfDayInEnvrn) + ") for " + EnvironmentName);
                     DisplayPerfSimulationFlag = false;
-                } //else {
-                  //  DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " (" + DayOfSimChr + "/" + std::to_string(NumOfDayInEnvrn) + ") for " + EnvironmentName);
-                //}
+                }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
                     DisplayString("Starting last  year of environment at:  " + DayOfSimChr);

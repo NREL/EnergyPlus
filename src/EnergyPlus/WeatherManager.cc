@@ -1259,11 +1259,9 @@ namespace WeatherManager {
                             WeekDayTypes = 0;
                             JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
                             JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
-                            if (JDay5End >= JDay5Start) {
-                                curSimDayForEndOfRunPeriod = DayOfSim + (JDay5End - JDay5Start) + LeapYearAdd;
-                            } else {
-                                curSimDayForEndOfRunPeriod = DayOfSim + General::OrdinalDay(12, 31, LeapYearAdd) - JDay5Start + JDay5End;
-                            }
+
+                            curSimDayForEndOfRunPeriod = Environment(Envrn).TotalDays;
+
                             Loop = JDay5Start;
                             while (true) {
                                 WeekDayTypes(Loop) = TWeekDay;
@@ -1284,9 +1282,7 @@ namespace WeatherManager {
                                 DaylightSavingIsActive = true;
                             }
                             Environment(Envrn).SetWeekDays = false;
-                            if (Environment(Envrn).ActualWeather) {
-                                curSimDayForEndOfRunPeriod = Environment(Envrn).TotalDays;
-                            }
+
                             if (DaylightSavingIsActive) {
                                 SetDSTDateRanges(MonWeekDay, DSTIndex, DSTActStMon, DSTActStDay, DSTActEnMon, DSTActEnDay);
                             }
@@ -2526,9 +2522,9 @@ namespace WeatherManager {
         OutDewPointTemp = TodayOutDewPointTemp(TimeStep, HourOfDay);
         if (EMSOutDewPointTempOverrideOn) OutDewPointTemp = EMSOutDewPointTempOverrideValue;
         OutRelHum = TodayOutRelHum(TimeStep, HourOfDay);
-        OutRelHumValue = OutRelHum * 1.0e-2;
+        OutRelHumValue = OutRelHum / 100.0;
         if (EMSOutRelHumOverrideOn) {
-            OutRelHumValue = EMSOutRelHumOverrideValue * 1.0e-2;
+            OutRelHumValue = EMSOutRelHumOverrideValue / 100.0;
             OutRelHum = EMSOutRelHumOverrideValue;
         }
 
@@ -2589,7 +2585,7 @@ namespace WeatherManager {
         if (EMSDifSolarRadOverrideOn) DifSolarRad = EMSDifSolarRadOverrideValue;
         BeamSolarRad = TodayBeamSolarRad(TimeStep, HourOfDay);
         if (EMSBeamSolarRadOverrideOn) BeamSolarRad = EMSBeamSolarRadOverrideValue;
-        LiquidPrecipitation = TodayLiquidPrecip(TimeStep, HourOfDay) * 1.0e-3; // convert from mm to m
+        LiquidPrecipitation = TodayLiquidPrecip(TimeStep, HourOfDay) / 1000.0; // convert from mm to m
 
         if (UseRainValues) {
             IsRain = TodayIsRain(TimeStep, HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
