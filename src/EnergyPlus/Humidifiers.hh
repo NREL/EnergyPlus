@@ -105,7 +105,6 @@ namespace Humidifiers {
         Real64 ThermalEffRated;     // rated thermal efficiency of the gas fired humidifier [-]
         Real64 CurMakeupWaterTemp;  // makeup water temperature from main water [C]
         int EfficiencyCurvePtr;     // index to efficiency curve
-        int EfficiencyCurveType;    // type of efficiency curve
         int InletWaterTempOption;   // type inlet water temperature fixed or variable
         Real64 FanPower;            // nominal fan power [watts]
         Real64 StandbyPower;        // standby power consumption [watts]
@@ -146,7 +145,7 @@ namespace Humidifiers {
         // Default Constructor
         HumidifierData()
             : HumType_Code(0), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0), CurMakeupWaterTemp(0.0),
-              EfficiencyCurvePtr(0), EfficiencyCurveType(0), InletWaterTempOption(0), FanPower(0.0), StandbyPower(0.0), AirInNode(0), AirOutNode(0),
+              EfficiencyCurvePtr(0), InletWaterTempOption(0), FanPower(0.0), StandbyPower(0.0), AirInNode(0), AirOutNode(0),
               AirInTemp(0.0), AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0), AirOutHumRat(0.0), AirOutEnthalpy(0.0),
               AirOutMassFlowRate(0.0), HumRatSet(0.0), WaterAdd(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0), WaterCons(0.0), WaterConsRate(0.0),
               SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedSupplyVdot(0.0),

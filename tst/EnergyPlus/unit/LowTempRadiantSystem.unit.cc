@@ -1798,3 +1798,71 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
     // check chilled water design flow rate calculated here and autosized flow are identical
     EXPECT_DOUBLE_EQ(DesChilledWaterVolFlowRate, CFloRadSys(RadSysNum).WaterVolFlowMax);
 }
+
+TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
+{
+    int RadSysNum;
+    int RadSysType;
+    Real64 Temperature;
+    Real64 WaterMassFlow;
+    Real64 FlowFraction;
+    Real64 NumCircs;
+    Real64 TubeLength;
+    Real64 TubeDiameter;
+    Real64 HXEffectFuncResult;
+    int GlycolIndex = 0;
+
+    // Set values of items that will stay constant for all calls to HX Effectiveness function
+    RadSysNum = 1;
+    WaterMassFlow = 0.1;
+    FlowFraction = 1.0;
+    NumCircs = 1;
+    TubeLength = 10.0;
+    TubeDiameter = 0.05;
+    PlantLoop(1).FluidName = "WATER";
+
+    // Test 1: Heating for Hydronic System
+    HXEffectFuncResult = 0.0;
+    OperatingMode = HeatingMode;
+    RadSysType = HydronicSystem;
+    Temperature = 10.0;
+    HydrRadSys(RadSysNum).HWLoopNum = 1;
+    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
+                                                WaterMassFlow, FlowFraction, NumCircs,
+                                                TubeLength, TubeDiameter, GlycolIndex);
+    EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
+    
+    // Test 2: Cooling for Hydronic System
+    HXEffectFuncResult = 0.0;
+    OperatingMode = CoolingMode;
+    RadSysType = HydronicSystem;
+    Temperature = 10.0;
+    HydrRadSys(RadSysNum).CWLoopNum = 1;
+    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
+                                                WaterMassFlow, FlowFraction, NumCircs,
+                                                TubeLength, TubeDiameter, GlycolIndex);
+    EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
+    
+    // Test 3: Heating for Constant Flow System
+    HXEffectFuncResult = 0.0;
+    OperatingMode = HeatingMode;
+    RadSysType = ConstantFlowSystem;
+    Temperature = 10.0;
+    CFloRadSys(RadSysNum).HWLoopNum = 1;
+    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
+                                                WaterMassFlow, FlowFraction, NumCircs,
+                                                TubeLength, TubeDiameter, GlycolIndex);
+    EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
+    
+    // Test 4: Cooling for Constant Flow System
+    HXEffectFuncResult = 0.0;
+    OperatingMode = CoolingMode;
+    RadSysType = ConstantFlowSystem;
+    Temperature = 10.0;
+    CFloRadSys(RadSysNum).CWLoopNum = 1;
+    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
+                                                WaterMassFlow, FlowFraction, NumCircs,
+                                                TubeLength, TubeDiameter, GlycolIndex);
+    EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
+
+}

@@ -73,6 +73,7 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HVACControllers.hh>
+#include <HVACHXAssistedCoolingCoil.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -83,6 +84,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SimAirServingZones.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
 #include <WaterManager.hh>
@@ -189,9 +191,10 @@ namespace WaterCoils {
     Array1D_bool MyUAAndFlowCalcFlag;
     Array1D_bool MyCoilDesignFlag;
     Array1D_bool CoilWarningOnceFlag;
-    Array1D_int WaterTempCoolCoilErrs; // error counting for detailed coils
-    Array1D_int PartWetCoolCoilErrs;   // error counting for detailed coils
-    bool GetWaterCoilsInputFlag(true); // Flag set to make sure you get input once
+    Array1D_int WaterTempCoolCoilErrs;              // error counting for detailed coils
+    Array1D_int PartWetCoolCoilErrs;                // error counting for detailed coils
+    bool GetWaterCoilsInputFlag(true);              // Flag set to make sure you get input once
+    bool WaterCoilControllerCheckOneTimeFlag(true); // flg used to check water coil controller
     Array1D_bool CheckEquipName;
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -238,6 +241,7 @@ namespace WaterCoils {
         CheckEquipName.deallocate();
         WaterCoil.deallocate();
         WaterCoilNumericFields.deallocate();
+        WaterCoilControllerCheckOneTimeFlag = true;
     }
 
     void SimulateWaterCoilComponents(std::string const &CompName,
@@ -1004,6 +1008,7 @@ namespace WaterCoils {
         using namespace FaultsManager;
         using DataAirSystems::PrimaryAirSystem;
         using HVACControllers::GetControllerNameAndIndex;
+        using SimAirServingZones::CheckWaterCoilIsOnAirLoop;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallNo(1.e-9); // SmallNo number in place of zero
@@ -1118,6 +1123,38 @@ namespace WaterCoils {
             for (tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum) {
                 GetControllerNameAndIndex(
                     WaterCoil(tempCoilNum).WaterInletNodeNum, WaterCoil(tempCoilNum).ControllerName, WaterCoil(tempCoilNum).ControllerIndex, errFlag);
+            }
+        }
+
+        if (WaterCoilControllerCheckOneTimeFlag && (DataHVACGlobals::GetAirPathDataDone)) {
+            bool ErrorsFound = false;
+            bool WaterCoilOnAirLoop = true;
+            for (tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum) {
+                if (WaterCoil(tempCoilNum).ControllerIndex > 0) {
+                    int CoilTypeNum(0);
+                    std::string CompType;
+                    std::string CompName = WaterCoil(tempCoilNum).Name;
+                    if (WaterCoil(tempCoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_Cooling) {
+                        CoilTypeNum = SimAirServingZones::WaterCoil_Cooling;
+                        CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater);
+                    } else if (WaterCoil(tempCoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_DetFlatFinCooling) {
+                        CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
+                        CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
+                    } else if (WaterCoil(tempCoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_SimpleHeating) {
+                        CoilTypeNum = SimAirServingZones::WaterCoil_SimpleHeat;
+                        CompType = cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
+                    }
+                    WaterCoilOnAirLoop = true;
+                    CheckWaterCoilIsOnAirLoop(CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
+                    if (!WaterCoilOnAirLoop) {
+                        ShowContinueError("Controller:WaterCoil = " + WaterCoil(tempCoilNum).ControllerName + ". Invalid water controller entry.");
+                        ErrorsFound = true;
+                    }
+                }
+            }
+            WaterCoilControllerCheckOneTimeFlag = false;
+            if (ErrorsFound) {
+                ShowFatalError("Program terminated for previous condition.");
             }
         }
 
@@ -2084,8 +2121,8 @@ namespace WaterCoils {
                 } else {
                     CompType = cAllCoilTypes(Coil_CoolingWater); // Coil:Cooling:Water
                 }
-                bPRINT = false; // do not print this sizing request since the autosized value is needed and this input may not be autosized (we should
-                                // print this!)
+                bPRINT = false;       // do not print this sizing request since the autosized value is needed and this input may not be autosized (we
+                                      // should print this!)
                 TempSize = AutoSize;  // get the autosized air volume flow rate for use in other calculations
                 SizingString.clear(); // doesn't matter
                 CompName = WaterCoil(CoilNum).Name;
@@ -2104,6 +2141,7 @@ namespace WaterCoils {
                     DataAirFlowUsedForSizing = DesCoilAirFlow;
                     DataFlowUsedForSizing = DesCoilAirFlow;
                     DataDesOutletAirTemp = DesCoilExitTemp;
+<<<<<<< HEAD
                     // DataDesOutletAirHumRat = PsyWFnTdbRhPb( DataDesOutletAirTemp, 0.9, StdBaroPress, RoutineName ); //TRANE, moved into
                     // GetCoilDesFlowT routine
                     DataDesOutletAirHumRat =
@@ -2115,6 +2153,52 @@ namespace WaterCoils {
                     bPRINT = false; // do not print this sizing request since this coil does not have a design inlet air temp input field (we should
                                     // print this!)
                     TempSize = AutoSize; // TRANE not an input for this model
+=======
+                    DataDesOutletAirHumRat = PsyWFnTdbRhPb(DataDesOutletAirTemp, 0.9, StdBaroPress, RoutineName);
+                }
+
+                SizingString = "Design Coil Load [W]"; // there is no input field for this value and this is not the rated capacity (we should
+                                                       // always print this!)
+                RequestSizing(CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
+                WaterCoil(CoilNum).DesWaterCoolingCoilRate = TempSize;
+                WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
+                DataCapacityUsedForSizing = WaterCoil(CoilNum).DesWaterCoolingCoilRate;
+
+                // Why isn't the water volume flow rate based on the user inputs for inlet/outlet air/water temps? Water volume flow rate is
+                // always based on autosized inputs.
+                bPRINT = true;
+                FieldNum = 1; //  CoilModel_Detailed: N1 , \field Maximum Water Flow Rate, else: N1 , \field Design Water Flow Rate
+                SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
+                TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
+                RequestSizing(CompType, CompName, CoolingWaterflowSizing, SizingString, TempSize, bPRINT, RoutineName);
+                WaterCoil(CoilNum).MaxWaterVolFlowRate = TempSize;
+                DataWaterFlowUsedForSizing = TempSize;
+
+                if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
+                    FieldNum = 1;
+                    bPRINT = false; // do not print this sizing request since this coil does not have a design air flow rate input field (we
+                                    // should print this!)
+                } else {
+                    FieldNum = 2; //  N2 , \field Design Air Flow Rate
+                    bPRINT = true;
+                }
+                SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
+                TempSize = WaterCoil(CoilNum).DesAirVolFlowRate;
+                RequestSizing(CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
+                WaterCoil(CoilNum).DesAirVolFlowRate = TempSize;
+                WaterCoil(CoilNum).DesAirMassFlowRate = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
+
+                if (WaterCoil(CoilNum).DesAirVolFlowRate <= 0.0) {
+                    WaterCoil(CoilNum).DesAirVolFlowRate = 0.0;
+                    ShowWarningError("The design air flow rate is zero for Coil:Cooling:Water " + WaterCoil(CoilNum).Name);
+                    ShowContinueError("The autosize value for max air volume flow rate is zero");
+                }
+
+                if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
+                    FieldNum = 1;
+                    bPRINT = false; // do not print this sizing request since this coil does not have a design inlet air temp input field (we
+                                    // should print this!)
+>>>>>>> develop
                 } else {
                     FieldNum = 4; //  N4 , \field Design Inlet Air Temperature
                     bPRINT = true;
@@ -2128,8 +2212,8 @@ namespace WaterCoils {
                 DataDesInletAirTemp = TempSize;
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
-                    FieldNum = 1;   // do not print this sizing request since this coil does not have a design inlet water temp input field (we should
-                                    // print this!)
+                    FieldNum = 1;   // do not print this sizing request since this coil does not have a design inlet water temp input field (we
+                                    // should print this!)
                     bPRINT = false; // no field for detailed water coil
                     TempSize = AutoSize; // TRANE coil report
                 } else {
@@ -2162,8 +2246,8 @@ namespace WaterCoils {
                 }
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
-                    FieldNum = 1;   // do not print this sizing request since this coil does not have a design outlet air temp input field (we should
-                                    // print this!)
+                    FieldNum = 1;   // do not print this sizing request since this coil does not have a design outlet air temp input field (we
+                                    // should print this!)
                     bPRINT = false; // no field for detailed water coil
                     TempSize = AutoSize; // TRANE
                 } else {
@@ -2180,8 +2264,8 @@ namespace WaterCoils {
                 WaterCoil(CoilNum).DesOutletAirTemp = TempSize;
                 DataDesOutletAirTemp = TempSize;
 
-                if (CurSysNum > 0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This will change
-                                     // the order of the eio file.
+                if (CurSysNum > 0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This will
+                                     // change the order of the eio file.
                     if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                         FieldNum = 1;   // do not print this sizing request since this coil does not have a design inlet air humrat input field (we
                                         // should print this!)
@@ -2200,10 +2284,16 @@ namespace WaterCoils {
                 }
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
+<<<<<<< HEAD
                     FieldNum = 1; // do not print this sizing request since this coil does not have a design outlet air humrat input field (we should
                                   // print this!)
                     bPRINT = false;      // no field for detailed water coil
                     TempSize = AutoSize; // TRANE
+=======
+                    FieldNum = 1;   // do not print this sizing request since this coil does not have a design outlet air humrat input field (we
+                                    // should print this!)
+                    bPRINT = false; // no field for detailed water coil
+>>>>>>> develop
                 } else {
                     FieldNum = 7; //  N7 , \field Design Outlet Air Humidity Ratio
                     bPRINT = true;
@@ -2457,8 +2547,8 @@ namespace WaterCoils {
                 WaterCoil(CoilNum).DesTotWaterCoilLoad = TempSize;
                 DataCapacityUsedForSizing = WaterCoil(CoilNum).DesWaterHeatingCoilRate;
 
-                // We now have the design load if it was autosized. For the case of CoilPerfInpMeth == NomCap, calculate the air flow rate specified
-                // by the NomCap inputs. This overrides all previous values
+                // We now have the design load if it was autosized. For the case of CoilPerfInpMeth == NomCap, calculate the air flow rate
+                // specified by the NomCap inputs. This overrides all previous values
                 if (WaterCoil(CoilNum).CoilPerfInpMeth == NomCap && NomCapUserInp) {
                     WaterCoil(CoilNum).InletAirMassFlowRate = WaterCoil(CoilNum).DesTotWaterCoilLoad /
                                                               (CpAirStd * (WaterCoil(CoilNum).DesOutletAirTemp - WaterCoil(CoilNum).DesInletAirTemp));
@@ -2575,8 +2665,8 @@ namespace WaterCoils {
                     EstimateCoilInletWaterTemp(DataCoilNum, DataFanOpMode, 1.0, DataCapacityUsedForSizing, DesCoilInletWaterTempUsed);
                     WaterCoil(DataCoilNum).InletWaterTemp = DesCoilInletWaterTempUsed;
                 }
-                // must set DataCapacityUsedForSizing, DataWaterFlowUsedForSizing and DataFlowUsedForSizing to size UA. Any value of 0 will result in
-                // UA = 1.
+                // must set DataCapacityUsedForSizing, DataWaterFlowUsedForSizing and DataFlowUsedForSizing to size UA. Any value of 0 will result
+                // in UA = 1.
                 RequestSizing(CompType, CompName, WaterHeatingCoilUASizing, SizingString, TempSize, bPRINT, RoutineName);
                 if (DesCoilWaterInTempSaved < DesCoilHWInletTempMin) {
                     ShowWarningError("Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
@@ -3117,7 +3207,8 @@ namespace WaterCoils {
             DryCoilEfficiency = 0.0;
             // Tuned Replaced by below to eliminate pow calls
             //			for ( CoefPointer = 1; CoefPointer <= 5; ++CoefPointer ) {
-            //				DryCoilEfficiency += WaterCoil( CoilNum ).DryFinEfficncyCoef( CoefPointer ) * std::pow( DryFinEfficncy,
+            //				DryCoilEfficiency += WaterCoil( CoilNum ).DryFinEfficncyCoef( CoefPointer ) * std::pow(
+            // DryFinEfficncy,
             // CoefPointer
             //-
             // 1
@@ -3286,7 +3377,8 @@ namespace WaterCoils {
                         denom = (WaterCoil(CoilNum).EnthVsTempCurveAppxSlope - WetCoilCoeff * ScaledWaterSpecHeat -
                                  (1.0 - WetCoilCoeff) * K1 * MoistAirSpecificHeat);
                         //          write(outputfiledebug,*) ' denom=',denom
-                        //          WetDryInterfcWaterTemp = ((1.0 - WetCoilCoeff) * (InletAirEnthalpy - WaterCoil(CoilNum)%EnthVsTempCurveConst - K1
+                        //          WetDryInterfcWaterTemp = ((1.0 - WetCoilCoeff) * (InletAirEnthalpy - WaterCoil(CoilNum)%EnthVsTempCurveConst -
+                        //          K1
                         //          *  &
                         //                                     MoistAirSpecificHeat * TempAirIn) + WetCoilCoeff * &
                         //                                     TempWaterIn * (WaterCoil(CoilNum)%EnthVsTempCurveAppxSlope -  &
@@ -4293,8 +4385,8 @@ namespace WaterCoils {
         if ((iter > itmax) && (!WarmupFlag)) {
             ShowWarningError("For Coil:Cooling:Water " + WaterCoil(CoilNum).Name);
             ShowContinueError("CalcCoilUAbyEffectNTU: Maximum iterations exceeded:Coil UA calculation");
-            CalcCoilUAbyEffectNTU =
-                0.0; // Autodesk:Return Line added to set return value: Using non-converged CoilUA value may be preferred but that was not happening
+            CalcCoilUAbyEffectNTU = 0.0; // Autodesk:Return Line added to set return value: Using non-converged CoilUA value may be preferred but
+                                         // that was not happening
         } else {
 
             // Assign value to CalcCoilUAbyEffectNTU
