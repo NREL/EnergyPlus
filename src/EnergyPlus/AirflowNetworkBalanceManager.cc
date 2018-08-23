@@ -397,7 +397,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Locals
         int i;
-        int AFNSupplyFanType;
+        int AFNSupplyFanType = 0;
 
         if (AirflowNetworkGetInputFlag) {
             GetAirflowNetworkInput();
@@ -469,7 +469,7 @@ namespace AirflowNetworkBalanceManager {
         if (allocated(ZoneEquipConfig) && NumHybridVentSysAvailMgrs > 0 && allocated(PrimaryAirSystem)) HybridVentilationControl();
         if (VentilationCtrl == 1 && NumHybridVentSysAvailMgrs > 0) AirflowNetworkFanActivated = false;
 
-        if (present(Iter) && present(ResimulateAirZone)) {
+        if (present(Iter) && present(ResimulateAirZone) && SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
             if (AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == FanType_SimpleOnOff) {
                 ResimulateAirZone = true;
             }

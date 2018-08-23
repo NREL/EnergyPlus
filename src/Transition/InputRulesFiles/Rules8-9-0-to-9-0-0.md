@@ -48,10 +48,37 @@ New F9=F13 = Old F7-F11
 
 
 
+# Object Change: `FenestrationSurface:Detailed`
 
+Fields F1-F6 (A1-A5, N1) remain the same.  
+Delete F7, which is A6 \field Shading Control Name.
+Shift all later fields by one.
 
+# Object Change: `Window`
 
+Fields F1-F3 (A1-A3) remain the same.  
+Delete F4, which is A4 \field Shading Control Name.
+Shift all later fields by one.
 
+# Object Change: `GlazedDoor`
+
+Fields F1-F3 (A1-A3) remain the same.  
+Delete F4, which is A4 \field Shading Control Name.
+Shift all later fields by one.
+
+# Object Change: `WindowProperty:ShadingControl`
+
+Change object type from `WindowProperty:ShadingControl` to `WindowShadingControl`
+Field F1 (A1) remains the same.
+Insert new field F2 (N1) as a blank, \field Shading Control Sequence Number.
+All remaining old Fields F2-F12 (A2-A10, N1-N2) shift by one to F3-F13 (A2-A10, N2-N3).
+Add the following new fields at the end, starting with F14:
+F14 (A11) ????? \field Daylighting Control Name.
+F15 (A12) "Sequential" \field Multiple Surface Control Type.
+F16 and following (A13ff) \field Fenestration Surface n Name: 
+a) Loop through all of the old Fenestration:Detailed, Window, and GlazedDoor objects, 
+b) If the "Shading Control Name" is not blank, and it matches the name (F1) of this object, then add the surface name as a new field here
+Order matters here, so need to maintain the same order that was previously used for control, which was ???
 
 
 

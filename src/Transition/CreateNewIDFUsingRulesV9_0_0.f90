@@ -134,8 +134,40 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: AlphaNumI
   REAL :: SaveNumber
 
-  ! for Schedule:Compact from 8.8 to 8.9
-  CHARACTER(len=MaxNameLength) ::  UpperInArg=blank
+  ! new variables for WINDOWPROPERTY:SHADINGCONTROL from 8.9 to 9.0
+  INTEGER :: TotWinObjs = 0
+  INTEGER :: TotObjsWithShadeCtrl = 0
+  INTEGER :: TotBaseSurfObjs = 0
+  TYPE FenestrationSurf
+    CHARACTER(len=MaxObjectNameLength) :: FenSurfName =' ' ! Fenestration surface name
+    CHARACTER(len=MaxObjectNameLength) :: FenBaseSurfName =' ' ! Base surface name
+    CHARACTER(len=MaxObjectNameLength) :: FenZoneName =' ' ! Zone name
+    CHARACTER(len=MaxObjectNameLength) :: FenShadeControlName =' ' ! Original WindowProperty:ShadingControl name
+  END TYPE
+  TYPE(FenestrationSurf), ALLOCATABLE, DIMENSION(:) :: FenSurf
+  INTEGER :: surfNum = 0
+  INTEGER :: baseSurfNum = 0
+  LOGICAL :: baseSurfFound = .false.
+
+  TYPE ShadeControl
+    CHARACTER(len=MaxObjectNameLength) :: OldShadeControlName =' ' ! Original WindowProperty:ShadingControl name
+    INTEGER :: NumZones = 0 ! Number of zones for this old shade control name
+    CHARACTER(len=MaxObjectNameLength), ALLOCATABLE, DIMENSION(:) :: ShadeControlZoneName ! New WindowShadingControl zone names
+    INTEGER , ALLOCATABLE, DIMENSION(:) :: SequenceNum ! New WindowShadingControl sequence numbers
+  END TYPE    
+  TYPE(ShadeControl), ALLOCATABLE, DIMENSION(:) :: ShadeControls
+  INTEGER :: TotOldShadeControls = 0
+  INTEGER :: shadeCtrlNum = 0
+  INTEGER :: NumZones = 0
+  INTEGER :: newZoneNum = 0
+  INTEGER :: zoneNum = 0
+  INTEGER :: seqCount = 0
+  CHARACTER(len=MaxObjectNameLength) :: curOldShadeName = ' '
+  CHARACTER(len=MaxObjectNameLength) :: prevOldShadeName = ' '
+  LOGICAL :: zoneFound = .false.
+  INTEGER :: daylightNum = 0
+  ! end new variables for WINDOWPROPERTY:SHADINGCONTROL from 8.9 to 9.0 
+  
 
   ! For run period transitions
   TYPE FieldFlagAndValue
@@ -291,6 +323,203 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             ENDIF
           ENDDO
 
+     ! Begin Pre-process fenestration surfaces for transition from WindowProperty:ShadingControl to WindowShadingControl
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(FenSurf)) DEALLOCATE(FenSurf)
+          IF(ALLOCATED(ShadeControls)) DEALLOCATE(ShadeControls)
+          TotWinObjs = GetNumObjectsFound('FENESTRATIONSURFACE:DETAILED') + GetNumObjectsFound('WINDOW') + GetNumObjectsFound('GLAZEDDOOR')
+          TotBaseSurfObjs = GetNumObjectsFound('BUILDINGSURFACE:DETAILED') + GetNumObjectsFound('WALL:DETAILED') + GetNumObjectsFound('ROOFCEILING:DETAILED') + GetNumObjectsFound('FLOOR:DETAILED')
+          TotBaseSurfObjs = TotBaseSurfObjs + GetNumObjectsFound('WALL:EXTERIOR') + GetNumObjectsFound('WALL:ADIABATIC') + GetNumObjectsFound('WALL:UNDERGROUND') + GetNumObjectsFound('WALL:INTERZONE')
+          TotBaseSurfObjs = TotBaseSurfObjs + GetNumObjectsFound('ROOF') + GetNumObjectsFound('CEILING:ADIABATIC') + GetNumObjectsFound('CEILING:INTERZONE')
+          TotBaseSurfObjs = TotBaseSurfObjs + GetNumObjectsFound('FLOOR:GROUNDCONTACT') + GetNumObjectsFound('FLOOR:ADIABATIC') + GetNumObjectsFound('FLOOR:INTERZONE')
+          ALLOCATE(FenSurf(TotWinObjs))
+ 
+          ! Loop through all objects that might have a window shading control assigned and make a list
+          TotObjsWithShadeCtrl = 0
+          DO surfNum=1,GetNumObjectsFound('FENESTRATIONSURFACE:DETAILED')
+            CALL GetObjectItem('FENESTRATIONSURFACE:DETAILED',surfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            IF (Alphas(6) .NE. Blank) THEN
+              TotObjsWithShadeCtrl = TotObjsWithShadeCtrl + 1
+              FenSurf(TotObjsWithShadeCtrl)%FenSurfName = TRIM(Alphas(1))
+              FenSurf(TotObjsWithShadeCtrl)%FenBaseSurfName = TRIM(Alphas(4))
+              FenSurf(TotObjsWithShadeCtrl)%FenShadeControlName = TRIM(Alphas(6))
+            ENDIF
+          ENDDO
+          DO surfNum=1,GetNumObjectsFound('WINDOW')
+            CALL GetObjectItem('WINDOW',surfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            IF (Alphas(4) .NE. Blank) THEN
+              TotObjsWithShadeCtrl = TotObjsWithShadeCtrl + 1
+              FenSurf(TotObjsWithShadeCtrl)%FenSurfName = TRIM(Alphas(1))
+              FenSurf(TotObjsWithShadeCtrl)%FenBaseSurfName = TRIM(Alphas(3))
+              FenSurf(TotObjsWithShadeCtrl)%FenShadeControlName = TRIM(Alphas(4))
+            ENDIF
+          ENDDO
+          DO surfNum=1,GetNumObjectsFound('GLAZEDOOR')
+            CALL GetObjectItem('GLAZEDOOR',surfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            IF (Alphas(4) .NE. Blank) THEN
+              TotObjsWithShadeCtrl = TotObjsWithShadeCtrl + 1
+              FenSurf(TotObjsWithShadeCtrl)%FenSurfName = TRIM(Alphas(1))
+              FenSurf(TotObjsWithShadeCtrl)%FenBaseSurfName = TRIM(Alphas(3))
+              FenSurf(TotObjsWithShadeCtrl)%FenShadeControlName = TRIM(Alphas(4))
+            ENDIF
+          ENDDO
+      
+          ! Loop through all objects with a window shading control assigned and find out which zone they are in
+          DO surfNum=1,TotObjsWithShadeCtrl
+            baseSurfFound = .false.
+            ! Loop through all possible base surfaces until match is found
+            DO baseSurfNum=1,GetNumObjectsFound('BUILDINGSURFACE:DETAILED')
+              CALL GetObjectItem('BUILDINGSURFACE:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(4))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('WALL:DETAILED')
+              CALL GetObjectItem('WALL:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('ROOFCEILING:DETAILED')
+              CALL GetObjectItem('ROOFCEILING:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('FLOOR:DETAILED')
+              CALL GetObjectItem('FLOOR:DETAILED',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('WALL:EXTERIOR')
+              CALL GetObjectItem('WALL:EXTERIOR',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('WALL:ADIABATIC')
+              CALL GetObjectItem('WALL:ADIABATIC',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('WALL:UNDERGROUND')
+              CALL GetObjectItem('WALL:UNDERGROUND',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('WALL:INTERZONE')
+              CALL GetObjectItem('WALL:INTERZONE',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('ROOF')
+              CALL GetObjectItem('ROOF',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('CEILING:ADIABATIC')
+              CALL GetObjectItem('CEILING:ADIABATIC',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('CEILING:INTERZONE')
+              CALL GetObjectItem('CEILING:INTERZONE',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('FLOOR:GROUNDCONTACT')
+              CALL GetObjectItem('FLOOR:GROUNDCONTACT',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('FLOOR:ADIABATIC')
+              CALL GetObjectItem('FLOOR:ADIABATIC',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+            IF (baseSurfFound) CYCLE
+            DO baseSurfNum=1,GetNumObjectsFound('FLOOR:INTERZONE')
+              CALL GetObjectItem('FLOOR:INTERZONE',baseSurfNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              IF (.not. SameString(FenSurf(surfNum)%FenBaseSurfName,Alphas(1))) CYCLE
+              baseSurfFound=.true.
+              FenSurf(surfNum)%FenZoneName = TRIM(Alphas(3))
+              EXIT
+            ENDDO
+          ENDDO
+ 
+          ! Now build list of new WindowShadingControl names for each old WindowProperty:ShadingControl
+          TotOldShadeControls = GetNumObjectsFound('WINDOWPROPERTY:SHADINGCONTROL')
+          NumZones = GetNumObjectsFound('ZONE')
+          ALLOCATE(ShadeControls(TotOldShadeControls))
+          DO shadeCtrlNum=1,TotOldShadeControls
+            ALLOCATE(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(NumZones))
+            ALLOCATE(ShadeControls(shadeCtrlNum)%SequenceNum(NumZones))
+            CALL GetObjectItem('WINDOWPROPERTY:SHADINGCONTROL',shadeCtrlNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            ShadeControls(shadeCtrlNum)%OldShadeControlName = TRIM(Alphas(1))
+            ShadeControls(shadeCtrlNum)%NumZones = 0
+            DO surfNum=1,TotObjsWithShadeCtrl
+              zoneFound = .false.
+              IF (.not. SameString(FenSurf(surfNum)%FenShadeControlName,ShadeControls(shadeCtrlNum)%OldShadeControlName)) CYCLE
+              DO newZoneNum=1,ShadeControls(shadeCtrlNum)%NumZones
+                IF (.not. SameString(FenSurf(surfNum)%FenZoneName,ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum))) CYCLE
+                zoneFound = .true.
+                EXIT
+              ENDDO
+              IF (zoneFound) CYCLE
+              ShadeControls(shadeCtrlNum)%NumZones = ShadeControls(shadeCtrlNum)%NumZones + 1
+              ShadeControls(shadeCtrlNum)%ShadeControlZoneName(ShadeControls(shadeCtrlNum)%NumZones) = FenSurf(surfNum)%FenZoneName
+              ShadeControls(shadeCtrlNum)%SequenceNum(newZoneNum) = 0
+            ENDDO
+          ENDDO
+          ! Now set new WindowShadingControl sequence numbers - this isn't right yet - should be driven by surface order, not shading control order, but maybe doesn't matter
+          DO zoneNum=1,NumZones
+            seqCount = 0
+            CALL GetObjectItem('ZONE',zoneNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            DO shadeCtrlNum=1,TotOldShadeControls
+              DO newZoneNum=1,ShadeControls(shadeCtrlNum)%NumZones
+                IF (SameString(Alphas(1),ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum))) THEN
+                  seqCount = seqCount + 1
+                  ShadeControls(shadeCtrlNum)%SequenceNum(newZoneNum) = seqCount
+                ENDIF
+              ENDDO
+            ENDDO
+          ENDDO
+     ! End Pre-process fenestration surfaces for transition from WindowProperty:ShadingControl to WindowShadingControl
+
           DO Num=1,NumIDFRecords
 
             IF (DeleteThisRecord(Num)) CYCLE
@@ -438,7 +667,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with F, insert the rules here
 
+              CASE('FENESTRATIONSURFACE:DETAILED')
+                ! Delete field 7 (A6) Shading Control Name
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:6) = InArgs(1:6)
+                OutArgs(7:CurArgs-1) = InArgs(8:CurArgs)
+                CurArgs = CurArgs - 1
+                nodiff = .false.
+
               ! If your original object starts with G, insert the rules here
+
+              CASE('GLAZEDDOOR')
+                ! Delete field 4 (A4) Shading Control Name
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:3) = InArgs(1:3)
+                OutArgs(4:CurArgs-1) = InArgs(5:CurArgs)
+                CurArgs = CurArgs - 1
+                nodiff = .false.
 
               ! If your original object starts with H, insert the rules here
 
@@ -577,6 +822,70 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(2) = "VenetianHorizontal"
                   nodiff = .FALSE.
                 END IF 
+
+              CASE('WINDOW')
+                ! Delete field 4 (A4) Shading Control Name
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:3) = InArgs(1:3)
+                OutArgs(4:CurArgs-1) = InArgs(5:CurArgs)
+                CurArgs = CurArgs - 1
+                nodiff = .false.
+
+              CASE('WINDOWPROPERTY:SHADINGCONTROL')
+                ! lots of stuff . . . for transition, make a separate new WindowShadingControl object for each zone it is used in
+                ObjectName = 'WindowShadingControl'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(4:CurArgs+2) = InArgs(2:CurArgs)
+                IF ( CurArgs .LT. 12) THEN
+                  OutArgs(CurArgs+3:14) = Blank
+                ENDIF
+                CurArgs = 14
+                DO shadeCtrlNum=1,TotOldShadeControls
+                  IF (.not. SameString(ShadeControls(shadeCtrlNum)%OldShadeControlName,InArgs(1))) CYCLE
+                  IF (ShadeControls(shadeCtrlNum)%NumZones .GT. 0) THEN
+                    DO newZoneNum=1,ShadeControls(shadeCtrlNum)%NumZones
+                      OutArgs(1) = TRIM(InArgs(1)) // '-' // TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum))
+                      OutArgs(2) = TRIM(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum)) ! Zone Name
+                      OutArgs(3) = RoundSigDigits(ShadeControls(shadeCtrlNum)%SequenceNum(newZoneNum),0) ! Shading Control Sequence Number
+                      OutArgs(15) = Blank ! Daylighting Control Name
+                      IF (SameString('SwitchableGlazing',InArgs(2)) .AND. SameString('MeetDaylightIlluminanceSetpoint',InArgs(4))) THEN
+                        OutArgs(16) = 'Group' ! Multiple Surface Control Type
+                      ELSE
+                        OutArgs(16) = 'Sequential' ! Multiple Surface Control Type
+                      ENDIF
+                      CurArgs = 16
+                      ! Find matching Daylighting control object, if any
+                      DO daylightNum=1,GetNumObjectsFound('DAYLIGHTING:CONTROLS')
+                        CALL GetObjectItem('DAYLIGHTING:CONTROLS',daylightNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                        IF (.not. SameString(ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum),Alphas(2))) CYCLE
+                        OutArgs(15) = TRIM(Alphas(1)) ! Daylighting Control Name
+                        EXIT
+                      ENDDO
+                      ! Add surface fields
+                      DO surfNum=1,TotObjsWithShadeCtrl
+                        IF (.not. SameString(FenSurf(surfNum)%FenShadeControlName,InArgs(1))) CYCLE
+                        IF (.not. SameString(FenSurf(surfNum)%FenZoneName,ShadeControls(shadeCtrlNum)%ShadeControlZoneName(newZoneNum))) CYCLE
+                        CurArgs = CurArgs + 1
+                        OutArgs(CurArgs) = FenSurf(surfNum)%FenSurfName
+                      ENDDO
+                      nodiff = .false.
+                      ! Write new shading control object for this combination of old shading control plus zone
+                      CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                      Written=.true.
+                    ENDDO
+                  ELSE
+                    ! This control was unused, so don't write it, because a zone name is required, throw a warning
+                    CALL ShowWarningError('WindowProperty:ShadingControl=""' // TRIM(InArgs(1)) // '" was not used by any surfaces, so it has not been written to the new idf.',Auditf)
+                    !OutArgs(1) = InArgs(1)
+                    !OutArgs(2) = Blank ! Zone Name (don't know that here)
+                    !OutArgs(15) = Blank ! Daylighting Control Name
+                    !OutArgs(16) = 'Sequential' ! Multiple Surface Control Type
+                    !CurArgs = 16
+                    nodiff = .false.
+                    Written=.true.
+                  ENDIF
+                  EXIT
+                ENDDO    
 
               ! If your original object starts with Z, insert the rules here
 

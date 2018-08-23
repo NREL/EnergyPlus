@@ -1806,7 +1806,7 @@ namespace EMSManager {
 
             if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
-            if (Surface(loopSurfNum).WindowShadingControlPtr == 0) continue;
+            if (!Surface(loopSurfNum).HasShadeControl) continue;
 
             if (SurfaceWindow(loopSurfNum).HasShadeOrBlindLayer) {
                 SetupEMSActuator("Window Shading Control",
