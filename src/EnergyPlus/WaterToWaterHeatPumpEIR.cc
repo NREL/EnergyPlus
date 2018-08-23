@@ -571,7 +571,11 @@ namespace EnergyPlus {
                     try {
                         thisWWHP.sizingFactor = fields.at("sizing_factor");
                     } catch (...) {
-                        thisWWHP.sizingFactor = inputProcessor->getDefaultRealValue(cCurrentModuleObject, "sizing_factor");
+                        Real64 defaultVal = 0.0;
+                        if (!inputProcessor->getDefaultRealValue(cCurrentModuleObject, "sizing_factor", defaultVal)) {
+                            ShowSevereError("EIR WWHP: Sizing factor not entered and could not get default value");
+                            errorsFound = true;
+                        }
                     }
 
                     thisWWHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(
@@ -621,8 +625,13 @@ namespace EnergyPlus {
                             cCurrentModuleObject, thisWWHP.name, sourceSideInletNodeName, sourceSideOutletNodeName,
                             "Condenser Water Nodes");
 
-                    eir_wwhp.push_back(thisWWHP);
+                    if (!errorsFound) {
+                        eir_wwhp.push_back(thisWWHP);
+                    }
                 }
+            }
+            if (errorsFound) {
+                ShowFatalError("Previous EIR WWHP errors cause program termination");
             }
         }
 
@@ -694,7 +703,11 @@ namespace EnergyPlus {
                     try {
                         thisWWHP.sizingFactor = fields.at("sizing_factor");
                     } catch (...) {
-                        thisWWHP.sizingFactor = inputProcessor->getDefaultRealValue(cCurrentModuleObject, "sizing_factor");
+                        Real64 defaultVal = 0.0;
+                        if (!inputProcessor->getDefaultRealValue(cCurrentModuleObject, "sizing_factor", defaultVal)) {
+                            ShowSevereError("EIR WWHP: Sizing factor not entered and could not get default value");
+                            errorsFound = true;
+                        }
                     }
 
                     thisWWHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(
@@ -746,6 +759,9 @@ namespace EnergyPlus {
 
                     eir_wwhp.push_back(thisWWHP);
                 }
+            }
+            if (errorsFound) {
+                ShowFatalError("Previous EIR WWHP errors cause program termination");
             }
         }
 

@@ -453,14 +453,13 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
     return false;
 }
 
-Real64 InputProcessor::getDefaultRealValue(std::string const &objectWord, std::string const &fieldName)
+bool InputProcessor::getDefaultRealValue(std::string const &objectWord, std::string const &fieldName, Real64 &value)
 {
-    int adjustedNumber = getJSONObjNum(objectWord, 1); // TODO: There must be a better way to get this, we don't need an index for this operation, just looking up schema
     auto find_iterators = objectCacheMap.find(objectWord);
     if (find_iterators == objectCacheMap.end()) {
         auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
-            return -1;
+            return false;
         }
         find_iterators = objectCacheMap.find(tmp_umit->second);
     }
@@ -471,9 +470,10 @@ Real64 InputProcessor::getDefaultRealValue(std::string const &objectWord, std::s
     Real64 defaultValue = 0.0;
     bool defaultFound = findDefault(defaultValue, sizing_factor_schema_field_obj);
     if (defaultFound) {
-        return defaultValue;
+        value = defaultValue;
+        return true;
     } else {
-        return -1; // TODO: What to return here I wonder?  Just raise a developer-oriented exception?
+        return false;
     }
 }
 

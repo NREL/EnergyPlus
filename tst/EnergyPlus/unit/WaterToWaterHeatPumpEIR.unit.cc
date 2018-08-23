@@ -60,7 +60,9 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRWaterToWaterHeatPumps;
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsHeatingAndCooling) {
+class EIRWWHPFixture : public EnergyPlusFixture {};
+
+TEST_F(EIRWWHPFixture, ConstructionFullObjectsHeatingAndCooling) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -77,7 +79,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsHeatingAndCoo
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
-                            "  ,",
+                            "  2,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -153,7 +155,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsHeatingAndCoo
     );
 }
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsHeatingNoCompanion) {
+TEST_F(EIRWWHPFixture, HeatingConstructionFullObjectsNoCompanion) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -170,7 +172,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsHeatingNoComp
                             "  3.14,",
                             "  25.56,",
                             "  40.0,",
-                            "  ,",
+                            "  1,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -212,7 +214,66 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsHeatingNoComp
     );
 }
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsCoolingNoCompanion) {
+TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectsNoCompanion) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  0.001,",
+                            "  0.001,",
+                            "  1000,",
+                            "  3.14,",
+                            "  25.56,",
+                            "  40.0,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_wwhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+
+    // validate the cooling side
+    EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingWWHP->plantTypeOfNum);
+    EXPECT_EQ(nullptr, thisCoolingWWHP->companionHeatPumpCoil);
+    EXPECT_EQ(1, thisCoolingWWHP->capFuncTempCurveIndex);
+    EXPECT_EQ(1, thisCoolingWWHP->powerRatioFuncTempCurveIndex);
+    EXPECT_EQ(1, thisCoolingWWHP->powerRatioFuncPLRCurveIndex);
+
+    // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
+    EXPECT_THROW(
+            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
+            std::runtime_error
+    );
+    EXPECT_THROW(
+            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
+            std::runtime_error
+    );
+}
+
+TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectWithDefaults) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -255,23 +316,11 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullObjectsCoolingNoComp
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
     EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingWWHP->plantTypeOfNum);
-    EXPECT_EQ(nullptr, thisCoolingWWHP->companionHeatPumpCoil);
-    EXPECT_EQ(1, thisCoolingWWHP->capFuncTempCurveIndex);
-    EXPECT_EQ(1, thisCoolingWWHP->powerRatioFuncTempCurveIndex);
-    EXPECT_EQ(1, thisCoolingWWHP->powerRatioFuncPLRCurveIndex);
+    EXPECT_NEAR(1, thisCoolingWWHP->sizingFactor, 0.001);
 
-    // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
-            std::runtime_error
-    );
 }
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullyAutoSized) {
+TEST_F(EIRWWHPFixture, CoolingConstructionFullyAutoSized) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -288,7 +337,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullyAutoSized) {
                             "  Autosize,",
                             "  25.56,",
                             "  40.0,",
-                            "  ,",
+                            "  1,",
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
@@ -330,7 +379,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPHeatingConstructionFullyAutoSized) {
     );
 }
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPInitialization) {
+TEST_F(EIRWWHPFixture, Initialization) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -476,7 +525,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPInitialization) {
 
 }
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingOutletSetpointWorker) {
+TEST_F(EIRWWHPFixture, CoolingOutletSetpointWorker) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -576,7 +625,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingOutletSetpointWorker) {
     );
 }
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSetRunStateAndFlowWorker) {
+TEST_F(EIRWWHPFixture, CoolingSetRunStateAndFlowWorker) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -771,7 +820,7 @@ TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSetRunStateAndFlowWorker) {
 
 }
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPCoolingSimulate) {
+TEST_F(EIRWWHPFixture, CoolingSimulate) {
     std::string const idf_objects =
             delimited_string(
                     {
