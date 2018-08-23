@@ -2308,6 +2308,9 @@ namespace HVACUnitarySystem {
                     DataTotCapCurveIndex = GetVSCoilCapFTCurveIndex(UnitarySystem(UnitarySysNum).CoolingCoilIndex, ErrFound);
                     DataIsDXCoil = true;
                 }
+                if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit) {
+                    DataCondWaterInletTemp = VariableSpeedCoils::RatedInletWaterTemp; // use rated water temp for water-cooled coil
+                }
                 RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 CoolCapAtPeak = TempSize;
                 DXCoolCap = CoolCapAtPeak;
@@ -2319,6 +2322,7 @@ namespace HVACUnitarySystem {
             DataIsDXCoil = false;
             DataTotCapCurveIndex = 0;
             DataFlowUsedForSizing = 0.0;
+            DataCondWaterInletTemp = 0.0;
         }
 
         // STEP 2: find the autosized heating air flow rate and capacity
