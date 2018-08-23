@@ -117,7 +117,9 @@ public:
 
     bool findDefault(Real64 &default_value, json const &schema_field_obj);
 
-    bool getDefaultRealValue(std::string const &objectWord, std::string const &fieldName, Real64 &value);
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value);
+
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value);
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 

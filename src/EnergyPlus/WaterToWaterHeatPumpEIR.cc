@@ -594,7 +594,7 @@ namespace EnergyPlus {
                         thisWWHP.sizingFactor = fields.at("sizing_factor");
                     } catch (...) {
                         Real64 defaultVal = 0.0;
-                        if (!inputProcessor->getDefaultRealValue(cCurrentModuleObject, "sizing_factor", defaultVal)) {
+                        if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "sizing_factor", defaultVal)) {
                             ShowSevereError("EIR WWHP: Sizing factor not entered and could not get default value");
                             errorsFound = true;
                         }
@@ -728,7 +728,7 @@ namespace EnergyPlus {
                         thisWWHP.sizingFactor = fields.at("sizing_factor");
                     } catch (...) {
                         Real64 defaultVal = 0.0;
-                        if (!inputProcessor->getDefaultRealValue(cCurrentModuleObject, "sizing_factor", defaultVal)) {
+                        if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "sizing_factor", defaultVal)) {
                             ShowSevereError("EIR WWHP: Sizing factor not entered and could not get default value");
                             errorsFound = true;
                         }
