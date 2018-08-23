@@ -2453,15 +2453,15 @@ namespace ReportSizingManager {
                                                                              // 0 because now called before capacity is sized
                         ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                          "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
-                        ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
-                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
+                        ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [KGWATER/KGDRYAIR]");
+                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
                         if (DataDesInletAirHumRat > 0.016) {
                             AutosizeDes = 0.5 * DataDesInletAirHumRat;
                         } else {
                             AutosizeDes = DataDesInletAirHumRat;
                         }
                         ShowContinueError("....coil leaving humidity ratio will be reset to:");
-                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
+                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
                     }
 
                     // check for dry coil and reset outlet humrat if needed
@@ -2472,12 +2472,16 @@ namespace ReportSizingManager {
                                                                           // because now called before capacity is sized
                         if (DataDesInletAirHumRat > AutosizeDes && UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
                             ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
-                                             "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio.");
-                            ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
-                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
+                                             "\", Cooling Coil is running dry for sizing because minimum humidity ratio for chilled water inlet is > "
+                                             "design air leaving humidity ratio.");
+                            ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [KGWATER/KGDRYAIR]");
+                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
+                            ShowContinueError("    Inlet chilled water temperature = " + RoundSigDigits(DataDesInletWaterTemp, 3) + " [C]");
+                            ShowContinueError("    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
+                                              RoundSigDigits(DesHumRatAtWaterInTemp, 3) + " [KGWATER/KGDRYAIR]");
                             AutosizeDes = DataDesInletAirHumRat;
                             ShowContinueError("....coil leaving humidity ratio will be reset to:");
-                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
+                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
                         }
                     }
                     bCheckForZero = false;
