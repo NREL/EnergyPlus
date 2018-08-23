@@ -89,7 +89,9 @@ namespace EnergyPlus {
 
             // flow rate terms
             Real64 loadSideDesignVolFlowRate = 0.0;
+            bool loadSideDesignVolFlowRateWasAutoSized = false;
             Real64 sourceSideDesignVolFlowRate = 0.0;
+            bool sourceSideDesignVolFlowRateWasAutoSized = false;
             Real64 loadSideDesignMassFlowRate = 0.0;
             Real64 sourceSideDesignMassFlowRate = 0.0;
             Real64 loadSideMassFlowRate = 0.0;

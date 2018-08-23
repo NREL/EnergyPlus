@@ -431,12 +431,32 @@ namespace EnergyPlus {
         }
 
         void EIRWaterToWaterHeatPump::size() {
+            // Tries to size the load side flow rate and capacity, source side flow, and the rated power usage
+            // There are two major sections to this function, one if plant sizing is available, and one if not
+            // If plant sizing is available, then we can generate sizes for the equipment.  This is done for not-only
+            //   autosized fields, but also hard-sized fields so that we can report out significant deviations between
+            //   the two values.
+            // If plant sizing is not available, it tries to use a companion heat pump coil to do sizing
+            //
             auto & tmpCapacity = this->referenceCapacity;
             auto & tmpVolFlow = this->loadSideDesignVolFlowRate;
             int pltLoadSizNum = DataPlant::PlantLoop(this->loadSideLocation.loopNum).PlantSizNum;
             if (pltLoadSizNum > 0) {
                 if (DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
                     tmpVolFlow = DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
+                    if (this->companionHeatPumpCoil) {
+                        tmpVolFlow = max(tmpVolFlow, this->companionHeatPumpCoil->loadSideDesignVolFlowRate);
+                        this->loadSideDesignVolFlowRate = tmpVolFlow;
+                    }
+                    Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                   DataGlobals::CWInitConvTemp,
+                                                                   DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                   "EIRWaterToWaterHeatPump::size()");
+                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                       DataGlobals::CWInitConvTemp,
+                                                                       DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                       "EIRWaterToWaterHeatPump::size()");
+                    tmpCapacity = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpVolFlow;
                 }
             }
             if(this->loadSideDesignVolFlowRate == DataSizing::AutoSize) {
@@ -543,12 +563,14 @@ namespace EnergyPlus {
                     auto tmpFlowRate = fields.at("load_side_reference_flow_rate");
                     if (tmpFlowRate == "Autosize") {
                         thisWWHP.loadSideDesignVolFlowRate = DataSizing::AutoSize;
+                        thisWWHP.loadSideDesignVolFlowRateWasAutoSized = true;
                     } else {
                         thisWWHP.loadSideDesignVolFlowRate = tmpFlowRate;
                     }
                     auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
                     if (tmpSourceFlowRate == "Autosize") {
                         thisWWHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
+                        thisWWHP.sourceSideDesignVolFlowRateWasAutoSized = true;
                     } else {
                         thisWWHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate;
                     }
@@ -675,12 +697,14 @@ namespace EnergyPlus {
                     auto tmpFlowRate = fields.at("load_side_reference_flow_rate");
                     if (tmpFlowRate == "Autosize") {
                         thisWWHP.loadSideDesignVolFlowRate = DataSizing::AutoSize;
+                        thisWWHP.loadSideDesignVolFlowRateWasAutoSized = true;
                     } else {
                         thisWWHP.loadSideDesignVolFlowRate = tmpFlowRate;
                     }
                     auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
                     if (tmpSourceFlowRate == "Autosize") {
                         thisWWHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
+                        thisWWHP.sourceSideDesignVolFlowRateWasAutoSized = true;
                     } else {
                         thisWWHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate;
                     }
