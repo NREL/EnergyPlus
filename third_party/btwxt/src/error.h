@@ -44,7 +44,7 @@ namespace Btwxt {
         std::ostringstream oss;
         expand_type{0, (oss << args, 0)...};
         return oss.str();
-    };
+    }
 
 }
 #endif // BTWXT_ERROR_H_

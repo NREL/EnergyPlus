@@ -10,7 +10,7 @@ option( BUILD_BTWXT_TESTING "Build Btwxt testing targets" OFF )
 option( BTWXT_GET_EIGEN "Download Eigen (if not already included in top project)" ON )
 
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -fPIC")
 
 set (CMAKE_MODULE_PATH "${btwxt_SOURCE_DIR}/cmake")
 

@@ -13,7 +13,7 @@
 namespace Btwxt {
 
 
-    Hypercube::Hypercube() = default;;
+    Hypercube::Hypercube() = default;
 
     Hypercube::Hypercube(const std::size_t &ndims,
                          const std::vector<Method> &methods) :
@@ -21,8 +21,9 @@ namespace Btwxt {
             vertices(make_hypercube(ndims, methods)),
             methods(methods)
     {
+        collection.resize(ndims,std::vector<double>(2));
         sivor = { {-1,0},{-1,1},{1,0},{1,1} };
-    };
+    }
 
     void Hypercube::collect_things(PointLocator &the_locator) {
         point_floor = the_locator.get_floor();
@@ -38,7 +39,7 @@ namespace Btwxt {
 
         std::vector< std::vector<double> > spacing_mults = get_spacing_mults(the_blob);
         for (const auto& v: vertices) {
-            weight = weigh_one_vertex(v, spacing_mults);
+            weight = get_vertex_weight(v, spacing_mults);
             values = the_blob.get_column_near_safe(point_floor, v);
 //            showMessage(MSG_INFO, stringify("vertex total = \n", values*weight));
             result += values * weight;
@@ -58,24 +59,25 @@ namespace Btwxt {
         return spacing_mults;
     }
 
-    double Hypercube::weigh_one_vertex(const std::vector<int> &v,
+    double Hypercube::get_vertex_weight(const std::vector<int> &v,
                 const std::vector< std::vector<double> >& spacing_mults) {
-        std::vector< std::vector<double> > collection(ndims);
         int sign, flavor;
         for (std::size_t dim = 0; dim < ndims; dim++) {
             if (methods[dim] == Method::CUBIC) {
                 std::tie(sign, flavor) = sivor[v[dim] + 1];
-                if (v[dim] == 0 | v[dim] == 1) {
-                    collection[dim].push_back(interp_coeffs[dim][v[dim]]);
+                if (v[dim] == 0 || v[dim] == 1) { // closest neighbors have a normal interpolation term
+                    collection[dim][0] = interp_coeffs[dim][v[dim]];
+                } else {
+                    collection[dim][0] = 0.0;
                 }
-                collection[dim].push_back(cubic_slope_coeffs[dim][flavor]
-                                          * spacing_mults[dim][flavor] * sign);
+                collection[dim][1] = cubic_slope_coeffs[dim][flavor]
+                                          * spacing_mults[dim][flavor] * sign;
             } else {  // LINEAR or CONSTANT
-                collection[dim].push_back(interp_coeffs[dim][v[dim]]);
+                collection[dim][0] = interp_coeffs[dim][v[dim]];
+                collection[dim][1] = 0.0;
             }
         }
-        std::vector<double> multiplied = cart_product_m(collection);
-        return std::accumulate(multiplied.begin(), multiplied.end(), 0.0);
+        return sum_weighting_terms(collection);
     }
 
 
@@ -114,19 +116,22 @@ namespace Btwxt {
         return combinations;
     }
 
-    std::vector<double> cart_product_m(const std::vector< std::vector<double> >& v ) {
-        int N = 1;
-        for (const auto &list : v) { N *= list.size(); }
+    double sum_weighting_terms(const std::vector< std::vector<double> >& v ) {
+        std::size_t nV = v.size();
+        std::size_t N = 1;
+        for (std::size_t dim=0; dim < nV; ++dim) { N *= 2; } // Two options per dimension (normal or slope terms)
 
-        std::vector<double> products(N, 1);
-        for(int n=0 ; n<N ; ++n ) {
-            div_t q { n, 0 };
-            for( int i=v.size()-1 ; 0<=i ; --i ) {
-                q = div( q.quot, v[i].size() );
-                products[n] *= v[i][q.rem];
+
+        // Add all combinations of coefficient term products
+        double weight_sum = 0.0;
+        for(std::size_t n=0 ; n < N ; ++n ) {
+            double product = 1.0;
+            for(std::size_t dim=0; dim < nV; ++dim) {
+               product *= v[dim][bool(n & 1<<dim)];
             }
+            weight_sum += product;
         }
-        return products;
+        return weight_sum;
     }
 
 }

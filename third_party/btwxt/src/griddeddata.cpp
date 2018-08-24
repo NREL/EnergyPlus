@@ -12,7 +12,7 @@
 namespace Btwxt {
 
 
-    GridAxis::GridAxis() = default;;
+    GridAxis::GridAxis() = default;
 
     GridAxis::GridAxis(std::vector<double> grid_vector,
                        Method extrapolation_method, Method interpolation_method,
@@ -29,7 +29,7 @@ namespace Btwxt {
         }
 
         showMessage(MsgLevel::MSG_DEBUG, "GridAxis object constructed from vector!");
-    };
+    }
 
     std::size_t GridAxis::get_length() {
         return grid.size();
@@ -96,7 +96,7 @@ namespace Btwxt {
     }
 
 
-    GriddedData::GriddedData() = default;;
+    GriddedData::GriddedData() = default;
 
     GriddedData::GriddedData(
             std::vector<std::vector<double> > grid,
@@ -113,7 +113,7 @@ namespace Btwxt {
         construct_axes(grid);
         value_tables = construct_values(values);
         showMessage(MsgLevel::MSG_DEBUG, "GriddedData constructed from vectors!");
-    };
+    }
 
     GriddedData::GriddedData(
             std::vector<GridAxis> grid_axes,
@@ -131,7 +131,7 @@ namespace Btwxt {
 
         value_tables = construct_values(values);
         showMessage(MsgLevel::MSG_DEBUG, "GriddedData constructed from GridAxis vector!");
-    };
+    }
 
     GriddedData::GriddedData(
             std::vector<GridAxis> grid_axes
@@ -146,7 +146,7 @@ namespace Btwxt {
         }
         num_tables = 0;
         showMessage(MsgLevel::MSG_DEBUG, "GriddedData constructed from GridAxis vector!");
-    };
+    }
 
     void GriddedData::construct_axes(
             const std::vector<std::vector<double> > &grid
@@ -157,7 +157,7 @@ namespace Btwxt {
         }
 
         showMessage(MsgLevel::MSG_DEBUG, stringify(ndims, "-D GridAxis object constructed"));
-    };
+    }
 
     std::size_t GriddedData::add_value_table(std::vector<double> &value_vector) {
         if (num_tables >= 1) {
@@ -181,7 +181,7 @@ namespace Btwxt {
         vtables.row(0) = fill_value_row(value_vector, num_values);
         showMessage(MsgLevel::MSG_DEBUG, stringify("value tables: \n", vtables));
         return vtables;
-    };
+    }
 
     Eigen::ArrayXXd GriddedData::construct_values(
             const std::vector<std::vector<double> > &values
@@ -197,7 +197,7 @@ namespace Btwxt {
         }
         showMessage(MsgLevel::MSG_DEBUG, stringify("value tables: \n", vtables));
         return vtables;
-    };
+    }
 
     Eigen::Map<Eigen::ArrayXd> GriddedData::fill_value_row(
             std::vector<double> &value_vector,
@@ -210,11 +210,11 @@ namespace Btwxt {
         }
         Eigen::Map<Eigen::ArrayXd> value_row(&value_vector[0], num_values);
         return value_row;
-    };
+    }
 
-    std::size_t GriddedData::get_ndims() { return grid_axes.size();; };
+    std::size_t GriddedData::get_ndims() { return grid_axes.size(); }
 
-    std::size_t GriddedData::get_num_tables() { return num_tables; };
+    std::size_t GriddedData::get_num_tables() { return num_tables; }
 
     std::vector<double> GriddedData::get_values(const std::vector<std::size_t> &coords) {
         Eigen::ArrayXd val_col = get_column(coords);
@@ -258,7 +258,7 @@ namespace Btwxt {
         return get_column(translation);
     }
 
-    std::vector<double> GriddedData::get_grid_vector(const std::size_t &dim)
+    const std::vector<double> &GriddedData::get_grid_vector(const std::size_t &dim)
     {
         return grid_axes[dim].grid;
     }
@@ -324,7 +324,7 @@ namespace Btwxt {
             ++first;
         }
         return true;
-    };
+    }
 
     template <typename T>
     std::size_t locate_coords(

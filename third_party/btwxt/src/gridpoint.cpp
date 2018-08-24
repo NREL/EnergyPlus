@@ -12,31 +12,31 @@
 namespace Btwxt {
 
 
-    GridPoint::GridPoint() {};
+    GridPoint::GridPoint() {}
 
     GridPoint::GridPoint(const std::vector<double> &target_vector) :
             target(target_vector) {
         showMessage(MsgLevel::MSG_DEBUG, "GridPoint object constructed from vector!");
-    };
+    }
 
 
-    PointLocator::PointLocator() {};
+    PointLocator::PointLocator() {}
 
     PointLocator::PointLocator(
-            GridPoint &current_grid_point, GriddedData &the_blob
+            GridPoint &current_grid_point, GriddedData &grid_data
     ) :
-            ndims(the_blob.get_ndims()),
+            ndims(grid_data.get_ndims()),
             point_floor(ndims, 0),
             weights(ndims, 0),
             is_inbounds(ndims),
             interp_coeffs(ndims, std::vector<double>(2, 0.0)),
             cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)) {
-        find_floor(current_grid_point, the_blob);
-        calculate_weights(current_grid_point, the_blob);
-        consolidate_methods(the_blob.get_interp_methods(),
-                            the_blob.get_extrap_methods());
+        find_floor(current_grid_point, grid_data);
+        calculate_weights(current_grid_point, grid_data);
+        consolidate_methods(grid_data.get_interp_methods(),
+                            grid_data.get_extrap_methods());
         calculate_interp_coeffs();
-    };
+    }
 
     std::vector<std::size_t> PointLocator::get_floor() { return point_floor; }
 
@@ -51,19 +51,19 @@ namespace Btwxt {
     std::vector<std::vector<double> > PointLocator::get_cubic_slope_coeffs() { return cubic_slope_coeffs; }
 
     void PointLocator::find_floor(
-            GridPoint &current_grid_point, GriddedData &the_blob) {
+            GridPoint &current_grid_point, GriddedData &grid_data) {
         for (std::size_t dim = 0; dim < ndims; dim += 1) {
             double value {current_grid_point.target[dim]};
-            std::pair<double, double> extrap_limits = the_blob.get_extrap_limits(dim);
-            std::vector<double> grid_vector = the_blob.get_grid_vector(dim);
+            std::pair<double, double> extrap_limits = grid_data.get_extrap_limits(dim);
+            std::vector<double> grid_vector = grid_data.get_grid_vector(dim);
             locate_in_dim(value, is_inbounds[dim], point_floor[dim], grid_vector, extrap_limits);
         }
     }
 
     void PointLocator::calculate_weights(
-            GridPoint &current_grid_point, GriddedData &the_blob) {
+            GridPoint &current_grid_point, GriddedData &grid_data) {
         for (std::size_t dim = 0; dim < ndims; dim += 1) {
-            std::vector<double> grid_vector = the_blob.get_grid_vector(dim);
+            const std::vector<double> &grid_vector = grid_data.get_grid_vector(dim);
             double edge[] = {grid_vector[point_floor[dim]], grid_vector[point_floor[dim] + 1]};
             weights[dim] = compute_fraction(current_grid_point.target[dim], edge);
         }
@@ -80,8 +80,8 @@ namespace Btwxt {
             if (is_inbounds[dim] == Bounds::OUTBOUNDS) {
                 methods[dim] = extrap_methods[dim];
             } else if (is_inbounds[dim] == Bounds::OUTLAW) {
-                showMessage(MsgLevel::MSG_WARN, stringify("The target is outside the extrapolation limits in dimension ", dim,
-                                                ". Will perform constant extrapolation."));
+                //showMessage(MsgLevel::MSG_WARN, stringify("The target is outside the extrapolation limits in dimension ", dim,
+                //                                ". Will perform constant extrapolation."));
                 methods[dim] = Method::CONSTANT;
             }
         }
@@ -122,7 +122,7 @@ namespace Btwxt {
         } else if (target < grid_vector[0]) {
             dim_in = Bounds::OUTBOUNDS;
             dim_floor = 0;
-        } else if (target > grid_vector.back()) {
+        } else if (target >= grid_vector.back()) {
             dim_in = Bounds::OUTBOUNDS;
             dim_floor = l-2;  // l-2 because that's the left side of the (l-2, l-1) edge.
         } else {

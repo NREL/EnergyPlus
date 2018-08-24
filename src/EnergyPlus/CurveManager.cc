@@ -3226,9 +3226,10 @@ namespace CurveManager {
 
                 int gridIndex = btwxtContainer.getGridIndex(indVarListName, ErrorsFound);
                 PerfCurve(CurveNum).TableIndex = gridIndex;
-                PerfCurve(CurveNum).NumDims = btwxtContainer.getNumGridDims(gridIndex);
+                int numDims = btwxtContainer.getNumGridDims(gridIndex);
+                PerfCurve(CurveNum).NumDims = numDims;
 
-                for (int i=1; i < std::max(3, PerfCurve(CurveNum).NumDims); ++i) {
+                for (int i=1; i <= std::min(3, numDims); ++i) {
                     double vMin, vMax;
                     std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(gridIndex, i - 1);
                     if (i == 1) {

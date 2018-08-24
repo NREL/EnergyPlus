@@ -75,7 +75,7 @@ namespace Btwxt {
 
         std::size_t add_value_table(std::vector<double>& value_vector);
 
-        std::vector<double> get_grid_vector(const std::size_t &dim);
+        const std::vector<double> &get_grid_vector(const std::size_t &dim);
 
         std::pair<double, double> get_extrap_limits(const std::size_t &dim);
 

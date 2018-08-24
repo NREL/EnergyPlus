@@ -29,14 +29,15 @@ namespace Btwxt {
 
         std::vector< std::vector<double> > get_spacing_mults(GriddedData &the_blob);
 
-        double weigh_one_vertex(const std::vector<int> &v,
+        double get_vertex_weight(const std::vector<int> &v,
                 const std::vector< std::vector<double> >& spacing_mults);
 
         std::vector<std::size_t> point_floor;
         std::vector<Method> methods;
         std::vector<std::vector<double> > cubic_slope_coeffs;
         std::vector<std::vector<double> > interp_coeffs;
-        std::vector< std::pair<int, int> > sivor;  // {sign, flavor}
+        std::vector<std::vector<double> > collection;
+        std::vector< std::pair<int, int> > sivor;  // {sign, flavor}, flavor corresponds to the floor (0) or ceiling (1) bounding of the point
     };
 
 
@@ -48,7 +49,7 @@ namespace Btwxt {
     template <typename T>
     std::vector<std::vector<T> > cart_product(const std::vector<std::vector<T> > &v);
 
-    std::vector<double> cart_product_m(const std::vector<std::vector<double> > &v);
+    double sum_weighting_terms(const std::vector<std::vector<double> > &v);
 
 }
 #endif // HYPER_H_

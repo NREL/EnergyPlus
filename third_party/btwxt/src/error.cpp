@@ -42,7 +42,7 @@ namespace Btwxt {
     ) {
         btwxtCallbackFunction = callBackFunction;
         messageCallbackContextPtr = contextPtr;
-    };
+    }
 
 
 }
