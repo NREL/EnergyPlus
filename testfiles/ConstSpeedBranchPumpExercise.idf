@@ -30,8 +30,7 @@
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
   Site:Location,
     USA IL-CHICAGO-OHARE,    !- Name
@@ -283,7 +282,6 @@
     Load Profile 1 load Schedule,  !- Load Schedule Name
     0.002,                   !- Peak Flow Rate {m3/s}
     Load Profile 1 flow Schedule;  !- Flow Rate Fraction Schedule Name
->>>>>>> upstream/develop
 
 !Schedule:Constant,
 !  Load Profile 1 load Schedule,
