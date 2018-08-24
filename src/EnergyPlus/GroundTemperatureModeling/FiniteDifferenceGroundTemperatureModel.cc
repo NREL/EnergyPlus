@@ -258,8 +258,10 @@ void FiniteDiffGroundTempsModel::getWeatherData()
         NumOfWarmupDays = 0;
 
         annualAveAirTemp_num = 0.0;
+        // Protect against array bounds error
+        int maxSimDays = min(NumDaysInYear, NumOfDayInEnvrn);
 
-        while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+        while ((DayOfSim < maxSimDays) || (WarmupFlag)) { // Begin day loop ...
 
             ++DayOfSim;
 

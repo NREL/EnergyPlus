@@ -9900,9 +9900,6 @@ namespace WeatherManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
-        int Loop1;
-        int JDay1;
-        int JDay2;
         int LocalLeapYearAdd;
 
         // Transfer weather file information to the Environment derived type
