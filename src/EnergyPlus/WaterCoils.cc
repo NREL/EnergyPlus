@@ -2137,8 +2137,6 @@ namespace WaterCoils {
                     DataAirFlowUsedForSizing = DesCoilAirFlow;
                     DataFlowUsedForSizing = DesCoilAirFlow;
                     DataDesOutletAirTemp = DesCoilExitTemp;
-<<<<<<< HEAD
-<<<<<<< HEAD
                     // DataDesOutletAirHumRat = PsyWFnTdbRhPb( DataDesOutletAirTemp, 0.9, StdBaroPress, RoutineName ); //TRANE, moved into
                     // GetCoilDesFlowT routine
                     DataDesOutletAirHumRat =
@@ -2392,7 +2390,6 @@ namespace WaterCoils {
                 DataDesInletAirHumRat = 0.0;
                 DataDesInletWaterTemp = 0.0;
                 DataWaterCoilSizCoolDeltaT = 0.0;
-                DataCondWaterInletTemp = 0.0;
             } else {
                 // If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
                 if (WaterCoil(CoilNum).RequestingAutoSize) {
@@ -2649,8 +2646,6 @@ namespace WaterCoils {
                 DataDesicRegCoil = false;
                 DataWaterCoilSizHeatDeltaT = 0.0;
                 DataNomCapInpMeth = false;
-                DataCondWaterInletTemp = 0.0;
-
             } else {
                 // if there is no heating Plant Sizing object and autosizng was requested, issue an error message
                 if (WaterCoil(CoilNum).RequestingAutoSize) {

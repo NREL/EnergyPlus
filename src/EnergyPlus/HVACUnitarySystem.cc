@@ -2308,9 +2308,6 @@ namespace HVACUnitarySystem {
                     DataTotCapCurveIndex = GetVSCoilCapFTCurveIndex(UnitarySystem(UnitarySysNum).CoolingCoilIndex, ErrFound);
                     DataIsDXCoil = true;
                 }
-                if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit) {
-                    DataCondWaterInletTemp = VariableSpeedCoils::RatedInletWaterTemp; // use rated water temp for water-cooled coil
-                }
                 RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 CoolCapAtPeak = TempSize;
                 DXCoolCap = CoolCapAtPeak;
@@ -2322,7 +2319,6 @@ namespace HVACUnitarySystem {
             DataIsDXCoil = false;
             DataTotCapCurveIndex = 0;
             DataFlowUsedForSizing = 0.0;
-            DataCondWaterInletTemp = 0.0;
         }
 
         // STEP 2: find the autosized heating air flow rate and capacity
@@ -10685,14 +10681,14 @@ namespace HVACUnitarySystem {
         // Using/Aliasing
         using DataAirflowNetwork::AirflowNetworkControlMultizone;
         using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::KickOffSimulation;
+        using DataGlobals::WarmupFlag;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiMode;
         using DXCoils::SimDXCoilMultiSpeed;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -12010,13 +12006,13 @@ namespace HVACUnitarySystem {
         // Using/Aliasing
         using DataAirflowNetwork::AirflowNetworkControlMultizone;
         using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::KickOffSimulation;
+        using DataGlobals::WarmupFlag;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiSpeed;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -13879,8 +13875,8 @@ namespace HVACUnitarySystem {
         using DataAirflowNetwork::AirflowNetworkControlMultiADS;
         using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
         using DataAirflowNetwork::SimulateAirflowNetwork;
-        using DataAirLoop::AirLoopFlow;
         using DataAirLoop::AirLoopAFNInfo;
+        using DataAirLoop::AirLoopFlow;
         using Psychrometrics::PsyHFnTdbW;
 
         // Locals

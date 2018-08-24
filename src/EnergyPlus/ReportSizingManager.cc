@@ -364,7 +364,9 @@ namespace ReportSizingManager {
         int const MaxIte(500);    // Maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int DDNum;                                 // design day number corresponding to TimeStepNumAtMax
         int SolFla;                                // Flag of solver
+        int TimeStepNumAtMax;                      // time step number at max load
         bool IsAutoSize;                           // Indicator to autosize for reporting
         bool HardSizeNoDesRun;                     // Indicator to hardsize with no sizing runs for reporting
         bool SizingDesRunThisAirSys;               // true if a particular air system had a Sizing : System object and system sizing done
@@ -1608,11 +1610,14 @@ namespace ReportSizingManager {
                                 }
                                 CoilOutTemp = min(CoilInTemp, FinalZoneSizing(CurZoneEqNum).CoolDesTemp);
                                 CoilOutHumRat = min(CoilInHumRat, FinalZoneSizing(CurZoneEqNum).CoolDesHumRat);
-                                if (DataCondWaterInletTemp > 0) {
-                                    OutTemp = DataCondWaterInletTemp;
+                                TimeStepNumAtMax = FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax;
+                                DDNum = FinalZoneSizing(CurZoneEqNum).CoolDDNum;
+                                if (DDNum > 0 && TimeStepNumAtMax > 0) {
+                                    OutTemp = DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                                 } else {
-                                    OutTemp = FinalZoneSizing(CurZoneEqNum).OutTempAtCoolPeak;
+                                    OutTemp = 0.0;
                                 }
+
                                 rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine);
                                 CoilInEnth = PsyHFnTdbW(CoilInTemp, CoilInHumRat);
                                 CoilInWetBulb = PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine);
@@ -2469,7 +2474,7 @@ namespace ReportSizingManager {
                             ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
                             ShowContinueError("    Inlet chilled water temperature = " + RoundSigDigits(DataDesInletWaterTemp, 3) + " [C]");
                             ShowContinueError("    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
-                                              RoundSigDigits(DesHumRatAtWaterInTemp, 3) + " [KGWATER/KGDRYAIR]");
+                                              RoundSigDigits(DesHumRatAtWaterInTemp, 6) + " [KGWATER/KGDRYAIR]");
                             AutosizeDes = DataDesInletAirHumRat;
                             ShowContinueError("....coil leaving humidity ratio will be reset to:");
                             ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
@@ -2609,11 +2614,8 @@ namespace ReportSizingManager {
                                                    (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetHumRatAtCoolPeak;
                                 }
                             }
-                            if (DataCondWaterInletTemp > 0) {
-                                OutTemp = DataCondWaterInletTemp; // water cooled equipment, use condenser water inlet temp if defined
-                            } else {
-                                OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
-                            }
+
+                            OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
                             if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
                                 UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
                                 rhoair = StdRhoAir;
