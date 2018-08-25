@@ -142,8 +142,10 @@
     WinterSeasonDay,         !- Name
     1,                       !- Begin Month
     12,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -155,8 +157,10 @@
     SpringSeasonDay,         !- Name
     4,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     4,                       !- End Month
     16,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -168,8 +172,10 @@
     SummerSeasonDay,         !- Name
     7,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     16,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -181,8 +187,10 @@
     AutumnSeasonDay,         !- Name
     10,                      !- Begin Month
     12,                      !- Begin Day of Month
+    ,                        !- Begin Year
     10,                      !- End Month
     16,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period

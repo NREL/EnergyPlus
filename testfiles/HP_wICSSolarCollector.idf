@@ -236,8 +236,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     21,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     21,                      !- End Day of Month
+    ,                        !- End Year
     ,                        !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
@@ -249,8 +251,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     21,                      !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     21,                      !- End Day of Month
+    ,                        !- End Year
     ,                        !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period

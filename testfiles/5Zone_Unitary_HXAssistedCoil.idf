@@ -160,8 +160,10 @@
     Feb 1 to 5,              !- Name
     2,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     2,                       !- End Month
     5,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -173,8 +175,10 @@
     June 1 to 5,             !- Name
     6,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     6,                       !- End Month
     5,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period

@@ -261,8 +261,28 @@ namespace WeatherManager {
 
     // Types
 
+    enum class WeekDay
+    {
+        Sunday = 1,
+        Monday,
+        Tuesday,
+        Wednesday,
+        Thursday,
+        Friday,
+        Saturday
+    };
+
     struct EnvironmentData
     {
+        enum class Type
+        {
+            DesignDay,
+            RunPeriodDesign,
+            RunPeriodWeather,
+            HVACSizeDesignDay,
+            ksHVACSizeRunPeriodDesign,
+            ReadAllWeatherData
+        };
         // Members
         std::string Title;          // Environment name
         std::string cKindOfEnvrn;   // kind of environment
@@ -356,36 +376,38 @@ namespace WeatherManager {
     struct RunPeriodData
     {
         // Members
-        std::string Title;
-        std::string PeriodType;
-        int TotalDays; // total number of days in requested period
-        int StartMonth;
-        int StartDay;
-        int StartDate; // Calculated start date (Julian) for a weather file run period
-        int StartYear; // entered in "consecutive"/real runperiod object
-        int EndMonth;
-        int EndDay;
-        int EndDate;           // Calculated end date (Julian) for a weather file run period
-        int EndYear;           // entered in "consecutive"/real runperiod object
-        int DayOfWeek;         // Day of Week that the RunPeriod will start on (User Input)
-        bool UseDST;           // True if DaylightSavingTime is used for this RunPeriod
-        bool UseHolidays;      // True if Holidays are used for this RunPeriod (from WeatherFile)
-        bool ApplyWeekendRule; // True if "Weekend Rule" is to be applied to RunPeriod
-        bool UseRain;          // True if Rain from weather file should be used (set rain to true)
-        bool UseSnow;          // True if Snow from weather file should be used (set Snow to true)
-        Array1D_int MonWeekDay;
-        int NumSimYears;              // Total Number of years of simulation to be performed
-        int BeginYear;                // Start year entered in regular RunPeriod object
-        bool IsLeapYear;              // True if Begin Year is leap year.
+        std::string title;
+        std::string periodType;
+        int totalDays; // total number of days in requested period
+        int startMonth;
+        int startDay;
+        int startJulianDate; // Calculated start date (Julian or ordinal) for a weather file run period
+        int startYear;       // entered in "consecutive"/real runperiod object
+        int endMonth;
+        int endDay;
+        int endJulianDate;     // Calculated end date (Julian or ordinal) for a weather file run period
+        int endYear;           // entered in "consecutive"/real runperiod object
+        int dayOfWeek;         // Day of Week that the RunPeriod will start on (User Input)
+        WeekDay startWeekDay;  // Day of the week that the RunPeriod will start on (User Input)
+        bool useDST;           // True if DaylightSavingTime is used for this RunPeriod
+        bool useHolidays;      // True if Holidays are used for this RunPeriod (from WeatherFile)
+        bool applyWeekendRule; // True if "Weekend Rule" is to be applied to RunPeriod
+        bool useRain;          // True if Rain from weather file should be used (set rain to true)
+        bool useSnow;          // True if Snow from weather file should be used (set Snow to true)
+        Array1D_int monWeekDay;
+        int numSimYears;              // Total Number of years of simulation to be performed
+        bool isLeapYear;              // True if Begin Year is leap year.
         bool RollDayTypeOnRepeat;     // If repeating run period, increment day type on repeat.
         bool TreatYearsAsConsecutive; // When year rolls over, increment year and recalculate Leap Year
-        bool ActualWeather;           // true when using actual weather data
+        bool actualWeather;           // true when using actual weather data
+        //int BeginYear;
 
         // Default Constructor
         RunPeriodData()
-            : TotalDays(0), StartMonth(1), StartDay(1), StartDate(0), StartYear(0), EndMonth(12), EndDay(31), EndDate(0), EndYear(0), DayOfWeek(0),
-              UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true), UseSnow(true), MonWeekDay(12, 0), NumSimYears(1),
-              BeginYear(0), IsLeapYear(false), RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), ActualWeather(false)
+            : totalDays(0), startMonth(1), startDay(1), startJulianDate(0), startYear(2017), endMonth(12), endDay(31), endJulianDate(0), endYear(0),
+              dayOfWeek(0), startWeekDay(WeekDay::Sunday), useDST(false), useHolidays(false), applyWeekendRule(false), useRain(true), useSnow(true),
+              monWeekDay(12, 0), numSimYears(1), isLeapYear(false), RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), actualWeather(false)
+              //BeginYear(0)
         {
         }
     };
@@ -867,7 +889,9 @@ namespace WeatherManager {
 
     void SetupEnvironmentTypes();
 
-    bool IsLeapYear(int const Year);
+    bool isLeapYear(int const Year);
+
+    int computeJulianDate(int const gyyyy, int const gmm, int const gdd);
 
     void JGDate(int const jflag, // indicates direction of conversion,
                 int &jdate,      // input/output julian date, typically a 7 or 8 digit integer
@@ -877,6 +901,14 @@ namespace WeatherManager {
     );
 
     int CalculateDayOfWeek(int const JulianDate); // from JGDate calculation
+
+    WeekDay calculateDayOfWeek(int const year, int const month, int day);
+
+    int calculateDayOfYear(int const Month, int const Day);
+
+    int calculateDayOfYear(int const Month, int const Day, bool const leapYear);
+
+    bool validMonthDay(int const month, int const day, int const leapYearAdd = 0);
 
     struct AnnualMonthlyDryBulbWeatherData // derived type for processing and storing Dry-bulb weather or stat file
     {
