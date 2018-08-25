@@ -91,15 +91,16 @@
     ,                        !- Name
     1,                       !- Begin Month
     2,                       !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     1,                       !- End Day of Month
+    ,                        !- End Year
     Monday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1.0000;                  !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
 ! ***HOLIDAYS & DAYLIGHT SAVINGS***
 
@@ -1216,7 +1217,6 @@
     Front_Entry_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1232,7 +1232,6 @@
     Front_Retail_Wall_South, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1248,7 +1247,6 @@
     Point_Of_Sale_Wall_South,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices

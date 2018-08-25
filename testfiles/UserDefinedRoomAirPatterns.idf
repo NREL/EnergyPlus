@@ -74,8 +74,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
@@ -7264,7 +7266,6 @@
     ZN1_SW_1:S_ExtWall:3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7280,7 +7281,6 @@
     ZN1_SW_1:S_ExtWall:4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7296,7 +7296,6 @@
     ZN1_SW_1:S_ExtWall:5,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7312,7 +7311,6 @@
     ZN1_SW_1:S_ExtWall:6,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7328,7 +7326,6 @@
     ZN1_SW_1:S_ExtWall:7,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7344,7 +7341,6 @@
     ZN1_SW_1:W_ExtWall:3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7360,7 +7356,6 @@
     ZN1_SW_1:W_ExtWall:4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7376,7 +7371,6 @@
     ZN1_SW_1:W_ExtWall:5,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7392,7 +7386,6 @@
     ZN1_SW_1:W_ExtWall:6,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7408,7 +7401,6 @@
     ZN1_SW_1:W_ExtWall:7,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7424,7 +7416,6 @@
     ZN2_S_1:S_ExtWall:3,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7440,7 +7431,6 @@
     ZN2_S_1:S_ExtWall:4,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7456,7 +7446,6 @@
     ZN2_S_1:S_ExtWall:5,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7472,7 +7461,6 @@
     ZN2_S_1:S_ExtWall:6,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7488,7 +7476,6 @@
     ZN2_S_1:S_ExtWall:7,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7504,7 +7491,6 @@
     ZN3_SE_1:S_ExtWall:3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7520,7 +7506,6 @@
     ZN3_SE_1:S_ExtWall:4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7536,7 +7521,6 @@
     ZN3_SE_1:S_ExtWall:5,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7552,7 +7536,6 @@
     ZN3_SE_1:S_ExtWall:6,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7568,7 +7551,6 @@
     ZN3_SE_1:S_ExtWall:7,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7584,7 +7566,6 @@
     ZN3_SE_1:E_ExtWall:3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7600,7 +7581,6 @@
     ZN3_SE_1:E_ExtWall:4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7616,7 +7596,6 @@
     ZN3_SE_1:E_ExtWall:5,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7632,7 +7611,6 @@
     ZN3_SE_1:E_ExtWall:6,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7648,7 +7626,6 @@
     ZN3_SE_1:E_ExtWall:7,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7664,7 +7641,6 @@
     ZN4_E_1:E_ExtWall:3,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7680,7 +7656,6 @@
     ZN4_E_1:E_ExtWall:4,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7696,7 +7671,6 @@
     ZN4_E_1:E_ExtWall:5,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7712,7 +7686,6 @@
     ZN4_E_1:E_ExtWall:6,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7728,7 +7701,6 @@
     ZN4_E_1:E_ExtWall:7,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7744,7 +7716,6 @@
     ZN5_NE_1:E_ExtWall:3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7760,7 +7731,6 @@
     ZN5_NE_1:E_ExtWall:4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7776,7 +7746,6 @@
     ZN5_NE_1:E_ExtWall:5,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7792,7 +7761,6 @@
     ZN5_NE_1:E_ExtWall:6,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7808,7 +7776,6 @@
     ZN5_NE_1:E_ExtWall:7,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7824,7 +7791,6 @@
     ZN5_NE_1:N_ExtWall:3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7840,7 +7806,6 @@
     ZN5_NE_1:N_ExtWall:4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7856,7 +7821,6 @@
     ZN5_NE_1:N_ExtWall:5,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7872,7 +7836,6 @@
     ZN5_NE_1:N_ExtWall:6,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7888,7 +7851,6 @@
     ZN5_NE_1:N_ExtWall:7,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7904,7 +7866,6 @@
     ZN6_N_1:N_ExtWall:3,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7920,7 +7881,6 @@
     ZN6_N_1:N_ExtWall:4,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7936,7 +7896,6 @@
     ZN6_N_1:N_ExtWall:5,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7952,7 +7911,6 @@
     ZN6_N_1:N_ExtWall:6,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7968,7 +7926,6 @@
     ZN6_N_1:N_ExtWall:7,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -7984,7 +7941,6 @@
     ZN7_NW_1:N_ExtWall:3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8000,7 +7956,6 @@
     ZN7_NW_1:N_ExtWall:4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8016,7 +7971,6 @@
     ZN7_NW_1:N_ExtWall:5,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8032,7 +7986,6 @@
     ZN7_NW_1:N_ExtWall:6,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8048,7 +8001,6 @@
     ZN7_NW_1:N_ExtWall:7,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8064,7 +8016,6 @@
     ZN7_NW_1:W_ExtWall:3,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8080,7 +8031,6 @@
     ZN7_NW_1:W_ExtWall:4,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8096,7 +8046,6 @@
     ZN7_NW_1:W_ExtWall:5,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8112,7 +8061,6 @@
     ZN7_NW_1:W_ExtWall:6,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8128,7 +8076,6 @@
     ZN7_NW_1:W_ExtWall:7,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8144,7 +8091,6 @@
     ZN8_W_1:W_ExtWall:3,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8160,7 +8106,6 @@
     ZN8_W_1:W_ExtWall:4,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8176,7 +8121,6 @@
     ZN8_W_1:W_ExtWall:5,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8192,7 +8136,6 @@
     ZN8_W_1:W_ExtWall:6,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -8208,7 +8151,6 @@
     ZN8_W_1:W_ExtWall:7,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices

@@ -57,8 +57,10 @@
     Jan,                     !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -70,8 +72,10 @@
     Jul,                     !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -847,7 +851,7 @@
   ElectricEquipment:ITE:AirCooled,
     Data Center Servers,     !- Name
     Main Zone,               !- Zone Name
-    FlowFromSystem,          !- Air Flow Caclulation Method
+    FlowFromSystem,          !- Air Flow Calculation Method
     Watts/Unit,              !- Design Power Input Calculation Method
     500,                     !- Watts per Unit {W}
     100,                     !- Number of Units

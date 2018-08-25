@@ -373,7 +373,7 @@ namespace DElightManagerF {
 
                                         // Error if window has a shading device (blind/shade/screen) since
                                         // DElight cannot perform dynamic shading device deployment
-                                        if (wndo.WindowShadingControlPtr > 0) {
+                                        if (wndo.HasShadeControl) {
                                             ShowSevereError("Shading Device on window " + wndo.Name +
                                                             " dynamic control is not supported in a zone with DElight daylighting.");
                                             ErrorsFound = true;

@@ -230,15 +230,16 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1.0000;                  !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
 ! ***HOLIDAYS & DAYLIGHT SAVINGS***
 
@@ -3752,7 +3753,6 @@
     Bath_ZN_1_FLR_1_Wall_5,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3768,7 +3768,6 @@
     Cafeteria_ZN_1_FLR_1_Wall_2,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3784,7 +3783,6 @@
     Cafeteria_ZN_1_FLR_1_Wall_3,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3802,7 +3800,6 @@
     Computer_Class_ZN_1_FLR_1_Wall_3,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3818,7 +3815,6 @@
     Corner_Class_1_Pod_1_ZN_1_FLR_1_Wall_1,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3834,7 +3830,6 @@
     Corner_Class_1_Pod_1_ZN_1_FLR_1_Wall_4,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3850,7 +3845,6 @@
     Corner_Class_1_Pod_2_ZN_1_FLR_1_Wall_1,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3866,7 +3860,6 @@
     Corner_Class_1_Pod_2_ZN_1_FLR_1_Wall_4,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3882,7 +3875,6 @@
     Corner_Class_1_Pod_3_ZN_1_FLR_1_Wall_1,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3898,7 +3890,6 @@
     Corner_Class_1_Pod_3_ZN_1_FLR_1_Wall_4,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3914,7 +3905,6 @@
     Corner_Class_2_Pod_1_ZN_1_FLR_1_Wall_3,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3930,7 +3920,6 @@
     Corner_Class_2_Pod_1_ZN_1_FLR_1_Wall_4,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3946,7 +3935,6 @@
     Corner_Class_2_Pod_2_ZN_1_FLR_1_Wall_3,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3962,7 +3950,6 @@
     Corner_Class_2_Pod_2_ZN_1_FLR_1_Wall_4,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3978,7 +3965,6 @@
     Corner_Class_2_Pod_3_ZN_1_FLR_1_Wall_3,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -3994,7 +3980,6 @@
     Corner_Class_2_Pod_3_ZN_1_FLR_1_Wall_4,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4010,7 +3995,6 @@
     Corridor_Pod_1_ZN_1_FLR_1_Wall_6,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4026,7 +4010,6 @@
     Corridor_Pod_2_ZN_1_FLR_1_Wall_6,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4042,7 +4025,6 @@
     Corridor_Pod_3_ZN_1_FLR_1_Wall_7,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4058,7 +4040,6 @@
     Gym_ZN_1_FLR_1_Wall_2,   !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4074,7 +4055,6 @@
     Kitchen_ZN_1_FLR_1_Wall_2,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4090,7 +4070,6 @@
     Library_Media_Center_ZN_1_FLR_1_Wall_2,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4106,7 +4085,6 @@
     Library_Media_Center_ZN_1_FLR_1_Wall_3,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4122,7 +4100,6 @@
     Lobby_ZN_1_FLR_1_Wall_1, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4138,7 +4115,6 @@
     Main_Corridor_ZN_1_FLR_1_Wall_7,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4154,7 +4130,6 @@
     Mult_Class_1_Pod_1_ZN_1_FLR_1_Wall_1,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4170,7 +4145,6 @@
     Mult_Class_1_Pod_2_ZN_1_FLR_1_Wall_1,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4186,7 +4160,6 @@
     Mult_Class_1_Pod_3_ZN_1_FLR_1_Wall_1,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4202,7 +4175,6 @@
     Mult_Class_2_Pod_1_ZN_1_FLR_1_Wall_3,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4218,7 +4190,6 @@
     Mult_Class_2_Pod_2_ZN_1_FLR_1_Wall_3,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4234,7 +4205,6 @@
     Mult_Class_2_Pod_3_ZN_1_FLR_1_Wall_3,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4250,7 +4220,6 @@
     Offices_ZN_1_FLR_1_Wall_1,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4266,7 +4235,6 @@
     Offices_ZN_1_FLR_1_Wall_2,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4290,7 +4258,6 @@
     Gym_ZN_1_FLR_1_Ceiling,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     Al w/Break Frame,        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -4306,7 +4273,6 @@
     Gym_ZN_1_FLR_1_Ceiling,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     Al w/Break Frame,        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -4322,7 +4288,6 @@
     Gym_ZN_1_FLR_1_Ceiling,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     Al w/Break Frame,        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -4338,7 +4303,6 @@
     Gym_ZN_1_FLR_1_Ceiling,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     Al w/Break Frame,        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -4354,7 +4318,6 @@
     Gym_ZN_1_FLR_1_Ceiling,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     Al w/Break Frame,        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -4370,7 +4333,6 @@
     Gym_ZN_1_FLR_1_Ceiling,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     Al w/Break Frame,        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -4386,7 +4348,6 @@
     Gym_ZN_1_FLR_1_Ceiling,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     Al w/Break Frame,        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -4402,7 +4363,6 @@
     Gym_ZN_1_FLR_1_Ceiling,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     Al w/Break Frame,        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -4418,7 +4378,6 @@
     Gym_ZN_1_FLR_1_Ceiling,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     Al w/Break Frame,        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -11962,7 +11921,7 @@
     On/Off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:20,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -11974,7 +11933,7 @@
     On/Off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:30,1,          !- Field 6
     Until: 23:00,0,          !- Field 8

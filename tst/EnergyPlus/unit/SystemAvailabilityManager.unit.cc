@@ -186,7 +186,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfWeekTomorrow = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
 
     DataZoneEquipment::ZoneEquipAvail.allocate(5);
