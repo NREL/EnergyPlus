@@ -13,6 +13,10 @@ A new column "Fan Energy Index" has been added to the Equipment Summary:Fans rep
 
 See [6812](https://github.com/NREL/EnergyPlus/pull/6812)
 
+### Corrected EIO output of Advanced Single-Sided Natural Ventilation Wind Angles
+
+The advanced single-sided natural ventilation feature uses a higher-resolution table of wind angles, and these angles are now correctly represented in the EIO file.
+
 ### Reporting of Year numbers
 
 Simulation progress messages, now include the simulation year in the date stamp. e.g.
@@ -28,5 +32,3 @@ Environment,RUNPERIOD 1,WeatherFileRunPeriod,01/01/2019,12/31/2019,Tuesday,365,U
 
 
 See [6478](https://github.com/NREL/EnergyPlus/pull/6478)
-
-
