@@ -100,8 +100,10 @@
     ,                        !- Name
     10,                      !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     9,                       !- End Month
     30,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period

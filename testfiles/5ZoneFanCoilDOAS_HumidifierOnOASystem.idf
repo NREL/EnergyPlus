@@ -216,8 +216,10 @@
     WinterTypicalDays,       !- Name
     1,                       !- Begin Month
     21,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     27,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -229,8 +231,10 @@
     SummerTypicalDays,       !- Name
     7,                       !- Begin Month
     21,                      !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     27,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period

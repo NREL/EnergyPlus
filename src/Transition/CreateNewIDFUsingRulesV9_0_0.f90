@@ -169,6 +169,19 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   ! end new variables for WINDOWPROPERTY:SHADINGCONTROL from 8.9 to 9.0 
   
 
+  ! For run period transitions
+  TYPE FieldFlagAndValue
+    LOGICAL :: wasSet
+    CHARACTER(len=MaxNameLength) :: originalValue
+  END TYPE FieldFlagAndValue
+  TYPE (FieldFlagAndValue) :: RunPeriodStartYear
+  TYPE (FieldFlagAndValue) :: RunPeriodRepeated
+  INTEGER :: MonthNumber, DayNumber, YearNumber, RepeatedCount
+  INTEGER, EXTERNAL :: GetYearFromStartDayString
+  LOGICAL, EXTERNAL :: IsYearNumberALeapYear
+  INTEGER, EXTERNAL :: GetLeapYearFromStartDayString
+  INTEGER, EXTERNAL :: FindYearForWeekDay
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -687,6 +700,104 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with P, insert the rules here
 
               ! If your original object starts with R, insert the rules here
+              CASE('RUNPERIOD:CUSTOMRANGE')
+                ! Just change the type to RunPeriod and copy all of the arguments
+                ObjectName = 'RunPeriod'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                IF (SameString(TRIM(OutArgs(8)), "USEWEATHERFILE")) THEN
+                    CALL ShowWarningError('Run period start day of week USEWEATHERFILE option has been removed, start week day is set by the input start date.',Auditf)
+                    OutArgs(8) = Blank
+                END IF
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                Written=.true.
+                nodiff = .false.
+
+              CASE('RUNPERIOD')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! spend some time mining out the state of the run period object
+                RunPeriodStartYear%wasSet = .FALSE.
+                IF (CurArgs >= 14) THEN
+                  IF (TRIM(InArgs(14)) /= Blank) THEN
+                    RunPeriodStartYear%wasSet = .TRUE.
+                    RunPeriodStartYear%originalValue = InArgs(14)
+                  END IF
+                END IF
+                RunPeriodRepeated%wasSet = .FALSE.
+                IF (CurArgs >= 12) THEN
+                  IF (TRIM(InArgs(12)) /= Blank) THEN
+                    RunPeriodRepeated%wasSet = .TRUE.
+                    RunPeriodRepeated%originalValue = InArgs(12)
+                  END IF
+                END IF
+                ! Now start writing some object data out
+                ! Name, BeginMonth and BeginDay are the same
+                OutArgs(1:3) = InArgs(1:3) 
+                ! Start year is weird
+                IF (RunPeriodStartYear%wasSet) THEN
+                  OutArgs(4) = RunPeriodStartYear%originalValue
+                ELSE IF (RunPeriodRepeated%wasSet) THEN
+                  READ(OutArgs(2), *) MonthNumber
+                  READ(OutArgs(3), *) DayNumber
+                  IF (TRIM(InArgs(6)) /= Blank) THEN
+                    YearNumber = FindYearForWeekDay(MonthNumber, DayNumber, InArgs(6))
+                  ELSE
+                    YearNumber = FindYearForWeekDay(MonthNumber, DayNumber, "SUNDAY")
+                  END IF
+                  WRITE(OutArgs(4), *) YearNumber
+                ELSE
+                  OutArgs(4) = Blank
+                END IF
+                ! End month and End day or month are the same, just need to shift one field
+                OutArgs(5:6) = InArgs(4:5)
+                ! End year is weird
+                IF (RunPeriodRepeated%wasSet) THEN
+                  ! What if start year turns out to be blank above?
+                  IF (TRIM(OutArgs(4)) == Blank) THEN
+                    OutArgs(7) = Blank
+                  ELSE
+                    READ(RunPeriodRepeated%originalValue, *) RepeatedCount
+                    READ(OutArgs(4), *) YearNumber
+                    YearNumber = YearNumber + RepeatedCount
+                    WRITE(OutArgs(7), *) YearNumber
+                    IF (TRIM(InArgs(4))=="2".AND.TRIM(InArgs(5))=="29") THEN
+                      ! We should have a leap year end year
+                      IF (.NOT.IsYearNumberALeapYear(YearNumber)) THEN
+                        ! Warning about bad end year/end date combination
+                        OutArgs(6) = "28"
+                      END IF
+                    END IF
+                  END IF
+                ELSE
+                  OutArgs(7) = Blank
+                END IF
+                ! Start day of week is also weird
+                IF (RunPeriodStartYear%wasSet) THEN
+                  ! Throw warning saying the start of the week has been specified by the year
+                  OutArgs(8) = Blank  ! But why is this field even staying?
+                ELSE
+                  IF (SameString(TRIM(InArgs(6)), "USEWEATHERFILE")) THEN
+                    CALL ShowWarningError('Run period start day of week USEWEATHERFILE option has been removed, start week day is set by the input start date.',Auditf)
+                    OutArgs(8) = BLANK
+                  ELSE
+                    ! Copy it over unchanged?
+                    OutArgs(8) = InArgs(6)
+                  END IF
+                END IF
+                ! Remaining fields are mostly straightforward
+                OutArgs(9)  = InArgs(7)  ! Use Weather File Holidays
+                OutArgs(10) = InArgs(8)  ! Use Weather File DST
+                OutArgs(11) = InArgs(9)  ! Apply Weekend Holiday Rule
+                OutArgs(12) = InArgs(10) ! Use Weather File Rain
+                OutArgs(13) = InArgs(11) ! Use Weather File Snow
+                ! InArgs(12): Eliminate number of times to repeat runperiod
+                IF (TRIM(InArgs(13))=="YES") THEN
+                  ! Issue warning about incrementing day of week on repeat...
+                END IF
+                ! InArgs(14): Start year moved to above
+                OutArgs(14) = Blank ! new Treat weather as actual field?
+                CurArgs = 14
+                nodiff = .false.
 
               ! If your original object starts with S, insert the rules here
 
