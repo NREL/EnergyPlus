@@ -23,7 +23,7 @@
 ! The G-function is defined by the following data pairs
 
 !  Version,
-!    8.8;                    !- Version Identifier
+!    9.0;                    !- Version Identifier
 
   GroundHeatExchanger:System,
     Vertical GHE 1x2 Std,     !- Name

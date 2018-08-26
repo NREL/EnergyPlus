@@ -47,8 +47,14 @@
 
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
+#include <DataHeatBalFanSys.hh>
+#include <DataHeatBalance.hh>
+#include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
+#include <DataZoneEquipment.hh>
+#include <Psychrometrics.hh>
+#include <UtilityRoutines.hh>
+#include <WindowManager.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -87,6 +93,13 @@ namespace DataSurfaces {
     using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
+    using namespace DataHeatBalance;
+    using namespace DataHeatBalFanSys;
+    using namespace DataZoneEquipment;
+    using namespace DataLoopNode;
+    using namespace Psychrometrics;
+    using namespace DataEnvironment;
+    using namespace WindowManager;
 
     // Data
     // -only module should be available to other modules and routines.
@@ -370,7 +383,7 @@ namespace DataSurfaces {
     Array1D<Real64> DSZone; // Factor for sky diffuse solar radiation into a zone
     Array1D<Real64> DGZone; // Factor for ground diffuse solar radiation into a zone
     Array1D<Real64> DBZone; // Factor for diffuse radiation in a zone from
-    // beam reflecting from inside surfaces
+                            // beam reflecting from inside surfaces
     Array1D<Real64>
         DBZoneSSG;          // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
     Array1D<Real64> CBZone; // Factor for beam solar absorbed by interior shades
@@ -386,6 +399,10 @@ namespace DataSurfaces {
 
     Array2D<Real64> AWinSurf; // Time step value of factor for beam
     // absorbed in window glass layers
+
+    // Time step value of factor for diffuse absorbed in window layers
+    Array2D<Real64> AWinSurfDiffFront;
+    Array2D<Real64> AWinSurfDiffBack;
 
     Array2D<Real64> AWinCFOverlap; // Time step value of factor for beam
     // absorbed in window glass layers which comes from other windows
@@ -442,7 +459,7 @@ namespace DataSurfaces {
     Array1D<Real64> WinSysSolReflectance; // Effective solar reflectance of window + shading device,
     // if present
     Array1D<Real64> WinSysSolAbsorptance; // Effective solar absorptance of window + shading device,
-    // if present
+                                          // if present
     Array2D<Real64> SUNCOSHR(
         24, 3, 0.0); // Hourly values of SUNCOS (solar direction cosines) //Autodesk:Init Zero-initialization added to avoid use uninitialized
     Array2D<Real64> ReflFacBmToDiffSolObs;
@@ -677,6 +694,191 @@ namespace DataSurfaces {
         WindDir = fac;
     }
 
+    Real64 SurfaceData::getInsideAirTemperature(const int t_SurfNum) const
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   June 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Routine calculates reference air temperature for given surface (refactoring from the code)
+        //
+        // NOTE: This routine has been copy/pasted in the past in several different modules with slight
+        //       modifications at some of those places. It is quite logical that reference air temperature
+        //       for the surface is calculated as public function of SurfaceData structure (class) and is
+        //       later called as needed. Note that SurfaceNum had to be passed to this routine because of
+        //       access to global array TempEffBulkAir. I would propose refactoring where TempEffBulkAir
+        //       is part of SurfaceData structure and instead of calling TempEffBulkAir( SurfNum ) it should
+        //       be called Surface( SurfNum ).TempEffBulkAir (Simon Vidanovic)
+
+        Real64 RefAirTemp = 0;
+
+        // determine reference air temperature for this surface
+        {
+            const auto SELECT_CASE_var(TAirRef);
+            if (SELECT_CASE_var == ZoneMeanAirTemp) {
+                RefAirTemp = MAT(Zone);
+            } else if (SELECT_CASE_var == AdjacentAirTemp) {
+                RefAirTemp = DataHeatBalance::TempEffBulkAir(t_SurfNum);
+            } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
+                // determine ZoneEquipConfigNum for this zone
+                //            ControlledZoneAirFlag = .FALSE.
+                // ZoneEquipConfigNum = ZoneNum;
+                // check whether this zone is a controlled zone or not
+                if (!DataHeatBalance::Zone(Zone).IsControlled) {
+                    ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                                   DataHeatBalance::Zone(Zone).Name);
+                    // return;
+                }
+                // determine supply air conditions
+                Real64 SumSysMCp = 0;
+                Real64 SumSysMCpT = 0;
+                for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
+                    Real64 NodeTemp = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
+                    Real64 MassFlowRate = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
+                    Real64 CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(Zone), NodeTemp);
+                    SumSysMCp += MassFlowRate * CpAir;
+                    SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+                }
+                // a weighted average of the inlet temperatures.
+                RefAirTemp = SumSysMCpT / SumSysMCp;
+            } else {
+                // currently set to mean air temp but should add error warning here
+                RefAirTemp = MAT(Zone);
+            }
+        }
+
+        return RefAirTemp;
+    }
+
+    Real64 SurfaceData::getInsideIR(const int t_SurfNum)
+    {
+        auto &window(SurfaceWindow(t_SurfNum));
+        const Real64 value = window.IRfromParentZone + QHTRadSysSurf(t_SurfNum) + QHWBaseboardSurf(t_SurfNum) + QSteamBaseboardSurf(t_SurfNum) +
+                             QElecBaseboardSurf(t_SurfNum);
+        return value;
+    }
+
+    Real64 SurfaceData::getOutsideAirTemperature(const int t_SurfNum) const
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   June 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Routine calculates outside air temperature for given surface.
+        // Routine will return inside air temperature if it is interior surface. (refactoring from the code)
+        //
+        // NOTE: This routine has been copy/pasted in the past in several different modules with slight
+        //       modifications at some of those places. Exterior/interior surface air temperature is tied to surface.
+        Real64 temperature = 0;
+
+        if (ExtBoundCond > 0) // Interzone window
+        {
+            temperature = getInsideAirTemperature(t_SurfNum);
+        } else {
+            if (ExtWind) {
+                // Window is exposed to wind (and possibly rain)
+                if (IsRain) {
+                    // Raining: since wind exposed, outside window surface gets wet
+                    temperature = OutWetBulbTemp;
+                } else {
+                    // Dry
+                    temperature = OutDryBulbTemp;
+                }
+            } else {
+                // Window not exposed to wind
+                temperature = OutDryBulbTemp;
+            }
+        }
+
+        return temperature;
+    }
+
+    Real64 SurfaceData::getOutsideIR(const int t_SurfNum) const
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   July 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculates outside infrared radiation
+        Real64 value = 0;
+        if (ExtBoundCond > 0) {
+            value = SurfaceWindow(ExtBoundCond).IRfromParentZone + QHTRadSysSurf(ExtBoundCond) + QHWBaseboardSurf(ExtBoundCond) +
+                    QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
+        } else {
+            Real64 tout = getOutsideAirTemperature(t_SurfNum) + KelvinConv;
+            value = sigma * pow_4(tout);
+            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
+                    ViewFactorGroundIR * value;
+        }
+        return value;
+    }
+
+    Real64 SurfaceData::getSWIncident(const int t_SurfNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   July 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Return total short wave incident to the surface
+
+        return QRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).Zone);
+    }
+
+    Real64 SurfaceData::getSWBeamIncident(const int t_SurfNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   July 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Return total short wave incident from outside beam
+
+        return QRadSWOutIncidentBeam(t_SurfNum);
+    }
+
+    Real64 SurfaceData::getSWDiffuseIncident(const int t_SurfNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   July 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Return total short wave diffuse incident to the surface
+
+        return QRadSWOutIncidentSkyDiffuse(t_SurfNum) + QRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).Zone);
+    }
+
+    int SurfaceData::getTotLayers() const
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   August 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Returns total number of layer for current surface
+
+        auto &construction(Construct(Construction));
+        return construction.TotLayers;
+    }
+
     // Computed Shape Category
     ShapeCat SurfaceData::computed_shapeCat() const
     {
@@ -832,6 +1034,8 @@ namespace DataSurfaces {
         BmToDiffReflFacObs.deallocate();
         BmToDiffReflFacGnd.deallocate();
         AWinSurf.deallocate();
+        AWinSurfDiffFront.deallocate();
+        AWinSurfDiffBack.deallocate();
         AWinCFOverlap.deallocate();
         AirSkyRadSplit.deallocate();
         WinTransSolar.deallocate();
@@ -1018,6 +1222,36 @@ namespace DataSurfaces {
         }
 
         return ClassName;
+    }
+
+    Real64 SurfaceWindowCalc::AbsorptanceFromInteriorFrontSide() const
+    {
+        return (IntBeamAbsByShade + IntSWAbsByShade) * ShadeAbsFacFace(2);
+    }
+
+    Real64 SurfaceWindowCalc::AbsorptanceFromExteriorFrontSide() const
+    {
+        return (ExtBeamAbsByShade + ExtDiffAbsByShade) * ShadeAbsFacFace(1);
+    }
+
+    Real64 SurfaceWindowCalc::AbsFrontSide() const
+    {
+        return AbsorptanceFromExteriorFrontSide() + AbsorptanceFromInteriorFrontSide();
+    }
+
+    Real64 SurfaceWindowCalc::AbsorptanceFromInteriorBackSide() const
+    {
+        return (IntBeamAbsByShade + IntSWAbsByShade) * ShadeAbsFacFace(1);
+    }
+
+    Real64 SurfaceWindowCalc::AbsorptanceFromExteriorBackSide() const
+    {
+        return (ExtBeamAbsByShade + ExtDiffAbsByShade) * ShadeAbsFacFace(2);
+    }
+
+    Real64 SurfaceWindowCalc::AbsBackSide() const
+    {
+        return AbsorptanceFromExteriorBackSide() + AbsorptanceFromInteriorBackSide();
     }
 
 } // namespace DataSurfaces

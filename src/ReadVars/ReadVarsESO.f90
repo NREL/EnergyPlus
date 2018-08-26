@@ -150,6 +150,7 @@
   character(len=30) cdayofsim
   integer :: commacount
   integer :: commalimit
+  logical :: FixHeader
 
   write(*,*) 'ReadVarsESO program starting.'
   maxrptnum=-1
@@ -166,6 +167,7 @@
   Freqs=0
   gotinputfilename=.false.
   gotoutputfilename=.false.
+  FixHeader=.false.
 
   commalimit=LEN(outline)-10
 
@@ -199,6 +201,8 @@
       if (LineArg(1:1) == 'u' .or. LineArg(1:1) == 'U') Limited=.false.
       ! nolimit
       if (LineArg(1:1) == 'n' .or. LineArg(1:1) == 'N') Limited=.false.
+      ! fixheader
+      if (LineArg(1:1) == 'f' .or. LineArg(1:1) == 'F') FixHeader=.true.
     enddo
   endif
 
@@ -978,7 +982,11 @@
       write(auditunit,*) 'line 904 variable =',tracknum(ij),' not found'
     endif
   enddo
-  write(csvunit,inoutformat) ' ' !  final..trim(outline)
+  if (FixHeader) then
+    write(csvunit,inoutformat)     !  final..trim(outline)
+  else
+    write(csvunit,inoutformat) ' '
+  endif
   read(esounit,inoutformat) line ! first environment line
   curdate=blank
   curmonday=blank
@@ -1368,24 +1376,24 @@
     stop
 
 906 write(*,*) 'Output file='//trim(outputfilename)
-    write(*,*) 'error occured during processing.'
+    write(*,*) 'error occurred during processing.'
     write(*,*) 'Apparent line in error (1st 50 characters):'
     write(*,*) trim(line(1:50))
     write(*,*) 'ReadVarsESO program terminated.'
     write(auditunit,*) 'Output file='//trim(outputfilename)
-    write(auditunit,*) 'error occured during processing.'
+    write(auditunit,*) 'error occurred during processing.'
     write(auditunit,*) 'Apparent line in error (1st 50 characters):'
     write(auditunit,*) trim(line(1:50))
     write(auditunit,*) 'ReadVarsESO program terminated.'
     stop
 
 907 write(*,*) 'Output file='//trim(outputfilename)
-    write(*,*) 'error occured during processing.'
+    write(*,*) 'error occurred during processing.'
     write(*,*) 'Blank line in middle of processing.'
     write(*,*) 'Likely fatal error during EnergyPlus execution.'
     write(*,*) 'ReadVarsESO program terminated.'
     write(auditunit,*) 'Output file='//trim(outputfilename)
-    write(auditunit,*) 'error occured during processing.'
+    write(auditunit,*) 'error occurred during processing.'
     write(auditunit,*) 'Blank line in middle of processing.'
     write(auditunit,*) 'Likely fatal error during EnergyPlus execution.'
     write(auditunit,*) 'ReadVarsESO program terminated.'

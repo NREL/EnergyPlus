@@ -149,8 +149,10 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "    ,                        !- Name",
         "    1,                       !- Begin Month",
         "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    1,                       !- End Month",
         "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
         "    Tuesday,                 !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -1376,7 +1378,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
 
         "Timestep,1;",
 
