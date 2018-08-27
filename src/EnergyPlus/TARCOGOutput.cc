@@ -288,10 +288,11 @@ namespace TARCOGOutput {
         static gio::Fmt Format_1089("('IGU layers list:')");
         static gio::Fmt Format_10802("(' Layer',I3,' : ',I1,'              - Specular layer - Monolyhtic Glass')");
         static gio::Fmt Format_10803("(' Layer',I3,' : ',I1,'              - Laminated Glass')");
-        static gio::Fmt Format_10804("(' Layer',I3,' : ',I1,'              - Venetian Blind')");
+        static gio::Fmt Format_10804("(' Layer',I3,' : ',I1,'              - Horizontal Venetian Blind')");
         static gio::Fmt Format_10805("(' Layer',I3,' : ',I1,'              - Woven Shade')");
         static gio::Fmt Format_10806("(' Layer',I3,' : ',I1,'              - Diffuse Shade')");
         static gio::Fmt Format_10809("(' Layer',I3,' : ',I1,'              - UNKNOWN TYPE!')");
+        static gio::Fmt Format_10810("(' Layer',I3,' : ',I1,'              - Vertical Venetian Blind')");
         static gio::Fmt Format_1085("('    nslice     = ',I3,'          - Number of slices')");
         static gio::Fmt Format_1086("('    LaminateA  = ',F12.8,' - A coeff.')");
         static gio::Fmt Format_1087("('    LaminateB  = ',F12.8,' - B coeff.')");
@@ -421,8 +422,10 @@ namespace TARCOGOutput {
                     gio::write(InArgumentsFile, Format_10806) << i << LayerType(i);
                 } else if (SELECT_CASE_var == WOVSHADE) { // Woven Shade
                     gio::write(InArgumentsFile, Format_10805) << i << LayerType(i);
-                } else if (SELECT_CASE_var == VENETBLIND) { // Venetian blind
+                } else if (SELECT_CASE_var == VENETBLIND_HORIZ) { // Horizontal venetian blind
                     gio::write(InArgumentsFile, Format_10804) << i << LayerType(i);
+                } else if (SELECT_CASE_var == VENETBLIND_VERT) { // Vertical venetian blind
+                    gio::write(InArgumentsFile, Format_10810) << i << LayerType(i);
                 } else if (SELECT_CASE_var == SPECULAR) { // Specular layer
                     if (nslice(i) <= 1) {
                         gio::write(InArgumentsFile, Format_10802) << i << LayerType(i); // Monolithic glass
@@ -441,7 +444,7 @@ namespace TARCOGOutput {
             gio::write(InArgumentsFile, Format_1094) << emis(2 * i - 1);
             gio::write(InArgumentsFile, Format_1095) << emis(2 * i);
 
-            if (LayerType(i) == VENETBLIND) { // SD layer
+            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // SD layer
                 gio::write(InArgumentsFile, Format_1100) << Atop(i);
                 gio::write(InArgumentsFile, Format_1101) << Abot(i);
                 gio::write(InArgumentsFile, Format_1102) << Al(i);
@@ -637,7 +640,7 @@ namespace TARCOGOutput {
         gio::write(InArgumentsFile, fmtLD);
 
         for (i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) == VENETBLIND) { // SD layer
+            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // SD layer
                 gio::write(InArgumentsFile, Format_1084) << i << LayerType(i);
                 gio::write(InArgumentsFile, Format_1090) << thick(i);
                 gio::write(InArgumentsFile, Format_1091) << scon(i);
@@ -830,7 +833,7 @@ namespace TARCOGOutput {
                     gio::write(OutArgumentsFile, Format_2110) << 2 * i - 1 << theta(2 * i - 1) << theta(2 * i - 1) - KelvinConv;
                     gio::write(OutArgumentsFile, Format_2190) << i << q(2 * i);
                     gio::write(OutArgumentsFile, Format_2110) << 2 * i << theta(2 * i) << theta(2 * i) - KelvinConv;
-                } else if (SELECT_CASE_var == VENETBLIND) { // Venetian blind
+                } else if (SELECT_CASE_var == VENETBLIND_HORIZ || SELECT_CASE_var == VENETBLIND_VERT) { // Venetian blind
                     gio::write(OutArgumentsFile, Format_2111) << 2 * i - 1 << theta(2 * i - 1) << theta(2 * i - 1) - KelvinConv;
                     gio::write(OutArgumentsFile, Format_2195) << i << q(2 * i) << i << ShadeGapKeffConv(i);
                     gio::write(OutArgumentsFile, Format_2111) << 2 * i << theta(2 * i) << theta(2 * i) - KelvinConv;
@@ -891,7 +894,7 @@ namespace TARCOGOutput {
                     gio::write(OutArgumentsFile, Format_4190);
                     gio::write(OutArgumentsFile, Format_4121);
                     gio::write(OutArgumentsFile, Format_4120) << i << Ebb(i) << i << Rb(i);
-                } else if (SELECT_CASE_var == VENETBLIND) { // Venetian blind
+                } else if (SELECT_CASE_var == VENETBLIND_HORIZ || SELECT_CASE_var == VENETBLIND_VERT) { // Venetian blind
                     gio::write(OutArgumentsFile, Format_4112) << i << Ebf(i) << i << Rf(i);
                     gio::write(OutArgumentsFile, Format_4113);
                     gio::write(OutArgumentsFile, Format_4190);
@@ -1362,7 +1365,7 @@ namespace TARCOGOutput {
             gio::write(WINCogFile, Format_113);
             if (LayerType(i) == SPECULAR) {
                 gio::write(WINCogFile, Format_1060) << i;
-            } else if (LayerType(i) == VENETBLIND) {
+            } else if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
                 gio::write(WINCogFile, Format_1061) << i;
             } else if (LayerType(i) == WOVSHADE) {
                 gio::write(WINCogFile, Format_1062) << i;
@@ -1382,7 +1385,7 @@ namespace TARCOGOutput {
                 gio::write(WINCogFile, Format_1053) << Atop(i) << Abot(i) << Al(i) << Ar(i) << Ah(i);
             }
 
-            if (LayerType(i) == VENETBLIND) {
+            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
                 gio::write(WINCogFile, Format_1054);
                 gio::write(WINCogFile, Format_1055) << SlatThick(i) << SlatWidth(i) << SlatAngle(i) << SlatCond(i) << SlatSpacing(i) << SlatCurve(i);
             }

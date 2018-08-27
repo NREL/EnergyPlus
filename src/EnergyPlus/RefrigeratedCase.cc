@@ -602,7 +602,6 @@ namespace RefrigeratedCase {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::GetCurveType;
         using DataEnvironment::StdBaroPress;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHeatBalance::NumRefrigeratedRacks;
@@ -1117,11 +1116,13 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                if (!UtilityRoutines::SameString(GetCurveType(RefrigCase(CaseNum).LatCapCurvePtr), "CUBIC")) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(5) +
-                                    " object must be of type Cubic.");
-                    ErrorsFound = true;
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    RefrigCase(CaseNum).LatCapCurvePtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    RefrigCase(CaseNum).Name,   // Object Name
+                    cAlphaFieldNames(5));               // Field Name
 
                 NumNum = 8;
                 if (!lNumericBlanks(NumNum)) {
@@ -1441,11 +1442,13 @@ namespace RefrigeratedCase {
                 }
 
                 if (RefrigCase(CaseNum).DefCapCurvePtr > 0) {
-                    if (!UtilityRoutines::SameString(GetCurveType(RefrigCase(CaseNum).DefCapCurvePtr), "CUBIC")) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
-                                        cAlphaFieldNames(12) + " must be of type Cubic.");
-                        ErrorsFound = true;
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        RefrigCase(CaseNum).DefCapCurvePtr,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        RefrigCase(CaseNum).Name,   // Object Name
+                        cAlphaFieldNames(12));               // Field Name
                 }
 
                 //  warn user if defrost energy curve is entered that it is only used for temperature termination types
@@ -2408,11 +2411,13 @@ namespace RefrigeratedCase {
                             ErrorsFound = true;
                         }
                         // error checks for curve type entered and curve name
-                        if (!UtilityRoutines::SameString(GetCurveType(WarehouseCoil(CoilID).SHRCorrectionCurvePtr), "QUADRATIC")) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
-                                            cAlphaFieldNames(AlphaNum) + " must be of type Quadratic.");
-                            ErrorsFound = true;
-                        }
+                        ErrorsFound |= CurveManager::CheckCurveDims(
+                            WarehouseCoil(CoilID).SHRCorrectionCurvePtr,   // Curve index
+                            {1},                            // Valid dimensions
+                            RoutineName,                    // Routine name
+                            CurrentModuleObject,            // Object Type
+                            WarehouseCoil(CoilID).Name,     // Object Name
+                            cAlphaFieldNames(AlphaNum));    // Field Name
                     } else if (SELECT_CASE_var == TabularRH_DT1_TRoom) {
                         WarehouseCoil(CoilID).SHRCorrectionCurvePtr = GetCurveIndex(Alphas(AlphaNum)); // convert curve name to number
                         if (lAlphaBlanks(AlphaNum)) {
@@ -2852,13 +2857,13 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                if (!UtilityRoutines::SameString(GetCurveType(RefrigRack(RackNum).COPFTempPtr), "CUBIC")) {
-                    if (!UtilityRoutines::SameString(GetCurveType(RefrigRack(RackNum).COPFTempPtr), "QUADRATIC")) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " + cAlphaFieldNames(3) +
-                                        " object must be of type cubic or quadratic.");
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    RefrigRack(RackNum).COPFTempPtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    RefrigRack(RackNum).Name,     // Object Name
+                    cAlphaFieldNames(3));    // Field Name
 
                 RefrigRack(RackNum).CondenserFanPower = Numbers(2);
                 if (Numbers(2) < 0.0) {
@@ -2875,13 +2880,13 @@ namespace RefrigeratedCase {
                 }
 
                 if (!lAlphaBlanks(4)) {
-                    if (!UtilityRoutines::SameString(GetCurveType(RefrigRack(RackNum).TotCondFTempPtr), "CUBIC")) {
-                        if (!UtilityRoutines::SameString(GetCurveType(RefrigRack(RackNum).TotCondFTempPtr), "QUADRATIC")) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
-                                            cAlphaFieldNames(4) + " object must be of type cubic or quadratic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        RefrigRack(RackNum).TotCondFTempPtr,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        RefrigRack(RackNum).Name,     // Object Name
+                        cAlphaFieldNames(4));    // Field Name
                 }
 
                 if (UtilityRoutines::SameString(Alphas(5), "EvaporativelyCooled")) {
@@ -4368,11 +4373,13 @@ namespace RefrigeratedCase {
                                             cAlphaFieldNames(AlphaNum) + " not found:" + Alphas(AlphaNum));
                             ErrorsFound = true;
                         }
-                        if (!UtilityRoutines::SameString(GetCurveType(Secondary(SecondaryNum).VarSpeedCurvePtr), "CUBIC")) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", invalid  " +
-                                            cAlphaFieldNames(AlphaNum) + " object must be of type cubic.");
-                            ErrorsFound = true;
-                        }
+                        ErrorsFound |= CurveManager::CheckCurveDims(
+                            Secondary(SecondaryNum).VarSpeedCurvePtr,   // Curve index
+                            {1},                            // Valid dimensions
+                            RoutineName,                    // Routine name
+                            CurrentModuleObject,            // Object Type
+                            Secondary(SecondaryNum).Name,     // Object Name
+                            cAlphaFieldNames(AlphaNum));    // Field Name
                     } // input power conditions/levels for constant or variable speed pump drives
 
                     // Default non-hermetic motor eff at 85% and all shaft power goes to heat in fluid

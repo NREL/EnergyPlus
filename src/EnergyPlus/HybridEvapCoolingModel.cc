@@ -106,7 +106,6 @@ namespace HybridEvapCoolingModel {
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using CurveManager::GetCurveMinMaxValues;
-    using CurveManager::GetCurveType;
     using EnergyPlus::CurveManager::GetNormalPoint;
     using ScheduleManager::GetCurrentScheduleValue;
     typedef int *MyType;

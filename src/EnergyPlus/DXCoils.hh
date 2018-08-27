@@ -209,14 +209,12 @@ namespace DXCoils {
         Array1D_int CCapFTemp;            // index of total cooling capacity modifier curve
         // (function of entering wetbulb, outside drybulb)
         int CCapFTempErrorIndex;               // Used for warning messages when output of CCapFTemp is negative
-        Array1D_int TotCapTempModFacCurveType; // type of curve for CCapFTemp (cubic,quadratic,bi-quadratic)
         Array1D_int CCapFFlow;                 // index of total cooling capacity modifier curve
         // (function of actual supply air flow vs rated air flow)
         int CCapFFlowErrorIndex; // Used for warning messages when output of CCapFFlow is negative
         Array1D_int EIRFTemp;    // index of energy input ratio modifier curve
         // (function of entering wetbulb, outside drybulb)
         int EIRFTempErrorIndex;             // Used for warning messages when output of EIRFTemp is negative
-        Array1D_int EIRTempModFacCurveType; // type of curve for EIRFTemp (cubic,quadratic,bi-quadratic)
         Array1D_int EIRFFlow;               // index of energy input ratio modifier curve
         // (function of actual supply air flow vs rated air flow)
         int EIRFFlowErrorIndex;               // Used for warning messages when output of EIRFFlow is negative
@@ -357,14 +355,12 @@ namespace DXCoils {
         int WaterOutNode;             // Condenser water outlet node number for HPWH DX coil
         int HCOPFTemp;                // COP as a function of temperature curve index
         int HCOPFTempErrorIndex;      // Used for warning messages when output of HCOPFTemp is negative
-        int HCOPFTempCurveType;       // COP as a function of temperature curve type
         int HCOPFAirFlow;             // COP as a function of air flow rate ratio curve index
         int HCOPFAirFlowErrorIndex;   // Used for warning messages when output of HCOPFAirFlow is negative
         int HCOPFWaterFlow;           // COP as a function of water flow rate ratio curve index
         int HCOPFWaterFlowErrorIndex; // Used for warning messages when output of HCOPFWaterFlow is negative
         int HCapFTemp;                // Heating capacity as a function of temperature curve index
         int HCapFTempErrorIndex;      // Used for warning messages when output of HCapFTemp is negative
-        int HCapFTempCurveType;       // Heating capacity as a function of temperature curve type
         int HCapFAirFlow;             // Heating capacity as a function of air flow rate ratio curve index
         int HCapFAirFlowErrorIndex;   // Used for warning messages when output of HCapFAirFlow is negative
         int HCapFWaterFlow;           // Heating capacity as a function of water flow rate ratio curve index
@@ -439,8 +435,6 @@ namespace DXCoils {
         Array1D<Real64> MSEvapCondAirFlow;          // Air flow rate through the evap condenser for water use calcs [m3/s]
         Array1D<Real64> MSEvapCondPumpElecNomPower; // Nominal power input to the evap condenser
         // water circulation pump
-        Array1D_int MSTotCapTempModFacCurveType; // type of curve for CCapFTemp (cubic,quadratic,bi-quadratic)
-        Array1D_int MSEIRTempModFacCurveType;    // type of curve for EIRFTemp (cubic,quadratic,bi-quadratic)
         Array1D<Real64> MSTwet_Rated;            // Nominal time for condensate to begin leaving the coil's
         // condensate drain line (sec)
         Array1D<Real64> MSGamma_Rated; // Initial moisture evaporation rate divided by steady-state
@@ -460,7 +454,6 @@ namespace DXCoils {
         Array1D_int SHRFTemp;            // index of sensible heat ratio modifier curve
         // (function of entering wetbulb and drybulb)
         int SHRFTempErrorIndex;        // Used for warning messages when output of SHRFTemp is negative
-        Array1D_int SHRFTempCurveType; // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
         Array1D_int SHRFFlow;          // index of sensible heat ratio modifier curve
         // (function of actual supply air flow vs rated air flow)
         int SHRFFlowErrorIndex; // Used for warning messages when output of SHRFFlow is negative
@@ -468,7 +461,6 @@ namespace DXCoils {
         // (function of entering wetbulb and drybulb)
         int SHRFFlow2; // index of sensible heat ratio modifier curve
         // (function of actual supply air flow vs rated air flow)
-        int SHRFTempCurveType2;  // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
         bool UserSHRCurveExists; // TRUE if user specified SHR modifier curve exists
         bool ASHRAE127StdRprt;   // TRUE if user wishes to report ASHRAE 127 standard ratings
 
@@ -518,6 +510,7 @@ namespace DXCoils {
         int EIRFTErrIndex;         // index/pointer to recurring error structure for EIRFT curve value <= 0.0
         bool reportCoilFinalSizes; // one time report of sizes to coil selection report
         Real64 capModFacTotal;     // current coil capacity modification factor
+        int AirLoopNum; // Airloop number
 
         // Default Constructor
         DXCoilData()
@@ -527,8 +520,8 @@ namespace DXCoils {
               RatedAirVolFlowRateEMSOverrideON(MaxModes, false), RatedAirVolFlowRateEMSOverrideValue(MaxModes, 0.0),
               FanPowerPerEvapAirFlowRate(MaxModes, 0.0), RatedAirMassFlowRate(MaxModes, 0.0), BypassedFlowFrac(MaxModes, 0.0),
               RatedCBF(MaxModes, 0.0), AirInNode(0), AirOutNode(0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0),
-              TotCapTempModFacCurveType(MaxModes, 0), CCapFFlow(MaxModes, 0), CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0),
-              EIRTempModFacCurveType(MaxModes, 0), EIRFFlow(MaxModes, 0), EIRFFlowErrorIndex(0), PLFFPLR(MaxModes, 0),
+              CCapFFlow(MaxModes, 0), CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0),
+              EIRFFlow(MaxModes, 0), EIRFFlowErrorIndex(0), PLFFPLR(MaxModes, 0),
               ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0),
               CrankcaseHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), CompanionUpstreamDXCoil(0),
               FindCompanionUpStreamCoil(true), CondenserInletNodeNum(MaxModes, 0), LowOutletTempIndex(0), FullLoadOutAirTempLast(0.0),
@@ -550,8 +543,8 @@ namespace DXCoils {
               EvapWaterConsump(0.0), EvapCondAirFlow2(0.0), EvapCondEffect2(0.0), EvapCondPumpElecNomPower2(0.0), BasinHeaterPower(0.0),
               BasinHeaterConsumption(0.0), NumCapacityStages(1), NumDehumidModes(0), CoilPerformanceType(MaxModes),
               CoilPerformanceType_Num(MaxModes, 0), CoilPerformanceName(MaxModes), CoolingCoilStg2RuntimeFrac(0.0), DehumidificationMode(0),
-              WaterInNode(0), WaterOutNode(0), HCOPFTemp(0), HCOPFTempErrorIndex(0), HCOPFTempCurveType(0), HCOPFAirFlow(0),
-              HCOPFAirFlowErrorIndex(0), HCOPFWaterFlow(0), HCOPFWaterFlowErrorIndex(0), HCapFTemp(0), HCapFTempErrorIndex(0), HCapFTempCurveType(0),
+              WaterInNode(0), WaterOutNode(0), HCOPFTemp(0), HCOPFTempErrorIndex(0), HCOPFAirFlow(0),
+              HCOPFAirFlowErrorIndex(0), HCOPFWaterFlow(0), HCOPFWaterFlowErrorIndex(0), HCapFTemp(0), HCapFTempErrorIndex(0),
               HCapFAirFlow(0), HCapFAirFlowErrorIndex(0), HCapFWaterFlow(0), HCapFWaterFlowErrorIndex(0), InletAirTemperatureType(0),
               RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), HPWHCondPumpElecNomPower(0.0), HPWHCondPumpFracToWater(0.0),
               RatedHPWHCondWaterFlow(0.0), ElecWaterHeatingPower(0.0), ElecWaterHeatingConsumption(0.0), FanPowerIncludedInCOP(true),
@@ -561,8 +554,8 @@ namespace DXCoils {
               CondensateCollectMode(CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0),
               CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelType(0), NumOfSpeeds(0), PLRImpact(false), LatentImpact(false),
               MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true), HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false),
-              SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFTempCurveType(MaxModes, 0), SHRFFlow(MaxModes, 0), SHRFFlowErrorIndex(0),
-              SHRFTemp2(0), SHRFFlow2(0), SHRFTempCurveType2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0),
+              SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0), SHRFFlowErrorIndex(0),
+              SHRFTemp2(0), SHRFFlow2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0),
               SecCoilSHRFF(0), SecCoilAirFlow(0.0), SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0),
               SecCoilSensibleHeatGainRate(0.0), SecCoilTotalHeatRemovalRate(0.0), SecCoilSensibleHeatRemovalRate(0.0),
               SecCoilLatentHeatRemovalRate(0.0), IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0),
@@ -573,7 +566,8 @@ namespace DXCoils {
               // MSSecCoilRatedSHR( 0.0 )
               MSSpeedNumLS(1), MSSpeedNumHS(2), MSSpeedRatio(0.0), MSCycRatio(0.0), VRFIUPtr(0), VRFOUPtr(0), EvaporatingTemp(4.0),
               CondensingTemp(40.0), C1Te(0.0), C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), SH(0.0), SC(0.0), ActualSH(0.0), ActualSC(0.0),
-              RateBFVRFIUEvap(0.0592), RateBFVRFIUCond(0.1360), CAPFTErrIndex(0), EIRFTErrIndex(0), reportCoilFinalSizes(true), capModFacTotal(0.0)
+              RateBFVRFIUEvap(0.0592), RateBFVRFIUCond(0.1360), CAPFTErrIndex(0), EIRFTErrIndex(0), reportCoilFinalSizes(true), capModFacTotal(0.0),
+              AirLoopNum(0)
         {
         }
     };
@@ -969,6 +963,10 @@ namespace DXCoils {
     // *****************************************************************************
 
     void SetMSHPDXCoilHeatRecoveryFlag(int const DXCoilNum); // must match coil names for the coil type
+
+    void SetDXCoilAirLoopNumber(std::string const & CoilName,
+                                int const AirLoopNum
+    ); // must match coil names for the coil type
 
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.

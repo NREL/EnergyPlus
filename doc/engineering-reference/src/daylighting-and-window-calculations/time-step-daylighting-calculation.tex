@@ -206,20 +206,27 @@ In the last relationship, the background luminance is approximated as the larger
 
 If glare control has been specified and the glare index at either reference point exceeds a user-specified maximum value, \emph{G\(_{I,max}\)}, then the windows in the zone are shaded one by one in attempt to bring the glare at both points below \emph{G\(_{I,max}\)}. (Each time a window is shaded the glare and illuminance at each reference point is recalculated.) The following logic is used:
 
-1)~If there is only one reference point, shade a window if it is unshaded and shading it decreases the glare, even if it does not decrease the glare below \emph{G\(_{I,max}\)}. Note that if a window~ has already been shaded, say to control solar gain, it will be left in the shaded state.
-
-2)~If there are two reference points, then:
 \begin{itemize}
-\tightlist
 \item
-If glare is too high at both points, shade the window if it decreases glare at both points.
-\item
-If glare is too high only at the first point, shade the window if the glare at the first point decreases, and the glare at the second point stays below} \emph{G\(_{I,max}\)}.
-\item
-If glare is too high only at the second point, shade the window if the glare at the second point decreases, and the glare at the first point stays below \emph{G\(_{I,max}\)}.
-\end{itemize}
+  If there is only one reference point, shade a window if it is unshaded and shading it decreases the glare, even if it does not decrease the glare below \emph{G\(_{I,max}\)}. Note that if a window~ has already been shaded, say to control solar gain, it will be left in the shaded state.
 
-3)~Shades are closed in the order of window input until glare at both points is below \emph{G\(_{I,max}\)}, or until there are no more windows left to shade.
+\item
+  If there are two reference points, then:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    If glare is too high at both points, shade the window if it decreases glare at both points.
+  \item
+    If glare is too high only at the first point, shade the window if the glare at the first point decreases, and the glare at the second point stays below \emph{G\(_{I,max}\)}.
+  \item
+    If glare is too high only at the second point, shade the window if the glare at the second point decreases, and the glare at the first point stays below \emph{G\(_{I,max}\)}.
+  \end{itemize}
+
+\item
+  Shades are closed in the order specified by the fenestration objects listed in the WindowShadingControl object until glare at both points is below \emph{G\(_{I,max}\)}, or until there are no more windows left to shade.
+
+\end{itemize}
 
 \subsection{Lighting Control System Simulation}\label{lighting-control-system-simulation}
 
