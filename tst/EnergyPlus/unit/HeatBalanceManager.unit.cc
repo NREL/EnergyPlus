@@ -757,7 +757,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,8.9;",
+        delimited_string({"  Version,9.0;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -790,8 +790,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
                           "    ,                        !- Name",
                           "    1,                       !- Begin Month",
                           "    14,                      !- Begin Day of Month",
+                          "    ,                        !- Begin Year",
                           "    1,                       !- End Month",
                           "    14,                      !- End Day of Month",
+                          "    ,                        !- End Year",
                           "    Tuesday,                 !- Day of Week for Start Day",
                           "    Yes,                     !- Use Weather File Holidays and Special Days",
                           "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -803,8 +805,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
                           "    ,                        !- Name",
                           "    7,                       !- Begin Month",
                           "    7,                       !- Begin Day of Month",
+                          "    ,                        !- Begin Year",
                           "    7,                       !- End Month",
                           "    7,                       !- End Day of Month",
+                          "    ,                        !- End Year",
                           "    Tuesday,                 !- Day of Week for Start Day",
                           "    Yes,                     !- Use Weather File Holidays and Special Days",
                           "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -1235,7 +1239,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
     // Test eio output for HVACSystemRootFindingAlgorithm
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1269,7 +1273,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     // Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
 
     std::string const idf_objects = delimited_string({
-        "Version,8.9;",
+        "Version,9.0;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",

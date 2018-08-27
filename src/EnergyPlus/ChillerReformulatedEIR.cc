@@ -312,7 +312,6 @@ namespace ChillerReformulatedEIR {
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataSizing::AutoSize;
         using FluidProperties::FindGlycol;
@@ -407,10 +406,10 @@ namespace ChillerReformulatedEIR {
 
             // Check the type of part-load curves implemented: 1_LeavingCondenserWaterTemperature, 2_Lift    zrp_Aug2014
             if (UtilityRoutines::SameString(PartLoadCurveType, "LeavingCondenserWaterTemperature") &&
-                UtilityRoutines::SameString(GetCurveType(ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLR), "BICUBIC")) {
+                CurveManager::PerfCurve(ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLR).NumDims == 2) {
                 ElecReformEIRChiller(EIRChillerNum).PartLoadCurveType = PLR_LeavingCondenserWaterTemperature;
             } else if (UtilityRoutines::SameString(PartLoadCurveType, "Lift") &&
-                       UtilityRoutines::SameString(GetCurveType(ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLR), "CHILLERPARTLOADWITHLIFT")) {
+                CurveManager::PerfCurve(ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLR).NumDims == 3) {
                 ElecReformEIRChiller(EIRChillerNum).PartLoadCurveType = PLR_Lift;
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
@@ -1116,7 +1115,7 @@ namespace ChillerReformulatedEIR {
 
             if (ElecReformEIRChiller(EIRChillNum).HeatRecActive) {
                 rho = GetDensityGlycol(PlantLoop(ElecReformEIRChiller(EIRChillNum).HRLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(ElecReformEIRChiller(EIRChillNum).HRLoopNum).FluidIndex,
                                        RoutineName);
                 ElecReformEIRChiller(EIRChillNum).DesignHeatRecMassFlowRate = rho * ElecReformEIRChiller(EIRChillNum).DesignHeatRecVolFlowRate;

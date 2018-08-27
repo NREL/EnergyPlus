@@ -198,6 +198,12 @@ namespace DataAirSystems {
         structArrayLegacyFanModels,
         objectVectorOOFanSystemModel
     };
+    enum class fanPlacement
+    {
+        fanPlaceNotSet,
+        BlowThru,
+        DrawThru
+    };
 
     struct DefinePrimaryAirSystem // There is an array of these for each primary air system
     {
@@ -239,7 +245,8 @@ namespace DataAirSystems {
         bool SizeAirloopCoil;                 // simulates air loop coils before calling controllers
         fanModelTypeEnum supFanModelTypeEnum; // indicates which type of fan model to call for supply fan, legacy or new OO
         int SupFanNum;                        // index of the supply fan in the Fan data structure when model type is structArrayLegacyFanModels
-        int supFanVecIndex; // index in fan object vector for supply fan when model type is objectVectorOOFanSystemModel, zero-based index
+        int supFanVecIndex;          // index in fan object vector for supply fan when model type is objectVectorOOFanSystemModel, zero-based index
+        fanPlacement supFanLocation; // location of fan relative to coil
         fanModelTypeEnum retFanModelTypeEnum; // indicates which type of fan model to call for return fan, legacy or new OO
         int RetFanNum;                        // index of the return fan in the Fan data structure when model type is structArrayLegacyFanModels
         int retFanVecIndex;    // index in fan object vector for return fan when model type is objectVectorOOFanSystemModel, zero-based index
@@ -251,8 +258,8 @@ namespace DataAirSystems {
               NumInletBranches(0), InletBranchNum(3, 0), CentralHeatCoilExists(true), OASysExists(false), isAllOA(false), OASysInletNodeNum(0),
               OASysOutletNodeNum(0), OAMixOAInNodeNum(0), RABExists(false), RABMixInNode(0), SupMixInNode(0), MixOutNode(0), RABSplitOutNode(0),
               OtherSplitOutNode(0), NumOACoolCoils(0), NumOAHeatCoils(0), NumOAHXs(0), SizeAirloopCoil(true),
-              supFanModelTypeEnum(fanModelTypeNotYetSet), SupFanNum(0), supFanVecIndex(-1), retFanModelTypeEnum(fanModelTypeNotYetSet), RetFanNum(0),
-              retFanVecIndex(-1), FanDesCoolLoad(0.0)
+              supFanModelTypeEnum(fanModelTypeNotYetSet), SupFanNum(0), supFanVecIndex(-1), supFanLocation(fanPlacement::fanPlaceNotSet),
+              retFanModelTypeEnum(fanModelTypeNotYetSet), RetFanNum(0), retFanVecIndex(-1), FanDesCoolLoad(0.0)
         {
         }
     };

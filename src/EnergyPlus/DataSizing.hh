@@ -182,6 +182,13 @@ namespace DataSizing {
     extern int const GlobalCoolingSizingFactorMode;
     extern int const LoopComponentSizingFactorMode;
 
+    enum class zoneFanPlacement
+    {
+        zoneFanPlaceNotSet,
+        zoneBlowThru,
+        zoneDrawThru
+    };
+
     // DERIVED TYPE DEFINITIONS:
 
     // INTERFACE BLOCK SPECIFICATIONS
@@ -228,6 +235,7 @@ namespace DataSizing {
     extern bool TermUnitPIU;                          // TRUE if a powered induction terminal unit
     extern bool TermUnitIU;                           // TRUE if an unpowered induction terminal unit
     extern bool ZoneEqFanCoil;                        // TRUE if a 4 pipe fan coil unit is being simulated
+    extern bool ZoneEqOutdoorAirUnit;                 // TRUE if an OutdoorAirUnit is being simulated
     extern bool ZoneEqUnitHeater;                     // TRUE if a unit heater is being simulated
     extern bool ZoneEqUnitVent;                       // TRUE if a unit ventilator is being simulated
     extern bool ZoneEqVentedSlab;                     // TRUE if a ventilated slab is being simulated
@@ -243,6 +251,10 @@ namespace DataSizing {
     extern bool DataScalableCapSizingON;              // boolean determines scalable zone capacity sizing is specified
     extern bool DataSysScalableFlowSizingON;          // boolean determines scalable system flow sizing is specified
     extern bool DataSysScalableCapSizingON;           // boolean determines scalable system capacity sizing is specified
+    extern Real64 DataCoilSizingAirInTemp;            // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingAirInHumRat;          // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingAirOutTemp;           // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingAirOutHumRat;         // saves sizing data for use in coil object reporting
     extern Real64 DataDesInletWaterTemp;              // coil inlet water temperture used for warning messages
     extern Real64 DataDesInletAirHumRat;              // coil inlet air humidity ratio used for warning messages
     extern Real64 DataDesInletAirTemp;                // coil inlet air temperature used for warning messages
@@ -303,6 +315,7 @@ namespace DataSizing {
     extern bool DataNomCapInpMeth;                    // True if heating coil is sized by CoilPerfInpMeth == NomCap
     extern int DataFanEnumType;                       // Fan type used during sizing
     extern int DataFanIndex;                          // Fan index used during sizing
+    extern zoneFanPlacement DataFanPlacement;         // identifies location of fan wrt coil
 
     // Types
 

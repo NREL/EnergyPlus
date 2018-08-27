@@ -251,6 +251,7 @@ namespace DataSizing {
     bool TermUnitPIU(false);                        // TRUE if a powered induction terminal unit
     bool TermUnitIU(false);                         // TRUE if an unpowered induction terminal unit
     bool ZoneEqFanCoil(false);                      // TRUE if a 4 pipe fan coil unit is being simulated
+    bool ZoneEqOutdoorAirUnit(false);               // TRUE if an OutdoorAirUnit is being simulated
     bool ZoneEqUnitHeater(false);                   // TRUE if a unit heater is being simulated
     bool ZoneEqUnitVent(false);                     // TRUE if a unit ventilator unit is being simulated
     bool ZoneEqVentedSlab(false);                   // TRUE if a ventilated slab is being simulated
@@ -261,6 +262,10 @@ namespace DataSizing {
     bool DataErrorsFound(false);                    // used for simulation termination when errors are found
     Real64 AutoVsHardSizingThreshold(0.1);          // criteria threshold used to determine if user hard size and autosize disagree 10%
     Real64 AutoVsHardSizingDeltaTempThreshold(1.5); // temperature criteria threshold for autosize versus hard size [C]
+    Real64 DataCoilSizingAirInTemp(0.0);            // saves sizing data for use in coil object reporting
+    Real64 DataCoilSizingAirInHumRat(0.0);          // saves sizing data for use in coil object reporting
+    Real64 DataCoilSizingAirOutTemp(0.0);           // saves sizing data for use in coil object reporting
+    Real64 DataCoilSizingAirOutHumRat(0.0);         // saves sizing data for use in coil object reporting
     Real64 DataDesInletWaterTemp(0.0);              // coil inlet water temperture used for warning messages
     Real64 DataDesInletAirHumRat(0.0);              // coil inlet air humidity ratio used for warning messages
     Real64 DataDesInletAirTemp(0.0);                // coil inlet air temperature used for warning messages
@@ -309,6 +314,7 @@ namespace DataSizing {
     bool DataNomCapInpMeth(false);                  // True if heating coil is sized by CoilPerfInpMeth == NomCa
     int DataFanEnumType(-1);                        // Fan type used during sizing
     int DataFanIndex(-1);                           // Fan index used during sizing
+    zoneFanPlacement DataFanPlacement(zoneFanPlacement::zoneFanPlaceNotSet); // identifies location of fan wrt coil
 
     // Object Data
     Array1D<OARequirementsData> OARequirements;
@@ -404,6 +410,7 @@ namespace DataSizing {
         TermUnitPIU = false;
         TermUnitIU = false;
         ZoneEqFanCoil = false;
+        ZoneEqOutdoorAirUnit = false;
         ZoneEqUnitHeater = false;
         ZoneEqUnitVent = false;
         ZoneEqVentedSlab = false;
@@ -458,6 +465,7 @@ namespace DataSizing {
         DataZoneNumber = 0;
         DataFanEnumType = -1;
         DataFanIndex = -1;
+        DataFanPlacement = zoneFanPlacement::zoneFanPlaceNotSet;
         DataWaterCoilSizCoolDeltaT = 0.0;
         DataWaterCoilSizHeatDeltaT = 0.0;
         DataNomCapInpMeth = false;
@@ -657,6 +665,7 @@ namespace DataSizing {
         DataWaterCoilSizCoolDeltaT = 0.0;
         DataWaterCoilSizHeatDeltaT = 0.0;
         DataNomCapInpMeth = false;
+        DataFanPlacement = zoneFanPlacement::zoneFanPlaceNotSet;
 
         // These zone specific sizing variables are set in zone equipment to use for sizing.
         // Reset to avoid chance that second zone equipment will size using these variables set by first zone equipment to be sized

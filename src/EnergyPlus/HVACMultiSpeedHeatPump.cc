@@ -58,6 +58,7 @@
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <DataAirflowNetwork.hh>
 #include <DataBranchNodeConnections.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
@@ -541,7 +542,6 @@ namespace HVACMultiSpeedHeatPump {
 
         using BranchNodeConnections::SetUpCompSets;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DXCoils::GetDXCoilIndex;
         auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
@@ -716,6 +716,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
+                                    MSHeatPump(MSHPNum).AirLoopNumber = AirLoopNumber;
                                     break;
                                 }
                                 MSHeatPump(MSHPNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
@@ -1314,7 +1315,7 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPump(MSHPNum).DesignHeatRecFlowRate = Numbers(6);
             if (MSHeatPump(MSHPNum).DesignHeatRecFlowRate > 0.0) {
                 MSHeatPump(MSHPNum).HeatRecActive = true;
-                MSHeatPump(MSHPNum).DesignHeatRecMassFlowRate = RhoH2O(CWInitConvTemp) * MSHeatPump(MSHPNum).DesignHeatRecFlowRate;
+                MSHeatPump(MSHPNum).DesignHeatRecMassFlowRate = RhoH2O(DataGlobals::HWInitConvTemp) * MSHeatPump(MSHPNum).DesignHeatRecFlowRate;
                 MSHeatPump(MSHPNum).HeatRecInletNodeNum = GetOnlySingleNode(
                     Alphas(16), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent);
                 if (MSHeatPump(MSHPNum).HeatRecInletNodeNum == 0) {
@@ -1883,7 +1884,7 @@ namespace HVACMultiSpeedHeatPump {
 
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
-                                           CWInitConvTemp,
+                                           DataGlobals::HWInitConvTemp,
                                            PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidIndex,
                                            RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow =
@@ -1951,7 +1952,7 @@ namespace HVACMultiSpeedHeatPump {
 
                 if (MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
-                                           CWInitConvTemp,
+                                           DataGlobals::HWInitConvTemp,
                                            PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidIndex,
                                            RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow =
@@ -2128,7 +2129,7 @@ namespace HVACMultiSpeedHeatPump {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
-                                                   CWInitConvTemp,
+                                                   DataGlobals::HWInitConvTemp,
                                                    PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidIndex,
                                                    RoutineName);
                             MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -2176,7 +2177,7 @@ namespace HVACMultiSpeedHeatPump {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
-                                                   CWInitConvTemp,
+                                                   DataGlobals::HWInitConvTemp,
                                                    PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidIndex,
                                                    RoutineName);
                             MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -2651,6 +2652,11 @@ namespace HVACMultiSpeedHeatPump {
             } else {
                 PrimaryAirSystem(CurSysNum).SupFanNum = MSHeatPump(MSHeatPumpNum).FanNum;
                 PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            }
+            if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
+                DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+            } else if (MSHeatPump(MSHeatPumpNum).FanPlaceType = DrawThru) {
+                DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
             }
         }
 
@@ -3718,11 +3724,10 @@ namespace HVACMultiSpeedHeatPump {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataAirLoop::LoopCompCycRatio;
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirflowNetwork::AirflowNetworkControlMultiADS;
+        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
+        using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataAirLoop::AirLoopAFNInfo;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3732,11 +3737,13 @@ namespace HVACMultiSpeedHeatPump {
             MSHPHeatRecovery(MSHeatPumpNum);
         }
 
-        LoopSystemOnMassFlowrate = CompOnMassFlow;
-        LoopSystemOffMassFlowrate = CompOffMassFlow;
-        LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
-        LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
-        LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
+        if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate = CompOnMassFlow;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate = CompOffMassFlow;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
+        }
     }
 
     //******************************************************************************

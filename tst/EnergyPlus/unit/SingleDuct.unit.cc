@@ -134,7 +134,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues();
 
@@ -306,7 +306,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues();
 
@@ -1993,7 +1993,6 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "    0.8,                     !- Nominal Thermal Efficiency",
         "    LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable",
         "    HeatSys1 Boiler Non-Condensing Boiler Curve, !- Normalized Boiler Efficiency Curve Name",
-        "    82.2000,                 !- Design Water Outlet Temperature{ C }",
         "    AUTOSIZE,                !- Design Water Flow Rate{ m3 / s }",
         "    0.0,                     !- Minimum Part Load Ratio",
         "    1.2,                     !- Maximum Part Load Ratio",

@@ -1377,18 +1377,12 @@ namespace WaterToAirHeatPumpSimple {
                         OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
                         rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                        MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
                         SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                         TotalCapCoeff1 = SimpleWatertoAirHP(HPNum).TotalCoolCap1;
                         TotalCapCoeff2 = SimpleWatertoAirHP(HPNum).TotalCoolCap2;
                         TotalCapCoeff3 = SimpleWatertoAirHP(HPNum).TotalCoolCap3;
                         TotalCapCoeff4 = SimpleWatertoAirHP(HPNum).TotalCoolCap4;
                         TotalCapCoeff5 = SimpleWatertoAirHP(HPNum).TotalCoolCap5;
-                        ratioTWB = (MixWetBulb + 273.15) / 283.15;
-                        // rated condenser water inlet temperature of 85F
-                        ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
-                        TotCapTempModFac = TotalCapCoeff1 + (ratioTWB * TotalCapCoeff2) + (ratioTS * TotalCapCoeff3) + (1.0 * TotalCapCoeff4) +
-                                           (1.0 * TotalCapCoeff5);
                         Real64 FanCoolLoad = 0.0;
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
@@ -1406,10 +1400,20 @@ namespace WaterToAirHeatPumpSimple {
                             }
                             } // end switch
                             Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
-                            MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                                MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                                SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            }
                         }
                         CoolCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                         CoolCapAtPeak = max(0.0, CoolCapAtPeak);
+                        MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                        ratioTWB = (MixWetBulb + 273.15) / 283.15;
+                        // rated condenser water inlet temperature of 85F
+                        ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
+                        TotCapTempModFac = TotalCapCoeff1 + (ratioTWB * TotalCapCoeff2) + (ratioTS * TotalCapCoeff3) + (1.0 * TotalCapCoeff4) +
+                                           (1.0 * TotalCapCoeff5);
                         if (TotCapTempModFac > 0.0) {
                             RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac;
                         } else {
@@ -1463,18 +1467,12 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                        MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
                         SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                         TotalCapCoeff1 = SimpleWatertoAirHP(HPNum).TotalCoolCap1;
                         TotalCapCoeff2 = SimpleWatertoAirHP(HPNum).TotalCoolCap2;
                         TotalCapCoeff3 = SimpleWatertoAirHP(HPNum).TotalCoolCap3;
                         TotalCapCoeff4 = SimpleWatertoAirHP(HPNum).TotalCoolCap4;
                         TotalCapCoeff5 = SimpleWatertoAirHP(HPNum).TotalCoolCap5;
-                        ratioTWB = (MixWetBulb + 273.15) / 283.15;
-                        // rated condenser water inlet temperature of 85F
-                        ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
-                        TotCapTempModFac = TotalCapCoeff1 + (ratioTWB * TotalCapCoeff2) + (ratioTS * TotalCapCoeff3) + (1.0 * TotalCapCoeff4) +
-                                           (1.0 * TotalCapCoeff5);
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
                             case DataAirSystems::structArrayLegacyFanModels: {
@@ -1490,9 +1488,21 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
+                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                            if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                                MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            } else {
+                                SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            }
                         }
                         CoolCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                         CoolCapAtPeak = max(0.0, CoolCapAtPeak);
+                        MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                        ratioTWB = (MixWetBulb + 273.15) / 283.15;
+                        // rated condenser water inlet temperature of 85F
+                        ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
+                        TotCapTempModFac = TotalCapCoeff1 + (ratioTWB * TotalCapCoeff2) + (ratioTS * TotalCapCoeff3) + (1.0 * TotalCapCoeff4) +
+                                           (1.0 * TotalCapCoeff5);
                         if (TotCapTempModFac > 0.0) {
                             RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac;
                         } else {

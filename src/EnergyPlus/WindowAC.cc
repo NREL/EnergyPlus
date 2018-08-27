@@ -1068,6 +1068,11 @@ namespace WindowAC {
             DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
         }
         DataSizing::DataFanIndex = WindAC(WindACNum).FanIndex;
+        if (WindAC(WindACNum).FanPlace == BlowThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        } else if (WindAC(WindACNum).FanPlace = DrawThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+        }
 
         if (CurZoneEqNum > 0) {
             if (WindAC(WindACNum).HVACSizingIndex > 0) {

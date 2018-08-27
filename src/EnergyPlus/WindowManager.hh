@@ -50,6 +50,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Array3D.hh>
 
@@ -184,6 +185,12 @@ namespace WindowManager {
     extern Array1D<Real64> rbvisPhi;         // Glazing system visible back reflectance for each angle of incidence
     extern Array1D<Real64> CosPhiIndepVar;   // Cos of incidence angles at 10-deg increments for curve fits
 
+    class CWindowModel;
+    class CWindowOpticalModel;
+
+    extern std::unique_ptr<CWindowModel> inExtWindowModel;
+    extern std::unique_ptr<CWindowOpticalModel> winOpticalModel;
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
     //   Optical Calculation Routines
     //   Heat Balance Routines
@@ -191,6 +198,8 @@ namespace WindowManager {
     // Functions
 
     void clear_state();
+
+    void InitWindowOpticalCalculations();
 
     void InitGlassOpticalCalculations();
 
@@ -245,6 +254,12 @@ namespace WindowManager {
                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
+    );
+
+    void CalcWindowHeatBalanceInternalRoutines(int const SurfNum,          // Surface number
+                                               Real64 const HextConvCoeff, // Outside air film conductance coefficient
+                                               Real64 &SurfInsideTemp,     // Inside window surface temperature
+                                               Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
     //****************************************************************************
@@ -499,6 +514,10 @@ namespace WindowManager {
     // added for custom solar or visible spectrum
 
     void CheckAndReadCustomSprectrumData();
+
+    //*****************************************************************************************
+
+    void initWindowModel();
 
     //*****************************************************************************************
 

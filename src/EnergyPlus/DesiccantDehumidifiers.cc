@@ -1514,20 +1514,14 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ExhaustFanMaxPower = Numbers(3);
             DesicDehum(DesicDehumNum).ExhaustFanCurveIndex = GetCurveIndex(Alphas(15));
 
-            if (!UtilityRoutines::SameString(GetCurveType(DesicDehum(DesicDehumNum).ExhaustFanCurveIndex), "")) {
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DesicDehum(DesicDehumNum).ExhaustFanCurveIndex));
-                    if (SELECT_CASE_var == "CUBIC") {
-
-                    } else if (SELECT_CASE_var == "QUADRATIC") {
-
-                    } else {
-                        ShowSevereError(DesicDehum(DesicDehumNum).DehumType + ", \"" + DesicDehum(DesicDehumNum).Name +
-                                        "\" illegal Part Load Fraction Correlation Curve (function of part-load ratio) type for this object = " +
-                                        GetCurveType(DesicDehum(DesicDehumNum).ExhaustFanCurveIndex));
-                        ErrorsFoundGeneric = true;
-                    }
-                }
+            if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
+                ErrorsFoundGeneric |= CurveManager::CheckCurveDims(
+                    DesicDehum(DesicDehumNum).ExhaustFanCurveIndex,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    CurrentModuleObject,            // Object Type
+                    DesicDehum(DesicDehumNum).Name, // Object Name
+                    cAlphaFields(15));              // Field Name
             }
 
             if (DesicDehum(DesicDehumNum).Preheat == Yes) {
@@ -1789,7 +1783,7 @@ namespace DesiccantDehumidifiers {
                         GetCoilMaxWaterFlowRate("Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
                     if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
                         FluidDensity = GetDensityGlycol(PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                                                        DataGlobals::HWInitConvTemp,
                                                         PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
                                                         initCBVAV);
                         DesicDehum(DesicDehumNum).MaxCoilFluidFlow *= FluidDensity;
@@ -1912,7 +1906,7 @@ namespace DesiccantDehumidifiers {
                                 }
                                 if (CoilMaxVolFlowRate != AutoSize) {
                                     FluidDensity = GetDensityGlycol(PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                                    DataGlobals::CWInitConvTemp,
+                                                                    DataGlobals::HWInitConvTemp,
                                                                     PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
                                                                     RoutineName);
                                     DesicDehum(DesicDehumNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;

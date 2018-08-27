@@ -571,7 +571,7 @@ namespace MoistureBalanceEMPDManager {
 
         // Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
         dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow(RHaver, material.MoistBCoeff - 1) +
-                 material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
+                 material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
 
         // Convert vapor density and temperature of zone air to RH
         RHZone = rho_vapor_air_in * 461.52 * (TempZone + KelvinConv) * std::exp(-23.7093 + 4111.0 / ((TempZone + KelvinConv) - 35.45));
