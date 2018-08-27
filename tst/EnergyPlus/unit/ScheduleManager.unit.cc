@@ -377,7 +377,7 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
     int ASchedIndex = GetScheduleIndex("SCHYR_A"); // interpolate Linear
     EXPECT_NEAR(0.001, LookUpScheduleValue(ASchedIndex, 7, 4), 0.000001);
@@ -490,7 +490,7 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
     int ASchedIndex = GetScheduleIndex("SCHYR_A"); // interpolate Linear
     EXPECT_NEAR(0.001, LookUpScheduleValue(ASchedIndex, 7, 4), 0.000001);
@@ -563,7 +563,7 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
     int ASchedIndex = GetScheduleIndex("SCHYR_A"); // interpolate Linear
     EXPECT_NEAR(0.0, LookUpScheduleValue(ASchedIndex, 7, 4), 0.000001);

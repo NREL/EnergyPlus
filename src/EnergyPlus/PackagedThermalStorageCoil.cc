@@ -467,18 +467,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyCapFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
-                            TESCoil(item).CoolingOnlyCapFTempObjectNum = GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyCapFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(11) + "=\"" + cAlphaArgs(11) + "\".");
-                            ShowContinueError("Choose a curve or table with two independent variables, x and y.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        TESCoil(item).CoolingOnlyCapFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(11));                   // Field Name
                 }
 
                 TESCoil(item).CoolingOnlyCapFFlowCurve = GetCurveIndex(cAlphaArgs(12));
@@ -493,22 +488,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyCapFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingOnlyCapFFlowObjectNum = GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyCapFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        TESCoil(item).CoolingOnlyCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(12));                   // Field Name
                 }
 
                 TESCoil(item).CoolingOnlyEIRFTempCurve = GetCurveIndex(cAlphaArgs(13));
@@ -523,18 +509,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyEIRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
-                            TESCoil(item).CoolingOnlyEIRFTempObjectNum = GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyEIRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(13) + "=\"" + cAlphaArgs(13) + "\".");
-                            ShowContinueError("Choose a curve or table with two independent variables, x and y.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        TESCoil(item).CoolingOnlyEIRFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(13));                   // Field Name
                 }
 
                 TESCoil(item).CoolingOnlyEIRFFlowCurve = GetCurveIndex(cAlphaArgs(14));
@@ -549,22 +530,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyEIRFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingOnlyEIRFFlowObjectNum = GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyEIRFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(14) + "=\"" + cAlphaArgs(14) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        TESCoil(item).CoolingOnlyEIRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(14));                   // Field Name
                 }
 
                 TESCoil(item).CoolingOnlyPLFFPLRCurve = GetCurveIndex(cAlphaArgs(15));
@@ -579,22 +551,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyPLFFPLRCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingOnlyPLFFPLRObjectNum = GetCurveObjectTypeNum(TESCoil(item).CoolingOnlyPLFFPLRCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(15) + "=\"" + cAlphaArgs(15) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        TESCoil(item).CoolingOnlyPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(15));                   // Field Name
                 }
 
                 TESCoil(item).CoolingOnlySHRFTempCurve = GetCurveIndex(cAlphaArgs(16));
@@ -609,18 +572,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingOnlySHRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
-                            TESCoil(item).CoolingOnlySHRFTempObjectNum = GetCurveObjectTypeNum(TESCoil(item).CoolingOnlySHRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(16) + "=\"" + cAlphaArgs(16) + "\".");
-                            ShowContinueError("Choose a curve or table with two independent variables, x and y.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        TESCoil(item).CoolingOnlySHRFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(16));                   // Field Name
                 }
 
                 TESCoil(item).CoolingOnlySHRFFlowCurve = GetCurveIndex(cAlphaArgs(17));
@@ -635,22 +593,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingOnlySHRFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingOnlySHRFFlowObjectNum = GetCurveObjectTypeNum(TESCoil(item).CoolingOnlySHRFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(17) + "=\"" + cAlphaArgs(17) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        TESCoil(item).CoolingOnlySHRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(17));                   // Field Name
                 }
             }
 
@@ -691,18 +640,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingCapFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndChargeCoolingCapFTempObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingCapFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(19) + "=\"" + cAlphaArgs(19) + "\".");
-                            ShowContinueError("Choose a curve or table with three independent variables -- x, y, and z.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeCoolingCapFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(19));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve = GetCurveIndex(cAlphaArgs(20));
@@ -717,25 +661,14 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndChargeCoolingCapFFlowObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(20) + "=\"" + cAlphaArgs(20) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(20));                   // Field Name
                 }
-
                 TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve = GetCurveIndex(cAlphaArgs(21));
                 if (TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(21)) {
@@ -748,18 +681,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndChargeCoolingEIRFTempObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(21) + "=\"" + cAlphaArgs(21) + "\".");
-                            ShowContinueError("Choose a curve or table with three independent variables -- x, y, and z.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(21));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve = GetCurveIndex(cAlphaArgs(22));
@@ -774,23 +702,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndChargeCoolingEIRFFlowObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(22) + "=\"" + cAlphaArgs(22) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(22));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(23));
@@ -805,23 +723,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndChargeCoolingPLFFPLRObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(23) + "=\"" + cAlphaArgs(23) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(23));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeChargingCapFTempCurve = GetCurveIndex(cAlphaArgs(24));
@@ -836,18 +744,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingCapFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndChargeCoolingEIRFTempObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingCapFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(24) + "=\"" + cAlphaArgs(24) + "\".");
-                            ShowContinueError("Choose a curve or table with three independent variables -- x, y, and z.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeChargingCapFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(24));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve = GetCurveIndex(cAlphaArgs(25));
@@ -862,23 +765,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndChargeChargingCapFEvapPLRObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(25) + "=\"" + cAlphaArgs(25) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(25));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeChargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(26));
@@ -893,18 +786,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingEIRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndChargeChargingEIRFTempObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingEIRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(26) + "=\"" + cAlphaArgs(26) + "\".");
-                            ShowContinueError("Choose a curve or table with three independent variables -- x, y, and z.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeChargingEIRFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(26));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve = GetCurveIndex(cAlphaArgs(27));
@@ -919,23 +807,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndChargeChargingEIRFFLowObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(27) + "=\"" + cAlphaArgs(27) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(27));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(28));
@@ -950,23 +828,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndChargeChargingPLFFPLRObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(28) + "=\"" + cAlphaArgs(28) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(28));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeSHRFTempCurve = GetCurveIndex(cAlphaArgs(29));
@@ -981,19 +849,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeSHRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV) ||
-                            (SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndChargeSHRFTempObjectNum = GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeSHRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(29) + "=\"" + cAlphaArgs(29) + "\".");
-                            ShowContinueError("Choose a curve or table with two or three independent variables.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeSHRFTempCurve,   // Curve index
+                         {2, 3},                                  // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(29));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndChargeSHRFFlowCurve = GetCurveIndex(cAlphaArgs(30));
@@ -1008,22 +870,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeSHRFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndChargeSHRFFlowObjectNum = GetCurveObjectTypeNum(TESCoil(item).CoolingAndChargeSHRFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(30) + "=\"" + cAlphaArgs(30) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndChargeSHRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(30));                   // Field Name
                 }
 
             } // Cooling and Charge Mode available
@@ -1065,18 +918,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndDischargeCoolingCapFTempObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(32) + "=\"" + cAlphaArgs(32) + "\".");
-                            ShowContinueError("Choose a curve or table with three independent variables -- x, y, and z.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(32));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve = GetCurveIndex(cAlphaArgs(33));
@@ -1091,23 +939,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndDischargeCoolingCapFFlowObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(33) + "=\"" + cAlphaArgs(33) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(33));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve = GetCurveIndex(cAlphaArgs(34));
@@ -1122,18 +960,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndDischargeCoolingEIRFTempObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(34) + "=\"" + cAlphaArgs(34) + "\".");
-                            ShowContinueError("Choose a curve or table with three independent variables -- x, y, and z.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(34));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve = GetCurveIndex(cAlphaArgs(35));
@@ -1148,23 +981,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndDischargeCoolingEIRFFlowObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(35) + "=\"" + cAlphaArgs(35) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(35));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(36));
@@ -1179,23 +1002,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndDischargeCoolingPLFFPLRObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(36) + "=\"" + cAlphaArgs(36) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(36));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve = GetCurveIndex(cAlphaArgs(37));
@@ -1210,18 +1023,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndDischargeDischargingCapFTempObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(37) + "=\"" + cAlphaArgs(37) + "\".");
-                            ShowContinueError("Choose a curve or table with three independent variables -- x, y, and z.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(37));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve = GetCurveIndex(cAlphaArgs(38));
@@ -1236,23 +1044,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndDischargeDischargingCapFFlowObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(38) + "=\"" + cAlphaArgs(38) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(38));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve = GetCurveIndex(cAlphaArgs(39));
@@ -1267,23 +1065,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(39) + "=\"" + cAlphaArgs(39) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(39));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(40));
@@ -1298,18 +1086,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndDischargeDischargingEIRFTempObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(40) + "=\"" + cAlphaArgs(40) + "\".");
-                            ShowContinueError("Choose a curve or table with three independent variables -- x, y, and z.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(40));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve = GetCurveIndex(cAlphaArgs(41));
@@ -1324,23 +1107,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndDischargeDischargingEIRFFLowObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(41) + "=\"" + cAlphaArgs(41) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(41));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(42));
@@ -1355,23 +1128,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndDischargeDischargingPLFFPLRObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(42) + "=\"" + cAlphaArgs(42) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(42));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeSHRFTempCurve = GetCurveIndex(cAlphaArgs(43));
@@ -1386,20 +1149,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeSHRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV) ||
-                            (SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).CoolingAndDischargeSHRFTempObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeSHRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(43) + "=\"" + cAlphaArgs(43) + "\".");
-                            ShowContinueError("Choose a curve or table with two or three independent variables.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeSHRFTempCurve,   // Curve index
+                         {2, 3},                                  // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(43));                   // Field Name
                 }
 
                 TESCoil(item).CoolingAndDischargeSHRFFlowCurve = GetCurveIndex(cAlphaArgs(44));
@@ -1414,23 +1170,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeSHRFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).CoolingAndDischargeSHRFFlowObjectNum =
-                                GetCurveObjectTypeNum(TESCoil(item).CoolingAndDischargeSHRFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(44) + "=\"" + cAlphaArgs(44) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).CoolingAndDischargeSHRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(44));                   // Field Name
                 }
 
             } // cooling and discharge mode available
@@ -1468,18 +1214,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).ChargeOnlyChargingCapFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
-                            TESCoil(item).ChargeOnlyChargingCapFTempObjectNum = GetCurveObjectTypeNum(TESCoil(item).ChargeOnlyChargingCapFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(46) + "=\"" + cAlphaArgs(46) + "\".");
-                            ShowContinueError("Choose a curve or table with two independent variables, x and y.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).ChargeOnlyChargingCapFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(46));                   // Field Name
                 }
 
                 TESCoil(item).ChargeOnlyChargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(47));
@@ -1494,18 +1235,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).ChargeOnlyChargingEIRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
-                            TESCoil(item).ChargeOnlyChargingEIRFTempObjectNum = GetCurveObjectTypeNum(TESCoil(item).ChargeOnlyChargingEIRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(47) + "=\"" + cAlphaArgs(47) + "\".");
-                            ShowContinueError("Choose a curve or table with two independent variables, x and y.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).ChargeOnlyChargingEIRFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(47));                   // Field Name
                 }
 
             } // Charge only mode available
@@ -1543,18 +1279,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyCapFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
-                            TESCoil(item).DischargeOnlyCapFTempObjectNum = GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyCapFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(49) + "=\"" + cAlphaArgs(49) + "\".");
-                            ShowContinueError("Choose a curve or table with two independent variables, x and y.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).DischargeOnlyCapFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(49));                   // Field Name
                 }
 
                 TESCoil(item).DischargeOnlyCapFFlowCurve = GetCurveIndex(cAlphaArgs(50));
@@ -1569,22 +1300,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyCapFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).DischargeOnlyCapFFlowObjectNum = GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyCapFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(50) + "=\"" + cAlphaArgs(50) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).DischargeOnlyCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(50));                   // Field Name
                 }
 
                 TESCoil(item).DischargeOnlyEIRFTempCurve = GetCurveIndex(cAlphaArgs(51));
@@ -1599,18 +1321,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyEIRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
-                            TESCoil(item).DischargeOnlyEIRFTempObjectNum = GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyEIRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(51) + "=\"" + cAlphaArgs(51) + "\".");
-                            ShowContinueError("Choose a curve or table with two independent variables, x and y.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).DischargeOnlyEIRFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(51));                   // Field Name
                 }
 
                 TESCoil(item).DischargeOnlyEIRFFlowCurve = GetCurveIndex(cAlphaArgs(52));
@@ -1625,22 +1342,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyEIRFFlowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).DischargeOnlyEIRFFlowObjectNum = GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyEIRFFlowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(52) + "=\"" + cAlphaArgs(52) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).DischargeOnlyEIRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(52));                   // Field Name
                 }
 
                 TESCoil(item).DischargeOnlyPLFFPLRCurve = GetCurveIndex(cAlphaArgs(53));
@@ -1655,22 +1363,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyPLFFPLRCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).DischargeOnlyPLFFPLRObjectNum = GetCurveObjectTypeNum(TESCoil(item).DischargeOnlyPLFFPLRCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(53) + "=\"" + cAlphaArgs(53) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).DischargeOnlyPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(53));                   // Field Name
                 }
 
                 TESCoil(item).DischargeOnlySHRFTempCurve = GetCurveIndex(cAlphaArgs(54));
@@ -1685,19 +1384,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).DischargeOnlySHRFTempCurve));
-                        if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                            (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV) ||
-                            (SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                            TESCoil(item).DischargeOnlySHRFTempObjectNum = GetCurveObjectTypeNum(TESCoil(item).DischargeOnlySHRFTempCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(54) + "=\"" + cAlphaArgs(54) + "\".");
-                            ShowContinueError("Choose a curve or table with two or three independent variables");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).DischargeOnlySHRFTempCurve,   // Curve index
+                         {2, 3},                                  // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(54));                   // Field Name
                 }
 
                 TESCoil(item).DischargeOnlySHRFFLowCurve = GetCurveIndex(cAlphaArgs(55));
@@ -1712,22 +1405,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    {
-                        auto const SELECT_CASE_var(GetCurveObjectTypeNum(TESCoil(item).DischargeOnlySHRFFLowCurve));
-                        if ((SELECT_CASE_var == CurveType_Linear) || (SELECT_CASE_var == CurveType_Quadratic) ||
-                            (SELECT_CASE_var == CurveType_Cubic) || (SELECT_CASE_var == CurveType_Quartic) ||
-                            (SELECT_CASE_var == CurveType_Exponent) || (SELECT_CASE_var == CurveType_TableOneIV) ||
-                            (SELECT_CASE_var == CurveType_ExponentialSkewNormal) || (SELECT_CASE_var == CurveType_Sigmoid) ||
-                            (SELECT_CASE_var == CurveType_RectangularHyperbola1) || (SELECT_CASE_var == CurveType_RectangularHyperbola2) ||
-                            (SELECT_CASE_var == CurveType_ExponentialDecay) || (SELECT_CASE_var == CurveType_DoubleExponentialDecay)) {
-                            TESCoil(item).DischargeOnlySHRFFLowObjectNum = GetCurveObjectTypeNum(TESCoil(item).DischargeOnlySHRFFLowCurve);
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                            ShowContinueError(cAlphaFieldNames(55) + "=\"" + cAlphaArgs(55) + "\".");
-                            ShowContinueError("Choose a curve or table with one independent variable, x.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                         TESCoil(item).DischargeOnlySHRFFLowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(55));                   // Field Name
                 }
 
             } // Discharge Only mode available
@@ -3304,14 +2988,10 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                auto const SELECT_CASE_var(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempObjectNum);
-                if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                    (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
+                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve).NumDims == 2) {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
-                } else if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 } else {
-                    assert(false);
+                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
             SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFFlowCurve, AirMassFlowRatio);
@@ -3740,14 +3420,10 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                auto const SELECT_CASE_var(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempObjectNum);
-                if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                    (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
+                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve).NumDims == 2) {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
-                } else if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 } else {
-                    assert(false);
+                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
             SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFFlowCurve, AirMassFlowRatio);
@@ -4293,14 +3969,10 @@ namespace PackagedThermalStorageCoil {
                 }
             } // coil will be wet so use SHR curves
             {
-                auto const SELECT_CASE_var(TESCoil(TESCoilNum).DischargeOnlySHRFTempObjectNum);
-                if ((SELECT_CASE_var == CurveType_BiCubic) || (SELECT_CASE_var == CurveType_BiQuadratic) ||
-                    (SELECT_CASE_var == CurveType_QuadraticLinear) || (SELECT_CASE_var == CurveType_TableTwoIV)) {
+                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve).NumDims == 2) {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
-                } else if ((SELECT_CASE_var == CurveType_TriQuadratic) || (SELECT_CASE_var == CurveType_TableMultiIV)) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 } else {
-                    assert(false);
+                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
 

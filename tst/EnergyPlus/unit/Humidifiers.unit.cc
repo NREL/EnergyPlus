@@ -290,7 +290,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     ASSERT_TRUE(process_idf(idf_objects));
 
     thisHum.EfficiencyCurvePtr = CurveManager::GetCurveIndex("THERMALEFFICIENCYFPLR");
-    thisHum.EfficiencyCurveType = CurveManager::Quadratic;
 
     thisHum.CalcGasSteamHumidifier(0.030);
     EXPECT_NEAR(0.7875, thisHum.ThermalEff, 0.001);

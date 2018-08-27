@@ -1922,7 +1922,7 @@ namespace General {
                 ShowSevereError("Invalid Julian date Entered=" + String);
                 ErrorsFound = true;
             } else {
-                InvJulianDay(FstNum, PMonth, PDay, 0);
+                InvOrdinalDay(FstNum, PMonth, PDay, 0);
                 DateType = 1;
             }
         } else {
@@ -2186,7 +2186,7 @@ namespace General {
         }
     }
 
-    int JulianDay(int const Month,        // Month, 1..12
+    int OrdinalDay(int const Month,        // Month, 1..12
                   int const Day,          // Day of Month, not validated by month
                   int const LeapYearValue // 1 if leap year indicated, 0 if not
     )
@@ -2250,7 +2250,7 @@ namespace General {
         return JulianDay;
     }
 
-    void InvJulianDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
+    void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2447,7 +2447,7 @@ namespace General {
     )
     {
         // J. Glazer - August 2017
-        int firstDayOfMonth = JulianDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear);
+        int firstDayOfMonth = OrdinalDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear);
         int dayOfWeekForFirstDay = (DataEnvironment::RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
         int jdatForNth;
         if (dayOfWeek >= dayOfWeekForFirstDay) {
