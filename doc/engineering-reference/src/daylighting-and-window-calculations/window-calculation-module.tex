@@ -194,7 +194,7 @@ The values for \({R_{i,w}}\)~and \({R_{o,w}}\)~depend on U and are calculated us
 So that the glass-to-glass resistance is calculated using:
 
 \begin{equation}
-\({R_{l,w}} = \frac{1}{U} - {R_{i,w}} - {R_{o,w}}\)
+{R_{l,w}} = \frac{1}{U} - {R_{i,w}} - {R_{o,w}}
 \end{equation}
 
 Because the window model in EnergyPlus is for flat geometries, the models are not necessarily applicable to low-performance projecting products, such as skylights with unisulated curbs.~ The model cannot support glazing systems with a U higher than 7.0 because the thermal resistance of the film coefficients alone can provide this level of performance and none of the various resistances can be negative.
@@ -267,7 +267,7 @@ Fra{c_{inward}} = \frac{{\left( {{R_{o,s}} + 0.5\,{R_{l,w}}} \right)}}{{\left( {
 Then, the solar reflectances of the front face, \({R_{s,f}}\), and back face, \({R_{s,b}}\), are calculated using:
 
 \begin{equation}
-\({R_{s,f}} = {R_{s,b}} = 1 - {T_{Sol}} - \frac{{\left( {SHGC - {T_{Sol}}} \right)}}{{Fra{c_{inward}}}}\)
+{R_{s,f}} = {R_{s,b}} = 1 - {T_{Sol}} - \frac{{\left( {SHGC - {T_{Sol}}} \right)}}{{Fra{c_{inward}}}}
 \end{equation}
 
 The thermal absorptance, or emittance, is taken as 0.84 for both the front and back and the longwave transmittance is 0.0.
@@ -1441,7 +1441,7 @@ The model for window screens currently allows placement on the exterior surface 
 
 The user may elect not to model the inward reflected beam transmittance due to the uncertainty of the direction of scattering or its low magnitude for low-reflecting screen materials. The user may alternately choose to model the inwardly-reflected transmitted beam as an additive component to the direct beam transmittance in the same solid angle and direction. Finally, the additional flux due to the inward reflection of direct beam radiation may be modeled as hemispherically-diffuse transmittance.
 
-This reflected beam transmittance component depends upon the diffuse (i.e., beam-to-diffuse) reflectance of the screen material, so this reflectance (\(\rho_sc}\)) is a required input to the model. Guidance input values for this diffuse reflectance are provided, to account for screens that are dark, medium, or light colored in appearance, in the likely case that more accurate values for the material reflectance are difficult or time-consuming to obtain. If the diffuse reflectance of the screen material is known, use this value in place of the guidance provided.
+This reflected beam transmittance component depends upon the diffuse (i.e., beam-to-diffuse) reflectance of the screen material, so this reflectance \(\rho_{sc}\) is a required input to the model. Guidance input values for this diffuse reflectance are provided, to account for screens that are dark, medium, or light colored in appearance, in the likely case that more accurate values for the material reflectance are difficult or time-consuming to obtain. If the diffuse reflectance of the screen material is known, use this value in place of the guidance provided.
 
 The model is based on an orthogonal crossed cylinder geometry in which the screen material's cylindrical diameter and spacing are known. The model assumes that the screen material diameter and spacing are the same in both directions. Figure~\ref{fig:screen-model-rendering-of-intersecting} shows a rendering of intersecting orthogonal crossed cylinders used as the basis for the EnergyPlus screen model.
 
@@ -2104,7 +2104,7 @@ Then, the integral becomes:
 \label{eq:ScriptLx2pj2x1pi1S1pi1Integral}
 \end{equation}
 
-where the function \(\lamba\) is defined as:
+where the function \(\lambda\) is defined as:
 
 \begin{equation}
 {\lambda ^{{\rm{(s)}}}}({{\bf{p}}_j}) = \left( {{{\bf{p}}_j}\cdot {{\bf{n}}^{{\rm{(s)}}}}} \right)\Delta {\Omega_j}
@@ -2186,22 +2186,22 @@ In the LBNL method, these equations are used extensively to calculate the overal
 \centering
 \begin{tabular} { | l | c | l | }
 \hline
- & T_{ij}^F & Front Transmittance matrix elements \\
- & R_{ij}^F & Back Reflectance matrix elements \\
-Exterior Window & \mathcal{A}_i^{F,n} & In-situ absorptance of n\(^{th}\) layer for front incidence \\
- & \mathcal{A}_i^{B,n} & In-situ absorptance of n\(^{th}\) layer for back incidence \\
+ & $T_{ij}^F$ & Front Transmittance matrix elements \\
+ & $R_{ij}^F$ & Back Reflectance matrix elements \\
+Exterior Window & $A_i^{F,n}$ & In-situ absorptance of $n^{th}$ layer for front incidence \\
+ & $A_i^{B,n}$ & In-situ absorptance of $n^{th}$ layer for back incidence \\
 \hline
- & T_{ij}^F & Front Transmittance matrix elements \\
- & T_{ij}^B & Back Transmittance matrix elements \\
-Interior Window & R_{ij}^F & Front Reflectance matrix elements \\
- & R_{ij}^B & Back Reflectance matrix elements \\
- & \mathcal{A}_i^{F,n} & In-situ absorptance of n\(^{th}\) layer for front incidence \\
- & \mathcal{A}_i^{B,n} & In-situ absorptance of n\(^{th}\) layer for back incidence \\
+ & $T_{ij}^F$ & Front Transmittance matrix elements \\
+ & $T_{ij}^B$ & Back Transmittance matrix elements \\
+Interior Window & $R_{ij}^F$ & Front Reflectance matrix elements \\
+ & $R_{ij}^B$ & Back Reflectance matrix elements \\
+ & $A_i^{F,n}$ & In-situ absorptance of n\(^{th}\) layer for front incidence \\
+ & $A_i^{B,n}$ & In-situ absorptance of n\(^{th}\) layer for back incidence \\
 \hline
 \end{tabular}
 \end{table}
  
-The transmittance and reflectance are overall system properties.~ (For daylighting calculations, one also needs the transmittance and reflectance averaged over the visible spectrum only; the quantities indicated in the table pertain to the entire solar spectrum.)~ For the optical calculations we do not need to know anything about the individual layers making up the fenestration.~ However, the thermal calculation of heat flow through the fenestration requires knowledge of the amount of radiation absorbed in each of the fenestration layers.~ As indicated in the table, we therefore need the in-situ layer absorptance for each layer, referenced to the incident surface.~ This is denoted \(\(\mathcal{A}\)_i^{F,n}\)~for the fraction of the \emph{i\(^{th}\)} component of the irradiance incident on the front surface of the fenestration that is absorbed in layer \emph{n}, with a similar quantity, \(\(\mathcal{A}\)_i^{B,n}\), for irradiance incident on the back surface.~ The term ``in-situ layer absorptance'' is used because these are not simply the absorptance of the layer, but include the transmittance and interreflection by other layers of the system prior to the absorptance in layer \emph{n}.~ The absorptance is a row vector, having possibly a different value for each direction of the incident irradiance, so that for an irradiance \emph{E\(_{i}\)\(^{F}\)} on the front surface of a fenestration and \emph{E\(_{i}\)\(^{B}\)} on the back surface, the power \emph{Q\(^{n}\)} absorbed per unit area in layer \emph{n} would be:
+The transmittance and reflectance are overall system properties.~ (For daylighting calculations, one also needs the transmittance and reflectance averaged over the visible spectrum only; the quantities indicated in the table pertain to the entire solar spectrum.)~ For the optical calculations we do not need to know anything about the individual layers making up the fenestration.~ However, the thermal calculation of heat flow through the fenestration requires knowledge of the amount of radiation absorbed in each of the fenestration layers.~ As indicated in the table, we therefore need the in-situ layer absorptance for each layer, referenced to the incident surface.~ This is denoted $A_i^{F,n}$~for the fraction of the $i^{th}$ component of the irradiance incident on the front surface of the fenestration that is absorbed in layer \emph{n}, with a similar quantity, $A_i^{B,n}$, for irradiance incident on the back surface.~ The term ``in-situ layer absorptance'' is used because these are not simply the absorptance of the layer, but include the transmittance and interreflection by other layers of the system prior to the absorptance in layer \emph{n}.~ The absorptance is a row vector, having possibly a different value for each direction of the incident irradiance, so that for an irradiance $E_{i}^{F}$ on the front surface of a fenestration and $E_{i}^{B}$ on the back surface, the power $Q^{n}$ absorbed per unit area in layer \emph{n} would be
 
 \begin{equation}
 {Q^n} = \sum\limits_i {{\mathop{\rm \mathcal{A}}\nolimits}_i^{F,n}E_i^F}  + \sum\limits_j {{\mathop{\rm \mathcal{A}}\nolimits}_j^{B,n}E_j^B}

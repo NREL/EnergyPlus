@@ -93,7 +93,7 @@ There is a logical flag \emph{SysSizingCalc} corresponding to \emph{ZoneSizingCa
   Loop over the zones cooled by this air loop: 
 \end{enumerate}
 
-{\setlength\parindent{25pt} NonCoinCoolMassFlow\(_{sys}\) = \Sigma {DesCoolMassFlow\(_{zone}\)} }
+{\setlength\parindent{25pt} NonCoinCoolMassFlow\(_{sys}\) = $\Sigma$ {DesCoolMassFlow\(_{zone}\)} }
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
@@ -103,7 +103,7 @@ There is a logical flag \emph{SysSizingCalc} corresponding to \emph{ZoneSizingCa
   Loop over the zones heated by this air loop: 
 \end{enumerate}
 
-{\setlength\parindent{25pt} NonCoinCoolMassFlow\(_{sys}\) = \Sigma {DesHeatMassFlow\(_{zone}\)} }
+{\setlength\parindent{25pt} NonCoinCoolMassFlow\(_{sys}\) = $\Sigma$ {DesHeatMassFlow\(_{zone}\)} }
 
 \subsubsection{DuringDay}\label{duringday}
 
@@ -114,13 +114,13 @@ There is a logical flag \emph{SysSizingCalc} corresponding to \emph{ZoneSizingCa
   Loop over the zones cooled by this air loop:
 \end{enumerate}
 
-\emph{CoolFlowSeq\(_{sys}\)(i)} = \Sigma \emph{CoolFlowSeq \(_{zone}\)}(i)
+\emph{CoolFlowSeq\(_{sys}\)(i)} = $\Sigma$ \emph{CoolFlowSeq \(_{zone}\)}(i)
 
-\emph{SysCoolRetTemp(i)} = \Sigma (\emph{CoolZoneRetTempSeq(i) * CoolFlowSeq\(_{zone}\)(i)})\emph{/ CoolFlowSeq\(_{sys}\)(i)}
+\emph{SysCoolRetTemp(i)} = $\Sigma$ (\emph{CoolZoneRetTempSeq(i) * CoolFlowSeq\(_{zone}\)(i)})\emph{/ CoolFlowSeq\(_{sys}\)(i)}
 
-\emph{SysCoolRetHumRat(i)} = \Sigma (\emph{CoolZoneHumRatSeq(i) * CoolFlowSeq\(_{zone}\)(i)})\emph{/ CoolFlowSeq\(_{sys}\)(i)}
+\emph{SysCoolRetHumRat(i)} = $\Sigma$ (\emph{CoolZoneHumRatSeq(i) * CoolFlowSeq\(_{zone}\)(i)})\emph{/ CoolFlowSeq\(_{sys}\)(i)}
 
-\emph{FracOA = \rho\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{CoolFlowSeq\(_{sys}\)(i)}
+\emph{FracOA = $\rho$\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{CoolFlowSeq\(_{sys}\)(i)}
 
 \emph{T\(_{mix}\)} = \emph{T\(_{outside}\)} * \emph{FracOA} + \emph{SysCoolRetTemp(i)}(1 - \emph{FracOA})
 
@@ -154,7 +154,7 @@ And save the corresponding mixed, return and outside conditions:
 
 \emph{CoolOutHumRat\(_{sys}\)} = \emph{W\(_{outside}\)}
 
-Here \emph{\rho\(_{air}\)} is the density of dry air at 20\(^{\circ}\)C and standard elevation corrected pressure, {[}kg/m\(^{3}\){]};
+Here $\rho$\(_{air}\) is the density of dry air at 20\(^{\circ}\)C and standard elevation corrected pressure, {[}kg/m\(^{3}\){]};
 
 {\setlength\parindent{25pt} FracOA is the outside air fraction; }
 {\setlength\parindent{25pt} C\(_{p,air}\) is the specific heat of dry air at 20\(^{\circ}\)C, {[}J/kg-K{]}; }
@@ -172,13 +172,13 @@ Here \emph{\rho\(_{air}\)} is the density of dry air at 20\(^{\circ}\)C and stan
   Loop over the zones heated by this air loop.
 \end{enumerate}
 
-\emph{HeatFlowSeq\(_{sys}\)(i)} = \Sigma \emph{HeatFlowSeq \(_{zone}\)}(i)
+\emph{HeatFlowSeq\(_{sys}\)(i)} = $\Sigma$ \emph{HeatFlowSeq \(_{zone}\)}(i)
 
-\emph{SysHeatRetTemp(i)} = \Sigma (\emph{HeatZoneRetTempSeq(i) * HeatFlowSeq\(_{zone}\)(i)})\emph{/}
+\emph{SysHeatRetTemp(i)} = $\Sigma$ (\emph{HeatZoneRetTempSeq(i) * HeatFlowSeq\(_{zone}\)(i)})\emph{/}
 
 \emph{HeatFlowSeq\(_{sys}\)(i)}
 
-\emph{SysHeatRetHumRat(i)} = \Sigma (\emph{HeatZoneHumRatSeq(i) * HeatFlowSeq\(_{zone}\)(i)})\emph{/}
+\emph{SysHeatRetHumRat(i)} = $\Sigma$ (\emph{HeatZoneHumRatSeq(i) * HeatFlowSeq\(_{zone}\)(i)})\emph{/}
 
 \emph{HeatFlowSeq\(_{sys}\)(i)}
 
@@ -222,17 +222,17 @@ Here \emph{MinFlowRat\(_{sys}\)} is the user specified minimum supply flow ratio
 
 If the user has specified \emph{coincident} system sizing then:
 
-\emph{DesCoolVolFlow\(_{sys}\)} = \emph{\rho\(_{air}\)} *\emph{CoinCoolMassFlow\(_{sys}\)}
+\emph{DesCoolVolFlow\(_{sys}\)} = \emph{$\rho$\(_{air}\)} *\emph{CoinCoolMassFlow\(_{sys}\)}
 
-\emph{DesHeatVolFlow\(_{sys}\)} = \emph{\rho\(_{air}\)} *\emph{CoinHeatMassFlow\(_{sys}\)}
+\emph{DesHeatVolFlow\(_{sys}\)} = \emph{$\rho$\(_{air}\)} *\emph{CoinHeatMassFlow\(_{sys}\)}
 
 \emph{DesMainVolFlow\(_{sys}\)} = \textbf{Max}(\emph{DesCoolVolFlow\(_{sys}\)}, \emph{DesHeatVolFlow\(_{sys}\)})
 
 If the user has specified \emph{noncoincident}system sizing then:
 
-\emph{DesCoolVolFlow\(_{sys}\)} = \emph{\rho\(_{air}\)} *\emph{NonCoinCoolMassFlow\(_{sys}\)}
+\emph{DesCoolVolFlow\(_{sys}\)} = \emph{$\rho$\(_{air}\)} *\emph{NonCoinCoolMassFlow\(_{sys}\)}
 
-\emph{DesHeatVolFlow\(_{sys}\)} = \emph{\rho\(_{air}\)} *\emph{NonCoinHeatMassFlow\(_{sys}\)}
+\emph{DesHeatVolFlow\(_{sys}\)} = \emph{$\rho$\(_{air}\)} *\emph{NonCoinHeatMassFlow\(_{sys}\)}
 
 \emph{DesMainVolFlow\(_{sys}\)} = \textbf{Max}(\emph{DesCoolVolFlow\(_{sys}\)}, \emph{DesHeatVolFlow\(_{sys}\)})
 
@@ -276,7 +276,7 @@ For noncoincident sizing the task is harder since we don't have a single time-st
 
 In \emph{FinalZoneSizing} replace the value in \emph{DesCoolCoilInTemp} with the user specified \emph{CoolSupTemp\(_{sys}\)}. Do the same for \emph{DesCoolCoilInHumRat} and \emph{CoolSupHumRat}. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions.
 
- \emph{NonCoinCoolMassFlow\(_{sys}\)} = \Sigma \emph{DesCoolMassFlow\(_{zone}\)}
+ \emph{NonCoinCoolMassFlow\(_{sys}\)} = $\Sigma$ \emph{DesCoolMassFlow\(_{zone}\)}
   
  \emph{SysCoolRetTemp} = (\emph{ZoneRetTempAtCoolPeak *DesCoolMassFlow\(_{zone}\)}) / {NonCoinCoolMassFlow\(_{sys}\)}
  
@@ -288,7 +288,7 @@ In \emph{FinalZoneSizing} replace the value in \emph{DesCoolCoilInTemp} with the
 
 At the end of the zone loop calculate mixed air conditions and the system sensible cooling capacity.
 
-\emph{FracOA = \rho\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{NonCoinCoolMassFlow\(_{sys}\)}
+\emph{FracOA = $\rho$\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{NonCoinCoolMassFlow\(_{sys}\)}
 
 \emph{T\(_{mix}\)} = \emph{SysCoolOutTemp} * \emph{FracOA} + \emph{SysCoolRetTemp} * (1 - \emph{FracOA})
 
@@ -308,7 +308,7 @@ Then (for noncoincident sizing) the variables calculated in section (ii) are mov
 
 In \emph{FinalZoneSizing} replace the value in \emph{DesHeatCoilInTemp} with the user specified \emph{HeatSupTemp\(_{sys}\)}. Do the same for \emph{DesHeatCoilInHumRat} and \emph{HeatSupHumRat}. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions.
 
-\emph{NonCoinHeatMassFlow\(_{sys}\)} = \Sigma \emph{DesHeatMassFlow\(_{zone}\)}}
+\emph{NonCoinHeatMassFlow\(_{sys}\)} = $\Sigma$ \emph{DesHeatMassFlow\(_{zone}\)}
 
 \emph{SysHeatRetTemp} = (\emph{ZoneRetTempAtHeatPeak *}\emph{DesHeatMassFlow\(_{zone}\)})/
 \emph{NonCoinHeatMassFlow\(_{sys}\)}
@@ -322,7 +322,7 @@ In \emph{FinalZoneSizing} replace the value in \emph{DesHeatCoilInTemp} with the
 
 At the end of the zone loop calculate mixed air conditions and the system sensible cooling capacity.
 
-\emph{FracOA = \rho\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{NonCoinHeatMassFlow\(_{sys}\)}
+\emph{FracOA = $\rho$\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{NonCoinHeatMassFlow\(_{sys}\)}
 
 \emph{T\(_{mix}\)} = \emph{SysHeatOutTemp} * \emph{FracOA} + \emph{SysHeatRetTemp} * (1 - \emph{FracOA})
 
@@ -349,7 +349,7 @@ Loop over the air loops.
 \begin{enumerate}
 \def\labelenumi{(\roman{enumi})}
 \tightlist
-{\setlength\itemindent{25pt} \item As in the zone case, the user specified system design flow rates are turned into sizing ratios by dividing the user input value by the calculated value. The same strategy is employed for sizing on the ventilation requirement: the design ventilation flow rate is divided by the calculated design flow rate value. For each air loop this gives us a \emph{SizRat\(_{cool}\)} and \emph{SizRat\(_{heat}\)}.
+\setlength\itemindent{25pt} \item As in the zone case, the user specified system design flow rates are turned into sizing ratios by dividing the user input value by the calculated value. The same strategy is employed for sizing on the ventilation requirement: the design ventilation flow rate is divided by the calculated design flow rate value. For each air loop this gives us a \emph{SizRat\(_{cool}\)} and \emph{SizRat\(_{heat}\)}.
 \end{enumerate}
 
 \emph{CoinCoolMassFlow} = \emph{SizRat\(_{cool}\)} * \emph{CoinCoolMassFlow\(_{calc}\)}
@@ -369,7 +369,7 @@ Since the flow rates have been altered the outside air fraction will change. Thi
 
 \emph{CoolFlowSeq\(_{sys}\)(i)} = \emph{SizRat\(_{cool}\)} * \emph{CoolFlowSeq\(_{sys,calc}\)(i)}
 
-\emph{FracOA = \rho\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{CoolFlowSeq\(_{sys}\)(i)}
+\emph{FracOA = $\rho$\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{CoolFlowSeq\(_{sys}\)(i)}
 
 \emph{T\(_{mix}\)} = \emph{SysCoolOutTempSeq(i) *FracOA +~} \emph{SysCoolRetTempSeq(i) *(1-FracOA)}
 
@@ -382,7 +382,7 @@ Since the flow rates have been altered the outside air fraction will change. Thi
 {\setlength\itemindent{25pt} \item Do the same calculation for peak cooling.}
 \end{enumerate}
 
-\emph{FracOA = \rho\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{DesCoolVolFlow}
+\emph{FracOA = $\rho$\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{DesCoolVolFlow}
 
 \emph{T\(_{mix}\)} = \emph{CoolOutTemp\(_{sys}\) *FracOA + CoolRetTemp\(_{sys}\) *(}1-FracOA)
 
@@ -414,7 +414,7 @@ Since the flow rates have been altered the outside air fraction will change. Thi
 
 \emph{HeatFlowSeq\(_{sys}\)(i)} = \emph{SizRat\(_{Heat}\)} * \emph{HeatFlowSeq\(_{sys,calc}\)(i)}
 
-\emph{FracOA = \rho\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{HeatFlowSeq\(_{sys}\)(i)}
+\emph{FracOA = $\rho$\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{HeatFlowSeq\(_{sys}\)(i)}
 
 \emph{T\(_{mix}\)} = \emph{SysHeatOutTempSeq(i) * FracOA + SysHeatRetTempSeq(i) * (1-FracOA)}
 
@@ -427,7 +427,7 @@ Since the flow rates have been altered the outside air fraction will change. Thi
 {\setlength\itemindent{25pt} \item Do the same calculation for peak heating.}
 \end{enumerate}
 
-\emph{FracOA = \rho\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{DesHeatVolFlow}
+\emph{FracOA = $\rho$\(_{air}\)} * \emph{DesOutAirVolFlow\(_{sys}\)}/ \emph{DesHeatVolFlow}
 
 \emph{T\(_{mix}\)} = \emph{HeatOutTemp\(_{sys}\) *FracOA + HeatRetTemp\(_{sys}\) *} \emph{(}1-FracOA)
 

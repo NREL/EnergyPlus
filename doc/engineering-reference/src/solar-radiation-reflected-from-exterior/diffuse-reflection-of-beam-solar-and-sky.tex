@@ -83,10 +83,7 @@ In this equation, the product \emph{ViewFacSky*DifShdgRatioIsoSky} is the sky ir
 The above reflection factor is used in the timestep calculation to find the irradiance on a receiving surface due to sky radiation reflected from obstructions:
 
 \begin{equation}
-\begin{split}
-QRadSWOutIncSkyDiffReflObs(RecSurfNum) = DifSolarRad \\
-* ReflFacSkySolObs(RecSurfNum) (W/m^{2})
-\end{split}
+QRadSWOutIncSkyDiffReflObs(RecSurfNum) = DifSolarRad * ReflFacSkySolObs(RecSurfNum) (W/m^{2})
 \end{equation}
 
 where \emph{DifSolarRad} is the horizontal sky irradiance on an unobstructed horizontal plane (W/m\(^{2}\)).
@@ -122,10 +119,7 @@ where
 This factor is used in the timestep calculation to find the irradiance on a receiving surface due to sky radiation reflected from the ground:
 
 \begin{equation}
-\begin{split}
-QRadSWOutIncSkyDiffReflGnd(RecSurfNum) = DifSolarRad * \({\rho_{gnd}}\) \\
-* ReflFacSkySolGnd(RecSurfNum)~ (W/m\(^{2}\))
-\end{split}
+QRadSWOutIncSkyDiffReflGnd(RecSurfNum) = DifSolarRad * {\rho_{gnd}} * ReflFacSkySolGnd(RecSurfNum)~ (W/m^{2})
 \end{equation}
 
 where \({\rho_{gnd}}\) is the solar reflectance of the ground, which is assumed to be uniform over the ground plane but may vary monthly (because of snow cover, for example).
@@ -163,7 +157,7 @@ QRadSWOutIncBmToDiffReflObs(RecSurfNum) = BeamSolarRad \\
 \end{split}
 \end{equation}
 
-where \emph{BeamSolarRad} is the timestep value of beam normal solar intensity (W/{m^2}), and \emph{WeightNow} and \emph{WeightPreviousHour} are time-averaging factors.
+where \emph{BeamSolarRad} is the timestep value of beam normal solar intensity \(W/{m^2}\), and \emph{WeightNow} and \emph{WeightPreviousHour} are time-averaging factors.
 
 \subsection{Beam Solar Radiation Diffusely Reflected from the Ground}\label{beam-solar-radiation-diffusely-reflected-from-the-ground}
 
@@ -185,11 +179,7 @@ where
 This factor is used in the timestep calculation to find the diffuse irradiance on a receiving surface due to beam solar diffusely reflected from the ground:
 
 \begin{equation}
-\begin{split}
-QRadSWOutIncBmToDiffReflGnd(RecSurfNum) = BeamSolarRad * \({\rho_{gnd}}\) \\
-* (WeightNow * ReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay) \\
-+ WeightPreviousHour * ReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
-\end{split}
+QRadSWOutIncBmToDiffReflGnd(RecSurfNum) = BeamSolarRad * {\rho_{gnd}} * (WeightNow * ReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay) + WeightPreviousHour * ReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
 \end{equation}
 
 \subsection{Beam Solar Radiation Specularly Reflected from Obstructions}\label{beam-solar-radiation-specularly-reflected-from-obstructions}
@@ -253,9 +243,5 @@ In this case \({f_{C,glazed}}\) is ``Fraction of shading surface that is glazed'
 The above specular reflection factor is used in the timestep calculation to find the beam irradiance on a receiving surface due to beam-beam reflection from obstructions:
 
 \begin{equation}
-\begin{split}
-QRadSWOutIncBmToBmReflObsRecSurfNum) = BeamSolarRad \\
-* (WeightNow * ReflFacBmToBmSolObs(RecSurfNum,HourOfDay) \\
-+ WeightPreviousHour * ReflFacBmToBmSolObs(RecSurfNum,PreviousHour))
-\end{split}
+QRadSWOutIncBmToBmReflObsRecSurfNum) = BeamSolarRad * (WeightNow * ReflFacBmToBmSolObs(RecSurfNum,HourOfDay) + WeightPreviousHour * ReflFacBmToBmSolObs(RecSurfNum,PreviousHour))
 \end{equation}

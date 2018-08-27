@@ -124,14 +124,14 @@ and,
 Once the predicted zone air temperature has been calculated from Equations~\ref{eq:PredictedZoneAirTempHeat} and~\ref{eq:PredictedZoneAirTempCool}, the air system response may be determined. When a zone requires cooling, the system supply air temperature is constant at the cooling coil outlet temperature and the volume flow rate is given by:
 
 \begin{equation}
-{\dot V_{\supply}} = {\eta_c}{\dot V_{\max }}
+{\dot V_{supply}} = {\eta_c}{\dot V_{max}}
 \label{eq:VDotCCoilOutlet}
 \end{equation}
 
 where the supply air fraction $\eta$\(_{c}\) is computed from Equation~\ref{eq:NormalizedSupplyAirFlowC}. When heating is required by the zone, the air system provides air at the minimum volume flow rate and at a temperature given by:
 
 \begin{equation}
-{T_{\supply}} = {T_{c/c}} + \frac{{{\eta_h}{{\dot Q}_{h/c,\max }}}}{{{C_p}\rho {{\dot V}_{\min }}}}
+{T_{supply}} = {T_{c/c}} + \frac{{{\eta_h}{{\dot Q}_{h/c,max}}}}{{{C_p}\rho {{\dot V}_{min}}}}
 \label{eq:TempSupplyAtMinFlowRate}
 \end{equation}
 

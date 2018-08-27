@@ -389,7 +389,7 @@ N_{tube/row} = {\mathop{\rm Int}\nolimits} ({\rm{13750}}\cdot \dot Vcoil,water,m
 \end{equation}
 
 \begin{equation}
-N\(_{tube/row}\) = \textbf{Max}(\emph{N\(_{tube/row}\)},3)
+N_{tube/row} = \textbf{Max}(N_{tube/row},3)
 \end{equation}
 
 \subsubsection{Fin Diameter}\label{fin-diameter}
@@ -794,29 +794,29 @@ We now have all the data needed to obtain UA. The numerical inversion is carried
 If the coil is not part of an induction unit then obtain the coil inlet temperature from the zone design data array;
 
 \begin{equation}
-\emph{T\(_{in,air}\) = DesHeatCoilInTemp\(_{zone}\)}
+T_{in,air} = DesHeatCoilInTemp_{zone}
 \end{equation}
 
 If the coil is part of an induction unit take into account the induced air:
 
 \begin{equation}
-\emph{Frac\(_{minflow}\)} = \emph{MinFlowFrac\(_{zone}\)}
+Frac_{minflow} = MinFlowFrac_{zone}
 \end{equation}
 
 \begin{equation}
-\emph{T\(_{in,air}\)} = \emph{DesHeatCoilInTemp\(_{zone}\)} * \emph{Frac\(_{minflow}\)} +
+T_{in,air} = DesHeatCoilInTemp_{zone} * Frac_{minflow} +
 \end{equation}
 
 \begin{equation}
-\emph{ZoneTempAtHeatPeak\(_{zone}\)} *(1- \emph{Frac\(_{minflow}\)})
+ZoneTempAtHeatPeak_{zone} *(1- Frac_{minflow})
 \end{equation}
 
 \begin{equation}
-\emph{W\(_{in,air}\)} = \emph{DesHeatCoilInHumRat\(_{zone}\)}
+W_{in,air} = DesHeatCoilInHumRat_{zone}
 \end{equation}
 
 \begin{equation}
-\emph{T\(_{in,water}\)} = \emph{ExitTemp\(_{plt,hw,des}\)}
+T_{in,water} = ExitTemp_{plt,hw,des}
 \end{equation}
 
 \begin{equation}
@@ -824,11 +824,11 @@ If the coil is part of an induction unit take into account the induced air:
 \end{equation}
 
 \begin{equation}
-\emph{T\(_{out,air}\) = HeatDesTemp\(_{zone}\)}
+T_{out,air} = HeatDesTemp_{zone}
 \end{equation}
 
 \begin{equation}
-W\(_{out,air}\) = HeatDesHumRat\(_{zone}\)
+W_{out,air} = HeatDesHumRat_{zone}
 \end{equation}
 
 If the coil is part of a terminal unit the mass flow rate is determined by the volumetric flow rate of the terminal unit:
@@ -1079,25 +1079,25 @@ CCap_{rated} = \dot V_{air,rated}/FlowCapRatio_{max}
 where
 
 \begin{equation}
-\emph{FlowCapRatio\(_{min}\)} = 0.00004027 m\(^{3}\)/s per watt (300 cfm/ton)
+FlowCapRatio_{min} = 0.00004027 m^{3}/s per watt (300 cfm/ton)
 \end{equation}
 
 and
 
 \begin{equation}
-\emph{FlowCapRatio\(_{max}\)} = 0.00006041 m\(^{3}\)/s per watt (450 cfm/ton)
+FlowCapRatio_{max} = 0.00006041 m^{3}/s per watt (450 cfm/ton)
 \end{equation}
 
 The sizing calculation for DX cooling coils for 100\% dedicated outdor air system (DOAS) are identical to regular DX cooling coils. However, they operate operate at different flow to capacity ratio ranges and are within the prescribed range below:
 
 \begin{equation}
-\emph{FlowCapRatio\(_{min}\)} = 0.00001677 m\(^{3}\)/s per Watt (125 cfm/ton)
+FlowCapRatio_{min} = 0.00001677 m^{3}/s per Watt (125 cfm/ton)
 \end{equation}
 
 and
 
 \begin{equation}
-\emph{FlowCapRatio\(_{max}\)} = 0.00003355 m\(^{3}\)/s per Watt (250 cfm/ton)
+FlowCapRatio_{max} = 0.00003355 m^{3}/s per Watt (250 cfm/ton)
 \end{equation}
 
 \subsubsection{Zone Coils}\label{zone-coils-5}
@@ -1173,25 +1173,25 @@ CCap_{rated} = \dot V_{air,rated} /FlowCapRatio_{max}
 where
 
 \begin{equation}
-\emph{FlowCapRatio\(_{min}\)} = 0.00004027 m\(^{3}\)/s per watt (300 cfm/ton)
+\emph{FlowCapRatio\(_{min}\)} = 0.00004027 m^{3}/s per watt (300 cfm/ton)
 \end{equation}
 
 and
 
 \begin{equation}
-\emph{FlowCapRatio\(_{max}\)} = 0.00006041 m\(^{3}\)/s per watt (450 cfm/ton)
+\emph{FlowCapRatio\(_{max}\)} = 0.00006041 m^{3}/s per watt (450 cfm/ton)
 \end{equation}
 
 We check the design flow to the total cooling capacity rato for dedicated zone outdoor unit DX cooling coils to be within the limits prescribed below:
 
 \begin{equation}
-\emph{FlowCapRatio\(_{min}\)} = 0.00001677 m\(^{3}\)/s per Watt (125 cfm/ton)
+\emph{FlowCapRatio\(_{min}\)} = 0.00001677 m^{3}/s per Watt (125 cfm/ton)
 \end{equation}
 
 and
 
 \begin{equation}
-\emph{FlowCapRatio\(_{max}\)} = 0.00003355 m\(^{3}\)/s per Watt (250 cfm/ton)
+\emph{FlowCapRatio\(_{max}\)} = 0.00003355 m^{3}/s per Watt (250 cfm/ton)
 \end{equation}
 
 \subsubsection{Rated Total Heating Capacity}\label{rated-total-heating-capacity-2}
@@ -1664,7 +1664,7 @@ For duct type = \emph{heating}:
 For duct type = \emph{other}:
 
 \begin{equation}
-\({\dot m_a} = DesMainVolFlo{w_{sys}} \cdot {\rho_a}\),
+{\dot m_a} = DesMainVolFlo{w_{sys}} \cdot {\rho_a}
 \end{equation}
 
 and the humidity ratios are:
@@ -1876,7 +1876,7 @@ where~\({\dot Q_{fluidcooler,nom}}\) is provided by the user.
 \end{itemize}
 
 \begin{equation}
-\({\dot V_{fluidcooler,air,des}} = {\dot Q_{fluidcooler,nom}}/({T_{in,water}} - {T_{in,air}})*4\)
+{\dot V_{fluidcooler,air,des}} = {\dot Q_{fluidcooler,nom}}/({T_{in,water}} - {T_{in,air}})*4
 \end{equation}
 
 where:
@@ -2166,6 +2166,7 @@ where:
 
 \begin{equation}
 \emph{T\(_{coil,in}\)} = \emph{DesColdCoilInTemp\(_{zone}\)}
+\end{equation}
 
 \begin{equation}
 \emph{T\(_{coil,out}\)} = \emph{ColdDesTemp\(_{zone}\)}
