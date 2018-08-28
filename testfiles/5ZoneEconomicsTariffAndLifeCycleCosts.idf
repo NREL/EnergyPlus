@@ -166,8 +166,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -855,7 +857,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -871,7 +872,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1066,7 +1066,6 @@
     RIGHT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1241,7 +1240,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1257,7 +1255,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1432,7 +1429,6 @@
     LEFT-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -5118,27 +5114,27 @@
     1.0429,                  !- Year 7 Escalation
     1.0410,                  !- Year 8 Escalation
     1.0406,                  !- Year 9 Escalation
-    1.0444,                  !- Year 10 Escalation
-    1.0505,                  !- Year 11 Escalation
-    1.0535,                  !- Year 12 Escalation
-    1.0524,                  !- Year 13 Escalation
-    1.0478,                  !- Year 14 Escalation
-    1.0429,                  !- Year 15 Escalation
-    1.0391,                  !- Year 16 Escalation
-    1.0372,                  !- Year 17 Escalation
-    1.0360,                  !- Year 18 Escalation
-    1.0341,                  !- Year 19 Escalation
-    1.0319,                  !- Year 20 Escalation
-    1.0288,                  !- Year 21 Escalation
-    1.0341,                  !- Year 22 Escalation
-    1.0425,                  !- Year 23 Escalation
-    1.0508,                  !- Year 24 Escalation
-    1.0569,                  !- Year 25 Escalation
-    1.0626,                  !- Year 26 Escalation
-    1.0694,                  !- Year 27 Escalation
-    1.0721,                  !- Year 28 Escalation
-    1.0744,                  !- Year 29 Escalation
-    1.0774;                  !- Year 30 Escalation
+    1.0444,                  !- <none>
+    1.0505,                  !- <none>
+    1.0535,                  !- <none>
+    1.0524,                  !- <none>
+    1.0478,                  !- <none>
+    1.0429,                  !- <none>
+    1.0391,                  !- <none>
+    1.0372,                  !- <none>
+    1.0360,                  !- <none>
+    1.0341,                  !- <none>
+    1.0319,                  !- <none>
+    1.0288,                  !- <none>
+    1.0341,                  !- <none>
+    1.0425,                  !- <none>
+    1.0508,                  !- <none>
+    1.0569,                  !- <none>
+    1.0626,                  !- <none>
+    1.0694,                  !- <none>
+    1.0721,                  !- <none>
+    1.0744,                  !- <none>
+    1.0774;                  !- <none>
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Commercial-Electricity,  !- LCC Price Escalation Name
@@ -5154,27 +5150,27 @@
     1.0429,                  !- Year 7 Escalation
     1.0410,                  !- Year 8 Escalation
     1.0406,                  !- Year 9 Escalation
-    1.0444,                  !- Year 10 Escalation
-    1.0505,                  !- Year 11 Escalation
-    1.0535,                  !- Year 12 Escalation
-    1.0524,                  !- Year 13 Escalation
-    1.0478,                  !- Year 14 Escalation
-    1.0429,                  !- Year 15 Escalation
-    1.0391,                  !- Year 16 Escalation
-    1.0372,                  !- Year 17 Escalation
-    1.0360,                  !- Year 18 Escalation
-    1.0341,                  !- Year 19 Escalation
-    1.0319,                  !- Year 20 Escalation
-    1.0288,                  !- Year 21 Escalation
-    1.0341,                  !- Year 22 Escalation
-    1.0425,                  !- Year 23 Escalation
-    1.0508,                  !- Year 24 Escalation
-    1.0569,                  !- Year 25 Escalation
-    1.0626,                  !- Year 26 Escalation
-    1.0694,                  !- Year 27 Escalation
-    1.0721,                  !- Year 28 Escalation
-    1.0744,                  !- Year 29 Escalation
-    1.0774;                  !- Year 30 Escalation
+    1.0444,                  !- <none>
+    1.0505,                  !- <none>
+    1.0535,                  !- <none>
+    1.0524,                  !- <none>
+    1.0478,                  !- <none>
+    1.0429,                  !- <none>
+    1.0391,                  !- <none>
+    1.0372,                  !- <none>
+    1.0360,                  !- <none>
+    1.0341,                  !- <none>
+    1.0319,                  !- <none>
+    1.0288,                  !- <none>
+    1.0341,                  !- <none>
+    1.0425,                  !- <none>
+    1.0508,                  !- <none>
+    1.0569,                  !- <none>
+    1.0626,                  !- <none>
+    1.0694,                  !- <none>
+    1.0721,                  !- <none>
+    1.0744,                  !- <none>
+    1.0774;                  !- <none>
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Commercial-Natural gas,  !- LCC Price Escalation Name
@@ -5190,27 +5186,27 @@
     1.0113,                  !- Year 7 Escalation
     1.0289,                  !- Year 8 Escalation
     1.0616,                  !- Year 9 Escalation
-    1.1031,                  !- Year 10 Escalation
-    1.1321,                  !- Year 11 Escalation
-    1.1484,                  !- Year 12 Escalation
-    1.1623,                  !- Year 13 Escalation
-    1.1786,                  !- Year 14 Escalation
-    1.1925,                  !- Year 15 Escalation
-    1.2025,                  !- Year 16 Escalation
-    1.2138,                  !- Year 17 Escalation
-    1.2289,                  !- Year 18 Escalation
-    1.2453,                  !- Year 19 Escalation
-    1.2642,                  !- Year 20 Escalation
-    1.2818,                  !- Year 21 Escalation
-    1.3182,                  !- Year 22 Escalation
-    1.3560,                  !- Year 23 Escalation
-    1.3899,                  !- Year 24 Escalation
-    1.4151,                  !- Year 25 Escalation
-    1.4491,                  !- Year 26 Escalation
-    1.4881,                  !- Year 27 Escalation
-    1.4818,                  !- Year 28 Escalation
-    1.4931,                  !- Year 29 Escalation
-    1.5145;                  !- Year 30 Escalation
+    1.1031,                  !- <none>
+    1.1321,                  !- <none>
+    1.1484,                  !- <none>
+    1.1623,                  !- <none>
+    1.1786,                  !- <none>
+    1.1925,                  !- <none>
+    1.2025,                  !- <none>
+    1.2138,                  !- <none>
+    1.2289,                  !- <none>
+    1.2453,                  !- <none>
+    1.2642,                  !- <none>
+    1.2818,                  !- <none>
+    1.3182,                  !- <none>
+    1.3560,                  !- <none>
+    1.3899,                  !- <none>
+    1.4151,                  !- <none>
+    1.4491,                  !- <none>
+    1.4881,                  !- <none>
+    1.4818,                  !- <none>
+    1.4931,                  !- <none>
+    1.5145;                  !- <none>
 
   LifeCycleCost:UseAdjustment,
     NoElectricUseAdjustment, !- Name

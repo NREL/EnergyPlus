@@ -625,7 +625,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     DataEnvironment::DayOfMonth = 21;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(Month, DayOfMonth, HourOfDay);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, HourOfDay);
 
     UpdateScheduleValues();
 
@@ -928,7 +928,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     DataEnvironment::DayOfMonth = 21;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(Month, DayOfMonth, HourOfDay);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, HourOfDay);
 
     UpdateScheduleValues();
 

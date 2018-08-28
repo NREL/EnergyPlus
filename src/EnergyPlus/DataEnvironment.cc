@@ -160,7 +160,7 @@ namespace DataEnvironment {
     bool EMSWindSpeedOverrideOn(false);       // EMS flag for outdoor air wind speed
     Real64 EMSWindSpeedOverrideValue;         // EMS override value for outdoor air wind speed
     Real64 WaterMainsTemp;                    // Current water mains temperature
-    int Year;                                 // Current calendar year of the simulation
+    int Year;                                 // Current calendar year of the simulation from the weather file
     int YearTomorrow;                         // Tomorrow's calendar year of the simulation
     Array1D<Real64> SOLCOS(3);                // Solar direction cosines at current time step
     Real64 CloudFraction;                     // Fraction of sky covered by clouds
@@ -180,6 +180,7 @@ namespace DataEnvironment {
     std::string WeatherFileLocationTitle;     // Location Title from Weather File
     std::string CurMnDyHr;                    // Current Month/Day/Hour timestamp info
     std::string CurMnDy;                      // Current Month/Day timestamp info
+    std::string CurMnDyYr;                    // Current Month/Day/Year timestamp info
     int CurEnvirNum;                          // current environment number
     int TotDesDays(0);                        // Total number of Design days to Setup
     int TotRunDesPersDays(0);                 // Total number of Run Design Periods [Days] (Weather data) to Setup
@@ -309,6 +310,7 @@ namespace DataEnvironment {
         WeatherFileLocationTitle = std::string();
         CurMnDyHr = std::string();
         CurMnDy = std::string();
+        CurMnDyYr = std::string();
         CurEnvirNum = int();
         TotDesDays = 0;
         TotRunDesPersDays = 0;
