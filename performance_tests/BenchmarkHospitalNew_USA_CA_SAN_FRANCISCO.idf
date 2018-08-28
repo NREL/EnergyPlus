@@ -126,8 +126,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
@@ -1969,7 +1971,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam1_Mult4_Flr_1,  !- Name
@@ -2373,7 +2375,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam2_Flr_1,   !- Name
@@ -2777,7 +2779,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam3_Mult4_Flr_1,  !- Name
@@ -3181,7 +3183,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam4_Flr_1,   !- Name
@@ -3585,7 +3587,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam5_Mult4_Flr_1,  !- Name
@@ -3861,7 +3863,6 @@
     Office1_Mult4_Flr_1_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4005,7 +4006,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office1_Mult4_Flr_1,  !- Name
@@ -4242,7 +4243,6 @@
     Lobby_Flr_1_Wall_1_West, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -4458,7 +4458,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Lobby_Flr_1,      !- Name
@@ -4823,7 +4823,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_Flr_1,   !- Name
@@ -5016,7 +5016,6 @@
     ER_NurseStat_Flr_1_Wall_1_East,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -5232,7 +5231,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_NurseStat_Flr_1,  !- Name
@@ -5581,7 +5580,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR1_Flr_2,        !- Name
@@ -5985,7 +5984,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR2_Mult5_Flr_2,  !- Name
@@ -6389,7 +6388,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR3_Flr_2,        !- Name
@@ -6793,7 +6792,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR4_Flr_2,        !- Name
@@ -7069,7 +7068,6 @@
     IC_PatRoom1_Mult5_Flr_2_Wall_North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -7213,7 +7211,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:IC_PatRoom1_Mult5_Flr_2,  !- Name
@@ -7434,7 +7432,6 @@
     IC_PatRoom2_Flr_2_Wall_North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -7466,7 +7463,6 @@
     IC_PatRoom2_Flr_2_Wall_West,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -7594,7 +7590,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:IC_PatRoom2_Flr_2,!- Name
@@ -7815,7 +7811,6 @@
     IC_PatRoom3_Mult6_Flr_2_Wall_West,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -7959,7 +7954,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:IC_PatRoom3_Mult6_Flr_2,  !- Name
@@ -8196,7 +8191,6 @@
     ICU_Flr_2_Wall_West,     !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -8324,7 +8318,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ICU_Flr_2,        !- Name
@@ -8673,7 +8667,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ICU_NurseSat_Flr_2,  !- Name
@@ -9022,7 +9016,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_Flr_2,   !- Name
@@ -9231,7 +9225,6 @@
     OR_NurseSat_Flr_2_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -9431,7 +9424,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR_NurseSat_Flr_2,!- Name
@@ -9652,7 +9645,6 @@
     PatRoom1_Mult10_Flr_3_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -9796,7 +9788,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom1_Mult10_Flr_3,  !- Name
@@ -10072,7 +10064,6 @@
     PatRoom2_Flr_3_Wall_East,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -10104,7 +10095,6 @@
     PatRoom2_Flr_3_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -10232,7 +10222,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom2_Flr_3,   !- Name
@@ -10508,7 +10498,6 @@
     PatRoom3_Mult10_Flr_3_Wall_East,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -10652,7 +10641,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom3_Mult10_Flr_3,  !- Name
@@ -10928,7 +10917,6 @@
     PatRoom4_Flr_3_Wall_North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -10960,7 +10948,6 @@
     PatRoom4_Flr_3_Wall_East,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -11088,7 +11075,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom4_Flr_3,   !- Name
@@ -11364,7 +11351,6 @@
     PatRoom5_Mult10_Flr_3_Wall_North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -11508,7 +11494,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom5_Mult10_Flr_3,  !- Name
@@ -11912,7 +11898,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PhysTherapy_Flr_3,!- Name
@@ -12188,7 +12174,6 @@
     PatRoom6_Flr_3_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -12220,7 +12205,6 @@
     PatRoom6_Flr_3_Wall_West,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -12348,7 +12332,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom6_Flr_3,   !- Name
@@ -12624,7 +12608,6 @@
     PatRoom7_Mult10_Flr_3_Wall_West,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -12768,7 +12751,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom7_Mult10_Flr_3,  !- Name
@@ -13044,7 +13027,6 @@
     PatRoom8_Flr_3_Wall_North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -13076,7 +13058,6 @@
     PatRoom8_Flr_3_Wall_West,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -13204,7 +13185,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom8_Flr_3,   !- Name
@@ -13716,7 +13697,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:NurseSat_Lobby_Flr_3,  !- Name
@@ -14101,7 +14082,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Lab_Flr_3,        !- Name
@@ -14661,7 +14642,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_SE_Flr_3,!- Name
@@ -15138,7 +15119,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_NW_Flr_3,!- Name
@@ -15331,7 +15312,6 @@
     PatRoom1_Mult10_Flr_4_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -15475,7 +15455,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom1_Mult10_Flr_4,  !- Name
@@ -15751,7 +15731,6 @@
     PatRoom2_Flr_4_Wall_East,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -15783,7 +15762,6 @@
     PatRoom2_Flr_4_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -15911,7 +15889,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom2_Flr_4,   !- Name
@@ -16187,7 +16165,6 @@
     PatRoom3_Mult10_Flr_4_Wall_East,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -16331,7 +16308,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom3_Mult10_Flr_4,  !- Name
@@ -16607,7 +16584,6 @@
     PatRoom4_Flr_4_Wall_North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -16639,7 +16615,6 @@
     PatRoom4_Flr_4_Wall_East,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -16767,7 +16742,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom4_Flr_4,   !- Name
@@ -17043,7 +17018,6 @@
     PatRoom5_Mult10_Flr_4_Wall_North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -17187,7 +17161,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom5_Mult10_Flr_4,  !- Name
@@ -17591,7 +17565,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Radiology_Flr_4,  !- Name
@@ -17867,7 +17841,6 @@
     PatRoom6_Flr_4_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -17899,7 +17872,6 @@
     PatRoom6_Flr_4_Wall_West,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -18027,7 +17999,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom6_Flr_4,   !- Name
@@ -18303,7 +18275,6 @@
     PatRoom7_Mult10_Flr_4_Wall_West,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -18447,7 +18418,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom7_Mult10_Flr_4,  !- Name
@@ -18723,7 +18694,6 @@
     PatRoom8_Flr_4_Wall_North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -18755,7 +18725,6 @@
     PatRoom8_Flr_4_Wall_West,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -18883,7 +18852,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom8_Flr_4,   !- Name
@@ -19395,7 +19364,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:NurseSat_Lobby_Flr_4,  !- Name
@@ -19780,7 +19749,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Lab_Flr_4,        !- Name
@@ -20340,7 +20309,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_SE_Flr_4,!- Name
@@ -20817,7 +20786,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_NW_Flr_4,!- Name
@@ -21042,7 +21011,6 @@
     Dining_Flr_5_Wall_South, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -21154,7 +21122,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Dining_Flr_5,     !- Name
@@ -21536,7 +21504,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:NurseSat_Flr_5,   !- Name
@@ -21901,7 +21869,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Kitchen_Flr_5,    !- Name
@@ -22246,7 +22214,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:20,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -22258,7 +22226,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Average,         !- Field 3
+    Interpolate:Average,     !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:30,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -22485,7 +22453,6 @@
     Office1_Flr_5_Wall_South,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -22517,7 +22484,6 @@
     Office1_Flr_5_Wall_West, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -22645,7 +22611,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office1_Flr_5,    !- Name
@@ -22866,7 +22832,6 @@
     Office2_Mult5_Flr_5_Wall_West,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -23010,7 +22975,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office2_Mult5_Flr_5,  !- Name
@@ -23231,7 +23196,6 @@
     Office3_Flr_5_Wall_North,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -23263,7 +23227,6 @@
     Office3_Flr_5_Wall_West, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -23391,7 +23354,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office3_Flr_5,    !- Name
@@ -23612,7 +23575,6 @@
     Office4_Mult6_Flr_5_Wall_North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -23756,7 +23718,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office4_Mult6_Flr_5,  !- Name
@@ -24177,7 +24139,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    ;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_Flr_5,   !- Name

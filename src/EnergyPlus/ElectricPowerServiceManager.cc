@@ -2930,11 +2930,14 @@ ElectricStorage::ElectricStorage( // main constructor
                 ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + " cannot be blank. But no entry found.");
                 errorsFound = true;
-            } else if (!UtilityRoutines::SameString(CurveManager::GetCurveType(chargeCurveNum_), "RectangularHyperbola2")) {
-                ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
-                ShowContinueError("Curve Type must be RectangularHyperbola2 but was " + CurveManager::GetCurveType(chargeCurveNum_));
-                errorsFound = true;
+            } else {
+                errorsFound |= CurveManager::CheckCurveDims(
+                    chargeCurveNum_,   // Curve index
+                    {1},               // Valid dimensions
+                    routineName,       // Routine name
+                    DataIPShortCuts::cCurrentModuleObject,  // Object Type
+                    name_,             // Object Name
+                    DataIPShortCuts::cAlphaFieldNames(4));  // Field Name
             }
             dischargeCurveNum_ = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(5)); // voltage calculation for discharging
             if (dischargeCurveNum_ == 0 && !DataIPShortCuts::lAlphaFieldBlanks(5)) {
@@ -2945,11 +2948,14 @@ ElectricStorage::ElectricStorage( // main constructor
                 ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + " cannot be blank. But no entry found.");
                 errorsFound = true;
-            } else if (!UtilityRoutines::SameString(CurveManager::GetCurveType(dischargeCurveNum_), "RectangularHyperbola2")) {
-                ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + DataIPShortCuts::cAlphaArgs(5));
-                ShowContinueError("Curve Type must be RectangularHyperbola2 but was " + CurveManager::GetCurveType(dischargeCurveNum_));
-                errorsFound = true;
+            } else {
+                errorsFound |= CurveManager::CheckCurveDims(
+                    dischargeCurveNum_,   // Curve index
+                    {1},               // Valid dimensions
+                    routineName,       // Routine name
+                    DataIPShortCuts::cCurrentModuleObject,  // Object Type
+                    name_,             // Object Name
+                    DataIPShortCuts::cAlphaFieldNames(5));  // Field Name
             }
 
             if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "Yes")) {
@@ -2976,12 +2982,14 @@ ElectricStorage::ElectricStorage( // main constructor
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + " cannot be blank when " + DataIPShortCuts::cAlphaArgs(6) +
                                       " = Yes. But no entry found.");
                     errorsFound = true;
-                } else if (!UtilityRoutines::SameString(CurveManager::GetCurveType(lifeCurveNum_), "DoubleExponentialDecay")) {
-                    ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                    ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
-                    ShowContinueError("Curve Type must be DoubleExponentialDecay but was " + CurveManager::GetCurveType(lifeCurveNum_));
-                    errorsFound = true;
+                } else {
+                    errorsFound |= CurveManager::CheckCurveDims(
+                        lifeCurveNum_,   // Curve index
+                        {1},               // Valid dimensions
+                        routineName,       // Routine name
+                        DataIPShortCuts::cCurrentModuleObject,  // Object Type
+                        name_,             // Object Name
+                        DataIPShortCuts::cAlphaFieldNames(7));  // Field Name
                 }
 
                 cycleBinNum_ = DataIPShortCuts::rNumericArgs(14);

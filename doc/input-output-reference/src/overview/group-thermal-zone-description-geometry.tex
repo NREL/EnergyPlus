@@ -1105,7 +1105,8 @@ The following window and door objects can be used to specify simple, rectangular
 
 \subsection{Window}\label{window}
 
-The Window object is used to place windows on surfaces that can have windows, including exterior walls, interior walls, interzone walls, roofs, floors that are exposed to outdoor conditions, interzone ceiling/floors. These, of course, can be entered using the simple rectangular objects or the more detailed vertex entry objects.
+The Window object is used to place windows on surfaces that can have windows, including exterior walls, interior walls, interzone walls, roofs, floors that are exposed to outdoor conditions, interzone ceiling/floors. These, of course, can be entered using the simple rectangular objects or the more detailed vertex entry objects. Shades and screens may be applied by referencing this subsurface in a window shading control (ref: WindowShadingControl object). To assign a shade to a window or glass door, see WindowMaterial: Shade. To assign a screen, see WindowMaterial:Screen. To assign a blind, see WindowMaterial:Blind. To assign switchable glazing, such as electrochromic glazing, see WindowShadingControl.
+
 
 \subsubsection{Inputs}\label{inputs-14-016}
 
@@ -1122,10 +1123,6 @@ For windows, if Construction Name is not found among the constructions on the in
 \paragraph{Field: Building Surface Name}\label{field-building-surface-name-000}
 
 This is the name of a surface that contains this subsurface. Certain kinds of surfaces may not be allowed to have subsurfaces. For example, a surface in contact with the ground (e.g., Outside Boundary Condition = Ground) cannot contain a window. The window assumes the outward facing angle as well as the tilt angle of the base surface.
-
-\paragraph{Field: Shading Control Name}\label{field-shading-control-name}
-
-This field, if not blank, is the name of the window shading control (ref: WindowProperty:ShadingControl object) for this subsurface. It is used for Surface Type = Window and GlassDoor. To assign a shade to a window or glass door, see WindowMaterial: Shade. To assign a screen, see WindowMaterial:Screen. To assign a blind, see WindowMaterial:Blind. To assign switchable glazing, such as electrochromic glazing, see WindowProperty:ShadingControl.
 
 \paragraph{Field: Frame and Divider Name}\label{field-frame-and-divider-name}
 
@@ -1217,7 +1214,7 @@ This field is the height of the door in meters.
 
 \subsection{GlazedDoor}\label{glazeddoor}
 
-The GlazedDoor object is used to place doors on surfaces that can have doors, including exterior walls, interior walls, interzone walls, roofs, floors that are exposed to outdoor conditions, interzone ceiling/floors. These, of course, can be entered using the simple rectangular objects or the more detailed vertex entry objects.
+The GlazedDoor object is used to place doors on surfaces that can have doors, including exterior walls, interior walls, interzone walls, roofs, floors that are exposed to outdoor conditions, interzone ceiling/floors. These, of course, can be entered using the simple rectangular objects or the more detailed vertex entry objects. Shades and screens may be applied by referencing this subsurface in a window shading control (ref: WindowShadingControl object). To assign a shade to a window or glass door, see WindowMaterial: Shade. To assign a screen, see WindowMaterial:Screen. To assign a blind, see WindowMaterial:Blind. To assign switchable glazing, such as electrochromic glazing, see WindowShadingControl.
 
 \subsubsection{Inputs}\label{inputs-16-012}
 
@@ -1234,10 +1231,6 @@ For windows, if Construction Name is not found among the constructions on the in
 \paragraph{Field: Building Surface Name}\label{field-building-surface-name-2}
 
 This is the name of a surface that contains this subsurface. Certain kinds of surfaces may not be allowed to have subsurfaces. For example, a surface in contact with the ground (Outside Boundary Condition = Ground) cannot contain a window. The door assumes the outward facing angle as well as the tilt angle of the base surface.
-
-\paragraph{Field: Shading Control Name}\label{field-shading-control-name-1}
-
-This field, if not blank, is the name of the window shading control (ref: WindowProperty:ShadingControl object) for this subsurface. It is used for Surface Type = Window and GlassDoor. To assign a shade to a window or glass door, see WindowMaterial: Shade. To assign a screen, see WindowMaterial:Screen. To assign a blind, see WindowMaterial:Blind. To assign switchable glazing, such as electrochromic glazing, see WindowProperty:ShadingControl.
 
 \paragraph{Field: Frame and Divider Name}\label{field-frame-and-divider-name-1}
 
@@ -1463,7 +1456,6 @@ Examples of the rectangular surfaces are found in the example files 4ZoneWithSha
       Zn001:Wall001:Win001,    !- Name
       SINGLE PANE HW WINDOW,   !- Construction Name
       Zn001:Wall001,           !- Building Surface Name
-      ,                        !- Shading Control Name
       ,                        !- Frame and Divider Name
       1,                       !- Multiplier
       4,                       !- Starting X Coordinate {m}
@@ -1522,7 +1514,6 @@ Examples of the rectangular surfaces are found in the example files 4ZoneWithSha
       Zn002:Wall001:Win001,    !- Name
       SINGLE PANE HW WINDOW,   !- Construction Name
       Zn002:Wall001,           !- Building Surface Name
-      ,                        !- Shading Control Name
       ,                        !- Frame and Divider Name
       1,                       !- Multiplier
       4,                       !- Starting X Coordinate {m}
@@ -2135,7 +2126,7 @@ BuildingSurface:Detailed,Zn001:Wall001,  !- Base Surface Name
 
 \subsection{FenestrationSurface:Detailed}\label{fenestrationsurfacedetailed}
 
-This surface class is used for subsurfaces, which can be of five different types: Windows, Doors, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers. A subsurface (such as a window) of a base surface (such as a wall) inherits several of the properties (such as Outside Boundary Condition, Sun Exposure, etc.) of the base surface. Windows, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers are considered to have one or more glass layers and so transmit solar radiation. Doors are considered to be opaque.
+This surface class is used for subsurfaces, which can be of five different types: Windows, Doors, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers. A subsurface (such as a window) of a base surface (such as a wall) inherits several of the properties (such as Outside Boundary Condition, Sun Exposure, etc.) of the base surface. Windows, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers are considered to have one or more glass layers and so transmit solar radiation. Doors are considered to be opaque. For Surface Type = Window and GlassDoor, shades and screens may be applied by referencing this subsurface in a window shading control (ref: WindowShadingControl object). To assign a shade to a window or glass door, see WindowMaterial: Shade. To assign a screen, see WindowMaterial:Screen. To assign a blind, see WindowMaterial:Blind. To assign switchable glazing, such as electrochromic glazing, see WindowShadingControl.
 
 The surface can be of 3 sides or 4 sides. A 4-sided but non-rectangular fenestration surface is allowed and will be transferred to an equivalent rectangular surface with the same area and aspect ratio for the convection calculations at window air gaps.
 
@@ -2194,10 +2185,6 @@ However, if you do use the reflections option AND you are modeling a Daylighting
 Note 1: The corresponding view factor to the sky for diffuse solar radiation is not a user input; it is calculated within EnergyPlus based on surface orientation, sky solar radiance distribution, and shadowing surfaces.
 
 Note 2: The view factors to the sky and ground for thermal infrared (long-wave) radiation are not user inputs; they are calculated within EnergyPlus based on surface tilt and shadowing surfaces. Shadowing surfaces are considered to have the same emissivity and temperature as the ground, so they are lumped together with the ground in calculating the ground infrared view factor.
-
-\paragraph{Field: Shading Control Name}\label{field-shading-control-name-2}
-
-This field, if not blank, is the name of the window shading control (ref: WindowProperty:ShadingControl object) for this subsurface. It is used for Surface Type = Window and GlassDoor. To assign a shade to a window or glass door, see WindowMaterial: Shade. To assign a screen, see WindowMaterial:Screen. To assign a blind, see WindowMaterial:Blind. To assign switchable glazing, such as electrochromic glazing, see WindowProperty:ShadingControl.
 
 \paragraph{Field: Frame and Divider Name}\label{field-frame-and-divider-name-2}
 
@@ -2266,15 +2253,15 @@ Option & Object/Field or Output Variable & Input File (distributed with install)
 
 Build up a window from \textbf{layers} & Window\-Material:\-Glazing, Window\-Material:-Gas, Window\-Material:\-Shade, Window\-Material:\-Screen, Window\-Material:\-Blind, Construction & Window\-Tests.idf \tabularnewline
 Add an \textbf{overhang} & Shading:\-Zone:\-Detailed & 5Zone\-Air\-Cooled.idf \tabularnewline
-Add a \textbf{shading device} & Window\-Material:\-Shade, Window\-Material:\-Screen or Window\-Material:\-Blind; Window\-Property:\-Shading\-Control & Window\-Tests.idf, Purch\-Air\-Window\-Blind.idf \tabularnewline
-\textbf{Control} a shading device & Window\-Property:\-Shading\-Control & Purch\-Air\-WindowBlind.idf \tabularnewline
+Add a \textbf{shading device} & Window\-Material:\-Shade, Window\-Material:\-Screen or Window\-Material:\-Blind; Window\-Shading\-Control & Window\-Tests.idf, Purch\-Air\-Window\-Blind.idf \tabularnewline
+\textbf{Control} a shading device & Window:\-Shading\-Control & Purch\-Air\-WindowBlind.idf \tabularnewline
 Determine when a shading device is on in a particular timestep & Print the variable ``Surface Shading Device Is On Time Fraction'' & Purch\-Air\-Window\-Blind.idf \tabularnewline
-Control the \textbf{slat angle} of a blind & Window\-Property:\-Shading\-Control & Purch\-Air\-Window\-Blind.idf \tabularnewline
+Control the \textbf{slat angle} of a blind & Window\-Shading\-Control & Purch\-Air\-Window\-Blind.idf \tabularnewline
 Add a \textbf{frame} & Window\-Property:\-FrameAndDivider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Add a \textbf{divider} & Window\-Property:\-Frame\-And\-Divider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Allow window to \textbf{daylight} a zone & Day\-lighting:Controls & Purch\-Air\-With\-Day\-lighting.idf, DElight-\-Detailed-\-Comparison.idf \tabularnewline
 Find \textbf{solar reflected} onto window from neighboring buildings & Building/\-Solar\-Distribution field – uses ``WithReflections'' & Reflective\-Adjacent\-Building.idf \tabularnewline
-Model \textbf{switchable glazing} (e.g., electrochromic glass) & Window\-Property:\-Shading\-Control & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
+Model \textbf{switchable glazing} (e.g., electrochromic glass) & Window\-Shading\-Control & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Add an \textbf{interior window} & Define two Fenestration\-Surface:\-Detailed's, one for each associated interior wall & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
 \textbf{Track} how beam solar falls on interior surfaces & Building/\-Solar Distribution = Full\-Interior\-And\-Exterior & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
 \textbf{Track} beam solar transmitted through interior windows & Building/Solar Distribution = Full\-Interior\-And\-Exterior & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
@@ -4005,13 +3992,13 @@ Shading:Site:Detailed,
   ;     !- Name of glazing construction
 \end{lstlisting}
 
-\subsection{WindowProperty:ShadingControl}\label{windowpropertyshadingcontrol}
+\subsection{WindowShadingControl}\label{windowpropertyshadingcontrol}
 
 Window shading with coverings like drapes, blinds, screens or pull-down shades can be used to reduce the amount of solar radiation entering the window or reduce daylighting glare. It can also be used to reduce heat loss through the window (movable insulation). Leaving the window covering open in the winter can maximize solar heat gain and thereby reduce heating loads.
 
-With WindowProperty:ShadingControl---which is referenced by windows and glass doors (ref: FenestrationSurface:Detailed with Type = Window or GlassDoor)--you specify the type and location of the shading device, what variable or combination of variables controls deployment of the shading device, and what the control setpoint is. If the shading device is a blind, you also specify how the slat angle is controlled.
+With WindowShadingControl you specify the type and location of the shading device, what variable or combination of variables controls deployment of the shading device, and what the control setpoint is. If the shading device is a blind, you also specify how the slat angle is controlled. Each WindowShadingControl object is associated with a zone and has a list of one or more windows and glass doors to which the shading control is applied (ref: FenestrationSurface:Detailed with Type = Window or GlassDoor, Window, and GlazedDoor).
 
-NOTE: WindowProperty:ShadingControl does not work with complex fenestration systems. Controlled complex fenestration systems can be made only with Energy Management Systems objects. Inserting WindowProperty:ShadingControl in FenestrationSurface:Detailed while using complex fenestration systems will be ignored by program.
+NOTE: WindowShadingControl does not work with complex fenestration systems. Controlled complex fenestration systems can be made only with Energy Management Systems objects. Refrencing a FenestrationSurface:Detailed in a WindowShadingControl while using complex fenestration systems will be ignored by program.
 
 As shown in Figure~\ref{fig:allowed-locations-of-a-window-shading-device.}, a shading device can be inside the window (Shading Type = InteriorShade or InteriorBlind), outside the window (Shading Type = ExteriorShade or ExteriorBlind), or between panes of glass (Shading Type = BetweenGlassShade or BetweenGlassBlind). The exception is window screens which can only be outside the window (Shading Type = ExteriorScreen).
 
@@ -4033,7 +4020,7 @@ There are two ways of specifying the actual shading device:
 
 This is the name of a window Construction that has the shading device as one of its layers. The thermal and solar-optical properties of the shading device are given by the shading material referenced in that Construction (ref: Construction, WindowMaterial:Shade, WindowMaterial:Screen and WindowMaterial:Blind). To use this method you have to define two Constructions for the window, one without the shading device and one with it. See Example 1, below.
 
-The Construction without the shading device is referenced in the FenestrationSurface:Detailed input for the window (see IDF example, below). The Construction with the shading device is referenced by the window's WindowProperty:ShadingControl.
+The Construction without the shading device is referenced in the FenestrationSurface:Detailed input for the window (see IDF example, below). The Construction with the shading device is referenced by the window's WindowShadingControl.
 
 For Shading Type = InteriorShade, InteriorBlind, ExteriorShade, ExteriorScreen and ExteriorBlind these two Constructions must be identical expect for the presence of the shading layer in the shaded Construction, otherwise you will get an error message. You will also get an error message if the Construction referenced by the window has a shading layer.
 
@@ -4042,7 +4029,7 @@ For Shading Type = InteriorShade, InteriorBlind, ExteriorShade, ExteriorScreen a
 
 This is the name of a WindowMaterial:Shade, WindowMaterial:Screen or WindowMaterial:Blind. This method can be used with Shading Type = InteriorShade, InteriorBlind, ExteriorShade and ExteriorBlind. It cannot be used with Shading Type = BetweenGlassShade, BetweenGlassBlind, or SwitchableGlazing. If Shading Type = InteriorShade or ExteriorShade, then you specify the name of a WindowMaterial:Shade. If Shading Type = InteriorBlind or ExteriorBlind, then you specify the name of a WindowMaterial:Blind. If Shading Type = ExteriorScreen, then you specify the name of a WindowMaterial:Screen. See Example 2, below. This method is simpler to use since you don't have to specify two Constructions that differ only by the shading layer.
 
-When this method is used, the program will automatically create a shaded window construction by adding a shading layer to the outside or inside of the construction corresponding to the window referencing the WindowProperty:ShadingControl. The name, created by the program, of this shaded construction is composed as follows: if the name of the window construction is CCC and the material name of the shading device is DDD, then the shaded construction name is CCC:DDD:INT for an interior shading device and CCC:DDD:EXT for an exterior shading device.
+When this method is used, the program will automatically create a shaded window construction by adding a shading layer to the outside or inside of the construction corresponding to the windows referenced by the WindowShadingControl. The name, created by the program, of this shaded construction is composed as follows: if the name of the window construction is CCC and the material name of the shading device is DDD, then the shaded construction name is CCC:DDD:INT for an interior shading device and CCC:DDD:EXT for an exterior shading device.
 
 This method is the required if you want to add a shading device to a construction brought in from a WINDOW Data File (ref:Construction:WindowDataFile).
 
@@ -4051,19 +4038,35 @@ Note that if both ``Name of Construction with Shading'' and ``Material Name of S
 
 Most Shading Control Types allow you to specify a schedule that determines when the control is active. One example is a control that is active seasonally. For example, to deploy shading only in the summer when the incident solar is high enough, use Shading Control Type = OnIfHighSolarOnWindow with a schedule that is 1 during the summer months and 0 otherwise and specify Shading Control Is Scheduled = YES.
 
-In addition, most Shading Control Types also allow you to specify that glare control is active in addition to the specified Control Type. For example, you might want to deploy shading when the solar incident on a window is too high OR the glare from the window is too high. This type of joint control requires that the window be in a daylit zone, that the maximum allowed glare be specified in the Daylighting object for the zone, and that Glare Control Is Active = YES in WindowProperty:ShadingControl.
+In addition, most Shading Control Types also allow you to specify that glare control is active in addition to the specified Control Type. For example, you might want to deploy shading when the solar incident on a window is too high OR the glare from the window is too high. This type of joint control requires that the window be in a daylit zone, that the maximum allowed glare be specified in the Daylighting object for the zone, and that Glare Control Is Active = YES in WindowShadingControl.
 
-If Shading Type = InteriorBlind, ExteriorBlind or BetweenGlassBlind you can use WindowProperty:ShadingControl to specify how the slat angle of the blind is controlled when the blind is in place.
+If Shading Type = InteriorBlind, ExteriorBlind or BetweenGlassBlind you can use WindowShadingControl to specify how the slat angle of the blind is controlled when the blind is in place.
 
-A special type of WindowProperty:ShadingControl is SwitchableGlazing. An example is electrochromic glazing in which the transmittance and reflectance of the glass is controlled electronically. For example, you could have electrochromic glazing switch from clear (high transmittance) to dark (low transmittance) to control solar gain. If you choose the Shading Type = SwitchableGlazing option for WindowProperty:ShadingControl, the unswitched (clear) state is specified by the Construction referenced by the window and the switched (dark) state is specified by the Construction referenced by WindowProperty:ShadingControl for that window. For example, if you specify Shading Type = SwitchableGlazing and Shading Control Type = OnIfHighSolarOnWindow, then the glazing will switch to the dark state whenever the solar radiation striking the window exceeds the Setpoint value.
+A special type of WindowShadingControl is SwitchableGlazing. An example is electrochromic glazing in which the transmittance and reflectance of the glass is controlled electronically. For example, you could have electrochromic glazing switch from clear (high transmittance) to dark (low transmittance) to control solar gain. If you choose the Shading Type = SwitchableGlazing option for WindowShadingControl, the unswitched (clear) state is specified by the Construction referenced by the window and the switched (dark) state is specified by the Construction referenced by WindowShadingControl for that window. For example, if you specify Shading Type = SwitchableGlazing and Shading Control Type = OnIfHighSolarOnWindow, then the glazing will switch to the dark state whenever the solar radiation striking the window exceeds the Setpoint value.
 
 For Shading Type = SwitchableGlazing the state of the window is either clear (unswitched) or dark (fully switched) for all Shading Control Types except MeetDaylightIlluminanceSetpoint. In this case, the transmittance of the glazing is adjusted to just meet the daylight illuminance set point at the first daylighting reference point (see Daylighting). This type of control assures that there is just enough solar gain to meet the daylighting requirements in a zone, and no more, thus reducing the cooling load.
+
+To specify the order of when shades are deployed, the two different approaches can be used:
+
+- If shades for each window are independently controlled, than a single WindowShadingControl object should be used and the Multiple Surface Control Type field should be set to Sequential. The windows should be specified in the Fenestration Surface N Name fields in the order that they should be deployed. The Shading Control Sequence Number field is not used being used since only one WindowShadingControl is used so it can be set to any value or left blank.
+
+- If shades for a group of windows are deployed together and shades for another group of windows are deployed after that, than multiple WindowShadingControl objects should be used. Each WindowShadingControl should have Multiple Surface Control Type field should be set to Group and the names of each window in the group should be specified in the Fenestration Surface N Name fields. The Shading Control Sequence Number in the  WindowShadingControl object that controls the first group of shades should be set to 1. The Shading Control Sequence Number in the  WindowShadingControl object that controls the second group of shades should be set to 2. Any number of additional groups of shades can be added and Shading Control Sequence Number can be incremented by one for each group.
+
+It is possible to mix these two approaches. For example, if first a group of shades is controlled together followed by a sequence of individual windows than these approaches can be combined with the Multiple Surface Control Type field should be set to Sequential in the second WindowShadingControl object.
 
 \subsubsection{Inputs}\label{inputs-32-001}
 
 \paragraph{Field: Name}\label{field-name-29-001}
 
-Name of the window shading control. It is referenced by a window (ref: Field: Shading Control Name).
+Name of the window shading control.
+
+\paragraph{Field: Zone Name}\label{field-zone-name-29-001}
+
+Name of the zone where this shading control is used.
+
+\paragraph{Field: Shading Control Sequence Number}\label{shading-control-sequence-number}
+
+If multiple WindowShadingControl objects are used in the same zone, then the order that they deploy the window shades can be set with this field. The first WindowShadingControl should be 1 and subsequent WindowShadingControl should 2, 3, etc. This is usually used when the Multiple Surface Control Type field is set to Group to control groups of windows in a certain order.
 
 \paragraph{Field: Shading Type}\label{field-shading-type}
 
@@ -4123,7 +4126,7 @@ Note: For exterior window screens \emph{AlwaysOn, AlwaysOff, and OnIfScheduleAll
 
 Note: Unlike other Shading Control Types, glare control is active whether or not a schedule is specified.
 
-\emph{MeetDaylightIlluminanceSetpoint}: Used only with ShadingType = SwitchableGlazing in zones with daylighting controls. In this case the transmittance of the glazing is adjusted to just meet the daylight illuminance set point at the first daylighting reference point. Note that the daylight illuminance set point is specified in the Daylighting:Controls object for the Zone; it is not specified as a WindowProperty:ShadingControl SetPoint. When the glare control is active, if meeting the daylight illuminance set point at the first daylighting reference point results in higher discomfort glare index (DGI) than the specified zone's maximum allowable DGI for either of the daylight reference points, the glazing will be further dimmed until the DGI equals the specified maximum allowable value.
+\emph{MeetDaylightIlluminanceSetpoint}: Used only with ShadingType = SwitchableGlazing in zones with daylighting controls. In this case the transmittance of the glazing is adjusted to just meet the daylight illuminance set point at the first daylighting reference point. Note that the daylight illuminance set point is specified in the Daylighting:Controls object for the Zone; it is not specified as a WindowShadingControl SetPoint. When the glare control is active, if meeting the daylight illuminance set point at the first daylighting reference point results in higher discomfort glare index (DGI) than the specified zone's maximum allowable DGI for either of the daylight reference points, the glazing will be further dimmed until the DGI equals the specified maximum allowable value.
 
 The following three control types can be used to reduce zone heating load during the winter by reducing window conductive heat loss at night and leaving the window unshaded during the day to maximize solar gain. They are applicable to any Shading Type except ExteriorScreen but are most appropriate for interior or exterior shades with high insulating value (``movable insulation''). ``Night'' means the sun is down and ``day'' means the sun is up.
 
@@ -4210,11 +4213,27 @@ This is the name of a schedule of slat angles that is used when Type of Slat Ang
 
 Used only as the second setpoint for the following two-setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar
 
+\paragraph{Field: Daylighting Controls Object Name}\label{field-daylighting-controls-object-name}
+
+Name of the Daylighting:Controls object that provides the glare and illuminance control to the zone.
+
+\paragraph{Field: Multiple Surface Control Type}\label{field-multiple-surface-control-type}
+
+The field can have one of two options:
+
+\emph{Sequential}: The following list of fenestration surfaces are controlled individually in the order specified.
+
+\emph{Group}: The entire list of fenestration surfaces is controlled simultaneously, and if glare control is needed, the entire group of window shades are deployed together a the same time.
+
+\paragraph{Field: Fenestration Surface <n> Name}\label{field-fenestration-surface1-name}
+
+The name of a FenestrationSurface:Detailed, Window, or GlazedDoor object controlled by this WindowShadingControl. This field can be repeated to apply the same shading control to more than one fenestration surface. When Multiple Surface Control Type is set to Sequential, the order of the Fenestration Surface Names is the order that the shades will be deployed. The object is extensible so that additional fields of fenestration surface names can be added to the object. All of the fenestration surfaces must be either in the zone specified in the Zone Name field or in an adjacent zone connected by an interior window.
+
 An IDF example: window with interior roll shade that is deployed when solar incident on the window exceeds 50 W/m\(^{2}\).
 
 \begin{lstlisting}
 ! Example 1: Interior movable shade specified by giving name of shaded construction
-! in WindowProperty:ShadingControl
+! in WindowShadingControl
 
 WindowMaterial:Glazing, GLASS - CLEAR SHEET 1 / 8 IN,  !- Material Name
        SpectralAverage,! Optical data type {SpectralAverage or Spectral}
@@ -4253,7 +4272,10 @@ Construction, SINGLE PANE WITH INT SHADE, ! Name of construction with shade
        GLASS - CLEAR SHEET 1 / 8 IN,  !- First material layer
        ROLL SHADE                  ;  !- Second material layer
 
-WindowProperty:ShadingControl, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Control
+WindowShadingControl, 
+       CONTROL ON INCIDENT SOLAR,    !- Name
+       West Zone,                    !- Zone Name
+       1,                            !- Shading Control Sequence Number
        InteriorShade,                !- Shading Type
        SINGLE PANE WITH INT SHADE,   !- Name of construction with shading device
        OnIfHighSolarOnWindow,        !- Shading Control Type
@@ -4263,15 +4285,19 @@ WindowProperty:ShadingControl, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Co
        NO,                           !- Glare Control Is Active
        ,                             !- Material Name of Shading Device
        ,                             !- Type of Slat Angle Control for Blinds
-       ;                             !- Slat Angle Schedule Name
+       ,                             !- Slat Angle Schedule Name
+       ,                             !- Setpoint 2 {W/m2 or deg C}
+       West Zone_DaylCtrl,           !- Daylighting Control Object Name
+       Sequential,                   !- Multiple Surface Control Type
+       Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name
 
-FenestrationSurface:Detailed, Zn001:Wall001:Win001,  !- SubSurface Name
+FenestrationSurface:Detailed, 
+       Zn001:Wall001:Win001,         !- SubSurface Name
        Window                   ,    !- Class
        SINGLE PANE WITH NO SHADE,    !- Name of construction without shading device
        Zn001:Wall001            ,    !- Base Surface Name
        ,                             !- Target
        0.5000000                ,    !- VF to Ground
-       CONTROL ON INCIDENT SOLAR,    !- Window Shading Control name
        ,                             !- Frame/Divider name
        1.0                      ,    !- Multiplier
        4                        ,    !- Number of vertices (assumed rectangular)
@@ -4282,7 +4308,7 @@ FenestrationSurface:Detailed, Zn001:Wall001:Win001,  !- SubSurface Name
 \end{lstlisting}
 
 \begin{lstlisting}
-! Example 2: Interior movable shade specified by giving name of shading device in WindowProperty:ShadingControl
+! Example 2: Interior movable shade specified by giving name of shading device in WindowShadingControl
 
 WindowMaterial:Glazing, GLASS - CLEAR SHEET 1 / 8 IN,  !- Material Name
        SpectralAverage,! Optical data type {SpectralAverage or Spectral}
@@ -4317,7 +4343,10 @@ WindowMaterial:Shade, ROLL SHADE,  !- Material Name
 Construction, SINGLE PANE WITH NO SHADE,  ! Name of construction without shade
        GLASS - CLEAR SHEET 1 / 8 IN;  !- First material layer
 
-WINDOWPROPERTY:SHADINGCONTROL, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Control
+WindowShadingControl, 
+       CONTROL ON INCIDENT SOLAR,    !- Name
+       West Zone,                    !- Zone Name
+       1,                            !- Shading Control Sequence Number
        InteriorShade,                !- Shading Type
        ,                             !- Name of shaded construction
        OnIfHighSolarOnWindow,        !- Shading Control Type
@@ -4327,15 +4356,19 @@ WINDOWPROPERTY:SHADINGCONTROL, CONTROL ON INCIDENT SOLAR,  !- Name of Shading Co
        NO,                           !- Glare Control Is Active
        ROLL SHADE,                   !- Material Name of Shading Device
        ,                             !- Type of Slat Angle Control for Blinds
-       ;                             !- Slat Angle Schedule Name
+       ,                             !- Slat Angle Schedule Name
+       ,                             !- Setpoint 2 {W/m2 or deg C}
+       West Zone_DaylCtrl,           !- Daylighting Control Object Name
+       Sequential,                   !- Multiple Surface Control Type
+       Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name
 
-FenestrationSurface:Detailed, Zn001:Wall001:Win001,  !- SubSurface Name
+FenestrationSurface:Detailed, 
+       Zn001:Wall001:Win001,         !- SubSurface Name
        Window                   ,    !- Class
        SINGLE PANE WITH NO SHADE,    !- Name of construction without shade
        Zn001:Wall001            ,    !- Base Surface Name
        ,                             !- Target
        0.5000000                ,    !- VF to Ground
-       CONTROL ON INCIDENT SOLAR,    !- Window Shading Control name
        ,                             !- Frame/Divider name
        1.0                      ,    !- Multiplier
        4                        ,    !- Number of vertices (assumed rectangular)
@@ -4718,7 +4751,7 @@ This is the name of a window (or glass door) to which the storm glass is applied
 \item
   The window construction (without the storm glass layer) can have up to three glass layers.
 \item
-  If the window has an associated shaded construction (ref: WindowProperty:ShadingControl), that construction can have an interior shade or blind and up to three glass layers, or a between-glass shade or blind and two glass layers. The shaded construction cannot have an exterior shade or blind, cannot have a between-glass shade or blind and three glass layers, and cannot be switchable glazing.
+  If the window has an associated shaded construction (ref: WindowShadingControl), that construction can have an interior shade or blind and up to three glass layers, or a between-glass shade or blind and two glass layers. The shaded construction cannot have an exterior shade or blind, cannot have a between-glass shade or blind and three glass layers, and cannot be switchable glazing.
 \item
   The window cannot be an airflow window, i.e., a window that has an associated WindowProperty:AirflowControl.
 \end{itemize}

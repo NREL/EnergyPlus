@@ -136,8 +136,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -149,8 +151,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -874,7 +878,6 @@
     Living:North,            !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -890,7 +893,6 @@
     Living:East,             !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -906,7 +908,6 @@
     Living:South,            !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -922,7 +923,6 @@
     Living:West,             !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1944,7 +1944,7 @@
     0.81,                    !- Speed 1 Gross Rated Sensible Heat Ratio
     4.32,                    !- Speed 1 Gross Rated Cooling COP {W/W}
     0.6135,                  !- Speed 1 Rated Air Flow Rate {m3/s}
-    573.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    573.3,                   !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACCoolCapFT Speed 1,   !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     HPACCoolCapFF Speed 1,   !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     HPACCOOLEIRFT Speed 1,   !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -1963,7 +1963,7 @@
     0.758,                   !- Speed 2 Gross Rated Sensible Heat Ratio
     3.98,                    !- Speed 2 Gross Rated Cooling COP {W/W}
     0.7551,                  !- Speed 2 Rated Air Flow Rate {m3/s}
-    673.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    673.3,                   !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACCoolCapFT Speed 2,   !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     HPACCoolCapFF Speed 2,   !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     HPACCOOLEIRFT Speed 2,   !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
