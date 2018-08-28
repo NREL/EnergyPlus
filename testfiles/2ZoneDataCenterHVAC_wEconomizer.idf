@@ -142,8 +142,10 @@
     WinterSeasonDay,         !- Name
     1,                       !- Begin Month
     12,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -155,8 +157,10 @@
     SpringSeasonDay,         !- Name
     4,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     4,                       !- End Month
     16,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -168,8 +172,10 @@
     SummerSeasonDay,         !- Name
     7,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     16,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -181,8 +187,10 @@
     AutumnSeasonDay,         !- Name
     10,                      !- Begin Month
     12,                      !- Begin Day of Month
+    ,                        !- Begin Year
     10,                      !- End Month
     16,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -2751,7 +2759,7 @@
   ElectricEquipment:ITE:AirCooled,
     WestDataCenter_Equip,    !- Name
     West Zone,               !- Zone Name
-    FlowFromSystem,
+    FlowFromSystem,          !- Air Flow Calculation Method
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
     ,                        !- Number of Units
@@ -2892,7 +2900,7 @@
   ElectricEquipment:ITE:AirCooled,
     EastDataCenter_Equip,    !- Name
     East Zone,               !- Zone Name
-    FlowControlWithApproachTemperatures, !- Air Flow Caclulation Method
+    FlowControlWithApproachTemperatures,  !- Air Flow Calculation Method
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
     ,                        !- Number of Units
@@ -2918,10 +2926,10 @@
     ITE-CPU,                 !- CPU End-Use Subcategory
     ITE-Fans,                !- Fan End-Use Subcategory
     ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
-    2,                       !- field Supply Approach Temperature
-    ,                        !- field Supply Approach Temperature Schedule
-    0,                      !- field Return Approach Temperature 
-    ;                        !- field Return Approach Temperature Schedule
+    2,                       !- Supply Temperature Difference {deltaC}
+    ,                        !- Supply Temperature Difference Schedule
+    0,                       !- Return Temperature Difference {deltaC}
+    ;                        !- Return Temperature Difference Schedule
 
   Schedule:Compact,
     LIGHTS-1,                !- Name

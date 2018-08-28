@@ -19,7 +19,7 @@ The following is a list of life-cycle costing related objects that provide a way
   LifeCycleCost:UseAdjustment
 \end{itemize}
 
-The utility costs (see UtilityCost:Tariff) and first costs (see ComponentCost:LineItem) are~ calculated by EnergyPlus are used along with other current and future costs input using the LifeCycleCost:RecurringCosts and LifeCycleCost:NonrecurringCost objects and these are combined these into the present value life-cycle cost metric. The LifeCycleCost:Parameters object establishes the set of assumptions for the analysis along with LifeCycleCost:UsePriceEscalation (often from a DataSet) and LifeCycleCost:UseAdjustment.
+The utility costs (see UtilityCost:Tariff) and first costs (see ComponentCost:LineItem) are~ calculated by EnergyPlus are used along with other current and future costs input using the LifeCycleCost:RecurringCosts and LifeCycleCost:NonrecurringCost objects and these are combined into the present value life-cycle cost metric. The LifeCycleCost:Parameters object establishes the set of assumptions for the analysis along with LifeCycleCost:UsePriceEscalation (often from a DataSet) and LifeCycleCost:UseAdjustment.
 
 It is important to understand that the comparison of different simulation results and their present values is not performed by EnergyPlus. Instead, EnergyPlus provides the present value calculations for a specific simulation combining the energy costs, first costs, and future costs and you need to make the comparison between the results of multiple simulations.
 

@@ -24,8 +24,10 @@
     ,                        !- Name
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     4,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     ,                        !- Day of Week for Start Day
     ,                        !- Use Weather File Holidays and Special Days
     ,                        !- Use Weather File Daylight Saving Period
@@ -611,7 +613,6 @@
     1fNY1vx3jAvesY6geZTgIV1KacGhEwLAJhAz_9iQZZ23>EWF0,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -715,7 +716,6 @@
     3i2eFc1ofBz80jvIMxrXvL1KacGhEwLAJhAz_9iQZZ23>EWF0,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices

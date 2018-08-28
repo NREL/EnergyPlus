@@ -58,6 +58,7 @@
 #include <DataGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataSurfaces.hh>
+#include <OutputReports.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
 #include <WeatherManager.hh>
@@ -78,9 +79,11 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
         "RunPeriod,",
         ",                        !- Name",
         "2,                       !- Begin Month",
-        "27,                       !- Begin Day of Month",
-        "3,                      !- End Month",
-        "3,                      !- End Day of Month",
+        "27,                      !- Begin Day of Month",
+        ",                        !- Begin Year",
+        "3,                       !- End Month",
+        "3,                       !- End Day of Month",
+        ",                        !- End Year",
         "Tuesday,                 !- Day of Week for Start Day",
         "Yes,                     !- Use Weather File Holidays and Special Days",
         "Yes,                     !- Use Weather File Daylight Saving Period",
@@ -341,4 +344,278 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients)
     EXPECT_NEAR(1993.771, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 90.0), 0.01);
     EXPECT_NEAR(1882.294, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 120.0), 0.01);
     EXPECT_NEAR(1800.136, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 150.0), 0.01);
+}
+
+TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
+{
+    using DataEnvironment::DayOfYear;
+    using DataEnvironment::Latitude;
+    using DataEnvironment::WaterMainsTemp;
+    using WeatherManager::OADryBulbAverage;
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile,  !- Calculation Method",
+        "   ,                            !- Temperature Schedule Name",
+        "   9.99,                        !- Annual Average Outdoor Air Temperature {C}",
+        "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    // for calculation method CorrelationFromWeatherFile these parameters are ignored
+    EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    // set water mains parameters for CorrelationFromWeatherFile method
+    OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
+    OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
+    OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+    DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
+
+    // January 15th water mains temperature test
+    DataEnvironment::DayOfYear = 15; // January 15th
+    WeatherManager::CalcWaterMainsTemp();
+    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.5145, 0.0001);
+
+    // July 15th water mains temperature test
+    DataEnvironment::DayOfYear = 196; // July 15th
+    WeatherManager::CalcWaterMainsTemp();
+    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.0452, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
+{
+    using DataEnvironment::DayOfYear;
+    using DataEnvironment::Latitude;
+    using DataEnvironment::WaterMainsTemp;
+    using WeatherManager::OADryBulbAverage;
+
+    int AnnualNumberOfDays(0);
+    Real64 MonthlyDailyDryBulbMin(0.0);
+    Real64 MonthlyDailyDryBulbMax(0.0);
+    Real64 AnnualDailyAverageDryBulbTempSum(0.0);
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile,  !- Calculation Method",
+        "   ,                            !- Temperature Schedule Name",
+        "   9.99,                        !- Annual Average Outdoor Air Temperature {C}",
+        "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    // for calculation method CorrelationFromWeatherFile these parameters are ignored
+    EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    Array1D<Real64> MonthlyDryBulbTempFromStatFile(12, {-4.60, -2.50, 3.80, 10.00, 15.30, 21.10, 24.10, 21.80, 18.10, 11.00, 4.70, -3.70});
+    OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyDryBulbTempFromStatFile;
+
+    // calc water mains parameters for CorrelationFromWeatherFile method
+    for (int i = 1; i <= 12; ++i) {
+        AnnualDailyAverageDryBulbTempSum += OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i) * EndDayOfMonth(i);
+        MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i));
+        MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i));
+        AnnualNumberOfDays += EndDayOfMonth(i);
+    }
+    OADryBulbAverage.AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
+    OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
+    // check results
+    EXPECT_NEAR(OADryBulbAverage.AnnualAvgOADryBulbTemp, 9.9882, 0.0001);
+    EXPECT_NEAR(OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 28.7000, 0.0001);
+
+    // test water mains temperature
+    // WeatherManager::WaterMainsTempsMethod = WeatherManager::CorrelationFromWeatherFileMethod;
+    OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+    DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
+
+    // January 21st water mains temperature test
+    DataEnvironment::DayOfYear = 21; // January 21st
+    WeatherManager::CalcWaterMainsTemp();
+    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.23463, 0.00001);
+
+    // July 21st water mains temperature test
+    DataEnvironment::DayOfYear = 202; // July 21st
+    WeatherManager::CalcWaterMainsTemp();
+    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.33812, 0.00001);
+}
+TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest)
+{
+
+    using DataEnvironment::WaterMainsTemp;
+    using WeatherManager::OADryBulbAverage;
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile,  !- Calculation Method",
+        "   ,                            !- Temperature Schedule Name",
+        "   9.99,                        !- Annual Average Outdoor Air Temperature {C}",
+        "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    // for calculation method CorrelationFromWeatherFile these two parameters are ignored
+    EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    DataGlobals::OutputFileInits = GetNewUnitNumber();
+    // set water mains temp parameters for CorrelationFromWeatherFile method
+    OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
+    OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
+    OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+
+    // report water mains parameters to eio file
+    WeatherManager::ReportWaterMainsTempParameters();
+
+    std::string const eiooutput = delimited_string({"! <Site Water Mains Temperature Information>,"
+                                                    "Calculation Method{},"
+                                                    "Water Mains Temperature Schedule Name{},"
+                                                    "Annual Average Outdoor Air Temperature{C},"
+                                                    "Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC},"
+                                                    "Fixed Default Water Mains Temperature{C}",
+                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,NA,9.99,28.78,NA"});
+
+    EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+}
+TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
+{
+    std::string const idf_objects = delimited_string({
+        "  Version,9.0;",
+
+        "  SizingPeriod:DesignDay,",
+        "    Atlanta Jan 21 cooling,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    16.9,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    11.6,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+        "    13.2,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    8,                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    97620,                   !- Barometric Pressure {Pa}",
+        "    0.0,                     !- Wind Speed {m/s}",
+        "    0.0,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAETau2017,           !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    0.325,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    2.461;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+
+        "  SizingPeriod:DesignDay,",
+        "    Atlanta Jul 21 cooling,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    33.3,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    11.5,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+        "    23.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    3.5,                     !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    97620,                   !- Barometric Pressure {Pa}",
+        "    0.0,                     !- Wind Speed {m/s}",
+        "    0.0,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAETau2017,           !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    .556,                    !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    1.779;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    DataEnvironment::TotDesDays = 2;
+    // setup environment state
+    Environment.allocate(DataEnvironment::TotDesDays);
+    DesignDay.allocate(DataEnvironment::TotDesDays);
+    Environment(1).DesignDayNum = 1;
+    Environment(2).DesignDayNum = 2;
+    GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    // init local variables
+    Real64 ETR = 1367.0;
+    Real64 BeamRad(0.0);
+    Real64 DiffRad(0.0);
+    Real64 GloHorzRad(0.0);
+
+    // EnvrnNum = 1 uses Tau values of January
+    int EnvrnNum = 1;
+    Real64 CosZenith = 1.0; // assumed zero zenith angle
+    Real64 TauB = DesDayInput(EnvrnNum).TauB;
+    Real64 TauD = DesDayInput(EnvrnNum).TauD;
+    // check tau values
+    EXPECT_EQ(4, DesDayInput(EnvrnNum).SolarModel);
+    EXPECT_EQ(0.325, TauB);
+    EXPECT_EQ(2.461, TauD);
+    // calc expected values for environment 1
+    Real64 AB = 1.454 - 0.406 * TauB - 0.268 * TauD + 0.021 * TauB * TauD;
+    Real64 AD = 0.507 + 0.205 * TauB - 0.080 * TauD - 0.190 * TauB * TauD;
+    Real64 M = AirMass(CosZenith);
+    Real64 expectedIDirN = ETR * std::exp(-TauB * std::pow(M, AB));
+    Real64 expectedIDifH = ETR * std::exp(-TauD * std::pow(M, AD));
+    Real64 expectedIGlbH = expectedIDirN * CosZenith + expectedIDifH;
+    // calc TauModel
+    ASHRAETauModel(DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
+    // check the coefficients are correctly applied
+    EXPECT_EQ(expectedIDirN, BeamRad);
+    EXPECT_EQ(expectedIDifH, DiffRad);
+    EXPECT_EQ(expectedIGlbH, GloHorzRad);
+
+    // EnvrnNum = 2 uses Tau values of July
+    EnvrnNum = 2;
+    CosZenith = 1.0; // assumed zero zenith angle
+    TauB = DesDayInput(EnvrnNum).TauB;
+    TauD = DesDayInput(EnvrnNum).TauD;
+    // check tau values
+    EXPECT_EQ(0.556, TauB);
+    EXPECT_EQ(1.779, TauD);
+    // calc expected values for environment 2
+    AB = 1.454 - 0.406 * TauB - 0.268 * TauD + 0.021 * TauB * TauD;
+    AD = 0.507 + 0.205 * TauB - 0.080 * TauD - 0.190 * TauB * TauD;
+    M = AirMass(CosZenith);
+    expectedIDirN = ETR * std::exp(-TauB * std::pow(M, AB));
+    expectedIDifH = ETR * std::exp(-TauD * std::pow(M, AD));
+    expectedIGlbH = expectedIDirN * CosZenith + expectedIDifH;
+    // reset the arguments to zero
+    BeamRad = 0.0;
+    DiffRad = 0.0;
+    GloHorzRad = 0.0;
+    // calc TauModel
+    ASHRAETauModel(DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
+    // check the coefficients are correctly applied
+    EXPECT_EQ(expectedIDirN, BeamRad);
+    EXPECT_EQ(expectedIDifH, DiffRad);
+    EXPECT_EQ(expectedIGlbH, GloHorzRad);
 }

@@ -737,8 +737,8 @@ namespace DataHeatBalance {
     Array4D_int BackSurfaces;  // For a given hour and timestep, a list of up to 20 surfaces receiving
     // beam solar radiation from a given exterior window
     Array4D<Real64> OverlapAreas; // For a given hour and timestep, the areas of the exterior window sending
-    // beam solar radiation to the surfaces listed in BackSurfaces
-    //                       Air       Argon     Krypton   Xenon
+                                  // beam solar radiation to the surfaces listed in BackSurfaces
+                                  //                       Air       Argon     Krypton   Xenon
     Array2D<Real64> const GasCoeffsCon(
         3,
         10,
@@ -2366,6 +2366,21 @@ namespace DataHeatBalance {
         return NominalUwithConvCoeffs;
     }
 
+    bool ConstructionData::isGlazingConstruction() const
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   September 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Commonly used routine in several places in EnergyPlus which examines if current
+        // construcdtion is glazing construction
+        auto const MaterialGroup = Material(LayerPoint(1)).Group;
+        return MaterialGroup == WindowGlass || MaterialGroup == Shade || MaterialGroup == Screen || MaterialGroup == WindowBlind ||
+               MaterialGroup == WindowSimpleGlazing;
+    }
     void SetFlagForWindowConstructionWithShadeOrBlindLayer()
     {
 
@@ -2413,7 +2428,7 @@ namespace DataHeatBalance {
 
             if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
-            if (Surface(loopSurfNum).WindowShadingControlPtr == 0) continue;
+            if (!Surface(loopSurfNum).HasShadeControl) continue;
             if (SurfaceWindow(loopSurfNum).ShadedConstruction == 0) continue;
 
             ConstrNum = SurfaceWindow(loopSurfNum).ShadedConstruction;

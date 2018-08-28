@@ -121,7 +121,7 @@ For each air loop, loop over all the branches in the loop. Initialize each branc
 {\dot m_{br,\min }} = {\rho_{std}} \cdot {\dot V_{br,\min }}
 \end{equation}
 
-where \({\rho_{std}}\) ~is the density of air at 20 degrees C, humidity ratio = 0, standard pressure.
+where \({\rho_{std}}\) is the density of air at 20 degrees C, humidity ratio = 0, standard pressure.
 
 For each branch, loop over all the nodes on the branch and set the node data to the following values:
 
@@ -169,7 +169,7 @@ For each branch, loop over all the nodes on the branch and set the node data to 
 Q{u_{node}} = 0.0
 \end{equation}
 
-where \({W_{oa}}\) ~is the humidity ratio of the outside air; \({\rm{PsyHFnTdbW}}\) is the EnergyPlus psychrometric function for enthalpy \emph{h}, given temperature and humidity ratio; and \emph{Qu} is quality.
+where \({W_{oa}}\) is the humidity ratio of the outside air; \({\rm{PsyHFnTdbW}}\) is the EnergyPlus psychrometric function for enthalpy \emph{h}, given temperature and humidity ratio; and \emph{Qu} is quality.
 
 \subsubsection{System Time Step Initializations}\label{system-time-step-initializations}
 
@@ -208,8 +208,8 @@ During and at the end of each loop some tests are performed.
 
 At the end of the first pass of loop 2, a decision is made on whether a second pass is needed. The first pass has been performed assuming that there is a mass flow balance in the central air system simulation. This is usually the case. A call to \emph{ResolveSysFlow} checks the mass balance and imposes a mass balance if there is not a balance. The lack of a system mass balance requires a resimulation of the central air system: i.e., a second pass in loop 2.
 
-In loop 3 a call to \emph{ManageControllers} simulates controller action and checks for controller convergence. If convergence is achieved loop 3 is exited.
+In loop 3, a call to \emph{ManageControllers} simulates controller action and checks for controller convergence. If convergence is achieved loop 3 is exited.
 
-After all the controllers on a loop are converged,~ steps 5 \& 6 are repeated one more time to ensure all the components on the loop have final values.
+After all the controllers on a loop are converged, steps 5 \& 6 are repeated one more time to ensure all the components on the loop have final values.
 
 At the end of the primary air system simulation a call to \emph{UpdateHVACInterface} passes the primary air system outlet node data to the zone equipment inlet nodes. If the data across the supply side -- demand side gap doesn't match to within a preset tolerance, the flag \emph{SimZoneEquipment} is set to \emph{true} to ensure that the zone equipment side gets resimulated. Finally a flag indicating whether the economizer is active is set. This flag is used at a higher level to decide whether the primary air system needs to be resimulated if an HVAC component is calling for economizer lockout.

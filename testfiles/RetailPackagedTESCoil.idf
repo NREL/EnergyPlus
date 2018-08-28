@@ -64,15 +64,16 @@
     RunPeriod 1,             !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Monday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1.0000;                  !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
 ! ***HOLIDAYS & DAYLIGHT SAVINGS***
 
@@ -1189,7 +1190,6 @@
     Front_Entry_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1205,7 +1205,6 @@
     Front_Retail_Wall_South, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1221,7 +1220,6 @@
     Point_Of_Sale_Wall_South,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -5874,7 +5872,7 @@
     CoolCharge-Charge-Cap-fT,!- Name
     LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
     4,                       !- Number of Interpolation Points
-    TriQuadratic,            !- Curve Type
+    ,                        !- Curve Type
     SingleLineIndependentVariableWithMatrix,  !- Table Data Format
     ,                        !- External File Name
     Ascending,               !- X1 Sort Order
@@ -5891,8 +5889,8 @@
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
     ,                        !- Minimum Value of X6
-    ,                        !- Maximum Value of X6 
-	0.5,                     !- Minimum Table Output
+    ,                        !- Maximum Value of X6
+    0.5,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
     Temperature,             !- Input Unit Type for X2
@@ -6427,7 +6425,7 @@
     CoolCharge-Charge-EIR-fT,!- Name
     LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
     4,                       !- Number of Interpolation Points
-    TriQuadratic,            !- Curve Type
+    ,                        !- Curve Type
     SingleLineIndependentVariableWithMatrix,  !- Table Data Format
     ,                        !- External File Name
     Ascending,               !- X1 Sort Order

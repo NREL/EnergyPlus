@@ -788,6 +788,8 @@ namespace SurfaceGeometry {
         BmToDiffReflFacObs.dimension(TotSurfaces, 0.0);
         BmToDiffReflFacGnd.dimension(TotSurfaces, 0.0);
         AWinSurf.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
+        AWinSurfDiffFront.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
+        AWinSurfDiffBack.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
         AWinCFOverlap.dimension(MaxSolidWinLayers, TotSurfaces, 0.0);
     }
 
@@ -947,12 +949,10 @@ namespace SurfaceGeometry {
         int OpaqueHTSurfsWithWin; // Number of floors, walls and roofs with windows in a zone
         int InternalMassSurfs;    // Number of internal mass surfaces in a zone
         static bool RelWarning(false);
-        int ConstrNumSh;               // Shaded construction number for a window
-        int LayNumOutside;             // Outside material numbers for a shaded construction
-        int BlNum;                     // Blind number
-        bool WinShadingCtrlReferenced; // True if a WindowShadingControl is referenced by at least one window
-        int ShadingCtrl;               // WindowShadingControl number
-        int AddedSubSurfaces;          // Subsurfaces (windows) added when windows reference Window5 Data File
+        int ConstrNumSh;      // Shaded construction number for a window
+        int LayNumOutside;    // Outside material numbers for a shaded construction
+        int BlNum;            // Blind number
+        int AddedSubSurfaces; // Subsurfaces (windows) added when windows reference Window5 Data File
         // entries with two glazing systems
         int NeedToAddSurfaces;    // Surfaces that will be added due to "unentered" other zone surface
         int NeedToAddSubSurfaces; // SubSurfaces that will be added due to "unentered" other zone surface
@@ -1887,7 +1887,7 @@ namespace SurfaceGeometry {
 
                 // TH 2/9/2010. Fixed for CR 8010 for speed up purpose rather than fixing the problem
                 WinShadingControlPtr = Surface(SurfNum).WindowShadingControlPtr;
-                if (WinShadingControlPtr != 0) {
+                if (Surface(SurfNum).HasShadeControl) {
                     if (WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle)
                         SurfaceWindow(SurfNum).MovableSlats = true;
                     // for a constant schedule of slat angle, it acts the same way as fixed angle
@@ -1937,7 +1937,7 @@ namespace SurfaceGeometry {
 
                     if (errFlag) {
                         ErrorsFound = true;
-                        ShowContinueError("WindowProperty:ShadingControl " + WindowShadingControl(WinShadingControlPtr).Name +
+                        ShowContinueError("WindowShadingControl " + WindowShadingControl(WinShadingControlPtr).Name +
                                           " has errors, program will terminate.");
                     }
 
@@ -1953,18 +1953,8 @@ namespace SurfaceGeometry {
 
             } // End of surface loop
 
-            // Warning if a WindowShadingControl is not referenced by any window; user may think
-            // window shading is occurring when it really isn't
-            for (ShadingCtrl = 1; ShadingCtrl <= TotWinShadingControl; ++ShadingCtrl) {
-                WinShadingCtrlReferenced = false;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                    if (Surface(SurfNum).WindowShadingControlPtr == ShadingCtrl) WinShadingCtrlReferenced = true;
-                }
-                if (!WinShadingCtrlReferenced) {
-                    ShowWarningError(RoutineName + "WindowProperty:ShadingControl: \"" + WindowShadingControl(ShadingCtrl).Name +
-                                     "\" is not referenced by any window.");
-                }
-            }
+            // final associate fenestration surfaces referenced in WindowShadingControl
+            FinalAssociateWindowShadingControlFenestration(ErrorsFound);
         }
 
         // Check for zones with not enough surfaces
@@ -3844,13 +3834,7 @@ namespace SurfaceGeometry {
         //        \minimum 0.0
         //        \maximum 1.0
         //        \default autocalculate
-        //   A6, \field Shading Control Name
-        //        \note enter the name of a WindowProperty:ShadingControl object
-        //        \type object-list
-        //        \object-list WindowShadeControlNames
-        //        \note used for windows and glass doors only
-        //        \note If not specified, window or glass door has no shading (blind, roller shade, etc.)
-        //   A7, \field Frame and Divider Name
+        //   A6, \field Frame and Divider Name
         //        \note Enter the name of a WindowProperty:FrameAndDivider object
         //        \type object-list
         //        \object-list WindowFrameAndDividerNames
@@ -3896,9 +3880,9 @@ namespace SurfaceGeometry {
         cCurrentModuleObject = "FenestrationSurface:Detailed";
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
 
-        if (SurfaceNumAlpha != 7) {
+        if (SurfaceNumAlpha != 6) {
             ShowSevereError(cCurrentModuleObject +
-                            ": Object Definition indicates not = 7 Alpha Objects, Number Indicated=" + TrimSigDigits(SurfaceNumAlpha));
+                            ": Object Definition indicates not = 6 Alpha Objects, Number Indicated=" + TrimSigDigits(SurfaceNumAlpha));
             ErrorsFound = true;
         }
 
@@ -4108,6 +4092,7 @@ namespace SurfaceGeometry {
 
             CheckConvexity(SurfNum, SurfaceTmp(SurfNum).Sides);
             SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
+            SurfaceTmp(SurfNum).HasShadeControl = false;
 
             if (SurfaceTmp(SurfNum).Class == SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass_GlassDoor ||
                 SurfaceTmp(SurfNum).Class == SurfaceClass_TDD_Diffuser || SurfaceTmp(SurfNum).Class == SurfaceClass_TDD_Dome) {
@@ -4130,41 +4115,14 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
 
-                if (!cAlphaArgs(6).empty()) {
-                    if (TotWinShadingControl > 0) {
-                        SurfaceTmp(SurfNum).WindowShadingControlPtr =
-                            UtilityRoutines::FindItemInList(cAlphaArgs(6), WindowShadingControl, TotWinShadingControl);
-                    }
-                    if (SurfaceTmp(SurfNum).WindowShadingControlPtr == 0) {
-                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(6) + "=\"" +
-                                        cAlphaArgs(6) + "\".");
-                        ErrorsFound = true;
-                    }
+                InitialAssociateWindowShadingControlFenestration(ErrorsFound, SurfNum);
 
-                    // Error if this is not an exterior window and shading device has been specified
-                    // PETER: should doors be disallowed too?
-                    if (SurfaceTmp(SurfNum).WindowShadingControlPtr > 0 && SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
-
-                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(6) +
-                                        " because it is not an exterior window.");
-                        ErrorsFound = true;
-
-                    } else if (Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL && SurfaceTmp(SurfNum).WindowShadingControlPtr > 0) {
-
-                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(6) + "=\"" +
-                                        cAlphaArgs(6) + "\".");
-                        ShowContinueError(".. equivalent layer window model does not use shading control object.");
-                        ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
-                        SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
-                    }
-                }
-
-                CheckWindowShadingControlFrameDivider("GetHTSubSurfaceData", ErrorsFound, SurfNum, 7);
+                CheckWindowShadingControlFrameDivider("GetHTSubSurfaceData", ErrorsFound, SurfNum, 6);
 
                 if (SurfaceTmp(SurfNum).Sides == 3) { // Triangular window
-                    if (!cAlphaArgs(7).empty()) {
-                        ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(7) + "=\"" +
-                                         cAlphaArgs(7) + "\".");
+                    if (!cAlphaArgs(6).empty()) {
+                        ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(6) + "=\"" +
+                                         cAlphaArgs(6) + "\".");
                         ShowContinueError(".. because it is a triangular window and cannot have a frame or divider or reveal reflection.");
                         ShowContinueError("Frame, divider and reveal reflection will be ignored for this window.");
                     }
@@ -4450,6 +4408,8 @@ namespace SurfaceGeometry {
                 }
 
                 SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
+                SurfaceTmp(SurfNum).HasShadeControl = false;
+                InitialAssociateWindowShadingControlFenestration(ErrorsFound, SurfNum);
 
                 if (!GettingIZSurfaces && (SurfaceTmp(SurfNum).Class == SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass_GlassDoor)) {
 
@@ -4463,27 +4423,6 @@ namespace SurfaceGeometry {
                         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                         "\", Exterior boundary condition = Ground is not be allowed with windows.");
                         ErrorsFound = true;
-                    }
-
-                    if (!cAlphaArgs(WindowShadingField).empty()) {
-                        if (TotWinShadingControl > 0) {
-                            SurfaceTmp(SurfNum).WindowShadingControlPtr =
-                                UtilityRoutines::FindItemInList(cAlphaArgs(WindowShadingField), WindowShadingControl, TotWinShadingControl);
-                        }
-                        if (SurfaceTmp(SurfNum).WindowShadingControlPtr == 0) {
-                            ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                                            cAlphaFieldNames(WindowShadingField) + "=\"" + cAlphaArgs(WindowShadingField) + "\".");
-                            ErrorsFound = true;
-                        }
-
-                        // Error if this is not an exterior window and shading device has been specified
-                        // PETER: should doors be disallowed too?
-                        if (SurfaceTmp(SurfNum).WindowShadingControlPtr > 0 && SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
-
-                            ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                                            cAlphaFieldNames(WindowShadingField) + " because it is not an exterior window.");
-                            ErrorsFound = true;
-                        }
                     }
 
                     CheckWindowShadingControlFrameDivider("GetRectSubSurfaces", ErrorsFound, SurfNum, FrameField);
@@ -4539,7 +4478,7 @@ namespace SurfaceGeometry {
 
         WSCPtr = SurfaceTmp(SurfNum).WindowShadingControlPtr;
         ConstrNumSh = 0;
-        if (!ErrorsFound && WSCPtr > 0) {
+        if (!ErrorsFound && SurfaceTmp(SurfNum).HasShadeControl) {
             ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
             if (ConstrNumSh > 0) {
                 SurfaceTmp(SurfNum).ShadedConstruction = ConstrNumSh;
@@ -4568,12 +4507,12 @@ namespace SurfaceGeometry {
                 TotLayers = Construct(ConstrNum).TotLayers;
                 TotShLayers = Construct(ConstrNumSh).TotLayers;
                 if (TotShLayers - 1 != TotLayers) {
-                    ShowWarningError("WindowProperty:ShadingControl: Interior shade or blind: Potential problem in match of unshaded/shaded "
-                                     "constructions, shaded should have 1 more layers than unshaded.");
+                    ShowWarningError("WindowShadingControl: Interior shade or blind: Potential problem in match of unshaded/shaded constructions, "
+                                     "shaded should have 1 more layers than unshaded.");
                     ShowContinueError("Unshaded construction=" + Construct(ConstrNum).Name);
                     ShowContinueError("Shaded construction=" + Construct(ConstrNumSh).Name);
-                    ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowProperty:ShadingControl "
-                                      "(Field #3) with the Window Construction rather than a shaded construction.");
+                    ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
+                                      "with the Window Construction rather than a shaded construction.");
                 }
                 for (Lay = 1; Lay <= Construct(ConstrNum).TotLayers; ++Lay) {
                     if (Construct(ConstrNum).LayerPoint(Lay) != Construct(ConstrNumSh).LayerPoint(Lay)) {
@@ -4593,12 +4532,12 @@ namespace SurfaceGeometry {
                 TotLayers = Construct(ConstrNum).TotLayers;
                 TotShLayers = Construct(ConstrNumSh).TotLayers;
                 if (TotShLayers - 1 != TotLayers) {
-                    ShowWarningError("WindowProperty:ShadingControl: Exterior shade, screen or blind: Potential problem in match of unshaded/shaded "
+                    ShowWarningError("WindowShadingControl: Exterior shade, screen or blind: Potential problem in match of unshaded/shaded "
                                      "constructions, shaded should have 1 more layer than unshaded.");
                     ShowContinueError("Unshaded construction=" + Construct(ConstrNum).Name);
                     ShowContinueError("Shaded construction=" + Construct(ConstrNumSh).Name);
-                    ShowContinueError("If preceding two constructions have the same name, you have likely specified a WindowProperty:ShadingControl "
-                                      "(Field #3) with the Window Construction rather than a shaded construction.");
+                    ShowContinueError("If preceding two constructions have the same name, you have likely specified a WindowShadingControl (Field "
+                                      "#3) with the Window Construction rather than a shaded construction.");
                 }
                 for (Lay = 1; Lay <= Construct(ConstrNum).TotLayers; ++Lay) {
                     if (Construct(ConstrNum).LayerPoint(Lay) != Construct(ConstrNumSh).LayerPoint(Lay + 1)) {
@@ -4628,12 +4567,12 @@ namespace SurfaceGeometry {
                 TotLayers = Construct(ConstrNum).TotLayers;
                 TotShLayers = Construct(ConstrNumSh).TotLayers;
                 if (TotShLayers - 2 != TotLayers) {
-                    ShowWarningError("WindowProperty:ShadingControl: Between Glass Shade/Blind: Potential problem in match of unshaded/shaded "
-                                     "constructions, shaded should have 2 more layers than unshaded.");
+                    ShowWarningError("WindowShadingControl: Between Glass Shade/Blind: Potential problem in match of unshaded/shaded constructions, "
+                                     "shaded should have 2 more layers than unshaded.");
                     ShowContinueError("Unshaded construction=" + Construct(ConstrNum).Name);
                     ShowContinueError("Shaded construction=" + Construct(ConstrNumSh).Name);
-                    ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowProperty:ShadingControl "
-                                      "(Field #3) with the Window Construction rather than a shaded construction.");
+                    ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
+                                      "with the Window Construction rather than a shaded construction.");
                 }
                 if (Construct(ConstrNum).LayerPoint(TotLayers) != Construct(ConstrNumSh).LayerPoint(TotShLayers)) {
                     ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
@@ -4811,7 +4750,7 @@ namespace SurfaceGeometry {
             if (NumShades != 0) {
                 ShowSevereError(cRoutineName + ": Window \"" + SubSurfaceName + "\" must not directly reference");
                 ShowContinueError("a Construction (i.e, \"" + SubSurfaceConstruction + "\") with a shading device.");
-                ShowContinueError("Use WindowProperty:ShadingControl to specify a shading device for a window.");
+                ShowContinueError("Use WindowShadingControl to specify a shading device for a window.");
                 ErrorsFound = true;
             }
         }
@@ -6312,10 +6251,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfLocalEnvironment;
-        using DataSurfaces::TotSurfaces;
+        using DataSurfaces::Surface;
         using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::TotSurfaces;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6469,10 +6408,10 @@ namespace SurfaceGeometry {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfLocalEnvironment;
-        using DataSurfaces::TotSurfaces;
+        using DataSurfaces::Surface;
         using DataSurfaces::TotSurfLocalEnv;
+        using DataSurfaces::TotSurfaces;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6589,11 +6528,11 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
+        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataHeatBalance::HeatTransferAlgosUsed;
         using DataHeatBalance::HighHConvLimit;
         using DataHeatBalance::LowHConvLimit;
         using DataHeatBalance::NumberOfHeatTransferAlgosUsed;
-        using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
 
@@ -7655,6 +7594,7 @@ namespace SurfaceGeometry {
         SurfaceTmp(SurfNum + 1).SchedMovInsulExt = SurfaceTmp(SurfNum).SchedMovInsulExt;
         SurfaceTmp(SurfNum + 1).SchedMovInsulInt = SurfaceTmp(SurfNum).SchedMovInsulInt;
         SurfaceTmp(SurfNum + 1).WindowShadingControlPtr = SurfaceTmp(SurfNum).WindowShadingControlPtr;
+        SurfaceTmp(SurfNum + 1).HasShadeControl = SurfaceTmp(SurfNum).HasShadeControl;
         SurfaceTmp(SurfNum + 1).ShadedConstruction = SurfaceTmp(SurfNum).ShadedConstruction;
         SurfaceTmp(SurfNum + 1).FrameDivider = SurfaceTmp(SurfNum).FrameDivider;
         SurfaceTmp(SurfNum + 1).Multiplier = SurfaceTmp(SurfNum).Multiplier;
@@ -7836,7 +7776,7 @@ namespace SurfaceGeometry {
 
         // FLOW:
         // Get the total number of window shading control blocks
-        cCurrentModuleObject = "WindowProperty:ShadingControl";
+        cCurrentModuleObject = "WindowShadingControl";
         TotWinShadingControl = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (TotWinShadingControl == 0) return;
 
@@ -7867,29 +7807,62 @@ namespace SurfaceGeometry {
 
             ++ControlNum;
             WindowShadingControl(ControlNum).Name = cAlphaArgs(1); // Set the Control Name in the Derived Type
-            WindowShadingControl(ControlNum).ShadedConstruction = UtilityRoutines::FindItemInList(cAlphaArgs(3), Construct, TotConstructs);
-            WindowShadingControl(ControlNum).ShadingDevice = UtilityRoutines::FindItemInList(cAlphaArgs(8), Material, TotMaterials);
-            WindowShadingControl(ControlNum).Schedule = GetScheduleIndex(cAlphaArgs(5));
-            WindowShadingControl(ControlNum).SetPoint = rNumericArgs(1);
-            WindowShadingControl(ControlNum).SetPoint2 = rNumericArgs(2);
-            WindowShadingControl(ControlNum).ShadingControlIsScheduled = false;
-            if (cAlphaArgs(6) == "YES") WindowShadingControl(ControlNum).ShadingControlIsScheduled = true;
-            WindowShadingControl(ControlNum).GlareControlIsActive = false;
-            if (cAlphaArgs(7) == "YES") WindowShadingControl(ControlNum).GlareControlIsActive = true;
-            WindowShadingControl(ControlNum).SlatAngleSchedule = GetScheduleIndex(cAlphaArgs(10));
 
-            ControlType = cAlphaArgs(4);
+            WindowShadingControl(ControlNum).ZoneIndex = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+            if (WindowShadingControl(ControlNum).ZoneIndex == 0) {
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                "\" not found.");
+                ErrorsFound = true;
+            }
+
+            WindowShadingControl(ControlNum).SequenceNumber = int(rNumericArgs(1));
+            WindowShadingControl(ControlNum).ShadedConstruction = UtilityRoutines::FindItemInList(cAlphaArgs(4), Construct, TotConstructs);
+            WindowShadingControl(ControlNum).ShadingDevice = UtilityRoutines::FindItemInList(cAlphaArgs(9), Material, TotMaterials);
+            WindowShadingControl(ControlNum).Schedule = GetScheduleIndex(cAlphaArgs(6));
+            WindowShadingControl(ControlNum).SetPoint = rNumericArgs(2);
+            WindowShadingControl(ControlNum).SetPoint2 = rNumericArgs(3);
+            WindowShadingControl(ControlNum).ShadingControlIsScheduled = false;
+            if (cAlphaArgs(7) == "YES") WindowShadingControl(ControlNum).ShadingControlIsScheduled = true;
+            WindowShadingControl(ControlNum).GlareControlIsActive = false;
+            if (cAlphaArgs(8) == "YES") WindowShadingControl(ControlNum).GlareControlIsActive = true;
+            WindowShadingControl(ControlNum).SlatAngleSchedule = GetScheduleIndex(cAlphaArgs(11));
+
+            // store the string for now and associate it after daylighting control objects are read
+            WindowShadingControl(ControlNum).DaylightingControlName = cAlphaArgs(12);
+
+            if (cAlphaArgs(13) == "SEQUENTIAL") {
+                WindowShadingControl(ControlNum).MultiSurfaceCtrlIsGroup = false;
+            } else if (cAlphaArgs(13) == "GROUP") {
+                WindowShadingControl(ControlNum).MultiSurfaceCtrlIsGroup = true;
+            } else {
+                WindowShadingControl(ControlNum).MultiSurfaceCtrlIsGroup = false;
+                ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" should be either SEQUENTIAL or GROUP " +
+                                 cAlphaFieldNames(13) + "=\"" + cAlphaArgs(13) + "\", defaulting to \"SEQUENTIAL\"");
+            }
+            ControlType = cAlphaArgs(5);
+
+            if (ControlNumAlpha >= 14) {
+                WindowShadingControl(ControlNum).FenestrationCount = ControlNumAlpha - 13;
+                WindowShadingControl(ControlNum).FenestrationName.allocate(WindowShadingControl(ControlNum).FenestrationCount);
+                WindowShadingControl(ControlNum).FenestrationIndex.allocate(WindowShadingControl(ControlNum).FenestrationCount);
+                for (int i = 1; i <= WindowShadingControl(ControlNum).FenestrationCount; i++) {
+                    WindowShadingControl(ControlNum).FenestrationName(i) = cAlphaArgs(i + 13);
+                }
+            } else {
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                "\" invalid. Must reference at least one Fenestration Surface object name.");
+            }
 
             if (ControlType == "SCHEDULE") {
                 ControlType = "ONIFSCHEDULEALLOWS";
                 WindowShadingControl(ControlNum).ShadingControlIsScheduled = true;
                 WindowShadingControl(ControlNum).GlareControlIsActive = false;
                 ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
-                                 cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\", changing to \"" + ControlType + "\"");
+                                 cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\", changing to \"" + ControlType + "\"");
                 // Error if schedule has not been specified
                 if (WindowShadingControl(ControlNum).Schedule <= 0) {
                     ErrorsFound = true;
-                    ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + " has " + cAlphaFieldNames(4) + " \"" +
+                    ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + " has " + cAlphaFieldNames(5) + " \"" +
                                      ControlType + "\" but a schedule has not been specified.");
                 }
             }
@@ -7899,11 +7872,11 @@ namespace SurfaceGeometry {
                 WindowShadingControl(ControlNum).ShadingControlIsScheduled = true;
                 WindowShadingControl(ControlNum).GlareControlIsActive = false;
                 ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
-                                 cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\", changing to \"" + ControlType + "\"");
+                                 cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\", changing to \"" + ControlType + "\"");
                 // Error if schedule has not been specified
                 if (WindowShadingControl(ControlNum).Schedule <= 0) {
                     ErrorsFound = true;
-                    ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + " has " + cAlphaFieldNames(4) + " \"" +
+                    ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + " has " + cAlphaFieldNames(5) + " \"" +
                                      ControlType + "\" but a schedule has not been specified.");
                 }
             }
@@ -7913,7 +7886,7 @@ namespace SurfaceGeometry {
                 WindowShadingControl(ControlNum).ShadingControlIsScheduled = false;
                 WindowShadingControl(ControlNum).GlareControlIsActive = true;
                 ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
-                                 cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\", changing to \"" + ControlType + "\"");
+                                 cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\", changing to \"" + ControlType + "\"");
             }
 
             if (ControlType == "GLARE") {
@@ -7921,15 +7894,15 @@ namespace SurfaceGeometry {
                 WindowShadingControl(ControlNum).ShadingControlIsScheduled = false;
                 WindowShadingControl(ControlNum).GlareControlIsActive = true;
                 ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
-                                 cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\", changing to \"" + ControlType + "\"");
+                                 cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\", changing to \"" + ControlType + "\"");
             }
 
             if (WindowShadingControl(ControlNum).ShadingDevice > 0) {
                 if (Material(WindowShadingControl(ControlNum).ShadingDevice).Group == Screen &&
                     !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
                     ErrorsFound = true;
-                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(4) +
-                                    "=\"" + cAlphaArgs(4) + "\" for exterior screens.");
+                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(5) +
+                                    "=\"" + cAlphaArgs(5) + "\" for exterior screens.");
                     ShowContinueError("Valid shading control types for exterior window screens are ALWAYSON, ALWAYSOFF, or ONIFSCHEDULEALLOWS.");
                 }
             } else {
@@ -7938,19 +7911,19 @@ namespace SurfaceGeometry {
                     if (Material(Construct(WindowShadingControl(ControlNum).ShadedConstruction).LayerPoint(1)).Group == Screen &&
                         !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
                         ErrorsFound = true;
-                        ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(4) +
-                                        "=\"" + cAlphaArgs(4) + "\" for exterior screens.");
+                        ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(5) +
+                                        "=\"" + cAlphaArgs(5) + "\" for exterior screens.");
                         ShowContinueError("Valid shading control types for exterior window screens are ALWAYSON, ALWAYSOFF, or ONIFSCHEDULEALLOWS.");
                     }
-                } else if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\", " + cAlphaFieldNames(3) +
+                } else if (lAlphaFieldBlanks(4)) {
+                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\", " + cAlphaFieldNames(4) +
                                     " is blank.");
                     ShowContinueError("A valid construction is required.");
                     ErrorsFound = true;
                 } else {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\", " + cAlphaFieldNames(3) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\", " + cAlphaFieldNames(4) +
                                     " is invalid.");
-                    ShowContinueError("Construction=\"" + cAlphaArgs(3) + "\" was used. A valid construction is required.");
+                    ShowContinueError("Construction=\"" + cAlphaArgs(4) + "\" was used. A valid construction is required.");
                     ErrorsFound = true;
                 }
             }
@@ -7970,79 +7943,79 @@ namespace SurfaceGeometry {
                 WindowShadingControl(ControlNum).ShadingControlIsScheduled = false;
                 WindowShadingControl(ControlNum).GlareControlIsActive = false;
                 ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
-                                 cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\", changing to \"" + ControlType + "\"");
+                                 cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\", changing to \"" + ControlType + "\"");
             }
 
             // Error if illegal control type
             Found = UtilityRoutines::FindItemInList(ControlType, cValidWindowShadingControlTypes, NumValidWindowShadingControlTypes);
             if (Found == 0) {
                 ErrorsFound = true;
-                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(4) + "=\"" +
-                                cAlphaArgs(4) + "\".");
+                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(5) + "=\"" +
+                                cAlphaArgs(5) + "\".");
             } else {
                 WindowShadingControl(ControlNum).ShadingControlType = ValidWindowShadingControlTypes(Found);
             }
 
             // Error checks
-            if (cAlphaArgs(6) != "YES" && cAlphaArgs(6) != "NO") {
-                ErrorsFound = true;
-                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(6) + "=\"" +
-                                cAlphaArgs(6) + "\".");
-            }
-            if (cAlphaArgs(7) != "YES" && cAlphaArgs(7) != "NO") {
+            if (cAlphaArgs(7) != "YES" && cAlphaArgs(7) != "NO") { // Shading Control is Schedule field
                 ErrorsFound = true;
                 ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(7) + "=\"" +
                                 cAlphaArgs(7) + "\".");
+            }
+            if (cAlphaArgs(8) != "YES" && cAlphaArgs(8) != "NO") { // Glare Control is Active field
+                ErrorsFound = true;
+                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(8) + "=\"" +
+                                cAlphaArgs(8) + "\".");
             }
 
             if ((WindowShadingControl(ControlNum).ShadingControlType == WSCT_OnIfScheduled) &&
                 (!WindowShadingControl(ControlNum).ShadingControlIsScheduled)) { // CR 7709 BG
                 ErrorsFound = true;
-                ShowSevereError(cCurrentModuleObject + " = \"" + WindowShadingControl(ControlNum).Name + "\" invalid, " + cAlphaFieldNames(6) +
-                                " must be set to \"Yes\" for " + cAlphaFieldNames(4) + " = OnIfScheduleAllows");
+                ShowSevereError(cCurrentModuleObject + " = \"" + WindowShadingControl(ControlNum).Name + "\" invalid, " + cAlphaFieldNames(7) +
+                                " must be set to \"Yes\" for " + cAlphaFieldNames(5) + " = OnIfScheduleAllows");
             }
 
-            if (cAlphaArgs(9) != "FIXEDSLATANGLE" && cAlphaArgs(9) != "SCHEDULEDSLATANGLE" && cAlphaArgs(9) != "BLOCKBEAMSOLAR") {
+            if (cAlphaArgs(10) != "FIXEDSLATANGLE" && cAlphaArgs(10) != "SCHEDULEDSLATANGLE" && cAlphaArgs(10) != "BLOCKBEAMSOLAR") {
                 ErrorsFound = true;
-                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(9) + "=\"" +
-                                cAlphaArgs(9) + "\".");
-            } else if (cAlphaArgs(9) == "FIXEDSLATANGLE") {
+                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(10) + "=\"" +
+                                cAlphaArgs(10) + "\".");
+            } else if (cAlphaArgs(10) == "FIXEDSLATANGLE") {
                 WindowShadingControl(ControlNum).SlatAngleControlForBlinds = WSC_SAC_FixedSlatAngle;
-            } else if (cAlphaArgs(9) == "SCHEDULEDSLATANGLE") {
+            } else if (cAlphaArgs(10) == "SCHEDULEDSLATANGLE") {
                 WindowShadingControl(ControlNum).SlatAngleControlForBlinds = WSC_SAC_ScheduledSlatAngle;
-            } else if (cAlphaArgs(9) == "BLOCKBEAMSOLAR") {
+            } else if (cAlphaArgs(10) == "BLOCKBEAMSOLAR") {
                 WindowShadingControl(ControlNum).SlatAngleControlForBlinds = WSC_SAC_BlockBeamSolar;
             }
 
             // For upward compatibility change old "noninsulating" and "insulating" shade types to
             // INTERIORSHADE or EXTERIORSHADE
-            if (cAlphaArgs(2) == "INTERIORNONINSULATINGSHADE" || cAlphaArgs(2) == "INTERIORINSULATINGSHADE") {
+            if (cAlphaArgs(3) == "INTERIORNONINSULATINGSHADE" || cAlphaArgs(3) == "INTERIORINSULATINGSHADE") {
                 ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
-                                 cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\", changing to \"InteriorShade\"");
+                                 cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\", changing to \"InteriorShade\"");
                 WindowShadingControl(ControlNum).ShadingType = WSC_ST_InteriorShade;
-                cAlphaArgs(2) = "INTERIORSHADE";
+                cAlphaArgs(3) = "INTERIORSHADE";
             }
-            if (cAlphaArgs(2) == "EXTERIORNONINSULATINGSHADE" || cAlphaArgs(2) == "EXTERIORINSULATINGSHADE") {
+            if (cAlphaArgs(3) == "EXTERIORNONINSULATINGSHADE" || cAlphaArgs(3) == "EXTERIORINSULATINGSHADE") {
                 ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
-                                 cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\", changing to \"ExteriorShade\"");
+                                 cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\", changing to \"ExteriorShade\"");
                 WindowShadingControl(ControlNum).ShadingType = WSC_ST_ExteriorShade;
-                cAlphaArgs(2) = "EXTERIORSHADE";
+                cAlphaArgs(3) = "EXTERIORSHADE";
             }
 
-            if (ControlType == "MEETDAYLIGHTILLUMINANCESETPOINT" && cAlphaArgs(2) != "SWITCHABLEGLAZING") {
+            if (ControlType == "MEETDAYLIGHTILLUMINANCESETPOINT" && cAlphaArgs(3) != "SWITCHABLEGLAZING") {
                 ErrorsFound = true;
-                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(4) + "=\"" +
-                                cAlphaArgs(4) + "\".");
-                ShowContinueError("..." + cAlphaFieldNames(2) + " must be SwitchableGlazing for this control, but entered type=\"" + cAlphaArgs(2) +
+                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
+                                cAlphaArgs(3) + "\".");
+                ShowContinueError("..." + cAlphaFieldNames(3) + " must be SwitchableGlazing for this control, but entered type=\"" + cAlphaArgs(3) +
                                   "\".");
             }
 
             // Check for illegal shading type name
-            Found = UtilityRoutines::FindItemInList(cAlphaArgs(2), cValidShadingTypes, NumValidShadingTypes);
+            Found = UtilityRoutines::FindItemInList(cAlphaArgs(3), cValidShadingTypes, NumValidShadingTypes);
             if (Found == 0) {
                 ErrorsFound = true;
-                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(2) + "=\"" +
-                                cAlphaArgs(2) + "\".");
+                ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
+                                cAlphaArgs(3) + "\".");
             } else {
                 WindowShadingControl(ControlNum).ShadingType = ValidShadingTypes(Found);
             }
@@ -8057,39 +8030,39 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             } else if (IShadedConst == 0 && IShadingDevice > 0) {
                 if (ShTyp == WSC_ST_SwitchableGlazing) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(2) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= SwitchableGlazing but no matching shaded construction");
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WSC_ST_InteriorShade || ShTyp == WSC_ST_ExteriorShade) && Material(IShadingDevice).Group != Shade) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(2) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= InteriorShade or ExteriorShade but matching shading device is not a window shade");
                     ShowContinueError(cAlphaFieldNames(8) + " in error=\"" + Material(IShadingDevice).Name + "\".");
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WSC_ST_ExteriorScreen) && Material(IShadingDevice).Group != Screen) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(2) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= ExteriorScreen but matching shading device is not a window screen");
                     ShowContinueError(cAlphaFieldNames(8) + " in error=\"" + Material(IShadingDevice).Name + "\".");
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WSC_ST_InteriorBlind || ShTyp == WSC_ST_ExteriorBlind) && Material(IShadingDevice).Group != WindowBlind) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(2) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= InteriorBlind or ExteriorBlind but matching shading device is not a window blind");
                     ShowContinueError(cAlphaFieldNames(8) + " in error=\"" + Material(IShadingDevice).Name + "\".");
                     ErrorsFound = true;
                 }
                 if (ShTyp == WSC_ST_BetweenGlassShade || ShTyp == WSC_ST_BetweenGlassBlind) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(2) +
+                    ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= BetweenGlassShade or BetweenGlassBlind and");
                     ShowContinueError(cAlphaFieldNames(8) + " is specified. This is illegal. Specify shaded construction instead.");
                     ErrorsFound = true;
                 }
             } else if (IShadedConst > 0 && IShadingDevice > 0) {
                 IShadingDevice = 0;
-                ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" Both " + cAlphaFieldNames(3) + " and " +
-                                 cAlphaFieldNames(8) + " are specified.");
-                ShowContinueError("The " + cAlphaFieldNames(3) + "=\"" + Construct(IShadedConst).Name + "\" will be used.");
+                ShowWarningError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" Both " + cAlphaFieldNames(4) + " and " +
+                                 cAlphaFieldNames(9) + " are specified.");
+                ShowContinueError("The " + cAlphaFieldNames(4) + "=\"" + Construct(IShadedConst).Name + "\" will be used.");
             }
 
             // If type = interior or exterior shade or blind require that the shaded construction
@@ -8104,45 +8077,45 @@ namespace SurfaceGeometry {
                         IShadingDevice = Construct(IShadedConst).LayerPoint(NLayers);
                         if (Material(Construct(IShadedConst).LayerPoint(NLayers)).Group != Shade) {
                             ErrorsFound = true;
-                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(3) +
-                                            "=\"" + cAlphaArgs(3) + "\"");
-                            ShowContinueError("of " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
+                                            "=\"" + cAlphaArgs(4) + "\"");
+                            ShowContinueError("of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a shade layer on the inside of the window.");
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_ExteriorShade) {
                         IShadingDevice = Construct(IShadedConst).LayerPoint(1);
                         if (Material(Construct(IShadedConst).LayerPoint(1)).Group != Shade) {
                             ErrorsFound = true;
-                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(3) +
-                                            "=\"" + cAlphaArgs(3) + "\"");
-                            ShowContinueError("of " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(43) +
+                                            "=\"" + cAlphaArgs(4) + "\"");
+                            ShowContinueError("of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a shade layer on the outside of the window.");
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_ExteriorScreen) {
                         IShadingDevice = Construct(IShadedConst).LayerPoint(1);
                         if (Material(Construct(IShadedConst).LayerPoint(1)).Group != Screen) {
                             ErrorsFound = true;
-                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(3) +
-                                            "=\"" + cAlphaArgs(3) + "\"");
-                            ShowContinueError("of " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
+                                            "=\"" + cAlphaArgs(4) + "\"");
+                            ShowContinueError("of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a screen layer on the outside of the window.");
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_InteriorBlind) {
                         IShadingDevice = Construct(IShadedConst).LayerPoint(NLayers);
                         if (Material(Construct(IShadedConst).LayerPoint(NLayers)).Group != WindowBlind) {
                             ErrorsFound = true;
-                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(3) +
-                                            "=\"" + cAlphaArgs(3) + "\"");
-                            ShowContinueError("of " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
+                                            "=\"" + cAlphaArgs(4) + "\"");
+                            ShowContinueError("of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a blind layer on the inside of the window.");
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_ExteriorBlind) {
                         IShadingDevice = Construct(IShadedConst).LayerPoint(1);
                         if (Material(Construct(IShadedConst).LayerPoint(1)).Group != WindowBlind) {
                             ErrorsFound = true;
-                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(3) +
-                                            "=\"" + cAlphaArgs(3) + "\"");
-                            ShowContinueError("of " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
+                                            "=\"" + cAlphaArgs(4) + "\"");
+                            ShowContinueError("of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a blind layer on the outside of the window.");
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_BetweenGlassShade) {
@@ -8155,9 +8128,10 @@ namespace SurfaceGeometry {
                         }
                         if (BGShadeBlindError) {
                             ErrorsFound = true;
-                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(3) +
-                                            "=\"" + cAlphaArgs(3) + "\"");
-                            ShowContinueError("of " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" should have two or three glass layers and a");
+                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
+                                            "=\"" + cAlphaArgs(4) + "\"");
+                            ShowContinueError("of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(32) +
+                                              "\" should have two or three glass layers and a");
                             ShowContinueError("between-glass shade layer with a gas layer on each side.");
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_BetweenGlassBlind) {
@@ -8170,36 +8144,95 @@ namespace SurfaceGeometry {
                         }
                         if (BGShadeBlindError) {
                             ErrorsFound = true;
-                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(3) +
-                                            "=\"" + cAlphaArgs(3) + "\"");
-                            ShowContinueError("of " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" should have two or three glass layers and a");
+                            ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
+                                            "=\"" + cAlphaArgs(4) + "\"");
+                            ShowContinueError("of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\" should have two or three glass layers and a");
                             ShowContinueError("between-glass blind layer with a gas layer on each side.");
                         }
                     }
                 }
                 if (IShadingDevice > 0) {
                     if ((ShTyp == WSC_ST_InteriorShade || ShTyp == WSC_ST_ExteriorShade) && Material(IShadingDevice).Group != Shade) {
-                        ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(2) +
+                        ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(3) +
                                         "= InteriorShade or ExteriorShade but matching shading device is not a window shade");
                         ShowContinueError("Shading Device in error=\"" + Material(IShadingDevice).Name + "\".");
                         ErrorsFound = true;
                     }
                     if ((ShTyp == WSC_ST_ExteriorScreen) && Material(IShadingDevice).Group != Screen) {
-                        ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(2) +
+                        ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(3) +
                                         "= ExteriorScreen but matching shading device is not an exterior window screen.");
                         ShowContinueError("Shading Device in error=\"" + Material(IShadingDevice).Name + "\".");
                         ErrorsFound = true;
                     }
                     if ((ShTyp == WSC_ST_InteriorBlind || ShTyp == WSC_ST_ExteriorBlind) && Material(IShadingDevice).Group != WindowBlind) {
-                        ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(2) +
+                        ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(3) +
                                         "= InteriorBlind or ExteriorBlind but matching shading device is not a window blind.");
                         ShowContinueError("Shading Device in error=\"" + Material(IShadingDevice).Name + "\".");
                         ErrorsFound = true;
                     }
                 }
             }
-
         } // End of loop over window shading controls
+    }
+
+    void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum)
+    {
+        // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows and sets the WindowShadingControlPtr
+        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
+                if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), SurfaceTmp(SurfNum).Name)) {
+                    if (SurfaceTmp(SurfNum).WindowShadingControlPtr == 0) {
+                        SurfaceTmp(SurfNum).WindowShadingControlPtr = iShadeCtrl;
+                        SurfaceTmp(SurfNum).HasShadeControl = true;
+                        // check to make the window refenced is an exterior window
+                        if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
+                            ErrorsFound = true;
+                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: \"" + SurfaceTmp(SurfNum).Name +
+                                            "\", invalid " + " because it is not an exterior window.");
+                            ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                        }
+                        // check to make sure the window is not using equivalent layer window construction
+                        if (Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
+                            ErrorsFound = true;
+                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(SurfNum).Name +
+                                            "\", invalid " + "\".");
+                            ShowContinueError(".. equivalent layer window model does not use shading control object.");
+                            ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
+                            ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                            SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
+                        }
+                    } else {
+                        ErrorsFound = true;
+                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: Fenestration surface named \"" +
+                                        SurfaceTmp(SurfNum).Name + "\" appears on more than one WindowShadingControl list.");
+                        ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
+                                          "\" and another one.");
+                    }
+                }
+            }
+        }
+    }
+
+
+    void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound)
+    {
+        // J.Glazer 2018 - operates on Surface array after final indices are known for windows and checks to make sure it is correct
+        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
+                int fenestrationIndex =
+                    UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), Surface, TotSurfaces);
+                if (Surface(fenestrationIndex).WindowShadingControlPtr == iShadeCtrl) {
+                    WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
+                } else {
+                    // this error condition should not occur since the rearrangement of Surface() from SurfureTmp() is reliable.
+                    ErrorsFound = true;
+                    ShowSevereError("FinalAssociateWindowShadingControlFenestration: Fenestration surface named \"" + Surface(fenestrationIndex).Name +
+                                    "\" has WindowShadingContol index that does not match the initial index assigned.");
+                    ShowContinueError("This occurs while WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
+                                      "\" is being evaluated. ");
+                }
+            }
+        }
     }
 
     void GetStormWindowData(bool &ErrorsFound) // If errors found in input
@@ -8218,7 +8251,6 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::JulianDay;
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -8260,10 +8292,10 @@ namespace SurfaceGeometry {
             StormWindow(StormWinNum).StormWinDistance = rNumericArgs(1);
             StormWindow(StormWinNum).MonthOn = rNumericArgs(2);
             StormWindow(StormWinNum).DayOfMonthOn = rNumericArgs(3);
-            StormWindow(StormWinNum).DateOn = JulianDay(StormWindow(StormWinNum).MonthOn, StormWindow(StormWinNum).DayOfMonthOn, 1);
+            StormWindow(StormWinNum).DateOn = General::OrdinalDay(StormWindow(StormWinNum).MonthOn, StormWindow(StormWinNum).DayOfMonthOn, 1);
             StormWindow(StormWinNum).MonthOff = rNumericArgs(4);
             StormWindow(StormWinNum).DayOfMonthOff = rNumericArgs(5);
-            StormWindow(StormWinNum).DateOff = JulianDay(StormWindow(StormWinNum).MonthOff, StormWindow(StormWinNum).DayOfMonthOff, 1);
+            StormWindow(StormWinNum).DateOff = General::OrdinalDay(StormWindow(StormWinNum).MonthOff, StormWindow(StormWinNum).DayOfMonthOff, 1);
 
             if (StormWindow(StormWinNum).DateOn == StormWindow(StormWinNum).DateOff) {
                 ShowSevereError(cCurrentModuleObject + ": Date On = Date Off -- not allowed, occurred in WindowProperty:StormWindow Input #" +
@@ -8589,7 +8621,7 @@ namespace SurfaceGeometry {
                     }
                     // Require that gas be air in airflow gaps on either side of a between glass shade/blind
                     WSCPtr = Surface(SurfNum).WindowShadingControlPtr;
-                    if (WSCPtr > 0) {
+                    if (Surface(SurfNum).HasShadeControl) {
                         if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
                             WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
                             ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
@@ -9612,7 +9644,7 @@ namespace SurfaceGeometry {
                         }
                         if (SurfaceTmp(SurfNum).Class == SurfaceClass_Window) {
                             ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\"");
-                            ShowContinueError("invalid use on a Window. Use WindowProperty:ShadingControl instead.");
+                            ShowContinueError("invalid use on a Window. Use WindowShadingControl instead.");
                             ErrorsFound = true;
                         }
                     }
@@ -9914,19 +9946,19 @@ namespace SurfaceGeometry {
         if (edgeNot2orig.size() == size_t(0)) {
             edgeNot2 = edgeNot2orig;
             return true;
-        } else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not on the
-                 // "other side" of the edge Go through all the points looking for the number that are colinear and see if that is consistent with the
-                 // number of edges found that didn't have a count of two
+        } else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not
+                 // on the "other side" of the edge Go through all the points looking for the number that are colinear and see if that is
+                 // consistent with the number of edges found that didn't have a count of two
             DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints(
                 zonePoly, uniqueVertices); // this is done after initial test since it is computationally intensive.
             std::vector<EdgeOfSurf> edgeNot2again = edgesNotTwoForEnclosedVolumeTest(updatedZonePoly, uniqueVertices);
             if (edgeNot2again.size() == size_t(0)) {
                 return true;
             } else {
-                edgeNot2 = edgesInBoth(
-                    edgeNot2orig,
-                    edgeNot2again); // only return a list of those edges that appear in both the original edge and the revised edges
-                                    // this eliminates added edges that will confuse users and edges that were caught by the updateZonePoly routine
+                edgeNot2 = edgesInBoth(edgeNot2orig,
+                                       edgeNot2again); // only return a list of those edges that appear in both the original edge and the
+                                                       // revised edges this eliminates added edges that will confuse users and edges that
+                                                       // were caught by the updateZonePoly routine
                 return false;
             }
         }
@@ -10067,8 +10099,8 @@ namespace SurfaceGeometry {
         }
     }
 
-    // updates the polyhedron used to describe a zone to include points on an edge that are between and collinear to points already describing the
-    // edge
+    // updates the polyhedron used to describe a zone to include points on an edge that are between and collinear to points already describing
+    // the edge
     DataVectorTypes::Polyhedron updateZonePolygonsForMissingColinearPoints(DataVectorTypes::Polyhedron const &zonePoly,
                                                                            std::vector<Vector> const &uniqVertices)
     {
@@ -10259,8 +10291,8 @@ namespace SurfaceGeometry {
         return std::make_tuple(isFlrHoriz, isClgHoriz, areWlVert);
     }
 
-    // tests whether a pair of walls in the zone are the same except offset from one another and facing the opposite direction and also returns the
-    // wall area and distance between
+    // tests whether a pair of walls in the zone are the same except offset from one another and facing the opposite direction and also
+    // returns the wall area and distance between
     bool areOppositeWallsSame(DataVectorTypes::Polyhedron const &zonePoly,
                               Real64 &oppositeWallArea,            // return the area of the wall that has an opposite wall
                               Real64 &distanceBetweenOppositeWalls // returns distance
@@ -11743,6 +11775,7 @@ namespace SurfaceGeometry {
         SurfaceTmp(TotSurfaces).MaterialMovInsulInt = SurfaceTmp(SurfNum).MaterialMovInsulInt;
         SurfaceTmp(TotSurfaces).SchedMovInsulExt = SurfaceTmp(SurfNum).SchedMovInsulExt;
         SurfaceTmp(TotSurfaces).WindowShadingControlPtr = SurfaceTmp(SurfNum).WindowShadingControlPtr;
+        SurfaceTmp(TotSurfaces).HasShadeControl = SurfaceTmp(SurfNum).HasShadeControl;
         SurfaceTmp(TotSurfaces).ShadedConstruction = SurfaceTmp(SurfNum).ShadedConstruction;
         SurfaceTmp(TotSurfaces).FrameDivider = SurfaceTmp(SurfNum).FrameDivider;
         SurfaceTmp(TotSurfaces).Multiplier = SurfaceTmp(SurfNum).Multiplier;
@@ -12247,12 +12280,12 @@ namespace SurfaceGeometry {
                     Real64 Tri1Area(AreaPolygon(3, Triangle1) / TotalArea);
                     Real64 Tri2Area(AreaPolygon(3, Triangle2) / TotalArea);
 
-                    // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex quadralateral
-                    // using the wrong two triangles
+                    // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
+                    // quadralateral using the wrong two triangles
                     if ((Tri1Area + Tri2Area) > 1.05) {
 
-                        // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this time)
-                        // split into 2 3-sided polygons (Triangle 1 and Triangle 2)
+                        // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this
+                        // time) split into 2 3-sided polygons (Triangle 1 and Triangle 2)
                         Triangle1(1) = vertex(1);
                         Triangle1(2) = vertex(2);
                         Triangle1(3) = vertex(4);
@@ -12711,7 +12744,8 @@ namespace SurfaceGeometry {
             }
             OldVertex.deallocate();
             if (DisplayExtraWarnings) {
-                ShowWarningError("CheckConvexity: Surface=\"" + SurfaceTmp(SurfNum).Name + "\": The vertex points has been reprocessed as Sides = " + RoundSigDigits(SurfaceTmp(SurfNum).Sides));
+                ShowWarningError("CheckConvexity: Surface=\"" + SurfaceTmp(SurfNum).Name +
+                                 "\": The vertex points has been reprocessed as Sides = " + RoundSigDigits(SurfaceTmp(SurfNum).Sides));
             }
         }
     }
@@ -12859,7 +12893,6 @@ namespace SurfaceGeometry {
         Surface(SurfNum).Width = WidthEff;
         Surface(SurfNum).Height = HeightEff;
     }
-
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus
