@@ -726,8 +726,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 RunPeriodRepeated%wasSet = .FALSE.
                 IF (CurArgs >= 12) THEN
                   IF (TRIM(InArgs(12)) /= Blank) THEN
-                    RunPeriodRepeated%wasSet = .TRUE.
-                    RunPeriodRepeated%originalValue = InArgs(12)
+                    READ(InArgs(12), *) RepeatedCount
+                    IF (RepeatedCount > 1) THEN
+                      RunPeriodRepeated%wasSet = .TRUE.
+                      RunPeriodRepeated%originalValue = InArgs(12)
+                    ENDIF
                   END IF
                 END IF
                 ! Now start writing some object data out
