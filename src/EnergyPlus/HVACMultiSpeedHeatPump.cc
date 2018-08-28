@@ -2655,7 +2655,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
                 DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
-            } else if (MSHeatPump(MSHeatPumpNum).FanPlaceType = DrawThru) {
+            } else if (MSHeatPump(MSHeatPumpNum).FanPlaceType == DrawThru) {
                 DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
             }
         }

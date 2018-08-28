@@ -2030,7 +2030,7 @@ namespace HVACUnitaryBypassVAV {
         }
         if (CBVAV(CBVAVNum).FanPlace == BlowThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
-        } else if (CBVAV(CBVAVNum).FanPlace = DrawThru) {
+        } else if (CBVAV(CBVAVNum).FanPlace == DrawThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
         }
 

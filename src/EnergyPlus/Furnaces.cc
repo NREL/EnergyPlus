@@ -6022,7 +6022,7 @@ namespace Furnaces {
         DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
         if (Furnace(FurnaceNum).FanPlace == BlowThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
-        } else if (Furnace(FurnaceNum).FanPlace = DrawThru) {
+        } else if (Furnace(FurnaceNum).FanPlace == DrawThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
         }
 

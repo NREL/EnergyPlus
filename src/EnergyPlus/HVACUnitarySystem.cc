@@ -2234,7 +2234,7 @@ namespace HVACUnitarySystem {
             }
             if (UnitarySystem(UnitarySysNum).FanPlace == BlowThru) {
                 PrimaryAirSystem(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
-            } else if (UnitarySystem(UnitarySysNum).FanPlace = DrawThru) {
+            } else if (UnitarySystem(UnitarySysNum).FanPlace == DrawThru) {
                 PrimaryAirSystem(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
             }
         } else if (CurZoneEqNum > 0 && UnitarySystem(UnitarySysNum).FanExists) {
@@ -2246,7 +2246,7 @@ namespace HVACUnitarySystem {
             DataSizing::DataFanIndex = UnitarySystem(UnitarySysNum).FanIndex;
             if (UnitarySystem(UnitarySysNum).FanPlace == BlowThru) {
                 DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
-            } else if (UnitarySystem(UnitarySysNum).FanPlace = DrawThru) {
+            } else if (UnitarySystem(UnitarySysNum).FanPlace == DrawThru) {
                 DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
             }
         }

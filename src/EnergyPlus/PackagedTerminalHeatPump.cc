@@ -4854,7 +4854,7 @@ namespace PackagedTerminalHeatPump {
         DataSizing::DataFanIndex = PTUnit(PTUnitNum).FanIndex;
         if (PTUnit(PTUnitNum).FanPlace == BlowThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
-        } else if (PTUnit(PTUnitNum).FanPlace = DrawThru) {
+        } else if (PTUnit(PTUnitNum).FanPlace == DrawThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
         }
 

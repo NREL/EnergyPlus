@@ -6054,7 +6054,7 @@ namespace HVACVariableRefrigerantFlow {
         DataSizing::DataFanIndex = VRFTU(VRFTUNum).FanIndex;
         if (VRFTU(VRFTUNum).FanPlace == BlowThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
-        } else if (VRFTU(VRFTUNum).FanPlace = DrawThru) {
+        } else if (VRFTU(VRFTUNum).FanPlace == DrawThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
         }
 

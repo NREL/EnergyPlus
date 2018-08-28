@@ -6027,11 +6027,11 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
                 0.001);
 
     // 3 cooling speeds with autosized MSHP design spec yielding equally distributed air flow at 1/3 per speed
-    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(1), 0.033043, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(1), 0.032773, 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(1), UnitarySystem(1).CoolVolumeFlowRate(1), 0.000001);
-    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(2), 0.066086, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(2), 0.065547, 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(2), UnitarySystem(1).CoolVolumeFlowRate(2), 0.000001);
-    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(3), 0.099128, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(3), 0.098321, 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(3), UnitarySystem(1).CoolVolumeFlowRate(3), 0.000001);
 
     EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(1), 0.333333, 0.000001);
@@ -6049,25 +6049,25 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
                 0.000001);
 
     // 10 heating speeds with autosized MSHP design spec yielding equally distributed air flow at 1/10 per speed
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(1), 0.008304, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(1), 0.008236, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(1), UnitarySystem(1).HeatVolumeFlowRate(1));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(2), 0.016608, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(2), 0.016472, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(2), UnitarySystem(1).HeatVolumeFlowRate(2));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(3), 0.024912, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(3), 0.024709, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(3), UnitarySystem(1).HeatVolumeFlowRate(3));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(4), 0.033216, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(4), 0.032945, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(4), UnitarySystem(1).HeatVolumeFlowRate(4));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(5), 0.041520, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(5), 0.041182, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(5), UnitarySystem(1).HeatVolumeFlowRate(5));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(6), 0.049824, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(6), 0.049418, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(6), UnitarySystem(1).HeatVolumeFlowRate(6));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(7), 0.058128, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(7), 0.057654, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(7), UnitarySystem(1).HeatVolumeFlowRate(7));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(8), 0.066432, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(8), 0.065891, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(8), UnitarySystem(1).HeatVolumeFlowRate(8));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(9), 0.074736, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(9), 0.074127, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(9), UnitarySystem(1).HeatVolumeFlowRate(9));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(10), 0.083040, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(10), 0.082364, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(10), UnitarySystem(1).HeatVolumeFlowRate(10));
 }
 

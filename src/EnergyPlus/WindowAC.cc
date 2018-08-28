@@ -1070,7 +1070,7 @@ namespace WindowAC {
         DataSizing::DataFanIndex = WindAC(WindACNum).FanIndex;
         if (WindAC(WindACNum).FanPlace == BlowThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
-        } else if (WindAC(WindACNum).FanPlace = DrawThru) {
+        } else if (WindAC(WindACNum).FanPlace == DrawThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
         }
 

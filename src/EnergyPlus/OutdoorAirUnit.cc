@@ -1480,7 +1480,7 @@ namespace OutdoorAirUnit {
         DataSizing::DataFanIndex = OutAirUnit(OAUnitNum).SFan_Index;
         if (OutAirUnit(OAUnitNum).FanPlace == BlowThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
-        } else if (OutAirUnit(OAUnitNum).FanPlace = DrawThru) {
+        } else if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
             DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
         }
 

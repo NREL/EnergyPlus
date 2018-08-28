@@ -666,6 +666,10 @@ namespace DataSizing {
         DataWaterCoilSizHeatDeltaT = 0.0;
         DataNomCapInpMeth = false;
         DataFanPlacement = zoneFanPlacement::zoneFanPlaceNotSet;
+        DataCoilSizingAirInTemp = 0.0;
+        DataCoilSizingAirInHumRat = 0.0;
+        DataCoilSizingAirOutTemp = 0.0;
+        DataCoilSizingAirOutHumRat = 0.0;
 
         // These zone specific sizing variables are set in zone equipment to use for sizing.
         // Reset to avoid chance that second zone equipment will size using these variables set by first zone equipment to be sized
