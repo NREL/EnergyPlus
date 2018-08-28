@@ -143,8 +143,10 @@
     Annual Run,              !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -733,8 +735,8 @@
     ,                        !- Pressure Drop Curve Name
     GroundHeatExchanger:System,  !- Component 1 Object Type
     Vertical GHE 1x4 Std,    !- Component 1 Name
-    GLHE Inlet,         !- Component 1 Inlet Node Name
-    GLHE Outlet;        !- Component 1 Outlet Node Name
+    GLHE Inlet,              !- Component 1 Inlet Node Name
+    GLHE Outlet;             !- Component 1 Outlet Node Name
 
   Branch,
     Ground Loop Supply Inlet Branch,  !- Name
@@ -840,7 +842,7 @@
 
   NodeList,
     Ground Loop Supply Setpoint Nodes,  !- Name
-    GLHE Outlet,                        !- Node 1 Name
+    GLHE Outlet,             !- Node 1 Name
     Ground Loop Supply Outlet;  !- Node 2 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:NODE ===========
@@ -896,40 +898,40 @@
 !-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:SYSTEM ===========
 
   GroundHeatExchanger:System,
-    Vertical GHE 1x4 Std,  !- Name
-    GLHE Inlet,         !- Inlet Node Name
-    GLHE Outlet,        !- Outlet Node Name
-    0.00100944,         !- Design Flow Rate {m3/s}
+    Vertical GHE 1x4 Std,    !- Name
+    GLHE Inlet,              !- Inlet Node Name
+    GLHE Outlet,             !- Outlet Node Name
+    0.00100944,              !- Design Flow Rate {m3/s}
     Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
-    KATemps,            !- Undisturbed Ground Temperature Model Name
-    2.5,                !- Ground Thermal Conductivity {W/m-K}
-    2.5E+06,            !- Ground Thermal Heat Capacity {J/m3-K}
-    ,                   !- Response Factors Object Name
-    GHE-Array;
+    KATemps,                 !- Undisturbed Ground Temperature Model Name
+    2.5,                     !- Ground Thermal Conductivity {W/m-K}
+    2.5E+06,                 !- Ground Thermal Heat Capacity {J/m3-K}
+    ,                        !- GHE:Vertical:ResponseFactors Object Name
+    GHE-Array;               !- GHE:Vertical:Array Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:VERTICAL:PROPERTIES ===========
 
   GroundHeatExchanger:Vertical:Properties,
-    GHE-1 Props,        !- Name
-    1,                  !- Depth of Top of Borehole {m}
-    100,                !- Borehole Length {m}
-    0.114,              !- Borehole Diameter {m}
-    0.7443,             !- Grout Thermal Conductivity {W/m-K}
-    3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}
-    0.3895,             !- Pipe Thermal Conductivity {W/m-K}
-    1.77E+06,           !- Pipe Thermal Heat Capacity {J/m3-K}
-    0.03341,            !- Pipe Outer Diameter {m}
-    0.002984,           !- Pipe Thickness {m}
-    0.04913;            !- U-Tube Distance {m}
+    GHE-1 Props,             !- Name
+    1,                       !- Depth of Top of Borehole {m}
+    100,                     !- Borehole Length {m}
+    0.114,                   !- Borehole Diameter {m}
+    0.7443,                  !- Grout Thermal Conductivity {W/m-K}
+    3.90E+06,                !- Grout Thermal Heat Capacity {J/m3-K}
+    0.3895,                  !- Pipe Thermal Conductivity {W/m-K}
+    1.77E+06,                !- Pipe Thermal Heat Capacity {J/m3-K}
+    0.03341,                 !- Pipe Outer Diameter {m}
+    0.002984,                !- Pipe Thickness {m}
+    0.04913;                 !- U-Tube Distance {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:VERTICAL:ARRAY ===========
 
   GroundHeatExchanger:Vertical:Array,
-    GHE-Array,          !- Name
-    GHE-1 Props,        !- GHE Properties
-    2,                  !- Number of Boreholes in X Direction
-    2,                  !- Number of Boreholes in Y Direction
-    5;                  !- Borehole Spacing {m}
+    GHE-Array,               !- Name
+    GHE-1 Props,             !- GHE:Vertical:Properties Object Name
+    2,                       !- Number of Boreholes in X-Direction
+    2,                       !- Number of Boreholes in Y-Direction
+    5;                       !- Borehole Spacing {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: PLANTLOOP ===========
 
@@ -1060,9 +1062,9 @@
 
   Output:Variable,*,Ground Heat Exchanger Average Fluid Temperature,hourly;
 
-  Output:Variable,*,Ground Heat Exchanger Farfield Ground Temperature,hourly; !- HVAC Average [C]
+  Output:Variable,*,Ground Heat Exchanger Farfield Ground Temperature,hourly;
 
-  Output:Variable,*,Site Ground Temperature,hourly; !- Zone Average [C]
+  Output:Variable,*,Site Ground Temperature,hourly;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:SQLITE ===========
 

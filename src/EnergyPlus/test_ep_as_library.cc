@@ -64,10 +64,17 @@ int main(int argc, char *argv[])
     StoreMessageCallback(message_callback_handler);
     StoreProgressCallback(progress_callback_handler);
 
+    int status(EXIT_FAILURE);
     if (argc < 2) {
         std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     } else {
-        EnergyPlusPgm(argv[1]);
+        status = RunEnergyPlus(argv[1]);
     }
+    if (!std::cin.good()) std::cin.clear();
+    if (!std::cerr.good()) std::cerr.clear();
+    if (!std::cout.good()) std::cout.clear();
+    std::cerr << "Standard error is still available for use" << std::endl;
+    std::cout << "Standard output is still available for use" << std::endl;
+    return status;
 }

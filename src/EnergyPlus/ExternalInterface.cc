@@ -1378,7 +1378,7 @@ namespace ExternalInterface {
                                                                      FMU(i).Instance(j).Name,
                                                                      ErrorsFound);
                             //							UtilityRoutines::VerifyName( FMU( i ).Instance( j ).fmuInputVariable(
-                            // k
+                            //k
                             //).Name,  FMU(
                             // i
                             //).Instance(

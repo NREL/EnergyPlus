@@ -122,6 +122,7 @@ namespace DaylightingManager {
     extern std::string mapLine; // character variable to hold map outputs
 
     // Functions
+    void clear_state();
 
     void DayltgAveInteriorReflectance(int &ZoneNum); // Zone number
 
@@ -345,6 +346,8 @@ namespace DaylightingManager {
 
     void CheckTDDsAndLightShelvesInDaylitZones();
 
+    void AssociateWindowShadingControlWithDaylighting();
+
     void GetLightWellData(bool &ErrorsFound); // If errors found in input
 
     void DayltgGlare(int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt
@@ -465,6 +468,10 @@ namespace DaylightingManager {
     void CloseDFSFile();
 
     void DayltgSetupAdjZoneListsAndPointers();
+
+    void CreateShadeDeploymentOrder(int &ZoneNum);
+
+    void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum);
 
     void DayltgInterReflIllFrIntWins(int &ZoneNum); // Zone number
 

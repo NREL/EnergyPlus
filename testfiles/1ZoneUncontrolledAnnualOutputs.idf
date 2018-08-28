@@ -119,15 +119,16 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    2018,                    !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
-    Tuesday,                 !- Day of Week for Start Day
+    2019,                    !- End Year
+    Monday,                  !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    2;                       !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
   Site:Location,
     Denver Centennial  Golden   N_CO_USA Design_Conditions,  !- Name

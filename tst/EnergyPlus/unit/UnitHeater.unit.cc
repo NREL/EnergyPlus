@@ -149,8 +149,10 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "    ,                        !- Name",
         "    1,                       !- Begin Month",
         "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    1,                       !- End Month",
         "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
         "    Tuesday,                 !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -1148,7 +1150,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     // calculate hot water coil design capacity
     HWCoilDesignCapacity = HWMaxVolFlowRate * HWDensity * CpHW * HWPlantDeltaTDesign;
     EXPECT_NEAR(HWCoilDesignCapacity, WaterCoils::WaterCoil(CoilNum).DesWaterHeatingCoilRate, 1.0);
-    EXPECT_NEAR(188.51, WaterCoils::WaterCoil(CoilNum).UACoil, 0.02);
+    EXPECT_NEAR(189.06, WaterCoils::WaterCoil(CoilNum).UACoil, 0.02);
 }
 
 TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
