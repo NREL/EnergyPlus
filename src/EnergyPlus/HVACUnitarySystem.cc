@@ -2228,9 +2228,13 @@ namespace HVACUnitarySystem {
             if (UnitarySystem(UnitarySysNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 PrimaryAirSystem(CurSysNum).supFanVecIndex = UnitarySystem(UnitarySysNum).FanIndex;
                 PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                DataSizing::DataFanIndex = UnitarySystem(UnitarySysNum).FanIndex;
             } else {
                 PrimaryAirSystem(CurSysNum).SupFanNum = UnitarySystem(UnitarySysNum).FanIndex;
                 PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                DataSizing::DataFanIndex = UnitarySystem(UnitarySysNum).FanIndex;
             }
             if (UnitarySystem(UnitarySysNum).FanPlace == BlowThru) {
                 PrimaryAirSystem(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;

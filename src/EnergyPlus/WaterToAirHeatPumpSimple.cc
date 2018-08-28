@@ -1569,7 +1569,6 @@ namespace WaterToAirHeatPumpSimple {
                         OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
                         rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                        MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
                         SupEnth = PsyHFnTdbW(SupTemp, MixHumRat);
                         SensCapCoeff1 = SimpleWatertoAirHP(HPNum).SensCoolCap1;
                         SensCapCoeff2 = SimpleWatertoAirHP(HPNum).SensCoolCap2;
@@ -1577,12 +1576,6 @@ namespace WaterToAirHeatPumpSimple {
                         SensCapCoeff4 = SimpleWatertoAirHP(HPNum).SensCoolCap4;
                         SensCapCoeff5 = SimpleWatertoAirHP(HPNum).SensCoolCap5;
                         SensCapCoeff6 = SimpleWatertoAirHP(HPNum).SensCoolCap6;
-                        ratioTDB = (MixTemp + 273.15) / 283.15;
-                        ratioTWB = (MixWetBulb + 273.15) / 283.15;
-                        // rated condenser water inlet temperature of 85F
-                        ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
-                        SensCapTempModFac = SensCapCoeff1 + (ratioTDB * SensCapCoeff2) + (ratioTWB * SensCapCoeff3) + (ratioTS * SensCapCoeff4) +
-                                            (1.0 * SensCapCoeff5) + (1.0 * SensCapCoeff6);
                         Real64 FanCoolLoad = 0.0;
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
@@ -1600,13 +1593,24 @@ namespace WaterToAirHeatPumpSimple {
                             }
                             } // end switch
                             Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
-                            MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                                MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                                SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            }
                         }
                         // Sensible capacity is calculated from enthalpy difference with constant humidity ratio, i.e.,
                         // there is only temperature difference between entering and leaving air enthalpy. Previously
                         // it was calculated using m.cp.dT
                         SensCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                         SensCapAtPeak = max(0.0, SensCapAtPeak);
+                        MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                        ratioTDB = (MixTemp + 273.15) / 283.15;
+                        ratioTWB = (MixWetBulb + 273.15) / 283.15;
+                        // rated condenser water inlet temperature of 85F
+                        ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
+                        SensCapTempModFac = SensCapCoeff1 + (ratioTDB * SensCapCoeff2) + (ratioTWB * SensCapCoeff3) + (ratioTS * SensCapCoeff4) +
+                                            (1.0 * SensCapCoeff5) + (1.0 * SensCapCoeff6);
                         RatedCapCoolSensDes = SensCapAtPeak / SensCapTempModFac;
                     } else {
                         RatedCapCoolSensDes = 0.0;
@@ -1652,7 +1656,6 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                        MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
                         SupEnth = PsyHFnTdbW(SupTemp, MixHumRat);
                         SensCapCoeff1 = SimpleWatertoAirHP(HPNum).SensCoolCap1;
                         SensCapCoeff2 = SimpleWatertoAirHP(HPNum).SensCoolCap2;
@@ -1660,12 +1663,6 @@ namespace WaterToAirHeatPumpSimple {
                         SensCapCoeff4 = SimpleWatertoAirHP(HPNum).SensCoolCap4;
                         SensCapCoeff5 = SimpleWatertoAirHP(HPNum).SensCoolCap5;
                         SensCapCoeff6 = SimpleWatertoAirHP(HPNum).SensCoolCap6;
-                        ratioTDB = (MixTemp + 273.15) / 283.15;
-                        ratioTWB = (MixWetBulb + 273.15) / 283.15;
-                        // rated condenser water inlet temperature of 85F
-                        ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
-                        SensCapTempModFac = SensCapCoeff1 + (ratioTDB * SensCapCoeff2) + (ratioTWB * SensCapCoeff3) + (ratioTS * SensCapCoeff4) +
-                                            (1.0 * SensCapCoeff5) + (1.0 * SensCapCoeff6);
                         Real64 FanCoolLoad = 0.0;
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
@@ -1682,12 +1679,25 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
+                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                            if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                                MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            } else {
+                                SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                            }
                         }
                         // Sensible capacity is calculated from enthalpy difference with constant humidity ratio, i.e.,
                         // there is only temperature difference between entering and leaving air enthalpy. Previously
                         // it was calculated using m.cp.dT
                         SensCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                         SensCapAtPeak = max(0.0, SensCapAtPeak);
+                        MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                        ratioTDB = (MixTemp + 273.15) / 283.15;
+                        ratioTWB = (MixWetBulb + 273.15) / 283.15;
+                        // rated condenser water inlet temperature of 85F
+                        ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
+                        SensCapTempModFac = SensCapCoeff1 + (ratioTDB * SensCapCoeff2) + (ratioTWB * SensCapCoeff3) + (ratioTS * SensCapCoeff4) +
+                                            (1.0 * SensCapCoeff5) + (1.0 * SensCapCoeff6);
                         if (SensCapTempModFac > 0.0) {
                             RatedCapCoolSensDes = SensCapAtPeak / SensCapTempModFac;
                         } else {

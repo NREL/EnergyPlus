@@ -2027,11 +2027,11 @@ namespace HVACUnitaryBypassVAV {
                 PrimaryAirSystem(CurSysNum).SupFanNum = CBVAV(CBVAVNum).FanIndex;
                 PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
             }
-        }
-        if (CBVAV(CBVAVNum).FanPlace == BlowThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
-        } else if (CBVAV(CBVAVNum).FanPlace == DrawThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+            if (CBVAV(CBVAVNum).FanPlace == BlowThru) {
+                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            } else if (CBVAV(CBVAVNum).FanPlace == DrawThru) {
+                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            }
         }
 
         if (CBVAV(CBVAVNum).MaxCoolAirVolFlow == AutoSize) {

@@ -2193,7 +2193,7 @@ namespace FanCoilUnits {
         Real64 MinSAMassFlowRate;     // minimum supply air mass flow rate [kg/s]
         Real64 MaxSAMassFlowRate;     // maximum supply air mass flow rate [kg/s]
         // Real64 FCOutletTempOn;        // ASHRAE outlet air temperature when coil is on [C]
-        Real64 HWFlow;       // hot water mass flow rate solution [kg/s]		Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
+        Real64 HWFlow;       // hot water mass flow rate solution [kg/s]
         Real64 MdotLockH;    // saved value of locked chilled water mass flow rate [kg/s]
         Real64 MdotLockC;    // saved value of locked hot water mass flow rate [kg/s]
         Real64 CWFlow;       // cold water mass flow rate solution [kg/s]

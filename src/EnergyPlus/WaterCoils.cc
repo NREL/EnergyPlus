@@ -2195,6 +2195,22 @@ namespace WaterCoils {
                     RequestSizing(CompType, CompName, CoolingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
                     WaterCoil(CoilNum).DesInletAirHumRat = TempSize;
                 }
+                if (CurSysNum > 0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This will
+                                     // change the order of the eio file.
+                    if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
+                        FieldNum = 1;   // do not print this sizing request since this coil does not have a design inlet air humrat input field (we
+                                        // should print this!)
+                        bPRINT = false; // no field for detailed water coil
+                    } else {
+                        FieldNum = 6; //  N6 , \field Design Inlet Air Humidity Ratio
+                        bPRINT = true;
+                    }
+                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum); // + " [kgWater/kgDryAir]";
+                    DataFlowUsedForSizing = DataAirFlowUsedForSizing;
+                    TempSize = WaterCoil(CoilNum).DesInletAirHumRat;
+                    RequestSizing(CompType, CompName, CoolingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).DesInletAirHumRat = TempSize;
+                }
                 DataDesInletAirHumRat = WaterCoil(CoilNum).DesInletAirHumRat;
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2245,23 +2261,6 @@ namespace WaterCoils {
                 WaterCoil(CoilNum).DesOutletAirTemp = TempSize;
                 DataDesOutletAirTemp = TempSize;
 
-                if (CurSysNum > 0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This will
-                                     // change the order of the eio file.
-                    if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
-                        FieldNum = 1;   // do not print this sizing request since this coil does not have a design inlet air humrat input field (we
-                                        // should print this!)
-                        bPRINT = false; // no field for detailed water coil
-                    } else {
-                        FieldNum = 6; //  N6 , \field Design Inlet Air Humidity Ratio
-                        bPRINT = true;
-                    }
-                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum); // + " [kgWater/kgDryAir]";
-                    DataFlowUsedForSizing = DataAirFlowUsedForSizing;
-                    TempSize = WaterCoil(CoilNum).DesInletAirHumRat;
-                    RequestSizing(CompType, CompName, CoolingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesInletAirHumRat = TempSize;
-                }
-
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                     FieldNum = 1;   // do not print this sizing request since this coil does not have a design outlet air humrat input field (we
                                     // should print this!)
@@ -2273,7 +2272,6 @@ namespace WaterCoils {
                 SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum);    // + " [kgWater/kgDryAir]";
                 DataCapacityUsedForSizing = WaterCoil(CoilNum).DesWaterCoolingCoilRate; // used for warning messages
                 DataDesInletAirTemp = WaterCoil(CoilNum).DesOutletAirTemp;
-                DataDesInletAirHumRat = WaterCoil(CoilNum).DesInletAirHumRat;
                 DataDesInletWaterTemp = WaterCoil(CoilNum).DesInletWaterTemp;
                 TempSize = WaterCoil(CoilNum).DesOutletAirHumRat;
                 RequestSizing(CompType, CompName, CoolingWaterDesAirOutletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
@@ -4679,29 +4677,29 @@ namespace WaterCoils {
                 if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) {
                     coilObjClassName = "Coil:Heating:Water";
                     coilSelectionReportObj->setCoilFinalSizes(WaterCoil(CoilNum).Name,
-                        coilObjClassName,
-                        WaterCoil(CoilNum).DesWaterHeatingCoilRate,
-                        WaterCoil(CoilNum).DesWaterHeatingCoilRate,
-                        WaterCoil(CoilNum).DesAirVolFlowRate,
-                        WaterCoil(CoilNum).MaxWaterVolFlowRate);
+                                                              coilObjClassName,
+                                                              WaterCoil(CoilNum).DesWaterHeatingCoilRate,
+                                                              WaterCoil(CoilNum).DesWaterHeatingCoilRate,
+                                                              WaterCoil(CoilNum).DesAirVolFlowRate,
+                                                              WaterCoil(CoilNum).MaxWaterVolFlowRate);
                     WaterCoil(CoilNum).reportCoilFinalSizes = false;
                 } else if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_DetFlatFinCooling) {
                     coilObjClassName = "Coil:Cooling:Water:DetailedGeometry";
                     coilSelectionReportObj->setCoilFinalSizes(WaterCoil(CoilNum).Name,
-                        coilObjClassName,
-                        WaterCoil(CoilNum).DesWaterCoolingCoilRate,
-                        -999.0,
-                        WaterCoil(CoilNum).DesAirVolFlowRate,
-                        WaterCoil(CoilNum).MaxWaterVolFlowRate);
+                                                              coilObjClassName,
+                                                              WaterCoil(CoilNum).DesWaterCoolingCoilRate,
+                                                              -999.0,
+                                                              WaterCoil(CoilNum).DesAirVolFlowRate,
+                                                              WaterCoil(CoilNum).MaxWaterVolFlowRate);
                     WaterCoil(CoilNum).reportCoilFinalSizes = false;
                 } else if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_Cooling) {
                     coilObjClassName = "Coil:Cooling:Water";
                     coilSelectionReportObj->setCoilFinalSizes(WaterCoil(CoilNum).Name,
-                        coilObjClassName,
-                        WaterCoil(CoilNum).DesWaterCoolingCoilRate,
-                        -999.0,
-                        WaterCoil(CoilNum).DesAirVolFlowRate,
-                        WaterCoil(CoilNum).MaxWaterVolFlowRate);
+                                                              coilObjClassName,
+                                                              WaterCoil(CoilNum).DesWaterCoolingCoilRate,
+                                                              -999.0,
+                                                              WaterCoil(CoilNum).DesAirVolFlowRate,
+                                                              WaterCoil(CoilNum).MaxWaterVolFlowRate);
                     WaterCoil(CoilNum).reportCoilFinalSizes = false;
                 }
             }

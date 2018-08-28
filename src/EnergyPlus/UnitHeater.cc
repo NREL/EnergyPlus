@@ -1043,6 +1043,8 @@ namespace UnitHeater {
             DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
         }
         DataFanIndex = UnitHeat(UnitHeatNum).Fan_Index;
+        // unit heater is always blow thru
+        DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
         if (CurZoneEqNum > 0) {
             if (UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {

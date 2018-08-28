@@ -6015,15 +6015,20 @@ namespace Furnaces {
         SuppHeatCap = 0.0;
 
         if (Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex = Furnace(FurnaceNum).FanIndex;
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
             DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
         } else {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = Furnace(FurnaceNum).FanIndex;
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
             DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
         }
-        DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
         if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
         } else if (Furnace(FurnaceNum).FanPlace == DrawThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
         }
 
         if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {

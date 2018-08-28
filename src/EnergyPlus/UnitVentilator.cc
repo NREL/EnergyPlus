@@ -1718,6 +1718,8 @@ namespace UnitVentilator {
             DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
         }
         DataSizing::DataFanIndex = UnitVent(UnitVentNum).Fan_Index;
+        // unit ventilator is always blow thru
+        DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
         if (UnitVent(UnitVentNum).CoilOption == BothOption) {
             ZoneCoolingOnlyFan = true;
