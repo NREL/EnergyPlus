@@ -797,7 +797,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     DataEnvironment::HolidayIndex = 0;
     ScheduleManager::ProcessScheduleInput();
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
 
     createFacilityElectricPowerServiceObject();
