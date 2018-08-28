@@ -60,13 +60,13 @@
 
 namespace EnergyPlus {
 
-void AbortEnergyPlus();
+int AbortEnergyPlus();
 
 void CloseMiscOpenFiles();
 
 void CloseOutOpenFiles();
 
-void EndEnergyPlus();
+int EndEnergyPlus();
 
 int GetNewUnitNumber();
 
