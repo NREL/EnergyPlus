@@ -156,6 +156,7 @@ namespace DataSurfaces {
     extern int const SurfaceClass_TDD_Diffuser;
 
     // Parameters to indicate heat transfer model to use for surface
+    extern Array1D_string const HeatTransferModelNames;
     extern int const HeatTransferModel_NotSet;
     extern int const HeatTransferModel_None; // shading surfaces for example
     extern int const HeatTransferModel_CTF;
