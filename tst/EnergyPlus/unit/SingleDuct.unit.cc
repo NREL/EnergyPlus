@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues();
 
@@ -307,7 +307,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues();
 

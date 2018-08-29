@@ -70,6 +70,7 @@
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -336,6 +337,7 @@ void EnergyPlusFixture::clear_all_states()
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
+    DaylightingManager::clear_state();
     DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
     DirectAirManager::clear_state();

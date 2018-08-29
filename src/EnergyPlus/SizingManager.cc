@@ -2019,7 +2019,7 @@ namespace SizingManager {
                                 // store timing description of Last occurance of max
                                 int Month(0);
                                 int DayOfMonth(0);
-                                General::InvJulianDay(DayLoop, Month, DayOfMonth, 1);
+                                General::InvOrdinalDay(DayLoop, Month, DayOfMonth, 1);
                                 std::string MonthDayString;
                                 static gio::Fmt MnDyFmt("(I2.2,'/',I2.2)");
                                 gio::write(MonthDayString, MnDyFmt) << Month << DayOfMonth;
