@@ -351,12 +351,43 @@ namespace CurveManager {
             } else if (SELECT_CASE_var == LagrangeInterpolationLinearExtrapolation) {
                 CurveValue = TableLookupObject(CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
             } else if (SELECT_CASE_var == BtwxtMethod) {
-                std::vector<double> target{Var1};
-                if (present(Var2)) target.push_back(Var2);
-                if (present(Var3)) target.push_back(Var3);
-                if (present(Var4)) target.push_back(Var4);
-                if (present(Var5)) target.push_back(Var5);
-                if (present(Var6)) target.push_back(Var6);
+                Real64 vMin, vMax, var;
+
+                // TODO: Generalize for N-dims
+                var = Var1;
+                std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 0);
+                var = max(min(var, vMax), vMin);
+                std::vector<double> target{var};
+                if (present(Var2)) {
+                    var = Var2;
+                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 1);
+                    var = max(min(var, vMax), vMin);
+                    target.push_back(var);
+                }
+                if (present(Var3)) {
+                    var = Var3;
+                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 2);
+                    var = max(min(var, vMax), vMin);
+                    target.push_back(var);
+                }
+                if (present(Var4)) {
+                    var = Var4;
+                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 3);
+                    var = max(min(var, vMax), vMin);
+                    target.push_back(var);
+                }
+                if (present(Var5)) {
+                    var = Var5;
+                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 4);
+                    var = max(min(var, vMax), vMin);
+                    target.push_back(var);
+                }
+                if (present(Var6)) {
+                    var = Var6;
+                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 5);
+                    var = max(min(var, vMax), vMin);
+                    target.push_back(var);
+                }
 
                 CurveValue = btwxtContainer.getGridValue(PerfCurve(CurveIndex).TableIndex,PerfCurve(CurveIndex).GridValueIndex,target);
             } else {

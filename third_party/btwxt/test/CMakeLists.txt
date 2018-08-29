@@ -1,8 +1,7 @@
 # Test Executable
 
 include_directories("../src"
-                    "${gtest_SOURCE_DIR}/include"
-                    "${PROJECT_SOURCE_DIR}/vendor/eigen3")
+                    "${gtest_SOURCE_DIR}/include")
 
 set(library_sources
   main_test.cpp

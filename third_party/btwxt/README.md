@@ -85,6 +85,5 @@ std::vector<double> result = my_interpolator(new_target);
 
 ## Dependencies
 Btwxt uses
-*  [Eigen](http://eigen.tuxfamily.org) Arrays as containers for the value tables.
 *  [Googletest](https://github.com/google/googletest), both gtest and gmock for unittests.
-The library uses CMake DownloadProject to incorporate Eigen and Googletest into the build.
+The library uses CMake DownloadProject to incorporate Googletest into the build.

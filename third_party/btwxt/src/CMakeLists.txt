@@ -1,7 +1,5 @@
 # Main library
 
-include_directories("${PROJECT_SOURCE_DIR}/vendor/eigen3")
-
 set(library_sources
   btwxt.h
   btwxt.cpp
@@ -9,8 +7,6 @@ set(library_sources
   griddeddata.cpp
   gridpoint.h
   gridpoint.cpp
-  hypercube.h
-  hypercube.cpp
   error.h
   error.cpp
 )

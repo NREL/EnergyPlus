@@ -67,7 +67,6 @@
 // Btwxt Headers
 #include <btwxt.h>
 #include <griddeddata.h>
-#include <error.h>
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>

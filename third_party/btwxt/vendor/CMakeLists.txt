@@ -27,14 +27,3 @@ if (BUILD_BTWXT_TESTING AND NOT TARGET gtest)
     add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 
 endif()
-
-if (BTWXT_GET_EIGEN)
-    download_project(PROJ               eigen3
-                     GIT_REPOSITORY     https://github.com/eigenteam/eigen-git-mirror.git
-                     GIT_TAG            master
-                     DOWNLOAD_DIR       "${CMAKE_CURRENT_BINARY_DIR}/eigen3-dl"
-                     SOURCE_DIR         "${CMAKE_CURRENT_SOURCE_DIR}/eigen3"
-                     BINARY_DIR         "${CMAKE_CURRENT_BINARY_DIR}/eigen3"
-                     ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-    )
-endif()

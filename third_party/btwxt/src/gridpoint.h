@@ -1,77 +1,93 @@
 /* Copyright (c) 2018 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef GRIDPOINT_H_
 #define GRIDPOINT_H_
 
 // Standard
-#include<vector>
+#include <memory>
+#include <vector>
 
 // btwxt
 #include "griddeddata.h"
 
 namespace Btwxt {
 
-    enum class Bounds {
-        OUTLAW, OUTBOUNDS, INBOUNDS
-    };
+enum class Bounds { OUTLAW, OUTBOUNDS, INBOUNDS };
 
-    class GridPoint {
-    public:
-        // target is an array of doubles specifying the point we are interpolating to.
-        GridPoint();
+class GridPoint {
+public:
+  GridPoint();
 
-        explicit GridPoint(const std::vector<double> &target_vector);
+  GridPoint(GriddedData &grid_data);
 
-        std::vector<double> target;
-    };
+  GridPoint(GriddedData &grid_data, std::vector<double> v);
+
+  void set_target(std::vector<double> v);
+
+  std::vector<double> get_current_target();
+
+  std::vector<std::size_t> get_floor();
+
+  std::vector<double> get_weights();
+
+  std::vector<Bounds> get_is_inbounds();
+
+  std::vector<Method> get_methods();
+
+  std::vector<std::vector<double>> get_interp_coeffs();
+
+  std::vector<std::vector<double>> get_cubic_slope_coeffs();
+
+  std::vector<double> get_results();
+
+  std::vector<std::vector<double>> get_spacing_mults(GriddedData &grid_data);
+
+  double get_vertex_weight(const std::vector<short> &v,
+                           const std::vector<std::vector<double>> &spacing_mults);
+
+  void set_floor();
+
+private:
+  friend class RegularGridInterpolator;
+  GriddedData *grid_data;
+  std::size_t ndims;
+  std::vector<double> target;
+  bool target_is_set;
+  std::vector<std::size_t> point_floor; // index of grid point <= target
+  std::vector<double> weights;
+  std::vector<Bounds> is_inbounds; // for deciding interpolation vs. extrapolation;
+  std::vector<Method> methods;
+  std::vector<std::vector<short>> hypercube;
+
+  std::vector<std::vector<double>> interp_coeffs;
+  std::vector<std::vector<double>> cubic_slope_coeffs;
+  std::vector<std::vector<double>> terms;
+  std::vector<double> results;
+  static std::vector<std::pair<int, int>> sivor; // {sign, flavor}, flavor corresponds to the floor
+                                                 // (0) or ceiling (1) bounding of the point
+
+  void calculate_weights();
+
+  void consolidate_methods();
+
+  void calculate_interp_coeffs();
+
+  double sum_weighting_terms();
+
+  void set_dim_floor(std::size_t dim);
+
+  void set_hypercube();
+
+  void set_hypercube(std::vector<Method> methods);
+
+  std::vector<std::vector<short>>& get_hypercube();
 
 
-    class PointLocator {
-    public:
-        PointLocator();
+};
 
-        PointLocator(GridPoint &, GriddedData &);
-
-        std::vector<std::size_t> get_floor();
-
-        std::vector<double> get_weights();
-
-        std::vector<Bounds> get_is_inbounds();
-
-        std::vector<Method> get_methods();
-
-        std::vector<std::vector<double> > get_interp_coeffs();
-
-        std::vector<std::vector<double> > get_cubic_slope_coeffs();
-
-    private:
-        std::size_t ndims;
-        std::vector<std::size_t> point_floor;  // index of grid point <= target
-        std::vector<double> weights;
-        std::vector<Bounds> is_inbounds;  // for deciding interpolation vs. extrapolation;
-        std::vector<Method> methods;
-        std::vector<std::vector<double> > interp_coeffs;
-        std::vector<std::vector<double> > cubic_slope_coeffs;
-
-        void find_floor(GridPoint &, GriddedData &);
-
-        void calculate_weights(GridPoint &, GriddedData &);
-
-        void consolidate_methods(const std::vector<Method> &interp_methods,
-                                 const std::vector<Method> &extrap_methods);
-
-        void calculate_interp_coeffs();
-    };
-
-
-    // free functions
-    void locate_in_dim(const double &target, Bounds &dim_in, std::size_t &dim_floor,
-                       std::vector<double> grid_vector, std::pair<double, double> &extrap_limits);
-
-    std::size_t index_below_in_vector(const double &target, std::vector<double> &my_vec);
-
-    double compute_fraction(double x, double edge[2]);
-}
+// free functions
+double compute_fraction(double x, double edge[2]);
+} // namespace Btwxt
 
 #endif // GRIDPOINT_H_

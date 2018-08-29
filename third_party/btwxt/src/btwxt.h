@@ -1,89 +1,102 @@
 /* Copyright (c) 2018 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef GRIDINTERP_H_
 #define GRIDINTERP_H_
 
 // Standard
-#include<vector>
-#include "Eigen/Dense"
+#include <vector>
 
 // btwxt
 #include "griddeddata.h"
 #include "gridpoint.h"
-#include "hypercube.h"
-
 
 namespace Btwxt {
 
+enum class MsgLevel { MSG_DEBUG, MSG_INFO, MSG_WARN, MSG_ERR };
+extern int LOG_LEVEL;
+
+typedef void (*BtwxtCallbackFunction)(const MsgLevel messageType, const std::string message,
+                                      void *contextPtr);
+
+extern BtwxtCallbackFunction btwxtCallbackFunction;
+extern void *messageCallbackContextPtr;
+
+void setMessageCallback(BtwxtCallbackFunction callbackFunction, void *contextPtr);
 
 // this will be the public-facing class.
-    class RegularGridInterpolator {
-    public:
-        // GridSpace, GridAxis, AllValueTables, ValueTable are instantiated in RGI constructor.
-        RegularGridInterpolator();
+class RegularGridInterpolator {
+public:
+  // GridSpace, GridAxis, AllValueTables, ValueTable are instantiated in RGI constructor.
 
-        explicit RegularGridInterpolator(GriddedData &the_blob);
+  RegularGridInterpolator();
 
-        RegularGridInterpolator(
-                const std::vector<std::vector<double> > &grid,
-                const std::vector<std::vector<double> > &values
-        );
+  explicit RegularGridInterpolator(GriddedData &grid_data);
 
-        // Add value table to GriddedData
-        std::size_t add_value_table(std::vector<double>& value_vector) {
-            return grid_data.add_value_table(value_vector);
-        }
+  RegularGridInterpolator(const std::vector<std::vector<double>> &grid,
+                          const std::vector<std::vector<double>> &values);
 
-        // GridPoint gets instantiated inside calculate_value_at_target
-        double calculate_value_at_target(std::vector<double> target, std::size_t table_index);
+  RegularGridInterpolator(const RegularGridInterpolator &source);
 
-        double operator()(std::vector<double> target, std::size_t table_index) {
-            return calculate_value_at_target(std::move(target), table_index);
-        }
+  RegularGridInterpolator &operator=(const RegularGridInterpolator &source) {
+    if (this == &source) {
+      return *this;
+    }
 
-        double calculate_value_at_target(std::size_t table_index);
+    grid_data = source.grid_data;
+    grid_point = source.grid_point;
+    if (source.grid_point.grid_data != nullptr) {
+      this->grid_point.grid_data = &this->grid_data;
+    }
+    return *this;
+  }
 
-        double operator()(std::size_t table_index) {
-            return calculate_value_at_target(table_index);
-        }
+  // Add value table to GriddedData
+  std::size_t add_value_table(std::vector<double> &value_vector) {
+    return grid_data.add_value_table(value_vector);
+  }
 
-        std::vector<double> calculate_all_values_at_target(std::vector<double> target);
+  // GridPoint gets instantiated inside calculate_value_at_target
+  double get_value_at_target(std::vector<double> target, std::size_t table_index);
 
-        std::vector<double> operator()(std::vector<double> target) {
-            return calculate_all_values_at_target(std::move(target));
-        }
+  double operator()(std::vector<double> target, std::size_t table_index) {
+    return get_value_at_target(std::move(target), table_index);
+  }
 
-        std::vector<double> calculate_all_values_at_target();
+  double get_value_at_target(std::size_t table_index);
 
-        std::vector<double> operator()() {
-            return calculate_all_values_at_target();
-        }
+  double operator()(std::size_t table_index) { return get_value_at_target(table_index); }
 
-        void set_new_grid_point(const std::vector<double> &target);
+  std::vector<double> get_values_at_target(std::vector<double> target);
 
-        std::vector<double> get_current_grid_point();
+  std::vector<double> operator()(std::vector<double> target) {
+    return get_values_at_target(std::move(target));
+  }
 
-        void clear_current_grid_point();
+  std::vector<double> get_values_at_target();
 
-        std::size_t get_ndims();
+  std::vector<double> operator()() { return get_values_at_target(); }
 
-        std::pair<double, double> get_axis_limits(int dim);
+  void set_new_target(const std::vector<double> &target);
 
-    private:
-        GriddedData grid_data;
-        bool cgp_exists;
-        GridPoint current_grid_point;
-        PointLocator the_locator;
-        Hypercube hypercube;
+  std::vector<double> get_current_target();
 
-        void check_target_dimensions(const std::vector<double> &target);
+  void clear_current_target();
 
-        std::vector<double> interpolation_wrapper();
-    };
+  std::size_t get_ndims();
 
+  void set_axis_interp_method(std::size_t dim, Method method) {
+    grid_data.set_axis_interp_method(dim, method);
+  }
 
-// free functions
-    std::size_t pow(const std::size_t &base, const std::size_t &power);
-}
+  std::vector<std::vector<short>>& get_hypercube();
+
+  std::pair<double, double> get_axis_limits(int dim);
+
+private:
+  GriddedData grid_data;
+  GridPoint grid_point;
+};
+
+} // namespace Btwxt
 #endif // GRIDINTERP_H_
