@@ -230,6 +230,12 @@ namespace DaylightingManager {
 
     // Functions
 
+    void clear_state()
+    {
+        // this will need a lot more, but it is a start
+        ZoneDaylight.deallocate();
+    }
+
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
     {
 

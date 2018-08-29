@@ -1678,13 +1678,13 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     Real64 NonAirSysOutput = 0.0;
     DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, 0.3521952339035046, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(15).Temp, 19.191523455437512, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(15).MassFlowRate, 0.046199561631265804, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, 0.35251094469529615, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(15).Temp, 19.191879243000013, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(15).MassFlowRate, 0.046012222387687624, 0.00001);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(39).Temp, 45.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(39).MassFlowRate, 0.0);
 
-    EXPECT_NEAR(NonAirSysOutput, -1004.0437766383318, 0.0001);
+    EXPECT_NEAR(NonAirSysOutput, -1000.0409091712534, 0.01);
 
     // next run with a sensible heating load of 5000 W and cold supply air
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
@@ -1696,10 +1696,10 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
-    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 34.895727719471829, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.18997902875440670, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 34.893552713525501, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.18999690807019429, 0.00001);
 
-    EXPECT_NEAR(NonAirSysOutput, 8023.9273066417645, 0.0001);
+    EXPECT_NEAR(NonAirSysOutput, 8026.4098164990628, 0.01);
 
     // next run with cooling load and neutral supply air
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
@@ -1716,8 +1716,8 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     NonAirSysOutput = 0.0;
     DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_NEAR(DataLoopNode::Node(15).Temp, 18.027306264618733, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(15).MassFlowRate, 0.25614844309380103, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(15).Temp, 18.030236752882026, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(15).MassFlowRate, 0.25590950750675651, 0.00001);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(39).Temp, 45.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(39).MassFlowRate, 0.0);
     // EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 18.027306264618733, 0.00001 );
@@ -1725,7 +1725,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
     // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 
-    EXPECT_NEAR(NonAirSysOutput, -4318.4346465170929, 0.0001);
+    EXPECT_NEAR(NonAirSysOutput, -4317.5458033204004, 0.01);
 
     // next run with heating load and neutral supply air
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
@@ -1739,14 +1739,14 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
-    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 33.646641648256931, 0.00001);
-    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.098729299097229120, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(39).Temp, 33.64526551877691, 0.00001);
+    EXPECT_NEAR(DataLoopNode::Node(39).MassFlowRate, 0.098707980876250004, 0.00001);
     // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
     // EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 );
     // EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 33.836239364981424, 0.00001 );
     // EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
 
-    EXPECT_NEAR(NonAirSysOutput, 4685.4000901131676, 0.0001);
+    EXPECT_NEAR(NonAirSysOutput, 4684.9561806348047, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
