@@ -2,7 +2,7 @@
 
 \subsection{Problem Statement}\label{problem-statement-008}
 
-EnergyPlus offers a wide range of control options in the WindowProperty:ShadingControl object, but it is easy to imagine custom schemes for controlling shades or blinds that are not available. We need to ask, Can we use the EMS to override the shading controls?
+EnergyPlus offers a wide range of control options in the WindowShadingControl object, but it is easy to imagine custom schemes for controlling shades or blinds that are not available. We need to ask, Can we use the EMS to override the shading controls?
 
 \subsection{EMS Design Discussion}\label{ems-design-discussion-008}
 
@@ -21,13 +21,13 @@ We assume that a model for the direct sun control is based on incidence angle, w
 
 Because the transmitted solar is a problem only when there is a cooling load, we also trigger the blind based on the current data for cooling. The report variable called ``Zone/Sys Sensible Cooling Rate'' is used in an EMS sensor to obtain an Erl variable with the most recent data about zone cooling load required to meet setpoint. When this value is positive, we know the zone cannot make good use of passive solar heating, so we close the blind.
 
-The EMS actuator will override the operation of a WindowProperty:ShadingControl input object. Related to this, the EDD file shows
+The EMS actuator will override the operation of a WindowShadingControl input object. Related to this, the EDD file shows
 
 ! \textless{}EnergyManagementSystem:Actuator Available\textgreater{}, Component Unique Name, Component Type,~ Control Type
 
 EnergyManagementSystem:Actuator Available,ZN001:WALL001:WIN001,Window Shading Control,Control Status
 
-Although the user-defined name for the WindowProperty:ShadingControl is ``INCIDENT SOLAR ON BLIND,'' the component unique name of the actuator that is available is called ``ZN001:WALL001:WIN001.''~ There could be multiple windows, all with shades, and each is governed by a single WindowProperty:ShadingControl input object. The EMS actuator could override each window separately. The Control Type is called ``Control Status,'' and requires you to set the status to one of a set of possible control flags. For this case, with only an interior shade, there are two states for the actuator to take. The first shows the shade is ``off,'' and corresponds to a value of 0.0. The second shows the interior shade is ``on,'' and corresponds to a value of 6.0.
+Although the user-defined name for the WindowShadingControl is ``INCIDENT SOLAR ON BLIND,'' the component unique name of the actuator that is available is called ``ZN001:WALL001:WIN001.''~ There could be multiple windows, all with shades, and each is governed by a single WindowShadingControl input object. The EMS actuator could override each window separately. The Control Type is called ``Control Status,'' and requires you to set the status to one of a set of possible control flags. For this case, with only an interior shade, there are two states for the actuator to take. The first shows the shade is ``off,'' and corresponds to a value of 0.0. The second shows the interior shade is ``on,'' and corresponds to a value of 6.0.
 
 \subsection{EMS Input Objects}\label{ems-input-objects-008}
 

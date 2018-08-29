@@ -6,6 +6,7 @@ The heat balance on the inside face can be written as follows:
 
 \begin{equation}
 {q''_{LWX}} + {q''_{SW}} + {q''_{LWS}} + {q''_{ki}} + {q''_{sol}} + {q''_{conv}} = 0
+\label{eq:InsideFaceHeatBalanceEquation}
 \end{equation}
 
 where:
@@ -109,13 +110,15 @@ Transmitted solar radiation is also distributed over the surfaces in the zone in
 
 The convection flux is calculated using the heat transfer coefficients as follows:
 
-\({q''_{conv}} = {h_c}({T_s} - {T_a})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (89)
+\begin{equation}
+{q''_{conv}} = {h_c}({T_s} - {T_a})
+\end{equation}
 
 The inside convection coefficients (\emph{h\(_{c}\)}) can be calculated using one of many different models.~ Currently the implementation uses coefficients based on correlations for natural, mixed, and forced convection.
 
 \subsection{Interior Conduction}\label{interior-conduction}
 
-This contribution to the inside surface heat balance is the wall conduction term, \({q''_{ki}}\) ~shown in Equation (30).~ This represents the heat transfer to the inside face of the building element. Again, a CTF formulation is used to determine this heat flux.
+This contribution to the inside surface heat balance is the wall conduction term, \({q''_{ki}}\) ~shown in Equation~\ref{eq:InsideFaceHeatBalanceEquation}. This represents the heat transfer to the inside face of the building element. Again, a CTF formulation is used to determine this heat flux.
 
 \subsection{Interior Convection}\label{interior-convection}
 
@@ -311,17 +314,17 @@ This is usually bound at a minimum of .1 in EnergyPlus. This is a component of t
 
 \subsubsection{Walton Unstable Horizontal Or Tilt}\label{walton-unstable-horizontal-or-tilt}
 
-Walton (11983) developed the following equation by fitting curves from various sources.
+Walton (1983) developed the following equation by fitting curves from various sources.
 
 \begin{equation}
-h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}
+h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.238 - \left| {\cos \Sigma } \right|}}
 \end{equation}
 
 Unstable refers to the direction of heat flow and the associated buoyancy relative to the surfaces. Unstable is when the natural tendency is to enhance flow in the sense that rising warmer air, or falling cooler air, is free to move away from the surface. This is usually bound at a minimum of .1 in EnergyPlus. This is a component of the TARP overall algorithm described below.
 
 \subsubsection{Walton Stable Horizontal Or Tilt}\label{walton-stable-horizontal-or-tilt}
 
-Walton (11983) developed the following equation by fitting curves from various sources.
+Walton (1983) developed the following equation by fitting curves from various sources.
 
 \begin{equation}
 h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}
@@ -331,7 +334,7 @@ Stable refers to the direction of heat flow and the associated buoyancy relative
 
 \subsubsection{Fisher Pedersen Ceiling Diffuser Walls}\label{fisher-pedersen-ceiling-diffuser-walls}
 
-Fisher and Pedersen 1997) developed the following equation from laboratory chamber measurements.
+Fisher and Pedersen (1997) developed the following equation from laboratory chamber measurements.
 
 \begin{equation}
 h = 1.208 + 1.012 * AC{H^{0.604}}
@@ -610,7 +613,7 @@ where,
 
 \(H\) ~is the height of the window.
 
-The Rayleigh number based on height, \(R{a_H}\) , is calculated using,
+The Rayleigh number based on height, \(R{a_H}\) , is calculated using:
 
 \begin{equation}
 R{a_H} = \frac{{{\rho ^2}{H^3}g\,{c_p}\left| {{T_{surf,i}} - {T_{air}}} \right|}}{{{T_{m,f}}\mu \lambda }}
@@ -666,11 +669,11 @@ Case D. \(179^o < \gamma \leq 180^o\)
 Nu = 0.58Ra_H^{{\raise0.7ex\hbox{1} \!\mathord{\left/ {\vphantom {1 5}}\right.}\!\lower0.7ex\hbox{5}}};\;R{a_H} \le {10^{11}}
 \end{equation}
 
-The material properties are evaluated at the mean film temperature.~ Standard EnergyPlus psychrometric functions are used for \(\rho\) ~and \({c_p}\) .~ Thermal conductivity is calculated using,
+The material properties are evaluated at the mean film temperature.~ Standard EnergyPlus psychrometric functions are used for \(\rho\) ~and \({c_p}\) .~ Thermal conductivity is calculated using:
 
 \(\lambda = 2.873 \times {10^{ - 3}} + 7.76 \times {10^{ - 8}}{T_{m,f}}\) .
 
-Kinematic viscosity is calculated using,
+Kinematic viscosity is calculated using:
 
 \(\mu = 3.723 \times {10^{ - 6}} + 4.94 \times {10^{ - 8}}{T_{m,f}}\) .
 
@@ -742,7 +745,7 @@ For no temperature difference OR a vertical surface the following correlation is
 
 For ($\Delta$T \textless{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textgreater{} 0.0 AND an downward facing surface) an enhanced convection correlation is used:
 
-\(h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.283 - \left| {\cos \Sigma } \right|}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (91)
+\(h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.238 - \left| {\cos \Sigma } \right|}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (91)
 
 where $\Sigma$ is the surface tilt angle.
 
@@ -754,7 +757,7 @@ where $\Sigma$ is the surface tilt angle.
 
 \subsubsection{Simple Natural Convection Algorithm}\label{simple-natural-convection-algorithm}
 
-The simple convection model uses constant coefficients for different heat transfer configurations, using the same criteria as the detailed model to determine reduced and enhanced convection.~ The coefficients are also taken directly from Walton (1983).~ Walton derived his coefficients from the surface conductances for e = 0.90 found in the ASHRAE Handbook (1985) in Table~\ref{table:simulation-flags} on p.~23.2.~ The radiative heat transfer component was estimated at 1.02 * 0.9 = 0.918 BTU/h-ft2-F and then subtracted off.~ Finally the coefficients were converted to SI units to yield the values below.
+The simple convection model uses constant coefficients for different heat transfer configurations, using the same criteria as the detailed model to determine reduced and enhanced convection.~ The coefficients are also taken directly from Walton (1983).~ Walton derived his coefficients from the surface conductances for e = 0.90 found in the ASHRAE Handbook (1985) in the table found on p.~23.2.~ The radiative heat transfer component was estimated at 1.02 * 0.9 = 0.918 BTU/h-ft2-F and then subtracted off.~ Finally the coefficients were converted to SI units to yield the values below.
 
 For a vertical surface:
 
@@ -792,9 +795,12 @@ The ceiling diffuser algorithm is based on empirical correlations developed by F
 
 For Floors:
 
-\(h = 3.873 + 0.082 * AC{H^{0.98}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (93)
+\begin{equation}
+h = 3.873 + 0.082 * AC{H^{0.98}}
+\end{equation}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (93)
 
-The correlation for floors is illustrated in the following figure:
+The correlation for floors is illustrated in Figure~\ref{fig:ceiling-diffuser-correlation-for-floors}.
 
 \begin{figure}[hbtp] % fig 1017
 \centering
@@ -804,9 +810,11 @@ The correlation for floors is illustrated in the following figure:
 
 For ceilings:
 
-\(h = 2.234 + 4.099 * AC{H^{0.503}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (94)
+\begin{equation}
+h = 2.234 + 4.099 * AC{H^{0.503}}
+\end{equation}
 
-The correlation for ceilings is illustrated in the following figure:
+The correlation for ceilings is illustrated in Figure~\ref{fig:ceiling-diffuser-correlation-for-ceilings}.
 
 \begin{figure}[hbtp] % fig 1018
 \centering
@@ -816,9 +824,11 @@ The correlation for ceilings is illustrated in the following figure:
 
 For Walls:
 
-\(h = 1.208 + 1.012 * AC{H^{0.604}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (95)
+\begin{equation}
+h = 1.208 + 1.012 * AC{H^{0.604}}
+\end{equation}
 
-The correlation for walls is illustrated in the following figure:
+The correlation for walls is illustrated in Figure~\ref{fig:ceiling-diffuser-correlation-for-walls}.
 
 \begin{figure}[hbtp] % fig 1019
 \centering
@@ -834,11 +844,13 @@ This algorithm gives the convection coefficients for air in a narrow vertical ca
 
 For a vertical cavity, the correlation from ISO 15099 is:
 
-\({\rm{NU1 = 0}}{\rm{.0673838 R}}{{\rm{a}}^{{\textstyle{\frac{{\rm{1}}}{{\rm{3}}}}}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ for 5E4 \textless{} Ra \textless{} 1E6
-
-\({\rm{NU1 = 0}}{\rm{.028154 R}}{{\rm{a}}^{{\rm{0}}{\rm{.4134}}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ for 1E4 \textless{} Ra \textless{} 5E4
-
-\({\rm{NU1 = 1 + 1}}{\rm{.7596678E - 10 R}}{{\rm{a}}^{{\rm{2}}{\rm{.2984755}}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ for Ra \textless{} = 1E4
+\begin{equation}
+\begin{array}{lcl}
+    NU1 = 0.0673838 Ra^{\frac{1}{3}} & for &  5E4 < Ra < 1E6 \\
+    NU1 = 0.028154 Ra^{0.4134} & for &  1E4 < Ra < 5E4 \\
+    NU1 = 1 + 1.7596678E^{-10} Ra^{2.2984755} & for &  Ra \leq 1E4 \\
+\end{array}
+\end{equation}
 
 \begin{equation}
 {\rm{NU2}} = 0.242{\left( {{\raise0.7ex\hbox{{{\rm{Ra}}}} \!\mathord{\left/ {\vphantom {{{\rm{Ra}}} {\rm{A}}}}\right.}\!\lower0.7ex\hbox{{\rm{A}}}}} \right)^{0.272}}

@@ -562,7 +562,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Zn001:Wall001,           !- Building Surface Name                                                             ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    0.5000000,               !- View Factor to Ground                                                             ",
-        "    ,                        !- Shading Control Name                                                              ",
         "    ,                        !- Frame and Divider Name                                                            ",
         "    1.0,                     !- Multiplier                                                                        ",
         "    4,                       !- Number of Vertices                                                                ",
@@ -665,7 +664,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
     InternalHeatGains::GetInternalHeatGainsInput();
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
@@ -725,4 +724,176 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 
     ProfileAngle(1, CosDirSun, vert, ProfAng);
     EXPECT_NEAR(1.94715, ProfAng, 0.00001);
+}
+
+TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
+{
+    DataGlobals::NumOfZones = 4;
+    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    ZoneDaylight(1).Name = "ZD1";
+    ZoneDaylight(2).Name = "ZD2";
+    ZoneDaylight(3).Name = "ZD3";
+    ZoneDaylight(4).Name = "ZD4";
+
+    TotWinShadingControl = 3;
+    WindowShadingControl.allocate(TotWinShadingControl);
+
+    WindowShadingControl(1).Name = "WSC1";
+    WindowShadingControl(1).DaylightingControlName = "ZD3";
+
+    WindowShadingControl(2).Name = "WSC2";
+    WindowShadingControl(2).DaylightingControlName = "ZD1";
+
+    WindowShadingControl(3).Name = "WSC3";
+    WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
+
+    AssociateWindowShadingControlWithDaylighting();
+
+    EXPECT_EQ(WindowShadingControl(1).DaylightControlIndex, 3);
+    EXPECT_EQ(WindowShadingControl(2).DaylightControlIndex, 1);
+    EXPECT_EQ(WindowShadingControl(3).DaylightControlIndex, 0);
+}
+
+TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
+{
+    TotWinShadingControl = 3;
+    WindowShadingControl.allocate(TotWinShadingControl);
+    int zn = 1;
+ 
+    WindowShadingControl(1).Name = "WSC1";
+    WindowShadingControl(1).ZoneIndex = zn;
+    WindowShadingControl(1).SequenceNumber = 2;
+    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(1).FenestrationCount = 3;
+    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
+    WindowShadingControl(1).FenestrationIndex(1) = 1;
+    WindowShadingControl(1).FenestrationIndex(2) = 2;
+    WindowShadingControl(1).FenestrationIndex(3) = 3;
+
+    WindowShadingControl(2).Name = "WSC2";
+    WindowShadingControl(2).ZoneIndex = zn;
+    WindowShadingControl(2).SequenceNumber = 3;
+    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    WindowShadingControl(2).FenestrationCount = 4;
+    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
+    WindowShadingControl(2).FenestrationIndex(1) = 4;
+    WindowShadingControl(2).FenestrationIndex(2) = 5;
+    WindowShadingControl(2).FenestrationIndex(3) = 6;
+    WindowShadingControl(2).FenestrationIndex(4) = 7;
+
+    WindowShadingControl(3).Name = "WSC3";
+    WindowShadingControl(3).ZoneIndex = zn;
+    WindowShadingControl(3).SequenceNumber = 1;
+    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(3).FenestrationCount = 2;
+    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
+    WindowShadingControl(3).FenestrationIndex(1) = 8;
+    WindowShadingControl(3).FenestrationIndex(2) = 9;
+
+    DataGlobals::NumOfZones = zn;
+    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+
+    CreateShadeDeploymentOrder(zn);
+
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
+
+    std::vector<int> compare1;
+    compare1.push_back(8);
+    compare1.push_back(9);
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[0], compare1);
+
+    std::vector<int> compare2;
+    compare2.push_back(1);
+    compare2.push_back(2);
+    compare2.push_back(3);
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[1], compare2);
+
+    std::vector<int> compare3;
+    compare3.push_back(4);
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[2], compare3);
+
+    std::vector<int> compare4;
+    compare4.push_back(5);
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[3], compare4);
+
+    std::vector<int> compare5;
+    compare5.push_back(6);
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[4], compare5);
+
+    std::vector<int> compare6;
+    compare6.push_back(7);
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[5], compare6);
+}
+
+TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
+{
+    TotWinShadingControl = 3;
+    WindowShadingControl.allocate(TotWinShadingControl);
+    int zn = 1;
+ 
+    WindowShadingControl(1).Name = "WSC1";
+    WindowShadingControl(1).ZoneIndex = zn;
+    WindowShadingControl(1).SequenceNumber = 2;
+    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(1).FenestrationCount = 3;
+    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
+    WindowShadingControl(1).FenestrationIndex(1) = 1;
+    WindowShadingControl(1).FenestrationIndex(2) = 2;
+    WindowShadingControl(1).FenestrationIndex(3) = 3;
+
+    WindowShadingControl(2).Name = "WSC2";
+    WindowShadingControl(2).ZoneIndex = zn;
+    WindowShadingControl(2).SequenceNumber = 3;
+    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    WindowShadingControl(2).FenestrationCount = 4;
+    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
+    WindowShadingControl(2).FenestrationIndex(1) = 4;
+    WindowShadingControl(2).FenestrationIndex(2) = 5;
+    WindowShadingControl(2).FenestrationIndex(3) = 6;
+    WindowShadingControl(2).FenestrationIndex(4) = 7;
+
+    WindowShadingControl(3).Name = "WSC3";
+    WindowShadingControl(3).ZoneIndex = zn;
+    WindowShadingControl(3).SequenceNumber = 1;
+    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(3).FenestrationCount = 2;
+    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
+    WindowShadingControl(3).FenestrationIndex(1) = 8;
+    WindowShadingControl(3).FenestrationIndex(2) = 9;
+
+    DataGlobals::NumOfZones = zn;
+    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+
+    CreateShadeDeploymentOrder(zn);
+
+    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
+
+    ZoneDaylight(zn).TotalDaylRefPoints = 1;
+    ZoneDaylight(zn).NumOfDayltgExtWins = 9;
+    ZoneDaylight(zn).MapShdOrdToLoopNum.allocate(ZoneDaylight(zn).NumOfDayltgExtWins);
+    ZoneDaylight(zn).DayltgExtWinSurfNums.allocate(ZoneDaylight(zn).NumOfDayltgExtWins);
+    ZoneDaylight(zn).DayltgExtWinSurfNums(1) = 1;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(2) = 2;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(3) = 3;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(4) = 4;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(5) = 5;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(6) = 6;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(7) = 7;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(8) = 8;
+    ZoneDaylight(zn).DayltgExtWinSurfNums(9) = 9;
+
+
+    MapShadeDeploymentOrderToLoopNumber(zn);
+
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(1), 8);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(2), 9);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(3), 1);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(4), 2);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(5), 3);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(6), 4);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(7), 5);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(8), 6);
+    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(9), 7);
+
+
 }

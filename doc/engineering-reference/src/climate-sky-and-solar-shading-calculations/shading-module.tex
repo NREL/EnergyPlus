@@ -21,7 +21,7 @@ Current solar position is described in terms of three direction cosines that are
 The fractional year is calculated, in radians:
 
 \begin{equation}
-\gamma  = \frac{{2\pi }}{{366}}(day_of_year)
+\gamma  = \frac{{2\pi }}{{366}}(day~of~year)
 \end{equation}
 
 From this fractional year, the equation of time and solar declination angle are calculated.~ For each time step (time value = fractional hour), the hour angle is calculated from:
@@ -87,7 +87,7 @@ The GlobalGeometryRules object specifies to EnergyPlus how the surface vertices 
 
 \subsubsection{Relative Coordinate Transformation}\label{relative-coordinate-transformation}
 
-When vertices are specified in ``relative'' coordinates, there can be a ``building'' north axis as well as a ``zone'' north axis.~ The building north axis/coordinate system is a rotation of y\(_{b}\) degrees from the global/world coordinate system.~ The global coordinates of zone origins are related to the building relative coordinates by:
+When vertices are specified in ``relative'' coordinates, there can be a ``building'' north axis as well as a ``zone'' north axis.~ The building north axis/coordinate system is a rotation of $\psi_b$ degrees from the global/world coordinate system.~ The global coordinates of zone origins are related to the building relative coordinates by:
 
 \begin{equation}
 {X_{zo}} = {X_{br}}\cdot \cos {\psi_b} - {Y_{br}}\cdot \sin {\psi_b}
@@ -143,7 +143,7 @@ Y = {Y_{so}} + {X_{sr}}\cdot \sin \psi  - {Y_{sr}}\cdot \cos \psi \cdot \cos \ph
 Z = {Z_{so}} + {Y_{sr}}\cdot \sin \phi
 \end{equation}
 
-\subsubsection{World Coordinates è Relative Coordinates}\label{world-coordinates-uxe8-relative-coordinates}
+\subsubsection{World Coordinates to Relative Coordinates}\label{world-coordinates-to-relative-coordinates}
 
 Vertices in the global coordinate system can be transformed to the coordinate system relative to a given surface by
 
@@ -169,6 +169,7 @@ Vertices in the global coordinate system can be transformed to the coordinate sy
 
 \begin{equation}
 {Z_{sr}} =  - {X'}\cdot \sin \psi \cdot \sin \phi  + {Y'}\cdot \cos \psi \cdot \sin \phi  + {Z'}\cdot \cos \phi
+\label{eq:ZsrEquation}
 \end{equation}
 
 \subsection{Shadow Projection}\label{shadow-projection}
@@ -183,7 +184,7 @@ Surfaces 1, 4, and 5 are in sunlight; 2 and 3 are in shade. It is possible to th
 \caption{Basic shadowing concept structure \protect \label{fig:basic-shadowing-concept-structure}}
 \end{figure}
 
-The expressions in equation are the direction cosines of the surface:
+The expressions in Equation~\ref{eq:ZsrEquation} are the direction cosines of the surface:
 
 \begin{equation}
 C{W_1} = \sin \psi \cdot \cos \phi
@@ -333,10 +334,10 @@ A point is enclosed by a clockwise, convex polygon if the point lies to the righ
 \caption{Figure Formed from Intercept Overlaps Between A and B \protect \label{fig:figure-formed-from-intercept-overlaps-between}}
 \end{figure}
 
-Once the vertices are determined, they must be sorted into clockwise order for the area to be computed.~ Given a closed, planar polygon of n sequential vertices (x\(_{1}\), y\(_{1}\)), (x\(_{2}\), y\(_{2}\)) \ldots{}, (x\(_{n}\), y\(_{n}\)), its \textbf{area} is given:
+Once the vertices are determined, they must be sorted into clockwise order for the area to be computed.~ Given a closed, planar polygon of n sequential vertices (x\(_{1}\), y\(_{1}\)), (x\(_{2}\), y\(_{2}\)), \ldots{}, (x\(_{n}\), y\(_{n}\)), its \textbf{area} is given:
 
 \begin{equation}
-Area = {\textstyle{1 \over 2}}\sum\limits_{i = 1}^n {({x_i}{y_{i + 1}} - {x_{i + 1}}{y_i})}
+Area = {\frac{1}{2}}\sum\limits_{i = 1}^n {({x_i}{y_{i + 1}} - {x_{i + 1}}{y_i})}
 \end{equation}
 
 where (x\(_{n+1}\),y\(_{n+1}\)) = (x\(_{1}\), y\(_{1}\))
@@ -397,7 +398,7 @@ The total solar gain on any exterior surface is a combination of the absorption 
 
 where
 
-a = solar absorptance of the surface
+$\alpha$ = solar absorptance of the surface
 
 A = angle of incidence of the sun's rays
 
@@ -479,13 +480,14 @@ This new treatment of diffuse solar is intended to more accurately account for t
 
 \subsubsection{Interior Solar Radiation Absorbed by Opaque Surfaces}\label{interior-solar-radiation-absorbed-by-opaque-surfaces}
 
-The short-wave radiation absorbed on the inside face of an opaque surface (floor, wall or ceiling) is given by
+The short-wave radiation absorbed on the inside face of an opaque surface (floor, wall or ceiling) is given by:
 
 \begin{equation}
 \begin{array}{l}
 QRadSWInAbs(SurfNum) = QS(ZoneNum)*AbsIntSurf(SurfNum) \\
-\quad \quad \quad \quad+ AISurf(SurfNum)*BeamSolarRad [W/m2]
+\quad \quad \quad \quad+ AISurf(SurfNum)*BeamSolarRad [W/m^2]
 \end{array}
+\label{eq:ShortWaveRadInsideFaceOpaqueSurf}
 \end{equation}
 
 where
@@ -518,7 +520,7 @@ where
 
 \emph{A\(_{i}\)} = surface area {[}m\(^{2}\){]}
 
-\({\alpha_i}\) = inside solar absorptance for an opaque surface, or, for a window, = back diffuse transmittance plus back diffuse system absorptance of glass layers and shading device layers (if present)
+\({\alpha_i}\) = inside solar absorptance for an opaque surface, or, for a window, $\alpha_i$ = back diffuse transmittance plus back diffuse system absorptance of glass layers and shading device layers (if present)
 
 Solving this equation for \emph{QS} gives:
 
@@ -532,12 +534,12 @@ where
 VMULT(ZoneNum) = \frac{1}{{\sum\limits_{i = 1}^{{N_{surf}}} {AbsIntSur{f_i}*{A_i}} }}{\rm{    [}}{{\rm{m}}^{{\rm{ - 2}}}}]
 \end{equation}
 
-\emph{Q\(_{sw}\)} is given by
+and \emph{Q\(_{sw}\)} is given by:
 
 \begin{equation}
 \begin{array}{l}
-Q{S_{SW}} = QD(ZoneNum) + ZoneIntGain(ZoneNum)\% QLTSW \\
-\quad \quad \quad + ZoneIntGain(ZoneNum)\% T_QLTSW [W]
+{Q_{SW}} = QD(ZoneNum) + ZoneIntGain(ZoneNum)\% QLTSW \\
+\quad \quad \quad + ZoneIntGain(ZoneNum)\% T\_QLTSW [W]
 \end{array}
 \end{equation}
 
@@ -581,16 +583,15 @@ where
 \emph{BTOTZone} is given by:
 
 \begin{equation}
-BTOTZone = \sum\limits_{i = 1}^{{N_{extwin}}} {TBmAl{l_i}*SunlitFrac{t_i}*CosIn{c_i}*Are{a_i}*InOutprojSLFracMul{t_i}}
+\begin{array}{rl}
+BTOTZone = & \sum\limits_{i = 1}^{{N_{extwin}}} {TBmAl{l_i}*SunlitFrac{t_i}*CosIn{c_i}*Are{a_i}*InOutprojSLFracMul{t_i}} \\
+           & +~Diffuse~entering~zone~from~beam~reflected~by~window~inside~reveal~surfaces \\
+           & +~Diffuse~transmitted~by~windows~from~beam~reflected~by~outside~reveal~surfaces \\
+           & -~Beam~absorbed~by~window~inside~reveal~surfaces \\
+\end{array}
 \end{equation}
 
-\emph{+ Diffuse entering zone from beam reflected by window inside reveal surfaces\footnote{See ``Beam Solar Reflection from Window Reveal Surfaces.''}}
-
-\emph{+ Diffuse transmitted by windows from beam reflected by outside reveal surfaces}
-
-\emph{--~ Beam absorbed by window inside reveal surfaces}
-
-Here,
+For more information on the diffuse entering the zone from beam reflected, see ``Beam Solar Reflection from Window Reveal Surfaces.''  In the above equation,
 
 \emph{TBmAll} = beam-to-beam plus beam-to-diffuse transmittance of window
 
@@ -604,15 +605,15 @@ Here,
 
 \emph{BABSZone} is given by the following sum (see Figure~\ref{fig:vertical-section-through-a-two-zone-building}):
 
-\emph{BABSZone} = ~ \emph{Beam absorbed by opaque inside surfaces}\footnote{If Solar Distribution = FullInteriorAndExterior in the Building object, the program calculates where beam solar from exterior windows falls inside the zone. Otherwise, all beam solar is assumed to fall on the floor.}
-
-\emph{~~~~~~~~~~~~~~~~~~~~~~~ + Beam transmitted through the zone's interior windows +}
-
-\emph{~~~~~~~~~~~~~~~~~~~~~~~ + Beam transmitted back out of the zone's exterior windows +}
-
-\emph{~~~~~~~~~~~~~~~~~~~~~~~ + Beam absorbed by the zone's exterior and interior windows +}
-
-\emph{~~~~~~~~~~~~~~~~~~~~~~~ + Beam absorbed by inside daylighting shelves}
+\begin{equation}
+\begin{array}{rl}
+BABSZone = & {Beam~absorbed~by~opaque~inside~surfaces}\footnote{If Solar Distribution = FullInteriorAndExterior in the Building object, the program calculates where beam solar from exterior windows falls inside the zone. Otherwise, all beam solar is assumed to fall on the floor.} \\
+           & + {Beam~transmitted~through~the~zone's~interior~windows} \\
+           & + {Beam~transmitted~back~out~of~the~zone's~exterior~windows} \\
+           & + {Beam~absorbed~by~the~zone's~exterior~and~interior~windows} \\
+           & + {Beam~absorbed~by~inside~daylighting~shelves} \\
+\end{array}
+\end{equation}
 
 \begin{figure}[hbtp] % fig 49
 \centering
@@ -624,10 +625,10 @@ If zone \emph{ZoneNum} shares interior windows with other zones, \emph{QS(ZoneNu
 
 \begin{equation}
 \begin{array}{rl}
-   QS(ZoneNum) & = QS(ZoneNum) \\
-               &+ \sum_{otherZones}\text{FractDifShortZtoZ(OtherZoneNum,ZoneNum)} \\
-               &* [QD(OtherZoneNum) + ZoneIntGain(OtherZoneNum)\% QLTSW \\
-               &\quad + ZoneIntGain(OtherZoneNum)\% T_QLTSW]
+   QS(ZoneNum) \to & QS(ZoneNum) \\
+                   &+ \sum_{otherZones}\text{FractDifShortZtoZ(OtherZoneNum,ZoneNum)} \\
+                   &* [QD(OtherZoneNum) + ZoneIntGain(OtherZoneNum)\% QLTSW \\
+                   &\quad + ZoneIntGain(OtherZoneNum)\% T\_QLTSW]
   \end{array}
 \end{equation}
 
@@ -637,9 +638,13 @@ where
 
 \paragraph{Interior Beam Radiation}\label{interior-beam-radiation}
 
-The inside beam solar irradiance factor\footnote{For the purposes of the surface heat balance calculation, any beam solar radiation absorbed by a surface is assumed to be uniformly distributed over the surface even though in reality it is likely to be concentrated in one or more discrete patches on the surface.} in is given by:
+The inside beam solar irradiance factor\footnote{For the purposes of the surface heat balance calculation, any beam solar radiation absorbed by a surface is assumed to be uniformly distributed over the surface even though in reality it is likely to be concentrated in one or more discrete patches on the surface.} in Equation~\ref{eq:ShortWaveRadInsideFaceOpaqueSurf} is given by:
 
-\(AISurf(SurfNum) = \frac{{AbsIntSurf(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}}\) where
+\begin{equation}
+AISurf(SurfNum) = \frac{{AbsIntSurf(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}}
+\end{equation}
+
+where
 
 \emph{i} = exterior window number
 
@@ -659,7 +664,11 @@ The inside beam solar irradiance factor\footnote{For the purposes of the surface
 
 The interior short-wave radiation absorbed by layer \emph{l} (glass, shade or blind) of a window is equal to:
 
-\(\begin{array}{l}QS(ZoneNum)*\alpha_{l,back}^{dif}(SurfNum) + \\BeamSolarRad*\frac{{\alpha_{l,back}^{beam}(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)} *CosIn{c_i}{\rm{ [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}\) where
+\begin{equation}
+\begin{array}{l}QS(ZoneNum)*\alpha_{l,back}^{dif}(SurfNum) + \\BeamSolarRad*\frac{{\alpha_{l,back}^{beam}(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)} *CosIn{c_i}{\rm{ [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}
+\end{equation}
+
+where
 
 \(\alpha_{l,back}^{dif}\) = the system diffuse solar absorptance of layer \emph{l} for irradiance from the back side
 
