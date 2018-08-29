@@ -1229,10 +1229,10 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_ElecHeatCoil_Only)
     EXPECT_EQ(0.0, UnitarySystem(1).IdleMassFlowRate);
 }
 
-TEST_F( ZoneUnitarySystemTest, UnitarySystem_MultiStageGasHeatCoil_Only_ContFan )
+TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultiStageGasHeatCoil_Only_ContFan)
 {
 
-    std::string const idf_objects = delimited_string( {
+    std::string const idf_objects = delimited_string({
 
         "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
@@ -1358,14 +1358,14 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_MultiStageGasHeatCoil_Only_ContFan 
         "  0.5,                            !- Minimum Value of x",
         "  1.5;                            !- Maximum Value of x",
 
-    } );
+    });
 
-    ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    GetUnitarySystemInputData( ErrorsFound ); // get UnitarySystem input from object above
+    GetUnitarySystemInputData(ErrorsFound); // get UnitarySystem input from object above
     // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
     HVACUnitarySystem::GetInputFlag = false;
-    EXPECT_FALSE( ErrorsFound ); // expect no errors
+    EXPECT_FALSE(ErrorsFound); // expect no errors
 
     SetPredefinedTables();
 
@@ -1374,53 +1374,54 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_MultiStageGasHeatCoil_Only_ContFan 
     bool FirstHVACIteration = false;
     DataGlobals::BeginEnvrnFlag = false;
 
-    SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+    SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
-    Node( 1 ).MassFlowRate = UnitarySystem( 1 ).DesignMassFlowRate;
-    Node( 1 ).MassFlowRateMaxAvail = UnitarySystem( 1 ).DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    Node(1).MassFlowRate = UnitarySystem(1).DesignMassFlowRate;
+    Node(1).MassFlowRateMaxAvail = UnitarySystem(1).DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    Node( 1 ).Temp = 24.0;         // 24C db
-    Node( 1 ).HumRat = 0.00922;    // 17C wb
-    Node( 1 ).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    Node(1).Temp = 24.0;         // 24C db
+    Node(1).HumRat = 0.00922;    // 17C wb
+    Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ProcessScheduleInput(); // read schedules
 
     // Heating coil air inlet node = 3
-    Node( 3 ).MassFlowRateMax = UnitarySystem( 1 ).DesignMassFlowRate; // max at fan outlet so fan won't limit flow
-                                                                       // Heating coil air outlet node = 2
-    Node( 2 ).TempSetPoint = 25.0;
+    Node(3).MassFlowRateMax = UnitarySystem(1).DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+                                                                   // Heating coil air outlet node = 2
+    Node(2).TempSetPoint = 25.0;
 
-    Schedule( 1 ).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // Heating mode
-    SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+    SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR( Node( 2 ).Temp, Node( 2 ).TempSetPoint, 0.001 );
+    EXPECT_NEAR(Node(2).Temp, Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT( Node( 2 ).Temp, Node( 3 ).Temp );
-    // no load air flow rate in UnitarySystemPerformance:Multispeed is blank (DS no load flow ratio defaults to 1) so idle mass flow rate = speed 1 heating flow
-    EXPECT_EQ( UnitarySystem( 1 ).HeatMassFlowRate( 1 ), UnitarySystem( 1 ).IdleMassFlowRate );
+    EXPECT_GT(Node(2).Temp, Node(3).Temp);
+    // no load air flow rate in UnitarySystemPerformance:Multispeed is blank (DS no load flow ratio defaults to 1) so idle mass flow rate = speed 1
+    // heating flow
+    EXPECT_EQ(UnitarySystem(1).HeatMassFlowRate(1), UnitarySystem(1).IdleMassFlowRate);
     // make sure control works at speed = 1
-    EXPECT_EQ( UnitarySystem( 1 ).HeatingSpeedNum, 1 );
+    EXPECT_EQ(UnitarySystem(1).HeatingSpeedNum, 1);
 
     // Heating coil air outlet node = 2
-    Node( 2 ).TempSetPoint = 34.0;
+    Node(2).TempSetPoint = 34.0;
 
     // Heating mode
-    SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+    SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR( Node( 2 ).Temp, Node( 2 ).TempSetPoint, 0.001 );
+    EXPECT_NEAR(Node(2).Temp, Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT( Node( 2 ).Temp, Node( 3 ).Temp );
+    EXPECT_GT(Node(2).Temp, Node(3).Temp);
     // make sure control works at speed = 2
-    EXPECT_EQ( UnitarySystem( 1 ).HeatingSpeedNum, 2 );
+    EXPECT_EQ(UnitarySystem(1).HeatingSpeedNum, 2);
 }
 
 TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance)
@@ -6873,7 +6874,8 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
         UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     Iter = 1;
@@ -6881,7 +6883,8 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
         UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     Iter = 2;
@@ -6889,7 +6892,8 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
         UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     Iter = 3;
@@ -6897,7 +6901,8 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
         UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
 
@@ -6906,25 +6911,29 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
         UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
     Iter = 1;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
         UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
     Iter = 2;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
         UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
     Iter = 3;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
         UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
 
     UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).CoolMassFlowRate(1);
 
@@ -9894,7 +9903,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipmentBlankCtrlZone)
         "ZoneHVAC:EquipmentList,",
         "    East Zone Equipment,     !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirLoopHVAC:UnitarySystem,  !- Zone Equipment 1 Object Type",
+        "    AirLoopHVAC:UnitarySystem:Legacy,  !- Zone Equipment 1 Object Type",
         "    East Zone Unitary System,   !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
@@ -9910,7 +9919,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipmentBlankCtrlZone)
         "    East Zone Zone Air Node,  !- Zone Air Node Name",
         "    East Zone Return Outlet;  !- Zone Return Air Node Name",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  East Zone Unitary System,       !- Name",
         "  Load,                           !- Control Type",
         "  ,                               !- Controlling Zone or Thermostat Location",

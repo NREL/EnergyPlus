@@ -63,8 +63,13 @@ namespace UnitarySystems {
 
     // why are these external?
     // Last mode of operation
-    extern int const CoolingMode; // last compressor operating mode was in cooling
-    extern int const HeatingMode; // last compressor operating mode was in heating
+    extern int const CoolingMode;  // last compressor operating mode was in cooling
+    extern int const HeatingMode;  // last compressor operating mode was in heating
+    extern bool HeatingLoad;       // True when zone needs heating
+    extern bool CoolingLoad;       // True when zone needs cooling
+    extern Real64 MoistureLoad;    // Dehumidification Load (W)
+    extern Real64 CompOnMassFlow;  // Supply air mass flow rate w/ compressor ON [kg/s]
+    extern Real64 CompOffMassFlow; // Supply air mass flow rate w/ compressor OFF [kg/s]
 
     // Compressor operation
     extern int const On;  // normal compressor operation
@@ -84,7 +89,7 @@ namespace UnitarySystems {
     extern int const FlowPerCoolingCapacity;
     extern int const FlowPerHeatingCapacity;
 
-    class DesignSpecMSHP
+    struct DesignSpecMSHP
     {
         friend class UnitarySys;
 
@@ -102,7 +107,7 @@ namespace UnitarySystems {
         std::vector<Real64> coolingVolFlowRatio; // The ratio of flow to max for this speed
         std::vector<Real64> heatingVolFlowRatio; // The ratio of flow to max for this speed
 
-    private:
+        //    private:
         int m_DesignSpecMSHPType_Num;
         bool m_SingleModeFlag;
 
@@ -110,7 +115,7 @@ namespace UnitarySystems {
         static void getDesignSpecMSHPdata(bool errorsFound);
     };
 
-    class UnitarySys
+    struct UnitarySys
     {
 
         enum class ControlType : int
@@ -404,7 +409,7 @@ namespace UnitarySystems {
         std::string Name;
         std::string UnitType;
 
-    private:
+        //    private:
         // private members not initialized in constructor
         std::string m_FanName;
         std::string m_ATMixerName;
@@ -698,7 +703,7 @@ namespace UnitarySystems {
         {
         }
 
-        static void getUnitarySystemInputData(std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool errorsFound);
+        static void getUnitarySystemInputData(std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
         static UnitarySys *factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 

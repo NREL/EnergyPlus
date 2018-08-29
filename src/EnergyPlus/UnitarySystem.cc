@@ -169,7 +169,7 @@ namespace UnitarySystems {
           m_FanOpModeSchedPtr(0), m_FanExists(false), m_FanType_Num(0), m_RequestAutoSize(false), m_ActualFanVolFlowRate(0.0),
           m_DesignFanVolFlowRate(0.0), m_DesignMassFlowRate(0.0), m_FanAvailSchedPtr(0), m_FanOpMode(0), m_ATMixerIndex(0), m_ATMixerPriNode(0),
           m_ATMixerSecNode(0), m_AirLoopEquipment(true), m_ZoneInletNode(0), m_ZoneSequenceCoolingNum(0), m_ZoneSequenceHeatingNum(0),
-          m_HeatCoilExists(false), m_HeatingSizingRatio(0.0), m_HeatingCoilType_Num(0), m_DXHeatingCoil(false), m_HeatingCoilIndex(0),
+          m_HeatCoilExists(false), m_HeatingSizingRatio(1.0), m_HeatingCoilType_Num(0), m_DXHeatingCoil(false), m_HeatingCoilIndex(0),
           m_HeatingCoilAvailSchPtr(0), m_DesignHeatingCapacity(0.0), m_MaxHeatAirVolFlow(0.0), m_NumOfSpeedHeating(0), m_MultiSpeedHeatingCoil(false),
           m_VarSpeedHeatingCoil(false), m_SystemHeatControlNodeNum(0), m_CoolCoilExists(false), m_CoolingCoilType_Num(0), m_NumOfSpeedCooling(0),
           m_CoolingCoilAvailSchPtr(0), m_DesignCoolingCapacity(0.0), m_MaxCoolAirVolFlow(0.0), m_CondenserNodeNum(0), m_CondenserType(0),
@@ -243,6 +243,7 @@ namespace UnitarySystems {
         initLoadBasedControlFlowFracFlagReady = true;
         initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax = 0.0;
         initUnitarySystemsQActual = 0.0;
+        getMSHPInputOnceFlag = true;
         getInputOnceFlag = true;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
@@ -1036,15 +1037,13 @@ namespace UnitarySystems {
                     if (ScheduleManager::GetCurrentScheduleValue(this->m_SysAvailSchedPtr) > 0.0) {
                         if (this->m_LastMode == CoolingMode) {
                             if (this->m_MultiOrVarSpeedCoolCoil) {
-                                DataLoopNode::Node(this->AirInNode).MassFlowRate =
-                                    this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling];
+                                DataLoopNode::Node(this->AirInNode).MassFlowRate = this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling];
                             } else {
                                 DataLoopNode::Node(this->AirInNode).MassFlowRate = this->MaxCoolAirMassFlow;
                             }
                         } else if (this->m_LastMode == HeatingMode) {
                             if (this->m_MultiOrVarSpeedHeatCoil) {
-                                DataLoopNode::Node(this->AirInNode).MassFlowRate =
-                                    this->m_HeatMassFlowRate[this->m_NumOfSpeedHeating];
+                                DataLoopNode::Node(this->AirInNode).MassFlowRate = this->m_HeatMassFlowRate[this->m_NumOfSpeedHeating];
                             } else {
                                 DataLoopNode::Node(this->AirInNode).MassFlowRate = this->MaxHeatAirMassFlow;
                             }
@@ -2490,7 +2489,7 @@ namespace UnitarySystems {
         //    UnitarySystemNumericFields.deallocate(); // remove temporary array for field names at end of sizing
     }
 
-    void UnitarySys::getUnitarySystemInputData(std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool errorsFound)
+    void UnitarySys::getUnitarySystemInputData(std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
 
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
@@ -2867,12 +2866,12 @@ namespace UnitarySystems {
                 }
                 if (loc_controlZoneName != "") thisSys.ControlZoneNum = UtilityRoutines::FindItemInList(loc_controlZoneName, DataHeatBalance::Zone);
                 //// check that control zone name is valid for load based control
-                //if (UnitarySystem(UnitarySysNum).ControlType == LoadBased || UnitarySystem(UnitarySysNum).ControlType == CCM_ASHRAE) {
+                // if (UnitarySystem(UnitarySysNum).ControlType == LoadBased || UnitarySystem(UnitarySysNum).ControlType == CCM_ASHRAE) {
                 //    if (UnitarySystem(UnitarySysNum).ControlZoneNum == 0) {
                 //        ShowSevereError(CurrentModuleObject + ": " + UnitarySystem(UnitarySysNum).Name);
                 //        ShowContinueError("When " + cAlphaFields(iControlTypeAlphaNum) + " = " + Alphas(iControlTypeAlphaNum));
-                //        ShowContinueError(cAlphaFields(iControlZoneAlphaNum) + " must be a valid zone name, zone name = " + Alphas(iControlZoneAlphaNum));
-                //        ErrorsFound = true;
+                //        ShowContinueError(cAlphaFields(iControlZoneAlphaNum) + " must be a valid zone name, zone name = " +
+                //        Alphas(iControlZoneAlphaNum)); ErrorsFound = true;
                 //    }
                 //}
 
@@ -6995,10 +6994,9 @@ namespace UnitarySystems {
         if (this->ATMixerExists) {
             // There is an air terminal mixer
             if (this->ATMixerType == DataHVACGlobals::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
-                                                          // set the primary air inlet mass flow rate
+                                                                           // set the primary air inlet mass flow rate
                 DataLoopNode::Node(this->m_ATMixerPriNode).MassFlowRate =
-                    min(DataLoopNode::Node(this->m_ATMixerPriNode).MassFlowRateMaxAvail,
-                        DataLoopNode::Node(this->AirInNode).MassFlowRate);
+                    min(DataLoopNode::Node(this->m_ATMixerPriNode).MassFlowRateMaxAvail, DataLoopNode::Node(this->AirInNode).MassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
                 // the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
                 SingleDuct::SimATMixer(this->m_ATMixerName, FirstHVACIteration, this->m_ATMixerIndex);
@@ -7027,7 +7025,7 @@ namespace UnitarySystems {
                 this->controlCoolingSystemToSP(AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
                 PartLoadRatio = this->m_CoolingPartLoadFrac;
                 CompOn = 0;
-                if ( PartLoadRatio > 0.0 ) {
+                if (PartLoadRatio > 0.0) {
                     CompOn = 1;
                     this->m_LastMode = CoolingMode;
                 }
@@ -7045,7 +7043,7 @@ namespace UnitarySystems {
                 this->controlHeatingSystemToSP(AirLoopNum, FirstHVACIteration, CompOn, HeatCoilLoad);
                 PartLoadRatio = this->m_HeatingPartLoadFrac;
                 int CompOn = 0;
-                if ( PartLoadRatio > 0.0 ) {
+                if (PartLoadRatio > 0.0) {
                     CompOn = 1;
                     this->m_LastMode = HeatingMode;
                 }
@@ -7066,7 +7064,7 @@ namespace UnitarySystems {
                 this->controlHeatingSystemToSP(AirLoopNum, FirstHVACIteration, CompOn, HeatCoilLoad);
                 PartLoadRatio = this->m_HeatingPartLoadFrac;
                 CompOn = 0;
-                if ( PartLoadRatio > 0.0 ) {
+                if (PartLoadRatio > 0.0) {
                     CompOn = 1;
                     this->m_LastMode = HeatingMode;
                 }
@@ -7084,7 +7082,7 @@ namespace UnitarySystems {
                 this->controlCoolingSystemToSP(AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
                 PartLoadRatio = this->m_CoolingPartLoadFrac;
                 CompOn = 0;
-                if ( PartLoadRatio > 0.0 ) {
+                if (PartLoadRatio > 0.0) {
                     CompOn = 1;
                     this->m_LastMode = CoolingMode;
                 }
@@ -10682,7 +10680,7 @@ namespace UnitarySystems {
                             Par[1] = double(this->m_CoolingCoilIndex);
                             Par[2] = DesOutTemp;
                             // Par(3) is only needed for variable speed coils (see DXCoilVarSpeedResidual and DXCoilCyclingResidual)
-                            Par[3] = 1.0; // m_UnitarySysNum;
+                            Par[3] = double(this->m_UnitarySysNum);
                             this->m_CoolingSpeedRatio = SpeedRatio;
                             if (SpeedRatio == 1.0) {
                                 General::SolveRoot(Acc, MaxIte, SolFla, SpeedRatio, this->DXCoilVarSpeedResidual, 0.0, 1.0, Par);
@@ -11795,7 +11793,7 @@ namespace UnitarySystems {
 
                                 Par[1] = double(this->m_HeatingCoilIndex);
                                 Par[2] = DesOutTemp;
-                                Par[3] = 1.0;
+                                Par[3] = double(this->m_UnitarySysNum);
                                 // Par(4) = CycRatio or SpeedRatio
                                 Par[5] = this->m_HeatingSpeedNum;
                                 Par[6] = double(FanOpMode);
