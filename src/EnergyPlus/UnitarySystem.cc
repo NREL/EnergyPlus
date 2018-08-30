@@ -1381,7 +1381,7 @@ namespace UnitarySystems {
         UnitarySys::getUnitarySystemInputData(objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
 
         if (errorsFound) {
-            ShowFatalError("getUnitarySystemInputData: did not find UnitarySystem. Check inputs");
+            ShowFatalError("getUnitarySystemInputData: previous errors cause termination. Check inputs");
         }
     }
 

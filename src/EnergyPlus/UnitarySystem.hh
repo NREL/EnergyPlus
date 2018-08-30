@@ -91,7 +91,7 @@ namespace UnitarySystems {
 
     struct DesignSpecMSHP
     {
-        friend class UnitarySys;
+        // friend class UnitarySys;
 
     public:
         DesignSpecMSHP(); // constructor
@@ -148,7 +148,7 @@ namespace UnitarySystems {
             UseCompressorOffFlow // set compressor OFF air flow rate equal to user defined value
         };
 
-        friend class DesignSpecMSHP;
+        // friend class DesignSpecMSHP;
 
         int m_UnitarySysNum;
         int m_unitarySystemType_Num;
