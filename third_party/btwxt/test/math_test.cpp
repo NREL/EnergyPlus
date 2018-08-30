@@ -27,7 +27,6 @@ TEST(GriddedData, free_check_sorted) {
   bool is_sorted;
   for (auto pair : my_vecs) {
     is_sorted = Btwxt::free_check_sorted(pair.first);
-    showMessage(MsgLevel::MSG_DEBUG, (is_sorted ? "true" : "false"));
     EXPECT_EQ(is_sorted, pair.second);
   }
   Btwxt::LOG_LEVEL = 1;

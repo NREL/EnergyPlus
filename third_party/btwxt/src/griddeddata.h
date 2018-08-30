@@ -86,13 +86,15 @@ public:
 
   std::vector<std::vector<double>> value_tables;
   std::size_t num_values;
-  std::vector<std::size_t> dimension_lengths;
   std::size_t num_tables;
   std::vector<GridAxis> grid_axes;
   std::size_t ndims;
+  std::vector<std::size_t> dimension_lengths;
 
 private:
   void construct_axes(const std::vector<std::vector<double>> &grid);
+  void set_dimension_sizes();
+  std::vector<std::size_t> dimension_step_size;
   std::vector<std::size_t> temp_coords;
   std::vector<double> results;
 };

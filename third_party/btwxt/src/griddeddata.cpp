@@ -85,26 +85,22 @@ GriddedData::GriddedData() = default;
 
 GriddedData::GriddedData(std::vector<std::vector<double>> grid,
                          std::vector<std::vector<double>> values)
-                         : ndims(grid.size()), temp_coords(ndims) {
-  num_values = 1;
-  for (const auto &grid_vector : grid) {
-    num_values *= grid_vector.size();
-    dimension_lengths.push_back(grid_vector.size());
-  }
+    : ndims(grid.size()), dimension_lengths(ndims), dimension_step_size(ndims), temp_coords(ndims) {
+  construct_axes(grid);
+  set_dimension_sizes();
   num_tables = values.size();
   results.resize(num_tables);
 
-  construct_axes(grid);
   value_tables = values;
 }
 
 GriddedData::GriddedData(std::vector<GridAxis> grid_axes, std::vector<std::vector<double>> values)
-    : grid_axes(grid_axes), ndims(grid_axes.size()), temp_coords(ndims) {
-  num_values = 1;
-  for (auto grid_vector : grid_axes) {
-    num_values *= grid_vector.get_length();
-    dimension_lengths.push_back(grid_vector.get_length());
-  }
+    : grid_axes(grid_axes),
+      ndims(grid_axes.size()),
+      dimension_lengths(ndims),
+      dimension_step_size(ndims),
+      temp_coords(ndims) {
+  set_dimension_sizes();
   num_tables = values.size();
   results.resize(num_tables);
 
@@ -112,13 +108,23 @@ GriddedData::GriddedData(std::vector<GridAxis> grid_axes, std::vector<std::vecto
 }
 
 GriddedData::GriddedData(std::vector<GridAxis> grid_axes)
-    : grid_axes(grid_axes), ndims(grid_axes.size()), temp_coords(ndims) {
-  num_values = 1;
-  for (auto grid_vector : grid_axes) {
-    num_values *= grid_vector.get_length();
-    dimension_lengths.push_back(grid_vector.get_length());
-  }
+    : grid_axes(grid_axes),
+      ndims(grid_axes.size()),
+      dimension_lengths(ndims),
+      dimension_step_size(ndims),
+      temp_coords(ndims) {
+  set_dimension_sizes();
   num_tables = 0;
+}
+
+void GriddedData::set_dimension_sizes() {
+  num_values = 1;
+  for (std::size_t dim = ndims - 1; /* dim >= 0 */ dim < ndims; --dim) {
+    std::size_t length = grid_axes[dim].get_length();
+    dimension_lengths[dim] = length;
+    dimension_step_size[dim] = num_values;
+    num_values *= length;
+  }
 }
 
 void GriddedData::construct_axes(const std::vector<std::vector<double>> &grid) {
@@ -144,10 +150,8 @@ std::size_t GriddedData::get_num_tables() { return num_tables; }
 
 std::size_t GriddedData::get_value_index(const std::vector<std::size_t> &coords) {
   std::size_t index = 0;
-  std::size_t panel_size = 1;
-  for (std::size_t dim = ndims - 1; /* dim >= 0 */ dim < ndims; --dim) {
-    index += coords[dim] * panel_size;
-    panel_size *= dimension_lengths[dim];
+  for (std::size_t dim = 0; dim < ndims; ++dim) {
+    index += coords[dim] * dimension_step_size[dim];
   }
   return index;
 }
