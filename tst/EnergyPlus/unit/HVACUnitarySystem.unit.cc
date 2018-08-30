@@ -3425,7 +3425,6 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInput)
 
 TEST_F(EnergyPlusFixture, UnitarySystem_VSDXCoilSizing)
 {
-    UnitarySystemData thisUnSys;
 
     bool ErrorsFound(false);
 
