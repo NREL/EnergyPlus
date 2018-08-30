@@ -6396,6 +6396,7 @@ namespace DaylightingManager {
         static bool firstTime(true); // true first time routine is called
 
         static bool blnCycle(false);
+        bool breakOuterLoop(false);
 
         if (ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) return;
 
@@ -6789,6 +6790,7 @@ namespace DaylightingManager {
             // Fourth loop over windows to determine which to switch
             // iterate in the order that the shades are specified in WindowShadeControl
             count = 0;
+            breakOuterLoop = false;
             for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
@@ -6853,12 +6855,13 @@ namespace DaylightingManager {
                             ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpSourceLumFromWinAtRefPt(loop, IS, IL);
                         } // IL
                     }     // ASETIL < 1
+                    // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
+                    if (DaylIllum(1) <= SetPnt(1)) {
+                        breakOuterLoop = true; 
+                        break;
+                    }
                 }
-
-                // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
-                if (DaylIllum(1) <= SetPnt(1)) {
-                    break;
-                }
+                if (breakOuterLoop) break;
 
             } // End of fourth window loop
 
@@ -7002,6 +7005,7 @@ namespace DaylightingManager {
 
                 // restore the count to the value prior to the last loop through the group of exterior windows
                 count = countBeforeListOfExtWinLoop;
+                breakOuterLoop = false;
 
                 for (auto IWin : listOfExtWin) {
                     ++count;
@@ -7125,11 +7129,13 @@ namespace DaylightingManager {
                                             continue;
                                         } else {
                                             // Glare still OK but glazing already in clear state, no more lighten
+                                            breakOuterLoop = true;
                                             break;
                                         }
                                     } else {
                                         // Glare too high, exit and use previous switching state
                                         tmpSWFactor += tmpSWIterStep;
+                                        breakOuterLoop = true;
                                         break;
                                     }
                                 }
@@ -7171,14 +7177,16 @@ namespace DaylightingManager {
                             } else {
                                 // For un-switchable glazing or switchable glazing but not MeetDaylightIlluminaceSetpoint control,
                                 // it is in shaded state and glare is ok - job is done, exit the window loop - IWin
+                                breakOuterLoop = true;
                                 break;
                             }
                         }
 
                     } // End of check if window glare control is active
                 }     // end of for(auto IWin : listOfExtWin)
-            }         // for group
-        }             // GlareFlag
+                if (breakOuterLoop) break;
+            } // for group
+        }     // GlareFlag
 
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off
@@ -10759,7 +10767,8 @@ namespace DaylightingManager {
         // J. Glazer - 2018
         // Allow a way to map back to the original "loop" index that is used in many other places in the
         // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
-        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 && ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
+        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 &&
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
             int count = 0;
             for (auto listOfExtWin : ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins) {
                 for (auto IWinShdOrd : listOfExtWin) {
