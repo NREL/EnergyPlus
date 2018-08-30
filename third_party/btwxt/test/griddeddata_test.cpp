@@ -59,33 +59,24 @@ TEST_F(TwoDFixture, get_values) {
   coords = {1, 0};
   returned_vec = test_gridded_data.get_values(coords);
   EXPECT_THAT(returned_vec, testing::ElementsAre(2, 4));
-
-  coords = {7, 0};
-  EXPECT_THROW(returned_vec = test_gridded_data.get_values(coords);, std::invalid_argument);
 };
 
-TEST_F(TwoDFixture, get_column) {
-  std::vector<std::size_t> coords = {0, 1};
-  std::vector<double> returned_vec = test_gridded_data.get_column(coords);
-  EXPECT_THAT(returned_vec, testing::ElementsAre(3, 6));
-}
-
-TEST_F(TwoDFixture, get_column_near_safe) {
+TEST_F(TwoDFixture, get_values_relative) {
   std::vector<std::size_t> coords{0, 1};
   std::vector<short> translation{1, 0}; // {1, 1} stays as is
   std::vector<double> expected_vec = test_gridded_data.get_values({1, 1});
-  EXPECT_EQ(test_gridded_data.get_column_near_safe(coords, translation), expected_vec);
+  EXPECT_EQ(test_gridded_data.get_values_relative(coords, translation), expected_vec);
 
   translation = {1, 1}; // {1, 2} -> {1, 1}
-  EXPECT_EQ(test_gridded_data.get_column_near_safe(coords, translation), expected_vec);
+  EXPECT_EQ(test_gridded_data.get_values_relative(coords, translation), expected_vec);
 
   translation = {-1, 0}; // {-1, 1} -> {0, 1}
   expected_vec = test_gridded_data.get_values({0, 1});
-  EXPECT_EQ(test_gridded_data.get_column_near_safe(coords, translation), expected_vec);
+  EXPECT_EQ(test_gridded_data.get_values_relative(coords, translation), expected_vec);
 
   translation = {3, -2}; // {3, -1} -> {2, 0}
   expected_vec = test_gridded_data.get_values({2, 0});
-  EXPECT_EQ(test_gridded_data.get_column_near_safe(coords, translation), expected_vec);
+  EXPECT_EQ(test_gridded_data.get_values_relative(coords, translation), expected_vec);
 }
 
 TEST(GridAxis, sorting) {
@@ -116,7 +107,7 @@ TEST(GridAxis, calc_spacing_multipliers) {
   auto interpolation_method{Method::CUBIC};
 
   GridAxis test_gridaxis(grid_vector, extrapolation_method, interpolation_method);
-  std::vector<std::vector<double>> values = test_gridaxis.spacing_multiplier;
+  std::vector<std::vector<double>> values = test_gridaxis.spacing_multipliers;
   EXPECT_THAT(values[0], testing::ElementsAre(1, 5.0 / 9, 0.5, 2.0 / 7));
   EXPECT_THAT(values[1], testing::ElementsAre(4.0 / 9, 0.5, 5.0 / 7, 1));
 }

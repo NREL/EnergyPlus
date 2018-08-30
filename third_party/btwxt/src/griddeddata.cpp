@@ -14,16 +14,16 @@ GridAxis::GridAxis() = default;
 
 GridAxis::GridAxis(std::vector<double> grid_vector, Method extrapolation_method,
                    Method interpolation_method, std::pair<double, double> extrapolation_limits)
-    : grid(std::move(grid_vector)), extrapolation_method(extrapolation_method),
+    : grid(std::move(grid_vector)),
+      spacing_multipliers(2, std::vector<double>(grid.size() - 1, 1.0)),
+      extrapolation_method(extrapolation_method),
       interpolation_method(interpolation_method),
       extrapolation_limits(std::move(extrapolation_limits)) {
   check_grid_sorted();
   check_extrap_limits();
   if (interpolation_method == Method::CUBIC) {
-    spacing_multiplier = calc_spacing_multipliers();
+    calc_spacing_multipliers();
   }
-
-  showMessage(MsgLevel::MSG_DEBUG, "GridAxis object constructed from vector!");
 }
 
 std::size_t GridAxis::get_length() { return grid.size(); }
@@ -31,7 +31,7 @@ std::size_t GridAxis::get_length() { return grid.size(); }
 void GridAxis::set_interp_method(const Method im) {
   interpolation_method = im;
   if (im == Method::CUBIC) {
-    spacing_multiplier = calc_spacing_multipliers();
+    calc_spacing_multipliers();
   }
 }
 
@@ -43,25 +43,22 @@ void GridAxis::set_extrap_limits(const std::pair<double, double> extrap_limits) 
 }
 
 double GridAxis::get_spacing_multiplier(const std::size_t &flavor, const std::size_t &index) {
-  return spacing_multiplier[flavor][index];
+  return spacing_multipliers[flavor][index];
 }
 
-std::vector<std::vector<double>> GridAxis::calc_spacing_multipliers() {
-  std::size_t grid_size = grid.size();
-  std::vector<std::vector<double>> v(2, std::vector<double>(grid_size - 1, 1.0));
+void GridAxis::calc_spacing_multipliers() {
   // "0" and "1" are the "flavors" of the calc_spacing_multipliers.
-  // If you are sitting at the "0" along an edge of they hypercube, you want the "0" flavof
+  // If you are sitting at the "0" along an edge of the hypercube, you want the "0" flavof
   double center_spacing;
   for (std::size_t i = 0; i < grid.size() - 1; i++) {
     center_spacing = grid[i + 1] - grid[i];
     if (i != 0) {
-      v[0][i] = center_spacing / (grid[i + 1] - grid[i - 1]);
+      spacing_multipliers[0][i] = center_spacing / (grid[i + 1] - grid[i - 1]);
     }
-    if (i + 2 != grid_size) {
-      v[1][i] = center_spacing / (grid[i + 2] - grid[i]);
+    if (i + 2 != grid.size()) {
+      spacing_multipliers[1][i] = center_spacing / (grid[i + 2] - grid[i]);
     }
   }
-  return v;
 }
 
 void GridAxis::check_grid_sorted() {
@@ -87,33 +84,35 @@ void GridAxis::check_extrap_limits() {
 GriddedData::GriddedData() = default;
 
 GriddedData::GriddedData(std::vector<std::vector<double>> grid,
-                         std::vector<std::vector<double>> values) {
-  ndims = grid.size();
+                         std::vector<std::vector<double>> values)
+                         : ndims(grid.size()), temp_coords(ndims) {
   num_values = 1;
   for (const auto &grid_vector : grid) {
     num_values *= grid_vector.size();
     dimension_lengths.push_back(grid_vector.size());
   }
   num_tables = values.size();
+  results.resize(num_tables);
 
   construct_axes(grid);
   value_tables = values;
 }
 
 GriddedData::GriddedData(std::vector<GridAxis> grid_axes, std::vector<std::vector<double>> values)
-    : grid_axes(grid_axes), ndims(grid_axes.size()) {
+    : grid_axes(grid_axes), ndims(grid_axes.size()), temp_coords(ndims) {
   num_values = 1;
   for (auto grid_vector : grid_axes) {
     num_values *= grid_vector.get_length();
     dimension_lengths.push_back(grid_vector.get_length());
   }
   num_tables = values.size();
+  results.resize(num_tables);
 
   value_tables = values;
 }
 
 GriddedData::GriddedData(std::vector<GridAxis> grid_axes)
-    : grid_axes(grid_axes), ndims(grid_axes.size()) {
+    : grid_axes(grid_axes), ndims(grid_axes.size()), temp_coords(ndims) {
   num_values = 1;
   for (auto grid_vector : grid_axes) {
     num_values *= grid_vector.get_length();
@@ -124,8 +123,7 @@ GriddedData::GriddedData(std::vector<GridAxis> grid_axes)
 
 void GriddedData::construct_axes(const std::vector<std::vector<double>> &grid) {
   for (const auto &axis : grid) {
-    GridAxis ga(axis);
-    grid_axes.push_back(ga);
+    grid_axes.emplace_back(axis);
   }
 }
 
@@ -136,6 +134,7 @@ std::size_t GriddedData::add_value_table(std::vector<double> &value_vector) {
   }
   value_tables.push_back(value_vector);
   num_tables++;
+  results.resize(num_tables);
   return num_tables - 1;
 }
 
@@ -143,47 +142,38 @@ std::size_t GriddedData::get_ndims() { return grid_axes.size(); }
 
 std::size_t GriddedData::get_num_tables() { return num_tables; }
 
-std::size_t GriddedData::locate_coords(const std::vector<std::size_t> &coords) {
+std::size_t GriddedData::get_value_index(const std::vector<std::size_t> &coords) {
   std::size_t index = 0;
   std::size_t panel_size = 1;
-  std::size_t ndims = dimension_lengths.size();
   for (std::size_t dim = ndims - 1; /* dim >= 0 */ dim < ndims; --dim) {
-    if (coords[dim] >= dimension_lengths[dim]) {
-      showMessage(MsgLevel::MSG_ERR, stringify("Overran dimension ", dim));
-    }
     index += coords[dim] * panel_size;
     panel_size *= dimension_lengths[dim];
   }
   return index;
 }
 
-std::vector<double> GriddedData::get_column(const std::vector<std::size_t> &coords) {
-  std::size_t index = locate_coords(coords);
-  std::vector<double> result(num_tables);
-  for (std::size_t i = 0; i < num_tables; ++i) {
-    result[i] = value_tables[i][index];
-  }
-  return result;
-}
-
 std::vector<double> GriddedData::get_values(const std::vector<std::size_t> &coords) {
-  return get_column(coords);
+  std::size_t index = get_value_index(coords);
+  for (std::size_t i = 0; i < num_tables; ++i) {
+    results[i] = value_tables[i][index];
+  }
+  return results;
 }
 
-std::vector<double> GriddedData::get_column_near_safe(const std::vector<std::size_t> &coords,
+std::vector<double> GriddedData::get_values_relative(const std::vector<std::size_t> &coords,
                                                       const std::vector<short> &translation) {
-  std::vector<std::size_t> result(translation.size());
+  int new_coord;
   for (std::size_t dim = 0; dim < coords.size(); dim++) {
-    int res = coords[dim] + translation[dim];
-    if (res < 0) {
-      result[dim] = 0;
-    } else if (res >= (int)dimension_lengths[dim]) {
-      result[dim] = dimension_lengths[dim] - 1;
+    new_coord = coords[dim] + translation[dim];
+    if (new_coord < 0) {
+      temp_coords[dim] = 0u;
+    } else if (new_coord >= (int)dimension_lengths[dim]) {
+      temp_coords[dim] = dimension_lengths[dim] - 1u;
     } else {
-      result[dim] = res;
+      temp_coords[dim] = new_coord;
     }
   }
-  return get_column(result);
+  return get_values(temp_coords);
 }
 
 const std::vector<double> &GriddedData::get_grid_vector(const std::size_t &dim) {

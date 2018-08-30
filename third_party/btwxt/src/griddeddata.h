@@ -21,12 +21,11 @@ public:
                     std::pair<double, double> extrapolation_limits = {-DBL_MAX, DBL_MAX});
 
   std::vector<double> grid;
-  std::vector<std::vector<double>> spacing_multiplier;
+  std::vector<std::vector<double>> spacing_multipliers;
   Method extrapolation_method;
   Method interpolation_method;
   std::pair<double, double> extrapolation_limits;
 
-  // std::pair<double> extrapolation_bounds;  <-- to add later
   // bool is_regular;  <-- to add later
 
   std::size_t get_length();
@@ -38,7 +37,7 @@ public:
   double get_spacing_multiplier(const std::size_t &flavor, const std::size_t &index);
 
 private:
-  std::vector<std::vector<double>> calc_spacing_multipliers();
+  void calc_spacing_multipliers();
   void check_grid_sorted();
   void check_extrap_limits();
 };
@@ -63,13 +62,11 @@ public:
 
   std::pair<double, double> get_extrap_limits(const std::size_t &dim);
 
+  std::size_t get_value_index(const std::vector<std::size_t> &coords);
+
   std::vector<double> get_values(const std::vector<std::size_t> &coords);
 
-  std::size_t locate_coords(const std::vector<std::size_t> &coords);
-
-  std::vector<double> get_column(const std::vector<std::size_t> &coords);
-
-  std::vector<double> get_column_near_safe(const std::vector<std::size_t> &coords,
+  std::vector<double> get_values_relative(const std::vector<std::size_t> &coords,
                                            const std::vector<short> &translation);
 
   double get_axis_spacing_mult(const std::size_t &dim, const std::size_t &flavor,
@@ -96,6 +93,8 @@ public:
 
 private:
   void construct_axes(const std::vector<std::vector<double>> &grid);
+  std::vector<std::size_t> temp_coords;
+  std::vector<double> results;
 };
 
 // free functions
@@ -115,7 +114,7 @@ std::vector<std::vector<T>> cart_product(const std::vector<std::vector<T>> &v) {
     combinations = std::move(r);
   }
   return combinations;
-};
+}
 
 } // namespace Btwxt
 #endif // GRIDDEDDATA_H_

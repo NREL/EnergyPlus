@@ -52,7 +52,6 @@ TEST_F(CubicFixture, hypercube_weigh_one_vertex) {
   test_gridded_data.set_axis_interp_method(1, Method::CUBIC);
   GridPoint grid_point(test_gridded_data, target);
   std::vector<Method> methods = grid_point.get_methods();
-  std::vector<std::vector<double>> spacing_mults = grid_point.get_spacing_mults(test_gridded_data);
 
   std::vector<double> mus = grid_point.get_weights();
   double mx = mus[0];
@@ -71,7 +70,7 @@ TEST_F(CubicFixture, hypercube_weigh_one_vertex) {
   double s0y = 2.0 / 4;
 
   std::vector<short> this_vertex = {0, 0};
-  double weight = grid_point.get_vertex_weight(this_vertex, spacing_mults);
+  double weight = grid_point.get_vertex_weight(this_vertex);
   double expected_result = c0x * c0y;
   expected_result += -1 * c0x * d1y * s1y;
   expected_result += -1 * d1x * s1x * c0y;
@@ -79,19 +78,19 @@ TEST_F(CubicFixture, hypercube_weigh_one_vertex) {
   EXPECT_DOUBLE_EQ(weight, expected_result);
 
   this_vertex = {-1, 1};
-  weight = grid_point.get_vertex_weight(this_vertex, spacing_mults);
+  weight = grid_point.get_vertex_weight(this_vertex);
   expected_result = -1 * d0x * s0x * c1y;
   expected_result += -1 * d0x * s0x * d0y * s0y;
   EXPECT_DOUBLE_EQ(weight, expected_result);
 
   this_vertex = {2, 0};
-  weight = grid_point.get_vertex_weight(this_vertex, spacing_mults);
+  weight = grid_point.get_vertex_weight(this_vertex);
   expected_result = d1x * s1x * c0y;
   expected_result += -1 * d1x * s1x * d1y * s1y;
   EXPECT_DOUBLE_EQ(weight, expected_result);
 
   this_vertex = {2, 2};
-  weight = grid_point.get_vertex_weight(this_vertex, spacing_mults);
+  weight = grid_point.get_vertex_weight(this_vertex);
   expected_result = d1x * s1x * d1y * s1y;
   EXPECT_DOUBLE_EQ(weight, expected_result);
 }

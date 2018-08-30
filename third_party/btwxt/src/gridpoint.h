@@ -23,7 +23,7 @@ public:
 
   GridPoint(GriddedData &grid_data, std::vector<double> v);
 
-  void set_target(std::vector<double> v);
+  void set_target(const std::vector<double> &v);
 
   std::vector<double> get_current_target();
 
@@ -41,10 +41,7 @@ public:
 
   std::vector<double> get_results();
 
-  std::vector<std::vector<double>> get_spacing_mults(GriddedData &grid_data);
-
-  double get_vertex_weight(const std::vector<short> &v,
-                           const std::vector<std::vector<double>> &spacing_mults);
+  double get_vertex_weight(const std::vector<short> &v);
 
   void set_floor();
 
@@ -58,11 +55,14 @@ private:
   std::vector<double> weights;
   std::vector<Bounds> is_inbounds; // for deciding interpolation vs. extrapolation;
   std::vector<Method> methods;
+  std::vector<Method> previous_methods;
   std::vector<std::vector<short>> hypercube;
 
   std::vector<std::vector<double>> interp_coeffs;
   std::vector<std::vector<double>> cubic_slope_coeffs;
+  std::vector<std::vector<double>> spacing_mults;
   std::vector<std::vector<double>> terms;
+  std::vector<double> temp_values;
   std::vector<double> results;
   static std::vector<std::pair<int, int>> sivor; // {sign, flavor}, flavor corresponds to the floor
                                                  // (0) or ceiling (1) bounding of the point

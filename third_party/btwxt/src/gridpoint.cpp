@@ -4,6 +4,7 @@
 // Standard
 #include <iostream>
 #include <numeric>
+#include <algorithm>
 
 // btwxt
 #include "error.h"
@@ -15,22 +16,38 @@ std::vector<std::pair<int, int>> GridPoint::sivor = {{-1, 0}, {-1, 1}, {1, 0}, {
 GridPoint::GridPoint() {}
 
 GridPoint::GridPoint(GriddedData &grid_data_in)
-    : grid_data(&grid_data_in), ndims(grid_data->get_ndims()), target(ndims, 0.0),
-      target_is_set(false), point_floor(ndims, 0), weights(ndims, 0), is_inbounds(ndims),
-      methods(ndims, Method::UNDEF), interp_coeffs(ndims, std::vector<double>(2, 0.0)),
-      cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
-      terms(ndims, std::vector<double>(2, 0.0)), results(grid_data->num_tables) {}
-
-GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v)
-    : grid_data(&grid_data_in), ndims(grid_data->get_ndims()), point_floor(ndims, 0),
-      weights(ndims, 0), is_inbounds(ndims), methods(ndims, Method::UNDEF),
+    : grid_data(&grid_data_in),
+      ndims(grid_data->get_ndims()),
+      target(ndims, 0.0),
+      target_is_set(false),
+      point_floor(ndims, 0),
+      weights(ndims, 0),
+      is_inbounds(ndims),
+      methods(ndims, Method::UNDEF),
       interp_coeffs(ndims, std::vector<double>(2, 0.0)),
       cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
-      terms(ndims, std::vector<double>(2, 0.0)), results(grid_data->num_tables) {
+      spacing_mults(ndims, std::vector<double>(2, 0.0)),
+      terms(ndims, std::vector<double>(2, 0.0)),
+      temp_values(grid_data->num_tables),
+      results(grid_data->num_tables) {}
+
+GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v)
+    : grid_data(&grid_data_in),
+      ndims(grid_data->get_ndims()),
+      point_floor(ndims, 0),
+      weights(ndims, 0),
+      is_inbounds(ndims),
+      methods(ndims, Method::UNDEF),
+      interp_coeffs(ndims, std::vector<double>(2, 0.0)),
+      cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
+      spacing_mults(ndims, std::vector<double>(2, 0.0)),
+      terms(ndims, std::vector<double>(2, 0.0)),
+      temp_values(grid_data->num_tables),
+      results(grid_data->num_tables) {
   set_target(v);
 }
 
-void GridPoint::set_target(std::vector<double> v) {
+void GridPoint::set_target(const std::vector<double> &v) {
   if (v.size() != ndims) {
     showMessage(MsgLevel::MSG_ERR,
                 stringify("Target and Gridded Data do not have the same dimensions."));
@@ -140,7 +157,7 @@ void GridPoint::consolidate_methods()
 // If out of bounds, extrapolate according to prescription
 // If outside of extrapolation limits, send a warning and perform constant extrapolation.
 {
-  std::vector<Method> previous_methods = methods;
+  previous_methods = methods;
   methods = grid_data->get_interp_methods();
   if (target_is_set) {
     auto extrap_methods = grid_data->get_extrap_methods();
@@ -168,13 +185,16 @@ void GridPoint::calculate_interp_coeffs() {
       interp_coeffs[dim][1] = -2 * mu * mu * mu + 3 * mu * mu;
       cubic_slope_coeffs[dim][0] = mu * mu * mu - 2 * mu * mu + mu;
       cubic_slope_coeffs[dim][1] = mu * mu * mu - mu * mu;
-    } else if (methods[dim] == Method::CONSTANT) {
-      mu = mu < 0 ? 0 : 1;
+      spacing_mults[dim][0] = grid_data->get_axis_spacing_mult(dim, 0, point_floor[dim]);
+      spacing_mults[dim][1] = grid_data->get_axis_spacing_mult(dim, 1, point_floor[dim]);
+    } else {
+      if (methods[dim] == Method::CONSTANT) {
+        mu = mu < 0 ? 0 : 1;
+      }
       interp_coeffs[dim][0] = 1 - mu;
       interp_coeffs[dim][1] = mu;
-    } else { // LINEAR
-      interp_coeffs[dim][0] = 1 - mu;
-      interp_coeffs[dim][1] = mu;
+      spacing_mults[dim][0] = 0.0;
+      spacing_mults[dim][1] = 0.0;
     }
   }
 }
@@ -182,6 +202,7 @@ void GridPoint::calculate_interp_coeffs() {
 std::vector<double> GridPoint::get_results() {
   if (results.size() != grid_data->num_tables) {
     results.resize(grid_data->num_tables);
+    temp_values.resize(grid_data->num_tables);
   }
   if (results.size() == 0u) {
     showMessage(MsgLevel::MSG_WARN,
@@ -195,30 +216,17 @@ std::vector<double> GridPoint::get_results() {
     return results;
   }
   double weight;
-  std::vector<std::vector<double>> spacing_mults = get_spacing_mults(*grid_data);
   for (const auto &v : hypercube) {
-    weight = get_vertex_weight(v, spacing_mults);
-    std::vector<double> values = grid_data->get_column_near_safe(point_floor, v);
+    weight = get_vertex_weight(v);
+    temp_values = grid_data->get_values_relative(point_floor, v);
     for (std::size_t i = 0; i < grid_data->num_tables; ++i) {
-      results[i] += values[i] * weight;
+      results[i] += temp_values[i] * weight;
     }
   }
   return results;
 }
 
-std::vector<std::vector<double>> GridPoint::get_spacing_mults(GriddedData &grid_data) {
-  std::vector<std::vector<double>> spacing_mults(ndims, std::vector<double>(2, 0));
-  for (std::size_t dim = 0; dim < ndims; dim++) {
-    if (methods[dim] == Method::CUBIC) {
-      spacing_mults[dim][0] = grid_data.get_axis_spacing_mult(dim, 0, point_floor[dim]);
-      spacing_mults[dim][1] = grid_data.get_axis_spacing_mult(dim, 1, point_floor[dim]);
-    }
-  }
-  return spacing_mults;
-}
-
-double GridPoint::get_vertex_weight(const std::vector<short> &v,
-                                    const std::vector<std::vector<double>> &spacing_mults) {
+double GridPoint::get_vertex_weight(const std::vector<short> &v) {
   int sign, flavor;
   for (std::size_t dim = 0; dim < ndims; dim++) {
     if (methods[dim] == Method::CUBIC) {
@@ -246,8 +254,9 @@ double GridPoint::sum_weighting_terms() {
 
   // Add all combinations of coefficient term products
   double weight_sum = 0.0;
+  double product;
   for (std::size_t n = 0; n < N; ++n) {
-    double product = 1.0;
+    product = 1.0;
     for (std::size_t dim = 0; dim < nT; ++dim) {
       product *= terms[dim][bool(n & 1 << dim)];
     }

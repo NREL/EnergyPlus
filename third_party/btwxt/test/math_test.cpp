@@ -41,7 +41,7 @@ TEST(GriddedData, locate_coords) {
 
   std::vector<std::size_t> coords = {2, 3};
   std::vector<std::size_t> dimension_lengths = {5, 7};
-  std::size_t index = test_gridded_data1.locate_coords(coords);
+  std::size_t index = test_gridded_data1.get_value_index(coords);
   EXPECT_EQ(index, 17u);
 
   coords = {2, 3, 2};
@@ -50,7 +50,7 @@ TEST(GriddedData, locate_coords) {
   std::vector<double> value2(5 * 7 * 3, 0.0);
   values = {value2};
   GriddedData test_gridded_data2(grid, values);
-  index = test_gridded_data2.locate_coords(coords);
+  index = test_gridded_data2.get_value_index(coords);
   EXPECT_EQ(index, 53u);
 }
 

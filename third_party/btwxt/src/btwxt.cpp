@@ -36,7 +36,7 @@ double RegularGridInterpolator::get_value_at_target(std::size_t table_index) {
   return result[table_index];
 }
 
-std::vector<double> RegularGridInterpolator::get_values_at_target(std::vector<double> target) {
+std::vector<double> RegularGridInterpolator::get_values_at_target(const std::vector<double> &target) {
   set_new_target(target);
   return grid_point.get_results();
 }
