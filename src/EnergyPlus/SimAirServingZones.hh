@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -168,8 +169,8 @@ namespace SimAirServingZones {
                              int const CompType_Num,        // numeric equivalent for component type
                              bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                              int const AirLoopNum,          // Primary air loop number
-                             int &CompIndex                 // numeric pointer for CompType/CompName -- passed back from other routines
-    );
+                             int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
+                             UnitarySystems::UnitarySys *CompPointer);
 
     void UpdateBranchConnections(int const AirLoopNum, // primary air system number
                                  int const BranchNum,  // branch reference number

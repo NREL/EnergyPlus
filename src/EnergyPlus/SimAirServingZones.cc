@@ -3334,7 +3334,8 @@ namespace SimAirServingZones {
                                     CompType_Num,
                                     FirstHVACIteration,
                                     AirLoopNum,
-                                    PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompIndex);
+                                    PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompIndex,
+                                    PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).compPointer);
             } // End of component loop
 
             // Enforce continuity through the splitter
@@ -3346,11 +3347,12 @@ namespace SimAirServingZones {
         CurDuctType = 0;
     }
 
-    void SimAirLoopComponent(std::string const &CompName,   // the component Name
-                             int const CompType_Num,        // numeric equivalent for component type
-                             bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
-                             int const AirLoopNum,          // Primary air loop number
-                             int &CompIndex                 // numeric pointer for CompType/CompName -- passed back from other routines
+    void SimAirLoopComponent(std::string const &CompName,            // the component Name
+                             int const CompType_Num,                 // numeric equivalent for component type
+                             bool const FirstHVACIteration,          // TRUE if first full HVAC iteration in an HVAC timestep
+                             int const AirLoopNum,                   // Primary air loop number
+                             int &CompIndex,                         // numeric pointer for CompType/CompName -- passed back from other routines
+                             UnitarySystems::UnitarySys *CompPointer // equipment actual pointer
     )
     {
 
@@ -3401,6 +3403,9 @@ namespace SimAirServingZones {
         Real64 QActual;
         bool CoolingActive;
         bool HeatingActive;
+        int OAUnitNum = 0;           // used only for UnitarySystem call
+        Real64 OAUCoilOutTemp = 0.0; // used only for UnitarySystem call
+        bool ZoneEquipFlag = false;  // used only for UnitarySystem call
 
         // FLOW:
 
@@ -3483,32 +3488,8 @@ namespace SimAirServingZones {
                 SimCoilUserDefined(CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
             } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
-                // set up a reference for this component and pass into SimAirLoopComponent to get rid of these for loops
-                bool foundComp = false;
-                for (int branchNum = 1; branchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++branchNum) {
-                    for (int compNum = 1; compNum <= PrimaryAirSystem(AirLoopNum).Branch(branchNum).TotalComponents; ++compNum) {
-                        if (CompName == PrimaryAirSystem(AirLoopNum).Branch(branchNum).Comp(compNum).Name) {
-                            int OAUnitNum = 0;
-                            Real64 OAUCoilOutTemp = 0.0;
-                            bool ZoneEquipFlag = false;
-                            PrimaryAirSystem(AirLoopNum)
-                                .Branch(branchNum)
-                                .Comp(compNum)
-                                .compPointer->simulate(CompName,
-                                                       FirstHVACIteration,
-                                                       AirLoopNum,
-                                                       CompIndex,
-                                                       HeatingActive,
-                                                       CoolingActive,
-                                                       OAUnitNum,
-                                                       OAUCoilOutTemp,
-                                                       ZoneEquipFlag);
-                            foundComp = true;
-                            break;
-                        }
-                    }
-                    if (foundComp) break;
-                }
+                CompPointer->simulate(
+                    CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, ZoneEquipFlag);
 
             } else if (SELECT_CASE_var == UnitarySystemHVAC) { // 'AirLoopHVAC:UnitarySystem:Legacy'
                 SimUnitarySystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive);

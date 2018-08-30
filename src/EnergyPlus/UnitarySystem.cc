@@ -3263,13 +3263,20 @@ namespace UnitarySystems {
                             } else {                                                                  // mine data from fan object
                                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(loc_m_FanName)); // call constructor
                                 thisSys.m_FanIndex = HVACFan::getFanObjectVectorIndex(loc_m_FanName);
-                                FanVolFlowRate = HVACFan::fanObjs[thisSys.m_FanIndex]->designAirVolFlowRate;
+                                if (thisSys.m_FanIndex > -1) {
+                                    FanInletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->inletNodeNum;
+                                    FanOutletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->outletNodeNum;
+                                    thisSys.m_FanAvailSchedPtr = HVACFan::fanObjs[thisSys.m_FanIndex]->availSchedIndex;
+                                    FanVolFlowRate = HVACFan::fanObjs[thisSys.m_FanIndex]->designAirVolFlowRate;
+                                } else {
+                                    ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
+                                    ShowContinueError("Unable to access fan data.");
+                                    ShowContinueError("Fan Type = " + loc_fanType + ", Fan name = " + loc_m_FanName);
+                                    errorsFound = true;
+                                }
                                 if (FanVolFlowRate == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                                 thisSys.m_ActualFanVolFlowRate = FanVolFlowRate;
                                 thisSys.m_DesignFanVolFlowRate = FanVolFlowRate;
-                                FanInletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->inletNodeNum;
-                                FanOutletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->outletNodeNum;
-                                thisSys.m_FanAvailSchedPtr = HVACFan::fanObjs[thisSys.m_FanIndex]->availSchedIndex;
                             }
                         }
                     } else {
