@@ -6397,6 +6397,7 @@ namespace DaylightingManager {
 
         static bool blnCycle(false);
         bool breakOuterLoop(false);
+        bool continueOuterLoop(false);
 
         if (ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) return;
 
@@ -6791,6 +6792,7 @@ namespace DaylightingManager {
             // iterate in the order that the shades are specified in WindowShadeControl
             count = 0;
             breakOuterLoop = false;
+            continueOuterLoop = false;
             for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
@@ -6802,11 +6804,15 @@ namespace DaylightingManager {
                     if (ASETIL(igroup) < 1.0) {
 
                         ICtrl = Surface(IWin).WindowShadingControlPtr;
-                        if (!Surface(IWin).HasShadeControl) continue;
-
-                        if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
-                            WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp)
+                        if (!Surface(IWin).HasShadeControl) {
+                            continueOuterLoop = true;
                             continue;
+                        }
+                        if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
+                            WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp) {
+                            continueOuterLoop = true;
+                            continue;
+                        }
 
                         IConst = Surface(IWin).Construction;
                         if (SurfaceWindow(IWin).StormWinFlag == 1) IConst = Surface(IWin).StormWinConstruction;
@@ -6857,12 +6863,12 @@ namespace DaylightingManager {
                     }     // ASETIL < 1
                     // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
                     if (DaylIllum(1) <= SetPnt(1)) {
-                        breakOuterLoop = true; 
+                        breakOuterLoop = true;
                         break;
                     }
                 }
                 if (breakOuterLoop) break;
-
+                if (continueOuterLoop) continue;
             } // End of fourth window loop
 
         } // ISWFLG /= 0 .AND. DaylIllum(1) > SETPNT(1)
@@ -6902,6 +6908,7 @@ namespace DaylightingManager {
             // Glare is too high at a ref pt.  Loop through windows.
             int count = 0;
 
+            continueOuterLoop = false;
             for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
@@ -6917,10 +6924,15 @@ namespace DaylightingManager {
                     // Check if window is eligible for glare control
                     // TH 1/21/2010. Switchable glazings already in partially switched state
                     //  should be allowed to further dim to control glare
-                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
-
+                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) {
+                        continueOuterLoop = false;
+                        continue;
+                    }
                     ICtrl = Surface(IWin).WindowShadingControlPtr;
-                    if (!Surface(IWin).HasShadeControl) continue;
+                    if (!Surface(IWin).HasShadeControl) {
+                        continueOuterLoop = false;
+                        continue;
+                    }
                     if (WindowShadingControl(ICtrl).GlareControlIsActive) {
                         atLeastOneGlareControlIsActive = true;
 
@@ -6970,6 +6982,7 @@ namespace DaylightingManager {
                         }
                     }
                 }
+                if (continueOuterLoop) continue;
 
                 if (atLeastOneGlareControlIsActive) {
 
