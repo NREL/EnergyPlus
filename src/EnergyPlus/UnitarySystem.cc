@@ -2673,7 +2673,7 @@ namespace UnitarySystems {
 
                 Real64 loc_m_HeatingSAFMethod_SAFlow(-999.0);
                 if (fields.find("heating_supply_air_flow_rate") != fields.end()) { // not required field
-                    auto tempFieldVal = fields.at("cooling_supply_air_flow_rate");
+                    auto tempFieldVal = fields.at("heating_supply_air_flow_rate");
                     if (tempFieldVal == "Autosize") {
                         loc_m_HeatingSAFMethod_SAFlow = DataSizing::AutoSize;
                     } else {
@@ -2703,7 +2703,7 @@ namespace UnitarySystems {
 
                 Real64 loc_m_NoCoolHeatSAFMethod_SAFlow(-999.0);
                 if (fields.find("no_load_supply_air_flow_rate") != fields.end()) { // not required field
-                    auto tempFieldVal = fields.at("cooling_supply_air_flow_rate");
+                    auto tempFieldVal = fields.at("no_load_supply_air_flow_rate");
                     if (tempFieldVal == "Autosize") {
                         loc_m_NoCoolHeatSAFMethod_SAFlow = DataSizing::AutoSize;
                     } else {
@@ -13540,10 +13540,10 @@ namespace UnitarySystems {
 
         int CoilIndex = int(Par[1]);
         int UnitarySysNum = int(Par[3]);
-        UnitarySys *thisSys = &unitarySys[UnitarySysNum];
+        UnitarySys &thisSys = unitarySys[UnitarySysNum];
 
         {
-            auto const SELECT_CASE_var(thisSys->m_CoolingCoilType_Num);
+            auto const SELECT_CASE_var(thisSys.m_CoolingCoilType_Num);
 
             if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
 
@@ -13558,7 +13558,7 @@ namespace UnitarySystems {
                 CompOp = int(Par[7]);
                 OnOffAirFlowRatio = 1.0;
 
-                thisSys->setAverageAirFlow(SpeedRatio, OnOffAirFlowRatio);
+                thisSys.setAverageAirFlow(SpeedRatio, OnOffAirFlowRatio);
                 DXCoils::CalcMultiSpeedDXCoilCooling(CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, 0);
                 OutletAirHumRat = DXCoils::DXCoilOutletHumRat(CoilIndex);
 
@@ -13578,9 +13578,9 @@ namespace UnitarySystems {
                 VariableSpeedCoils::SimVariableSpeedCoils("",
                                                           CoilIndex,
                                                           FanOpMode,
-                                                          thisSys->m_MaxONOFFCyclesperHour,
-                                                          thisSys->m_HPTimeConstant,
-                                                          thisSys->m_FanDelayTime,
+                                                          thisSys.m_MaxONOFFCyclesperHour,
+                                                          thisSys.m_HPTimeConstant,
+                                                          thisSys.m_FanDelayTime,
                                                           CompOp,
                                                           CycRatio,
                                                           SpeedNum,
@@ -13589,7 +13589,7 @@ namespace UnitarySystems {
                                                           LatLoad,
                                                           OnOffAirFlowRatio);
 
-                OutletAirHumRat = DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).HumRat;
+                OutletAirHumRat = DataLoopNode::Node(thisSys.CoolCoilOutletNodeNum).HumRat;
 
             } else {
                 assert(false);
@@ -13643,16 +13643,16 @@ namespace UnitarySystems {
         int UnitarySysNum = int(Par[3]);
         int AirloopNum = int(Par[9]);
         bool FirstHVACIteration = (Par[10] > 0.0);
-        UnitarySys *thisSys = &unitarySys[UnitarySysNum];
+        UnitarySys &thisSys = unitarySys[UnitarySysNum];
         {
-            auto const SELECT_CASE_var(thisSys->m_CoolingCoilType_Num);
+            auto const SELECT_CASE_var(thisSys.m_CoolingCoilType_Num);
 
             if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
 
-                if (thisSys->m_FanPlace == FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
-                    thisSys->m_CoolingCycRatio = CycRatio;
-                    thisSys->m_CoolingPartLoadFrac = CycRatio;
-                    thisSys->calcPassiveSystem(AirloopNum, FirstHVACIteration);
+                if (thisSys.m_FanPlace == FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
+                    thisSys.m_CoolingCycRatio = CycRatio;
+                    thisSys.m_CoolingPartLoadFrac = CycRatio;
+                    thisSys.calcPassiveSystem(AirloopNum, FirstHVACIteration);
                 } else {
                     DXCoils::CalcMultiSpeedDXCoil(CoilIndex, 0.0, CycRatio);
                 }
@@ -13667,11 +13667,11 @@ namespace UnitarySystems {
                 CompOp = int(Par[7]);
                 OnOffAirFlowRatio = 1.0;
 
-                thisSys->setAverageAirFlow(CycRatio, OnOffAirFlowRatio);
-                if (thisSys->m_FanPlace == FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
-                    thisSys->m_CoolingCycRatio = CycRatio;
-                    thisSys->m_CoolingPartLoadFrac = CycRatio;
-                    thisSys->calcPassiveSystem(AirloopNum, FirstHVACIteration);
+                thisSys.setAverageAirFlow(CycRatio, OnOffAirFlowRatio);
+                if (thisSys.m_FanPlace == FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
+                    thisSys.m_CoolingCycRatio = CycRatio;
+                    thisSys.m_CoolingPartLoadFrac = CycRatio;
+                    thisSys.calcPassiveSystem(AirloopNum, FirstHVACIteration);
                 } else {
                     DXCoils::CalcMultiSpeedDXCoilCooling(CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, 0);
                 }
@@ -13693,9 +13693,9 @@ namespace UnitarySystems {
                 VariableSpeedCoils::SimVariableSpeedCoils("",
                                                           CoilIndex,
                                                           FanOpMode,
-                                                          thisSys->m_MaxONOFFCyclesperHour,
-                                                          thisSys->m_HPTimeConstant,
-                                                          thisSys->m_FanDelayTime,
+                                                          thisSys.m_MaxONOFFCyclesperHour,
+                                                          thisSys.m_HPTimeConstant,
+                                                          thisSys.m_FanDelayTime,
                                                           CompOp,
                                                           CycRatio,
                                                           SpeedNum,
@@ -13704,7 +13704,7 @@ namespace UnitarySystems {
                                                           dummy,
                                                           OnOffAirFlowRatio);
 
-                OutletAirTemp = DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).Temp;
+                OutletAirTemp = DataLoopNode::Node(thisSys.CoolCoilOutletNodeNum).Temp;
 
             } else {
                 assert(false);
@@ -13749,10 +13749,10 @@ namespace UnitarySystems {
 
         int CoilIndex = int(Par[1]);
         int UnitarySysNum = int(Par[3]);
-        UnitarySys *thisSys = &unitarySys[UnitarySysNum];
+        auto &thisSys = unitarySys[UnitarySysNum];
 
         {
-            auto const SELECT_CASE_var(thisSys->m_CoolingCoilType_Num);
+            auto const SELECT_CASE_var(thisSys.m_CoolingCoilType_Num);
 
             if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
 
@@ -13767,7 +13767,7 @@ namespace UnitarySystems {
                 CompOp = int(Par[7]);
                 OnOffAirFlowRatio = 1.0;
 
-                thisSys->setAverageAirFlow(CycRatio, OnOffAirFlowRatio);
+                thisSys.setAverageAirFlow(CycRatio, OnOffAirFlowRatio);
                 DXCoils::CalcMultiSpeedDXCoilCooling(CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, 0);
                 OutletAirHumRat = DXCoils::DXCoilOutletHumRat(CoilIndex);
 
@@ -13786,9 +13786,9 @@ namespace UnitarySystems {
                 VariableSpeedCoils::SimVariableSpeedCoils("",
                                                           CoilIndex,
                                                           FanOpMode,
-                                                          thisSys->m_MaxONOFFCyclesperHour,
-                                                          thisSys->m_HPTimeConstant,
-                                                          thisSys->m_FanDelayTime,
+                                                          thisSys.m_MaxONOFFCyclesperHour,
+                                                          thisSys.m_HPTimeConstant,
+                                                          thisSys.m_FanDelayTime,
                                                           CompOp,
                                                           CycRatio,
                                                           SpeedNum,
@@ -13797,7 +13797,7 @@ namespace UnitarySystems {
                                                           LatLoad,
                                                           OnOffAirFlowRatio);
 
-                OutletAirHumRat = DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).HumRat;
+                OutletAirHumRat = DataLoopNode::Node(thisSys.CoolCoilOutletNodeNum).HumRat;
 
             } else {
                 assert(false);
@@ -13850,10 +13850,10 @@ namespace UnitarySystems {
 
         int CoilIndex = int(Par[1]);
         int UnitarySysNum = int(Par[3]);
-        UnitarySys *thisSys = &unitarySys[UnitarySysNum];
+        auto &thisSys = unitarySys[UnitarySysNum];
 
         {
-            auto const SELECT_CASE_var(thisSys->m_HeatingCoilType_Num);
+            auto const SELECT_CASE_var(thisSys.m_HeatingCoilType_Num);
 
             if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
 
@@ -13863,7 +13863,7 @@ namespace UnitarySystems {
                 CompOp = int(Par[7]);
                 OnOffAirFlowRatio = 1.0;
 
-                thisSys->setAverageAirFlow(CycRatio, OnOffAirFlowRatio);
+                thisSys.setAverageAirFlow(CycRatio, OnOffAirFlowRatio);
                 DXCoils::CalcMultiSpeedDXCoilHeating(CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
                 OutletAirTemp = DXCoils::DXCoilOutletTemp(CoilIndex);
 
@@ -13883,9 +13883,9 @@ namespace UnitarySystems {
                 VariableSpeedCoils::SimVariableSpeedCoils("",
                                                           CoilIndex,
                                                           FanOpMode,
-                                                          thisSys->m_MaxONOFFCyclesperHour,
-                                                          thisSys->m_HPTimeConstant,
-                                                          thisSys->m_FanDelayTime,
+                                                          thisSys.m_MaxONOFFCyclesperHour,
+                                                          thisSys.m_HPTimeConstant,
+                                                          thisSys.m_FanDelayTime,
                                                           CompOp,
                                                           CycRatio,
                                                           SpeedNum,
@@ -13894,7 +13894,7 @@ namespace UnitarySystems {
                                                           LatLoad,
                                                           OnOffAirFlowRatio);
 
-                OutletAirTemp = DataLoopNode::Node(thisSys->HeatCoilOutletNodeNum).Temp;
+                OutletAirTemp = DataLoopNode::Node(thisSys.HeatCoilOutletNodeNum).Temp;
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
 
@@ -13904,7 +13904,7 @@ namespace UnitarySystems {
 
                 HeatingCoils::CalcMultiStageElectricHeatingCoil(CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
 
-                OutletAirTemp = DataLoopNode::Node(thisSys->HeatCoilOutletNodeNum).Temp;
+                OutletAirTemp = DataLoopNode::Node(thisSys.HeatCoilOutletNodeNum).Temp;
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
 
@@ -13914,7 +13914,7 @@ namespace UnitarySystems {
 
                 HeatingCoils::CalcMultiStageGasHeatingCoil(CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
 
-                OutletAirTemp = DataLoopNode::Node(thisSys->HeatCoilOutletNodeNum).Temp;
+                OutletAirTemp = DataLoopNode::Node(thisSys.HeatCoilOutletNodeNum).Temp;
 
             } else {
                 assert(false);
@@ -13956,19 +13956,19 @@ namespace UnitarySystems {
         Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
 
         int UnitarySysNum = int(Par[1]);
-        UnitarySys *thisSys = &unitarySys[UnitarySysNum];
+        UnitarySys &thisSys = unitarySys[UnitarySysNum];
 
         Real64 DesiredOutletTemp = Par[2];
         Real64 DesiredOutletHumRat = Par[3];
 
         PackagedThermalStorageCoil::SimTESCoil(
-            thisSys->m_CoolingCoilName, thisSys->m_CoolingCoilIndex, thisSys->m_FanOpMode, thisSys->m_TESOpMode, PartLoadRatio);
+            thisSys.m_CoolingCoilName, thisSys.m_CoolingCoilIndex, thisSys.m_FanOpMode, thisSys.m_TESOpMode, PartLoadRatio);
 
         if (DesiredOutletHumRat > 0.0) {
-            OutletAirHumRat = DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).HumRat;
+            OutletAirHumRat = DataLoopNode::Node(thisSys.CoolCoilOutletNodeNum).HumRat;
             Residuum = OutletAirHumRat - DesiredOutletHumRat;
         } else {
-            OutletAirTemp = DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).Temp;
+            OutletAirTemp = DataLoopNode::Node(thisSys.CoolCoilOutletNodeNum).Temp;
             Residuum = OutletAirTemp - DesiredOutletTemp;
         }
 
