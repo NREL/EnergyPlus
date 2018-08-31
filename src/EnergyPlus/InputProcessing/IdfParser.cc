@@ -206,6 +206,13 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
         } else if (token == Token::NONE) {
             success = false;
             return root;
+        } else if (token == Token::SEMICOLON) {
+            next_token(idf, index);
+            continue;
+        } else if (token == Token::COMMA) {
+            errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) + " - Extraneous comma found.");
+            success = false;
+            return root;
         } else if (token == Token::EXCLAMATION) {
             eat_comment(idf, index);
         } else {

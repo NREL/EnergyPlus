@@ -3901,7 +3901,15 @@ ElectricTransformer::ElectricTransformer(std::string const &objectName)
             ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
             errorsFound = true;
         }
-
+        if (ratedCapacity_ == 0) {
+            if (performanceInputMode_ == TransformerPerformanceInput::lossesMethod) {
+                ShowWarningError(routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\".");
+                ShowContinueError("Specified " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
+                ShowContinueError("Specified " + DataIPShortCuts::cNumericFieldNames(2) + " = " + General::RoundSigDigits(ratedCapacity_, 1));
+                ShowContinueError("Transformer load and no load losses cannot be calculated with 0.0 rated capacity.");
+                ShowContinueError("Simulation continues but transformer losses will be set to zero.");
+            }
+        }
         ratedNL_ = DataIPShortCuts::rNumericArgs(6);
         ratedLL_ = DataIPShortCuts::rNumericArgs(7);
         ratedEfficiency_ = DataIPShortCuts::rNumericArgs(8);
@@ -4112,7 +4120,7 @@ void ElectricTransformer::manageTransformers(Real64 const surplusPowerOutFromLoa
     } // switch usage mode
 
     // check availability schedule
-    if (ScheduleManager::GetCurrentScheduleValue(availSchedPtr_) > 0.0) {
+    if (ratedCapacity_ > 0.0 && ScheduleManager::GetCurrentScheduleValue(availSchedPtr_) > 0.0) {
 
         Real64 pUL = elecLoad / ratedCapacity_;
 
