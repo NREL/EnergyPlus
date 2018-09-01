@@ -176,7 +176,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   END TYPE FieldFlagAndValue
   TYPE (FieldFlagAndValue) :: RunPeriodStartYear
   TYPE (FieldFlagAndValue) :: RunPeriodRepeated
-  INTEGER :: MonthNumber, DayNumber, YearNumber, RepeatedCount
+  INTEGER :: BeginMonthNumber, BeginDayNumber, BeginYearNumber, EndMonthNumber, EndDayNumber, EndYearNumber, RepeatedCount
   INTEGER, EXTERNAL :: GetYearFromStartDayString
   LOGICAL, EXTERNAL :: IsYearNumberALeapYear
   INTEGER, EXTERNAL :: GetLeapYearFromStartDayString
@@ -717,19 +717,28 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! spend some time mining out the state of the run period object
                 RunPeriodStartYear%wasSet = .FALSE.
+                BeginYearNumber = 0
                 IF (CurArgs >= 14) THEN
                   IF (TRIM(InArgs(14)) /= Blank) THEN
                     RunPeriodStartYear%wasSet = .TRUE.
                     RunPeriodStartYear%originalValue = InArgs(14)
+                    BeginYearNumber = ProcessNumber(InArgs(14),ErrFlag)
+                    IF (ErrFlag) THEN
+                      CALL ShowSevereError('Invalid Number, RunPeriod=' // TRIM(InArgs(1)) // ', field ' // TRIM(FldNames(14)) // '=' // TRIM(InArgs(14)),Auditf)
+                    ENDIF
                   END IF
                 END IF
                 RunPeriodRepeated%wasSet = .FALSE.
+                RepeatedCount = 0
                 IF (CurArgs >= 12) THEN
                   IF (TRIM(InArgs(12)) /= Blank) THEN
-                    READ(InArgs(12), *) RepeatedCount
+                    RunPeriodRepeated%originalValue = InArgs(12)
+                    RepeatedCount = ProcessNumber(InArgs(12),ErrFlag)
+                    IF (ErrFlag) THEN
+                      CALL ShowSevereError('Invalid Number, RunPeriod=' // TRIM(InArgs(1)) // ', field ' // TRIM(FldNames(12)) // '=' // TRIM(InArgs(12)),Auditf)
+                    ENDIF
                     IF (RepeatedCount > 1) THEN
                       RunPeriodRepeated%wasSet = .TRUE.
-                      RunPeriodRepeated%originalValue = InArgs(12)
                     ENDIF
                   END IF
                 END IF
@@ -738,16 +747,22 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1:3) = InArgs(1:3) 
                 ! Start year is weird
                 IF (RunPeriodStartYear%wasSet) THEN
-                  OutArgs(4) = RunPeriodStartYear%originalValue
+                  OutArgs(4) = RoundSigDigits(BeginYearNumber,0)
                 ELSE IF (RunPeriodRepeated%wasSet) THEN
-                  READ(OutArgs(2), *) MonthNumber
-                  READ(OutArgs(3), *) DayNumber
+                  BeginMonthNumber = ProcessNumber(InArgs(2),ErrFlag)
+                  IF (ErrFlag) THEN
+                    CALL ShowSevereError('Invalid Number, RunPeriod=' // TRIM(InArgs(1)) // ', field ' // TRIM(FldNames(2)) // '=' // TRIM(InArgs(2)),Auditf)
+                  ENDIF
+                  BeginDayNumber = ProcessNumber(InArgs(3),ErrFlag)
+                  IF (ErrFlag) THEN
+                    CALL ShowSevereError('Invalid Number, RunPeriod=' // TRIM(InArgs(1)) // ', field ' // TRIM(FldNames(3)) // '=' // TRIM(InArgs(3)),Auditf)
+                  ENDIF
                   IF (TRIM(InArgs(6)) /= Blank) THEN
-                    YearNumber = FindYearForWeekDay(MonthNumber, DayNumber, InArgs(6))
+                    BeginYearNumber = FindYearForWeekDay(BeginMonthNumber, BeginDayNumber, InArgs(6))
                   ELSE
-                    YearNumber = FindYearForWeekDay(MonthNumber, DayNumber, "SUNDAY")
+                    BeginYearNumber = FindYearForWeekDay(BeginMonthNumber, BeginDayNumber, "SUNDAY")
                   END IF
-                  WRITE(OutArgs(4), *) YearNumber
+                  OutArgs(4) = RoundSigDigits(BeginYearNumber, 0)
                 ELSE
                   OutArgs(4) = Blank
                 END IF
@@ -759,13 +774,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   IF (TRIM(OutArgs(4)) == Blank) THEN
                     OutArgs(7) = Blank
                   ELSE
-                    READ(RunPeriodRepeated%originalValue, *) RepeatedCount
-                    READ(OutArgs(4), *) YearNumber
-                    YearNumber = YearNumber + RepeatedCount
-                    WRITE(OutArgs(7), *) YearNumber
-                    IF (TRIM(InArgs(4))=="2".AND.TRIM(InArgs(5))=="29") THEN
+                    ! RepeatedCount was set earlier
+                    EndYearNumber = BeginYearNumber + RepeatedCount
+                    OutArgs(7) = RoundSigDigits( EndYearNumber, 0)
+
+                    EndMonthNumber = ProcessNumber(InArgs(4),ErrFlag)
+                    IF (ErrFlag) THEN
+                      CALL ShowSevereError('Invalid Number, RunPeriod=' // TRIM(InArgs(1)) // ', field ' // TRIM(FldNames(4)) // '=' // TRIM(InArgs(4)),Auditf)
+                    ENDIF
+                    EndDayNumber = ProcessNumber(InArgs(5),ErrFlag)
+                    IF (ErrFlag) THEN
+                      CALL ShowSevereError('Invalid Number, RunPeriod=' // TRIM(InArgs(1)) // ', field ' // TRIM(FldNames(5)) // '=' // TRIM(InArgs(5)),Auditf)
+                    ENDIF
+                    IF (EndMonthNumber==2 .AND. EndDayNumber==29) THEN
                       ! We should have a leap year end year
-                      IF (.NOT.IsYearNumberALeapYear(YearNumber)) THEN
+                      IF (.NOT.IsYearNumberALeapYear(EndYearNumber)) THEN
                         ! Warning about bad end year/end date combination
                         OutArgs(6) = "28"
                       END IF
