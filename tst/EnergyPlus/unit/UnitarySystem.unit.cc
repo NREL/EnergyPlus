@@ -10036,7 +10036,7 @@ TEST_F(EnergyPlusFixture, UnitarySysModel_ASHRAEModel_WaterCoils)
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
 
     // call once to initialize some variables (i.e., min air flow rate not correct on first pass)
-    int AirLoopNum = 1;
+    int AirLoopNum = 0;
     int CompIndex = 1;
     bool HeatActive = false;
     bool CoolActive = true;
