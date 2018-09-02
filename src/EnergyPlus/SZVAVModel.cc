@@ -1366,7 +1366,7 @@ namespace SZVAVModel {
         // using HVACUnitarySystem::CalcUnitarySystemWaterFlowResidual;
         // using PlantUtilities::SetComponentFlowRate;
         // using Psychrometrics::PsyHFnTdbW;
-        UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[SysIndex];
+        UnitarySystems::UnitarySys &thisSys = UnitarySystems::unitarySys[SysIndex];
 
         int const MaxIter(100);    // maximum number of iterations
         int SolFlag(0);            // return flag from RegulaFalsi for sensible load
@@ -1544,7 +1544,7 @@ namespace SZVAVModel {
             if (CoolingLoad) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                 // set the water flow ratio so water coil gets proper flow
                 SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
-                thisSys->calcUnitarySystemToLoad(AirLoopNum,
+                thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                  FirstHVACIteration,
                                                  PartLoadRatio,
                                                  0.0,
@@ -1557,7 +1557,7 @@ namespace SZVAVModel {
                                                  CompressorONFlag);
             } else {
                 SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
-                thisSys->calcUnitarySystemToLoad(AirLoopNum,
+                thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                  FirstHVACIteration,
                                                  0.0,
                                                  PartLoadRatio,
@@ -1589,7 +1589,7 @@ namespace SZVAVModel {
                 Par[12] = minAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed air flow rate, maxAirMassFlow indicates full
                                           // air flow
                 Par[13] = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
-                General::SolveRoot(0.001, MaxIter, SolFlag, PartLoadRatio, thisSys->calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
+                General::SolveRoot(0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 1: ";
                 }
@@ -1627,7 +1627,7 @@ namespace SZVAVModel {
                 Par[12] = AirMassFlow;      // sets air flow rate used when iterating on coil capacity
                 Par[13] = 0.0;              // other than 0 means to iterate on SA temperature
 
-                General::SolveRoot(0.001, MaxIter, SolFlag, PartLoadRatio, thisSys->calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
+                General::SolveRoot(0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 2: ";
                 }
@@ -1647,7 +1647,7 @@ namespace SZVAVModel {
                 if (CoolingLoad) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                     // set the water flow ratio so water coil gets proper flow
                     SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
-                    thisSys->calcUnitarySystemToLoad(AirLoopNum,
+                    thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                      FirstHVACIteration,
                                                      PartLoadRatio,
                                                      0.0,
@@ -1660,7 +1660,7 @@ namespace SZVAVModel {
                                                      CompressorONFlag);
                 } else {
                     SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
-                    thisSys->calcUnitarySystemToLoad(AirLoopNum,
+                    thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                      FirstHVACIteration,
                                                      0.0,
                                                      PartLoadRatio,
@@ -1693,7 +1693,7 @@ namespace SZVAVModel {
                 Par[12] = maxAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed air flow rate, maxAirMassFlow indicates full
                                           // air flow
                 Par[13] = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
-                General::SolveRoot(0.001, MaxIter, SolFlag, PartLoadRatio, thisSys->calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
+                General::SolveRoot(0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 3: ";
                 }
@@ -1713,7 +1713,7 @@ namespace SZVAVModel {
             if (SolFlag == -1) {
                 // get capacity for warning
                 if (CoolingLoad) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
-                    thisSys->calcUnitarySystemToLoad(AirLoopNum,
+                    thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                      FirstHVACIteration,
                                                      PartLoadRatio,
                                                      0.0,
@@ -1725,7 +1725,7 @@ namespace SZVAVModel {
                                                      SupHeaterLoad,
                                                      CompressorONFlag);
                 } else {
-                    thisSys->calcUnitarySystemToLoad(AirLoopNum,
+                    thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                      FirstHVACIteration,
                                                      0.0,
                                                      PartLoadRatio,
