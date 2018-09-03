@@ -2439,6 +2439,13 @@ namespace OutputReportTabular {
         return isCompLoadRepReq;
     }
 
+    bool hasSizingPeriodsDays()
+    {
+        int sizePerDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay");
+        int sizePerWeathFileDays = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
+        return ((sizePerDesDays + sizePerWeathFileDays) > 0);
+    }
+
     void InitializePredefinedMonthlyTitles()
     {
         // SUBROUTINE INFORMATION:
