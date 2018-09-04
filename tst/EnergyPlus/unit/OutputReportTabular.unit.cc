@@ -6570,7 +6570,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(hasSizingPeriodsDays);
+    EXPECT_TRUE(hasSizingPeriodsDays());
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileDays)
@@ -6585,12 +6585,27 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
   "  SummerDesignDay,         !- Day of Week for Start Day",
   "  No,                      !- Use Weather File Daylight Saving Period",
   "  No;                      !- Use Weather File Rain and Snow Indicators",
-
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(hasSizingPeriodsDays);
+    EXPECT_TRUE(hasSizingPeriodsDays());
 }
 
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileConditionType)
+{
+    std::string const idf_objects = delimited_string({
+  "SizingPeriod:WeatherFileConditionType,",
+  "  Hot,                     !- Name",
+  "  SummerExtreme,           !- Period Selection",
+  "  Monday,                  !- Day of Week for Start Day",
+  "  Yes,                     !- Use Weather File Daylight Saving Period",
+  "  Yes;                     !- Use Weather File Rain and Snow Indicators",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // this test should show a false since this type of sizing period is not compatible with the component loads calculations
+    EXPECT_FALSE(hasSizingPeriodsDays());
+}
 
