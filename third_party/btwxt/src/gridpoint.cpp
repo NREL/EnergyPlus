@@ -11,8 +11,6 @@
 
 namespace Btwxt {
 
-std::vector<std::pair<int, int>> GridPoint::sivor = {{-1, 0}, {-1, 1}, {1, 0}, {1, 1}};
-
 GridPoint::GridPoint() {}
 
 GridPoint::GridPoint(GriddedData &grid_data_in)
@@ -24,12 +22,13 @@ GridPoint::GridPoint(GriddedData &grid_data_in)
       weights(ndims, 0),
       is_inbounds(ndims),
       methods(ndims, Method::UNDEF),
+      reset_hypercube(false),
+      weighting_factors(ndims, std::vector<double>(4, 0.0)),
       interp_coeffs(ndims, std::vector<double>(2, 0.0)),
       cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
-      spacing_mults(ndims, std::vector<double>(2, 0.0)),
-      terms(ndims, std::vector<double>(2, 0.0)),
       temp_values(grid_data->num_tables),
-      results(grid_data->num_tables) {}
+      results(grid_data->num_tables) {
+}
 
 GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v)
     : grid_data(&grid_data_in),
@@ -38,10 +37,10 @@ GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v)
       weights(ndims, 0),
       is_inbounds(ndims),
       methods(ndims, Method::UNDEF),
+      reset_hypercube(false),
+      weighting_factors(ndims, std::vector<double>(4, 0.0)),
       interp_coeffs(ndims, std::vector<double>(2, 0.0)),
       cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
-      spacing_mults(ndims, std::vector<double>(2, 0.0)),
-      terms(ndims, std::vector<double>(2, 0.0)),
       temp_values(grid_data->num_tables),
       results(grid_data->num_tables) {
   set_target(v);
@@ -129,9 +128,13 @@ void GridPoint::set_hypercube(std::vector<Method> methods) {
                                              "have the correct number of dimensions."));
   }
   std::vector<std::vector<int>> options(ndims, {0, 1});
+  reset_hypercube = false;
 
   for (std::size_t dim = 0; dim < ndims; dim++) {
-    if (methods[dim] == Method::CUBIC) {
+    if (target_is_set && weights[dim] == 0.0) {
+      options[dim] = {0};
+      reset_hypercube = true;
+    } else if (methods[dim] == Method::CUBIC) {
       options[dim] = {-1, 0, 1, 2};
     }
   }
@@ -172,7 +175,8 @@ void GridPoint::consolidate_methods()
       }
     }
   }
-  if (!std::equal(previous_methods.begin(), previous_methods.end(), methods.begin())) {
+  reset_hypercube |= !std::equal(previous_methods.begin(), previous_methods.end(), methods.begin());
+  if (reset_hypercube) {
     set_hypercube(methods);
   }
 }
@@ -183,19 +187,21 @@ void GridPoint::calculate_interp_coeffs() {
     if (methods[dim] == Method::CUBIC) {
       interp_coeffs[dim][0] = 2 * mu * mu * mu - 3 * mu * mu + 1;
       interp_coeffs[dim][1] = -2 * mu * mu * mu + 3 * mu * mu;
-      cubic_slope_coeffs[dim][0] = mu * mu * mu - 2 * mu * mu + mu;
-      cubic_slope_coeffs[dim][1] = mu * mu * mu - mu * mu;
-      spacing_mults[dim][0] = grid_data->get_axis_spacing_mult(dim, 0, point_floor[dim]);
-      spacing_mults[dim][1] = grid_data->get_axis_spacing_mult(dim, 1, point_floor[dim]);
+      cubic_slope_coeffs[dim][0] = (mu * mu * mu - 2 * mu * mu + mu)*grid_data->get_axis_spacing_mult(dim, 0, point_floor[dim]);
+      cubic_slope_coeffs[dim][1] = (mu * mu * mu - mu * mu)*grid_data->get_axis_spacing_mult(dim, 1, point_floor[dim]);
     } else {
       if (methods[dim] == Method::CONSTANT) {
         mu = mu < 0 ? 0 : 1;
       }
       interp_coeffs[dim][0] = 1 - mu;
       interp_coeffs[dim][1] = mu;
-      spacing_mults[dim][0] = 0.0;
-      spacing_mults[dim][1] = 0.0;
+      cubic_slope_coeffs[dim][0] = 0.0;
+      cubic_slope_coeffs[dim][1] = 0.0;
     }
+    weighting_factors[dim][0] = -cubic_slope_coeffs[dim][0]; // point below floor (-1)
+    weighting_factors[dim][1] = interp_coeffs[dim][0] - cubic_slope_coeffs[dim][1]; // floor (0)
+    weighting_factors[dim][2] = interp_coeffs[dim][1] + cubic_slope_coeffs[dim][0]; // ceiling (1)
+    weighting_factors[dim][3] = cubic_slope_coeffs[dim][1]; // point above ceiling (2)
   }
 }
 
@@ -227,42 +233,11 @@ std::vector<double> GridPoint::get_results() {
 }
 
 double GridPoint::get_vertex_weight(const std::vector<short> &v) {
-  int sign, flavor;
+  double weight = 1.0;
   for (std::size_t dim = 0; dim < ndims; dim++) {
-    if (methods[dim] == Method::CUBIC) {
-      std::tie(sign, flavor) = sivor[v[dim] + 1];
-      if (v[dim] == 0 || v[dim] == 1) { // closest neighbors have a normal interpolation term
-        terms[dim][0] = interp_coeffs[dim][v[dim]];
-      } else {
-        terms[dim][0] = 0.0;
-      }
-      terms[dim][1] = cubic_slope_coeffs[dim][flavor] * spacing_mults[dim][flavor] * sign;
-    } else { // LINEAR or CONSTANT
-      terms[dim][0] = interp_coeffs[dim][v[dim]];
-      terms[dim][1] = 0.0;
-    }
+    weight *= weighting_factors[dim][v[dim] + 1];
   }
-  return sum_weighting_terms();
-}
-
-double GridPoint::sum_weighting_terms() {
-  std::size_t nT = terms.size();
-  std::size_t N = 1;
-  for (std::size_t dim = 0; dim < nT; ++dim) {
-    N *= 2;
-  } // Two options per dimension (normal or slope terms)
-
-  // Add all combinations of coefficient term products
-  double weight_sum = 0.0;
-  double product;
-  for (std::size_t n = 0; n < N; ++n) {
-    product = 1.0;
-    for (std::size_t dim = 0; dim < nT; ++dim) {
-      product *= terms[dim][bool(n & 1 << dim)];
-    }
-    weight_sum += product;
-  }
-  return weight_sum;
+  return weight;
 }
 
 double compute_fraction(double x, double edge[2]) {

@@ -211,6 +211,7 @@ namespace CurveManager {
         int X1SortOrder;                                  // sort order for table data for X1
         int X2SortOrder;                                  // sort order for table data for X2
         int GridValueIndex;                               // Index of output within RGI for new Table:Lookup
+        Real64 NormalizationValue;                        // normalization value (TODO: Move from Table object)
         Real64 Coeff1;                                    // constant coefficient
         Real64 Coeff2;                                    // linear coeff (1st independent variable)
         Real64 Coeff3;                                    // quadratic coeff (1st independent variable)
@@ -267,7 +268,7 @@ namespace CurveManager {
         // Default Constructor
         PerfomanceCurveData()
             : ObjectType(""), CurveType(0), InterpolationType(0), DataFormat(0), TableIndex(0), NumDims(0), NumIVLowErrorIndex(0),
-              NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), Coeff1(0.0), Coeff2(0.0), Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0),
+              NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), NormalizationValue(1.0), Coeff1(0.0), Coeff2(0.0), Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0),
               Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0), Coeff11(0.0), Coeff12(0.0), Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0),
               Var3Max(0.0), Var3Min(0.0), Var4Max(0.0), Var4Min(0.0), Var5Max(0.0), Var5Min(0.0), Var6Max(0.0), Var6Min(0.0), CurveMin(0.0),
               CurveMax(0.0), CurveMinPresent(false), CurveMaxPresent(false), Var1MinPresent(false), Var1MaxPresent(false), Var2MinPresent(false),

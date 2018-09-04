@@ -473,6 +473,7 @@ namespace HybridEvapCoolingModel {
     bool CMode::CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject)
     {
 
+        // Note: This is abusing the table normalization value
         Real64 CheckNormalizationReference = GetNormalPoint(CurveID);
         if (NormalizationReference == -1) {
             // should never happen, because to get to this function we need a valid curve but check anyway.

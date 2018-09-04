@@ -57,23 +57,21 @@ private:
   std::vector<Method> methods;
   std::vector<Method> previous_methods;
   std::vector<std::vector<short>> hypercube;
+  bool reset_hypercube;
+  std::vector<std::vector<double>> weighting_factors; // A set of weighting factors for each dimension
+
 
   std::vector<std::vector<double>> interp_coeffs;
   std::vector<std::vector<double>> cubic_slope_coeffs;
-  std::vector<std::vector<double>> spacing_mults;
-  std::vector<std::vector<double>> terms;
+
   std::vector<double> temp_values;
   std::vector<double> results;
-  static std::vector<std::pair<int, int>> sivor; // {sign, flavor}, flavor corresponds to the floor
-                                                 // (0) or ceiling (1) bounding of the point
 
   void calculate_weights();
 
   void consolidate_methods();
 
   void calculate_interp_coeffs();
-
-  double sum_weighting_terms();
 
   void set_dim_floor(std::size_t dim);
 

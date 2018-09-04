@@ -3291,6 +3291,8 @@ namespace CurveManager {
                     normalizationFactor = fields.at("normalization_value");
                 }
 
+                PerfCurve(CurveNum).NormalizationValue = normalizationFactor;
+
                 if (fields.count("values")) {
                     for (auto value : fields.at("values")) {
                         lookupValues.push_back(value.at("output_value").get<Real64>()/normalizationFactor);
@@ -6177,8 +6179,12 @@ namespace CurveManager {
     {
 
         if (CurveIndex > 0 && CurveIndex <= NumCurves && PerfCurve(CurveIndex).TableIndex > 0) {
-            const int tableIndex = PerfCurve(CurveIndex).TableIndex;
-            return TableData(tableIndex).NormalPoint;
+            if (PerfCurve(CurveIndex).InterpolationType == BtwxtMethod) {
+              return PerfCurve(CurveIndex).NormalizationValue;
+            } else {
+              const int tableIndex = PerfCurve(CurveIndex).TableIndex;
+              return TableData(tableIndex).NormalPoint;
+            }
         } else {
             std::string s = std::to_string(CurveIndex);
             ShowWarningError("GetNormalPoint: CurveIndex not in range of curves, CurveIndex requested  " + s);
