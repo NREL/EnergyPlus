@@ -183,6 +183,8 @@ An example of this object in an IDF is:
 
 \subsubsection{Outputs}\label{outputs-043}
 
+The Ideal Loads air system outdoor air load variables are only calculated when there is active heating or cooling (or humidification/dehumidification).
+
 \begin{itemize}
 \item
   HVAC,Sum,Zone Ideal Loads Supply Air Sensible Heating Energy {[}J{]}
@@ -298,7 +300,7 @@ An example of this object in an IDF is:
 
 \paragraph{Ideal Loads Output Variable Overview}\label{ideal-loads-output-variable-overview}
 
-All of the ZoneHVAC:IdealLoadsAirSystem loads and energy use are reported for Sensible Heating, Latent Heating, Total Heating, Sensible Cooling, Latent Cooling, and Total Cooling. To explain the relationship between the various outputs, Total Cooling Energy will be used.
+All of the ZoneHVAC:IdealLoadsAirSystem loads and energy use are reported for Sensible Heating, Latent Heating, Total Heating, Sensible Cooling, Latent Cooling, and Total Cooling. To explain the relationship between the various outputs, Total Cooling Energy will be used. Note that the outdoor air load variables are only calculated when there is active heating or cooling (or humidification/dehumidification).
 
 \emph{Zone Ideal Loads Supply Air Total Cooling Energy} is the district cooling energy consumed by the ideal loads system ``cooling coil'' to cool and dehumidify the supply air.
 
