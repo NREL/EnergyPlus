@@ -6536,7 +6536,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     EXPECT_EQ("AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 }
 
-TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays)
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodDesignDay)
 {
     std::string const idf_objects = delimited_string({
   "SizingPeriod:DesignDay,",
@@ -6572,4 +6572,25 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays)
 
     EXPECT_TRUE(hasSizingPeriodsDays);
 }
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileDays)
+{
+    std::string const idf_objects = delimited_string({
+  "SizingPeriod:WeatherFileDays,",
+  "  Summer including Extreme Summer days,  !- Name",
+  "  7,                       !- Begin Month",
+  "  18,                      !- Begin Day of Month",
+  "  7,                       !- End Month",
+  "  25,                      !- End Day of Month",
+  "  SummerDesignDay,         !- Day of Week for Start Day",
+  "  No,                      !- Use Weather File Daylight Saving Period",
+  "  No;                      !- Use Weather File Rain and Snow Indicators",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_TRUE(hasSizingPeriodsDays);
+}
+
 
