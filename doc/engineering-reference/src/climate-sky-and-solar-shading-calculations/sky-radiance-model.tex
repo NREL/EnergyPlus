@@ -246,7 +246,7 @@ where \emph{SF\(_{sun}\)} is the beam sunlit fraction. The total sky diffuse irr
 {I'_{sky}} = {R_{horizon}}{I_{horizon}} + {R_{dome}}{I_{dome}} + {R_{circumsolar}}{I_{circumsolar}}
 \end{equation}
 
-\emph{R\(_{horizon}\)} and \emph{R\(_{dome}\)} are calculated once for each surface since they are independent of sun position.
+If the Sky Diffuse Modeling Algorithm (ShadowCalculation object) is set to SimpleSkyDiffuseModeling, then \emph{R\(_{horizon}\)} and \emph{R\(_{dome}\)} are calculated once for each surface since they are independent of sun position, or else if the Sky Diffuse Modeling Algorithm is set to DetailedSkyDiffuseModeling, then \emph{R\(_{horizon}\)} and \emph{R\(_{dome}\)} are calculated every timestep for each surface.
 
 With shadowing we then have:
 
