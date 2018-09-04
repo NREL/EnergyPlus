@@ -6535,3 +6535,41 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     EXPECT_EQ(76ul, strings.size());
     EXPECT_EQ("AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 }
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays)
+{
+    std::string const idf_objects = delimited_string({
+  "SizingPeriod:DesignDay,",
+  "  CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+  "  1,                       !- Month",
+  "  21,                      !- Day of Month",
+  "  WinterDesignDay,         !- Day Type",
+  "  -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+  "  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+  "  Wetbulb,                 !- Humidity Condition Type",
+  "  -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+  "  ,                        !- Humidity Condition Day Schedule Name",
+  "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+  "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+  "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+  "  99063.,                  !- Barometric Pressure {Pa}",
+  "  4.9,                     !- Wind Speed {m/s}",
+  "  270,                     !- Wind Direction {deg}",
+  "  No,                      !- Rain Indicator",
+  "  No,                      !- Snow Indicator",
+  "  No,                      !- Daylight Saving Time Indicator",
+  "  ASHRAEClearSky,          !- Solar Model Indicator",
+  "  ,                        !- Beam Solar Day Schedule Name",
+  "  ,                        !- Diffuse Solar Day Schedule Name",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+  "  0.0;                     !- Sky Clearness",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_TRUE(hasSizingPeriodsDays);
+}
+
