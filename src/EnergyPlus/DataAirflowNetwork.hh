@@ -502,11 +502,12 @@ namespace DataAirflowNetwork {
         int InletNode;    // Inlet node number
         int OutletNode;   // Outlet node number
         int EPlusZoneNum; // Zone number
+        int PressCtrlNum; // pressure control number
 
         // Default Constructor
         MultizoneCompExhaustFanProp()
             : FlowRate(0.0), SchedPtr(0), FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), InletNode(0), OutletNode(0),
-              EPlusZoneNum(0)
+              EPlusZoneNum(0), PressCtrlNum(0)
         {
         }
     };
@@ -594,9 +595,10 @@ namespace DataAirflowNetwork {
         std::string EPlusType; // EnergyPlus node type
         Real64 Height;         // Nodal height
         int EPlusNodeNum;      // EPlus node number
+        int AirLoopNum;        // AirLoop number
 
         // Default Constructor
-        DisSysNodeProp() : Height(0.0), EPlusNodeNum(0)
+        DisSysNodeProp() : Height(0.0), EPlusNodeNum(0), AirLoopNum(0)
         {
         }
     };
@@ -692,9 +694,11 @@ namespace DataAirflowNetwork {
         int InletNode;             // Inlet node number
         int OutletNode;            // Outlet node number
         Real64 MaxAirMassFlowRate; // Max Specified MAss Flow Rate of Damper [kg/s]
+        int AirLoopNum;            // Air loop number
 
         // Default Constructor
-        DisSysCompCVFProp() : FlowRate(0.0), Ctrl(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0)
+        DisSysCompCVFProp()
+            : FlowRate(0.0), Ctrl(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0)
         {
         }
     };
@@ -726,9 +730,10 @@ namespace DataAirflowNetwork {
         std::string EPlusType; // EnergyPlus coil type
         Real64 L;              // Air path length
         Real64 D;              // Air path hydraulic diameter
+        int AirLoopNum;        // AirLoop number
 
         // Default Constructor
-        DisSysCompCoilProp() : L(0.0), D(0.0)
+        DisSysCompCoilProp() : L(0.0), D(0.0), AirLoopNum(0)
         {
         }
     };
@@ -757,9 +762,10 @@ namespace DataAirflowNetwork {
         Real64 D;              // Air path hydraulic diameter
         int DamperInletNode;   // Damper inlet node number
         int DamperOutletNode;  // Damper outlet node number
+        int AirLoopNum;        // AirLoop number
 
         // Default Constructor
-        DisSysCompTermUnitProp() : L(0.0), D(0.0), DamperInletNode(0), DamperOutletNode(0)
+        DisSysCompTermUnitProp() : L(0.0), D(0.0), DamperInletNode(0), DamperOutletNode(0), AirLoopNum(0)
         {
         }
     };
@@ -807,11 +813,12 @@ namespace DataAirflowNetwork {
         int EPlusTypeNum;
         int RAFNNodeNum; // RoomAir model node number
         int NumOfLinks;  // Number of links for RoomAir model
+        int AirLoopNum;  // AirLoop number
 
         // Default Constructor
         AirflowNetworkNodeProp()
             : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0), EPlusTypeNum(0),
-              RAFNNodeNum(0), NumOfLinks(0)
+              RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
         }
     };
@@ -843,10 +850,12 @@ namespace DataAirflowNetwork {
         int ConnectionFlag;   // Return and supply connection flag
         bool VAVTermDamper;   // True if this component is a damper for a VAV terminal
         int LinkageViewFactorObjectNum;
+        int AirLoopNum; // Airloop number
 
         // Default Constructor
         AirflowNetworkLinkageProp()
-            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(0), VAVTermDamper(false), LinkageViewFactorObjectNum(0)
+            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(0), VAVTermDamper(false), LinkageViewFactorObjectNum(0),
+              AirLoopNum(0)
         {
         }
     };
@@ -863,9 +872,15 @@ namespace DataAirflowNetwork {
         int ControlTypeSet;            // Control type set to be used for pressure control
         int AvailSchedPtr;             // Availability schedule pointer
         int PresSetpointSchedPtr;      // Pressure setpoint schedule pointer
+        int AirLoopNum;                // Air loop number
+        int OANodeNum;                 // outdoor air node number
+        bool bypass;                   // Can not perform pressure control as true
+        Real64 PresCtrlMassRate;
 
         // Default Constructor
-        PressureControllerProp() : ZoneNum(0), AFNNodeNum(0), ControlTypeSet(0), AvailSchedPtr(0), PresSetpointSchedPtr(0)
+        PressureControllerProp()
+            : ZoneNum(0), AFNNodeNum(0), ControlTypeSet(0), AvailSchedPtr(0), PresSetpointSchedPtr(0), AirLoopNum(0), OANodeNum(0), bypass(false),
+              PresCtrlMassRate(0.0)
         {
         }
     };
@@ -882,10 +897,13 @@ namespace DataAirflowNetwork {
         Real64 StandardW; // Standard humidity ratio for crack data [kg/kg]
         int InletNode;    // Inlet node number
         int OutletNode;   // Outlet node number
+        int OAMixerNum;   // OA Mixer number
+        int PressCtrlNum; // Pressure control number
 
         // Default Constructor
         DisSysCompAirflowProp()
-            : SchedPtr(0), FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), InletNode(0), OutletNode(0)
+            : SchedPtr(0), FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), InletNode(0), OutletNode(0), OAMixerNum(0),
+              PressCtrlNum(0)
         {
         }
     };
@@ -893,14 +911,18 @@ namespace DataAirflowNetwork {
     struct AirflowNetworkNodeSimuData // Node variable for simulation
     {
         // Members
-        Real64 TZ;   // Temperature [C]
-        Real64 WZ;   // Humidity ratio [kg/kg]
-        Real64 PZ;   // Pressure [Pa]
-        Real64 CO2Z; // CO2 [ppm]
-        Real64 GCZ;  // Generic contaminant [ppm]
+        Real64 TZ;       // Temperature [C]
+        Real64 WZ;       // Humidity ratio [kg/kg]
+        Real64 PZ;       // Pressure [Pa]
+        Real64 CO2Z;     // CO2 [ppm]
+        Real64 GCZ;      // Generic contaminant [ppm]
+        Real64 TZlast;   // Temperature [C] at previous time step
+        Real64 WZlast;   // Humidity ratio [kg/kg] at previous time step
+        Real64 CO2Zlast; // CO2 [ppm] at previous time step
+        Real64 GCZlast;  // Generic contaminant [ppm] at previous time step
 
         // Default Constructor
-        AirflowNetworkNodeSimuData() : TZ(0.0), WZ(0.0), PZ(0.0), CO2Z(0.0), GCZ(0.0)
+        AirflowNetworkNodeSimuData() : TZ(0.0), WZ(0.0), PZ(0.0), CO2Z(0.0), GCZ(0.0), TZlast(0.0), WZlast(0.0), CO2Zlast(0.0), GCZlast(0.0)
         {
         }
     };
@@ -1040,6 +1062,7 @@ namespace DataAirflowNetwork {
         Real64 TotalLatGainJ;
         Real64 TotalLatLossW;
         Real64 TotalLatLossJ;
+        bool OnOffFlag;
 
         // Default Constructor
         AiflowNetworkReportProp()
@@ -1050,7 +1073,7 @@ namespace DataAirflowNetwork {
               LeakSenLossW(0.0), LeakSenLossJ(0.0), LeakLatGainW(0.0), LeakLatGainJ(0.0), LeakLatLossW(0.0), LeakLatLossJ(0.0), CondSenGainW(0.0),
               CondSenGainJ(0.0), CondSenLossW(0.0), CondSenLossJ(0.0), DiffLatGainW(0.0), DiffLatGainJ(0.0), DiffLatLossW(0.0), DiffLatLossJ(0.0),
               RadGainW(0.0), RadGainJ(0.0), RadLossW(0.0), RadLossJ(0.0), TotalSenGainW(0.0), TotalSenGainJ(0.0), TotalSenLossW(0.0),
-              TotalSenLossJ(0.0), TotalLatGainW(0.0), TotalLatGainJ(0.0), TotalLatLossW(0.0), TotalLatLossJ(0.0)
+              TotalSenLossJ(0.0), TotalLatGainW(0.0), TotalLatGainJ(0.0), TotalLatLossW(0.0), TotalLatLossJ(0.0), OnOffFlag(false)
         {
         }
     };
@@ -1094,16 +1117,15 @@ namespace DataAirflowNetwork {
     extern Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
     extern Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
     extern Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
-    extern AirflowNetworkSimuProp AirflowNetworkSimu; // unique object name | AirflowNetwork control | Wind pressure coefficient input control |
-                                                      // Integer equivalent for WPCCntr field | CP Array name at WPCCntr = "INPUT" | Building type |
-                                                      // Height Selection | Maximum number of iteration | Initialization flag | Relative airflow
-                                                      // convergence | Absolute airflow convergence | Convergence acceleration limit | Maximum
-                                                      // pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of
-                                                      // Building Width Along Short Axis to Width Along Long Axis | Number of wind directions |
-                                                      // Minimum pressure difference | Exterior large opening error count during HVAC system operation
-                                                      // | Exterior large opening error index during HVAC system operation | Large opening error count
-                                                      // at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization
-                                                      // flag type
+    extern AirflowNetworkSimuProp
+        AirflowNetworkSimu; // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
+                            // field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration |
+                            // Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit |
+                            // Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along
+                            // Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening
+                            // error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large
+                            // opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag
+                            // type
     extern Array1D<AirflowNetworkNodeProp> AirflowNetworkNodeData;
     extern Array1D<AirflowNetworkCompProp> AirflowNetworkCompData;
     extern Array1D<AirflowNetworkLinkageProp> AirflowNetworkLinkageData;

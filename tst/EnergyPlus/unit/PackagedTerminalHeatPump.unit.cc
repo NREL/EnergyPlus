@@ -524,8 +524,8 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     SizeFan(1);
     // the fan vol flow rate should equal the max of cooling and heating coil flow rates
-    EXPECT_EQ(Fan(1).MaxAirFlowRate,
-              max(VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate, VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate));
+    Real64 maxCoilAirFlow = max(VariableSpeedCoils::VarSpeedCoil( 1 ).RatedAirVolFlowRate, VariableSpeedCoils::VarSpeedCoil( 2 ).RatedAirVolFlowRate);
+    EXPECT_EQ(Fan(1).MaxAirFlowRate, maxCoilAirFlow);
     EXPECT_EQ(Fan(1).MaxAirFlowRate, max(PTUnit(1).MaxCoolAirVolFlow, PTUnit(1).MaxHeatAirVolFlow));
 
     // Initialize the packaged terminal heat pump

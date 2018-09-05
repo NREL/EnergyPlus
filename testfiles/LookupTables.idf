@@ -241,8 +241,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -254,8 +256,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -1034,7 +1038,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1854,7 +1857,7 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
-	,                        !- Minimum Value of X6
+    ,                        !- Minimum Value of X6
     ,                        !- Maximum Value of X6
     0.8,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
@@ -1863,7 +1866,7 @@
     ,                        !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
-	,                        !- Input Unit Type for X6
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     1,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -1988,7 +1991,7 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
-	,                        !- Minimum Value of X6
+    ,                        !- Minimum Value of X6
     ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
@@ -2671,7 +2674,7 @@
 
   Table:OneIndependentVariable,
     FanPowerRatioCurve,      !- Name
-    Exponent,                !- Curve Type
+    ,                        !- Curve Type
     LagrangeinterpolationLinearExtrapolation,  !- Interpolation Method
     0.0,                     !- Minimum Value of X
     1.5,                     !- Maximum Value of X
@@ -3352,7 +3355,7 @@
     ,                        !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
-	,                        !- Input Unit Type for X6
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     2,                       !- Number of Independent Variables
     5,                       !- Number of Values for Independent Variable X1

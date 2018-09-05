@@ -100,7 +100,6 @@ namespace HybridUnitaryAirConditioners {
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using CurveManager::GetCurveMinMaxValues;
-    using CurveManager::GetCurveType;
     using HybridEvapCoolingModel::CMode;
 
     Array1D<Model> ZoneHybridUnitaryAirConditioner;

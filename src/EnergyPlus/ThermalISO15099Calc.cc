@@ -572,9 +572,8 @@ namespace ThermalISO15099Calc {
                               Gin,
                               rir,
                               vfreevent,
-                              Ah,
                               nperr,
-                              ErrorMessage);
+                              ErrorMessage );
 
         for (int i = 1; i <= nlayer; ++i) {
             EffectiveOpenness(i) = Ah(i) / (width * height);

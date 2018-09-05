@@ -35,7 +35,7 @@ Build
 Builds
 
 # by default CLion uses cmake-build-debug as the build folder, so add that as well
-cmake-build-debug
+cmake-build-*
 
 # App-specific project files, for example, for Geany IDE:
 *.geany

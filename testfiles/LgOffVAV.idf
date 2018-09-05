@@ -140,8 +140,10 @@
     Jan,                     !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -153,8 +155,10 @@
     Jul,                     !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -622,7 +626,6 @@
     EW1-P1T,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -734,7 +737,6 @@
     EW1-P2T,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -846,7 +848,6 @@
     EW1-P3T,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -958,7 +959,6 @@
     EW1-P4T,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1166,7 +1166,6 @@
     EW1-P1F,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1278,7 +1277,6 @@
     EW1-P2F,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1390,7 +1388,6 @@
     EW1-P3F,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1502,7 +1499,6 @@
     EW1-P4F,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1710,7 +1706,6 @@
     EW1-P1I,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1822,7 +1817,6 @@
     EW1-P2I,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -1934,7 +1928,6 @@
     EW1-P3I,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
@@ -2046,7 +2039,6 @@
     EW1-P4I,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50,                    !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.00,                    !- Multiplier
     4,                       !- Number of Vertices
