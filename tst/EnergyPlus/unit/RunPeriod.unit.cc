@@ -68,6 +68,27 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::WeatherManager;
 using namespace EnergyPlus::ScheduleManager;
 
+TEST_F(EnergyPlusFixture, RunPeriod_Defaults)
+{
+    RunPeriodData runperiod;
+    EXPECT_EQ(WeatherManager::WeekDay::Sunday, runperiod.startWeekDay);
+
+    EXPECT_EQ(1, runperiod.startMonth);
+    EXPECT_EQ(1, runperiod.startDay);
+    EXPECT_EQ(2017, runperiod.startYear);
+    EXPECT_EQ(2457755, runperiod.startJulianDate);
+
+    EXPECT_EQ(12, runperiod.endMonth);
+    EXPECT_EQ(31, runperiod.endDay);
+    EXPECT_EQ(2017, runperiod.endYear);
+    EXPECT_EQ(2458119, runperiod.endJulianDate);
+
+    std::array<Real64, 12> startDays{{1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6}};
+    for (size_t i = 0; i < 12; ++i) {
+        EXPECT_EQ(startDays[i], runperiod.monWeekDay[i]);
+    }
+}
+
 TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
 {
     std::string const idf_objects = delimited_string({
@@ -202,6 +223,11 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
     EXPECT_EQ(2017, WeatherManager::RunPeriodInput[3].startYear);
     EXPECT_EQ(2457755, WeatherManager::RunPeriodInput[3].startJulianDate);
     EXPECT_EQ(2458119, WeatherManager::RunPeriodInput[3].endJulianDate);
+    // This is the default, check that it works properly
+    std::array<Real64, 12> startDays{ {1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6} };
+    for (size_t i = 0; i < 12; ++i) {
+        EXPECT_EQ(startDays[i], WeatherManager::RunPeriodInput[3].monWeekDay[i]);
+    }
 
     EXPECT_EQ(WeatherManager::WeekDay::Wednesday, WeatherManager::RunPeriodInput[4].startWeekDay);
     EXPECT_EQ(2010, WeatherManager::RunPeriodInput[4].startYear);
