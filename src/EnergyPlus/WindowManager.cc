@@ -1785,49 +1785,6 @@ namespace WindowManager {
         // shade. These are used to calculate zone MRT contribution from window when
         // interior blind/shade is deployed.
 
-        // Loop for BSDF windows
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            auto &surfaceWindow(SurfaceWindow(SurfNum));
-
-            if (surfaceWindow.WindowModelType == WindowBSDFModel) {
-                // Set shading flags for BSDF windows
-                // Set shading flags. This could be also done inside SurfaceWindow structure, however, order is important
-                if (Construct(Surface(SurfNum).Construction).BSDFInput.BasisType != 0) {
-                    surfaceWindow.WindowModelType = WindowBSDFModel;
-                    // Set shading layer flags for windows
-                    auto &construction(Construct(Surface(SurfNum).Construction));
-                    auto &surface_window(SurfaceWindow(SurfNum));
-                    int TotLayers = construction.TotLayers;
-                    for (auto Lay = 1; Lay <= TotLayers; ++Lay) {
-                        int LayPtr = construction.LayerPoint(Lay);
-                        auto &material(Material(LayPtr));
-                        bool isShading = material.Group == ComplexWindowShade;
-                        if (isShading && Lay == 1) surface_window.ShadingFlag = ExtShadeOn;
-                        if (isShading && Lay == TotLayers) surface_window.ShadingFlag = IntShadeOn;
-                    }
-                }
-                if (surfaceWindow.ShadingFlag == IntShadeOn) {
-                    auto &construction(Construct(Surface(SurfNum).Construction));
-                    int TotLay = construction.TotLayers;
-                    int ShadingLayerPtr = construction.LayerPoint(TotLay);
-                    ShadingLayerPtr = Material(ShadingLayerPtr).ComplexShadePtr;
-                    auto &complexShade = ComplexShade(ShadingLayerPtr);
-                    auto TauShadeIR = complexShade.IRTransmittance;
-                    auto EpsShadeIR = complexShade.BackEmissivity;
-                    auto RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
-                    // Get properties of glass next to inside shading layer
-                    int GlassLayPtr = construction.LayerPoint(TotLay - 2);
-                    auto EpsGlassIR = Material(GlassLayPtr).AbsorpThermalBack;
-                    auto RhoGlassIR = 1 - EpsGlassIR;
-
-                    auto EffShBlEmiss = EpsShadeIR * (1.0 + RhoGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR));
-                    surfaceWindow.EffShBlindEmiss[0] = EffShBlEmiss;
-                    auto EffGlEmiss = EpsGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR);
-                    surfaceWindow.EffGlassEmiss[0] = EffGlEmiss;
-                }
-            }
-        }
-
         // Loop for ordinary windows
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
@@ -2008,7 +1965,7 @@ namespace WindowManager {
 
             // TH 2/16/2010. CR 8010. The following code was modified and moved to GetSurfaceData
             //  in SurfaceGeometry module, because for blinds with variable slats new blinds were created and assigned
-            if (Surface(SurfNum).WindowShadingControlPtr != 0) {
+            if (Surface(SurfNum).HasShadeControl) {
                 //  ConstrNumSh = Surface(SurfNum)%ShadedConstruction
                 ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
                 //  IF(ShadingType == WSC_ST_ExteriorBlind) THEN
@@ -2090,7 +2047,7 @@ namespace WindowManager {
                 ConstrNum = Surface(SurfNum).Construction;
                 MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers);
                 if (Material(MatNum).SolarDiffusing) {
-                    if (Surface(SurfNum).WindowShadingControlPtr == 0) {
+                    if (!Surface(SurfNum).HasShadeControl) {
                         SurfaceWindow(SurfNum).SolarDiffusing = true;
                     } else { // There is a shading control
                         if (WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType == SwitchableGlazing) {
@@ -8373,7 +8330,7 @@ namespace WindowManager {
         PrintTransMap = false;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
-            if (Surface(SurfNum).WindowShadingControlPtr != 0) {
+            if (Surface(SurfNum).HasShadeControl) {
                 ConstrNumSh = Surface(SurfNum).ShadedConstruction;
                 MatNum = Construct(ConstrNumSh).LayerPoint(1);
                 ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;

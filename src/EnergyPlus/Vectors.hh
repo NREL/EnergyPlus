@@ -120,6 +120,8 @@ namespace Vectors {
 
     void CalcCoPlanarNess(Array1A<Vector> Surf, int const NSides, bool &IsCoPlanar, Real64 &MaxDist, int &ErrorVertex);
 
+    std::vector<int> PointsInPlane(Array1A<Vector> BaseSurf, int const BaseSides, Array1A<Vector> QuerySurf, int const QuerySides, bool &ErrorFound);
+
     Real64 CalcPolyhedronVolume(Polyhedron const &Poly);
 
 } // namespace Vectors

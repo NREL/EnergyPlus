@@ -237,12 +237,12 @@ namespace General {
                           int const Month,
                           bool &ErrorsFound);
 
-    int JulianDay(int const Month,        // Month, 1..12
-                  int const Day,          // Day of Month, not validated by month
-                  int const LeapYearValue // 1 if leap year indicated, 0 if not
+    int OrdinalDay(int const Month,        // Month, 1..12
+                   int const Day,          // Day of Month, not validated by month
+                   int const LeapYearValue // 1 if leap year indicated, 0 if not
     );
 
-    void InvJulianDay(int const Number, int &PMonth, int &PDay, int const LeapYr);
+    void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr);
 
     bool BetweenDates(int const TestDate,  // Date to test
                       int const StartDate, // Start date in sequence

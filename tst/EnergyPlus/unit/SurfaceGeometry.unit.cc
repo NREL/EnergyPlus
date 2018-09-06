@@ -288,7 +288,6 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
         "    Surface 3 - Rectangle,   !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.0,                     !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1.0,                     !- Multiplier",
         "    Autocalculate,           !- Number of Vertices",
@@ -341,7 +340,6 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
         "    Surface 3 - Rectangle,   !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.0,                     !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1.0,                     !- Multiplier",
         "    Autocalculate,           !- Number of Vertices",
@@ -356,7 +354,6 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
         "    Surface 3 - Rectangle,   !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.5,                     !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1,                       !- Multiplier",
         "    3,                       !- Number of Vertices",
@@ -789,7 +786,6 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
         "	WallExample,             !- Building Surface Name            ",
         "	,                        !- Outside Boundary Condition Object",
         "	0.50000,                 !- View Factor to Ground            ",
-        "	,                        !- Shading Control Name             ",
         "	,                        !- Frame and Divider Name           ",
         "	1,                       !- Multiplier                       ",
         "	4,                       !- Number of Vertices               ",
@@ -805,7 +801,6 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
         "	WallExample,             !- Building Surface Name            ",
         "	,                        !- Outside Boundary Condition Object",
         "	0.50000,                 !- View Factor to Ground            ",
-        "	,                        !- Shading Control Name             ",
         "	,                        !- Frame and Divider Name           ",
         "	1,                       !- Multiplier                       ",
         "	4,                       !- Number of Vertices               ",
@@ -821,7 +816,6 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
         "	WallExample,             !- Building Surface Name            ",
         "	,                        !- Outside Boundary Condition Object",
         "	0.50000,                 !- View Factor to Ground            ",
-        "	,                        !- Shading Control Name             ",
         "	,                        !- Frame and Divider Name           ",
         "	1,                       !- Multiplier                       ",
         "	4,                       !- Number of Vertices               ",
@@ -3016,7 +3010,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
         "   171.704, 3.5052, 6.1976, !- X, Y, Z Vertex 3 {m}",
         "   171.704, 0, 6.1976;                     !- X, Y, Z Vertex 4 {m}",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -3027,8 +3021,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     SurfaceTmp.allocate(2);
     int SurfNum = 0;
     int TotHTSurfs = 2;
-    Array1D_string const BaseSurfCls(3, { "WALL", "FLOOR", "ROOF" });
-    Array1D_int const BaseSurfIDs(3, { 1, 2, 3 });
+    Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
+    Array1D_int const BaseSurfIDs(3, {1, 2, 3});
     int NeedToAddSurfaces;
 
     GetGeometryParameters(ErrorsFound);
@@ -3040,20 +3034,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     SinBldgRelNorth = 0.0;
     CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs,
-        NeedToAddSurfaces);
+    GetHTSurfaceData(ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     EXPECT_EQ(2, SurfNum);
-    std::string const error_string = delimited_string({
-        "   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", invalid Construction Name=\"TYPICAL\".",
-        "   ** Severe  ** BuildingSurface:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", invalid Construction Name=\"TYPICAL\".",
-        "   ** Severe  ** RoofCeiling:Detailed=\"016W88_WATERMETER - FLOOR : A\", Vertex size mismatch between base surface :016W88_WATERMETER - FLOOR : A and outside boundary surface: 006W27_RESTROOMS - ROOFCEILING : A",
-        "   **   ~~~   ** The vertex sizes are 5 for base surface and 4 for outside boundary surface. Please check inputs.",
-        "   ** Severe  ** RoofCeiling:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", Vertex size mismatch between base surface :006W27_RESTROOMS - ROOFCEILING : A and outside boundary surface: 016W88_WATERMETER - FLOOR : A",
-        "   **   ~~~   ** The vertex sizes are 4 for base surface and 5 for outside boundary surface. Please check inputs."
-        });
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", invalid Construction Name=\"TYPICAL\".",
+                          "   ** Severe  ** BuildingSurface:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", invalid Construction Name=\"TYPICAL\".",
+                          "   ** Severe  ** RoofCeiling:Detailed=\"016W88_WATERMETER - FLOOR : A\", Vertex size mismatch between base surface "
+                          ":016W88_WATERMETER - FLOOR : A and outside boundary surface: 006W27_RESTROOMS - ROOFCEILING : A",
+                          "   **   ~~~   ** The vertex sizes are 5 for base surface and 4 for outside boundary surface. Please check inputs.",
+                          "   ** Severe  ** RoofCeiling:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", Vertex size mismatch between base surface "
+                          ":006W27_RESTROOMS - ROOFCEILING : A and outside boundary surface: 016W88_WATERMETER - FLOOR : A",
+                          "   **   ~~~   ** The vertex sizes are 4 for base surface and 5 for outside boundary surface. Please check inputs."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
-
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
@@ -3168,5 +3161,408 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
     EXPECT_EQ(8.0, Surface(ThisSurf).Vertex(2).y);
     EXPECT_EQ(15.0, Surface(ThisSurf).Vertex(3).x);
     EXPECT_EQ(8.0, Surface(ThisSurf).Vertex(3).y);
+}
 
+TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
+{
+    TotWinShadingControl = 3;
+    WindowShadingControl.allocate(TotWinShadingControl);
+    int zn = 1;
+
+    WindowShadingControl(1).Name = "WSC1";
+    WindowShadingControl(1).ZoneIndex = zn;
+    WindowShadingControl(1).SequenceNumber = 2;
+    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(1).FenestrationCount = 3;
+    WindowShadingControl(1).FenestrationName.allocate(WindowShadingControl(1).FenestrationCount);
+    WindowShadingControl(1).FenestrationName(1) = "Fene-01";
+    WindowShadingControl(1).FenestrationName(2) = "Fene-02";
+    WindowShadingControl(1).FenestrationName(3) = "Fene-03";
+
+    WindowShadingControl(2).Name = "WSC2";
+    WindowShadingControl(2).ZoneIndex = zn;
+    WindowShadingControl(2).SequenceNumber = 3;
+    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    WindowShadingControl(2).FenestrationCount = 4;
+    WindowShadingControl(2).FenestrationName.allocate(WindowShadingControl(2).FenestrationCount);
+    WindowShadingControl(2).FenestrationName(1) = "Fene-04";
+    WindowShadingControl(2).FenestrationName(2) = "Fene-05";
+    WindowShadingControl(2).FenestrationName(3) = "Fene-06";
+    WindowShadingControl(2).FenestrationName(4) = "Fene-07";
+
+    WindowShadingControl(3).Name = "WSC3";
+    WindowShadingControl(3).ZoneIndex = zn;
+    WindowShadingControl(3).SequenceNumber = 1;
+    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(3).FenestrationCount = 2;
+    WindowShadingControl(3).FenestrationName.allocate(WindowShadingControl(3).FenestrationCount);
+    WindowShadingControl(3).FenestrationName(1) = "Fene-08";
+    WindowShadingControl(3).FenestrationName(2) = "Fene-09";
+
+    Construct.allocate(1);
+    Construct(1).WindowTypeEQL = false;
+
+    SurfaceTmp.allocate(9);
+
+    SurfaceTmp(1).Name = "Fene-04";
+    SurfaceTmp(1).Construction = 1;
+    SurfaceTmp(1).ExtBoundCond = ExternalEnvironment;
+
+    SurfaceTmp(2).Name = "Fene-05";
+    SurfaceTmp(2).Construction = 1;
+    SurfaceTmp(2).ExtBoundCond = ExternalEnvironment;
+
+    SurfaceTmp(3).Name = "Fene-06";
+    SurfaceTmp(3).Construction = 1;
+    SurfaceTmp(3).ExtBoundCond = ExternalEnvironment;
+
+    SurfaceTmp(4).Name = "Fene-01";
+    SurfaceTmp(4).Construction = 1;
+    SurfaceTmp(4).ExtBoundCond = ExternalEnvironment;
+
+    SurfaceTmp(5).Name = "Fene-02";
+    SurfaceTmp(5).Construction = 1;
+    SurfaceTmp(5).ExtBoundCond = ExternalEnvironment;
+
+    SurfaceTmp(6).Name = "Fene-03";
+    SurfaceTmp(6).Construction = 1;
+    SurfaceTmp(6).ExtBoundCond = ExternalEnvironment;
+
+    SurfaceTmp(7).Name = "Fene-07";
+    SurfaceTmp(7).Construction = 1;
+    SurfaceTmp(7).ExtBoundCond = ExternalEnvironment;
+
+    SurfaceTmp(8).Name = "Fene-08";
+    SurfaceTmp(8).Construction = 1;
+    SurfaceTmp(8).ExtBoundCond = ExternalEnvironment;
+
+    SurfaceTmp(9).Name = "Fene-09";
+    SurfaceTmp(9).Construction = 1;
+    SurfaceTmp(9).ExtBoundCond = ExternalEnvironment;
+
+    bool Err = false;
+
+    int surfNum = 1;
+    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_FALSE(Err);
+
+    surfNum = 2;
+    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_FALSE(Err);
+
+    surfNum = 3;
+    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_FALSE(Err);
+
+    surfNum = 4;
+    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    EXPECT_FALSE(Err);
+
+    surfNum = 5;
+    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    EXPECT_FALSE(Err);
+
+    surfNum = 6;
+    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    EXPECT_FALSE(Err);
+
+    surfNum = 7;
+    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_FALSE(Err);
+
+    surfNum = 8;
+    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 3);
+    EXPECT_FALSE(Err);
+
+    surfNum = 9;
+    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 3);
+    EXPECT_FALSE(Err);
+}
+
+TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
+{
+    TotWinShadingControl = 3;
+    WindowShadingControl.allocate(TotWinShadingControl);
+    int zn = 1;
+
+    WindowShadingControl(1).Name = "WSC1";
+    WindowShadingControl(1).ZoneIndex = zn;
+    WindowShadingControl(1).SequenceNumber = 2;
+    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(1).FenestrationCount = 3;
+    WindowShadingControl(1).FenestrationName.allocate(WindowShadingControl(1).FenestrationCount);
+    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
+    WindowShadingControl(1).FenestrationName(1) = "Fene-01";
+    WindowShadingControl(1).FenestrationName(2) = "Fene-02";
+    WindowShadingControl(1).FenestrationName(3) = "Fene-03";
+
+    WindowShadingControl(2).Name = "WSC2";
+    WindowShadingControl(2).ZoneIndex = zn;
+    WindowShadingControl(2).SequenceNumber = 3;
+    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    WindowShadingControl(2).FenestrationCount = 4;
+    WindowShadingControl(2).FenestrationName.allocate(WindowShadingControl(2).FenestrationCount);
+    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
+    WindowShadingControl(2).FenestrationName(1) = "Fene-04";
+    WindowShadingControl(2).FenestrationName(2) = "Fene-05";
+    WindowShadingControl(2).FenestrationName(3) = "Fene-06";
+    WindowShadingControl(2).FenestrationName(4) = "Fene-07";
+
+    WindowShadingControl(3).Name = "WSC3";
+    WindowShadingControl(3).ZoneIndex = zn;
+    WindowShadingControl(3).SequenceNumber = 1;
+    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    WindowShadingControl(3).FenestrationCount = 2;
+    WindowShadingControl(3).FenestrationName.allocate(WindowShadingControl(3).FenestrationCount);
+    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
+    WindowShadingControl(3).FenestrationName(1) = "Fene-08";
+    WindowShadingControl(3).FenestrationName(2) = "Fene-09";
+
+
+    TotSurfaces = 12;
+    Surface.allocate(TotSurfaces);
+
+    Surface(1).Name = "Fene-07";
+    Surface(1).WindowShadingControlPtr = 2;
+
+    Surface(2).Name = "Fene-01";
+    Surface(2).WindowShadingControlPtr = 1;
+
+    Surface(3).Name = "Fene-08";
+    Surface(3).WindowShadingControlPtr = 3;
+
+    Surface(4).Name = "Fene-02";
+    Surface(4).WindowShadingControlPtr = 1;
+
+    Surface(5).Name = "Fene-10";
+    Surface(5).WindowShadingControlPtr = 0;
+
+    Surface(6).Name = "Fene-03";
+    Surface(6).WindowShadingControlPtr = 1;
+
+    Surface(7).Name = "Fene-09";
+    Surface(7).WindowShadingControlPtr = 3;
+
+    Surface(8).Name = "Fene-04";
+    Surface(8).WindowShadingControlPtr = 2;
+
+    Surface(9).Name = "Fene-10";
+    Surface(9).WindowShadingControlPtr = 0;
+
+    Surface(10).Name = "Fene-05";
+    Surface(10).WindowShadingControlPtr = 2;
+
+    Surface(11).Name = "Fene-11";
+    Surface(11).WindowShadingControlPtr = 0;
+
+    Surface(12).Name = "Fene-06";
+    Surface(12).WindowShadingControlPtr = 2;
+
+
+    bool Err = false;
+
+    FinalAssociateWindowShadingControlFenestration(Err);
+    EXPECT_FALSE(Err);
+
+    EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(1), 2);
+    EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(2), 4);
+    EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(3), 6);
+
+    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(1), 8);
+    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(2), 10);
+    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(3), 12);
+    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(4), 1);
+
+    EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(1), 3);
+    EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(2), 7);
+
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "Version,                                                        ",
+        "	8.9;                     !- Version Identifier               ",
+        "	                                                             ",
+        "Material,",
+        "    Gypsum Board,            !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    0.0159,                  !- Thickness {m}",
+        "    0.16,                    !- Conductivity {W/m-K}",
+        "    800,                     !- Density {kg/m3}",
+        "    1090,                    !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Material,",
+        "    InsulationBatt,        !- Name",
+        "    VeryRough,               !- Roughness",
+        "    0.3048,                  !- Thickness {m}",
+        "    0.05,                    !- Conductivity {W/m-K}",
+        "    19,                      !- Density {kg/m3}",
+        "    960,                     !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Material,",
+        "    InfiniteRPCM23C,         !- Name",
+        "    VeryRough,               !- Roughness",
+        "    0.006,                   !- Thickness {m}",
+        "    0.815,                   !- Conductivity {W/m-K}",
+        "    929,                     !- Density {kg/m3}",
+        "    3140,                    !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Construction,",
+        "    Project semi-exposed ceiling,  !- Name",
+        "    InsulationBatt,        !- Outside Layer",
+        "    InfiniteRPCM23C,         !- Layer 2",
+        "    Gypsum Board;            !- Layer 3",
+
+        "Construction,",
+        "    Project semi-exposed ceiling_Rev,  !- Name",
+        "    Gypsum Board,            !- Outside Layer",
+        "    InfiniteRPCM23C,         !- Layer 2",
+        "    InsulationBatt;        !- Layer 3",
+
+        "BuildingSurface:Detailed,",
+        "    DATATELCOM_Ceiling_1_0_0,  !- Name",
+        "    Ceiling,                 !- Surface Type",
+        "    Project semi-exposed ceiling,  !- Construction Name",
+        "    DATATELCOM,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1_Floor_4_0_10000,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    9.64595244,              !- Vertex 1 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 1 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 1 Z-coordinate {m}",
+        "    13.20708687,             !- Vertex 2 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 2 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 2 Z-coordinate {m}",
+        "    13.20708687,             !- Vertex 3 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 3 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 3 Z-coordinate {m}",
+        "    9.64595244,              !- Vertex 4 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
+        "    3.499104;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1_Floor_4_0_10000,  !- Name",
+        "    Floor,                   !- Surface Type",
+        "    Project semi-exposed ceiling_Rev,  !- Construction Name",
+        "    ZONE1,             !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    DATATELCOM_Ceiling_1_0_0,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    13.20708687,             !- Vertex 1 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 1 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 1 Z-coordinate {m}",
+        "    9.64595244,              !- Vertex 2 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 2 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 2 Z-coordinate {m}",
+        "    9.64595244,              !- Vertex 3 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 3 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 3 Z-coordinate {m}",
+        "    13.20708687,             !- Vertex 4 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
+        "    3.499104;                !- Vertex 4 Z-coordinate {m}",
+
+        "SurfaceProperty:HeatTransferAlgorithm:Construction,",
+        "    Ceilings,                !- Name",
+        "    ConductionFiniteDifference,  !- Algorithm",
+        "    Project semi-exposed ceiling;  !- Construction Name",
+
+        "Zone,",
+        "    DATATELCOM,       !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    23.5824,                 !- Volume {m3}",
+        "    6.7395,                  !- Floor Area {m2}",
+        "    TARP;                    !- Zone Inside Convection Algorithm",
+        "Zone,",
+        "    ZONE1,             !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    999.6521,                !- Volume {m3}",
+        "    454.1032,                !- Floor Area {m2}",
+        "    TARP;                    !- Zone Inside Convection Algorithm",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetProjectControlData(ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);          // expect no errors
+
+    GetMaterialData(ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);    // expect no errors
+
+    GetConstructData(ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);     // expect no errors
+
+    GetZoneData(ErrorsFound);  // read zone data
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    CosZoneRelNorth.allocate(2);
+    SinZoneRelNorth.allocate(2);
+
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(2) = CosZoneRelNorth(1);
+    SinZoneRelNorth(2) = SinZoneRelNorth(1);
+    CosBldgRelNorth = 1.0;
+    SinBldgRelNorth = 0.0;
+
+    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
+    EXPECT_FALSE(ErrorsFound);   // expect no errors
+
+    EXPECT_EQ(5, Surface(1).HeatTransferAlgorithm);
+    EXPECT_EQ(5, Surface(2).HeatTransferAlgorithm);
+    std::string const error_string = delimited_string({
+        "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from calculated Zone Floor Area(s).",
+        "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.",
+        "   ** Warning ** An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in both constructions should be same.",
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: DATATELCOM_CEILING_1_0_0, is CondFD - ConductionFiniteDifference",
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is CTF - ConductionTransferFunction",
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is assigned to CondFD - ConductionFiniteDifference. Simulation continues.",
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+    
 }

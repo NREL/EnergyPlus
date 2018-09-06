@@ -3225,7 +3225,6 @@ namespace WindowComplexManager {
         Real64 CpAirZone;             // Heat capacity of zone air (J/kg-K)
         Real64 ConvHeatGainToZoneAir; // Convective heat gain to zone air from window gap airflow (W)
                                       //		int ConstrNumSh; // Construction number with shading device
-        Real64 TransDiff;             // Diffuse shortwave transmittance
         static int CalcSHGC(0);       // SHGC calculations are not necessary for E+ run
         static int NumOfIterations(0);
 
@@ -3847,6 +3846,7 @@ namespace WindowComplexManager {
             // contribution of frame and divider.
 
             SurfInsideTemp = theta(2 * nlayer) - KelvinConv;
+            SurfaceWindow(SurfNum).EffInsSurfTemp = SurfInsideTemp;
             SurfOutsideTemp = theta(1) - KelvinConv;
             SurfOutsideEmiss = emis(1);
 
@@ -3954,7 +3954,9 @@ namespace WindowComplexManager {
             //  ConstrNumSh = Surface(SurfNum)%StormWinShadedConstruction
             // END IF
             // IF(ShadeFlag <= 0) THEN
-            TransDiff = Construct(ConstrNum).TransDiff;
+            // TransDiff = Construct(ConstrNum).TransDiff;
+            int IState = SurfaceWindow(SurfNum).ComplexFen.NumStates;
+            Real64 TransDiff = SurfaceWindow(SurfNum).ComplexFen.State(IState).WinDiffTrans;
             // ELSE IF(ShadeFlag==IntShadeOn .OR. ShadeFlag==ExtShadeOn) THEN
             //  TransDiff = Construct(ConstrNum)%TransDiff
             // ELSE IF(ShadeFlag==IntBlindOn .OR. ShadeFlag==ExtBlindOn .OR.ShadeFlag==BGBlindOn) THEN

@@ -6019,11 +6019,11 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
                 0.001);
 
     // 3 cooling speeds with autosized MSHP design spec yielding equally distributed air flow at 1/3 per speed
-    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(1), 0.031373, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(1), 0.031395, 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(1), UnitarySystem(1).CoolVolumeFlowRate(1), 0.000001);
-    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(2), 0.062747, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(2), 0.062790, 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(2), UnitarySystem(1).CoolVolumeFlowRate(2), 0.000001);
-    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(3), 0.094120, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(3), 0.094185, 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(3), UnitarySystem(1).CoolVolumeFlowRate(3), 0.000001);
 
     EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(1), 0.333333, 0.000001);
@@ -6041,25 +6041,25 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
                 0.000001);
 
     // 10 heating speeds with autosized MSHP design spec yielding equally distributed air flow at 1/10 per speed
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(1), 0.007884, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(1), 0.007890, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(1), UnitarySystem(1).HeatVolumeFlowRate(1));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(2), 0.015769, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(2), 0.015780, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(2), UnitarySystem(1).HeatVolumeFlowRate(2));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(3), 0.023653, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(3), 0.023670, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(3), UnitarySystem(1).HeatVolumeFlowRate(3));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(4), 0.031538, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(4), 0.031560, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(4), UnitarySystem(1).HeatVolumeFlowRate(4));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(5), 0.039422, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(5), 0.039450, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(5), UnitarySystem(1).HeatVolumeFlowRate(5));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(6), 0.047307, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(6), 0.047339, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(6), UnitarySystem(1).HeatVolumeFlowRate(6));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(7), 0.055191, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(7), 0.055229, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(7), UnitarySystem(1).HeatVolumeFlowRate(7));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(8), 0.063076, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(8), 0.063119, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(8), UnitarySystem(1).HeatVolumeFlowRate(8));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(9), 0.070960, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(9), 0.071009, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(9), UnitarySystem(1).HeatVolumeFlowRate(9));
-    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(10), 0.078845, 0.000001);
+    EXPECT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(10), 0.078899, 0.000001);
     EXPECT_EQ(VarSpeedCoil(1).MSRatedAirVolFlowRate(10), UnitarySystem(1).HeatVolumeFlowRate(10));
 }
 
@@ -9292,12 +9292,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXHeatingCoilOnly)
 
     ASSERT_EQ(1, NumUnitarySystem); // only 1 unitary system above so expect 1 as number of unitary system objects
 
-    ASSERT_NEAR(UnitarySystem(1).DesignHeatingCapacity, 1301.766, 0.001);
+    ASSERT_NEAR(UnitarySystem(1).DesignHeatingCapacity, 1302.887, 0.001);
     ASSERT_EQ(UnitarySystem(1).DesignCoolingCapacity, 0.0);
-    ASSERT_NEAR(DXCoil(1).MSRatedTotCap(1), 325.441, 0.001);
-    ASSERT_NEAR(DXCoil(1).MSRatedTotCap(2), 650.883, 0.001);
-    ASSERT_NEAR(DXCoil(1).MSRatedTotCap(3), 976.324, 0.001);
-    ASSERT_NEAR(DXCoil(1).MSRatedTotCap(4), 1301.766, 0.001);
+    ASSERT_NEAR(DXCoil(1).MSRatedTotCap(1), 325.722, 0.001);
+    ASSERT_NEAR(DXCoil(1).MSRatedTotCap(2), 651.444, 0.001);
+    ASSERT_NEAR(DXCoil(1).MSRatedTotCap(3), 977.165, 0.001);
+    ASSERT_NEAR(DXCoil(1).MSRatedTotCap(4), 1302.887, 0.001);
     ASSERT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(1), 0.0131, 0.0001);
     ASSERT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(2), 0.0262, 0.0001);
     ASSERT_NEAR(UnitarySystem(1).HeatVolumeFlowRate(3), 0.0393, 0.0001);
@@ -9547,7 +9547,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerInlet)
         "AirLoopHVAC:UnitarySystem,",
         "  East Zone Unitary System,       !- Name",
         "  Setpoint,                       !- Control Type",
-        "  East Zone,                      !- Controlling Zone or Thermostat Location",
+        "  ,                               !- Controlling Zone or Thermostat Location",
         "  None,                           !- Dehumidification Control Type",
         "  ,                               !- Availability Schedule Name",
         "  East Zone Unitary System Inlet, !- Air Inlet Node Name",
@@ -9634,7 +9634,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerInlet)
     EXPECT_TRUE(UnitarySystem(1).ATMixerExists);
     EXPECT_EQ(ATMixer_InletSide, UnitarySystem(1).ATMixerType);
     EXPECT_FALSE(UnitarySystem(1).AirLoopEquipment);
-    EXPECT_EQ(1, UnitarySystem(1).ControlZoneNum);
+    EXPECT_EQ(0, UnitarySystem(1).ControlZoneNum); // control zone name/index not required for setpoint control
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply)
@@ -9680,7 +9680,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply)
         "AirLoopHVAC:UnitarySystem,",
         "  East Zone Unitary System,       !- Name",
         "  Setpoint,                       !- Control Type",
-        "  East Zone,                      !- Controlling Zone or Thermostat Location",
+        "  ,                               !- Controlling Zone or Thermostat Location",
         "  None,                           !- Dehumidification Control Type",
         "  ,                               !- Availability Schedule Name",
         "  East Zone Unitary System Inlet, !- Air Inlet Node Name",
@@ -9767,7 +9767,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply)
     EXPECT_TRUE(UnitarySystem(1).ATMixerExists);
     EXPECT_EQ(ATMixer_SupplySide, UnitarySystem(1).ATMixerType);
     EXPECT_FALSE(UnitarySystem(1).AirLoopEquipment);
-    EXPECT_EQ(1, UnitarySystem(1).ControlZoneNum);
+    EXPECT_EQ(0, UnitarySystem(1).ControlZoneNum); // control zone name/index not required for setpoint control
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipment)
@@ -9797,7 +9797,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipment)
         "AirLoopHVAC:UnitarySystem,",
         "  East Zone Unitary System,       !- Name",
         "  Setpoint,                       !- Control Type",
-        "  East Zone,                      !- Controlling Zone or Thermostat Location",
+        "  ,                               !- Controlling Zone or Thermostat Location",
         "  None,                           !- Dehumidification Control Type",
         "  ,                               !- Availability Schedule Name",
         "  East Zone Unitary System Inlet, !- Air Inlet Node Name",
@@ -9884,4 +9884,117 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipment)
     EXPECT_FALSE(UnitarySystem(1).ATMixerExists);
     EXPECT_FALSE(UnitarySystem(1).AirLoopEquipment);
     EXPECT_EQ(1, UnitarySystem(1).ControlZoneNum);
+}
+
+TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipmentBlankCtrlZone)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "ZoneHVAC:EquipmentList,",
+        "    East Zone Equipment,     !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    AirLoopHVAC:UnitarySystem,  !- Zone Equipment 1 Object Type",
+        "    East Zone Unitary System,   !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "Zone,",
+        "    East Zone;                !- Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "    East Zone,                !- Zone Name",
+        "    East Zone Equipment,      !- Zone Conditioning Equipment List Name",
+        "    East Zone Supply Inlet,   !- Zone Air Inlet Node or NodeList Name",
+        "    East Zone Unitary System Inlet,  !- Zone Air Exhaust Node or NodeList Name",
+        "    East Zone Zone Air Node,  !- Zone Air Node Name",
+        "    East Zone Return Outlet;  !- Zone Return Air Node Name",
+
+        "AirLoopHVAC:UnitarySystem,",
+        "  East Zone Unitary System,       !- Name",
+        "  Load,                           !- Control Type",
+        "  ,                               !- Controlling Zone or Thermostat Location",
+        "  None,                           !- Dehumidification Control Type",
+        "  ,                               !- Availability Schedule Name",
+        "  East Zone Unitary System Inlet, !- Air Inlet Node Name",
+        "  East Zone Supply Inlet,         !- Air Outlet Node Name",
+        "  Fan:OnOff,                      !- Supply Fan Object Type",
+        "  Supply Fan 1,                   !- Supply Fan Name",
+        "  BlowThrough,                    !- Fan Placement",
+        "  ,                               !- Supply Air Fan Operating Mode Schedule Name",
+        "  Coil:Heating:Electric,          !- Heating Coil Object Type",
+        "  Electric Heating Coil,          !- Heating Coil Name",
+        "  ,                               !- DX Heating Coil Sizing Ratio",
+        "  ,                               !- Cooling Coil Object Type",
+        "  ,                               !- Cooling Coil Name",
+        "  No,                             !- Use DOAS DX Cooling Coil",
+        "  2.0,                            !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+        "  SensibleOnlyLoadControl,        !- Latent Load Control",
+        "  ,                               !- Supplemental Heating Coil Object Type",
+        "  ,                               !- Supplemental Heating Coil Name",
+        "  ,                               !- Supply Air Flow Rate Method During Cooling Operation",
+        "  autosize,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+        "  ,                               !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+        "  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+        "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+        "  SupplyAirFlowRate,              !- Supply air Flow Rate Method During Heating Operation",
+        "  autosize,                       !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+        "  ,                               !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+        "  ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+        "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  ,                               !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+        "  autosize,                       !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+        "  ,                               !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+        "  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+        "  ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+        "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+        "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  80.0,                           !- Maximum Supply Air Temperature{ C }",
+        "  ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
+        "  ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name",
+        "  ,                               !- Maximum Cycling Rate",
+        "  ,                               !- Heat Pump Time Constant",
+        "  ,                               !- Fraction of On-Cycle Power Use",
+        "  ,                               !- Heat Pump Fan Delay Time",
+        "  ,                               !- Ancilliary On-Cycle Electric Power",
+        "  ,                               !- Ancilliary Off-Cycle Electric Power",
+        "  ,                               !- Design Heat Recovery Water Flow Rate",
+        "  ,                               !- Maximum Temperature for Heat Recovery",
+        "  ,                               !- Heat Recovery Water Inlet Node Name",
+        "  ,                               !- Heat Recovery Water Outlet Node Name",
+        "  ,                               !- Design Specification Multispeed Object Type",
+        "  ;                               !- Design Specification Multispeed Object Name",
+
+        "Fan:OnOff,",
+        "  Supply Fan 1,                   !- Name",
+        "  ,                               !- Availability Schedule Name",
+        "  0.7,                            !- Fan Total Efficiency",
+        "  600.0,                          !- Pressure Rise{ Pa }",
+        "  autosize,                       !- Maximum Flow Rate{ m3 / s }",
+        "  0.9,                            !- Motor Efficiency",
+        "  1.0,                            !- Motor In Airstream Fraction",
+        "  East Zone Unitary System Inlet, !- Air Inlet Node Name",
+        "  Heating Coil Air Inlet Node;    !- Air Outlet Node Name",
+
+        "Coil:Heating:Electric,",
+        "  Electric Heating Coil,          !- Name",
+        "  ,                               !- Availability Schedule Name",
+        "  1.0,                            !- Efficiency",
+        "  autosize,                       !- Nominal Capacity",
+        "  Heating Coil Air Inlet Node,    !- Air Inlet Node Name",
+        "  East Zone Supply Inlet,         !- Air Outlet Node Name",
+        "  ;                               !- Temperature Setpoint Node Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    bool ErrorsFound = false;
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    GetZoneEquipmentData1();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+
+    GetUnitarySystemInputData(ErrorsFound); // get UnitarySystem input from object above
+    EXPECT_TRUE(ErrorsFound);               // expect errors when control zone name is blank and Control Type = Load
 }

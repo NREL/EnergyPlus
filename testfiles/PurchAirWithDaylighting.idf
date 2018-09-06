@@ -498,8 +498,10 @@
     WinAirGap,               !- Layer 2
     SPECTRAL GLASS INNER PANE;  !- Layer 3
 
-  WindowProperty:ShadingControl,
-    WIN-CONTROL-GLARE,       !- Name
+  WindowShadingControl,
+    WIN-CONTROL-GLARE-West Zone,  !- Name
+    West Zone,               !- Zone Name
+    1,                       !- Shading Control Sequence Number
     SwitchableGlazing,       !- Shading Type
     ELECTRO-CON-DARK,        !- Construction with Shading Name
     OnIfHighGlare,           !- Shading Control Type
@@ -509,7 +511,11 @@
     YES,                     !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    West Zone_DaylCtrl,      !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn001:Wall001:Win001;    !- Fenestration Surface 1 Name
 
   WindowProperty:FrameAndDivider,
     TestFrameAndDivider,     !- Name
@@ -926,7 +932,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    WIN-CONTROL-GLARE,       !- Shading Control Name
     TestFrameAndDivider,     !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices

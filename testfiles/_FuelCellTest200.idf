@@ -39,15 +39,16 @@
     ,                        !- Name
     1,                       !- Begin Month
     9,                       !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     9,                       !- End Day of Month
+    ,                        !- End Year
     SUNDAY,                  !- Day of Week for Start Day
     NO,                      !- Use Weather File Holidays and Special Days
     NO,                      !- Use Weather File Daylight Saving Period
     NO,                      !- Apply Weekend Holiday Rule
     NO,                      !- Use Weather File Rain Indicators
-    NO,                      !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    NO;                      !- Use Weather File Snow Indicators
 
   Timestep,12;
 
