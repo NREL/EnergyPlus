@@ -64,10 +64,15 @@ public:
 
   std::size_t get_value_index(const std::vector<std::size_t> &coords);
 
+  std::size_t get_value_index_relative(const std::vector<std::size_t> &coords,
+                                       const std::vector<short> &translation);
+
   std::vector<double> get_values(const std::vector<std::size_t> &coords);
 
   std::vector<double> get_values_relative(const std::vector<std::size_t> &coords,
                                            const std::vector<short> &translation);
+
+  std::vector<double> get_values(const std::size_t index);
 
   double get_axis_spacing_mult(const std::size_t &dim, const std::size_t &flavor,
                                const std::size_t &index);

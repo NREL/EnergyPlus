@@ -7,6 +7,7 @@
 // Standard
 #include <memory>
 #include <vector>
+#include <map>
 
 // btwxt
 #include "griddeddata.h"
@@ -52,6 +53,7 @@ private:
   std::vector<double> target;
   bool target_is_set;
   std::vector<std::size_t> point_floor; // index of grid point <= target
+  std::size_t floor_index;
   std::vector<double> weights;
   std::vector<Bounds> is_inbounds; // for deciding interpolation vs. extrapolation;
   std::vector<Method> methods;
@@ -64,7 +66,8 @@ private:
   std::vector<std::vector<double>> interp_coeffs;
   std::vector<std::vector<double>> cubic_slope_coeffs;
 
-  std::vector<double> temp_values;
+  std::vector<std::vector<double>> hypercube_values;
+  std::vector<double> hypercube_weights;
   std::vector<double> results;
 
   void calculate_weights();
@@ -81,6 +84,11 @@ private:
 
   std::vector<std::vector<short>>& get_hypercube();
 
+  void set_hypercube_values();
+
+  std::map<std::pair<std::size_t,std::size_t>,std::vector<std::vector<double>>> hypercube_cache;
+
+  std::size_t hypercube_size_hash;
 
 };
 

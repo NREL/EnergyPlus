@@ -26,7 +26,6 @@ GridPoint::GridPoint(GriddedData &grid_data_in)
       weighting_factors(ndims, std::vector<double>(4, 0.0)),
       interp_coeffs(ndims, std::vector<double>(2, 0.0)),
       cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
-      temp_values(grid_data->num_tables),
       results(grid_data->num_tables) {
 }
 
@@ -41,7 +40,6 @@ GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v)
       weighting_factors(ndims, std::vector<double>(4, 0.0)),
       interp_coeffs(ndims, std::vector<double>(2, 0.0)),
       cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
-      temp_values(grid_data->num_tables),
       results(grid_data->num_tables) {
   set_target(v);
 }
@@ -84,6 +82,7 @@ void GridPoint::set_floor() {
   for (std::size_t dim = 0; dim < ndims; dim += 1) {
     set_dim_floor(dim);
   }
+  floor_index = grid_data->get_value_index(point_floor);
 }
 
 void GridPoint::set_dim_floor(std::size_t dim) {
@@ -113,47 +112,16 @@ void GridPoint::set_dim_floor(std::size_t dim) {
 }
 
 void GridPoint::calculate_weights() {
-  for (std::size_t dim = 0; dim < ndims; dim += 1) {
+  for (std::size_t dim = 0; dim < ndims; ++dim) {
     double edge[] = {grid_data->grid_axes[dim].grid[point_floor[dim]],
                      grid_data->grid_axes[dim].grid[point_floor[dim] + 1]};
     weights[dim] = compute_fraction(target[dim], edge);
   }
 }
 
-void GridPoint::set_hypercube() { set_hypercube(grid_data->get_interp_methods()); }
-
-void GridPoint::set_hypercube(std::vector<Method> methods) {
-  if (methods.size() != ndims) {
-    showMessage(MsgLevel::MSG_ERR, stringify("Error setting hypercube. Methods vector does not "
-                                             "have the correct number of dimensions."));
-  }
-  std::vector<std::vector<int>> options(ndims, {0, 1});
-  reset_hypercube = false;
-
-  for (std::size_t dim = 0; dim < ndims; dim++) {
-    if (target_is_set && weights[dim] == 0.0) {
-      options[dim] = {0};
-      reset_hypercube = true;
-    } else if (methods[dim] == Method::CUBIC) {
-      options[dim] = {-1, 0, 1, 2};
-    }
-  }
-  hypercube = {{}};
-  for (const auto &list : options) {
-    std::vector<std::vector<short>> r;
-    for (const auto &x : hypercube) {
-      for (const auto item : list) {
-        r.push_back(x);
-        r.back().push_back(item);
-      }
-    }
-    hypercube = std::move(r);
-  }
-}
-
-std::vector<std::vector<short>> &GridPoint::get_hypercube() {
-  consolidate_methods();
-  return hypercube;
+double compute_fraction(double x, double edge[2]) {
+  // how far along an edge is the target?
+  return (x - edge[0]) / (edge[1] - edge[0]);
 }
 
 void GridPoint::consolidate_methods()
@@ -181,6 +149,51 @@ void GridPoint::consolidate_methods()
   }
 }
 
+void GridPoint::set_hypercube() { set_hypercube(grid_data->get_interp_methods()); }
+
+void GridPoint::set_hypercube(std::vector<Method> methods) {
+  if (methods.size() != ndims) {
+    showMessage(MsgLevel::MSG_ERR, stringify("Error setting hypercube. Methods vector does not "
+                                             "have the correct number of dimensions."));
+  }
+  std::size_t previous_size = hypercube.size();
+  std::vector<std::vector<int>> options(ndims, {0, 1});
+  reset_hypercube = false;
+
+  hypercube_size_hash = 0;
+  std::size_t digit = 1;
+  for (std::size_t dim = 0; dim < ndims; dim++) {
+    if (target_is_set && weights[dim] == 0.0) {
+      options[dim] = {0};
+      reset_hypercube = true;
+    } else if (methods[dim] == Method::CUBIC) {
+      options[dim] = {-1, 0, 1, 2};
+    }
+    hypercube_size_hash += options[dim].size()*digit;
+    digit *= 10;
+  }
+  hypercube = {{}};
+  for (const auto &list : options) {
+    std::vector<std::vector<short>> r;
+    for (const auto &x : hypercube) {
+      for (const auto item : list) {
+        r.push_back(x);
+        r.back().push_back(item);
+      }
+    }
+    hypercube = std::move(r);
+  }
+  if (hypercube.size() != previous_size) {
+    hypercube_values.resize(hypercube.size(), std::vector<double>(grid_data->num_tables));
+    hypercube_weights.resize(hypercube.size());
+  }
+}
+
+std::vector<std::vector<short>> &GridPoint::get_hypercube() {
+  consolidate_methods();
+  return hypercube;
+}
+
 void GridPoint::calculate_interp_coeffs() {
   for (std::size_t dim = 0; dim < ndims; dim++) {
     double mu = weights[dim];
@@ -205,12 +218,27 @@ void GridPoint::calculate_interp_coeffs() {
   }
 }
 
-std::vector<double> GridPoint::get_results() {
+void GridPoint::set_hypercube_values() {
   if (results.size() != grid_data->num_tables) {
     results.resize(grid_data->num_tables);
-    temp_values.resize(grid_data->num_tables);
+    hypercube_values.resize(hypercube.size(), std::vector<double>(grid_data->num_tables));
+    hypercube_cache.clear();
   }
-  if (results.size() == 0u) {
+  if (hypercube_cache.count({floor_index,hypercube_size_hash})) {
+    hypercube_values = hypercube_cache.at({floor_index,hypercube_size_hash});
+    return;
+  }
+  std::size_t hypercube_index = 0;
+  for (const auto &v : hypercube) {
+    hypercube_values[hypercube_index] = grid_data->get_values_relative(point_floor, v);
+    ++hypercube_index;
+  }
+  hypercube_cache[{floor_index,hypercube_size_hash}] = hypercube_values;
+}
+
+std::vector<double> GridPoint::get_results() {
+  set_hypercube_values();
+  if (grid_data->num_tables == 0u) {
     showMessage(MsgLevel::MSG_WARN,
                 stringify("There are no value tables in the gridded data. No results returned."));
     return results;
@@ -221,12 +249,11 @@ std::vector<double> GridPoint::get_results() {
                 stringify("Results were requested, but no target has been set."));
     return results;
   }
-  double weight;
-  for (const auto &v : hypercube) {
-    weight = get_vertex_weight(v);
-    temp_values = grid_data->get_values_relative(point_floor, v);
-    for (std::size_t i = 0; i < grid_data->num_tables; ++i) {
-      results[i] += temp_values[i] * weight;
+  for (std::size_t i = 0; i < hypercube.size(); ++i) {
+    hypercube_weights[i] = get_vertex_weight(hypercube[i]);
+    const auto &values = hypercube_values[i];
+    for (std::size_t j = 0; j < grid_data->num_tables; ++j) {
+      results[j] += values[j] * hypercube_weights[i];
     }
   }
   return results;
@@ -238,11 +265,6 @@ double GridPoint::get_vertex_weight(const std::vector<short> &v) {
     weight *= weighting_factors[dim][v[dim] + 1];
   }
   return weight;
-}
-
-double compute_fraction(double x, double edge[2]) {
-  // how far along an edge is the target?
-  return (x - edge[0]) / (edge[1] - edge[0]);
 }
 
 } // namespace Btwxt

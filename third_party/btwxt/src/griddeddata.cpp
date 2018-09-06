@@ -156,16 +156,8 @@ std::size_t GriddedData::get_value_index(const std::vector<std::size_t> &coords)
   return index;
 }
 
-std::vector<double> GriddedData::get_values(const std::vector<std::size_t> &coords) {
-  std::size_t index = get_value_index(coords);
-  for (std::size_t i = 0; i < num_tables; ++i) {
-    results[i] = value_tables[i][index];
-  }
-  return results;
-}
-
-std::vector<double> GriddedData::get_values_relative(const std::vector<std::size_t> &coords,
-                                                      const std::vector<short> &translation) {
+std::size_t GriddedData::get_value_index_relative(const std::vector<std::size_t> &coords,
+                                     const std::vector<short> &translation) {
   int new_coord;
   for (std::size_t dim = 0; dim < coords.size(); dim++) {
     new_coord = coords[dim] + translation[dim];
@@ -177,7 +169,27 @@ std::vector<double> GriddedData::get_values_relative(const std::vector<std::size
       temp_coords[dim] = new_coord;
     }
   }
-  return get_values(temp_coords);
+  return get_value_index(temp_coords);
+}
+
+std::vector<double> GriddedData::get_values(const std::vector<std::size_t> &coords) {
+  std::size_t index = get_value_index(coords);
+  for (std::size_t i = 0; i < num_tables; ++i) {
+    results[i] = value_tables[i][index];
+  }
+  return results;
+}
+
+std::vector<double> GriddedData::get_values(const std::size_t index) {
+  for (std::size_t i = 0; i < num_tables; ++i) {
+    results[i] = value_tables[i][index];
+  }
+  return results;
+}
+
+std::vector<double> GriddedData::get_values_relative(const std::vector<std::size_t> &coords,
+                                                      const std::vector<short> &translation) {
+  return get_values(get_value_index_relative(coords, translation));
 }
 
 const std::vector<double> &GriddedData::get_grid_vector(const std::size_t &dim) {
