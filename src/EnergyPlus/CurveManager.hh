@@ -306,7 +306,7 @@ namespace CurveManager {
     };
 
     // Container for Btwxt N-d Objects
-    class BtwxtContainer
+    class BtwxtManager
     {
     public:
         using json = nlohmann::json;
@@ -317,6 +317,7 @@ namespace CurveManager {
             grids.emplace_back(Btwxt::RegularGridInterpolator(grid));
             gridMap.emplace(indVarListName,grids.size() -1 );
         };
+        void normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target);
         int addOutputValues(int gridIndex, std::vector<double> values);
         int getGridIndex(std::string indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
@@ -335,7 +336,7 @@ namespace CurveManager {
     extern Array1D<TableDataStruct> TempTableData;
     extern Array1D<TableDataStruct> Temp2TableData;
     extern Array1D<TableLookupData> TableLookup;
-    extern BtwxtContainer btwxtContainer;
+    extern BtwxtManager btwxtManager;
     // Functions
 
     // Clears the global data in CurveManager.

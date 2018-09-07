@@ -44,6 +44,10 @@ public:
 
   double get_vertex_weight(const std::vector<short> &v);
 
+  void normalize_grid_values_at_target(std::size_t table_num);
+
+  void normalize_grid_values_at_target();
+
   void set_floor();
 
 private:
@@ -85,6 +89,8 @@ private:
   std::vector<std::vector<short>>& get_hypercube();
 
   void set_hypercube_values();
+
+  void set_results();
 
   std::map<std::pair<std::size_t,std::size_t>,std::vector<std::vector<double>>> hypercube_cache;
 

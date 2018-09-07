@@ -161,3 +161,17 @@ TEST_F(TwoDFixture, cubic_interpolate) {
   EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(4.416), testing::DoubleEq(8.832)));
   Btwxt::LOG_LEVEL = 1;
 }
+
+TEST_F(TwoDFixture, normalize) {
+  Btwxt::LOG_LEVEL = 0;
+  test_gridded_data.set_axis_interp_method(0, Method::CUBIC);
+  test_gridded_data.set_axis_interp_method(1, Method::CUBIC);
+  test_rgi = RegularGridInterpolator(test_gridded_data);
+  test_rgi.set_new_target(target);
+
+  // All values, current target
+  test_rgi.normalize_values_at_target(0); // normalize first value table
+  std::vector<double> result = test_rgi.get_values_at_target();
+  EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(1.0), testing::DoubleEq(8.832)));
+  Btwxt::LOG_LEVEL = 1;
+}

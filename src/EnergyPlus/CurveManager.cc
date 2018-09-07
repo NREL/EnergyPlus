@@ -172,10 +172,10 @@ namespace CurveManager {
     int const ASCENDING(1);
     int const DESCENDING(2);
 
-    std::map<std::string, Btwxt::Method>  BtwxtContainer::interpMethods =
+    std::map<std::string, Btwxt::Method>  BtwxtManager::interpMethods =
             {{"Linear", Btwxt::Method::LINEAR}, {"Cubic", Btwxt::Method::CUBIC}};
 
-    std::map<std::string, Btwxt::Method>  BtwxtContainer::extrapMethods =
+    std::map<std::string, Btwxt::Method>  BtwxtManager::extrapMethods =
             {{"Linear", Btwxt::Method::LINEAR}, {"Constant", Btwxt::Method::CONSTANT}};
 
     // DERIVED TYPE DEFINITIONS
@@ -194,7 +194,7 @@ namespace CurveManager {
     Array1D<TableDataStruct> TempTableData;
     Array1D<TableDataStruct> Temp2TableData;
     Array1D<TableLookupData> TableLookup;
-    BtwxtContainer btwxtContainer;
+    BtwxtManager btwxtManager;
     std::unordered_map<std::string, std::string> UniqueCurveNames;
 
     // Functions
@@ -3139,7 +3139,7 @@ namespace CurveManager {
             for (auto &instance : indVarInstances.items()) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                btwxtContainer.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName),fields);
+                btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName),fields);
             }
         }
 
@@ -3147,12 +3147,14 @@ namespace CurveManager {
         int numIndVarLists = inputProcessor->getNumObjectsFound("Table:IndependentVariableList");
         std::map<std::string, std::vector<std::pair<double, double>>>
             varListLimits; // ugly, but this is needed for legacy behavior (otherwise limits are reset by Btwxt if they are within bounds).
+        std::map<std::string, std::vector<double>> varListNormalizeTargets;
         if (numIndVarLists > 0) {
             auto const indVarListInstances = inputProcessor->getObjectInstances("Table:IndependentVariableList");
             for (auto instance : indVarListInstances.items()) {
 
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
+                std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
 
                 std::vector<Btwxt::GridAxis > gridAxes;
 
@@ -3163,9 +3165,9 @@ namespace CurveManager {
                     Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
 
                     // Find independent variable input data
-                    if (btwxtContainer.independentVarRefs.count(indVarName)) {
+                    if (btwxtManager.independentVarRefs.count(indVarName)) {
                         // If found, read data
-                        auto const &indVarInstance = btwxtContainer.independentVarRefs.at(indVarName);
+                        auto const &indVarInstance = btwxtManager.independentVarRefs.at(indVarName);
 
                         std::vector<double> axis;
                         for (auto value : indVarInstance.at("values")) {
@@ -3174,13 +3176,13 @@ namespace CurveManager {
 
                         Btwxt::Method interpMethod, extrapMethod;
                         if (indVarInstance.count("interpolation_method")){
-                            interpMethod = BtwxtContainer::interpMethods.at(indVarInstance.at("interpolation_method"));
+                            interpMethod = BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method"));
                         } else {
                             interpMethod = Btwxt::Method::CUBIC;
                         }
 
                         if (indVarInstance.count("extrapolation_method")) {
-                            extrapMethod = BtwxtContainer::extrapMethods.at(indVarInstance.at("extrapolation_method"));
+                            extrapMethod = BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method"));
                         } else {
                             extrapMethod = Btwxt::Method::LINEAR;
                         }
@@ -3201,7 +3203,16 @@ namespace CurveManager {
                             max_val = max_grid_value;
                         }
 
-                        varListLimits[UtilityRoutines::MakeUPPERCase(thisObjectName)].push_back({min_val,max_val});
+                        varListLimits[varListName].push_back({min_val,max_val});
+
+                        Real64 normalizationValue;
+                        if (indVarInstance.count("normalization_value")) {
+                            normalizationValue = indVarInstance.at("normalization_value");
+                        } else {
+                            normalizationValue = NAN;
+                        }
+
+                        varListNormalizeTargets[varListName].push_back(normalizationValue);
 
                         // reset limits passed to Btwxt to avoid warnings related to different handling of limits
                         min_val = min(min_val, min_grid_value);
@@ -3217,8 +3228,8 @@ namespace CurveManager {
                     }
 
                 }
-                // Add grid to btwxtContainer
-                btwxtContainer.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
+                // Add grid to btwxtManager
+                btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }
 
@@ -3239,9 +3250,9 @@ namespace CurveManager {
                 std::string contextString = "Table:Lookup \"" + PerfCurve(CurveNum).Name + "\"";
                 Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
 
-                int gridIndex = btwxtContainer.getGridIndex(indVarListName, ErrorsFound);
+                int gridIndex = btwxtManager.getGridIndex(indVarListName, ErrorsFound);
                 PerfCurve(CurveNum).TableIndex = gridIndex;
-                int numDims = btwxtContainer.getNumGridDims(gridIndex);
+                int numDims = btwxtManager.getNumGridDims(gridIndex);
                 PerfCurve(CurveNum).NumDims = numDims;
 
                 for (int i=1; i <= std::min(6, numDims); ++i) {
@@ -3295,7 +3306,6 @@ namespace CurveManager {
                     }
                 }
 
-                // TODO: point normalization
                 if (normalize && fields.count("normalization_value")) {
                     normalizationFactor = fields.at("normalization_value");
                 }
@@ -3307,12 +3317,34 @@ namespace CurveManager {
                         lookupValues.push_back(value.at("output_value").get<Real64>()/normalizationFactor);
                     }
                 }
-                PerfCurve(CurveNum).GridValueIndex = btwxtContainer.addOutputValues(gridIndex, lookupValues);
+
+              PerfCurve(CurveNum).GridValueIndex = btwxtManager.addOutputValues(gridIndex, lookupValues);
+
+              if (normalize) {
+                auto const normalizeTarget = varListNormalizeTargets.at(indVarListName);
+
+                bool pointsSpecified = false;
+                bool pointsUnspecified = false;
+                for (auto value : normalizeTarget) {
+                  if (isnan(value)) {
+                    pointsUnspecified = true;
+                  } else {
+                    pointsSpecified = true;
+                  }
+                }
+                if (pointsSpecified && pointsUnspecified) {
+                  //error
+                } else if (pointsSpecified) {
+                    btwxtManager.normalizeGridValues(gridIndex,PerfCurve(CurveNum).GridValueIndex,normalizeTarget);
+                }
+
+              }
+
             }
         }
     }
 
-    int BtwxtContainer::getGridIndex(std::string indVarListName, bool &ErrorsFound) {
+    int BtwxtManager::getGridIndex(std::string indVarListName, bool &ErrorsFound) {
         int gridIndex = -1;
         if (gridMap.count(indVarListName)) {
             gridIndex = gridMap.at(indVarListName);
@@ -3324,21 +3356,25 @@ namespace CurveManager {
         return gridIndex;
     }
 
-    std::pair<double, double> BtwxtContainer::getGridAxisLimits(int gridIndex, int axisIndex) {
+    std::pair<double, double> BtwxtManager::getGridAxisLimits(int gridIndex, int axisIndex) {
         return grids[gridIndex].get_axis_limits(axisIndex);
     }
 
-    int BtwxtContainer::addOutputValues(int gridIndex, std::vector<double> values)
+    int BtwxtManager::addOutputValues(int gridIndex, std::vector<double> values)
     {
         return (int)grids[gridIndex].add_value_table(values);
     }
 
-    int BtwxtContainer::getNumGridDims(int gridIndex) {
+    int BtwxtManager::getNumGridDims(int gridIndex) {
         return (int)grids[gridIndex].get_ndims();
     }
 
-    double BtwxtContainer::getGridValue(int gridIndex, int outputIndex, const std::vector<double> target) {
+    double BtwxtManager::getGridValue(int gridIndex, int outputIndex, const std::vector<double> target) {
         return grids[gridIndex](target)[outputIndex];
+    }
+
+    void BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target) {
+        grids[gridIndex].normalize_values_at_target(outputIndex, target);
     }
 
     void InitCurveReporting()
@@ -5402,7 +5438,7 @@ namespace CurveManager {
 
       std::string contextString = "Table:Lookup \"" + PerfCurve(CurveIndex).Name + "\"";
       Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
-      Real64 TableValue = btwxtContainer.getGridValue(PerfCurve(CurveIndex).TableIndex,PerfCurve(CurveIndex).GridValueIndex,target);
+      Real64 TableValue = btwxtManager.getGridValue(PerfCurve(CurveIndex).TableIndex,PerfCurve(CurveIndex).GridValueIndex,target);
 
       if (PerfCurve(CurveIndex).CurveMinPresent) TableValue = max(TableValue, PerfCurve(CurveIndex).CurveMin);
       if (PerfCurve(CurveIndex).CurveMaxPresent) TableValue = min(TableValue, PerfCurve(CurveIndex).CurveMax);

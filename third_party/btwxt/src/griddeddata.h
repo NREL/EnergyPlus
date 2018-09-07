@@ -80,7 +80,8 @@ public:
   std::vector<Method> get_interp_methods();
 
   std::vector<Method> get_extrap_methods();
-  // double get_value(std::size_t table_index, std::vector<std::size_t> coords);
+
+  void normalize_value_table(std::size_t table_num, double scalar);
 
   void set_axis_extrap_method(const std::size_t &dim, Method);
 

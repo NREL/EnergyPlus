@@ -238,6 +238,13 @@ void GriddedData::set_axis_interp_method(const std::size_t &dim,
   grid_axes[dim].set_interp_method(interpolation_method);
 }
 
+void GriddedData::normalize_value_table(std::size_t table_num, double scalar) {
+  auto &table = value_tables[table_num];
+  scalar = 1.0/scalar;
+  std::transform(table.begin(), table.end(), table.begin(),
+                 std::bind(std::multiplies<double>(), std::placeholders::_1, scalar));
+}
+
 // free functions
 bool free_check_sorted(std::vector<double> my_vec) {
   // ensures that the grid vector is strictly ascending

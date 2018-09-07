@@ -45,6 +45,24 @@ std::vector<double> RegularGridInterpolator::get_values_at_target() {
   return grid_point.get_results();
 }
 
+void RegularGridInterpolator::normalize_values_at_target(std::size_t table_index, const std::vector<double> &target) {
+  set_new_target(target);
+  normalize_values_at_target(table_index);
+}
+
+void RegularGridInterpolator::normalize_values_at_target(std::size_t table_index) {
+  grid_point.normalize_grid_values_at_target(table_index);
+}
+
+void RegularGridInterpolator::normalize_values_at_target(const std::vector<double> &target) {
+  set_new_target(target);
+  normalize_values_at_target();
+}
+
+void RegularGridInterpolator::normalize_values_at_target() {
+  grid_point.normalize_grid_values_at_target();
+}
+
 void RegularGridInterpolator::set_new_target(const std::vector<double> &target) {
   grid_point.set_target(target);
 }

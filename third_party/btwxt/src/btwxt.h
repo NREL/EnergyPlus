@@ -67,17 +67,25 @@ public:
 
   double operator()(std::size_t table_index) { return get_value_at_target(table_index); }
 
+  std::vector<double> get_values_at_target();
+
   std::vector<double> get_values_at_target(const std::vector<double> &target);
 
   std::vector<double> operator()(const std::vector<double> &target) {
     return get_values_at_target(target);
   }
 
-  std::vector<double> get_values_at_target();
-
   std::vector<double> operator()() { return get_values_at_target(); }
 
   void set_new_target(const std::vector<double> &target);
+
+  void normalize_values_at_target();
+
+  void normalize_values_at_target(const std::vector<double> &target);
+
+  void normalize_values_at_target(std::size_t table_index);
+
+  void normalize_values_at_target(std::size_t table_index, const std::vector<double> &target);
 
   std::vector<double> get_current_target();
 
