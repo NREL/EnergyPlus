@@ -70,13 +70,11 @@ void GridAxis::check_grid_sorted() {
 
 void GridAxis::check_extrap_limits() {
   if (extrapolation_limits.first > grid[0]) {
-    showMessage(MsgLevel::MSG_WARN, "The lower extrapolation limit is within the grid. "
-                                    "Setting to smallest value.");
+    showMessage(MsgLevel::MSG_WARN, stringify("The lower extrapolation limit (", extrapolation_limits.first,") is within the set of grid values. Setting to smallest grid value (", grid[0],")."));
     extrapolation_limits.first = grid[0];
   }
   if (extrapolation_limits.second < grid.back()) {
-    showMessage(MsgLevel::MSG_WARN, "The upper extrapolation limit is within the grid. "
-                                    "Setting to largest value.");
+    showMessage(MsgLevel::MSG_WARN, stringify("The upper extrapolation limit (", extrapolation_limits.first,") is within the set of grid values. Setting to largest grid value (", grid.back(),")."));
     extrapolation_limits.second = grid.back();
   }
 }

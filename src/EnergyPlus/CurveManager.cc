@@ -201,19 +201,20 @@ namespace CurveManager {
     void BtwxtMessageCallback(
         const Btwxt::MsgLevel messageType,
         const std::string message,
-        void *//contextPtr
+        void *contextPtr
     ) {
+        std::string fullMessage = *(std::string*)contextPtr + ": " + message;
         if (messageType == Btwxt::MsgLevel::MSG_ERR) {
-            ShowSevereError("Btwxt: " + message);
+            ShowSevereError(fullMessage);
             ShowFatalError("Btwxt: Errors discovered, program terminates.");
         } else {
             if (static_cast<int>(messageType) >= Btwxt::LOG_LEVEL) {
                 if (messageType == Btwxt::MsgLevel::MSG_WARN) {
-                    //ShowWarningError("Btwxt: " + message);
+                    ShowWarningError(fullMessage);
                 } else if (messageType == Btwxt::MsgLevel::MSG_INFO) {
-                    ShowMessage("Btwxt: " + message);
+                    ShowMessage(fullMessage);
                 } else {
-                    ShowMessage("Btwxt: " + message);
+                    ShowMessage(fullMessage);
                 }
             }
         }
@@ -3172,7 +3173,6 @@ namespace CurveManager {
         int numIndVars = inputProcessor->getNumObjectsFound("Table:IndependentVariable");
         if (numIndVars > 0) {
             // Set Btwxt Message Callback
-            Btwxt::setMessageCallback(BtwxtMessageCallback, nullptr);
             auto const &indVarInstances = inputProcessor->getObjectInstances("Table:IndependentVariable");
             for (auto &instance : indVarInstances.items()) {
                 auto const &fields = instance.value();
@@ -3195,8 +3195,11 @@ namespace CurveManager {
                 // Loop through independent variables in list and add them to the grid
                 for (auto indVar : fields.at("independent_variables")) {
                     std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name"));
+                    std::string contextString = "Table:IndependentVariable \"" + indVarName + "\"";
+                    Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
+
                     // Find independent variable input data
-                    if (btwxtContainer.independentVarRefs.count(indVarName) > 0) {
+                    if (btwxtContainer.independentVarRefs.count(indVarName)) {
                         // If found, read data
                         auto const &indVarInstance = btwxtContainer.independentVarRefs.at(indVarName);
 
@@ -3238,8 +3241,6 @@ namespace CurveManager {
                 btwxtContainer.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }
-
-
 
         int numTblLookups = inputProcessor->getNumObjectsFound("Table:Lookup");
         if (numTblLookups > 0) {
