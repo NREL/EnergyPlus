@@ -182,24 +182,20 @@ From Equations~\ref{eq:HeatBalEqforTo}, ~\ref{eq:TOtEquationDetailedConductance}
 \label{eq:HeatBalanceEquationCase8}
 \end{equation}
 
-\subsection{Fortran Algorithm Examples}\label{fortran-algorithm-examples}
+\subsection{C++ Algorithm Examples}\label{c++-algorithm-examples}
 
-While EnergyPlus has been translated from FORTRAN to C++, these code examples show the implementation of these different cases.  In most cases, variable names have not changed.  For more details, please the current EnergyPlus code.
+These C++ code examples, which are translated from the EnergyPlus FORTRAN code, show the implementation of these different cases.  In most cases, variable names have not changed.  For more details, please the current EnergyPlus code.
 
 \subsubsection{Case5: Y\(_{0}\)~ small, simple conductance, with movable insulation:}\label{case5-yux5f0-small-simple-conductance-with-movable-insulation-1}
 
 From Equation~\ref{eq:HeatBalanceEquationCase5}:
 
 \begin{lstlisting}
-! Outside heat balance case: Movable insulation, slow conduction, simple convection
- F2 = DBLE(HmovInsul) / ( DBLE(HmovInsul) + DBLE(HExtSurf(SurfNum)) )
- TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                       &
-                    +DBLE(QRadSWOutAbs(SurfNum) )                   &
-           +Construct(ConstrNum)\%CTFCross(0)*TempSurfIn(SurfNum)   &
-           +F2* ( DBLE(QRadSWOutMvIns(SurfNum))                     &
-           + DBLE(HExtSurf(SurfNum))* DBLE(TempExt) ) )             &
-           /( Construct(ConstrNum)\%CTFOutside(0) + DBLE(HmovInsul) &
-          - F2* DBLE(HMovInsul))
+// Outside heat balance case: Movable insulation, slow conduction, simple convection
+   F2 = HMovInsul / (HMovInsul + HExtSurf(SurfNum) );
+   TH(1, 1, SurfNum) = (-CTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + construct.CTFCross(0) * TempSurfIn(SurfNum) +
+                       F2 * (QRadSWOutMvIns(SurfNum) + (HExtSurf(SurfNum)) * TempExt) /
+                       (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul);
 \end{lstlisting}
 
 \subsubsection{Case6: Y\(_{0}\) not small, simple conductance, with movable insulation:}\label{case6-yux5f0-not-small-simple-conductance-with-movable-insulation-1}
@@ -207,19 +203,14 @@ From Equation~\ref{eq:HeatBalanceEquationCase5}:
 From Equation~\ref{eq:HeatBalanceEquationCase6}:
 
 \begin{lstlisting}
-! Outside heat balance case: Movable insulation, quick conduction, simple convection
-F2 = DBLE(HmovInsul) / ( DBLE(HmovInsul) + DBLE(HExtSurf(SurfNum)) )
-TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)              &
-DBLE(QRadSWOutAbs(SurfNum))                               &
-+F2*( DBLE(QRadSWOutMvIns(SurfNum))                       &
-+DBLE(HExtSurf(SurfNum))* DBLE(TempExt) )                 &
-+F1*( CTFConstInPart(SurfNum)                             &
-+ DBLE(QRadSWInAbs(SurfNum))                              &
-+ DBLE(QRadThermInAbs(SurfNum))                           &
-+ DBLE(HConvIn(SurfNum))*MAT(ZoneNum)                     &
-+ DBLE(NetLWRadToSurf(SurfNum)) ) )                       &
-/( Construct(ConstrNum)\%CTFOutside(0) + DBLE(HmovInsul)  &
--F2* DBLE(HMovInsul )- F1*Construct(ConstrNum)\%CTFCross(0) )
+// Outside heat balance case: Movable insulation, quick conduction, simple convection
+   F1 = construct.CTFCross(0) / (construct.CTFInside(0) + HConvIn(SurfNum));
+   F2 = HMovInsul / (HMovInsul + HExtSurf(SurfNum) );
+   TH(1, 1, SurfNum) = (-CTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + QRadLWOutSrdSurfs(SurfNum) +
+                       F1 * (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + QRadThermInAbs(SurfNum) + 
+                       HConvIn(SurfNum) * MAT(ZoneNum) + NetLWRadToSurf(SurfNum)) +
+                       F2 * (QRadSWOutMvIns(SurfNum) + (HExtSurf(SurfNum)) * TempExt) /
+                      (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross(0));
 \end{lstlisting}
 
 \subsubsection{Case7: Y\(_{0}\)~ small, detailed conductance, with movable insulation:}\label{case7-yux5f0-small-detailed-conductance-with-movable-insulation-1}
@@ -227,18 +218,13 @@ DBLE(QRadSWOutAbs(SurfNum))                               &
 From Equation~\ref{eq:HeatBalanceEquationCase7}:
 
 \begin{lstlisting}
-! Outside heat balance case: Movable insulation, slow conduction, detailed convection
-F2 = DBLE(HMovInsul)/ ( DBLE(HMovInsul) + DBLE(HExtSurf(SurfNum))  &
-           +DBLE(HSky) + DBLE(HGround) )
-TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                       &
-+DBLE(QRadSWOutAbs(SurfNum))                                       &
-+Construct(ConstrNum)\%CTFCross(0)*TempSurfIn(SurfNum)             &
-+F2*( DBLE(QRadSWOutMvIns(SurfNum))                                &
-+DBLE(HExtSurf(SurfNum))*DBLE(TempExt)                             &
-+DBLE(HSky)*DBLE(SkyTemp)                                          &
-+DBLE(HGround)*DBLE(OutDryBulbTemp) ) )                            &
-/( Construct(ConstrNum)\%CTFOutside(0)                             &
-+DBLE(HMovInsul) - F2*DBLE(HMovInsul) )
+// Outside heat balance case: Movable insulation, slow conduction, detailed convection
+   F2 = HMovInsul / (HMovInsul + HcExtSurf(SurfNum) + HAirExtSurf(SurfNum) + HSkyExtSurf(SurfNum) + HGrdExtSurf(SurfNum));
+   TH(1, 1, SurfNum) = (-CTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + QRadLWOutSrdSurfs(SurfNum) + construct.CTFCross(0) * TempSurfIn(SurfNum) +
+                       F2 * (QRadSWOutMvIns(SurfNum) + (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * 
+                       TempExt + QAdditionalHeatSourceOutside(SurfNum) +
+                       HSkyExtSurf(SurfNum) * TSky + HGrdExtSurf(SurfNum) * TGround)) /
+                       (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul);
 \end{lstlisting}
 
 \subsubsection{Case8: Y\(_{0}\) not small, detailed conductance, with movable insulation:}\label{case8-yux5f0-not-small-detailed-conductance-with-movable-insulation-1}
@@ -246,47 +232,40 @@ TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                       &
 From Equation~\ref{eq:HeatBalanceEquationCase8}:
 
 \begin{lstlisting}
-! Outside heat balance case: Movable insulation, quick conduction, detailed convection
-F2 = DBLE(HMovInsul)/ ( DBLE(HMovInsul) + DBLE(HExtSurf(SurfNum)) &
-           +DBLE(HSky) + DBLE(HGround) )
-TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                      &
-+DBLE(QRadSWOutAbs(SurfNum))                                      &
-+F1*( CTFConstInPart(SurfNum)                                     &
-+DBLE(QRadSWInAbs(SurfNum))                                       &
-+DBLE(QRadThermInAbs(SurfNum))                                    &
-+DBLE(HConvIn(SurfNum))*MAT(ZoneNum)                              &
-+DBLE(NetLWRadToSurf(SurfNum)) )                                  &
-+F2*( DBLE(QRadSWOutMvIns(SurfNum))                               &
-+DBLE(HExtSurf(SurfNum))*DBLE(TempExt)                            &
-+DBLE(HSky)*DBLE(SkyTemp)                                         &
-+DBLE(HGround)*DBLE(OutDryBulbTemp) )                             &
-/( Construct(ConstrNum)\%CTFOutside(0)                            &
-+DBLE(HMovInsul) - F2*DBLE(HMovInsul)                             &
--F1*Construct(ConstrNum)\%CTFCross(0) )
+// Outside heat balance case: Movable insulation, quick conduction, detailed convection
+   F1 = construct.CTFCross(0) / (construct.CTFInside(0) + HConvIn(SurfNum));
+   F2 = HMovInsul / (HMovInsul + HcExtSurf(SurfNum) + HAirExtSurf(SurfNum) + HSkyExtSurf(SurfNum) + HGrdExtSurf(SurfNum));
+   TH(1, 1, SurfNum) = (-CTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + QRadLWOutSrdSurfs(SurfNum) +
+                       F1 * (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + QRadThermInAbs(SurfNum) + 
+                       HConvIn(SurfNum) * MAT(ZoneNum) + NetLWRadToSurf(SurfNum)) +
+                       F2 * (QRadSWOutMvIns(SurfNum) + (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * 
+                       TempExt + QAdditionalHeatSourceOutside(SurfNum) +
+                       HSkyExtSurf(SurfNum) * TSky + HGrdExtSurf(SurfNum) * TGround)) /
+                       (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross(0));
 \end{lstlisting}
 
-\subsection{Fortran Variable Descriptions}\label{fortran-variable-descriptions}
+\subsection{C++ Variable Descriptions}\label{c++-variable-descriptions}
 
 % table 16
 {\scriptsize
 \begin{longtable}[c]{p{1.8in}p{1.2in}p{0.9in}p{0.9in}p{1.2in}}
 
-\caption{Fortran Variables and Descriptions \label{table:fortran-variables-and-descriptions}} \tabularnewline
+\caption{C++ Variables and Descriptions \label{table:c++-variables-and-descriptions}} \tabularnewline
 \toprule 
-FORTRAN Variable & Description & Tarp Variable & Units & Description \tabularnewline
+C++ Variable & Description & Tarp Variable & Units & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Fortran Variables and Descriptions} \tabularnewline
+\caption[]{C++ Variables and Descriptions} \tabularnewline
 \toprule 
-FORTRAN Variable & Description & Tarp Variable & Units & Description \tabularnewline
+C++ Variable & Description & Tarp Variable & Units & Description \tabularnewline
 \midrule
 \endhead
 
-TH(SurfNum,1,1) & Temperature History(SurfNum,Hist Term,In/Out), where: Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times), In/Out (1 = Outside, 2 = Inside) & TO & C & Temperature of outside of surface I at time t \tabularnewline
-Construct(ConstrNum) \% CTFCross(0) & Cross or Y term of the CTF equation & Y0 & W/m  K & Cross CTF term \tabularnewline
-Construct(ConstrNum) \% CTFInside(0) & Inside or Z terms of the CTF equation & Z0 & W/m  K & Inside CTF term \tabularnewline
-Construct(ConstrNum) \% CTFOutside(0) & Outside or X terms of the CTF equation & X0 & W/m  K & Outside CTF term \tabularnewline
+TH(1, 1, SurfNum) & Temperature History(SurfNum,Hist Term,In/Out), where: Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times), In/Out (1 = Outside, 2 = Inside) & TO & C & Temperature of outside of surface I at time t \tabularnewline
+Construct(ConstrNum).CTFCross(0) & Cross or Y term of the CTF equation & Y0 & W/m  K & Cross CTF term \tabularnewline
+Construct(ConstrNum).CTFInside(0) & Inside or Z terms of the CTF equation & Z0 & W/m  K & Inside CTF term \tabularnewline
+Construct(ConstrNum).CTFOutside(0) & Outside or X terms of the CTF equation & X0 & W/m  K & Outside CTF term \tabularnewline
 CTFConstInPart(SurfNum) & Constant inside portion of the CTF calculation & KIP & W/m & Portion of inward conductive flux based on previous temperature and flux history terms \tabularnewline
 CTFConstOutPart(SurfNum) & Constant Outside portion of the CTF calculation & KOP & W/m & Portion of outward conductive flux based on previous temperature and flux history terms \tabularnewline
 F1, F2, F3 & Intermediate calculation variables & F1, F2, F3 & ~ & Radiation interchange factor between surfaces \tabularnewline
