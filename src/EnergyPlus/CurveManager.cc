@@ -352,45 +352,7 @@ namespace CurveManager {
             } else if (SELECT_CASE_var == LagrangeInterpolationLinearExtrapolation) {
                 CurveValue = TableLookupObject(CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
             } else if (SELECT_CASE_var == BtwxtMethod) {
-                Real64 vMin, vMax, var;
-
-                // TODO: Generalize for N-dims
-                var = Var1;
-                std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 0);
-                var = max(min(var, vMax), vMin);
-                std::vector<double> target{var};
-                if (present(Var2)) {
-                    var = Var2;
-                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 1);
-                    var = max(min(var, vMax), vMin);
-                    target.push_back(var);
-                }
-                if (present(Var3)) {
-                    var = Var3;
-                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 2);
-                    var = max(min(var, vMax), vMin);
-                    target.push_back(var);
-                }
-                if (present(Var4)) {
-                    var = Var4;
-                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 3);
-                    var = max(min(var, vMax), vMin);
-                    target.push_back(var);
-                }
-                if (present(Var5)) {
-                    var = Var5;
-                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 4);
-                    var = max(min(var, vMax), vMin);
-                    target.push_back(var);
-                }
-                if (present(Var6)) {
-                    var = Var6;
-                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(PerfCurve(CurveIndex).TableIndex, 5);
-                    var = max(min(var, vMax), vMin);
-                    target.push_back(var);
-                }
-
-                CurveValue = btwxtContainer.getGridValue(PerfCurve(CurveIndex).TableIndex,PerfCurve(CurveIndex).GridValueIndex,target);
+                CurveValue = BtwxtTableInterpolation(CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
             } else {
                 ShowFatalError("CurveValue: Invalid Interpolation Type");
             }
@@ -3183,6 +3145,8 @@ namespace CurveManager {
 
         // Create GridSpaces from Independent Variable List
         int numIndVarLists = inputProcessor->getNumObjectsFound("Table:IndependentVariableList");
+        std::map<std::string, std::vector<std::pair<double, double>>>
+            varListLimits; // ugly, but this is needed for legacy behavior (otherwise limits are reset by Btwxt if they are within bounds).
         if (numIndVarLists > 0) {
             auto const indVarListInstances = inputProcessor->getObjectInstances("Table:IndependentVariableList");
             for (auto instance : indVarListInstances.items()) {
@@ -3208,24 +3172,40 @@ namespace CurveManager {
                             axis.push_back(value.at("value"));
                         }
 
-                        Btwxt::Method interpMethod = BtwxtContainer::interpMethods.at(indVarInstance.at("interpolation_method"));
+                        Btwxt::Method interpMethod, extrapMethod;
+                        if (indVarInstance.count("interpolation_method")){
+                            interpMethod = BtwxtContainer::interpMethods.at(indVarInstance.at("interpolation_method"));
+                        } else {
+                            interpMethod = Btwxt::Method::CUBIC;
+                        }
 
-                        Btwxt::Method extrapMethod = BtwxtContainer::extrapMethods.at(indVarInstance.at("extrapolation_method"));
+                        if (indVarInstance.count("extrapolation_method")) {
+                            extrapMethod = BtwxtContainer::extrapMethods.at(indVarInstance.at("extrapolation_method"));
+                        } else {
+                            extrapMethod = Btwxt::Method::LINEAR;
+                        }
 
+                        double min_grid_value = *std::min_element(axis.begin(), axis.end());
+                        double max_grid_value = *std::max_element(axis.begin(), axis.end());
 
                         double min_val, max_val;
-                        // TODO: Input processor needs a set default value function
-                        if (indVarInstance.find("minimum_value") != indVarInstance.end()) {
+                        if (indVarInstance.count("minimum_value")) {
                             min_val = indVarInstance.at("minimum_value");
                         } else {
-                            min_val = *std::min_element(axis.begin(), axis.end());
+                            min_val = min_grid_value;
                         }
 
-                        if (indVarInstance.find("maximum_value") != indVarInstance.end()) {
+                        if (indVarInstance.count("maximum_value")) {
                             max_val = indVarInstance.at("maximum_value");
                         } else {
-                            max_val = *std::max_element(axis.begin(), axis.end());
+                            max_val = max_grid_value;
                         }
+
+                        varListLimits[UtilityRoutines::MakeUPPERCase(thisObjectName)].push_back({min_val,max_val});
+
+                        // reset limits passed to Btwxt to avoid warnings related to different handling of limits
+                        min_val = min(min_val, min_grid_value);
+                        max_val = max(max_val, max_grid_value);
 
                         gridAxes.emplace_back(axis, extrapMethod, interpMethod, std::pair<double, double> {min_val, max_val});
 
@@ -3256,24 +3236,52 @@ namespace CurveManager {
 
                 std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
 
+                std::string contextString = "Table:Lookup \"" + PerfCurve(CurveNum).Name + "\"";
+                Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
+
                 int gridIndex = btwxtContainer.getGridIndex(indVarListName, ErrorsFound);
                 PerfCurve(CurveNum).TableIndex = gridIndex;
                 int numDims = btwxtContainer.getNumGridDims(gridIndex);
                 PerfCurve(CurveNum).NumDims = numDims;
 
-                for (int i=1; i <= std::min(3, numDims); ++i) {
+                for (int i=1; i <= std::min(6, numDims); ++i) {
                     double vMin, vMax;
-                    std::tie(vMin, vMax) = btwxtContainer.getGridAxisLimits(gridIndex, i - 1);
+                    std::tie(vMin, vMax) = varListLimits.at(indVarListName)[i - 1];
                     if (i == 1) {
                         PerfCurve(CurveNum).Var1Min = vMin;
                         PerfCurve(CurveNum).Var1Max = vMax;
                     } else if (i == 2) {
                         PerfCurve(CurveNum).Var2Min = vMin;
                         PerfCurve(CurveNum).Var2Max = vMax;
-                    } else {
+                    } else if (i == 3) {
                         PerfCurve(CurveNum).Var3Min = vMin;
                         PerfCurve(CurveNum).Var3Max = vMax;
+                    } else if (i == 4) {
+                        PerfCurve(CurveNum).Var4Min = vMin;
+                        PerfCurve(CurveNum).Var4Max = vMax;
+                    } else if (i == 5) {
+                        PerfCurve(CurveNum).Var5Min = vMin;
+                        PerfCurve(CurveNum).Var5Max = vMax;
+                    } else if (i == 6) {
+                        PerfCurve(CurveNum).Var6Min = vMin;
+                        PerfCurve(CurveNum).Var6Max = vMax;
                     }
+                }
+
+                if (fields.count("minimum_output")) {
+                    PerfCurve(CurveNum).CurveMin = fields.at("minimum_output");
+                    PerfCurve(CurveNum).CurveMinPresent = true;
+                } else {
+                    PerfCurve(CurveNum).CurveMin = -DBL_MAX;
+                    PerfCurve(CurveNum).CurveMinPresent = false;
+                }
+
+                if (fields.count("maximum_output")) {
+                    PerfCurve(CurveNum).CurveMax = fields.at("maximum_output");
+                    PerfCurve(CurveNum).CurveMaxPresent = true;
+                } else {
+                    PerfCurve(CurveNum).CurveMax = DBL_MAX;
+                    PerfCurve(CurveNum).CurveMaxPresent = false;
                 }
 
                 std::vector<double> lookupValues;
@@ -5353,6 +5361,55 @@ namespace CurveManager {
         return TableValue;
     }
 
+    Real64 BtwxtTableInterpolation(int const CurveIndex,        // index of curve in curve array
+                                   Real64 const Var1,           // 1st independent variable
+                                   Optional<Real64 const> Var2, // 2nd independent variable
+                                   Optional<Real64 const> Var3, // 3rd independent variable
+                                   Optional<Real64 const> Var4, // 4th independent variable
+                                   Optional<Real64 const> Var5, // 5th independent variable
+                                   Optional<Real64 const> Var6  // 6th independent variable
+    )
+    {
+      // TODO: Generalize for N-dims
+      Real64 var = Var1;
+      var = max(min(var, PerfCurve(CurveIndex).Var1Max), PerfCurve(CurveIndex).Var1Min);
+      std::vector<double> target{var};
+      if (present(Var2)) {
+        var = Var2;
+        var = max(min(var, PerfCurve(CurveIndex).Var2Max), PerfCurve(CurveIndex).Var2Min);
+        target.push_back(var);
+      }
+      if (present(Var3)) {
+        var = Var3;
+        var = max(min(var, PerfCurve(CurveIndex).Var3Max), PerfCurve(CurveIndex).Var3Min);
+        target.push_back(var);
+      }
+      if (present(Var4)) {
+        var = Var4;
+        var = max(min(var, PerfCurve(CurveIndex).Var4Max), PerfCurve(CurveIndex).Var4Min);
+        target.push_back(var);
+      }
+      if (present(Var5)) {
+        var = Var5;
+        var = max(min(var, PerfCurve(CurveIndex).Var5Max), PerfCurve(CurveIndex).Var5Min);
+        target.push_back(var);
+      }
+      if (present(Var6)) {
+        var = Var6;
+        var = max(min(var, PerfCurve(CurveIndex).Var6Max), PerfCurve(CurveIndex).Var6Min);
+        target.push_back(var);
+      }
+
+      std::string contextString = "Table:Lookup \"" + PerfCurve(CurveIndex).Name + "\"";
+      Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
+      Real64 TableValue = btwxtContainer.getGridValue(PerfCurve(CurveIndex).TableIndex,PerfCurve(CurveIndex).GridValueIndex,target);
+
+      if (PerfCurve(CurveIndex).CurveMinPresent) TableValue = max(TableValue, PerfCurve(CurveIndex).CurveMin);
+      if (PerfCurve(CurveIndex).CurveMaxPresent) TableValue = min(TableValue, PerfCurve(CurveIndex).CurveMax);
+
+      return TableValue;
+    }
+
     void SolveRegression(int &CurveNum,                      // index to performance curve
                          std::string &TableType,             // tabular data object type
                          std::string &CurveName,             // performance curve name
@@ -6179,18 +6236,18 @@ namespace CurveManager {
     double GetNormalPoint(int const CurveIndex)
     {
 
-        if (CurveIndex > 0 && CurveIndex <= NumCurves && PerfCurve(CurveIndex).TableIndex > 0) {
+        if (CurveIndex > 0 && CurveIndex <= NumCurves) {
             if (PerfCurve(CurveIndex).InterpolationType == BtwxtMethod) {
-              return PerfCurve(CurveIndex).NormalizationValue;
-            } else {
-              const int tableIndex = PerfCurve(CurveIndex).TableIndex;
-              return TableData(tableIndex).NormalPoint;
+                return PerfCurve(CurveIndex).NormalizationValue;
+            } else if (PerfCurve(CurveIndex).TableIndex > 0) {
+                const int tableIndex = PerfCurve(CurveIndex).TableIndex;
+                return TableData(tableIndex).NormalPoint;
             }
-        } else {
-            std::string s = std::to_string(CurveIndex);
-            ShowWarningError("GetNormalPoint: CurveIndex not in range of curves, CurveIndex requested  " + s);
-            return -1;
         }
+
+        std::string s = std::to_string(CurveIndex);
+        ShowWarningError("GetNormalPoint: CurveIndex not in range of curves, CurveIndex requested  " + s);
+        return -1;
     }
 
     int GetCurveIndex(std::string const &CurveName) // name of the curve

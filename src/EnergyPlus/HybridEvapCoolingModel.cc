@@ -256,6 +256,7 @@ namespace HybridEvapCoolingModel {
 
             if (ValidPointer(HRsa_curve_pointer)) {
                 Y_val = NormalizationReference * CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = max(min(Y_val,1.0),0.0);
             } else {
                 Y_val = X_4; // return HR
             }

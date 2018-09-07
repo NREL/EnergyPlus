@@ -400,6 +400,14 @@ namespace CurveManager {
                              Optional<Real64 const> Var5 = _, // 5th independent variable
                              Optional<Real64 const> Var6 = _);
 
+    Real64 BtwxtTableInterpolation(int const CurveIndex,            // index of curve in curve array
+                                   Real64 const Var1,               // 1st independent variable
+                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
+                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
+                                   Optional<Real64 const> Var4 = _, // 4th independent variable
+                                   Optional<Real64 const> Var5 = _, // 5th independent variable
+                                   Optional<Real64 const> Var6 = _);
+
     void SolveRegression(int &CurveNum,                          // index to performance curve
                          std::string &TableType,                 // tabular data object type
                          std::string &CurveName,                 // performance curve name
