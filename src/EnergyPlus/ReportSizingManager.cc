@@ -1711,7 +1711,15 @@ namespace ReportSizingManager {
                         } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
                         } else {
-                            CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
+                            if (DesVolFlow > 0.0) {
+                                DesMassFlow = DesVolFlow * StdRhoAir;
+                            } else {
+                                DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
+                            }
+                            CoilInTemp =
+                                setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                            CoilInHumRat =
+                                setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         }
                         if ((TermUnitSingDuct || TermUnitPIU) && (CurTermUnitSizingNum > 0)) {
                             CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
@@ -1800,6 +1808,8 @@ namespace ReportSizingManager {
                         }
                         CoilInTemp =
                             setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                        CoilInHumRat =
+                            setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         CoilOutTemp = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
                         CoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
                         NominalCapacityDes =

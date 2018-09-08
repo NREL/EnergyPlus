@@ -1923,7 +1923,7 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 PTUnit(PTUnitNum).ATMixerExists = true;
             }
-            // check that air-conditioner doesn' have local outside air and DOA
+            // check that air-conditioner doesn't have local outside air and DOA
             if (PTUnit(PTUnitNum).ATMixerExists && OANodeNums(4) > 0) {
                 ShowSevereError(CurrentModuleObject + " = \"" + PTUnit(PTUnitNum).Name +
                                 "\". Air-conditioners has local as well as central outdoor air specified");

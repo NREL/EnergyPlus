@@ -644,7 +644,7 @@ namespace DataSizing {
         Real64 MaxHWVolFlow;          // design Hot Water vol flow for zone equipment unit [m3/s]
         Real64 MaxCWVolFlow;          // design Cold Water vol flow for zone equipment unit [m3/s]
         Real64 OAVolFlow;             // design outside air flow for zone equipment unit [m3/s]
-        Real64 ATMixerVolFlow;        // design ventilation air flow rate from air terminal mixer (central DOAS) [m3/s] //TRANE AT Mixer sizing
+        Real64 ATMixerVolFlow;        // design ventilation air flow rate from air terminal mixer (central DOAS) [m3/s]
         Real64 ATMixerCoolPriDryBulb; // design ventilation drybulb temperature from air terminal mixer during cooling (central DOAS) [C]
         Real64 ATMixerCoolPriHumRat;  // design ventilation humidity ratio from air terminal mixer during cooling (central DOAS) [kgH20/kgDryAir]
         Real64 ATMixerHeatPriDryBulb; // design ventilation drybulb temperature from air terminal mixer during heating (central DOAS) [C]
@@ -654,10 +654,10 @@ namespace DataSizing {
         Real64 CoolingAirVolFlow;     // design cooling air vol flow rate for equipment[m3/s]
         Real64 HeatingAirVolFlow;     // design heating air vol flow rate for equipment[m3/s]
         Real64 SystemAirVolFlow;      // design heating air vol flow rate for equipment[m3/s]
-        bool AirFlow;                 // TRUE if AirloopHVAC system air flow rate is calcualted
-        bool CoolingAirFlow;          // TRUE if AirloopHVAC system cooling air flow rate is calcualted
-        bool HeatingAirFlow;          // TRUE if AirloopHVAC system heating air flow rate is calcualted
-        bool SystemAirFlow;           // TRUE if AirloopHVAC system heating air flow rate is calcualted
+        bool AirFlow;                 // TRUE if AirloopHVAC system air flow rate is calculated
+        bool CoolingAirFlow;          // TRUE if AirloopHVAC system cooling air flow rate is calculated
+        bool HeatingAirFlow;          // TRUE if AirloopHVAC system heating air flow rate is calculated
+        bool SystemAirFlow;           // TRUE if AirloopHVAC system heating air flow rate is calculated
         bool Capacity;                // TRUE if AirloopHVAC system capacity is calculated
         bool CoolingCapacity;         // TRUE if AirloopHVAC system cooling capacity is calculated
         bool HeatingCapacity;         // TRUE if AirloopHVAC system heating capacity is calculated
@@ -672,19 +672,19 @@ namespace DataSizing {
         ZoneEqSizingData()
             : AirVolFlow(0.0), MaxHWVolFlow(0.0), MaxCWVolFlow(0.0), OAVolFlow(0.0),
               ATMixerVolFlow(0.0),        // design ventilation air flow rate from air terminal mixer (central DOAS) [m3/s]
-              ATMixerCoolPriDryBulb(0.0), // design air terminal mixer cooling outlet temperture [C]
+              ATMixerCoolPriDryBulb(0.0), // design air terminal mixer cooling outlet temperature [C]
               ATMixerCoolPriHumRat(0.0),  // design air terminal mixer cooling outlet humidity ratio [kgH20/kgDryAir]
-              ATMixerHeatPriDryBulb(0.0), // design air terminal mixer heating outlet temperture [C]
-              ATMixerHeatPriHumRat(0.0),  // design air terminal mixer cheating outlet humidity ratio [kgH20/kgDryAir]
+              ATMixerHeatPriDryBulb(0.0), // design air terminal mixer heating outlet temperature [C]
+              ATMixerHeatPriHumRat(0.0),  // design air terminal mixer heating outlet humidity ratio [kgH20/kgDryAir]
               DesCoolingLoad(0.0),        // design cooling load used for zone equipment [W]
               DesHeatingLoad(0.0),        // design heating load used for zone equipment [W]
               CoolingAirVolFlow(0.0),     // design cooling air vol flow rate for equipment[m3/s]
               HeatingAirVolFlow(0.0),     // design heating air vol flow rate for equipment[m3/s]
               SystemAirVolFlow(0.0),      // design heating air vol flow rate for equipment[m3/s]
-              AirFlow(false),             // TRUE if AirloopHVAC system air flow rate is calcualted
-              CoolingAirFlow(false),      // TRUE if AirloopHVAC system cooling air flow rate is calcualted
-              HeatingAirFlow(false),      // TRUE if AirloopHVAC system heating air flow rate is calcualted
-              SystemAirFlow(false),       // TRUE if AirloopHVAC system heating air flow rate is calcualted
+              AirFlow(false),             // TRUE if AirloopHVAC system air flow rate is calculated
+              CoolingAirFlow(false),      // TRUE if AirloopHVAC system cooling air flow rate is calculated
+              HeatingAirFlow(false),      // TRUE if AirloopHVAC system heating air flow rate is calculated
+              SystemAirFlow(false),       // TRUE if AirloopHVAC system heating air flow rate is calculated
               Capacity(false),            // TRUE if AirloopHVAC system capacity is calculated
               CoolingCapacity(false),     // TRUE if AirloopHVAC system cooling capacity is calculated
               HeatingCapacity(false),     // TRUE if AirloopHVAC system heating capacity is calculated
