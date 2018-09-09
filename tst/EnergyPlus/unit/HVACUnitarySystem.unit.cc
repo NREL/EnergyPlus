@@ -201,6 +201,7 @@ protected:
         FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.006;
 
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 20.0;
+        FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 20.0;
         FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 30.0;
         FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.007;
         FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * StdRhoAir;
@@ -2670,6 +2671,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTest
     FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = 1.005;
 
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 15.0;
+    FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 15.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.001;
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 30.0;
 
