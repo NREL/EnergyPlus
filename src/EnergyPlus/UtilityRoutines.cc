@@ -429,7 +429,7 @@ namespace UtilityRoutines {
     }
 } // namespace UtilityRoutines
 
-void AbortEnergyPlus()
+int AbortEnergyPlus()
 {
 
     // SUBROUTINE INFORMATION:
@@ -597,7 +597,7 @@ void AbortEnergyPlus()
     // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
     // indicating that E+ terminated with an error.
     if (NumExternalInterfaces > 0) CloseSocket(-1);
-    std::exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
 }
 
 void CloseMiscOpenFiles()
@@ -709,6 +709,11 @@ void CloseOutOpenFiles()
 
     bool exists;
     bool opened;
+    std::string name;
+    const std::string stdin_name("stdin");
+    const std::string stdout_name("stdout");
+    const std::string stderr_name("stderr");
+    bool not_special(false);
     int UnitNumber;
     int ios;
 
@@ -719,12 +724,18 @@ void CloseOutOpenFiles()
             exists = flags.exists();
             opened = flags.open();
             ios = flags.ios();
+            name = flags.name();
         }
-        if (exists && opened && ios == 0) gio::close(UnitNumber);
+        if (exists && opened && ios == 0) {
+            not_special = name.compare(stdin_name) != 0;
+            not_special = not_special && (name.compare(stdout_name) != 0);
+            not_special = not_special && (name.compare(stderr_name) != 0);
+            if (not_special) gio::close(UnitNumber);
+        }
     }
 }
 
-void EndEnergyPlus()
+int EndEnergyPlus()
 {
 
     // SUBROUTINE INFORMATION:
@@ -844,7 +855,7 @@ void EndEnergyPlus()
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation
     if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
-    std::exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
 
 int GetNewUnitNumber()

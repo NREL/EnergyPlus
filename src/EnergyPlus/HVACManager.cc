@@ -2463,7 +2463,6 @@ namespace HVACManager {
 
             // CR7751  second, calculate using indoor conditions for density property
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneLoop), ZoneAirHumRatAvg(ZoneLoop), RoutineName3);
-            CpAir = PsyCpAirFnWTdb(ZoneAirHumRatAvg(ZoneLoop), MAT(ZoneLoop));
             ZnAirRpt(ZoneLoop).InfilVolumeCurDensity = (MCPI(ZoneLoop) / CpAir / AirDensity) * TimeStepSys * SecInHour * ADSCorrectionFactor;
             ZnAirRpt(ZoneLoop).InfilAirChangeRate = ZnAirRpt(ZoneLoop).InfilVolumeCurDensity / (TimeStepSys * Zone(ZoneLoop).Volume);
             ZnAirRpt(ZoneLoop).InfilVdotCurDensity = (MCPI(ZoneLoop) / CpAir / AirDensity) * ADSCorrectionFactor;

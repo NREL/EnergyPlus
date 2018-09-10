@@ -45,8 +45,8 @@ DesHeatLoad & the zone design heating load in [W] \tabularnewline
 DesCoolLoad & the zone design cooling load in [W] \tabularnewline
 DesHeatDens & the zone design heating air density [kg/m  ] \tabularnewline
 DesCoolDens & the zone design cooling air density [kg/m  ] \tabularnewline
-DesHeatVolFlow & the zone design heating air volume flow rate [m  /s] \tabularnewline
-DesCoolVolFlow & the zone design cooling air volume flow rate [m  /s] \tabularnewline
+DesHeatVolFlow & the zone design heating air volume flow rate [m\(^{3}\)/s] \tabularnewline
+DesCoolVolFlow & the zone design cooling air volume flow rate [m\(^{3}\)/s] \tabularnewline
 DesHeatCoilInTemp & zone heating coil design air inlet temperature [C] \tabularnewline
 DesCoolCoilInTemp & zone cooling coil design air inlet temperature [C] \tabularnewline
 DesHeatCoilInHumRat & the zone heating coil design air inlet humidity ratio [kg/kg] \tabularnewline
@@ -71,7 +71,7 @@ TimeStepNumAtHeatMax & zone time step number (in the day) at the heating peak \t
 TimeStepNumAtCoolMax & zone time step number (in the day) at the cooling peak \tabularnewline
 HeatDDNum & design day index of design day causing heating peak \tabularnewline
 CoolDDNum & design day index of design day causing cooling peak \tabularnewline
-MinOA & design minimum outside air [m3/s] \tabularnewline
+MinOA & design minimum outside air [m\(^{3}\)/s] \tabularnewline
 HeatFlowSeq(i) & daily sequence of zone heating air mass flow rates (zone time step) [kg/s] \tabularnewline
 CoolFlowSeq(i) & daily sequence of zone cooling air mass flow rates (zone time step) [kg/s] \tabularnewline
 HeatLoadSeq(i) & daily sequence of zone heating loads (zone time step) [W] \tabularnewline
@@ -110,7 +110,7 @@ With the DOAS supply temperature set and the air mass flow rate set to the minim
 {\dot Q_{doa}} = {c_{p,air}}{\dot m_{vent,min}}({T_{sup}} - {T_z})
 \end{equation}
 
-\emph{UpdateSSystemOutputRequired} is then invoked to adjust the load to be met by the ideal zone system.
+\emph{UpdateSystemOutputRequired} is then invoked to adjust the load to be met by the ideal zone system.
 
 The ideal loads calculation steps are as follows.
 
@@ -159,18 +159,12 @@ The calculated and stored sequences are summed or averaged over the zone time-st
 
 \begin{enumerate}
 \def\labelenumi{(\alph{enumi})}
-\item
-  \emph{CoolFlowSeq}
-\item
-  \emph{CoolLoadSeq}
-\item
-  \emph{HeatFlowSeq}
-\item
-  \emph{HeatLoadSeq}
-\item
-  \emph{CoolZoneRetTempSeq}
-\item
-  \emph{HeatZoneRetTempSeq} 
+{\setlength\itemindent{25pt} \item \emph{CoolFlowSeq} }
+{\setlength\itemindent{25pt} \item \emph{CoolLoadSeq} }
+{\setlength\itemindent{25pt} \item \emph{HeatFlowSeq} }
+{\setlength\itemindent{25pt} \item \emph{HeatLoadSeq} }
+{\setlength\itemindent{25pt} \item \emph{CoolZoneRetTempSeq} }
+{\setlength\itemindent{25pt} \item \emph{HeatZoneRetTempSeq} }
 \end{enumerate}
 
 \begin{enumerate}

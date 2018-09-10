@@ -2584,7 +2584,6 @@ namespace ThermalComfort {
         using DataEnvironment::Month;
         using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SysTimeElapsed;
-        using General::InvJulianDay;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
 

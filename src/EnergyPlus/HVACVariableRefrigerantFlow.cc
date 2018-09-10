@@ -2076,7 +2076,7 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(33)) {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(33));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
-                    // Verify Curve Object, only legal type is BiQuadratic
+                    // Verify Curve Object, expected type is BiQuadratic
                     ErrorsFound |= CurveManager::CheckCurveDims(
                         VRF(VRFNum).DefrostEIRPtr,   // Curve index
                         {2},                     // Valid dimensions
@@ -2629,6 +2629,7 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(10)) {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(10));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
+                    // Verify Curve Object, expected type is BiQuadratic
                     ErrorsFound |= CurveManager::CheckCurveDims(
                         VRF(VRFNum).DefrostEIRPtr,   // Curve index
                         {2},                     // Valid dimensions
@@ -3033,10 +3034,10 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(10)) {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(10));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
-                    // Verify Curve Object, only legal type is linear, quadratic, or cubic
+                    // Verify Curve Object, expected type is BiQuadratic
                     ErrorsFound |= CurveManager::CheckCurveDims(
                         VRF(VRFNum).DefrostEIRPtr,  // Curve index
-                        {1},                        // Valid dimensions
+                        {2},                        // Valid dimensions
                         RoutineName,                // Routine name
                         cCurrentModuleObject,       // Object Type
                         VRF(VRFNum).Name,           // Object Name

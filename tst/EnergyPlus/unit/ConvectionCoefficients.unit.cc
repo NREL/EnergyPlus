@@ -61,6 +61,7 @@
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
 #include <DataLoopNode.hh>
+#include <DataRoomAirModel.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <HeatBalanceManager.hh>
@@ -612,6 +613,60 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPe
     EvaluateIntHcModels( SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+
+}
+
+TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateHnModels)
+{
+    
+    int SurfNum;
+    Real64 DeltaTemp;
+    Real64 CosineTilt;
+    Real64 Hn;
+    Array1D<Real64> SurfTemp;
+    Array1D<Real64> HcIn;
+    Array1D<Real64> Vhc;
+
+    SurfNum = 1;
+    DataSurfaces::Surface.allocate(SurfNum);
+    DataSurfaces::Surface(SurfNum).Zone = 1;
+    DataRoomAirModel::AirModel.allocate(1);
+    EnergyPlus::DataHeatBalance::TempEffBulkAir.allocate(1);
+    EnergyPlus::DataHeatBalance::TempEffBulkAir(1) = 1.0;
+    SurfTemp.allocate(1);
+    HcIn.allocate(1);
+    Vhc.allocate(1);
+    
+    // Test 1: CalcWaltonUnstableHorizontalOrTilt calculation for Hn
+    DeltaTemp = 1.0;
+    CosineTilt = 1.0;
+    Hn = 0.0;
+    Hn = CalcWaltonUnstableHorizontalOrTilt(DeltaTemp, CosineTilt);
+    EXPECT_NEAR(Hn, 1.520, 0.001);
+
+    //Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
+    DataSurfaces::Surface(SurfNum).HeatTransSurf = true;
+    DataSurfaces::Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
+    DataSurfaces::Surface(SurfNum).IntConvCoeff = 0.0;
+    DataRoomAirModel::AirModel(DataSurfaces::Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel_UCSDDV;
+    DataSurfaces::Surface(SurfNum).CosTilt = 1.0;
+    SurfTemp(1) = 0.0;
+    HcIn(1) = 0.0;
+    CalcDetailedHcInForDVModel(SurfNum, SurfTemp, HcIn);
+    Hn = HcIn(1);
+    EXPECT_NEAR(Hn, 1.520, 0.001);
+
+    DataSurfaces::Surface(SurfNum).HeatTransSurf = true;
+    DataSurfaces::Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
+    DataSurfaces::Surface(SurfNum).IntConvCoeff = 0.0;
+    DataRoomAirModel::AirModel(DataSurfaces::Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel_UCSDCV;
+    DataSurfaces::Surface(SurfNum).CosTilt = 1.0;
+    SurfTemp(1) = 0.0;
+    HcIn(1) = 0.0;
+    Vhc(1) = 1.0;
+    CalcDetailedHcInForDVModel(SurfNum, SurfTemp, HcIn, Vhc);
+    Hn = HcIn(1);
+    EXPECT_NEAR(Hn, 4.347, 0.001);
 
 }
 

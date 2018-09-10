@@ -134,7 +134,7 @@ namespace DataEnvironment {
     extern bool EMSWindSpeedOverrideOn;            // EMS flag for outdoor air wind speed
     extern Real64 EMSWindSpeedOverrideValue;       // EMS override value for outdoor air wind speed
     extern Real64 WaterMainsTemp;                  // Current water mains temperature
-    extern int Year;                               // Current calendar year of the simulation
+    extern int Year;                               // Current calendar year of the simulation from the weather file
     extern int YearTomorrow;                       // Tomorrow's calendar year of the simulation
     extern Array1D<Real64> SOLCOS;                 // Solar direction cosines at current time step
     extern Real64 CloudFraction;                   // Fraction of sky covered by clouds
@@ -154,6 +154,7 @@ namespace DataEnvironment {
     extern std::string WeatherFileLocationTitle;   // Location Title from Weather File
     extern std::string CurMnDyHr;                  // Current Month/Day/Hour timestamp info
     extern std::string CurMnDy;                    // Current Month/Day timestamp info
+    extern std::string CurMnDyYr;                  // Current Month/Day/Year timestamp info
     extern int CurEnvirNum;                        // current environment number
     extern int TotDesDays;                         // Total number of Design days to Setup
     extern int TotRunDesPersDays;                  // Total number of Run Design Periods [Days] (Weather data) to Setup
