@@ -19,6 +19,7 @@ GridPoint::GridPoint(GriddedData &grid_data_in)
       target(ndims, 0.0),
       target_is_set(false),
       point_floor(ndims, 0),
+      floor_index(0),
       weights(ndims, 0),
       is_inbounds(ndims),
       methods(ndims, Method::UNDEF),
@@ -26,7 +27,8 @@ GridPoint::GridPoint(GriddedData &grid_data_in)
       weighting_factors(ndims, std::vector<double>(4, 0.0)),
       interp_coeffs(ndims, std::vector<double>(2, 0.0)),
       cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
-      results(grid_data->num_tables) {
+      results(grid_data->num_tables),
+      hypercube_size_hash(0) {
 }
 
 GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v)
