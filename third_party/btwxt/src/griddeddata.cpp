@@ -3,6 +3,7 @@
 
 // Standard
 #include <iostream>
+#include <algorithm>
 
 // btwxt
 #include "error.h"
