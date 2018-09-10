@@ -122,6 +122,7 @@ namespace DaylightingManager {
     extern std::string mapLine; // character variable to hold map outputs
 
     // Functions
+    void clear_state();
 
     void DayltgAveInteriorReflectance(int &ZoneNum); // Zone number
 

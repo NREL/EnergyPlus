@@ -2055,7 +2055,7 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(33)) {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(33));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
-                    // Verify Curve Object, only legal type is BiQuadratic
+                    // Verify Curve Object, expected type is BiQuadratic
                     ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).DefrostEIRPtr, // Curve index
                                                                 {2},                       // Valid dimensions
                                                                 RoutineName,               // Routine name
@@ -2605,12 +2605,14 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(10)) {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(10));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
-                    ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).DefrostEIRPtr, // Curve index
-                                                                {2},                       // Valid dimensions
-                                                                RoutineName,               // Routine name
-                                                                cCurrentModuleObject,      // Object Type
-                                                                VRF(VRFNum).Name,          // Object Name
-                                                                cAlphaFieldNames(10));     // Field Name
+                    // Verify Curve Object, expected type is BiQuadratic
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        VRF(VRFNum).DefrostEIRPtr,   // Curve index
+                        {2},                     // Valid dimensions
+                        RoutineName,             // Routine name
+                        cCurrentModuleObject,    // Object Type
+                        VRF(VRFNum).Name,        // Object Name
+                        cAlphaFieldNames(10));   // Field Name
                 } else {
                     if (VRF(VRFNum).DefrostStrategy == ReverseCycle && VRF(VRFNum).DefrostControl == OnDemand) {
                         ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
@@ -3008,13 +3010,14 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(10)) {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(10));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
-                    // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).DefrostEIRPtr, // Curve index
-                                                                {1},                       // Valid dimensions
-                                                                RoutineName,               // Routine name
-                                                                cCurrentModuleObject,      // Object Type
-                                                                VRF(VRFNum).Name,          // Object Name
-                                                                cAlphaFieldNames(10));     // Field Name
+                    // Verify Curve Object, expected type is BiQuadratic
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        VRF(VRFNum).DefrostEIRPtr,  // Curve index
+                        {2},                        // Valid dimensions
+                        RoutineName,                // Routine name
+                        cCurrentModuleObject,       // Object Type
+                        VRF(VRFNum).Name,           // Object Name
+                        cAlphaFieldNames(10));      // Field Name
                 } else {
                     if (VRF(VRFNum).DefrostStrategy == ReverseCycle && VRF(VRFNum).DefrostControl == OnDemand) {
                         ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
