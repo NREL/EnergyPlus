@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     CurveNum = 2;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     CurveNum = 3;
     PerfCurve(CurveNum).CurveType = BiQuadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_BiQuadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -315,7 +315,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -330,7 +330,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     CurveNum = 2;
     PerfCurve(CurveNum).CurveType = Quadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_Quadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -345,7 +345,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     CurveNum = 3;
     PerfCurve(CurveNum).CurveType = BiQuadratic;
-    PerfCurve(CurveNum).ObjectType = CurveType_BiQuadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
@@ -444,8 +444,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.MSMaxONOFFCyclesperHour.allocate(Coil.NumOfSpeeds);
     Coil.MSLatentCapacityTimeConstant.allocate(Coil.NumOfSpeeds);
     Coil.MSFanPowerPerEvapAirFlowRate.allocate(Coil.NumOfSpeeds);
-    Coil.MSTotCapTempModFacCurveType.allocate(Coil.NumOfSpeeds);
-    Coil.MSEIRTempModFacCurveType.allocate(Coil.NumOfSpeeds);
 
     Coil.MinOATCompressor = -73.27777777777779;
     Coil.CrankcaseHeaterCapacity = 0.0;
@@ -495,7 +493,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.MSCCapFTemp(1) = nCapfT1;
-    Coil.MSTotCapTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nCapfFF1 = 2;
     pCurve = &PerfCurve(nCapfFF1);
@@ -527,7 +524,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.MSEIRFTemp(1) = nEIRfT1;
-    Coil.MSEIRTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nEIRfFF1 = 4;
     pCurve = &PerfCurve(nEIRfFF1);
@@ -591,7 +587,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.MSCCapFTemp(2) = nCapfT2;
-    Coil.MSTotCapTempModFacCurveType(2) = pCurve->CurveType;
 
     int const nCapfFF2 = 8;
     pCurve = &PerfCurve(nCapfFF2);
@@ -623,7 +618,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.MSEIRFTemp(2) = nEIRfT2;
-    Coil.MSEIRTempModFacCurveType(2) = pCurve->CurveType;
 
     int const nEIRfFF2 = 10;
     pCurve = &PerfCurve(nEIRfFF2);
@@ -656,10 +650,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
         PerfomanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == BiQuadratic) {
-            rCurve.ObjectType = CurveType_BiQuadratic;
+            rCurve.ObjectType = "Curve:Biquadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
         } else if (rCurve.CurveType == Quadratic) {
-            rCurve.ObjectType = CurveType_Quadratic;
+            rCurve.ObjectType = "Curve:Quadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
         }
     }
@@ -839,7 +833,6 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.CCapFTemp(1) = nCapfT2;
-    Coil.TotCapTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nCapfFF2 = 2;
     pCurve = &PerfCurve(nCapfFF2);
@@ -871,7 +864,6 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->Var2Max = 100;
 
     Coil.EIRFTemp(1) = nEIRfT2;
-    Coil.EIRTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nEIRfFF2 = 4;
     pCurve = &PerfCurve(nEIRfFF2);
@@ -904,10 +896,10 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
         PerfomanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == BiQuadratic) {
-            rCurve.ObjectType = CurveType_BiQuadratic;
+            rCurve.ObjectType = "Curve:Biquadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
         } else if (rCurve.CurveType == Quadratic) {
-            rCurve.ObjectType = CurveType_Quadratic;
+            rCurve.ObjectType = "Curve:Quadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
         }
     }
@@ -1856,7 +1848,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,8.9;",
+        "  Version,9.0;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -1951,4 +1943,116 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
     ASSERT_EQ("HEATING COIL SINGLESPEED", DXCoil(1).Name); // Heating Coil Single Speed
     ASSERT_EQ(-30.0, DXCoil(1).MinOATCompressor);          // removed the minimum limit of -20.0C
 }
+
+TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
+{
+
+    // tests minimum limits of Minimum Outdoor Drybulb Temperature for Compressor Operation #6507
+
+    std::string const idf_objects = delimited_string({
+
+        "  Version,9.0;",
+
+        "  Schedule:Compact,",
+        "    FanAvailSched,           !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+
+        "  Curve:Biquadratic,",
+        "    WindACCoolCapFT,         !- Name",
+        "    0.942587793,             !- Coefficient1 Constant",
+        "  0.009543347,             !- Coefficient2 x",
+        "  0.000683770,             !- Coefficient3 x**2",
+        "  -0.011042676,            !- Coefficient4 y",
+        "  0.000005249,             !- Coefficient5 y**2",
+        "  -0.000009720,            !- Coefficient6 x*y",
+        "  12.77778,                !- Minimum Value of x",
+        "  23.88889,                !- Maximum Value of x",
+        "  23.88889,                !- Minimum Value of y",
+        "  46.11111,                !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    RATED - CCAP - FFLOW,          !- Name",
+        "    0.84,                    !- Coefficient1 Constant",
+        "    0.16,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Biquadratic,",
+        "    WindACEIRFT,         !- Name",
+        "    0.942587793,             !- Coefficient1 Constant",
+        "  0.009543347,             !- Coefficient2 x",
+        "  0.000683770,             !- Coefficient3 x**2",
+        "  -0.011042676,            !- Coefficient4 y",
+        "  0.000005249,             !- Coefficient5 y**2",
+        "  -0.000009720,            !- Coefficient6 x*y",
+        "  12.77778,                !- Minimum Value of x",
+        "  23.88889,                !- Maximum Value of x",
+        "  23.88889,                !- Minimum Value of y",
+        "  46.11111,                !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "    RATED - CEIR - FFLOW,          !- Name",
+        "    1.3824,                  !- Coefficient1 Constant",
+        "    -0.4336,                 !- Coefficient2 x",
+        "    0.0512,                  !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    WindACPLFFPLR,         !- Name",
+        "    0.75,                    !- Coefficient1 Constant",
+        "    0.25,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+
+        "  Coil:Cooling:DX:TwoSpeed,",
+        "    Main Cooling Coil 1,     !- Name",
+        "    FanAvailSched,   !- Availability Schedule Name",
+        "    autosize,                !- High Speed Gross Rated Total Cooling Capacity{ W }",
+        "    0.8,                     !- High Speed Rated Sensible Heat Ratio",
+        "    3.0,                     !- High Speed Gross Rated Cooling COP{ W / W }",
+        "    autosize,                !- High Speed Rated Air Flow Rate{ m3 / s }",
+        "    ,                        !- Unit Internal Static Air Pressure{ Pa }",
+        "    Mixed Air Node 1,        !- Air Inlet Node Name",
+        "    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
+        "    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    RATED - CCAP - FFLOW,        !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name",
+        "    RATED - CEIR - FFLOW,        !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name",
+        "    autosize,                !- Low Speed Gross Rated Total Cooling Capacity{ W }",
+        "    0.8,                     !- Low Speed Gross Rated Sensible Heat Ratio",
+        "    4.2,                     !- Low Speed Gross Rated Cooling COP{ W / W }",
+        "    autosize,                !- Low Speed Rated Air Flow Rate{ m3 / s }",
+        "    WindACCoolCapFT,         !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
+        "    WindACEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
+        "    ;  !- Condenser Air Inlet Node Name",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ProcessScheduleInput();
+    GetDXCoils();
+
+    ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
+    ASSERT_EQ(-25.0, DXCoil(1).MinOATCompressor);          // use default value at -25C
+}
+
 } // namespace EnergyPlus

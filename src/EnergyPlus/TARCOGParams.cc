@@ -117,14 +117,15 @@ namespace TARCOGParams {
 
     //  Layer types:
     int const SPECULAR(0);
-    int const VENETBLIND(1);
+    int const VENETBLIND_HORIZ(1);
     int const WOVSHADE(2);
     int const PERFORATED(3);
     int const DIFFSHADE(4);
     int const BSDF(5);
+    int const VENETBLIND_VERT(6);
 
     int const MinLayType(0);
-    int const MaxLayType(5);
+    int const MaxLayType(6);
 
     //  Thermal models:
     int const THERM_MOD_ISO15099(0);
@@ -185,10 +186,15 @@ namespace TARCOGParams {
     // and horizontal louvred blind systems, Journal of Building Performance Simulation, DOI:
     // 10.1080/19401493.2017.1323010
 
-    Real64 const C1_VENET(0.016);
-    Real64 const C2_VENET(-0.63);
-    Real64 const C3_VENET(0.53);
-    Real64 const C4_VENET(0.043);
+    Real64 const C1_VENET_HORIZONTAL(0.016);
+    Real64 const C2_VENET_HORIZONTAL(-0.63);
+    Real64 const C3_VENET_HORIZONTAL(0.53);
+    Real64 const C4_VENET_HORIZONTAL(0.043);
+
+    Real64 const C1_VENET_VERTICAL(0.041);
+    Real64 const C2_VENET_VERTICAL(0.000);
+    Real64 const C3_VENET_VERTICAL(0.270);
+    Real64 const C4_VENET_VERTICAL(0.012);
 
     Real64 const C1_SHADE(0.05);
     Real64 const C2_SHADE(1.08);

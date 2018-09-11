@@ -351,8 +351,8 @@ namespace OutputReportTabularAnnual {
                         bool activeNewValue = false;
                         // the current timestamp
                         int minuteCalculated = General::DetermineMinuteForReporting(kindOfTimeStep);
-                        General::EncodeMonDayHrMin(timestepTimeStamp, DataEnvironment::Month, DataEnvironment::DayOfMonth, DataGlobals::HourOfDay,
-                                                   minuteCalculated);
+                        General::EncodeMonDayHrMin(
+                            timestepTimeStamp, DataEnvironment::Month, DataEnvironment::DayOfMonth, DataGlobals::HourOfDay, minuteCalculated);
                         // perform the selected aggregation type
                         // the following types of aggregations are not gathered at this point:
                         // noAggregation, valueWhenMaxMin, sumOrAverageHoursShown, 	maximumDuringHoursShown, minimumDuringHoursShown:
@@ -1217,14 +1217,22 @@ namespace OutputReportTabularAnnual {
                     }
                     // compute the actual amount of time spent in each bin and above and below
                     for (unsigned int row = 0; row != m_objectNames.size(); row++) { // loop through by row.
-                        fldStIt->m_cell[row].m_timeInBin = calculateBins(
-                            10, fldStIt->m_cell[row].deferredResults, fldStIt->m_cell[row].deferredElapsed, fldStIt->m_topBinValue,
-                            fldStIt->m_bottomBinValue, fldStIt->m_cell[row].m_timeAboveTopBin, fldStIt->m_cell[row].m_timeBelowBottomBin);
+                        fldStIt->m_cell[row].m_timeInBin = calculateBins(10,
+                                                                         fldStIt->m_cell[row].deferredResults,
+                                                                         fldStIt->m_cell[row].deferredElapsed,
+                                                                         fldStIt->m_topBinValue,
+                                                                         fldStIt->m_bottomBinValue,
+                                                                         fldStIt->m_cell[row].m_timeAboveTopBin,
+                                                                         fldStIt->m_cell[row].m_timeBelowBottomBin);
                     }
                     // do the total row binning
-                    fldStIt->m_timeInBinTotal =
-                        calculateBins(10, deferredTotalForColumn, fldStIt->m_cell[0].deferredElapsed, fldStIt->m_topBinValue,
-                                      fldStIt->m_bottomBinValue, fldStIt->m_timeAboveTopBinTotal, fldStIt->m_timeBelowBottomBinTotal);
+                    fldStIt->m_timeInBinTotal = calculateBins(10,
+                                                              deferredTotalForColumn,
+                                                              fldStIt->m_cell[0].deferredElapsed,
+                                                              fldStIt->m_topBinValue,
+                                                              fldStIt->m_bottomBinValue,
+                                                              fldStIt->m_timeAboveTopBinTotal,
+                                                              fldStIt->m_timeBelowBottomBinTotal);
                 }
             }
         }

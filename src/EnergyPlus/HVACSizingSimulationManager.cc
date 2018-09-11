@@ -111,13 +111,18 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(std::st
     for (int i = 1; i <= TotNumLoops; ++i) {
         if (PlantLoopName == PlantLoop(i).Name) { // found it
 
-            density = GetDensityGlycol(PlantLoop(i).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(i).FluidIndex,
-                                       "createNewCoincidentPlantAnalysisObject");
-            cp = GetSpecificHeatGlycol(PlantLoop(i).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(i).FluidIndex,
-                                       "createNewCoincidentPlantAnalysisObject");
+            density = GetDensityGlycol(
+                PlantLoop(i).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
+            cp = GetSpecificHeatGlycol(
+                PlantLoop(i).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
 
-            plantCoincAnalyObjs.emplace_back(PlantLoopName, i, PlantLoop(i).LoopSide(SupplySide).NodeNumIn, density, cp,
-                                             PlantSizData(PlantSizingIndex).NumTimeStepsInAvg, PlantSizingIndex);
+            plantCoincAnalyObjs.emplace_back(PlantLoopName,
+                                             i,
+                                             PlantLoop(i).LoopSide(SupplySide).NodeNumIn,
+                                             density,
+                                             cp,
+                                             PlantSizData(PlantSizingIndex).NumTimeStepsInAvg,
+                                             PlantSizingIndex);
         }
     }
 }
@@ -274,8 +279,8 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
             if (ReportDuringHVACSizingSimulation) {
                 if (sqlite) {
                     sqlite->sqliteBegin();
-                    sqlite->createSQLiteEnvironmentPeriodRecord(DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName,
-                                                                DataGlobals::KindOfSim);
+                    sqlite->createSQLiteEnvironmentPeriodRecord(
+                        DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim);
                     sqlite->sqliteCommit();
                 }
             }

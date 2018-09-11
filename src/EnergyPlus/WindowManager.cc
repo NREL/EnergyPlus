@@ -49,6 +49,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <memory>
 #include <string>
 
 // ObjexxFCL Headers
@@ -80,6 +81,10 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <WindowManagerExteriorOptical.hh>
+#include <WindowManagerExteriorThermal.hh>
+#include <WindowManagerExteriorData.hh>
+#include <WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -284,6 +289,9 @@ namespace WindowManager {
     Array1D<int> LayerNum(5, 0); // Glass layer number
     Array1D<int> AngleNum(5, 0); // Glass layer number for spectral and angular data only
 
+    std::unique_ptr<CWindowModel> inExtWindowModel;       // Information about windows model (interior or exterior)
+    std::unique_ptr<CWindowOpticalModel> winOpticalModel; // Information about windows optical model (Simplified or BSDF)
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
     //   Optical Calculation Routines
     //   Heat Balance Routines
@@ -408,6 +416,32 @@ namespace WindowManager {
         rfvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
         rbvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
         CosPhiIndepVar = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+        CWindowConstructionsSimplified::clearState();
+    }
+
+    void InitWindowOpticalCalculations()
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Simon Vidanovic
+        //       DATE WRITTEN   September 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Manages if optical calculation will be performed with internal or external routines
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+        // check and read custom solar and/or visible spectrum data if any
+        CheckAndReadCustomSprectrumData();
+        if (inExtWindowModel->isExternalLibraryModel()) {
+            InitWCE_SimplifiedOpticalData();
+        } else {
+            InitGlassOpticalCalculations();
+        }
     }
 
     void InitGlassOpticalCalculations()
@@ -608,9 +642,6 @@ namespace WindowManager {
         static Array1D<Real64> DbgBkAbsDiff(5, 0.0);
 
         // EndDebug
-
-        // check and read custom solar and/or visible spectrum data if any
-        CheckAndReadCustomSprectrumData();
 
         W5InitGlassParameters();
 
@@ -942,8 +973,16 @@ namespace WindowManager {
                     LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
                     if (!Material(LayPtr).GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= numpt(IGlass); ++ILam) {
-                            TransAndReflAtPhi(CosPhi, t(IGlass, ILam), rff(IGlass, ILam), rbb(IGlass, ILam), tPhi(IGlass, ILam), rfPhi(IGlass, ILam),
-                                              rbPhi(IGlass, ILam), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
+                            TransAndReflAtPhi(CosPhi,
+                                              t(IGlass, ILam),
+                                              rff(IGlass, ILam),
+                                              rbb(IGlass, ILam),
+                                              tPhi(IGlass, ILam),
+                                              rfPhi(IGlass, ILam),
+                                              rbPhi(IGlass, ILam),
+                                              lSimpleGlazingSystem,
+                                              SimpleGlazingSHGC,
+                                              SimpleGlazingU);
                         }
                     } else {
                         int NumX2 = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX2Vars;
@@ -1138,8 +1177,16 @@ namespace WindowManager {
                     if (!Material(LayPtr).GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= numpt(IGlass); ++ILam) {
 
-                            TransAndReflAtPhi(CosPhi, t(IGlass, ILam), rff(IGlass, ILam), rbb(IGlass, ILam), tPhi(IGlass, ILam), rfPhi(IGlass, ILam),
-                                              rbPhi(IGlass, ILam), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
+                            TransAndReflAtPhi(CosPhi,
+                                              t(IGlass, ILam),
+                                              rff(IGlass, ILam),
+                                              rbb(IGlass, ILam),
+                                              tPhi(IGlass, ILam),
+                                              rfPhi(IGlass, ILam),
+                                              rbPhi(IGlass, ILam),
+                                              lSimpleGlazingSystem,
+                                              SimpleGlazingSHGC,
+                                              SimpleGlazingU);
                         }
                     } else {
                         int NumX2 = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX2Vars;
@@ -1738,49 +1785,6 @@ namespace WindowManager {
         // shade. These are used to calculate zone MRT contribution from window when
         // interior blind/shade is deployed.
 
-        // Loop for BSDF windows
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            auto &surfaceWindow(SurfaceWindow(SurfNum));
-
-            if (surfaceWindow.WindowModelType == WindowBSDFModel) {
-                // Set shading flags for BSDF windows
-                // Set shading flags. This could be also done inside SurfaceWindow structure, however, order is important
-                if (Construct(Surface(SurfNum).Construction).BSDFInput.BasisType != 0) {
-                    surfaceWindow.WindowModelType = WindowBSDFModel;
-                    // Set shading layer flags for windows
-                    auto &construction(Construct(Surface(SurfNum).Construction));
-                    auto &surface_window(SurfaceWindow(SurfNum));
-                    int TotLayers = construction.TotLayers;
-                    for (auto Lay = 1; Lay <= TotLayers; ++Lay) {
-                        int LayPtr = construction.LayerPoint(Lay);
-                        auto &material(Material(LayPtr));
-                        bool isShading = material.Group == ComplexWindowShade;
-                        if (isShading && Lay == 1) surface_window.ShadingFlag = ExtShadeOn;
-                        if (isShading && Lay == TotLayers) surface_window.ShadingFlag = IntShadeOn;
-                    }
-                }
-                if (surfaceWindow.ShadingFlag == IntShadeOn) {
-                    auto &construction(Construct(Surface(SurfNum).Construction));
-                    int TotLay = construction.TotLayers;
-                    int ShadingLayerPtr = construction.LayerPoint(TotLay);
-                    ShadingLayerPtr = Material(ShadingLayerPtr).ComplexShadePtr;
-                    auto &complexShade = ComplexShade(ShadingLayerPtr);
-                    auto TauShadeIR = complexShade.IRTransmittance;
-                    auto EpsShadeIR = complexShade.BackEmissivity;
-                    auto RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
-                    // Get properties of glass next to inside shading layer
-                    int GlassLayPtr = construction.LayerPoint(TotLay - 2);
-                    auto EpsGlassIR = Material(GlassLayPtr).AbsorpThermalBack;
-                    auto RhoGlassIR = 1 - EpsGlassIR;
-
-                    auto EffShBlEmiss = EpsShadeIR * (1.0 + RhoGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR));
-                    surfaceWindow.EffShBlindEmiss[0] = EffShBlEmiss;
-                    auto EffGlEmiss = EpsGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR);
-                    surfaceWindow.EffGlassEmiss[0] = EffGlEmiss;
-                }
-            }
-        }
-
         // Loop for ordinary windows
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
@@ -1961,7 +1965,7 @@ namespace WindowManager {
 
             // TH 2/16/2010. CR 8010. The following code was modified and moved to GetSurfaceData
             //  in SurfaceGeometry module, because for blinds with variable slats new blinds were created and assigned
-            if (Surface(SurfNum).WindowShadingControlPtr != 0) {
+            if (Surface(SurfNum).HasShadeControl) {
                 //  ConstrNumSh = Surface(SurfNum)%ShadedConstruction
                 ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
                 //  IF(ShadingType == WSC_ST_ExteriorBlind) THEN
@@ -2043,7 +2047,7 @@ namespace WindowManager {
                 ConstrNum = Surface(SurfNum).Construction;
                 MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers);
                 if (Material(MatNum).SolarDiffusing) {
-                    if (Surface(SurfNum).WindowShadingControlPtr == 0) {
+                    if (!Surface(SurfNum).HasShadeControl) {
                         SurfaceWindow(SurfNum).SolarDiffusing = true;
                     } else { // There is a shading control
                         if (WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType == SwitchableGlazing) {
@@ -2439,6 +2443,29 @@ namespace WindowManager {
                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     )
     {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         S. Vidanovic
+        //       DATE WRITTEN   June 2016
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+        //
+        // PURPOSE OF THIS SUBROUTINE:
+        // Subroutine to direct wheter to use exterior or interior window routines
+        if (KickOffSizing || KickOffSimulation) return;
+
+        if (inExtWindowModel->isExternalLibraryModel()) {
+            CalcWindowHeatBalanceExternalRoutines(SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp);
+        } else {
+            CalcWindowHeatBalanceInternalRoutines(SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp);
+        }
+    }
+
+    void CalcWindowHeatBalanceInternalRoutines(int const SurfNum,          // Surface number
+                                               Real64 const HextConvCoeff, // Outside air film conductance coefficient
+                                               Real64 &SurfInsideTemp,     // Inside window surface temperature
+                                               Real64 &SurfOutsideTemp     // Outside surface temperature (C)
+    )
+    {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         F. Winkelmann
@@ -2484,12 +2511,12 @@ namespace WindowManager {
         // Using/Aliasing
         using namespace DataBSDFWindow;
         using DataHeatBalSurface::QConvOutReport;
-        using DataHeatBalSurface::QRadLWOutSrdSurfs;
-        using DataHeatBalSurface::QRadOutReport;
         using DataHeatBalSurface::QdotConvOutRep;
         using DataHeatBalSurface::QdotConvOutRepPerArea;
         using DataHeatBalSurface::QdotRadOutRep;
         using DataHeatBalSurface::QdotRadOutRepPerArea;
+        using DataHeatBalSurface::QRadLWOutSrdSurfs;
+        using DataHeatBalSurface::QRadOutReport;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSlatAng; // Function for slat angle interpolation
@@ -2578,8 +2605,6 @@ namespace WindowManager {
         int temp;
 
         // CurrentThermalAlgorithm = -1
-
-        if (KickOffSizing || KickOffSimulation) return;
 
         // Shorthand refernces
         auto &window(SurfaceWindow(SurfNum));
@@ -3373,11 +3398,11 @@ namespace WindowManager {
         Real64 EpsShIR1; // Long-wave emissivity of shade/blind surface facing glass; 1=interior shade/blind,
         Real64 EpsShIR2;
         //  2=exterior shade/blind
-        Real64 TauShIR;      // Long-wave transmittance of isolated shade/blind
-        Real64 sconsh;       // shade/blind conductance (W/m2-K)
-        int ShadeFlag;       // Shading flag
-        Real64 ShadeAbsFac1; // Fractions for apportioning absorbed radiation to shade/blind faces
-        Real64 ShadeAbsFac2;
+        Real64 TauShIR; // Long-wave transmittance of isolated shade/blind
+        Real64 sconsh;  // shade/blind conductance (W/m2-K)
+        int ShadeFlag;  // Shading flag
+        // Real64 ShadeAbsFac1; // Fractions for apportioning absorbed radiation to shade/blind faces
+        // Real64 ShadeAbsFac2;
         static Array1D<Real64> AbsRadShadeFace(2); // Solar radiation, short-wave radiation from lights, and long-wave //Tuned Made static
         //  radiation from lights and zone equipment absorbed by faces of shade/blind (W/m2)
         Real64 ShadeArea;          // shade/blind area (m2)
@@ -3430,12 +3455,8 @@ namespace WindowManager {
         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
             ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
             nglfacep = nglface + 2;
-            ShadeAbsFac1 = SurfaceWindow(SurfNum).ShadeAbsFacFace(1);
-            ShadeAbsFac2 = SurfaceWindow(SurfNum).ShadeAbsFacFace(2);
-            AbsRadShadeFace(1) = (SurfaceWindow(SurfNum).ExtBeamAbsByShade + SurfaceWindow(SurfNum).ExtDiffAbsByShade) * ShadeAbsFac1 +
-                                 (SurfaceWindow(SurfNum).IntBeamAbsByShade + SurfaceWindow(SurfNum).IntSWAbsByShade) * ShadeAbsFac2;
-            AbsRadShadeFace(2) = (SurfaceWindow(SurfNum).ExtBeamAbsByShade + SurfaceWindow(SurfNum).ExtDiffAbsByShade) * ShadeAbsFac2 +
-                                 (SurfaceWindow(SurfNum).IntBeamAbsByShade + SurfaceWindow(SurfNum).IntSWAbsByShade) * ShadeAbsFac1;
+            AbsRadShadeFace(1) = SurfaceWindow(SurfNum).AbsFrontSide();
+            AbsRadShadeFace(2) = SurfaceWindow(SurfNum).AbsBackSide();
             if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) AbsRadShadeFace(2) += SurfaceWindow(SurfNum).IntLWAbsByShade;
             sconsh = scon(ngllayer + 1);
             TauShIR = tir(nglface + 1);
@@ -5619,10 +5640,10 @@ namespace WindowManager {
                     // cell # 5
                     // 4 way interpolation between Curve E , Curve E, Curve E and Curve FGHI
 
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.50, 0.55, TransCurveE, TransCurveE,
-                                                            TransCurveFGHI, TransCurveE);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.50, 0.55, ReflectCurveE,
-                                                              ReflectCurveE, ReflectCurveFGHI, ReflectCurveE);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.50, 0.55, TransCurveE, TransCurveE, TransCurveFGHI, TransCurveE);
+                    ReflectTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.50, 0.55, ReflectCurveE, ReflectCurveE, ReflectCurveFGHI, ReflectCurveE);
 
                 } else if ((0.45 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.5)) {
                     // cell # 6
@@ -5633,10 +5654,18 @@ namespace WindowManager {
                 } else if ((0.35 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.45)) {
                     // cell # 7
                     // 4 way interpolation between Curve E , Curve FGHI, Curve J and Curve FGHI
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.35, 0.45, TransCurveJ, TransCurveE,
-                                                            TransCurveFGHI, TransCurveFGHI);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.35, 0.45, ReflectCurveJ,
-                                                              ReflectCurveE, ReflectCurveFGHI, ReflectCurveFGHI);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.35, 0.45, TransCurveJ, TransCurveE, TransCurveFGHI, TransCurveFGHI);
+                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU,
+                                                              SimpleGlazingSHGC,
+                                                              1.4195,
+                                                              1.7034,
+                                                              0.35,
+                                                              0.45,
+                                                              ReflectCurveJ,
+                                                              ReflectCurveE,
+                                                              ReflectCurveFGHI,
+                                                              ReflectCurveFGHI);
 
                 } else if ((0.3 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.35)) {
                     // cell # 8
@@ -5647,10 +5676,10 @@ namespace WindowManager {
                 } else if ((0.25 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.3)) {
                     // cell # 9
                     // 4 way interpolation between Curve J, Curve FGHI, Curve J and Curve FH
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.25, 0.3, TransCurveJ, TransCurveJ,
-                                                            TransCurveFH, TransCurveFGHI);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.25, 0.3, ReflectCurveJ,
-                                                              ReflectCurveJ, ReflectCurveFH, ReflectCurveFGHI);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.25, 0.3, TransCurveJ, TransCurveJ, TransCurveFH, TransCurveFGHI);
+                    ReflectTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.25, 0.3, ReflectCurveJ, ReflectCurveJ, ReflectCurveFH, ReflectCurveFGHI);
 
                 } else if (SimpleGlazingSHGC <= 0.25) {
                     // cell # 10
@@ -5700,10 +5729,10 @@ namespace WindowManager {
                 } else if ((0.6 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.65)) {
                     // cell # 17
                     // 4 way interpolation between Curve E , Curve E, Curve A, and Curve BDCD
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.6, 0.65, TransCurveE, TransCurveE,
-                                                            TransCurveBDCD, TransCurveA);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.6, 0.65, ReflectCurveE,
-                                                              ReflectCurveE, ReflectCurveBDCD, ReflectCurveA);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.6, 0.65, TransCurveE, TransCurveE, TransCurveBDCD, TransCurveA);
+                    ReflectTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.6, 0.65, ReflectCurveE, ReflectCurveE, ReflectCurveBDCD, ReflectCurveA);
 
                 } else if ((0.55 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.6)) {
                     // cell # 18
@@ -5714,10 +5743,18 @@ namespace WindowManager {
                 } else if ((0.5 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.55)) {
                     // cell # 19
                     // 4 way interpolation between Curve E , Curve FGHI, Curve BDCD and Curve BDCD
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.5, 0.55, TransCurveFGHI, TransCurveE,
-                                                            TransCurveBDCD, TransCurveBDCD);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.5, 0.55, ReflectCurveFGHI,
-                                                              ReflectCurveE, ReflectCurveBDCD, ReflectCurveBDCD);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.5, 0.55, TransCurveFGHI, TransCurveE, TransCurveBDCD, TransCurveBDCD);
+                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU,
+                                                              SimpleGlazingSHGC,
+                                                              3.4068,
+                                                              4.5424,
+                                                              0.5,
+                                                              0.55,
+                                                              ReflectCurveFGHI,
+                                                              ReflectCurveE,
+                                                              ReflectCurveBDCD,
+                                                              ReflectCurveBDCD);
 
                 } else if ((0.45 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.5)) {
                     // cell # 20
@@ -5728,18 +5765,26 @@ namespace WindowManager {
                 } else if ((0.3 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.45)) {
                     // cell # 21
                     // 4 way interpolation between Curve FGHI, Curve FGHI, Curve BDCD, and Curve D
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.3, 0.45, TransCurveFGHI,
-                                                            TransCurveFGHI, TransCurveD, TransCurveBDCD);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.3, 0.45, ReflectCurveFGHI,
-                                                              ReflectCurveFGHI, ReflectCurveD, ReflectCurveBDCD);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.3, 0.45, TransCurveFGHI, TransCurveFGHI, TransCurveD, TransCurveBDCD);
+                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU,
+                                                              SimpleGlazingSHGC,
+                                                              3.4068,
+                                                              4.5424,
+                                                              0.3,
+                                                              0.45,
+                                                              ReflectCurveFGHI,
+                                                              ReflectCurveFGHI,
+                                                              ReflectCurveD,
+                                                              ReflectCurveBDCD);
 
                 } else if ((0.25 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.3)) {
                     // cell # 22
                     // 4 way interpolation between Curve FGHI, Curve FH, Curve D, and Curve D
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.25, 0.3, TransCurveFH,
-                                                            TransCurveFGHI, TransCurveD, TransCurveD);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.25, 0.3, ReflectCurveFH,
-                                                              ReflectCurveFGHI, ReflectCurveD, ReflectCurveD);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.25, 0.3, TransCurveFH, TransCurveFGHI, TransCurveD, TransCurveD);
+                    ReflectTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.25, 0.3, ReflectCurveFH, ReflectCurveFGHI, ReflectCurveD, ReflectCurveD);
 
                 } else if (SimpleGlazingSHGC <= 0.25) {
                     // cell # 23
@@ -8285,7 +8330,7 @@ namespace WindowManager {
         PrintTransMap = false;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
-            if (Surface(SurfNum).WindowShadingControlPtr != 0) {
+            if (Surface(SurfNum).HasShadeControl) {
                 ConstrNumSh = Surface(SurfNum).ShadedConstruction;
                 MatNum = Construct(ConstrNumSh).LayerPoint(1);
                 ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
@@ -9528,6 +9573,15 @@ namespace WindowManager {
         }
 
         RunMeOnceFlag = true;
+    }
+
+    //*****************************************************************************************
+
+    void initWindowModel()
+    {
+        const std::string objectName = "WindowsCalculationEngine";
+        inExtWindowModel = CWindowModel::WindowModelFactory(objectName);
+        winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory();
     }
 
     //*****************************************************************************************

@@ -120,9 +120,8 @@ namespace DataRootFinder {
     int const iMethodSecant(3);        // Step performed using secant method
     int const iMethodBrent(4);         // Step performed using Brent's method
     // Names for each solution method type
-    Array1D_string const SolutionMethodTypes({-1, 4},
-                                             {"No solution method", "Bracketting method", "Bisection method", "False position method",
-                                              "Secant method", "Brent method"});
+    Array1D_string const SolutionMethodTypes(
+        {-1, 4}, {"No solution method", "Bracketting method", "Bisection method", "False position method", "Secant method", "Brent method"});
 
     // DERIVED TYPE DEFINITIONS
     // Type declaration for the numerical controls.

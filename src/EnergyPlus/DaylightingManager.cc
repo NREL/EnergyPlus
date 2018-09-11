@@ -230,6 +230,12 @@ namespace DaylightingManager {
 
     // Functions
 
+    void clear_state()
+    {
+        // this will need a lot more, but it is a start
+        ZoneDaylight.deallocate();
+    }
+
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
     {
 
@@ -532,7 +538,6 @@ namespace DaylightingManager {
         Real64 DFOcSky2;
         Real64 SlatAngle;
         int ISA;
-        int ICtrl;
         int ISlatAngle;
 
         static bool CreateDFSReportFile(true);
@@ -546,6 +551,7 @@ namespace DaylightingManager {
         if (firstTime) {
             GetDaylightingParametersInput();
             CheckTDDsAndLightShelvesInDaylitZones();
+            AssociateWindowShadingControlWithDaylighting();
             firstTime = false;
             if (allocated(CheckTDDZone)) CheckTDDZone.deallocate();
         } // End of check if firstTime
@@ -796,7 +802,6 @@ namespace DaylightingManager {
 
             for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
-                ICtrl = Surface(IWin).WindowShadingControlPtr;
 
                 // For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
                 // component will not be calculated for these windows until the time-step loop.
@@ -805,7 +810,7 @@ namespace DaylightingManager {
                     if (SurfaceWindow(IWin).MovableSlats) {
                         // variable slat angle - MaxSlatangle sets
                         ISA = MaxSlatAngs + 1;
-                    } else if (ICtrl > 0) {
+                    } else if (Surface(IWin).HasShadeControl) {
                         // window shade or blind with fixed slat angle
                         ISA = 2;
                     } else {
@@ -1093,24 +1098,24 @@ namespace DaylightingManager {
             ZoneDaylight(ZoneNum).DaylBackFacSunDisk = 0.0;
         } else {
 
-            ZoneDaylight(ZoneNum).DaylIllFacSky(HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints},
-                                                {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylSourceFacSky(HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints},
-                                                   {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylBackFacSky(HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints},
-                                                 {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylIllFacSky(
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylSourceFacSky(
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylBackFacSky(
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylIllFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
-            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                    {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylSourceFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                   {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                       {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylSourceFacSun(
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylBackFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
-            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                     {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
         }
 
         NRF = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
@@ -1125,9 +1130,38 @@ namespace DaylightingManager {
             //           -------------
             for (loopwin = 1; loopwin <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loopwin) {
 
-                FigureDayltgCoeffsAtPointsSetupForWindow(ZoneNum, IL, loopwin, CalledForRefPoint, RREF, VIEWVC, IWin, IWin2, NWX, NWY, W2, W3, W21,
-                                                         W23, LSHCAL, InShelfSurf, ICtrl, ShType, BlNum, WNORM2, ExtWinType, IConst, RREF2, DWX, DWY,
-                                                         DAXY, U2, U23, U21, VIEWVC2, is_Rectangle, is_Triangle);
+                FigureDayltgCoeffsAtPointsSetupForWindow(ZoneNum,
+                                                         IL,
+                                                         loopwin,
+                                                         CalledForRefPoint,
+                                                         RREF,
+                                                         VIEWVC,
+                                                         IWin,
+                                                         IWin2,
+                                                         NWX,
+                                                         NWY,
+                                                         W2,
+                                                         W3,
+                                                         W21,
+                                                         W23,
+                                                         LSHCAL,
+                                                         InShelfSurf,
+                                                         ICtrl,
+                                                         ShType,
+                                                         BlNum,
+                                                         WNORM2,
+                                                         ExtWinType,
+                                                         IConst,
+                                                         RREF2,
+                                                         DWX,
+                                                         DWY,
+                                                         DAXY,
+                                                         U2,
+                                                         U23,
+                                                         U21,
+                                                         VIEWVC2,
+                                                         is_Rectangle,
+                                                         is_Triangle);
                 //           ---------------------
                 // ---------- WINDOW ELEMENT LOOP ----------
                 //           ---------------------
@@ -1145,10 +1179,47 @@ namespace DaylightingManager {
 
                         ++WinEl;
 
-                        FigureDayltgCoeffsAtPointsForWindowElements(
-                            ZoneNum, IL, loopwin, CalledForRefPoint, WinEl, IWin, IWin2, IX, IY, SkyObstructionMult, W2, W21, W23, RREF, NWYlim,
-                            VIEWVC2, DWX, DWY, DAXY, U2, U23, U21, RWIN, RWIN2, Ray, PHRAY, LSHCAL, COSB, ObTrans, TVISB, DOMEGA, THRAY, hitIntObs,
-                            hitExtObs, WNORM2, ExtWinType, IConst, RREF2, is_Triangle, TVISIntWin, TVISIntWinDisk);
+                        FigureDayltgCoeffsAtPointsForWindowElements(ZoneNum,
+                                                                    IL,
+                                                                    loopwin,
+                                                                    CalledForRefPoint,
+                                                                    WinEl,
+                                                                    IWin,
+                                                                    IWin2,
+                                                                    IX,
+                                                                    IY,
+                                                                    SkyObstructionMult,
+                                                                    W2,
+                                                                    W21,
+                                                                    W23,
+                                                                    RREF,
+                                                                    NWYlim,
+                                                                    VIEWVC2,
+                                                                    DWX,
+                                                                    DWY,
+                                                                    DAXY,
+                                                                    U2,
+                                                                    U23,
+                                                                    U21,
+                                                                    RWIN,
+                                                                    RWIN2,
+                                                                    Ray,
+                                                                    PHRAY,
+                                                                    LSHCAL,
+                                                                    COSB,
+                                                                    ObTrans,
+                                                                    TVISB,
+                                                                    DOMEGA,
+                                                                    THRAY,
+                                                                    hitIntObs,
+                                                                    hitExtObs,
+                                                                    WNORM2,
+                                                                    ExtWinType,
+                                                                    IConst,
+                                                                    RREF2,
+                                                                    is_Triangle,
+                                                                    TVISIntWin,
+                                                                    TVISIntWinDisk);
 
                         //           -------------------
                         // ---------- SUN POSITION LOOP ----------
@@ -1161,10 +1232,41 @@ namespace DaylightingManager {
                             ISunPos = 0;
                             for (IHR = 1; IHR <= 24; ++IHR) {
 
-                                FigureDayltgCoeffsAtPointsForSunPosition(
-                                    ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, IHR, ISunPos, SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL,
-                                    InShelfSurf, COSB, ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2,
-                                    hitIntObs, hitExtObs, CalledForRefPoint, TVISIntWin, TVISIntWinDisk);
+                                FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum,
+                                                                         IL,
+                                                                         IX,
+                                                                         NWX,
+                                                                         IY,
+                                                                         NWYlim,
+                                                                         WinEl,
+                                                                         IWin,
+                                                                         IWin2,
+                                                                         IHR,
+                                                                         ISunPos,
+                                                                         SkyObstructionMult,
+                                                                         RWIN2,
+                                                                         Ray,
+                                                                         PHRAY,
+                                                                         LSHCAL,
+                                                                         InShelfSurf,
+                                                                         COSB,
+                                                                         ObTrans,
+                                                                         TVISB,
+                                                                         DOMEGA,
+                                                                         ICtrl,
+                                                                         ShType,
+                                                                         BlNum,
+                                                                         THRAY,
+                                                                         WNORM2,
+                                                                         ExtWinType,
+                                                                         IConst,
+                                                                         AZVIEW,
+                                                                         RREF2,
+                                                                         hitIntObs,
+                                                                         hitExtObs,
+                                                                         CalledForRefPoint,
+                                                                         TVISIntWin,
+                                                                         TVISIntWinDisk);
 
                             }    // End of hourly sun position loop, IHR
                         } else { // timestep integrated
@@ -1180,10 +1282,41 @@ namespace DaylightingManager {
                                 ISunPos = -1;
                             }
 
-                            FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, HourOfDay, ISunPos,
-                                                                     SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans, TVISB,
-                                                                     DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2,
-                                                                     hitIntObs, hitExtObs, CalledForRefPoint, TVISIntWin, TVISIntWinDisk);
+                            FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum,
+                                                                     IL,
+                                                                     IX,
+                                                                     NWX,
+                                                                     IY,
+                                                                     NWYlim,
+                                                                     WinEl,
+                                                                     IWin,
+                                                                     IWin2,
+                                                                     HourOfDay,
+                                                                     ISunPos,
+                                                                     SkyObstructionMult,
+                                                                     RWIN2,
+                                                                     Ray,
+                                                                     PHRAY,
+                                                                     LSHCAL,
+                                                                     InShelfSurf,
+                                                                     COSB,
+                                                                     ObTrans,
+                                                                     TVISB,
+                                                                     DOMEGA,
+                                                                     ICtrl,
+                                                                     ShType,
+                                                                     BlNum,
+                                                                     THRAY,
+                                                                     WNORM2,
+                                                                     ExtWinType,
+                                                                     IConst,
+                                                                     AZVIEW,
+                                                                     RREF2,
+                                                                     hitIntObs,
+                                                                     hitExtObs,
+                                                                     CalledForRefPoint,
+                                                                     TVISIntWin,
+                                                                     TVISIntWinDisk);
                         }
 
                     } // End of window Y-element loop, IY
@@ -1370,24 +1503,24 @@ namespace DaylightingManager {
                 IllumMapCalc(MapNum).DaylBackFacSun = 0.0;
                 IllumMapCalc(MapNum).DaylBackFacSunDisk = 0.0;
             } else {
-                IllumMapCalc(MapNum).DaylIllFacSky(HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints},
-                                                   {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-                IllumMapCalc(MapNum).DaylSourceFacSky(HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints},
-                                                      {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-                IllumMapCalc(MapNum).DaylBackFacSky(HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints},
-                                                    {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-                IllumMapCalc(MapNum).DaylIllFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                   {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-                IllumMapCalc(MapNum).DaylIllFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                       {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-                IllumMapCalc(MapNum).DaylSourceFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                      {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-                IllumMapCalc(MapNum).DaylSourceFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                          {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-                IllumMapCalc(MapNum).DaylBackFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                    {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-                IllumMapCalc(MapNum).DaylBackFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints},
-                                                        {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                IllumMapCalc(MapNum).DaylIllFacSky(
+                    HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                IllumMapCalc(MapNum).DaylSourceFacSky(
+                    HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                IllumMapCalc(MapNum).DaylBackFacSky(
+                    HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                IllumMapCalc(MapNum).DaylIllFacSun(
+                    HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                IllumMapCalc(MapNum).DaylIllFacSunDisk(
+                    HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                IllumMapCalc(MapNum).DaylSourceFacSun(
+                    HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                IllumMapCalc(MapNum).DaylSourceFacSunDisk(
+                    HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                IllumMapCalc(MapNum).DaylBackFacSun(
+                    HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                IllumMapCalc(MapNum).DaylBackFacSunDisk(
+                    HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             }
             NRF = IllumMapCalc(MapNum).TotalMapRefPoints;
 
@@ -1407,9 +1540,39 @@ namespace DaylightingManager {
 
                 for (loopwin = 1; loopwin <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loopwin) {
 
-                    FigureDayltgCoeffsAtPointsSetupForWindow(ZoneNum, IL, loopwin, CalledForMapPoint, RREF, VIEWVC, IWin, IWin2, NWX, NWY, W2, W3,
-                                                             W21, W23, LSHCAL, InShelfSurf, ICtrl, ShType, BlNum, WNORM2, ExtWinType, IConst, RREF2,
-                                                             DWX, DWY, DAXY, U2, U23, U21, VIEWVC2, is_Rectangle, is_Triangle, MapNum,
+                    FigureDayltgCoeffsAtPointsSetupForWindow(ZoneNum,
+                                                             IL,
+                                                             loopwin,
+                                                             CalledForMapPoint,
+                                                             RREF,
+                                                             VIEWVC,
+                                                             IWin,
+                                                             IWin2,
+                                                             NWX,
+                                                             NWY,
+                                                             W2,
+                                                             W3,
+                                                             W21,
+                                                             W23,
+                                                             LSHCAL,
+                                                             InShelfSurf,
+                                                             ICtrl,
+                                                             ShType,
+                                                             BlNum,
+                                                             WNORM2,
+                                                             ExtWinType,
+                                                             IConst,
+                                                             RREF2,
+                                                             DWX,
+                                                             DWY,
+                                                             DAXY,
+                                                             U2,
+                                                             U23,
+                                                             U21,
+                                                             VIEWVC2,
+                                                             is_Rectangle,
+                                                             is_Triangle,
+                                                             MapNum,
                                                              MapWindowSolidAngAtRefPtWtd); // Inactive MapWindowSolidAngAtRefPt arg removed
                     //           ---------------------
                     // ---------- WINDOW ELEMENT LOOP ----------
@@ -1427,11 +1590,49 @@ namespace DaylightingManager {
 
                             ++WinEl;
 
-                            FigureDayltgCoeffsAtPointsForWindowElements(
-                                ZoneNum, IL, loopwin, CalledForMapPoint, WinEl, IWin, IWin2, IX, IY, SkyObstructionMult, W2, W21, W23, RREF, NWYlim,
-                                VIEWVC2, DWX, DWY, DAXY, U2, U23, U21, RWIN, RWIN2, Ray, PHRAY, LSHCAL, COSB, ObTrans, TVISB, DOMEGA, THRAY,
-                                hitIntObs, hitExtObs, WNORM2, ExtWinType, IConst, RREF2, is_Triangle, TVISIntWin, TVISIntWinDisk, MapNum,
-                                MapWindowSolidAngAtRefPtWtd); // Inactive MapWindowSolidAngAtRefPt arg removed
+                            FigureDayltgCoeffsAtPointsForWindowElements(ZoneNum,
+                                                                        IL,
+                                                                        loopwin,
+                                                                        CalledForMapPoint,
+                                                                        WinEl,
+                                                                        IWin,
+                                                                        IWin2,
+                                                                        IX,
+                                                                        IY,
+                                                                        SkyObstructionMult,
+                                                                        W2,
+                                                                        W21,
+                                                                        W23,
+                                                                        RREF,
+                                                                        NWYlim,
+                                                                        VIEWVC2,
+                                                                        DWX,
+                                                                        DWY,
+                                                                        DAXY,
+                                                                        U2,
+                                                                        U23,
+                                                                        U21,
+                                                                        RWIN,
+                                                                        RWIN2,
+                                                                        Ray,
+                                                                        PHRAY,
+                                                                        LSHCAL,
+                                                                        COSB,
+                                                                        ObTrans,
+                                                                        TVISB,
+                                                                        DOMEGA,
+                                                                        THRAY,
+                                                                        hitIntObs,
+                                                                        hitExtObs,
+                                                                        WNORM2,
+                                                                        ExtWinType,
+                                                                        IConst,
+                                                                        RREF2,
+                                                                        is_Triangle,
+                                                                        TVISIntWin,
+                                                                        TVISIntWinDisk,
+                                                                        MapNum,
+                                                                        MapWindowSolidAngAtRefPtWtd); // Inactive MapWindowSolidAngAtRefPt arg removed
                             //           -------------------
                             // ---------- SUN POSITION LOOP ----------
                             //           -------------------
@@ -1441,11 +1642,43 @@ namespace DaylightingManager {
                             if (!DetailedSolarTimestepIntegration) {
                                 ISunPos = 0;
                                 for (IHR = 1; IHR <= 24; ++IHR) {
-                                    FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, IHR, ISunPos,
-                                                                             SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB,
-                                                                             ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType,
-                                                                             IConst, AZVIEW, RREF2, hitIntObs, hitExtObs, CalledForMapPoint,
-                                                                             TVISIntWin, TVISIntWinDisk, MapNum, MapWindowSolidAngAtRefPtWtd);
+                                    FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum,
+                                                                             IL,
+                                                                             IX,
+                                                                             NWX,
+                                                                             IY,
+                                                                             NWYlim,
+                                                                             WinEl,
+                                                                             IWin,
+                                                                             IWin2,
+                                                                             IHR,
+                                                                             ISunPos,
+                                                                             SkyObstructionMult,
+                                                                             RWIN2,
+                                                                             Ray,
+                                                                             PHRAY,
+                                                                             LSHCAL,
+                                                                             InShelfSurf,
+                                                                             COSB,
+                                                                             ObTrans,
+                                                                             TVISB,
+                                                                             DOMEGA,
+                                                                             ICtrl,
+                                                                             ShType,
+                                                                             BlNum,
+                                                                             THRAY,
+                                                                             WNORM2,
+                                                                             ExtWinType,
+                                                                             IConst,
+                                                                             AZVIEW,
+                                                                             RREF2,
+                                                                             hitIntObs,
+                                                                             hitExtObs,
+                                                                             CalledForMapPoint,
+                                                                             TVISIntWin,
+                                                                             TVISIntWinDisk,
+                                                                             MapNum,
+                                                                             MapWindowSolidAngAtRefPtWtd);
                                 } // End of hourly sun position loop, IHR
                             } else {
                                 if (SunIsUp && !MySunIsUpFlag) {
@@ -1459,11 +1692,43 @@ namespace DaylightingManager {
                                 } else if (!SunIsUp && !MySunIsUpFlag) {
                                     ISunPos = -1;
                                 }
-                                FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, HourOfDay, ISunPos,
-                                                                         SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans,
-                                                                         TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst,
-                                                                         AZVIEW, RREF2, hitIntObs, hitExtObs, CalledForMapPoint, TVISIntWin,
-                                                                         TVISIntWinDisk, MapNum, MapWindowSolidAngAtRefPtWtd);
+                                FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum,
+                                                                         IL,
+                                                                         IX,
+                                                                         NWX,
+                                                                         IY,
+                                                                         NWYlim,
+                                                                         WinEl,
+                                                                         IWin,
+                                                                         IWin2,
+                                                                         HourOfDay,
+                                                                         ISunPos,
+                                                                         SkyObstructionMult,
+                                                                         RWIN2,
+                                                                         Ray,
+                                                                         PHRAY,
+                                                                         LSHCAL,
+                                                                         InShelfSurf,
+                                                                         COSB,
+                                                                         ObTrans,
+                                                                         TVISB,
+                                                                         DOMEGA,
+                                                                         ICtrl,
+                                                                         ShType,
+                                                                         BlNum,
+                                                                         THRAY,
+                                                                         WNORM2,
+                                                                         ExtWinType,
+                                                                         IConst,
+                                                                         AZVIEW,
+                                                                         RREF2,
+                                                                         hitIntObs,
+                                                                         hitExtObs,
+                                                                         CalledForMapPoint,
+                                                                         TVISIntWin,
+                                                                         TVISIntWinDisk,
+                                                                         MapNum,
+                                                                         MapWindowSolidAngAtRefPtWtd);
                             }
                         } // End of window Y-element loop, IY
                     }     // End of window X-element loop, IX
@@ -1640,7 +1905,7 @@ namespace DaylightingManager {
         ShType = WSC_ST_NoShade; // 'NOSHADE'
         BlNum = 0;
         //		ScNum = 0; //Unused Set but never used
-        if (ICtrl > 0) ShType = WindowShadingControl(ICtrl).ShadingType;
+        if (Surface(IWin).HasShadeControl) ShType = WindowShadingControl(ICtrl).ShadingType;
         BlNum = SurfaceWindow(IWin).BlindNumber;
         //		ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
@@ -2406,12 +2671,29 @@ namespace DaylightingManager {
                         ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap.allocate(NRefPts, TotIllumMaps);
                     }
 
-                    AllocateForCFSRefPointsState(ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum), NumOfWinEl, NBasis,
-                                                 NTrnBasis);
+                    AllocateForCFSRefPointsState(
+                        ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum), NumOfWinEl, NBasis, NTrnBasis);
 
                     InitializeCFSStateData(ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum),
-                                           ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum), ZoneNum, IWin, RefPoint, CurFenState, NBasis,
-                                           NTrnBasis, AZVIEW, NWX, NWY, W2, W21, W23, DWX, DWY, WNorm, WinElArea, CalledFrom, MapNum);
+                                           ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum),
+                                           ZoneNum,
+                                           IWin,
+                                           RefPoint,
+                                           CurFenState,
+                                           NBasis,
+                                           NTrnBasis,
+                                           AZVIEW,
+                                           NWX,
+                                           NWY,
+                                           W2,
+                                           W21,
+                                           W23,
+                                           DWX,
+                                           DWY,
+                                           WNorm,
+                                           WinElArea,
+                                           CalledFrom,
+                                           MapNum);
                 }
 
             } else if (CalledFrom == CalledForRefPoint) {
@@ -2421,9 +2703,26 @@ namespace DaylightingManager {
 
                 AllocateForCFSRefPointsState(ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint), NumOfWinEl, NBasis, NTrnBasis);
 
-                InitializeCFSStateData(ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint), ComplexWind(IWin).RefPoint(iRefPoint), ZoneNum,
-                                       IWin, RefPoint, CurFenState, NBasis, NTrnBasis, AZVIEW, NWX, NWY, W2, W21, W23, DWX, DWY, WNorm, WinElArea,
-                                       CalledFrom, MapNum);
+                InitializeCFSStateData(ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint),
+                                       ComplexWind(IWin).RefPoint(iRefPoint),
+                                       ZoneNum,
+                                       IWin,
+                                       RefPoint,
+                                       CurFenState,
+                                       NBasis,
+                                       NTrnBasis,
+                                       AZVIEW,
+                                       NWX,
+                                       NWY,
+                                       W2,
+                                       W21,
+                                       W23,
+                                       DWX,
+                                       DWY,
+                                       WNorm,
+                                       WinElArea,
+                                       CalledFrom,
+                                       MapNum);
             }
         }
     }
@@ -3255,8 +3554,8 @@ namespace DaylightingManager {
             DayltgDirectIllumComplexFenestration(IWin, WinEl, iHour, ZoneNum, iRefPoint, CalledFrom, MapNum);
             // Call direct sun component only once since calculation is done for entire window
             if (WinEl == (NWX * NWY)) {
-                DayltgDirectSunDiskComplexFenestration(IWin2, ZoneNum, iHour, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum,
-                                                       MapWindowSolidAngAtRefPtWtd);
+                DayltgDirectSunDiskComplexFenestration(
+                    IWin2, ZoneNum, iHour, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum, MapWindowSolidAngAtRefPtWtd);
             }
             return;
         }
@@ -3556,8 +3855,8 @@ namespace DaylightingManager {
                                 } else {
                                     SlatAng = Blind(BlNum).SlatAngle * DegToRadians;
                                 }
-                                TransBmBmMult(JB) = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation,
-                                                                       Blind(BlNum).SlatThickness);
+                                TransBmBmMult(JB) = BlindBeamBeamTrans(
+                                    ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
                                 EDIRSUdisk(iHour, JB + 1) = RAYCOS(3) * TVISS * TransBmBmMult(JB) * ObTransDisk;
 
                                 // do this only once for fixed slat blinds
@@ -3724,8 +4023,8 @@ namespace DaylightingManager {
                                         } else {
                                             SlatAng = Blind(BlNum).SlatAngle * DegToRadians;
                                         }
-                                        TransBmBmMultRefl(JB) = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth,
-                                                                                   Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                        TransBmBmMultRefl(JB) = BlindBeamBeamTrans(
+                                            ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
                                         EDIRSUdisk(iHour, JB + 1) += SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(JB);
 
                                         if (!SurfaceWindow(IWin).MovableSlats) break;
@@ -4222,7 +4521,7 @@ namespace DaylightingManager {
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
 
                 WindowShadingControlPtr = Surface(SurfNum).WindowShadingControlPtr;
-                if (WindowShadingControlPtr > 0) {
+                if (Surface(SurfNum).HasShadeControl) {
                     if (WindowShadingControl(WindowShadingControlPtr).GlareControlIsActive) {
                         // Error if GlareControlIsActive but window is not in a Daylighting:Detailed zone
                         if (ZoneDaylight(Surface(SurfNum).Zone).TotalDaylRefPoints == 0) {
@@ -4372,8 +4671,17 @@ namespace DaylightingManager {
         cCurrentModuleObject = "Output:DaylightFactors";
         NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumReports > 0) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          1,
+                                          cAlphaArgs,
+                                          NumNames,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             if (has_prefix(cAlphaArgs(1), "SIZINGDAYS")) {
                 DFSReportSizingDays = true;
             } else if (has_prefix(cAlphaArgs(1), "ALLSHADOWCALCULATIONDAYS")) {
@@ -4448,8 +4756,17 @@ namespace DaylightingManager {
 
         if (TotIllumMaps > 0) {
             for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              MapNum,
+                                              cAlphaArgs,
+                                              NumAlpha,
+                                              rNumericArgs,
+                                              NumNumber,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 IllumMap(MapNum).Name = cAlphaArgs(1);
                 IllumMap(MapNum).Zone = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
 
@@ -4510,8 +4827,17 @@ namespace DaylightingManager {
                 cAlphaArgs(1) = "COMMA";
                 MapColSep = CharComma; // comma
             } else if (MapStyleIn == 1) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              1,
+                                              cAlphaArgs,
+                                              NumAlpha,
+                                              rNumericArgs,
+                                              NumNumber,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 if (cAlphaArgs(1) == "COMMA") {
                     MapColSep = CharComma; // comma
                 } else if (cAlphaArgs(1) == "TAB") {
@@ -4761,8 +5087,17 @@ namespace DaylightingManager {
         for (iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
             cAlphaArgs = "";
             rNumericArgs = 0.0;
-            inputProcessor->getObjectItem(cCurrentModuleObject, iDaylCntrl, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          iDaylCntrl,
+                                          cAlphaArgs,
+                                          NumAlpha,
+                                          rNumericArgs,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             ZoneFound = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (ZoneFound == 0) {
                 ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
@@ -4893,15 +5228,29 @@ namespace DaylightingManager {
                 zone_daylight.IllumSetPoint(refPtNum) = rNumericArgs(7 + refPtNum * 2);  // Field: Illuminance Setpoint at Reference Point
 
                 if (zone_daylight.DaylightMethod == SplitFluxDaylighting) {
-                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Illuminance", OutputProcessor::Unit::lux,
-                                        zone_daylight.DaylIllumAtRefPt(refPtNum), "Zone", "Average", zone_daylight.Name);
-                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Daylight Illuminance Setpoint Exceeded Time",
-                                        OutputProcessor::Unit::hr, zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum), "Zone", "Sum",
+                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Illuminance",
+                                        OutputProcessor::Unit::lux,
+                                        zone_daylight.DaylIllumAtRefPt(refPtNum),
+                                        "Zone",
+                                        "Average",
                                         zone_daylight.Name);
-                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Glare Index", OutputProcessor::Unit::None,
-                                        zone_daylight.GlareIndexAtRefPt(refPtNum), "Zone", "Average", zone_daylight.Name);
+                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Daylight Illuminance Setpoint Exceeded Time",
+                                        OutputProcessor::Unit::hr,
+                                        zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum),
+                                        "Zone",
+                                        "Sum",
+                                        zone_daylight.Name);
+                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Glare Index",
+                                        OutputProcessor::Unit::None,
+                                        zone_daylight.GlareIndexAtRefPt(refPtNum),
+                                        "Zone",
+                                        "Average",
+                                        zone_daylight.Name);
                     SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Glare Index Setpoint Exceeded Time",
-                                        OutputProcessor::Unit::hr, zone_daylight.TimeExceedingGlareIndexSPAtRefPt(refPtNum), "Zone", "Sum",
+                                        OutputProcessor::Unit::hr,
+                                        zone_daylight.TimeExceedingGlareIndexSPAtRefPt(refPtNum),
+                                        "Zone",
+                                        "Sum",
                                         zone_daylight.Name);
                 }
             }
@@ -4927,8 +5276,12 @@ namespace DaylightingManager {
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", will use 1");
                 zone_daylight.LightControlSteps = 1;
             }
-            SetupOutputVariable("Daylighting Lighting Power Multiplier", OutputProcessor::Unit::None, zone_daylight.ZonePowerReductionFactor, "Zone",
-                                "Average", zone_daylight.Name);
+            SetupOutputVariable("Daylighting Lighting Power Multiplier",
+                                OutputProcessor::Unit::None,
+                                zone_daylight.ZonePowerReductionFactor,
+                                "Zone",
+                                "Average",
+                                zone_daylight.Name);
         }
 
         for (SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
@@ -4940,10 +5293,16 @@ namespace DaylightingManager {
                     SurfaceWindow(SurfLoop).LumWinFromRefPtRep.allocate(ZoneDaylight(zoneOfSurf).TotalDaylRefPoints);
                     for (refPtNum = 1; refPtNum <= ZoneDaylight(zoneOfSurf).TotalDaylRefPoints; ++refPtNum) {
                         SetupOutputVariable("Daylighting Window Reference Point " + std::to_string(refPtNum) + " Illuminance",
-                                            OutputProcessor::Unit::lux, SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum), "Zone", "Average",
+                                            OutputProcessor::Unit::lux,
+                                            SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
+                                            "Zone",
+                                            "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Daylighting Window Reference Point " + std::to_string(refPtNum) + " View Luminance",
-                                            OutputProcessor::Unit::cd_m2, SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum), "Zone", "Average",
+                                            OutputProcessor::Unit::cd_m2,
+                                            SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
+                                            "Zone",
+                                            "Average",
                                             Surface(SurfLoop).Name);
                     }
                 }
@@ -5126,8 +5485,17 @@ namespace DaylightingManager {
         TotRefPoints = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         DaylRefPt.allocate(TotRefPoints);
         for (auto &pt : DaylRefPt) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, ++RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          ++RefPtNum,
+                                          cAlphaArgs,
+                                          NumAlpha,
+                                          rNumericArgs,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             pt.Name = cAlphaArgs(1);
             pt.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (pt.ZoneNum == 0) {
@@ -5271,6 +5639,26 @@ namespace DaylightingManager {
         if (ErrorsFound) ShowFatalError("CheckTDDsAndLightShelvesInDaylitZones: Errors in DAYLIGHTING input.");
     }
 
+    void AssociateWindowShadingControlWithDaylighting()
+    {
+        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            int found = -1;
+            for (int jZone = 1; jZone <= NumOfZones; ++jZone) {
+                if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).DaylightingControlName, ZoneDaylight(jZone).Name)) {
+                    found = jZone;
+                    break;
+                }
+            }
+            if (found > 0) {
+                WindowShadingControl(iShadeCtrl).DaylightControlIndex = found;
+            } else {
+                ShowWarningError("AssociateWindowShadingControlWithDaylighting: Daylighting object name used in WindowShadingControl not found.");
+                ShowContinueError("..The WindowShadingControl object=\"" + WindowShadingControl(iShadeCtrl).Name +
+                                  "\" and referenes an object named: \"" + WindowShadingControl(iShadeCtrl).DaylightingControlName + "\"");
+            }
+        }
+    }
+
     void GetLightWellData(bool &ErrorsFound) // If errors found in input
     {
 
@@ -5318,8 +5706,17 @@ namespace DaylightingManager {
 
         for (loop = 1; loop <= TotLightWells; ++loop) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject, loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          loop,
+                                          cAlphaArgs,
+                                          NumAlpha,
+                                          rNumericArgs,
+                                          NumProp,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(1), Surface);
             if (SurfNum == 0) {
@@ -5947,21 +6344,15 @@ namespace DaylightingManager {
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
         static Vector2<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
-        static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (first index),
-        //   bare/shaded window (second index)
+        static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
+        //   bare/shaded window (first index)
         static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
-        static Array2D<Real64> BFSKHR(2, 4); // Sky background luminance factor for sky type (first index),
-        //   bare/shaded window (second index)
+        static Array2D<Real64> BFSKHR(2, 4); // Sky background luminance factor for sky type (second index),
+        //   bare/shaded window (first index)
         static Vector2<Real64> BFSUHR;       // Sun background luminance factor for bare/shaded window
-        static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (first index),
-        //   bare/shaded window (second index)
-        static Vector2<Real64> SFSUHR;       // Sun source luminance factor for bare/shaded window
-        static Array2D<Real64> WDAYIL(2, 2); // Illuminance from window at reference point (first index)
-        //   for shade open/closed (second index)
-        static Array2D<Real64> WBACLU(2, 2); // Background illuminance from window at reference point (first index)
-        //   for shade open/closed (second index)
-        static Vector2<Real64> RDAYIL; // Illuminance from window at reference point after closing shade
-        static Vector2<Real64> RBACLU; // Background illuminance from window at reference point after closing shade
+        static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
+        //   bare/shaded window (first index)
+        static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
         static Vector2<Real64> GLRNDX; // Glare index at reference point
         static Vector2<Real64> GLRNEW; // New glare index at reference point
         int IL;                        // Reference point index
@@ -5973,17 +6364,15 @@ namespace DaylightingManager {
         int IConst;       // Window construction pointer
         int IConstShaded; // Pointer to shaded window construction
         int ICtrl;        // Window shading control pointer
-        Real64 DILLSW;    // Illuminance a ref point from windows that can be switched,
-        Real64 DILLUN;
-        //  and from those that can't (lux)
-        Real64 ASETIL;                    // Illuminance ratio (lux)
-        Real64 TVIS1;                     // Visible transmittance at normal incidence of unswitched glazing
-        Real64 TVIS2;                     // Visible transmittance at normal incidence of fully-switched glazing
-        Real64 VTRAT;                     // Ratio between switched and unswitched visible transmittance at normal incidence
-        Real64 BACL;                      // Window background (surround) luminance for glare calc (cd/m2)
-        Real64 SkyWeight;                 // Weighting factor used to average two different sky types
-        static Vector4<Real64> HorIllSky; // Horizontal illuminance for different sky types
-        Real64 HorIllSkyFac;              // Ratio between horizontal illuminance from sky horizontal irradiance and
+        Array1D<Real64> TVIS1(
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Visible transmittance at normal incidence of unswitched glazing
+        Array1D<Real64> TVIS2(
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Visible transmittance at normal incidence of fully-switched glazing
+        Real64 VTRAT;                                              // Ratio between switched and unswitched visible transmittance at normal incidence
+        Real64 BACL;                                               // Window background (surround) luminance for glare calc (cd/m2)
+        Real64 SkyWeight;                                          // Weighting factor used to average two different sky types
+        static Vector4<Real64> HorIllSky;                          // Horizontal illuminance for different sky types
+        Real64 HorIllSkyFac;                                       // Ratio between horizontal illuminance from sky horizontal irradiance and
         //   luminous efficacy and horizontal illuminance from averaged sky
         Real64 SlatAng; // Blind slat angle (rad)
         bool VarSlats;  // True if slats are movable, i.e., variable angle
@@ -6152,20 +6541,22 @@ namespace DaylightingManager {
 
                             DFSKHR(2, ISky) =
                                 VTRatio *
-                                (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                (WeightNow * InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylIllFacSky(HourOfDay, {2, MaxSlatAngs + 1}, ISky, IL, loop)) +
                                  WeightPreviousHour *
-                                     InterpSlatAng(SlatAng, VarSlats,
-                                                   ZoneDaylight(ZoneNum).DaylIllFacSky(PreviousHour, {2, MaxSlatAngs + 1}, ISky, IL, loop)));
+                                     InterpSlatAng(
+                                         SlatAng, VarSlats, ZoneDaylight(ZoneNum).DaylIllFacSky(PreviousHour, {2, MaxSlatAngs + 1}, ISky, IL, loop)));
 
                             if (ISky == 1) {
                                 DFSUHR(2) =
                                     VTRatio *
-                                    (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                    (WeightNow * InterpSlatAng(SlatAng,
+                                                               VarSlats,
                                                                ZoneDaylight(ZoneNum).DaylIllFacSun(HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
                                      WeightPreviousHour *
-                                         InterpSlatAng(SlatAng, VarSlats,
-                                                       ZoneDaylight(ZoneNum).DaylIllFacSun(PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
+                                         InterpSlatAng(
+                                             SlatAng, VarSlats, ZoneDaylight(ZoneNum).DaylIllFacSun(PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
 
                                 // We add the contribution from the solar disk if slats do not block beam solar
                                 // TH CR 8010. DaylIllFacSunDisk needs to be interpolated!
@@ -6173,58 +6564,69 @@ namespace DaylightingManager {
                                     DFSUHR(2) +=
                                         VTRatio *
                                         (WeightNow *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
                                          WeightPreviousHour *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
                             }
 
                             BFSKHR(2, ISky) =
                                 VTRatio *
-                                (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                (WeightNow * InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylBackFacSky(HourOfDay, {2, MaxSlatAngs + 1}, ISky, IL, loop)) +
                                  WeightPreviousHour *
-                                     InterpSlatAng(SlatAng, VarSlats,
+                                     InterpSlatAng(SlatAng,
+                                                   VarSlats,
                                                    ZoneDaylight(ZoneNum).DaylBackFacSky(PreviousHour, {2, MaxSlatAngs + 1}, ISky, IL, loop)));
 
                             if (ISky == 1) {
                                 BFSUHR(2) =
                                     VTRatio *
-                                    (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                    (WeightNow * InterpSlatAng(SlatAng,
+                                                               VarSlats,
                                                                ZoneDaylight(ZoneNum).DaylBackFacSun(HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
                                      WeightPreviousHour *
-                                         InterpSlatAng(SlatAng, VarSlats,
-                                                       ZoneDaylight(ZoneNum).DaylBackFacSun(PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
+                                         InterpSlatAng(
+                                             SlatAng, VarSlats, ZoneDaylight(ZoneNum).DaylBackFacSun(PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
 
                                 // TH CR 8010. DaylBackFacSunDisk needs to be interpolated!
                                 if (!SurfaceWindow(IWin).SlatsBlockBeam) {
                                     BFSUHR(2) +=
                                         VTRatio *
                                         (WeightNow *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
                                          WeightPreviousHour *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
                                 }
                             }
 
                             SFSKHR(2, ISky) =
                                 VTRatio *
-                                (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                (WeightNow * InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylSourceFacSky(HourOfDay, {2, MaxSlatAngs + 1}, ISky, IL, loop)) +
                                  WeightPreviousHour *
-                                     InterpSlatAng(SlatAng, VarSlats,
+                                     InterpSlatAng(SlatAng,
+                                                   VarSlats,
                                                    ZoneDaylight(ZoneNum).DaylSourceFacSky(PreviousHour, {2, MaxSlatAngs + 1}, ISky, IL, loop)));
 
                             if (ISky == 1) {
                                 SFSUHR(2) =
                                     VTRatio *
-                                    (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                    (WeightNow * InterpSlatAng(SlatAng,
+                                                               VarSlats,
                                                                ZoneDaylight(ZoneNum).DaylSourceFacSun(HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
                                      WeightPreviousHour *
-                                         InterpSlatAng(SlatAng, VarSlats,
+                                         InterpSlatAng(SlatAng,
+                                                       VarSlats,
                                                        ZoneDaylight(ZoneNum).DaylSourceFacSun(PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
 
                                 // TH CR 8010. DaylSourceFacSunDisk needs to be interpolated!
@@ -6232,10 +6634,12 @@ namespace DaylightingManager {
                                     SFSUHR(2) +=
                                         VTRatio *
                                         (WeightNow *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
                                          WeightPreviousHour *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
                                 }
                             }
@@ -6300,7 +6704,7 @@ namespace DaylightingManager {
         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
             IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
             ICtrl = Surface(IWin).WindowShadingControlPtr;
-            if (ICtrl > 0 && ISWFLG == 0) {
+            if (Surface(IWin).HasShadeControl && ISWFLG == 0) {
                 if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                     SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened)
                     ISWFLG = 1;
@@ -6327,102 +6731,138 @@ namespace DaylightingManager {
         // unswitched state. Assumes some windows in a space may have this control and
         // others not.
 
+        Array1D<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
+        Array1D<Real64> DILLUN;         //  and from those that aren't (lux)
+        Array1D_bool previously_shaded; // array of flags to indicate that previously groups would have already shaded this window
+        DILLSW.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
+        DILLUN.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
+        previously_shaded.allocate(ZoneDaylight(ZoneNum).NumOfDayltgExtWins);
+
         // If daylight illuminance is above setpoint, allow switching
         if (ISWFLG != 0 && DaylIllum(1) > SetPnt(1)) {
 
             // Third loop over windows.  Get illuminance at ref pt 1 from
-            // windows that can be switched (DILLSW) and those that can't (DILLUN).
-            // Windows that can be switched are initially in the unswitched state.
+            // windows that can be switched (DILLSW) with a group and those that can't (DILLUN).
+            // Windows that can be switched are initially in the unswitched state. For subsequent
+            // groups the windows in previous groups are fully switched.
             DILLSW = 0.0;
             DILLUN = 0.0;
-            for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
-                IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
-                ICtrl = Surface(IWin).WindowShadingControlPtr;
-                IS = 1;
-                if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
-                if (ICtrl > 0) {
-                    if (SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened &&
-                        WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
-                        DILLSW += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
-                    } else {
-                        DILLUN += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
+            previously_shaded = false;
+
+            int count = 0;
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
+                for (auto IWin : listOfExtWin) {
+                    ++count;
+                    // need to map back to the original order of the "loop" to not change all the other data structures
+                    loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
+
+                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    IS = 1;
+                    if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                    if (Surface(IWin).HasShadeControl) {
+                        if (SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened &&
+                            WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp && !previously_shaded(loop)) {
+                            DILLSW(igroup) += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
+                            previously_shaded(loop) = true;
+                        } else {
+                            if (!previously_shaded(loop)) {
+                                DILLUN(igroup) += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
+                            } else {
+                                DILLUN(igroup) += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, 1); // use the shaded state if previously shaded
+                            }
+                        }
                     }
                 }
             } // End of third window loop, IWin
 
+            Array1D<Real64> ASETIL; // Illuminance ratio (lux)
+            ASETIL.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
+
             // Transmittance multiplier
-            ASETIL = (SetPnt(1) - DILLUN) / (DILLSW + 0.00001);
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+                ASETIL(igroup) = (SetPnt(1) - DILLUN(igroup)) / (DILLSW(igroup) + 0.00001);
+            }
 
             // ASETIL < 1 means there's enough light, so check for switching
-            if (ASETIL < 1.0) {
 
-                // Fourth loop over windows to determine which to switch
-                for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
-                    IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
+            // Fourth loop over windows to determine which to switch
+            // iterate in the order that the shades are specified in WindowShadeControl
+            count = 0;
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
-                    ICtrl = Surface(IWin).WindowShadingControlPtr;
-                    if (ICtrl == 0) continue;
+                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
 
-                    if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
-                        WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp)
-                        continue;
+                for (auto IWin : listOfExtWin) {
+                    ++count;
+                    // need to map back to the original order of the "loop" to not change all the other data structures
+                    loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
+                    if (ASETIL(igroup) < 1.0) {
 
-                    IConst = Surface(IWin).Construction;
-                    if (SurfaceWindow(IWin).StormWinFlag == 1) IConst = Surface(IWin).StormWinConstruction;
-                    // Vis trans at normal incidence of unswitched glass
-                    TVIS1 = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        ICtrl = Surface(IWin).WindowShadingControlPtr;
+                        if (!Surface(IWin).HasShadeControl) continue;
 
-                    // Vis trans at normal incidence of fully switched glass
-                    IConstShaded = Surface(IWin).ShadedConstruction;
-                    TVIS2 = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
+                            WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp)
+                            continue;
 
-                    // Reset shading flag to indicate that window is shaded by being partially or fully switched
-                    SurfaceWindow(IWin).ShadingFlag = SwitchableGlazing;
+                        IConst = Surface(IWin).Construction;
+                        if (SurfaceWindow(IWin).StormWinFlag == 1) IConst = Surface(IWin).StormWinConstruction;
+                        // Vis trans at normal incidence of unswitched glass
+                        TVIS1(igroup) = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
 
-                    // ASETIL < 0 means illuminance from non-daylight-switchable windows exceeds setpoint,
-                    // so completely switch all daylight-switchable windows to minimize solar gain
-                    if (ASETIL <= 0.0) {
-                        SurfaceWindow(IWin).SwitchingFactor = 1.0;
-                        SurfaceWindow(IWin).VisTransSelected = TVIS2;
-                    } else {
-                        // Case where 0 < ASETIL < 1: darken glass in all
-                        // daylight-switchable windows to just meet illuminance setpoint
-                        // From this equation: SETPNT(1) = DILLUN + DILLSW/TVIS1 * VisTransSelected
-                        SurfaceWindow(IWin).VisTransSelected = max(TVIS2, ASETIL * TVIS1) + 0.000001;
-                        SurfaceWindow(IWin).SwitchingFactor = (TVIS1 - SurfaceWindow(IWin).VisTransSelected) / (TVIS1 - TVIS2 + 0.000001);
-                        // bound switching factor between 0 and 1
-                        SurfaceWindow(IWin).SwitchingFactor = min(1.0, SurfaceWindow(IWin).SwitchingFactor);
-                        SurfaceWindow(IWin).SwitchingFactor = max(0.0, SurfaceWindow(IWin).SwitchingFactor);
-                    }
+                        // Vis trans at normal incidence of fully switched glass
+                        IConstShaded = Surface(IWin).ShadedConstruction;
+                        TVIS2(igroup) = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
 
-                    // Adjust daylight quantities based on ratio between switched and unswitched visible transmittance
-                    for (IL = 1; IL <= NREFPT; ++IL) {
-                        // DaylIllum(IL) and BacLum(IL) were calculated at the clear state: IS = 1,
-                        //  and need to adjusted for intermediate switched state at VisTransSelected: IS = 2
-                        IS = 1;
-                        VTRAT = SurfaceWindow(IWin).VisTransSelected / (TVIS1 + 0.000001);
-                        DaylIllum(IL) += (VTRAT - 1.0) * ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
-                        ZoneDaylight(ZoneNum).BacLum(IL) += (VTRAT - 1.0) * ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
+                        // Reset shading flag to indicate that window is shaded by being partially or fully switched
+                        SurfaceWindow(IWin).ShadingFlag = SwitchableGlazing;
 
-                        // Adjust illum, background illum and source luminance for this window in intermediate switched state
-                        //  for later use in the DayltgGlare calc because SurfaceWindow(IWin)%ShadingFlag = SwitchableGlazing = 2
-                        IS = 2;
-                        VTRAT = SurfaceWindow(IWin).VisTransSelected / (TVIS2 + 0.000001);
-                        ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpIllumFromWinAtRefPt(loop, IS, IL);
-                        ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpBackLumFromWinAtRefPt(loop, IS, IL);
-                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpSourceLumFromWinAtRefPt(loop, IS, IL);
-                    } // IL
+                        // ASETIL < 0 means illuminance from non-daylight-switchable windows exceeds setpoint,
+                        // so completely switch all daylight-switchable windows to minimize solar gain
+                        if (ASETIL(igroup) <= 0.0) {
+                            SurfaceWindow(IWin).SwitchingFactor = 1.0;
+                            SurfaceWindow(IWin).VisTransSelected = TVIS2(igroup);
+                        } else {
+                            // Case where 0 < ASETIL < 1: darken glass in all
+                            // daylight-switchable windows to just meet illuminance setpoint
+                            // From this equation: SETPNT(1) = DILLUN + DILLSW/TVIS1 * VisTransSelected
+                            SurfaceWindow(IWin).VisTransSelected = max(TVIS2(igroup), ASETIL(igroup) * TVIS1(igroup)) + 0.000001;
+                            SurfaceWindow(IWin).SwitchingFactor =
+                                (TVIS1(igroup) - SurfaceWindow(IWin).VisTransSelected) / (TVIS1(igroup) - TVIS2(igroup) + 0.000001);
+                            // bound switching factor between 0 and 1
+                            SurfaceWindow(IWin).SwitchingFactor = min(1.0, SurfaceWindow(IWin).SwitchingFactor);
+                            SurfaceWindow(IWin).SwitchingFactor = max(0.0, SurfaceWindow(IWin).SwitchingFactor);
+                        }
 
-                    // If new daylight does not exceed the illuminance setpoint, done, no more checking other switchable glazings
-                    //  even though this should not happen because all switchable glazings suppose to be dimmed by a same ratio ASETIL
-                    //   In real world, this can be improved by setting priority of each switchable glazing to switch - NFP.
-                    if (DaylIllum(1) <= SetPnt(1)) {
-                        break;
-                    }
-                } // End of fourth window loop, IWin -- end of switching to control daylight illuminance
+                        // Adjust daylight quantities based on ratio between switched and unswitched visible transmittance
+                        for (IL = 1; IL <= NREFPT; ++IL) {
+                            // DaylIllum(IL) and BacLum(IL) were calculated at the clear state: IS = 1,
+                            //  and need to adjusted for intermediate switched state at VisTransSelected: IS = 2
+                            IS = 1;
+                            VTRAT = SurfaceWindow(IWin).VisTransSelected / (TVIS1(igroup) + 0.000001);
+                            DaylIllum(IL) += (VTRAT - 1.0) * ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
+                            ZoneDaylight(ZoneNum).BacLum(IL) += (VTRAT - 1.0) * ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
 
-            } // ASETIL < 1
-        }     // ISWFLG /= 0 .AND. DaylIllum(1) > SETPNT(1)
+                            // Adjust illum, background illum and source luminance for this window in intermediate switched state
+                            //  for later use in the DayltgGlare calc because SurfaceWindow(IWin)%ShadingFlag = SwitchableGlazing = 2
+                            IS = 2;
+                            VTRAT = SurfaceWindow(IWin).VisTransSelected / (TVIS2(igroup) + 0.000001);
+                            ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpIllumFromWinAtRefPt(loop, IS, IL);
+                            ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpBackLumFromWinAtRefPt(loop, IS, IL);
+                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpSourceLumFromWinAtRefPt(loop, IS, IL);
+                        } // IL
+                    }     // ASETIL < 1
+                }
+
+                // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
+                if (DaylIllum(1) <= SetPnt(1)) {
+                    break;
+                }
+
+            } // End of fourth window loop
+
+        } // ISWFLG /= 0 .AND. DaylIllum(1) > SETPNT(1)
 
         // Calculate glare index at each reference point assuming the daylight illuminance setpoint is
         //  met at both reference points, either by daylight or electric lights
@@ -6444,68 +6884,95 @@ namespace DaylightingManager {
             }
         }
 
+        Array3D<Real64> WDAYIL(
+            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point (second index)
+        //   for shade open/closed (first index), the number of shade deployment groups (third index)
+        Array3D<Real64> WBACLU(
+            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point (second index)
+        //   for shade open/closed (first index), the number of shade deployment groups (third index)
+        Array2D<Real64> RDAYIL(
+            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point after closing shade
+        Array2D<Real64> RBACLU(
+            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point after closing shade
+
         if (GlareFlag) {
             // Glare is too high at a ref pt.  Loop through windows.
-            for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
-                IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
+            int count = 0;
 
-                // Check if window is eligible for glare control
-                // TH 1/21/2010. Switchable glazings already in partially switched state
-                //  should be allowed to further dim to control glare
-                if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
-                ICtrl = Surface(IWin).WindowShadingControlPtr;
-                if (ICtrl == 0) continue;
-                if (WindowShadingControl(ICtrl).GlareControlIsActive) {
+                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
 
-                    // Illuminance (WDAYIL) and background luminance (WBACLU) contribution from this
-                    // window without shading (IS=1) and with shading (IS=2) for each ref pt
-                    //  For switchable windows, this may be partially switched rather than fully dark
-                    for (IL = 1; IL <= NREFPT; ++IL) {
-                        for (IS = 1; IS <= 2; ++IS) {
-                            WDAYIL(IS, IL) = ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
-                            WBACLU(IS, IL) = ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
-                        }
-                    }
+                int countBeforeListOfExtWinLoop = count;
+                bool atLeastOneGlareControlIsActive = false;
 
-                    // Recalculate illuminance and glare with shading on this window.
-                    //  For switchable glazings, this is the fully switched (dark) state
-                    for (IL = 1; IL <= NREFPT; ++IL) {
-                        if (SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) {
-                            // for non switchable glazings or switchable glazings not switched yet (still in clear state)
-                            //  SurfaceWindow(IWin)%ShadingFlag = GlassConditionallyLightened
-                            RDAYIL(IL) = DaylIllum(IL) - WDAYIL(1, IL) + WDAYIL(2, IL);
-                            RBACLU(IL) = ZoneDaylight(ZoneNum).BacLum(IL) - WBACLU(1, IL) + WBACLU(2, IL);
-                        } else {
-                            // switchable glazings already in partially switched state when calc the RDAYIL(IL) & RBACLU(IL)
-                            RDAYIL(IL) = DaylIllum(IL) - WDAYIL(2, IL) + tmpIllumFromWinAtRefPt(loop, 2, IL);
-                            RBACLU(IL) = ZoneDaylight(ZoneNum).BacLum(IL) - WBACLU(2, IL) + tmpBackLumFromWinAtRefPt(loop, 2, IL);
-                        }
-                    }
+                for (auto IWin : listOfExtWin) {
+                    ++count;
+                    // need to map back to the original order of the "loop" to not change all the other data structures
+                    loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
 
-                    if (SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) SurfaceWindow(IWin).ShadingFlag /= 10;
+                    // Check if window is eligible for glare control
+                    // TH 1/21/2010. Switchable glazings already in partially switched state
+                    //  should be allowed to further dim to control glare
+                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
 
-                    // For switchable glazings, it is switched to fully dark state,
-                    // update ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for use in DayltgGlare
-                    if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
+                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    if (!Surface(IWin).HasShadeControl) continue;
+                    if (WindowShadingControl(ICtrl).GlareControlIsActive) {
+                        atLeastOneGlareControlIsActive = true;
+
+                        // Illuminance (WDAYIL) and background luminance (WBACLU) contribution from this
+                        // window without shading (IS=1) and with shading (IS=2) for each ref pt
+                        //  For switchable windows, this may be partially switched rather than fully dark
                         for (IL = 1; IL <= NREFPT; ++IL) {
-                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                            for (IS = 1; IS <= 2; ++IS) {
+                                WDAYIL(IS, IL, igroup) = ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
+                                WBACLU(IS, IL, igroup) = ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
+                            }
                         }
 
-                        IConst = Surface(IWin).Construction;
-                        // Vis trans at normal incidence of unswitched glass
-                        TVIS1 = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        // Recalculate illuminance and glare with shading on this window.
+                        //  For switchable glazings, this is the fully switched (dark) state
+                        for (IL = 1; IL <= NREFPT; ++IL) {
+                            if (SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) {
+                                // for non switchable glazings or switchable glazings not switched yet (still in clear state)
+                                //  SurfaceWindow(IWin)%ShadingFlag = GlassConditionallyLightened
+                                RDAYIL(IL, igroup) = DaylIllum(IL) - WDAYIL(1, IL, igroup) + WDAYIL(2, IL, igroup);
+                                RBACLU(IL, igroup) = ZoneDaylight(ZoneNum).BacLum(IL) - WBACLU(1, IL, igroup) + WBACLU(2, IL, igroup);
+                            } else {
+                                // switchable glazings already in partially switched state when calc the RDAYIL(IL) & RBACLU(IL)
+                                RDAYIL(IL, igroup) = DaylIllum(IL) - WDAYIL(2, IL, igroup) + tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                RBACLU(IL, igroup) = ZoneDaylight(ZoneNum).BacLum(IL) - WBACLU(2, IL, igroup) + tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                            }
+                        }
 
-                        // Vis trans at normal incidence of fully switched glass
-                        IConstShaded = Surface(IWin).ShadedConstruction;
-                        TVIS2 = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        if (SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) SurfaceWindow(IWin).ShadingFlag /= 10;
+
+                        // For switchable glazings, it is switched to fully dark state,
+                        // update ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for use in DayltgGlare
+                        if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
+                            for (IL = 1; IL <= NREFPT; ++IL) {
+                                ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
+                                ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                            }
+
+                            IConst = Surface(IWin).Construction;
+                            // Vis trans at normal incidence of unswitched glass
+                            TVIS1(igroup) = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+
+                            // Vis trans at normal incidence of fully switched glass
+                            IConstShaded = Surface(IWin).ShadedConstruction;
+                            TVIS2(igroup) = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        }
                     }
+                }
+
+                if (atLeastOneGlareControlIsActive) {
 
                     // Re-calc daylight and glare at shaded state. For switchable glazings, it is the fully dark state.
                     for (IL = 1; IL <= NREFPT; ++IL) {
-                        BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL));
+                        BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL, igroup));
                         // DayltgGlare uses ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for shaded state
                         DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                     }
@@ -6531,169 +6998,187 @@ namespace DaylightingManager {
                             if (GLRNEW(2) > GLRNDX(2) || GLRNEW(1) > ZoneDaylight(ZoneNum).MaxGlareallowed) blnCycle = true;
                         }
                     }
+                }
 
-                    // Shading this window has not improved the glare situation.
-                    // Reset shading flag to no shading condition, go to next window.
-                    if (blnCycle) {
-                        //  for switchable glazings, reset properties to clear state or partial switched state?
+                // restore the count to the value prior to the last loop through the group of exterior windows
+                count = countBeforeListOfExtWinLoop;
+
+                for (auto IWin : listOfExtWin) {
+                    ++count;
+                    // need to map back to the original order of the "loop" to not change all the other data structures
+                    loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
+                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
+
+                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    if (!Surface(IWin).HasShadeControl) continue;
+                    if (WindowShadingControl(ICtrl).GlareControlIsActive) {
+
+                        // Shading this window has not improved the glare situation.
+                        // Reset shading flag to no shading condition, go to next window.
+                        if (blnCycle) {
+                            //  for switchable glazings, reset properties to clear state or partial switched state?
+                            if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
+                                SurfaceWindow(IWin).SwitchingFactor = 0.0;
+                                SurfaceWindow(IWin).VisTransSelected = TVIS1(igroup);
+
+                                // RESET properties for fully dark state
+                                for (IL = 1; IL <= NREFPT; ++IL) {
+                                    ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                    ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                                    ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
+                                }
+                            }
+
+                            SurfaceWindow(IWin).ShadingFlag = ShadeOff;
+                            continue;
+                        }
+
+                        // Shading this window has improved the glare situation.
+                        // Reset background luminance, glare index, and daylight illuminance at each ref pt.
+                        // For switchable glazings, this is fully switched, dark state
+                        for (IL = 1; IL <= NREFPT; ++IL) {
+                            ZoneDaylight(ZoneNum).BacLum(IL) = RBACLU(IL, igroup);
+                            GLRNDX(IL) = GLRNEW(IL);
+                            DaylIllum(IL) = RDAYIL(IL, igroup);
+                        }
+
+                        // TH comments (5/22/2009): seems for EC windows, if the calculated glare exceeds the max setpoint,
+                        //  the EC windows will be reset to fully dark state which significantly reduces the available daylight.
+                        //  A better way is to dim the EC windows as necessary just to meet the glare index, which will still
+                        //  provide more daylight while not exceeding the max glare! The question is then how to set the
+                        //  SwitchingFactor to just meet the glare index.
+                        //  This was addressed in CR 7984 for E+ 5.0. 1/19/2010
+
+                        // If switchable glazing, set switching factor to 1: fully switched.
                         if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
-                            SurfaceWindow(IWin).SwitchingFactor = 0.0;
-                            SurfaceWindow(IWin).VisTransSelected = TVIS1;
+                            // tmpSWFactor0 = SurfaceWindow( IWin ).SwitchingFactor; // save original
+                            // switching  factor
+                            ////Unused Set but never used
+                            SurfaceWindow(IWin).SwitchingFactor = 1.0;
+                            SurfaceWindow(IWin).VisTransSelected = TVIS2(igroup);
 
-                            // RESET properties for fully dark state
+                            // restore fully dark values
                             for (IL = 1; IL <= NREFPT; ++IL) {
+                                WDAYIL(2, IL, igroup) = tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                WBACLU(2, IL, igroup) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
                                 ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
                                 ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
                                 ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
                             }
                         }
 
-                        SurfaceWindow(IWin).ShadingFlag = ShadeOff;
-                        continue;
-                    }
-
-                    // Shading this window has improved the glare situation.
-                    // Reset background luminance, glare index, and daylight illuminance at each ref pt.
-                    // For switchable glazings, this is fully switched, dark state
-                    for (IL = 1; IL <= NREFPT; ++IL) {
-                        ZoneDaylight(ZoneNum).BacLum(IL) = RBACLU(IL);
-                        GLRNDX(IL) = GLRNEW(IL);
-                        DaylIllum(IL) = RDAYIL(IL);
-                    }
-
-                    // TH comments (5/22/2009): seems for EC windows, if the calculated glare exceeds the max setpoint,
-                    //  the EC windows will be reset to fully dark state which significantly reduces the available daylight.
-                    //  A better way is to dim the EC windows as necessary just to meet the glare index, which will still
-                    //  provide more daylight while not exceeding the max glare! The question is then how to set the
-                    //  SwitchingFactor to just meet the glare index.
-                    //  This was addressed in CR 7984 for E+ 5.0. 1/19/2010
-
-                    // If switchable glazing, set switching factor to 1: fully switched.
-                    if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
-                        //						tmpSWFactor0 = SurfaceWindow( IWin ).SwitchingFactor; // save original
-                        // switching  factor
-                        ////Unused Set but never used
-                        SurfaceWindow(IWin).SwitchingFactor = 1.0;
-                        SurfaceWindow(IWin).VisTransSelected = TVIS2;
-
-                        // restore fully dark values
-                        for (IL = 1; IL <= NREFPT; ++IL) {
-                            WDAYIL(2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
-                            WBACLU(2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
+                        // Check if glare now acceptable at each ref pt.
+                        GlareOK = false;
+                        if (NREFPT == 1) {
+                            if (GLRNDX(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
+                        } else if (NREFPT > 1) {
+                            if (GLRNDX(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed)
+                                GlareOK = true;
                         }
-                    }
 
-                    // Check if glare now acceptable at each ref pt.
-                    GlareOK = false;
-                    if (NREFPT == 1) {
-                        if (GLRNDX(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
-                    } else if (NREFPT > 1) {
-                        if (GLRNDX(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
-                    }
+                        if (GlareOK) {
+                            if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing &&
+                                WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
+                                // Added TH 1/14/2010
+                                // Only for switchable glazings with MeetDaylightIlluminanceSetpoint control
+                                // The glazing is in fully dark state, it might lighten a bit to provide more daylight
+                                //  while meeting maximum discomfort glare index
+                                // Iteration to find the right switching factor meeting the glare index
 
-                    if (GlareOK) {
-                        if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing &&
-                            WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
-                            // Added TH 1/14/2010
-                            // Only for switchable glazings with MeetDaylightIlluminanceSetpoint control
-                            // The glazing is in fully dark state, it might lighten a bit to provide more daylight
-                            //  while meeting maximum discomfort glare index
-                            // Iteration to find the right switching factor meeting the glare index
+                                // get fully dark state values
+                                tmpSWSL1 = tmpSourceLumFromWinAtRefPt(loop, 2, 1);
+                                if (NREFPT > 1) tmpSWSL2 = tmpSourceLumFromWinAtRefPt(loop, 2, 2);
 
-                            // get fully dark state values
-                            tmpSWSL1 = tmpSourceLumFromWinAtRefPt(loop, 2, 1);
-                            if (NREFPT > 1) tmpSWSL2 = tmpSourceLumFromWinAtRefPt(loop, 2, 2);
-
-                            // use simple fixed step search in iteraction, can be improved in future
-                            tmpSWFactor = 1.0 - tmpSWIterStep;
-                            while (tmpSWFactor > 0) {
-                                // calc new glare at new switching state
-                                for (IL = 1; IL <= NREFPT; ++IL) {
-                                    RDAYIL(IL) = DaylIllum(IL) + (WDAYIL(1, IL) - WDAYIL(2, IL)) * (1.0 - tmpSWFactor);
-                                    RBACLU(IL) = ZoneDaylight(ZoneNum).BacLum(IL) + (WBACLU(1, IL) - WBACLU(2, IL)) * (1.0 - tmpSWFactor);
-                                    BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL));
-                                    // needs to update SourceLumFromWinAtRefPt(IL,2,loop) before re-calc DayltgGlare
-                                    tmpMult = (TVIS1 - (TVIS1 - TVIS2) * tmpSWFactor) / TVIS2;
-                                    if (IL == 1) {
-                                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSWSL1 * tmpMult;
-                                    } else {
-                                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSWSL2 * tmpMult;
+                                // use simple fixed step search in iteraction, can be improved in future
+                                tmpSWFactor = 1.0 - tmpSWIterStep;
+                                while (tmpSWFactor > 0) {
+                                    // calc new glare at new switching state
+                                    for (IL = 1; IL <= NREFPT; ++IL) {
+                                        RDAYIL(IL, igroup) = DaylIllum(IL) + (WDAYIL(1, IL, igroup) - WDAYIL(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        RBACLU(IL, igroup) =
+                                            ZoneDaylight(ZoneNum).BacLum(IL) + (WBACLU(1, IL, igroup) - WBACLU(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL, igroup));
+                                        // needs to update SourceLumFromWinAtRefPt(IL,2,loop) before re-calc DayltgGlare
+                                        tmpMult = (TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor) / TVIS2(igroup);
+                                        if (IL == 1) {
+                                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSWSL1 * tmpMult;
+                                        } else {
+                                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSWSL2 * tmpMult;
+                                        }
+                                        // Calc new glare
+                                        DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                                     }
-                                    // Calc new glare
-                                    DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
-                                }
 
-                                // Check whether new glare is OK
-                                GlareOK = false;
-                                if (NREFPT == 1) {
-                                    if (GLRNEW(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
-                                } else if (NREFPT > 1) {
-                                    if (GLRNEW(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed)
-                                        GlareOK = true;
-                                }
+                                    // Check whether new glare is OK
+                                    GlareOK = false;
+                                    if (NREFPT == 1) {
+                                        if (GLRNEW(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
+                                    } else if (NREFPT > 1) {
+                                        if (GLRNEW(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed)
+                                            GlareOK = true;
+                                    }
 
-                                if (GlareOK) {
-                                    if (tmpSWFactor >= tmpSWIterStep) {
-                                        // Continue to lighten the glazing
-                                        tmpSWFactor -= tmpSWIterStep;
-                                        continue;
+                                    if (GlareOK) {
+                                        if (tmpSWFactor >= tmpSWIterStep) {
+                                            // Continue to lighten the glazing
+                                            tmpSWFactor -= tmpSWIterStep;
+                                            continue;
+                                        } else {
+                                            // Glare still OK but glazing already in clear state, no more lighten
+                                            break;
+                                        }
                                     } else {
-                                        // Glare still OK but glazing already in clear state, no more lighten
+                                        // Glare too high, exit and use previous switching state
+                                        tmpSWFactor += tmpSWIterStep;
                                         break;
                                     }
-                                } else {
-                                    // Glare too high, exit and use previous switching state
-                                    tmpSWFactor += tmpSWIterStep;
-                                    break;
                                 }
-                            }
 
-                            // Final re-calculation if needed
-                            if (!GlareOK) {
-                                // Glare too high, use previous state and re-calc
-                                for (IL = 1; IL <= NREFPT; ++IL) {
-                                    RDAYIL(IL) = DaylIllum(IL) + (WDAYIL(1, IL) - WDAYIL(2, IL)) * (1.0 - tmpSWFactor);
-                                    RBACLU(IL) = ZoneDaylight(ZoneNum).BacLum(IL) + (WBACLU(1, IL) - WBACLU(2, IL)) * (1.0 - tmpSWFactor);
-                                    BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL));
+                                // Final re-calculation if needed
+                                if (!GlareOK) {
+                                    // Glare too high, use previous state and re-calc
+                                    for (IL = 1; IL <= NREFPT; ++IL) {
+                                        RDAYIL(IL, igroup) = DaylIllum(IL) + (WDAYIL(1, IL, igroup) - WDAYIL(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        RBACLU(IL, igroup) =
+                                            ZoneDaylight(ZoneNum).BacLum(IL) + (WBACLU(1, IL, igroup) - WBACLU(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL, igroup));
 
-                                    // needs to update SourceLumFromWinAtRefPt(IL,2,IWin) before re-calc DayltgGlare
-                                    tmpMult = (TVIS1 - (TVIS1 - TVIS2) * tmpSWFactor) / TVIS2;
-                                    if (IL == 1) {
-                                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, 1) = tmpSWSL1 * tmpMult;
-                                    } else {
-                                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, 2) = tmpSWSL2 * tmpMult;
+                                        // needs to update SourceLumFromWinAtRefPt(IL,2,IWin) before re-calc DayltgGlare
+                                        tmpMult = (TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor) / TVIS2(igroup);
+                                        if (IL == 1) {
+                                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, 1) = tmpSWSL1 * tmpMult;
+                                        } else {
+                                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, 2) = tmpSWSL2 * tmpMult;
+                                        }
+                                        DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                                     }
-                                    DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                                 }
+
+                                // Update final results
+                                for (IL = 1; IL <= NREFPT; ++IL) {
+                                    ZoneDaylight(ZoneNum).BacLum(IL) = RBACLU(IL, igroup);
+                                    GLRNDX(IL) = GLRNEW(IL);
+                                    DaylIllum(IL) = RDAYIL(IL, igroup);
+
+                                    tmpMult = (TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor) / TVIS2(igroup);
+                                    // update report variables
+                                    ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL) * tmpMult;
+                                    ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL) * tmpMult;
+                                }
+                                SurfaceWindow(IWin).SwitchingFactor = tmpSWFactor;
+                                SurfaceWindow(IWin).VisTransSelected = TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor;
+
+                            } else {
+                                // For un-switchable glazing or switchable glazing but not MeetDaylightIlluminaceSetpoint control,
+                                // it is in shaded state and glare is ok - job is done, exit the window loop - IWin
+                                break;
                             }
-
-                            // Update final results
-                            for (IL = 1; IL <= NREFPT; ++IL) {
-                                ZoneDaylight(ZoneNum).BacLum(IL) = RBACLU(IL);
-                                GLRNDX(IL) = GLRNEW(IL);
-                                DaylIllum(IL) = RDAYIL(IL);
-
-                                tmpMult = (TVIS1 - (TVIS1 - TVIS2) * tmpSWFactor) / TVIS2;
-                                // update report variables
-                                ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL) * tmpMult;
-                                ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL) * tmpMult;
-                            }
-                            SurfaceWindow(IWin).SwitchingFactor = tmpSWFactor;
-                            SurfaceWindow(IWin).VisTransSelected = TVIS1 - (TVIS1 - TVIS2) * tmpSWFactor;
-
-                        } else {
-                            // For un-switchable glazing or switchable glazing but not MeetDaylightIlluminaceSetpoint control,
-                            // it is in shaded state and glare is ok - job is done, exit the window loop - IWin
-                            break;
                         }
-                    }
 
-                } // End of check if window glare control is active
-            }     // End of window loop, IWin
-        }         // GlareFlag
+                    } // End of check if window glare control is active
+                }     // end of for(auto IWin : listOfExtWin)
+            }         // for group
+        }             // GlareFlag
 
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off
@@ -7040,7 +7525,8 @@ namespace DaylightingManager {
         Real64 FB;
 
         static Array2D<Real64> const PF(
-            5, 7,
+            5,
+            7,
             reshape2<Real64, int>({1.00,  0.492, 0.226, 0.128, 0.081, 0.061, 0.057, 0.123, 0.119, 0.065, 0.043, 0.029,
                                    0.026, 0.023, 0.019, 0.026, 0.019, 0.016, 0.014, 0.011, 0.011, 0.008, 0.008, 0.008,
                                    0.008, 0.008, 0.006, 0.006, 0.0,   0.0,   0.003, 0.003, 0.003, 0.003, 0.003},
@@ -7583,7 +8069,7 @@ namespace DaylightingManager {
 
                 // Check if window has shade or blind
                 ICtrl = Surface(IWin).WindowShadingControlPtr;
-                if (ICtrl > 0) {
+                if (Surface(IWin).HasShadeControl) {
                     ShType = WindowShadingControl(ICtrl).ShadingType;
                     BlNum = SurfaceWindow(IWin).BlindNumber;
                     //					ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
@@ -7693,8 +8179,9 @@ namespace DaylightingManager {
                             } else {
                                 SlatAng = Blind(BlNum).SlatAngle * DegToRadians;
                             }
-                            TransBmBmMult(JB) = TVISBR * BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation,
-                                                                            Blind(BlNum).SlatThickness);
+                            TransBmBmMult(JB) =
+                                TVISBR *
+                                BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
                         } // End of loop over slat angles
 
                     } else { // Diffusing glass
@@ -7894,8 +8381,9 @@ namespace DaylightingManager {
                             } else {
                                 SlatAng = Blind(BlNum).SlatAngle * DegToRadians;
                             }
-                            TransBmBmMult(JB) = TVISBSun * BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation,
-                                                                              Blind(BlNum).SlatThickness);
+                            TransBmBmMult(JB) =
+                                TVISBSun *
+                                BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
                         } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
                         if (SurfaceWindow(IWin).OriginalClass == SurfaceClass_TDD_Dome) {
@@ -8270,8 +8758,8 @@ namespace DaylightingManager {
         // Integration over sky/ground/sun elements is done over window incoming basis element and flux is calculated for each
         // outgoing direction. This is used to calculate first reflected flux
 
-        ComplexFenestrationLuminances(IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk,
-                                      CalledFrom, MapNum);
+        ComplexFenestrationLuminances(
+            IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum);
 
         // luminance from sun disk needs to include fraction of sunlit area
         SolBmIndex = ComplexWind(IWin).Geom(CurCplxFenState).SolBmIndex(IHR, TimeStep);
@@ -8406,8 +8894,8 @@ namespace DaylightingManager {
         if (!allocated(ElementLuminanceSun)) ElementLuminanceSun.dimension(NIncBasis, 0.0);
         if (!allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.dimension(NIncBasis, 0.0);
 
-        ComplexFenestrationLuminances(IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk,
-                                      CalledFrom, MapNum);
+        ComplexFenestrationLuminances(
+            IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum);
 
         // find number of outgoing basis towards current reference point
         if (CalledFrom == CalledForRefPoint) {
@@ -9214,29 +9702,35 @@ namespace DaylightingManager {
 
                                 DFSKHR(2, ISky) =
                                     VTRatio *
-                                    (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                    (WeightNow * InterpSlatAng(SlatAng,
+                                                               VarSlats,
                                                                IllumMapCalc(MapNum).DaylIllFacSky(HourOfDay, {2, MaxSlatAngs + 1}, ISky, ILB, loop)) +
                                      WeightPreviousHour *
-                                         InterpSlatAng(SlatAng, VarSlats,
+                                         InterpSlatAng(SlatAng,
+                                                       VarSlats,
                                                        IllumMapCalc(MapNum).DaylIllFacSky(PreviousHour, {2, MaxSlatAngs + 1}, ISky, ILB, loop)));
 
                                 if (ISky == 1) {
                                     DFSUHR(2) =
                                         VTRatio *
-                                        (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                        (WeightNow * InterpSlatAng(SlatAng,
+                                                                   VarSlats,
                                                                    IllumMapCalc(MapNum).DaylIllFacSun(HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
                                          WeightPreviousHour *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            IllumMapCalc(MapNum).DaylIllFacSun(PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
 
                                     // We add the contribution from the solar disk if slats do not block beam solar
                                     // TH CR 8010, DaylIllFacSunDisk needs to be interpolated
                                     if (!SurfaceWindow(IWin).SlatsBlockBeam) {
                                         DFSUHR(2) +=
-                                            VTRatio * (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                            VTRatio * (WeightNow * InterpSlatAng(SlatAng,
+                                                                                 VarSlats,
                                                                                  IllumMapCalc(MapNum).DaylIllFacSunDisk(
                                                                                      HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
-                                                       WeightPreviousHour * InterpSlatAng(SlatAng, VarSlats,
+                                                       WeightPreviousHour * InterpSlatAng(SlatAng,
+                                                                                          VarSlats,
                                                                                           IllumMapCalc(MapNum).DaylIllFacSunDisk(
                                                                                               PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
                                     }
@@ -9245,28 +9739,34 @@ namespace DaylightingManager {
                                 BFSKHR(2, ISky) =
                                     VTRatio *
                                     (WeightNow *
-                                         InterpSlatAng(SlatAng, VarSlats,
+                                         InterpSlatAng(SlatAng,
+                                                       VarSlats,
                                                        IllumMapCalc(MapNum).DaylBackFacSky(HourOfDay, {2, MaxSlatAngs + 1}, ISky, ILB, loop)) +
                                      WeightPreviousHour *
-                                         InterpSlatAng(SlatAng, VarSlats,
+                                         InterpSlatAng(SlatAng,
+                                                       VarSlats,
                                                        IllumMapCalc(MapNum).DaylBackFacSky(PreviousHour, {2, MaxSlatAngs + 1}, ISky, ILB, loop)));
 
                                 if (ISky == 1) {
                                     BFSUHR(2) =
                                         VTRatio *
-                                        (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                        (WeightNow * InterpSlatAng(SlatAng,
+                                                                   VarSlats,
                                                                    IllumMapCalc(MapNum).DaylBackFacSun(HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
                                          WeightPreviousHour *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            IllumMapCalc(MapNum).DaylBackFacSun(PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
 
                                     // TH CR 8010, DaylBackFacSunDisk needs to be interpolated
                                     if (!SurfaceWindow(IWin).SlatsBlockBeam) {
                                         BFSUHR(2) +=
-                                            VTRatio * (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                            VTRatio * (WeightNow * InterpSlatAng(SlatAng,
+                                                                                 VarSlats,
                                                                                  IllumMapCalc(MapNum).DaylBackFacSunDisk(
                                                                                      HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
-                                                       WeightPreviousHour * InterpSlatAng(SlatAng, VarSlats,
+                                                       WeightPreviousHour * InterpSlatAng(SlatAng,
+                                                                                          VarSlats,
                                                                                           IllumMapCalc(MapNum).DaylBackFacSunDisk(
                                                                                               PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
                                     }
@@ -9275,29 +9775,35 @@ namespace DaylightingManager {
                                 SFSKHR(2, ISky) =
                                     VTRatio *
                                     (WeightNow *
-                                         InterpSlatAng(SlatAng, VarSlats,
+                                         InterpSlatAng(SlatAng,
+                                                       VarSlats,
                                                        IllumMapCalc(MapNum).DaylSourceFacSky(HourOfDay, {2, MaxSlatAngs + 1}, ISky, ILB, loop)) +
                                      WeightPreviousHour *
-                                         InterpSlatAng(SlatAng, VarSlats,
+                                         InterpSlatAng(SlatAng,
+                                                       VarSlats,
                                                        IllumMapCalc(MapNum).DaylSourceFacSky(PreviousHour, {2, MaxSlatAngs + 1}, ISky, ILB, loop)));
 
                                 if (ISky == 1) {
                                     SFSUHR(2) =
                                         VTRatio *
                                         (WeightNow *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            IllumMapCalc(MapNum).DaylSourceFacSun(HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
                                          WeightPreviousHour *
-                                             InterpSlatAng(SlatAng, VarSlats,
+                                             InterpSlatAng(SlatAng,
+                                                           VarSlats,
                                                            IllumMapCalc(MapNum).DaylSourceFacSun(PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
 
                                     // TH CR 8010, DaylSourceFacSunDisk needs to be interpolated
                                     if (!SurfaceWindow(IWin).SlatsBlockBeam) {
                                         SFSUHR(2) +=
-                                            VTRatio * (WeightNow * InterpSlatAng(SlatAng, VarSlats,
+                                            VTRatio * (WeightNow * InterpSlatAng(SlatAng,
+                                                                                 VarSlats,
                                                                                  IllumMapCalc(MapNum).DaylSourceFacSunDisk(
                                                                                      HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
-                                                       WeightPreviousHour * InterpSlatAng(SlatAng, VarSlats,
+                                                       WeightPreviousHour * InterpSlatAng(SlatAng,
+                                                                                          VarSlats,
                                                                                           IllumMapCalc(MapNum).DaylSourceFacSunDisk(
                                                                                               PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
                                     }
@@ -9358,7 +9864,7 @@ namespace DaylightingManager {
                 VTMULT = 1.0;
 
                 ICtrl = Surface(IWin).WindowShadingControlPtr;
-                if (ICtrl > 0) {
+                if (Surface(IWin).HasShadeControl) {
                     if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                         SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
                         // switchable windows in partial or fully switched state,
@@ -9393,7 +9899,7 @@ namespace DaylightingManager {
                     VTMULT = 1.0;
 
                     ICtrl = Surface(IWin).WindowShadingControlPtr;
-                    if (ICtrl > 0) {
+                    if (Surface(IWin).HasShadeControl) {
                         if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                             SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
                             // switchable windows in partial or fully switched state,
@@ -9558,8 +10064,14 @@ namespace DaylightingManager {
             SavedMnDy(MapNum) = CurMnDyHr.substr(0, 5);
         }
         if (EnvrnPrint(MapNum)) {
-            WriteDaylightMapTitle(MapNum, IllumMap(MapNum).UnitNo, IllumMap(MapNum).Name, EnvironmentName, IllumMap(MapNum).Zone,
-                                  RefPts(IllumMap(MapNum).Zone, 1), RefPts(IllumMap(MapNum).Zone, 2), IllumMap(MapNum).Z);
+            WriteDaylightMapTitle(MapNum,
+                                  IllumMap(MapNum).UnitNo,
+                                  IllumMap(MapNum).Name,
+                                  EnvironmentName,
+                                  IllumMap(MapNum).Zone,
+                                  RefPts(IllumMap(MapNum).Zone, 1),
+                                  RefPts(IllumMap(MapNum).Zone, 2),
+                                  IllumMap(MapNum).Z);
             EnvrnPrint(MapNum) = false;
         }
 
@@ -9639,8 +10151,8 @@ namespace DaylightingManager {
                         } // X Loop
                     }     // Y Loop
 
-                    sqlite->createSQLiteDaylightMap(MapNum, SQMonth, SQDayOfMonth, HourOfDay, IllumMap(MapNum).Xnum, XValue, IllumMap(MapNum).Ynum,
-                                                    YValue, IllumValue);
+                    sqlite->createSQLiteDaylightMap(
+                        MapNum, SQMonth, SQDayOfMonth, HourOfDay, IllumMap(MapNum).Xnum, XValue, IllumMap(MapNum).Ynum, YValue, IllumValue);
 
                 } // WriteOutputToSQLite
             }     // end time step
@@ -9879,7 +10391,6 @@ namespace DaylightingManager {
         int IntWinIndex;
         int ZoneAdjLoop;
         int NumOfIntWindowsCount;
-        int DayltgFacPtr;  // Daylighting factor pointer
         int ZoneExtWinCtr; // Exterior window counter
         int SurfNum;       // Surface number
         int loop;          // DO loop index
@@ -10066,7 +10577,6 @@ namespace DaylightingManager {
             } // End of check if a Daylighting:Detailed zone
         }     // End of primary zone loop
 
-        DayltgFacPtr = 0;
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             ZoneDaylight(ZoneNum).NumOfDayltgExtWins = 0;
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
@@ -10076,8 +10586,8 @@ namespace DaylightingManager {
                 if (ZoneExtWin(ZoneNum) == 0) continue;
                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums.allocate(ZoneExtWin(ZoneNum));
                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums = 0;
-                ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins.allocate(ZoneExtWin(ZoneNum));
-                ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins = 0;
+                ZoneDaylight(ZoneNum).MapShdOrdToLoopNum.allocate(ZoneExtWin(ZoneNum));
+                ZoneDaylight(ZoneNum).MapShdOrdToLoopNum = 0;
 
                 ZoneDaylight(ZoneNum).SolidAngAtRefPt.allocate(ZoneExtWin(ZoneNum), ZoneDaylight(ZoneNum).TotalDaylRefPoints);
                 ZoneDaylight(ZoneNum).SolidAngAtRefPt = 0.0;
@@ -10114,9 +10624,7 @@ namespace DaylightingManager {
                     if ((Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).ExtBoundCond == ExternalEnvironment) ||
                         SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
                         ++ZoneExtWinCtr;
-                        ++DayltgFacPtr;
                         ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = SurfNum;
-                        ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins(ZoneExtWinCtr) = DayltgFacPtr;
                     }
                 }
 
@@ -10130,9 +10638,7 @@ namespace DaylightingManager {
                             if ((Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
                                 SurfaceWindow(SurfNumAdj).OriginalClass == SurfaceClass_TDD_Diffuser) {
                                 ++ZoneExtWinCtr;
-                                ++DayltgFacPtr;
                                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = SurfNumAdj;
-                                ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins(ZoneExtWinCtr) = DayltgFacPtr;
 
                                 // If no daylighting in that zone, set up variables anyway:
                                 if (ZoneDaylight(ZoneNumAdj).TotalDaylRefPoints == 0) {
@@ -10183,7 +10689,13 @@ namespace DaylightingManager {
                 }
 
             } // End of check if a Daylighting:Detailed zone
-        }     // End of primary zone loop
+
+            if (TotWinShadingControl > 0) {
+                CreateShadeDeploymentOrder(ZoneNum);
+                MapShadeDeploymentOrderToLoopNumber(ZoneNum);
+            }
+
+        } // End of primary zone loop
 
         gio::write(OutputFileInits, Format_700);
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -10204,6 +10716,76 @@ namespace DaylightingManager {
         }
 
         ZoneExtWin.deallocate();
+    }
+
+    void CreateShadeDeploymentOrder(int &ZoneNum)
+    {
+        // J. Glazer - 2018
+        // create sorted list for shade deployment order
+        // first step is to create a sortable list of WindowShadingControl objects by sequence
+        std::vector<std::pair<int, int>> shadeControlSequence; // sequence, WindowShadingControl
+        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            if (WindowShadingControl(iShadeCtrl).ZoneIndex == ZoneNum) {
+                shadeControlSequence.push_back(std::make_pair(WindowShadingControl(iShadeCtrl).SequenceNumber, iShadeCtrl));
+            }
+        }
+        // sort the WindowShadingControl objects based on sequence number
+        sort(shadeControlSequence.begin(), shadeControlSequence.end());
+        // now make the deployment list of lists.
+        // each sublist is a group of surfaces that should be deployed together
+        // often the sublist is just a single item.
+        for (auto sequence : shadeControlSequence) {
+            int curShadeControl = sequence.second;
+            if (WindowShadingControl(curShadeControl).MultiSurfaceCtrlIsGroup) {
+                // add a group of surfaces since they should be deployed as a group
+                std::vector<int> group;
+                for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
+                    group.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
+                }
+                ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(group);
+            } else {
+                // add each individial surface as a separate list so they are deployed individually
+                for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
+                    std::vector<int> singleMemberVector;
+                    singleMemberVector.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
+                    ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(singleMemberVector);
+                }
+            }
+        }
+    }
+
+    void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum)
+    {
+        // J. Glazer - 2018
+        // Allow a way to map back to the original "loop" index that is used in many other places in the
+        // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
+        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 && ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
+            int count = 0;
+            for (auto listOfExtWin : ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins) {
+                for (auto IWinShdOrd : listOfExtWin) {
+                    ++count;
+                    if (count > ZoneDaylight(ZoneNum).NumOfDayltgExtWins)
+                        ShowWarningError("MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in zone " + Zone(ZoneNum).Name);
+                    bool found = false;
+                    for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
+                        int IWinLoop = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
+                        if (IWinShdOrd == IWinLoop) {
+                            ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count) = loop;
+                            found = true;
+                            break;
+                        }
+                    }
+                    // this should never occur.
+                    if (!found) ShowWarningError("MapShadeDeploymentOrderToLoopNumber: found unassociated window for zone " + Zone(ZoneNum).Name);
+                }
+            }
+            // double check MapShdOrdToLoopNum array, this should be unnessary but..
+            for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
+                if (ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(loop) == 0) {
+                    ShowWarningError("MapShadeDeploymentOrderToLoopNumber: found empty map for window in zone " + Zone(ZoneNum).Name);
+                }
+            }
+        }
     }
 
     void DayltgInterReflIllFrIntWins(int &ZoneNum) // Zone number
@@ -10455,8 +11037,17 @@ namespace DaylightingManager {
         NewAspectRatio = 1.0;
 
         if (inputProcessor->getNumObjectsFound(CurrentModuleObject) == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          cAlphas,
+                                          NAlphas,
+                                          rNumerics,
+                                          NNum,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             OldAspectRatio = rNumerics(1);
             NewAspectRatio = rNumerics(2);
             transformPlane = cAlphas(1);

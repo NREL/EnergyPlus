@@ -96,12 +96,12 @@ namespace SolarCollectors {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::BeginEnvrnFlag;
-    using DataSurfaces::SurfSunlitArea;
-    using DataSurfaces::SurfSunlitFrac;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceClass_Detached_B;
     using DataSurfaces::SurfaceClass_Detached_F;
     using DataSurfaces::SurfaceClass_Shading;
+    using DataSurfaces::SurfSunlitArea;
+    using DataSurfaces::SurfSunlitFrac;
     using PlantUtilities::SetComponentFlowRate;
 
     // Data
@@ -342,8 +342,17 @@ namespace SolarCollectors {
             for (FlatPlateParamNum = 1; FlatPlateParamNum <= NumOfFlatPlateParam; ++FlatPlateParamNum) {
 
                 ParametersNum = FlatPlateParamNum;
-                inputProcessor->getObjectItem(CurrentModuleParamObject, ParametersNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleParamObject,
+                                              ParametersNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              _,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 // Collector module parameters name
                 GlobalNames::VerifyUniqueInterObjectName(UniqueParametersNames, cAlphaArgs(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
@@ -487,10 +496,10 @@ namespace SolarCollectors {
                     ShowContinueError("Area of surface object will be used in all calculations.");
                 }
 
-                Collector(CollectorNum).InletNode = GetOnlySingleNode(cAlphaArgs(4), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                                      NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-                Collector(CollectorNum).OutletNode = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                                       NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Collector(CollectorNum).InletNode = GetOnlySingleNode(
+                    cAlphaArgs(4), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Collector(CollectorNum).OutletNode = GetOnlySingleNode(
+                    cAlphaArgs(5), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
                     Collector(CollectorNum).VolFlowRateMax = rNumericArgs(1); // Max volumetric flow rate used for plant sizing calculation
@@ -500,23 +509,52 @@ namespace SolarCollectors {
                 }
 
                 // Setup report variables
-                SetupOutputVariable("Solar Collector Incident Angle Modifier", OutputProcessor::Unit::None,
-                                    Collector(CollectorNum).IncidentAngleModifier, "System", "Average", Collector(CollectorNum).Name);
-
-                SetupOutputVariable("Solar Collector Efficiency", OutputProcessor::Unit::None, Collector(CollectorNum).Efficiency, "System",
-                                    "Average", Collector(CollectorNum).Name);
-
-                SetupOutputVariable("Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, Collector(CollectorNum).Power, "System",
-                                    "Average", Collector(CollectorNum).Name);
-
-                SetupOutputVariable("Solar Collector Heat Gain Rate", OutputProcessor::Unit::W, Collector(CollectorNum).HeatGain, "System", "Average",
+                SetupOutputVariable("Solar Collector Incident Angle Modifier",
+                                    OutputProcessor::Unit::None,
+                                    Collector(CollectorNum).IncidentAngleModifier,
+                                    "System",
+                                    "Average",
                                     Collector(CollectorNum).Name);
 
-                SetupOutputVariable("Solar Collector Heat Loss Rate", OutputProcessor::Unit::W, Collector(CollectorNum).HeatLoss, "System", "Average",
+                SetupOutputVariable("Solar Collector Efficiency",
+                                    OutputProcessor::Unit::None,
+                                    Collector(CollectorNum).Efficiency,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+
+                SetupOutputVariable("Solar Collector Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    Collector(CollectorNum).Power,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+
+                SetupOutputVariable("Solar Collector Heat Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    Collector(CollectorNum).HeatGain,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+
+                SetupOutputVariable("Solar Collector Heat Loss Rate",
+                                    OutputProcessor::Unit::W,
+                                    Collector(CollectorNum).HeatLoss,
+                                    "System",
+                                    "Average",
                                     Collector(FlatPlateUnitsNum).Name);
 
-                SetupOutputVariable("Solar Collector Heat Transfer Energy", OutputProcessor::Unit::J, Collector(CollectorNum).Energy, "System", "Sum",
-                                    Collector(FlatPlateUnitsNum).Name, _, "SolarWater", "HeatProduced", _, "Plant");
+                SetupOutputVariable("Solar Collector Heat Transfer Energy",
+                                    OutputProcessor::Unit::J,
+                                    Collector(CollectorNum).Energy,
+                                    "System",
+                                    "Sum",
+                                    Collector(FlatPlateUnitsNum).Name,
+                                    _,
+                                    "SolarWater",
+                                    "HeatProduced",
+                                    _,
+                                    "Plant");
 
                 TestCompSet(CurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Water Nodes");
 
@@ -529,8 +567,17 @@ namespace SolarCollectors {
 
                 ParametersNum = ICSParamNum + NumOfFlatPlateParam;
 
-                inputProcessor->getObjectItem(CurrentModuleParamObject, ICSParamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleParamObject,
+                                              ICSParamNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              _,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 // Collector module parameters name
                 GlobalNames::VerifyUniqueInterObjectName(UniqueParametersNames, cAlphaArgs(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
@@ -613,8 +660,17 @@ namespace SolarCollectors {
 
                 CollectorNum = ICSUnitsNum + NumFlatPlateUnits;
 
-                inputProcessor->getObjectItem(CurrentModuleObject, ICSUnitsNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              ICSUnitsNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 // Collector name
                 GlobalNames::VerifyUniqueInterObjectName(UniqueCollectorNames, cAlphaArgs(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
@@ -720,10 +776,10 @@ namespace SolarCollectors {
                     Collector(CollectorNum).VentCavIndex = VentCavIndex;
                 }
 
-                Collector(CollectorNum).InletNode = GetOnlySingleNode(cAlphaArgs(6), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                                      NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-                Collector(CollectorNum).OutletNode = GetOnlySingleNode(cAlphaArgs(7), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                                       NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Collector(CollectorNum).InletNode = GetOnlySingleNode(
+                    cAlphaArgs(6), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Collector(CollectorNum).OutletNode = GetOnlySingleNode(
+                    cAlphaArgs(7), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
                     Collector(CollectorNum).VolFlowRateMax = rNumericArgs(1); // Max volumetric flow rate used for plant sizing calculation
@@ -733,29 +789,87 @@ namespace SolarCollectors {
                 }
 
                 // Setup report variables
-                SetupOutputVariable("Solar Collector Transmittance Absorptance Product", OutputProcessor::Unit::None,
-                                    Collector(CollectorNum).TauAlpha, "System", "Average", Collector(CollectorNum).Name);
-                SetupOutputVariable("Solar Collector Overall Top Heat Loss Coefficient", OutputProcessor::Unit::W_m2C,
-                                    Collector(CollectorNum).UTopLoss, "System", "Average", Collector(CollectorNum).Name);
-                SetupOutputVariable("Solar Collector Absorber Plate Temperature", OutputProcessor::Unit::C, Collector(CollectorNum).TempOfAbsPlate,
-                                    "System", "Average", Collector(CollectorNum).Name);
-                SetupOutputVariable("Solar Collector Storage Water Temperature", OutputProcessor::Unit::C, Collector(CollectorNum).TempOfWater,
-                                    "System", "Average", Collector(CollectorNum).Name);
-                SetupOutputVariable("Solar Collector Thermal Efficiency", OutputProcessor::Unit::None, Collector(CollectorNum).Efficiency, "System",
-                                    "Average", Collector(CollectorNum).Name);
-                SetupOutputVariable("Solar Collector Storage Heat Transfer Rate", OutputProcessor::Unit::W, Collector(CollectorNum).StoredHeatRate,
-                                    "System", "Average", Collector(CollectorNum).Name);
-                SetupOutputVariable("Solar Collector Storage Heat Transfer Energy", OutputProcessor::Unit::J,
-                                    Collector(CollectorNum).StoredHeatEnergy, "System", "Sum", Collector(CollectorNum).Name, _, "SolarWater",
-                                    "HeatProduced", _, "Plant");
-                SetupOutputVariable("Solar Collector Skin Heat Transfer Rate", OutputProcessor::Unit::W, Collector(CollectorNum).SkinHeatLossRate,
-                                    "System", "Average", Collector(CollectorNum).Name);
-                SetupOutputVariable("Solar Collector Skin Heat Transfer Energy", OutputProcessor::Unit::J, Collector(CollectorNum).CollHeatLossEnergy,
-                                    "System", "Sum", Collector(CollectorNum).Name, _, "SolarWater", "HeatProduced", _, "Plant");
-                SetupOutputVariable("Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, Collector(CollectorNum).HeatRate, "System",
-                                    "Average", Collector(CollectorNum).Name);
-                SetupOutputVariable("Solar Collector Heat Transfer Energy", OutputProcessor::Unit::J, Collector(CollectorNum).HeatEnergy, "System",
-                                    "Sum", Collector(CollectorNum).Name, _, "SolarWater", "HeatProduced", _, "Plant");
+                SetupOutputVariable("Solar Collector Transmittance Absorptance Product",
+                                    OutputProcessor::Unit::None,
+                                    Collector(CollectorNum).TauAlpha,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+                SetupOutputVariable("Solar Collector Overall Top Heat Loss Coefficient",
+                                    OutputProcessor::Unit::W_m2C,
+                                    Collector(CollectorNum).UTopLoss,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+                SetupOutputVariable("Solar Collector Absorber Plate Temperature",
+                                    OutputProcessor::Unit::C,
+                                    Collector(CollectorNum).TempOfAbsPlate,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+                SetupOutputVariable("Solar Collector Storage Water Temperature",
+                                    OutputProcessor::Unit::C,
+                                    Collector(CollectorNum).TempOfWater,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+                SetupOutputVariable("Solar Collector Thermal Efficiency",
+                                    OutputProcessor::Unit::None,
+                                    Collector(CollectorNum).Efficiency,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+                SetupOutputVariable("Solar Collector Storage Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    Collector(CollectorNum).StoredHeatRate,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+                SetupOutputVariable("Solar Collector Storage Heat Transfer Energy",
+                                    OutputProcessor::Unit::J,
+                                    Collector(CollectorNum).StoredHeatEnergy,
+                                    "System",
+                                    "Sum",
+                                    Collector(CollectorNum).Name,
+                                    _,
+                                    "SolarWater",
+                                    "HeatProduced",
+                                    _,
+                                    "Plant");
+                SetupOutputVariable("Solar Collector Skin Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    Collector(CollectorNum).SkinHeatLossRate,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+                SetupOutputVariable("Solar Collector Skin Heat Transfer Energy",
+                                    OutputProcessor::Unit::J,
+                                    Collector(CollectorNum).CollHeatLossEnergy,
+                                    "System",
+                                    "Sum",
+                                    Collector(CollectorNum).Name,
+                                    _,
+                                    "SolarWater",
+                                    "HeatProduced",
+                                    _,
+                                    "Plant");
+                SetupOutputVariable("Solar Collector Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    Collector(CollectorNum).HeatRate,
+                                    "System",
+                                    "Average",
+                                    Collector(CollectorNum).Name);
+                SetupOutputVariable("Solar Collector Heat Transfer Energy",
+                                    OutputProcessor::Unit::J,
+                                    Collector(CollectorNum).HeatEnergy,
+                                    "System",
+                                    "Sum",
+                                    Collector(CollectorNum).Name,
+                                    _,
+                                    "SolarWater",
+                                    "HeatProduced",
+                                    _,
+                                    "Plant");
 
                 TestCompSet(CurrentModuleObject, cAlphaArgs(1), cAlphaArgs(6), cAlphaArgs(7), "Water Nodes");
 
@@ -840,9 +954,17 @@ namespace SolarCollectors {
         if (SetLoopIndexFlag(CollectorNum)) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(Collector(CollectorNum).Name, Collector(CollectorNum).TypeNum,
-                                                        Collector(CollectorNum).WLoopNum, Collector(CollectorNum).WLoopSideNum,
-                                                        Collector(CollectorNum).WLoopBranchNum, Collector(CollectorNum).WLoopCompNum, _, _, _, _, _,
+                PlantUtilities::ScanPlantLoopsForObject(Collector(CollectorNum).Name,
+                                                        Collector(CollectorNum).TypeNum,
+                                                        Collector(CollectorNum).WLoopNum,
+                                                        Collector(CollectorNum).WLoopSideNum,
+                                                        Collector(CollectorNum).WLoopBranchNum,
+                                                        Collector(CollectorNum).WLoopCompNum,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
                                                         errFlag);
                 if (errFlag) {
                     ShowFatalError("InitSolarCollector: Program terminated due to previous condition(s).");
@@ -862,16 +984,24 @@ namespace SolarCollectors {
         if (BeginEnvrnFlag && Collector(CollectorNum).Init) {
             // Clear node initial conditions
             if (Collector(CollectorNum).VolFlowRateMax > 0) { // CR7425
-                rho = GetDensityGlycol(PlantLoop(Collector(CollectorNum).WLoopNum).FluidName, DataGlobals::InitConvTemp,
-                                       PlantLoop(Collector(CollectorNum).WLoopNum).FluidIndex, RoutineName);
+                rho = GetDensityGlycol(PlantLoop(Collector(CollectorNum).WLoopNum).FluidName,
+                                       DataGlobals::InitConvTemp,
+                                       PlantLoop(Collector(CollectorNum).WLoopNum).FluidIndex,
+                                       RoutineName);
 
                 Collector(CollectorNum).MassFlowRateMax = Collector(CollectorNum).VolFlowRateMax * rho;
             } else {                                                 // CR7425
                 Collector(CollectorNum).MassFlowRateMax = BigNumber; // CR7425
             }                                                        // CR7425
 
-            InitComponentNodes(0.0, Collector(CollectorNum).MassFlowRateMax, InletNode, OutletNode, Collector(CollectorNum).WLoopNum,
-                               Collector(CollectorNum).WLoopSideNum, Collector(CollectorNum).WLoopBranchNum, Collector(CollectorNum).WLoopCompNum);
+            InitComponentNodes(0.0,
+                               Collector(CollectorNum).MassFlowRateMax,
+                               InletNode,
+                               OutletNode,
+                               Collector(CollectorNum).WLoopNum,
+                               Collector(CollectorNum).WLoopSideNum,
+                               Collector(CollectorNum).WLoopBranchNum,
+                               Collector(CollectorNum).WLoopCompNum);
 
             Collector(CollectorNum).Init = false;
 
@@ -944,8 +1074,13 @@ namespace SolarCollectors {
         Collector(CollectorNum).MassFlowRate = Collector(CollectorNum).MassFlowRateMax;
 
         // Request the mass flow rate from the plant component flow utility routine
-        SetComponentFlowRate(Collector(CollectorNum).MassFlowRate, InletNode, OutletNode, Collector(CollectorNum).WLoopNum,
-                             Collector(CollectorNum).WLoopSideNum, Collector(CollectorNum).WLoopBranchNum, Collector(CollectorNum).WLoopCompNum);
+        SetComponentFlowRate(Collector(CollectorNum).MassFlowRate,
+                             InletNode,
+                             OutletNode,
+                             Collector(CollectorNum).WLoopNum,
+                             Collector(CollectorNum).WLoopSideNum,
+                             Collector(CollectorNum).WLoopBranchNum,
+                             Collector(CollectorNum).WLoopCompNum);
 
         if (Collector(CollectorNum).InitICS) {
 
@@ -1011,8 +1146,8 @@ namespace SolarCollectors {
         using DataHeatBalance::QRadSWOutIncidentGndDiffuse;
         using DataHeatBalance::QRadSWOutIncidentSkyDiffuse;
         using DataHeatBalance::TempConvergTol;
-        using DataPlant::PlantLoop;
         using DataPlant::ccSimPlantEquipTypes;
+        using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // Locals
@@ -1075,8 +1210,8 @@ namespace SolarCollectors {
 
         MassFlowRate = Collector(CollectorNum).MassFlowRate;
 
-        Cp = GetSpecificHeatGlycol(PlantLoop(Collector(CollectorNum).WLoopNum).FluidName, InletTemp,
-                                   PlantLoop(Collector(CollectorNum).WLoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(
+            PlantLoop(Collector(CollectorNum).WLoopNum).FluidName, InletTemp, PlantLoop(Collector(CollectorNum).WLoopNum).FluidIndex, RoutineName);
 
         Area = Surface(SurfNum).Area;
         mCpA = MassFlowRate * Cp / Area;
@@ -1179,7 +1314,9 @@ namespace SolarCollectors {
                     }
                     ShowRecurringSevereErrorAtEnd("CalcSolarCollector: " + ccSimPlantEquipTypes(Collector(CollectorNum).TypeNum) + "=\"" +
                                                       Collector(CollectorNum).Name + "\", coefficient error continues.",
-                                                  Collector(CollectorNum).ErrIndex, qEquation, qEquation);
+                                                  Collector(CollectorNum).ErrIndex,
+                                                  qEquation,
+                                                  qEquation);
                 }
                 if (FRULT == 0.0 || qEquation < 0.0) { // Linear, 1st order solution
                     OutletTemp = Surface(SurfNum).OutDryBulbTemp - FRTAN * IncidentAngleModifier * QRadSWOutIncident(SurfNum) / FRUL;
@@ -1313,10 +1450,10 @@ namespace SolarCollectors {
         using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
         using DataHeatBalance::CosIncidenceAngle;
         using DataHeatBalance::QRadSWOutIncident;
+        using DataHVACGlobals::SysTimeElapsed;
+        using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
@@ -1393,11 +1530,11 @@ namespace SolarCollectors {
 
         MassFlowRate = Collector(ColleNum).MassFlowRate;
 
-        Cpw = GetSpecificHeatGlycol(PlantLoop(Collector(ColleNum).WLoopNum).FluidName, InletTemp, PlantLoop(Collector(ColleNum).WLoopNum).FluidIndex,
-                                    RoutineName);
+        Cpw = GetSpecificHeatGlycol(
+            PlantLoop(Collector(ColleNum).WLoopNum).FluidName, InletTemp, PlantLoop(Collector(ColleNum).WLoopNum).FluidIndex, RoutineName);
 
-        Rhow = GetDensityGlycol(PlantLoop(Collector(ColleNum).WLoopNum).FluidName, InletTemp, PlantLoop(Collector(ColleNum).WLoopNum).FluidIndex,
-                                RoutineName);
+        Rhow = GetDensityGlycol(
+            PlantLoop(Collector(ColleNum).WLoopNum).FluidName, InletTemp, PlantLoop(Collector(ColleNum).WLoopNum).FluidIndex, RoutineName);
 
         // calculate heat transfer coefficients and covers temperature:
         CalcHeatTransCoeffAndCoverTemp(ColleNum);
@@ -1424,8 +1561,8 @@ namespace SolarCollectors {
         b2 = -(Area * (hConvCoefA2W + Collector(ColleNum).UbLoss + Collector(ColleNum).UsLoss) + MassFlowRate * Cpw) / aw;
         b3 = (Area * (Collector(ColleNum).UbLoss * TempOSCM + Collector(ColleNum).UsLoss * TempOutdoorAir) + MassFlowRate * Cpw * InletTemp) / aw;
 
-        ICSCollectorAnalyticalSoluton(ColleNum, SecInTimeStep, a1, a2, a3, b1, b2, b3, TempAbsPlateOld, TempWaterOld, TempAbsPlate, TempWater,
-                                      AbsPlateMassFlag);
+        ICSCollectorAnalyticalSoluton(
+            ColleNum, SecInTimeStep, a1, a2, a3, b1, b2, b3, TempAbsPlateOld, TempWaterOld, TempAbsPlate, TempWater, AbsPlateMassFlag);
 
         Collector(ColleNum).SkinHeatLossRate =
             Area * (Collector(ColleNum).UTopLoss * (TempOutdoorAir - TempAbsPlate) + Collector(ColleNum).UsLoss * (TempOutdoorAir - TempWater) +
@@ -1877,8 +2014,8 @@ namespace SolarCollectors {
                         tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
                         hRadCoefA2C = tempnom / tempdenom;
                         // Calc convection heat transfer coefficient:
-                        hConvCoefA2C = CalcConvCoeffBetweenPlates(TempAbsPlate, TempOuterCover, AirGapDepth, Collector(ColleNum).CosTilt,
-                                                                  Collector(ColleNum).SinTilt);
+                        hConvCoefA2C = CalcConvCoeffBetweenPlates(
+                            TempAbsPlate, TempOuterCover, AirGapDepth, Collector(ColleNum).CosTilt, Collector(ColleNum).SinTilt);
                     } else {
                         // calculate the linearized radiation coeff.
                         tempnom = StefanBoltzmann * ((TempInnerCover + KelvinConv) + (TempOuterCover + KelvinConv)) *
@@ -1886,8 +2023,8 @@ namespace SolarCollectors {
                         tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
                         hRadCoefC2C = tempnom / tempdenom;
                         // Calc convection heat transfer coefficient:
-                        hConvCoefC2C = CalcConvCoeffBetweenPlates(TempInnerCover, TempOuterCover, AirGapDepth, Collector(ColleNum).CosTilt,
-                                                                  Collector(ColleNum).SinTilt);
+                        hConvCoefC2C = CalcConvCoeffBetweenPlates(
+                            TempInnerCover, TempOuterCover, AirGapDepth, Collector(ColleNum).CosTilt, Collector(ColleNum).SinTilt);
                     }
                 }
             }
@@ -2017,8 +2154,10 @@ namespace SolarCollectors {
         int const NumOfPropDivisions(11);
         static Array1D<Real64> const Temps(NumOfPropDivisions,
                                            {-23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}); // Temperature, in C
-        static Array1D<Real64> const Mu(NumOfPropDivisions, {0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199,
-                                                             0.0000203, 0.0000208, 0.0000229}); // Viscosity, in kg/(m.s)
+        static Array1D<Real64> const Mu(
+            NumOfPropDivisions,
+            {0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229}); // Viscosity, in
+                                                                                                                                      // kg/(m.s)
         static Array1D<Real64> const Conductivity(
             NumOfPropDivisions, {0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331}); // Conductivity, in W/mK
         static Array1D<Real64> const Pr(
@@ -2251,8 +2390,10 @@ namespace SolarCollectors {
         SafeCopyPlantNode(InletNode, OutletNode);
         // Set outlet node variables that are possibly changed
         Node(OutletNode).Temp = Collector(CollectorNum).OutletTemp;
-        Cp = GetSpecificHeatGlycol(PlantLoop(Collector(CollectorNum).WLoopNum).FluidName, Collector(CollectorNum).OutletTemp,
-                                   PlantLoop(Collector(CollectorNum).WLoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(PlantLoop(Collector(CollectorNum).WLoopNum).FluidName,
+                                   Collector(CollectorNum).OutletTemp,
+                                   PlantLoop(Collector(CollectorNum).WLoopNum).FluidIndex,
+                                   RoutineName);
         Node(OutletNode).Enthalpy = Cp * Node(OutletNode).Temp;
     }
 
