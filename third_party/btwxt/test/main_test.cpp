@@ -40,4 +40,4 @@ int main(int argc, char **argv) {
   setMessageCallback(my_callback, my_context_ptr);
 
   return RUN_ALL_TESTS();
-};
+}

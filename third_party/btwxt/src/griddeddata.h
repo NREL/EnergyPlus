@@ -16,7 +16,7 @@ class GridAxis {
 public:
   GridAxis();
 
-  explicit GridAxis(std::vector<double> grid_vector, Method extrapolation_method = Method::CONSTANT,
+  GridAxis(std::vector<double> grid_vector, Method extrapolation_method = Method::CONSTANT,
                     Method interpolation_method = Method::LINEAR,
                     std::pair<double, double> extrapolation_limits = {-DBL_MAX, DBL_MAX});
 

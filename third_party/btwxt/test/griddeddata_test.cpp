@@ -16,7 +16,7 @@ using namespace Btwxt;
 TEST_F(OneDFixture, construct_from_vectors) {
   std::size_t ndims = test_gridded_data.get_ndims();
   EXPECT_EQ(ndims, 1u);
-};
+}
 
 TEST_F(TwoDFixture, construct_from_vectors) {
   std::size_t ndims = test_gridded_data.get_ndims();
@@ -24,7 +24,7 @@ TEST_F(TwoDFixture, construct_from_vectors) {
 
   std::size_t num_tables = test_gridded_data.get_num_tables();
   EXPECT_EQ(num_tables, 2u);
-};
+}
 
 TEST_F(TwoDFixture, construct_from_axes) {
   GridAxis ax0 = GridAxis(std::vector<double>({0, 10, 15}));
@@ -44,12 +44,12 @@ TEST_F(TwoDFixture, construct_from_axes) {
   EXPECT_EQ(test_gridded_data.get_ndims(), 2u);
   EXPECT_EQ(test_gridded_data.get_num_tables(), 2u);
   EXPECT_THAT(test_gridded_data.get_values(coords), testing::ElementsAre(8, 16));
-};
+}
 
 TEST_F(TwoDFixture, get_grid_vector) {
   std::vector<double> returned_vec = test_gridded_data.get_grid_vector(1);
   EXPECT_THAT(returned_vec, testing::ElementsAre(4, 6));
-};
+}
 
 TEST_F(TwoDFixture, get_values) {
   std::vector<std::size_t> coords = {0, 1};
@@ -59,7 +59,7 @@ TEST_F(TwoDFixture, get_values) {
   coords = {1, 0};
   returned_vec = test_gridded_data.get_values(coords);
   EXPECT_THAT(returned_vec, testing::ElementsAre(2, 4));
-};
+}
 
 TEST_F(TwoDFixture, get_values_relative) {
   std::vector<std::size_t> coords{0, 1};
@@ -125,4 +125,4 @@ TEST(GridAxis, bad_limits) {
                 "Setting to largest grid value (15).\n";
   EXPECT_STDOUT(my_grid_axis.set_extrap_limits(extrap_limits);, ExpectedOut);
   EXPECT_EQ(my_grid_axis.extrapolation_limits.second, 15);
-};
+}

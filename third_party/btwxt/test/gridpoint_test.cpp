@@ -38,7 +38,7 @@ TEST_F(TwoDFixture, grid_point_out_of_bounds) {
   std::vector<double> weights = grid_point.get_weights();
   std::vector<double> expected_weights{1.2, -0.5};
   EXPECT_EQ(weights, expected_weights);
-};
+}
 
 TEST_F(TwoDFixture, grid_point_consolidate_methods) {
   GridPoint grid_point(test_gridded_data, target);
@@ -52,7 +52,7 @@ TEST_F(TwoDFixture, grid_point_consolidate_methods) {
   methods = grid_point.get_methods();
   expected_methods = {Method::LINEAR, Method::CONSTANT};
   EXPECT_EQ(methods, expected_methods);
-};
+}
 
 TEST_F(TwoDFixture, grid_point_interp_coeffs) {
   GridPoint grid_point(test_gridded_data, target);
@@ -66,7 +66,7 @@ TEST_F(TwoDFixture, grid_point_interp_coeffs) {
 
   EXPECT_EQ(cubic_slope_coeffs[0][0], 0);
   EXPECT_EQ(cubic_slope_coeffs[1][1], 0);
-};
+}
 
 TEST_F(CubicFixture, grid_point_interp_coeffs) {
   GridPoint grid_point(test_gridded_data, target);
@@ -81,4 +81,4 @@ TEST_F(CubicFixture, grid_point_interp_coeffs) {
 
   EXPECT_EQ(cubic_slope_coeffs[0][0], (mu * mu * mu - 2 * mu * mu + mu)*test_gridded_data.get_axis_spacing_mult(0,0,floor));
   EXPECT_EQ(cubic_slope_coeffs[0][1], (mu * mu * mu - mu * mu)*test_gridded_data.get_axis_spacing_mult(0,1,floor));
-};
+}

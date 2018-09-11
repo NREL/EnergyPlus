@@ -21,7 +21,7 @@ TEST_F(TwoDFixture, construct_from_gridded_data) {
   std::size_t ndims = rgi_from_grid.get_ndims();
   EXPECT_EQ(ndims, 2u);
   Btwxt::LOG_LEVEL = 1;
-};
+}
 
 TEST_F(TwoDFixture, target_undefined) {
   std::vector<double> returned_target;
@@ -108,7 +108,7 @@ TEST_F(TwoDFixture, interpolate) {
   // Single value, fresh target
   d_result = test_rgi.get_value_at_target(another_target, 1);
   EXPECT_DOUBLE_EQ(d_result, 6.378);
-};
+}
 
 TEST_F(TwoDFixture, extrapolate) {
   // axis1 is designated constant extrapolation
@@ -124,7 +124,7 @@ TEST_F(TwoDFixture, extrapolate) {
   result = test_rgi(lin_extr_target);
   EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(1.8), testing::DoubleEq(3.6)));
   Btwxt::LOG_LEVEL = 1;
-};
+}
 
 TEST_F(TwoDFixture, invalid_inputs) {
   // we expect two errors that the value table inputs do not match the grid
@@ -138,7 +138,7 @@ TEST_F(TwoDFixture, invalid_inputs) {
   EXPECT_THROW(test_rgi.set_new_target(short_target);, std::invalid_argument);
   std::vector<double> long_target = {1, 2, 3};
   EXPECT_THROW(test_rgi.set_new_target(long_target);, std::invalid_argument);
-};
+}
 
 TEST_F(OneDFixture, cubic_interpolate) {
   Btwxt::LOG_LEVEL = 0;
