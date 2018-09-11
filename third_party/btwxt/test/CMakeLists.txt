@@ -1,6 +1,6 @@
 # Test Executable
 
-include_directories("../src"
+include_directories("${btwxt_SOURCE_DIR}/src"
                     "${gtest_SOURCE_DIR}/include")
 
 set(library_sources
