@@ -3220,7 +3220,6 @@ namespace CurveManager {
 
                         gridAxes.emplace_back(axis, extrapMethod, interpMethod, std::pair<double, double> {min_val, max_val});
 
-                        // TODO: Check normalization across all IVs
                     } else {
                         // Independent variable does not exist
                         ShowSevereError("Table:IndependentVariableList: No Table:IndependentVariable found for " + indVarName + ".");
