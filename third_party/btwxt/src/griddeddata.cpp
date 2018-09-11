@@ -246,6 +246,36 @@ void GriddedData::normalize_value_table(std::size_t table_num, double scalar) {
                  std::bind(std::multiplies<double>(), std::placeholders::_1, scalar));
 }
 
+std::string GriddedData::write_data() {
+  std::vector<std::size_t> indices(ndims,0);
+  std::stringstream output("");
+
+  for (std::size_t dim=0; dim < ndims; ++dim) {
+    output << "Axis " << dim + 1 << ",";
+  }
+  for (std::size_t tab=0; tab < num_tables; ++tab) {
+    output << "Value " << tab + 1 << ",";
+  }
+  output << std::endl;
+  for (std::size_t index=0; index < num_values; ++index) {
+    for (std::size_t dim=0; dim < ndims; ++dim) {
+      output << grid_axes[dim].grid[indices[dim]] << ",";
+    }
+    for (std::size_t tab=0; tab < num_tables; ++tab) {
+      output << value_tables[tab][index] << ",";
+    }
+    output << std::endl;
+    ++indices[ndims - 1];
+    for (std::size_t dim= ndims - 1; dim > 0; --dim) {
+      if (indices[dim] >= dimension_lengths[dim]) {
+        ++indices[dim - 1];
+        indices[dim] = 0;
+      }
+    }
+  }
+  return output.str();
+}
+
 // free functions
 bool free_check_sorted(std::vector<double> my_vec) {
   // ensures that the grid vector is strictly ascending

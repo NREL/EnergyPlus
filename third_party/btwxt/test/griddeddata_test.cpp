@@ -26,6 +26,18 @@ TEST_F(TwoDFixture, construct_from_vectors) {
   EXPECT_EQ(num_tables, 2u);
 }
 
+TEST_F(TwoDFixture, write_data) {
+  EXPECT_EQ("Axis 1,Axis 2,Value 1,Value 2,\n"
+               "0,4,6,12,\n"
+               "0,6,3,6,\n"
+               "10,4,2,4,\n"
+               "10,6,8,16,\n"
+               "15,4,4,8,\n"
+               "15,6,2,4,\n",
+               test_gridded_data.write_data());
+}
+
+
 TEST_F(TwoDFixture, construct_from_axes) {
   GridAxis ax0 = GridAxis(std::vector<double>({0, 10, 15}));
   GridAxis ax1 = GridAxis(std::vector<double>({4, 6}));

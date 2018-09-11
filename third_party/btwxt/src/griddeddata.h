@@ -90,6 +90,8 @@ public:
 
   void set_axis_interp_method(const std::size_t &dim, Method);
 
+  std::string write_data();
+
   std::vector<std::vector<double>> value_tables;
   std::size_t num_values;
   std::size_t num_tables;
