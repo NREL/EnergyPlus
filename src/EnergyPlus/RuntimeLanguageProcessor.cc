@@ -2717,7 +2717,6 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DataGlobals::TimeStepZone;
         using DataHeatBalance::Construct;
         using General::TrimSigDigits;
@@ -2796,6 +2795,10 @@ namespace RuntimeLanguageProcessor {
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
+            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            MaxNumNumbers = max(MaxNumNumbers, NumNums);
+            MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
+            cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
             inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);

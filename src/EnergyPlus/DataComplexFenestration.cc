@@ -66,11 +66,12 @@ namespace DataComplexFenestration {
 
     // Data
     // Parameters for complex shade
-    int const csVenetian(1);
+    int const csVenetianHorizontal(1);
     int const csWoven(2);
     int const csPerforated(3);
     int const csOtherShadingType(4);
     int const csBSDF(5);
+    int const csVenetianVertical(6);
 
     // Parameters for gas definitions
     int const GasCoeffsCustom(0);

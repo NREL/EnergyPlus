@@ -309,6 +309,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
 
     int curSysNum = 0;
     int curZoneEqNum = 2;
+    int curOASysNum = 0;
     DataZoneEquipment::ZoneEquipList.allocate(3);
     DataZoneEquipment::ZoneEquipList(curZoneEqNum).NumOfEquipTypes = 2;
     DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipName.allocate(2);
@@ -348,9 +349,21 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     Real64 RatedCoilEff = 0.8;
 
     // First without setting coil inlet/outlet conditions
-    coilSelectionReportObj->setRatedCoilConditions(coil1Name, coil1Type, RatedCoilTotCap, RatedCoilSensCap, RatedAirMassFlow, RatedCoilInDb,
-                                                   RatedCoilInHumRat, RatedCoilInWb, RatedCoilOutDb, RatedCoilOutHumRat, RatedCoilOutWb,
-                                                   RatedCoilOadbRef, RatedCoilOawbRef, RatedCoilBpFactor, RatedCoilEff);
+    coilSelectionReportObj->setRatedCoilConditions(coil1Name,
+                                                   coil1Type,
+                                                   RatedCoilTotCap,
+                                                   RatedCoilSensCap,
+                                                   RatedAirMassFlow,
+                                                   RatedCoilInDb,
+                                                   RatedCoilInHumRat,
+                                                   RatedCoilInWb,
+                                                   RatedCoilOutDb,
+                                                   RatedCoilOutHumRat,
+                                                   RatedCoilOutWb,
+                                                   RatedCoilOadbRef,
+                                                   RatedCoilOawbRef,
+                                                   RatedCoilBpFactor,
+                                                   RatedCoilEff);
 
     EXPECT_EQ(RatedCoilTotCap, c1->coilRatedTotCap);
     EXPECT_EQ(RatedCoilSensCap, c1->coilRatedSensCap);
@@ -373,9 +386,21 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     RatedCoilInHumRat = 0.008;
     RatedCoilOutDb = 40.0;
     RatedCoilOutHumRat = 0.009;
-    coilSelectionReportObj->setRatedCoilConditions(coil1Name, coil1Type, RatedCoilTotCap, RatedCoilSensCap, RatedAirMassFlow, RatedCoilInDb,
-                                                   RatedCoilInHumRat, RatedCoilInWb, RatedCoilOutDb, RatedCoilOutHumRat, RatedCoilOutWb,
-                                                   RatedCoilOadbRef, RatedCoilOawbRef, RatedCoilBpFactor, RatedCoilEff);
+    coilSelectionReportObj->setRatedCoilConditions(coil1Name,
+                                                   coil1Type,
+                                                   RatedCoilTotCap,
+                                                   RatedCoilSensCap,
+                                                   RatedAirMassFlow,
+                                                   RatedCoilInDb,
+                                                   RatedCoilInHumRat,
+                                                   RatedCoilInWb,
+                                                   RatedCoilOutDb,
+                                                   RatedCoilOutHumRat,
+                                                   RatedCoilOutWb,
+                                                   RatedCoilOadbRef,
+                                                   RatedCoilOawbRef,
+                                                   RatedCoilBpFactor,
+                                                   RatedCoilEff);
     EXPECT_EQ(RatedCoilInDb, c1->ratedCoilInDb);
     EXPECT_EQ(RatedCoilInHumRat, c1->ratedCoilInHumRat);
     EXPECT_NEAR(43460.9, c1->ratedCoilInEnth, 0.1);
@@ -426,4 +451,76 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
 
     // Exercise report writing again
     coilSelectionReportObj->finishCoilSummaryReportTable();
+
+    // Test coil reporting
+    curZoneEqNum = 1;
+    DataSizing::ZoneEqSizing.allocate(1);
+    DataSizing::TermUnitFinalZoneSizing.allocate(1);
+    DataSizing::CurTermUnitSizingNum = curZoneEqNum;
+    DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInTempTU = RatedCoilInDb;
+    DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInHumRatTU = RatedCoilInHumRat;
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
+    DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ZoneName = DataHeatBalance::Zone(1).Name;
+    DataSizing::FinalZoneSizing.allocate(1);
+    DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay = "Heat Design Day";
+    DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatLoad = RatedCoilSensCap;
+    DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak = RatedCoilOutDb;
+    DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak = RatedCoilOutHumRat;
+    DataSizing::FinalZoneSizing(curZoneEqNum).ZoneRetTempAtHeatPeak = 21.6;
+    DataSizing::FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak = 0.007;
+    DataSizing::FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak = 21.0;
+    DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesTemp = 30.0;
+    DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesHumRat = 0.007;
+
+    Real64 fanHeatGain = 1.3;
+    Real64 coilCapFunTempFac = 1.0;
+    Real64 DXFlowPerCapMinRatio = 0.00004;
+    Real64 DXFlowPerCapMaxRatio = 0.00006;
+    DataEnvironment::StdRhoAir = 1.2;
+    DataSizing::DataFlowUsedForSizing = airFlowRate / DataEnvironment::StdRhoAir;
+
+    // setCoilHeatingCapacity will not overwrite previously set temperature data
+    coilSelectionReportObj->setCoilHeatingCapacity(coil1Name,
+                                                   coil1Type,
+                                                   RatedCoilTotCap,
+                                                   false,
+                                                   curSysNum,
+                                                   curZoneEqNum,
+                                                   curOASysNum,
+                                                   fanHeatGain,
+                                                   coilCapFunTempFac,
+                                                   DXFlowPerCapMinRatio,
+                                                   DXFlowPerCapMaxRatio);
+    EXPECT_EQ(entAirDryBulbTemp, c1->coilDesEntTemp);
+
+    entAirDryBulbTemp = 21.0; // change coil entering air temp
+    coilSelectionReportObj->setCoilEntAirTemp(coil1Name, coil1Type, entAirDryBulbTemp, curSysNum, curZoneEqNum);
+    lvgAirDryBulbTemp = 30.0;
+    coilSelectionReportObj->setCoilLvgAirTemp(coil1Name, coil1Type, lvgAirDryBulbTemp);
+    EXPECT_EQ(entAirDryBulbTemp, c1->coilDesEntTemp);
+    EXPECT_EQ(lvgAirDryBulbTemp, c1->coilDesLvgTemp);
+
+    DataSizing::TermUnitSingDuct = true;
+    // now reset entering/leaving air temps so that setCoilHeatingCapacity will initialize any uninitialized temperature data
+    // for example if a non-water coil is used in a terminal unit and setCoilEntAirTemp is not called
+    c1->coilDesEntTemp = -999.0;
+    c1->coilDesEntHumRat = -999.0;
+    c1->coilDesLvgTemp = -999.0;
+    c1->coilDesLvgHumRat = -999.0;
+    coilSelectionReportObj->setCoilHeatingCapacity(coil1Name,
+                                                   coil1Type,
+                                                   RatedCoilTotCap,
+                                                   false,
+                                                   curSysNum,
+                                                   curZoneEqNum,
+                                                   curOASysNum,
+                                                   fanHeatGain,
+                                                   coilCapFunTempFac,
+                                                   DXFlowPerCapMinRatio,
+                                                   DXFlowPerCapMaxRatio);
+    EXPECT_EQ(RatedCoilInDb, c1->coilDesEntTemp);
+    EXPECT_EQ(RatedCoilInHumRat, c1->coilDesEntHumRat);
+    EXPECT_EQ(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesTemp, c1->coilDesLvgTemp);
+    EXPECT_EQ(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesHumRat, c1->coilDesLvgHumRat);
 }

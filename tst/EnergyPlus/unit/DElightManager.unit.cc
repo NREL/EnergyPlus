@@ -238,7 +238,6 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
         "    Zn001:Wall001,           !- Building Surface Name                                                             ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    0.5000000,               !- View Factor to Ground                                                             ",
-        "    ,                        !- Shading Control Name                                                              ",
         "    ,                        !- Frame and Divider Name                                                            ",
         "    1.0,                     !- Multiplier                                                                        ",
         "    4,                       !- Number of Vertices                                                                ",
@@ -341,7 +340,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
     InternalHeatGains::GetInternalHeatGainsInput();
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;

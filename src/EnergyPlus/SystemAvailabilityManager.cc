@@ -4137,7 +4137,6 @@ namespace SystemAvailabilityManager {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::GetCurveType;
         using DataContaminantBalance::Contaminant;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4399,18 +4398,13 @@ namespace SystemAvailabilityManager {
                         ErrorsFound = true;
                     }
                     // Check curve type
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS));
-
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                        } else if (SELECT_CASE_var == "LINEAR") {
-
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
-                            ShowContinueError("Illegal curve type for " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        cCurrentModuleObject,            // Object Type
+                        HybridVentSysAvailMgrData(SysAvailNum).Name,     // Object Name
+                        cAlphaFieldNames(7));    // Field Name
                 }
             }
 

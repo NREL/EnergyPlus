@@ -3,7 +3,7 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     anyplace Load Calc,      !- Name
@@ -27,8 +27,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     ,                        !- Day of Week for Start Day
     ,                        !- Use Weather File Holidays and Special Days
     ,                        !- Use Weather File Daylight Saving Period

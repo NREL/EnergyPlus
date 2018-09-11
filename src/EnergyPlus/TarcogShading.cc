@@ -1081,8 +1081,22 @@ namespace TarcogShading {
     )
     {
         for (int i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) == VENETBLIND) {
-                double slatAngRad = SlatAngle(i) * 2 * DataGlobals::Pi / 360;
+            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
+                const Real64 slatAngRad = SlatAngle(i) * 2 * DataGlobals::Pi / 360;
+                Real64 C1_VENET(0);
+                Real64 C2_VENET(0);
+                Real64 C3_VENET(0);
+
+                if (LayerType(i) == VENETBLIND_HORIZ) {
+                    C1_VENET = C1_VENET_HORIZONTAL;
+                    C2_VENET = C2_VENET_HORIZONTAL;
+                    C3_VENET = C3_VENET_HORIZONTAL;
+                }
+                if (LayerType(i) == VENETBLIND_VERT) {
+                    C1_VENET = C1_VENET_VERTICAL;
+                    C2_VENET = C2_VENET_VERTICAL;
+                    C3_VENET = C3_VENET_VERTICAL;
+                }
                 Ah_eff(i) = width * height * C1_VENET * pow((Ah(i) / (width * height)) * pow(cos(slatAngRad), C2_VENET), C3_VENET);
                 Al_eff(i) = 0.0;
                 Ar_eff(i) = 0.0;
