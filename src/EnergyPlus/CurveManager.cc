@@ -3169,6 +3169,13 @@ namespace CurveManager {
                         // If found, read data
                         auto const &indVarInstance = btwxtManager.independentVarRefs.at(indVarName);
 
+                        if (indVarInstance.count("unit_type")) {
+                            auto unitType = indVarInstance.at("unit_type");
+                            if (!IsCurveOutputTypeValid(unitType)) {
+                                ShowSevereError(contextString + "Unit Type [" + unitType + "] is invalid");
+                            }
+                        }
+
                         std::vector<double> axis;
                         for (auto value : indVarInstance.at("values")) {
                             axis.push_back(value.at("value"));
@@ -3248,6 +3255,13 @@ namespace CurveManager {
 
                 std::string contextString = "Table:Lookup \"" + PerfCurve(CurveNum).Name + "\"";
                 Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
+
+                if (fields.count("output_unit_type")) {
+                    auto unitType = fields.at("output_unit_type");
+                    if (!IsCurveOutputTypeValid(unitType)) {
+                        ShowSevereError(contextString + "Output Unit Type [" + unitType + "] is invalid");
+                    }
+                }
 
                 int gridIndex = btwxtManager.getGridIndex(indVarListName, ErrorsFound);
                 PerfCurve(CurveNum).TableIndex = gridIndex;
