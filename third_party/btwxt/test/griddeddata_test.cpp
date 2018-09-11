@@ -106,7 +106,7 @@ TEST(GridAxis, calc_spacing_multipliers) {
   auto extrapolation_method{Method::CONSTANT};
   auto interpolation_method{Method::CUBIC};
 
-  GridAxis test_gridaxis(grid_vector, extrapolation_method, interpolation_method);
+  GridAxis test_gridaxis(grid_vector, extrapolation_method, interpolation_method, {-DBL_MAX, DBL_MAX});
   std::vector<std::vector<double>> values = test_gridaxis.spacing_multipliers;
   EXPECT_THAT(values[0], testing::ElementsAre(1, 5.0 / 9, 0.5, 2.0 / 7));
   EXPECT_THAT(values[1], testing::ElementsAre(4.0 / 9, 0.5, 5.0 / 7, 1));
