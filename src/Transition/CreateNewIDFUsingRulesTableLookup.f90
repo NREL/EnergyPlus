@@ -451,10 +451,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 PArgs = 10 + NumIndVarsVals(1)
                 CALL GetNewObjectDefInIDD('TABLE:INDEPENDENTVARIABLE',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
                 POutArgs(1) = TRIM(InArgs(1))//'_IndependentVariable1'
-                IF (SameString(InArgs(2),"LINEARINTERPOLATIONOFTABLE")) THEN
+                IF (SameString(InArgs(3),"LINEARINTERPOLATIONOFTABLE")) THEN
                   POutArgs(2) = "Linear"
                   POutArgs(3) = "Constant"
-                ELSEIF (SameString(InArgs(2),"LAGRANGEINTERPOLATIONLINEAREXTRAPOLATION")) THEN
+                ELSEIF (SameString(InArgs(3),"LAGRANGEINTERPOLATIONLINEAREXTRAPOLATION")) THEN
                   POutArgs(2) = "Cubic"
                   POutArgs(3) = "Linear"
                 ELSE
@@ -538,10 +538,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   PArgs = 10 + NumIndVarsVals(iPt)
                   CALL GetNewObjectDefInIDD('TABLE:INDEPENDENTVARIABLE',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
                   POutArgs(1) = TRIM(InArgs(1))//'_IndependentVariable'//RoundSigDigits(iPt)
-                  IF (SameString(InArgs(2),"LINEARINTERPOLATIONOFTABLE")) THEN
+                  IF (SameString(InArgs(3),"LINEARINTERPOLATIONOFTABLE")) THEN
                     POutArgs(2) = "Linear"
                     POutArgs(3) = "Constant"
-                  ELSEIF (SameString(InArgs(2),"LAGRANGEINTERPOLATIONLINEAREXTRAPOLATION")) THEN
+                  ELSEIF (SameString(InArgs(3),"LAGRANGEINTERPOLATIONLINEAREXTRAPOLATION")) THEN
                     POutArgs(2) = "Cubic"
                     POutArgs(3) = "Linear"
                   ELSE
