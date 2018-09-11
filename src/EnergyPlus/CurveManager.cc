@@ -3169,10 +3169,11 @@ namespace CurveManager {
                         // If found, read data
                         auto const &indVarInstance = btwxtManager.independentVarRefs.at(indVarName);
 
+                        // TODO: Actually use this to define output variable units
                         if (indVarInstance.count("unit_type")) {
                             auto unitType = indVarInstance.at("unit_type");
                             if (!IsCurveOutputTypeValid(unitType)) {
-                                ShowSevereError(contextString + "Unit Type [" + unitType + "] is invalid");
+                                ShowSevereError(contextString + ": Unit Type [" + unitType + "] is invalid");
                             }
                         }
 
@@ -3256,10 +3257,11 @@ namespace CurveManager {
                 std::string contextString = "Table:Lookup \"" + PerfCurve(CurveNum).Name + "\"";
                 Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
 
+                // TODO: Actually use this to define output variable units
                 if (fields.count("output_unit_type")) {
                     auto unitType = fields.at("output_unit_type");
                     if (!IsCurveOutputTypeValid(unitType)) {
-                        ShowSevereError(contextString + "Output Unit Type [" + unitType + "] is invalid");
+                        ShowSevereError(contextString + ": Output Unit Type [" + unitType + "] is invalid");
                     }
                 }
 
@@ -3346,7 +3348,10 @@ namespace CurveManager {
                   }
                 }
                 if (pointsSpecified && pointsUnspecified) {
-                  //error
+                    ShowSevereError(contextString + ": Table is to be normalized, but not all independent variables define a normalization value. Make sure either:");
+                    ShowContinueError("  a) a normalization value is defined for each independent variable, or");
+                    ShowContinueError("  b) no normalization values are defined (to use the Table:Lookup normalization value).");
+                    ErrorsFound = true;
                 } else if (pointsSpecified) {
                     btwxtManager.normalizeGridValues(gridIndex,PerfCurve(CurveNum).GridValueIndex,normalizeTarget);
                 }
