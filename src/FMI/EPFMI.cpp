@@ -141,14 +141,16 @@ unsigned int instantiate(const char *input,
   for ( size_t i = 0; i < nPar; ++i ) {
   }
 
-  const int argc = 6;
+  const int argc = 8;
   const char * argv[argc];
   argv[0] = "energyplus";
-  argv[1] = "-w";
-  argv[2] = weather;
-  argv[3] = "-i";
-  argv[4] = idd;
-  argv[5] = input;
+  argv[1] = "-d";
+  argv[2] = instanceName;
+  argv[3] = "-w";
+  argv[4] = weather;
+  argv[5] = "-i";
+  argv[6] = idd;
+  argv[7] = input;
 
 	EnergyPlus::CommandLineInterface::ProcessArgs( argc, argv );
 

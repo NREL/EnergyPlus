@@ -28,6 +28,7 @@ add_library( epfmi SHARED ${src} )
 target_link_libraries( epfmi energypluslib )
 
 add_executable( libfmi_test Test/EPFMI_DLL_TEST.c )
+add_dependencies( libfmi_test epfmi )
 
 set(test_src
   Test/EPFMI_Test.cpp

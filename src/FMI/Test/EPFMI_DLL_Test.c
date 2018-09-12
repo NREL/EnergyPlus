@@ -106,7 +106,7 @@ int loadLib(const char* libPath, FMU *fmu) {
 		return -1;
 	}
 #else
-	h = dlopen(libPath, RTLD_LAZY);
+	h = dlopen(libPath, RTLD_PRIVATE);
 	if (!h) {
 		printf("****** Unable to load the "
     "EnergyPlus functions library with path %s ****** \n",
@@ -164,9 +164,9 @@ int main(){
   char msg[500];
   //FMUZone* zone = (FMUZone*) object;
   FMU* fmu;
-	//FMU* fmu2;
+	FMU* fmu2;
   fmu = (FMU*)malloc(sizeof(FMU));
-	//fmu2 = (FMU*)malloc(sizeof(FMU*));
+	fmu2 = (FMU*)malloc(sizeof(FMU));
   int retVal;
 
 	const char * inputNames[] = {"Attic,T", "Core_ZN,T", "Perimeter_ZN_1,T", "Perimeter_ZN_2,T", "Perimeter_ZN_3,T", "Perimeter_ZN_4,T"};
@@ -196,15 +196,15 @@ int main(){
 	if (retVal  < 0) {
 		 printf("There was an error loading the EnergyPlus library\n");
 		}
-	//retVal = loadLib(eplib, fmu2);
-  //if (retVal  < 0) {
-  //   printf("There was an error loading the EnergyPlus library\n");
-  //  }
+	retVal = loadLib(fmulib, fmu2);
+  if (retVal  < 0) {
+     printf("There was an error loading the EnergyPlus library\n");
+    }
   printf("Initializing library \n");
   int result = fmu->instantiate(input, // input
                            weather, // weather
                            idd, // idd
-                           "Alpha", // instanceName
+                           "office", // instanceName
                            NULL, // parameterNames
                            NULL, // parameterValueReferences[]
                            0, // nPar
@@ -216,20 +216,20 @@ int main(){
                            24, // nOut
                            NULL); //log);
 
-	 // result = fmu2->instantiate(input2, // input
-	 //                           weather, // weather
-	 //                           idd, // idd
-	 //                           "Alpha", // instanceName
-	 //                           NULL, // parameterNames
-	 //                           NULL, // parameterValueReferences[]
-	 //                           0, // nPar
-	 //                           inputNames, // inputNames
-	 //                           inputValueReferences, // inputValueReferences[]
-	 //                           6, // nInp
-	 //                           outputNames, // outputNames
-	 //                           outputValueReferences, // outputValueReferences[]
-	 //                           24, // nOut
-	 //                           NULL); //log);
+	 result = fmu2->instantiate(input2, // input
+	                           weather, // weather
+	                           idd, // idd
+	                           "hotel", // instanceName
+	                           NULL, // parameterNames
+	                           NULL, // parameterValueReferences[]
+	                           0, // nPar
+	                           inputNames, // inputNames
+	                           inputValueReferences, // inputValueReferences[]
+	                           6, // nInp
+	                           outputNames, // outputNames
+	                           outputValueReferences, // outputValueReferences[]
+	                           24, // nOut
+	                           NULL); //log);
 
   double tStart = 0.0;
   int stopTimeDefined = 1;
@@ -238,25 +238,25 @@ int main(){
 	const unsigned int outputRefs[] = {6};
 	double inputs[] = {21.0, 21.0,21.0, 21.0, 21.0, 21.0};
 	const unsigned int inputRefs[] = {0, 1, 2, 3, 4, 5};
-  //fmi2EventInfo eventInfo;
+  fmi2EventInfo eventInfo;
 
   printf("Ready to setup experiment the FMU library \n");
   result = fmu->setupExperiment(tStart, 1, NULL);
 	printf("Done setting up experiment the FMU library \n");
   double time = tStart;
 
-  //while ( time < tEnd ) {
-	//	fmu->setTime(time, NULL);
+  while ( time < tEnd ) {
+		fmu->setTime(time, NULL);
 
-  //  result = fmu->getNextEventTime(&eventInfo, NULL);
-  //  result = fmu->setVariables(inputRefs, inputs, 6, NULL);
-  //  result = fmu->getVariables(outputRefs, outputs, 1, NULL);
-  //  printf("At time %f the output of name %s is %f\n.", time, outputNames[0], outputs[0]);
-  //  //snprintf(msg, 500, "The output of value is is %f\n.", outputs[2]);
-  //  //printf(msg);
-  //  time = time + 600;
-	//	printf("This is the time %f\n", time);
-  //}
+    result = fmu->getNextEventTime(&eventInfo, NULL);
+    result = fmu->setVariables(inputRefs, inputs, 6, NULL);
+    result = fmu->getVariables(outputRefs, outputs, 1, NULL);
+    printf("At time %f the output of name %s is %f\n.", time, outputNames[0], outputs[0]);
+    //snprintf(msg, 500, "The output of value is is %f\n.", outputs[2]);
+    //printf(msg);
+    time = time + 600;
+		printf("This is the time %f\n", time);
+  }
 	printf("Done running code in the loop\n");
   return 0;
 }
