@@ -299,6 +299,9 @@ namespace Boilers {
             ErrorsFound = true;
         }
 
+        // Check if we need to get the input
+        if (!GetBoilerInputFlag) return;
+
         // See if load distribution manager has already gotten the input
         if (allocated(Boiler)) return;
 
