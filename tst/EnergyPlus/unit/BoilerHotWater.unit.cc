@@ -64,6 +64,7 @@ using EnergyPlus::DataPlant::PlantLoop;
 using EnergyPlus::DataPlant::PlantFirstSizesOkayToFinalize;
 using EnergyPlus::DataSizing::AutoSize;
 using EnergyPlus::DataSizing::PlantSizData;
+using EnergyPlus::DataGlobals::HWInitConvTemp;
 
 using EnergyPlus::FluidProperties::GetDensityGlycol;
 using EnergyPlus::FluidProperties::GetSpecificHeatGlycol;
@@ -143,7 +144,7 @@ TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenRequired)
     EXPECT_NEAR(Boiler(1).getDesignVolumeFlowRate(), 1.2, 0.000001);
     EXPECT_NEAR(Boiler(1).getDesignNominalCapacity(), 49376304.0, 1.0);
 }
-TEST_F(BoilerSizingFixture, BoilerHotWaterAutoSizeTempTest)
+TEST_F(BoilerSizingFixture, BoilerHotWaterSizingTemperatureTest)
 {
     // unit test for checking hot water temperature for autosizing
     // boiler nominal capacity in Boiler:HotWater
@@ -156,13 +157,13 @@ TEST_F(BoilerSizingFixture, BoilerHotWaterAutoSizeTempTest)
 
     // calculate nominal capacity at 60.0 C hot water temperature
     Real64 rho = GetDensityGlycol(PlantLoop(1).FluidName,
-                                  60.0,
+                                  HWInitConvTemp,
                                   PlantLoop(1).FluidIndex,
-                                  "Boiler_HotWaterAutoSizeTempTest");
+                                  "BoilerHotWaterSizingTemperatureTest");
     Real64 Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName,
-                                      60.0,
+                                      HWInitConvTemp,
                                       PlantLoop(1).FluidIndex,
-                                      "Boiler_HotWaterAutoSizeTempTest");
+                                      "BoilerHotWaterSizingTemperatureTest");
 
     Boiler(1).getSizingFactor(sizingFactor);
 
