@@ -115,11 +115,16 @@ namespace Boilers {
         }
 
         std::string Name; // user identifier
-
-        // Operational fault parameters
-        bool FaultyBoilerFoulingFlag;     // True if the boiler has fouling fault
-        int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
-        Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
+        Real64 m_operatingLoad;                                         // W - Boiler Load
+        Real64 m_operatingHeatingEnergy;                                // J - Boiler energy integrated over time
+        Real64 m_operatingParasiticElectricalPower;                     // W - Parasitic electrical power (e.g. forced draft fan)
+        Real64 m_operatingParasiticElectricalConsumption;               // J - Parasitic Electrical Consumption (e.g. forced draft fan)
+        Real64 m_operatingMassFlowRate;                                 // kg/s - Boiler mass flow rate
+        Real64 m_operatingInletTemperature;                             // C - Boiler inlet temperature
+        Real64 m_operatingOutletTemperature;                            // C - Boiler outlet temperature
+        Real64 m_operatingPartLoadRatio;                                // Boiler operating part-load ratio
+        Real64 m_operatingFuelUseRate;                                  // W - Boiler fuel used
+        Real64 m_operatingFuelUse;                                      // J - Boiler Fuel consumed integrated over time
 
         // member functions
         static PlantComponent *factory(std::string objectName);
@@ -142,9 +147,12 @@ namespace Boilers {
         // public getters/setters
         Real64 getDesignNominalCapacity();
         Real64 getDesignVolumeFlowRate();
+        Real64 getFaultyBoilerFoulingFactor();
 
         void setDesignNominalCapacity(Real64 const capacity);
         void setDesignVolumeFlowRate(Real64 const flowRate);
+
+        void setFaultyBoilerFoulingFactorIndex(Real64 const index);
 
         // set the sizing factor for the boiler, if sizingFactor <= 0.0, it is set to 1.0
         void setDesignSizingFactor(Real64 const sizingFactor);
@@ -156,19 +164,18 @@ namespace Boilers {
 
         // Default Constructor
         BoilerObject()
-            : FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), m_fuelType(0), m_boilerTypeEnumerator(0),
-              m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_designNominalCapacity(0.0),
-              m_designNominalCapacityWasAutoSized(false), m_designEfficiency(0.0), m_designFlowMode(FlowModeType::Default),
-              m_outletSetpointMissingError(false), m_outletSetpointMissingErrorDone(false), m_designVolumeFlowRate(0.0),
-              m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0), m_designSizingFactor(0.0), m_nodeHotWaterInletIndex(0),
-              m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0), m_designMaxPartLoadRatio(0.0), m_designOptimalPartLoadRatio(0.0),
-              m_efficiencyCurveTemperatureMode(TemperatureEvaluationModeType::Default), m_curveEfficiencyIndex(0),
+            : m_fuelType(0), m_boilerTypeEnumerator(0), m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0),
+              m_designNominalCapacity(0.0), m_designNominalCapacityWasAutoSized(false), m_designEfficiency(0.0),
+              m_designFlowMode(FlowModeType::Default), m_outletSetpointMissingError(false), m_outletSetpointMissingErrorDone(false),
+              m_designVolumeFlowRate(0.0), m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0), m_designSizingFactor(0.0),
+              m_nodeHotWaterInletIndex(0), m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0), m_designMaxPartLoadRatio(0.0),
+              m_designOptimalPartLoadRatio(0.0), m_efficiencyCurveTemperatureMode(TemperatureEvaluationModeType::Default), m_curveEfficiencyIndex(0),
               m_efficiencyCurveType(EfficiencyCurveType::Default), m_designOutletTemperatureLimit(0.0), m_designParasiticElectricalLoad(0.0),
               m_efficiencyCurveOutputError(0), m_efficiencyCurveOutputErrorIndex(0), m_calculatedEfficiencyError(0),
-              m_calculatedEfficiencyErrorIndex(0), m_doOneTimeInitialisation(true), m_doEnvironmentInitialisation(true), m_operatingLoad(0.0),
-              m_operatingHeatingEnergy(0.0), m_operatingParasiticElectricalPower(0.0), m_operatingParasiticElectricalConsumption(0.0),
-              m_operatingMassFlowRate(0.0), m_operatingInletTemperature(0.0), m_operatingPartLoadRatio(0.0), m_operatingFuelUseRate(0.0),
-              m_operatingFuelUse(0.0)
+              m_calculatedEfficiencyErrorIndex(0), m_doOneTimeInitialisation(true), m_doEnvironmentInitialisation(true),
+              m_hasFaultyBoilerFoulingFactor(false), m_faultyBoilerFoulingFactorIndex(0), m_operatingLoad(0.0), m_operatingHeatingEnergy(0.0),
+              m_operatingParasiticElectricalPower(0.0), m_operatingParasiticElectricalConsumption(0.0), m_operatingMassFlowRate(0.0),
+              m_operatingInletTemperature(0.0), m_operatingPartLoadRatio(0.0), m_operatingFuelUseRate(0.0), m_operatingFuelUse(0.0)
         {
         }
 
@@ -206,16 +213,8 @@ namespace Boilers {
         std::string m_endUseSubcategory;                                // identifier use for the end use subcategory
         bool m_doOneTimeInitialisation;                                 // do the one time initialisation, i.e. locate on plantloops etc.
         bool m_doEnvironmentInitialisation;                             // do the environment initialisation, i.e. get inlet conditions etc.
-        Real64 m_operatingLoad;                                         // W - Boiler Load
-        Real64 m_operatingHeatingEnergy;                                // J - Boiler energy integrated over time
-        Real64 m_operatingParasiticElectricalPower;                     // W - Parasitic electrical power (e.g. forced draft fan)
-        Real64 m_operatingParasiticElectricalConsumption;               // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-        Real64 m_operatingMassFlowRate;                                 // kg/s - Boiler mass flow rate
-        Real64 m_operatingInletTemperature;                             // C - Boiler inlet temperature
-        Real64 m_operatingOutletTemperature;                            // C - Boiler outlet temperature
-        Real64 m_operatingPartLoadRatio;                                // Boiler operating part-load ratio
-        Real64 m_operatingFuelUseRate;                                  // W - Boiler fuel used
-        Real64 m_operatingFuelUse;                                      // J - Boiler Fuel consumed integrated over time
+        bool m_hasFaultyBoilerFoulingFactor;                            // True if the boiler has fouling fault
+        int m_faultyBoilerFoulingFactorIndex;                           // Index of the fault object corresponding to the boiler
 
         void initialise(); // number of the current boiler being simulated
 

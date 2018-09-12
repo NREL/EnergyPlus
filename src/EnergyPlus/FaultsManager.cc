@@ -800,8 +800,7 @@ namespace FaultsManager {
                     ErrorsFound = true;
                 } else {
                     // Link the boiler with the fault model
-                    Boilers::Boiler(BoilerNum).FaultyBoilerFoulingFlag = true;
-                    Boilers::Boiler(BoilerNum).FaultyBoilerFoulingIndex = jFault_BoilerFouling;
+                    Boilers::Boiler(BoilerNum).setFaultyBoilerFoulingFactorIndex(jFault_BoilerFouling);
                 }
             }
         }

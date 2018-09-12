@@ -201,6 +201,17 @@ namespace Boilers {
         return m_designVolumeFlowRate;
     }
 
+    Real64 BoilerObject::getFaultyBoilerFoulingFactor()
+    {
+        using FaultsManager::FaultsBoilerFouling;
+
+        if (m_hasFaultyBoilerFoulingFactor) {
+            return FaultsBoilerFouling(m_faultyBoilerFoulingFactorIndex).CalFoulingFactor();
+        } else {
+            return 1.0;
+        }
+    }
+
     void BoilerObject::setDesignNominalCapacity(Real64 const capacity)
     {
         using DataSizing::AutoSize;
@@ -215,6 +226,12 @@ namespace Boilers {
 
         m_designVolumeFlowRate = flowRate;
         m_designVolumeFlowRateWasAutoSized = (m_designVolumeFlowRate == AutoSize);
+    }
+
+    void BoilerObject::setFaultyBoilerFoulingFactorIndex(Real64 const index)
+    {
+        m_hasFaultyBoilerFoulingFactor = true;
+        m_faultyBoilerFoulingFactorIndex = index;
     }
 
     void BoilerObject::setDesignSizingFactor(Real64 const sizingFactor)
@@ -864,7 +881,6 @@ namespace Boilers {
         using DataGlobals::WarmupFlag;
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::SingleSetPoint;
-        using FaultsManager::FaultsBoilerFouling;
         using FluidProperties::GetSpecificHeatGlycol;
         using General::TrimSigDigits;
         using PlantUtilities::SetComponentFlowRate;
@@ -900,13 +916,13 @@ namespace Boilers {
         }
 
         // If there is a fault of boiler fouling (zrp_Nov2016)
-        if (FaultyBoilerFoulingFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        if (m_hasFaultyBoilerFoulingFactor && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
             // calculate the Faulty Boiler Fouling Factor using fault information
-            FaultyBoilerFoulingFactor = FaultsBoilerFouling(FaultyBoilerFoulingIndex).CalFoulingFactor();
+            const Real64 faultyBoilerFoulingFactor = getFaultyBoilerFoulingFactor();
 
             // update the boiler nominal capacity at faulty cases
-            operatingCapacity *= FaultyBoilerFoulingFactor;
-            operatingEfficiency *= FaultyBoilerFoulingFactor;
+            operatingCapacity *= faultyBoilerFoulingFactor;
+            operatingEfficiency *= faultyBoilerFoulingFactor;
         }
 
         // Set the current load equal to the boiler load
