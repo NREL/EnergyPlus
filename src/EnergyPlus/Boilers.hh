@@ -123,6 +123,7 @@ namespace Boilers {
 
         // member functions
         static PlantComponent *factory(std::string objectName);
+        static void GetBoilerInput();
 
         void simulate(const PlantLocation &calledFromLocation,
                       bool const FirstHVACIteration,
@@ -215,9 +216,6 @@ namespace Boilers {
         Real64 m_operatingPartLoadRatio;                                // Boiler operating part-load ratio
         Real64 m_operatingFuelUseRate;                                  // W - Boiler fuel used
         Real64 m_operatingFuelUse;                                      // J - Boiler Fuel consumed integrated over time
-
-        // static member functions
-        static void GetBoilerInput();
 
         void initialise(); // number of the current boiler being simulated
 

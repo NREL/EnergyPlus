@@ -99,6 +99,7 @@ namespace FaultsManager {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::ScheduleAlwaysOn;
+    using Boilers::BoilerObject;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -789,10 +790,8 @@ namespace FaultsManager {
 
             // Boiler check and link
             {
-                if (Boilers::GetBoilerInputFlag) {
-                    Boilers::GetBoilerInput();
-                    Boilers::GetBoilerInputFlag = false;
-                }
+                BoilerObject::GetBoilerInput();
+
                 // Check the boiler name and boiler type
                 int BoilerNum = UtilityRoutines::FindItemInList(FaultsBoilerFouling(jFault_BoilerFouling).BoilerName, Boilers::Boiler);
                 if (BoilerNum <= 0) {
