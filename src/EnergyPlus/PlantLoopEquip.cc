@@ -881,9 +881,6 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_Boiler) {
             if (EquipTypeNum == TypeOf_Boiler_Simple) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
             } else if (EquipTypeNum == TypeOf_Boiler_Steam) {
                 SimSteamBoiler(sim_component.TypeOf,
                                sim_component.Name,
