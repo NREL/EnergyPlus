@@ -65,6 +65,9 @@ using EnergyPlus::DataPlant::PlantFirstSizesOkayToFinalize;
 using EnergyPlus::DataSizing::AutoSize;
 using EnergyPlus::DataSizing::PlantSizData;
 
+using EnergyPlus::FluidProperties::GetDensityGlycol;
+using EnergyPlus::FluidProperties::GetSpecificHeatGlycol;
+
 class BoilerSizingFixture : public EnergyPlusFixture
 {
     protected:
@@ -138,48 +141,39 @@ TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenRequired)
 
     // confirm the values have been set by the sizing
     EXPECT_NEAR(Boiler(1).getDesignVolumeFlowRate(), 1.2, 0.000001);
-    EXPECT_NEAR(Boiler(1).getDesignNominalCapacity(), 50409257.0, 1.0);
+    EXPECT_NEAR(Boiler(1).getDesignNominalCapacity(), 49376304.0, 1.0);
 }
-TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
+TEST_F(BoilerSizingFixture, BoilerHotWaterAutoSizeTempTest)
 {
     // unit test for checking hot water temperature for autosizing
     // boiler nominal capacity in Boiler:HotWater
 
-    Boilers::Boiler.allocate(1);
-    // Autosized Hot Water Boiler
-    Boilers::Boiler(1).LoopNum = 1;
-    Boilers::Boiler(1).SizFac = 1.2;
-    Boilers::Boiler(1).NomCap = DataSizing::AutoSize;
-    Boilers::Boiler(1).NomCapWasAutoSized = true;
-    Boilers::Boiler(1).VolFlowRate = DataSizing::AutoSize;
-    Boilers::Boiler(1).VolFlowRateWasAutoSized = true;
+    Real64 sizingFactor(0.0);
 
-    DataPlant::PlantLoop.allocate(1);
-    DataSizing::PlantSizData.allocate(1);
-    // Hot Water Loop
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(1).DeltaT = 10.0;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    // Autosized Hot Water Boiler
+    Boiler(1).setDesignVolumeFlowRate(AutoSize);
+    Boiler(1).setDesignNominalCapacity(AutoSize);
 
     // calculate nominal capacity at 60.0 C hot water temperature
-    Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(Boiler(1).LoopNum).FluidName,
-                                                   60.0,
-                                                   DataPlant::PlantLoop(Boiler(1).LoopNum).FluidIndex,
-                                                   "Boiler_HotWaterAutoSizeTempTest");
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(Boiler(1).LoopNum).FluidName,
-                                                       60.0,
-                                                       DataPlant::PlantLoop(Boiler(1).LoopNum).FluidIndex,
-                                                       "Boiler_HotWaterAutoSizeTempTest");
+    Real64 rho = GetDensityGlycol(PlantLoop(1).FluidName,
+                                  60.0,
+                                  PlantLoop(1).FluidIndex,
+                                  "Boiler_HotWaterAutoSizeTempTest");
+    Real64 Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName,
+                                      60.0,
+                                      PlantLoop(1).FluidIndex,
+                                      "Boiler_HotWaterAutoSizeTempTest");
 
-    Real64 NomCapBoilerExpected = rho * PlantSizData(1).DesVolFlowRate * Cp * PlantSizData(1).DeltaT * Boiler(1).SizFac;
+    Boiler(1).getSizingFactor(sizingFactor);
 
-    // now call sizing routine
-    Boilers::SizeBoiler(1);
+    Real64 NomCapBoilerExpected = rho * PlantSizData(1).DesVolFlowRate * Cp * PlantSizData(1).DeltaT * sizingFactor;
+
+    // do the sizing
+    Boiler(1).doSizing();
+
     // see if boiler volume flow rate returned is autosized value
-    EXPECT_DOUBLE_EQ(Boilers::Boiler(1).VolFlowRate, 1.2);
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignVolumeFlowRate(), 1.2);
+
     // see if boiler nominal capacity returned is autosized value
-    EXPECT_DOUBLE_EQ(Boilers::Boiler(1).NomCap, NomCapBoilerExpected);
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignNominalCapacity(), NomCapBoilerExpected);
 }
