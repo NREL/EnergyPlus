@@ -703,10 +703,10 @@ namespace Boilers {
 
         if (PltSizNum > 0) {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                // TODO: temperatures here are different and inconsistent e.g. CWInitConvTemp
-                rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
-                // TODO: this is the only place m_designOutletTemperature is used. why not use the PlantSizing temperature?
-                Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, m_designOutletTemperature, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                // TODO: why not use the PlantSizing temperature?
+                rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+
                 // TODO: should the capacity be calculated from the design volume flow rate once it has been calculated? (switch order of autosize)
                 tmpNomCap = Cp * rho * m_designSizingFactor * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
             } else {
