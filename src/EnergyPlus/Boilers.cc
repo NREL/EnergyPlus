@@ -584,7 +584,7 @@ namespace Boilers {
 
         if (m_doEnvironmentInitialisation && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
-            rho = GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
             m_designMassFlowRate = m_designVolumeFlowRate * rho;
 
             InitComponentNodes(
