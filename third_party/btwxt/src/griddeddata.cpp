@@ -4,6 +4,7 @@
 // Standard
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 // btwxt
 #include "error.h"
