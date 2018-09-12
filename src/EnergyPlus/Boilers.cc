@@ -127,7 +127,7 @@ namespace Boilers {
     PlantComponent *BoilerObject::factory(std::string objectName)
     {
         if (GetBoilerInputFlag) {
-            GetBoilerInput();
+            getBoilerInput();
             GetBoilerInputFlag = false;
         }
         // Now look for this particular boiler in the list
@@ -252,7 +252,7 @@ namespace Boilers {
         GetBoilerInputFlag = true;
     }
 
-    void BoilerObject::GetBoilerInput()
+    void BoilerObject::getBoilerInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -298,9 +298,6 @@ namespace Boilers {
             ShowSevereError("No " + cCurrentModuleObject + " Equipment specified in input file");
             ErrorsFound = true;
         }
-
-        // Check if we need to get the input
-        if (!GetBoilerInputFlag) return;
 
         // See if load distribution manager has already gotten the input
         if (allocated(Boiler)) return;

@@ -123,7 +123,7 @@ namespace Boilers {
 
         // member functions
         static PlantComponent *factory(std::string objectName);
-        static void GetBoilerInput();
+        static void getBoilerInput();
 
         void simulate(const PlantLocation &calledFromLocation,
                       bool const FirstHVACIteration,

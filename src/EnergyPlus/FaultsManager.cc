@@ -790,7 +790,7 @@ namespace FaultsManager {
 
             // Boiler check and link
             {
-                BoilerObject::GetBoilerInput();
+                BoilerObject::getBoilerInput();
 
                 // Check the boiler name and boiler type
                 int BoilerNum = UtilityRoutines::FindItemInList(FaultsBoilerFouling(jFault_BoilerFouling).BoilerName, Boilers::Boiler);
