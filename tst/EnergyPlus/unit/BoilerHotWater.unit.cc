@@ -60,52 +60,52 @@
 
 using EnergyPlus::EnergyPlusFixture;
 using EnergyPlus::Boilers::Boiler;
-using EnergyPlus::DataPlant::PlantLoop;
+using EnergyPlus::DataGlobals::HWInitConvTemp;
 using EnergyPlus::DataPlant::PlantFirstSizesOkayToFinalize;
+using EnergyPlus::DataPlant::PlantLoop;
 using EnergyPlus::DataSizing::AutoSize;
 using EnergyPlus::DataSizing::PlantSizData;
-using EnergyPlus::DataGlobals::HWInitConvTemp;
 
 using EnergyPlus::FluidProperties::GetDensityGlycol;
 using EnergyPlus::FluidProperties::GetSpecificHeatGlycol;
 
 class BoilerSizingFixture : public EnergyPlusFixture
 {
-    protected:
-        virtual void SetUp()
-        {
-            // call the parent setup
-            EnergyPlusFixture::SetUp();
+protected:
+    virtual void SetUp()
+    {
+        // call the parent setup
+        EnergyPlusFixture::SetUp();
 
-            // global variables
-            PlantFirstSizesOkayToFinalize = true;
+        // global variables
+        PlantFirstSizesOkayToFinalize = true;
 
-            // sizing data
-            PlantSizData.allocate(1);
-            PlantSizData(1).DesVolFlowRate = 1.0;
-            PlantSizData(1).DeltaT = 10.0;
+        // sizing data
+        PlantSizData.allocate(1);
+        PlantSizData(1).DesVolFlowRate = 1.0;
+        PlantSizData(1).DeltaT = 10.0;
 
-            // hot water loop
-            PlantLoop.allocate(1);
-            PlantLoop(1).PlantSizNum = 1;
-            PlantLoop(1).FluidIndex = 1;
-            PlantLoop(1).FluidName = "WATER";
-            
-            // setup required boiler data
-            Boiler.allocate(1);
-            Boiler(1).setLoopNumber(1);
-            Boiler(1).setDesignSizingFactor(1.2);
-        }
+        // hot water loop
+        PlantLoop.allocate(1);
+        PlantLoop(1).PlantSizNum = 1;
+        PlantLoop(1).FluidIndex = 1;
+        PlantLoop(1).FluidName = "WATER";
 
-        virtual void TearDown()
-        {
-            PlantLoop.deallocate();
-            PlantSizData.deallocate();
-            Boiler.deallocate();
+        // setup required boiler data
+        Boiler.allocate(1);
+        Boiler(1).setLoopNumber(1);
+        Boiler(1).setDesignSizingFactor(1.2);
+    }
 
-            // call the parent tear down
-            EnergyPlusFixture::TearDown();
-        }
+    virtual void TearDown()
+    {
+        PlantLoop.deallocate();
+        PlantSizData.deallocate();
+        Boiler.deallocate();
+
+        // call the parent tear down
+        EnergyPlusFixture::TearDown();
+    }
 };
 
 TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenNotRequired)
@@ -155,14 +155,8 @@ TEST_F(BoilerSizingFixture, BoilerHotWaterSizingTemperatureTest)
     Boiler(1).setDesignNominalCapacity(AutoSize);
 
     // calculate nominal capacity at 60.0 C hot water temperature
-    Real64 rho = GetDensityGlycol(PlantLoop(1).FluidName,
-                                  HWInitConvTemp,
-                                  PlantLoop(1).FluidIndex,
-                                  "BoilerHotWaterSizingTemperatureTest");
-    Real64 Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName,
-                                      HWInitConvTemp,
-                                      PlantLoop(1).FluidIndex,
-                                      "BoilerHotWaterSizingTemperatureTest");
+    Real64 rho = GetDensityGlycol(PlantLoop(1).FluidName, HWInitConvTemp, PlantLoop(1).FluidIndex, "BoilerHotWaterSizingTemperatureTest");
+    Real64 Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, HWInitConvTemp, PlantLoop(1).FluidIndex, "BoilerHotWaterSizingTemperatureTest");
 
     Boiler(1).getSizingFactor(sizingFactor);
 

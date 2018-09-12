@@ -156,34 +156,35 @@ namespace Boilers {
 
         // Default Constructor
         BoilerObject()
-            : FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), m_fuelType(0), m_boilerTypeEnumerator(0), m_loopIndex(0),
-              m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_designNominalCapacity(0.0), m_designNominalCapacityWasAutoSized(false),
-              m_designEfficiency(0.0), m_designFlowMode(FlowModeType::Default), m_outletSetpointMissingError(false),
-              m_outletSetpointMissingErrorDone(false), m_designVolumeFlowRate(0.0), m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0),
-              m_designSizingFactor(0.0), m_nodeHotWaterInletIndex(0), m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0),
-              m_designMaxPartLoadRatio(0.0), m_designOptimalPartLoadRatio(0.0),
+            : FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), m_fuelType(0), m_boilerTypeEnumerator(0),
+              m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_designNominalCapacity(0.0),
+              m_designNominalCapacityWasAutoSized(false), m_designEfficiency(0.0), m_designFlowMode(FlowModeType::Default),
+              m_outletSetpointMissingError(false), m_outletSetpointMissingErrorDone(false), m_designVolumeFlowRate(0.0),
+              m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0), m_designSizingFactor(0.0), m_nodeHotWaterInletIndex(0),
+              m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0), m_designMaxPartLoadRatio(0.0), m_designOptimalPartLoadRatio(0.0),
               m_efficiencyCurveTemperatureMode(TemperatureEvaluationModeType::Default), m_curveEfficiencyIndex(0),
               m_efficiencyCurveType(EfficiencyCurveType::Default), m_designOutletTemperatureLimit(0.0), m_designParasiticElectricalLoad(0.0),
-              m_efficiencyCurveOutputError(0), m_efficiencyCurveOutputErrorIndex(0), m_calculatedEfficiencyError(0), m_calculatedEfficiencyErrorIndex(0), m_doOneTimeInitialisation(true),
-              m_doEnvironmentInitialisation(true), m_operatingLoad(0.0), m_operatingHeatingEnergy(0.0), m_operatingParasiticElectricalPower(0.0),
-              m_operatingParasiticElectricalConsumption(0.0), m_operatingMassFlowRate(0.0), m_operatingInletTemperature(0.0),
-              m_operatingPartLoadRatio(0.0), m_operatingFuelUseRate(0.0), m_operatingFuelUse(0.0)
+              m_efficiencyCurveOutputError(0), m_efficiencyCurveOutputErrorIndex(0), m_calculatedEfficiencyError(0),
+              m_calculatedEfficiencyErrorIndex(0), m_doOneTimeInitialisation(true), m_doEnvironmentInitialisation(true), m_operatingLoad(0.0),
+              m_operatingHeatingEnergy(0.0), m_operatingParasiticElectricalPower(0.0), m_operatingParasiticElectricalConsumption(0.0),
+              m_operatingMassFlowRate(0.0), m_operatingInletTemperature(0.0), m_operatingPartLoadRatio(0.0), m_operatingFuelUseRate(0.0),
+              m_operatingFuelUse(0.0)
         {
         }
 
     private:
         int m_fuelType;                                                 // resource type assignment
-        int m_boilerTypeEnumerator;                                                    // plant loop type identifier
-        int m_loopIndex;                                                    // plant loop connection
-        int m_loopSideIndex;                                                // plant loop side connection
-        int m_branchIndex;                                                  // plant loop branch connection
-        int m_componentIndex;                                                    // plant loop component connection
+        int m_boilerTypeEnumerator;                                     // plant loop type identifier
+        int m_loopIndex;                                                // plant loop connection
+        int m_loopSideIndex;                                            // plant loop side connection
+        int m_branchIndex;                                              // plant loop branch connection
+        int m_componentIndex;                                           // plant loop component connection
         Real64 m_designNominalCapacity;                                 // W - design nominal capacity of Boiler
         bool m_designNominalCapacityWasAutoSized;                       // true if previous was set to autosize input
         Real64 m_designEfficiency;                                      // boiler efficiency at design conditions
         FlowModeType m_designFlowMode;                                  // one of 3 modes for componet flow during operation
-        bool m_outletSetpointMissingError;                                    // True if the setpoint is missing at the outlet node
-        bool m_outletSetpointMissingErrorDone;                                      // true if setpoint warning issued
+        bool m_outletSetpointMissingError;                              // True if the setpoint is missing at the outlet node
+        bool m_outletSetpointMissingErrorDone;                          // true if setpoint warning issued
         Real64 m_designVolumeFlowRate;                                  // m3/s - Boiler water design volumetric flow rate
         bool m_designVolumeFlowRateWasAutoSized;                        // true if previous was set to autosize input
         Real64 m_designMassFlowRate;                                    // kg/s - Boiler water design mass flow rate
@@ -198,11 +199,11 @@ namespace Boilers {
         EfficiencyCurveType m_efficiencyCurveType;                      // Type of efficiency curve
         Real64 m_designOutletTemperatureLimit;                          // C - Boiler outlet maximum temperature limit
         Real64 m_designParasiticElectricalLoad;                         // W - Parasitic electric power (e.g. forced draft fan)
-        int m_efficiencyCurveOutputError;                                        // efficiency curve output <=0 recurring warning error counter
-        int m_efficiencyCurveOutputErrorIndex;                                        // efficiency curve output <=0 recurring warning error message index
-        int m_calculatedEfficiencyError;                                         // calculated efficiency >1.1 recurring warning error counter
-        int m_calculatedEfficiencyErrorIndex;                                         // calculated efficiency >1.1 recurring warning error message index
-        std::string m_endUseSubcategory;                                  // identifier use for the end use subcategory
+        int m_efficiencyCurveOutputError;                               // efficiency curve output <=0 recurring warning error counter
+        int m_efficiencyCurveOutputErrorIndex;                          // efficiency curve output <=0 recurring warning error message index
+        int m_calculatedEfficiencyError;                                // calculated efficiency >1.1 recurring warning error counter
+        int m_calculatedEfficiencyErrorIndex;                           // calculated efficiency >1.1 recurring warning error message index
+        std::string m_endUseSubcategory;                                // identifier use for the end use subcategory
         bool m_doOneTimeInitialisation;                                 // do the one time initialisation, i.e. locate on plantloops etc.
         bool m_doEnvironmentInitialisation;                             // do the environment initialisation, i.e. get inlet conditions etc.
         Real64 m_operatingLoad;                                         // W - Boiler Load

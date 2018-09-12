@@ -361,13 +361,12 @@ namespace Boilers {
 
             boiler.m_curveEfficiencyIndex = GetCurveIndex(cAlphaArgs(4));
             if (boiler.m_curveEfficiencyIndex > 0) {
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    boiler.m_curveEfficiencyIndex,   // Curve index
-                    {1, 2},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    cCurrentModuleObject,            // Object Type
-                    boiler.Name,         // Object Name
-                    cAlphaFieldNames(4));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(boiler.m_curveEfficiencyIndex, // Curve index
+                                                            {1, 2},                        // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            cCurrentModuleObject,          // Object Type
+                                                            boiler.Name,                   // Object Name
+                                                            cAlphaFieldNames(4));          // Field Name
             } else if (!lAlphaFieldBlanks(4)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
@@ -381,8 +380,8 @@ namespace Boilers {
                     if (!lAlphaFieldBlanks(3)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                         ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Boiler using curve type of " + CurveManager::PerfCurve(boiler.m_curveEfficiencyIndex).ObjectType + " must specify " +
-                                          cAlphaFieldNames(3));
+                        ShowContinueError("Boiler using curve type of " + CurveManager::PerfCurve(boiler.m_curveEfficiencyIndex).ObjectType +
+                                          " must specify " + cAlphaFieldNames(3));
                         ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
@@ -450,7 +449,7 @@ namespace Boilers {
                 boiler.m_endUseSubcategory = cAlphaArgs(8);
             } else {
                 boiler.m_endUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since
-                                                     // it appears this way in existing output files.
+                                                       // it appears this way in existing output files.
             }
         }
 
@@ -568,15 +567,26 @@ namespace Boilers {
         if (m_doOneTimeInitialisation) {
             // Locate the boilers on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(
-                Name, TypeOf_Boiler_Simple, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex, _, m_designOutletTemperatureLimit, _, _, _, errFlag);
+            ScanPlantLoopsForObject(Name,
+                                    TypeOf_Boiler_Simple,
+                                    m_loopIndex,
+                                    m_loopSideIndex,
+                                    m_branchIndex,
+                                    m_componentIndex,
+                                    _,
+                                    m_designOutletTemperatureLimit,
+                                    _,
+                                    _,
+                                    _,
+                                    errFlag);
             if (errFlag) {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }
 
             if ((m_designFlowMode == FlowModeType::LeavingSetPointModulated) || (m_designFlowMode == FlowModeType::Constant)) {
                 // reset flow priority
-                PlantLoop(m_loopIndex).LoopSide(m_loopSideIndex).Branch(m_branchIndex).Comp(m_componentIndex).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+                PlantLoop(m_loopIndex).LoopSide(m_loopSideIndex).Branch(m_branchIndex).Comp(m_componentIndex).FlowPriority =
+                    LoopFlowStatus_NeedyIfLoopOn;
             }
 
             m_doOneTimeInitialisation = false;
@@ -587,8 +597,14 @@ namespace Boilers {
             rho = GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
             m_designMassFlowRate = m_designVolumeFlowRate * rho;
 
-            InitComponentNodes(
-                0.0, m_designMassFlowRate, m_nodeHotWaterInletIndex, m_nodeHotWaterOutletIndex, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex);
+            InitComponentNodes(0.0,
+                               m_designMassFlowRate,
+                               m_nodeHotWaterInletIndex,
+                               m_nodeHotWaterOutletIndex,
+                               m_loopIndex,
+                               m_loopSideIndex,
+                               m_branchIndex,
+                               m_componentIndex);
 
             if (m_designFlowMode == FlowModeType::LeavingSetPointModulated) { // check if setpoint on outlet node
                 if ((Node(m_nodeHotWaterOutletIndex).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -696,7 +712,8 @@ namespace Boilers {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                 // TODO: why not use the PlantSizing temperature?
                 rho = GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
-                Cp = GetSpecificHeatGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(
+                    PlantLoop(m_loopIndex).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
 
                 // TODO: should the capacity be calculated from the design volume flow rate once it has been calculated? (switch order of autosize)
                 tmpNomCap = Cp * rho * m_designSizingFactor * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
@@ -933,8 +950,13 @@ namespace Boilers {
                 }
             } // End of Constant/Variable Flow If Block
 
-            SetComponentFlowRate(
-                m_operatingMassFlowRate, m_nodeHotWaterInletIndex, m_nodeHotWaterOutletIndex, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex);
+            SetComponentFlowRate(m_operatingMassFlowRate,
+                                 m_nodeHotWaterInletIndex,
+                                 m_nodeHotWaterOutletIndex,
+                                 m_loopIndex,
+                                 m_loopSideIndex,
+                                 m_branchIndex,
+                                 m_componentIndex);
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
             m_operatingMassFlowRate = Node(m_nodeHotWaterInletIndex).MassFlowRate;
