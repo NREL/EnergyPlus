@@ -95,7 +95,6 @@ class BoilerSizingFixture : public EnergyPlusFixture
             Boiler.allocate(1);
             Boiler(1).setLoopNumber(1);
             Boiler(1).setDesignSizingFactor(1.2);
-            Boiler(1).setDesignOutletTemperature(82.0);
         }
 
         virtual void TearDown()

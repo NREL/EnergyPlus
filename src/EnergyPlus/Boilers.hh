@@ -158,7 +158,7 @@ namespace Boilers {
         BoilerObject()
             : FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), m_fuelType(0), m_boilerTypeEnumerator(0), m_loopIndex(0),
               m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_designNominalCapacity(0.0), m_designNominalCapacityWasAutoSized(false),
-              m_designEfficiency(0.0), m_designOutletTemperature(0.0), m_designFlowMode(FlowModeType::Default), m_outletSetpointMissingError(false),
+              m_designEfficiency(0.0), m_designFlowMode(FlowModeType::Default), m_outletSetpointMissingError(false),
               m_outletSetpointMissingErrorDone(false), m_designVolumeFlowRate(0.0), m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0),
               m_designSizingFactor(0.0), m_nodeHotWaterInletIndex(0), m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0),
               m_designMaxPartLoadRatio(0.0), m_designOptimalPartLoadRatio(0.0),
@@ -181,7 +181,6 @@ namespace Boilers {
         Real64 m_designNominalCapacity;                                 // W - design nominal capacity of Boiler
         bool m_designNominalCapacityWasAutoSized;                       // true if previous was set to autosize input
         Real64 m_designEfficiency;                                      // boiler efficiency at design conditions
-        Real64 m_designOutletTemperature;                               // C - Boiler design outlet temperature
         FlowModeType m_designFlowMode;                                  // one of 3 modes for componet flow during operation
         bool m_outletSetpointMissingError;                                    // True if the setpoint is missing at the outlet node
         bool m_outletSetpointMissingErrorDone;                                      // true if setpoint warning issued

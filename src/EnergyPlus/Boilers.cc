@@ -231,11 +231,6 @@ namespace Boilers {
         m_loopIndex = loopNumber;
     }
 
-    void BoilerObject::setDesignOutletTemperature(Real64 const temperature)
-    {
-        m_designOutletTemperature = temperature;
-    }
-
     void BoilerObject::setDesignOutletTemperatureLimit(Real64 const temperature)
     {
         if (temperature > 0.0) {
@@ -399,17 +394,16 @@ namespace Boilers {
                 }
             }
 
-            boiler.m_designOutletTemperature = rNumericArgs(3);
-            boiler.setDesignVolumeFlowRate(rNumericArgs(4));
-            boiler.m_designMinPartLoadRatio = rNumericArgs(5);
-            boiler.m_designMaxPartLoadRatio = rNumericArgs(6);
-            boiler.m_designOptimalPartLoadRatio = rNumericArgs(7);
+            boiler.setDesignVolumeFlowRate(rNumericArgs(3));
+            boiler.m_designMinPartLoadRatio = rNumericArgs(4);
+            boiler.m_designMaxPartLoadRatio = rNumericArgs(5);
+            boiler.m_designOptimalPartLoadRatio = rNumericArgs(6);
 
-            boiler.setDesignOutletTemperatureLimit(rNumericArgs(8));
+            boiler.setDesignOutletTemperatureLimit(rNumericArgs(7));
 
-            boiler.m_designParasiticElectricalLoad = rNumericArgs(9);
+            boiler.m_designParasiticElectricalLoad = rNumericArgs(8);
 
-            boiler.setDesignSizingFactor(rNumericArgs(10));
+            boiler.setDesignSizingFactor(rNumericArgs(9));
 
             boiler.m_nodeHotWaterInletIndex = GetOnlySingleNode(cAlphaArgs(5),
                                                                 ErrorsFound,
