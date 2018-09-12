@@ -173,8 +173,7 @@ namespace Boilers {
 
     bool BoilerObject::hasTwoVariableEfficiencyCurve()
     {
-        return (m_efficiencyCurveType == EfficiencyCurveType::BiQuadratic || m_efficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
-                m_efficiencyCurveType == EfficiencyCurveType::BiCubic);
+        return CurveManager::PerfCurve(m_curveEfficiencyIndex).NumDims == 2;
     }
 
     void BoilerObject::clearOperatingVariables()
@@ -274,7 +273,6 @@ namespace Boilers {
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DataSizing::AutoSize;
         using General::RoundSigDigits;
         using GlobalNames::VerifyUniqueBoilerName;
@@ -368,27 +366,13 @@ namespace Boilers {
 
             boiler.m_curveEfficiencyIndex = GetCurveIndex(cAlphaArgs(4));
             if (boiler.m_curveEfficiencyIndex > 0) {
-                {
-                    auto const SELECT_CASE_var(GetCurveType(boiler.m_curveEfficiencyIndex));
-                    if (SELECT_CASE_var == "LINEAR") {
-                        boiler.m_efficiencyCurveType = EfficiencyCurveType::Linear;
-                    } else if (SELECT_CASE_var == "QUADRATIC") {
-                        boiler.m_efficiencyCurveType = EfficiencyCurveType::Quadratic;
-                    } else if (SELECT_CASE_var == "QUADRATICLINEAR") {
-                        boiler.m_efficiencyCurveType = EfficiencyCurveType::QuadraticLinear;
-                    } else if (SELECT_CASE_var == "CUBIC") {
-                        boiler.m_efficiencyCurveType = EfficiencyCurveType::Cubic;
-                    } else if (SELECT_CASE_var == "BICUBIC") {
-                        boiler.m_efficiencyCurveType = EfficiencyCurveType::BiCubic;
-                    } else if (SELECT_CASE_var == "BIQUADRATIC") {
-                        boiler.m_efficiencyCurveType = EfficiencyCurveType::BiQuadratic;
-                    } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                        ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                        ShowContinueError("...Curve type for " + cAlphaFieldNames(4) + "  = " + GetCurveType(boiler.m_curveEfficiencyIndex));
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    boiler.m_curveEfficiencyIndex,   // Curve index
+                    {1, 2},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    cCurrentModuleObject,            // Object Type
+                    boiler.Name,         // Object Name
+                    cAlphaFieldNames(4));               // Field Name
             } else if (!lAlphaFieldBlanks(4)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
@@ -402,13 +386,13 @@ namespace Boilers {
                     if (!lAlphaFieldBlanks(3)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                         ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.m_curveEfficiencyIndex) + " must specify " +
+                        ShowContinueError("Boiler using curve type of " + CurveManager::PerfCurve(boiler.m_curveEfficiencyIndex).ObjectType + " must specify " +
                                           cAlphaFieldNames(3));
                         ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                         ShowContinueError("Field " + cAlphaFieldNames(3) + " is blank");
-                        ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.m_curveEfficiencyIndex) +
+                        ShowContinueError("Boiler using curve type of " + CurveManager::PerfCurve(boiler.m_curveEfficiencyIndex).ObjectType +
                                           " must specify either EnteringBoiler or LeavingBoiler");
                     }
                     ErrorsFound = true;
