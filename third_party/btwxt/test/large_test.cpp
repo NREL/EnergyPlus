@@ -82,7 +82,7 @@ TEST_F(LargeFixture, construct) {
 
   std::vector<double> returned_target = test_rgi.get_current_target();
   EXPECT_THAT(returned_target, testing::ElementsAre(2.2, 3.3, 1.4, 4.1));
-};
+}
 
 TEST_F(LargeFixture, calculate) {
   test_rgi.set_new_target(target);
@@ -92,7 +92,7 @@ TEST_F(LargeFixture, calculate) {
   EXPECT_NEAR(result[0], fn0(target[0], target[1], target[2], target[3]), 0.02);
   EXPECT_DOUBLE_EQ(result[1], fn1(target[0], target[1], target[2], target[3]));
   Btwxt::LOG_LEVEL = 1;
-};
+}
 
 TEST_F(LargeFixture, verify_linear) {
   // no matter what we do, result[1] should always be 11!
@@ -152,7 +152,7 @@ TEST_F(LargeFixture, verify_linear) {
   test_rgi.set_new_target(target);
   result = test_rgi.get_values_at_target();
   EXPECT_DOUBLE_EQ(result[1], 11);
-};
+}
 
 TEST_F(LargeFixture, timer) {
   test_rgi.set_new_target(target);
@@ -175,7 +175,7 @@ TEST_F(LargeFixture, timer) {
   auto nano_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
   showMessage(MsgLevel::MSG_INFO,
               stringify("Time taken by direct functions: ", nano_duration.count(), " nanoseconds"));
-};
+}
 
 TEST_F(LargeFixture, multi_timer) {
   std::vector<std::vector<double>> set_of_targets = {
