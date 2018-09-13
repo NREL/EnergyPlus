@@ -113,15 +113,8 @@ namespace Boilers {
     int NumBoilers(0); // Number of boilers
     bool GetBoilerInputFlag(true);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
-
     // Object Data
     Array1D<BoilerObject> Boiler; // boiler data - dimension to number of machines
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Boiler Module Driver Subroutines
-    //*************************************************************************
 
     // Functions
     PlantComponent *BoilerObject::factory(std::string objectName)
@@ -316,8 +309,7 @@ namespace Boilers {
 
         Boiler.allocate(NumBoilers);
 
-        // LOAD ARRAYS WITH CURVE FIT Boiler DATA
-
+        // load arrays with boiler data
         for (auto &boiler : Boiler) {
             ++BoilerNum;
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -339,6 +331,7 @@ namespace Boilers {
             boiler.Name = cAlphaArgs(1);
             boiler.m_boilerTypeEnumerator = TypeOf_Boiler_Simple;
 
+            // get the fuel type enumerator from the string given by the user
             boiler.m_fuelType = AssignResourceTypeNum(cAlphaArgs(2));
             if (boiler.m_fuelType == 0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
@@ -348,6 +341,7 @@ namespace Boilers {
                 ErrorsFound = true;
             }
 
+            // get the design capacity entered by the user
             if (rNumericArgs(1) == 0.0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
@@ -356,13 +350,13 @@ namespace Boilers {
             }
             boiler.setDesignNominalCapacity(rNumericArgs(1));
 
-            boiler.m_designEfficiency = rNumericArgs(2);
             if (rNumericArgs(2) == 0.0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cNumericFieldNames(2) + '=' + RoundSigDigits(rNumericArgs(2), 3));
                 ShowSevereError("..." + cNumericFieldNames(2) + " must be greater than 0.0");
                 ErrorsFound = true;
             }
+            boiler.m_designEfficiency = rNumericArgs(2);
 
             {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
@@ -411,6 +405,8 @@ namespace Boilers {
             }
 
             boiler.setDesignVolumeFlowRate(rNumericArgs(3));
+
+            // set part load ratios
             boiler.m_designMinPartLoadRatio = rNumericArgs(4);
             boiler.m_designMaxPartLoadRatio = rNumericArgs(5);
             boiler.m_designOptimalPartLoadRatio = rNumericArgs(6);
@@ -474,6 +470,7 @@ namespace Boilers {
             ShowFatalError(RoutineName + "Errors found in processing " + cCurrentModuleObject + " input.");
         }
 
+        // setup the output
         for (auto &boiler : Boiler) {
             std::string const fuelType(GetResourceTypeChar(boiler.m_fuelType));
             std::string const fuelTypeCaps(UtilityRoutines::MakeUPPERCase(fuelType));
@@ -609,8 +606,7 @@ namespace Boilers {
             m_doOneTimeInitialisation = false;
         }
 
-        if (m_doEnvironmentInitialisation && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
-            // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
+        if (m_doEnvironmentInitialisation && BeginEnvrnFlag && PlantFirstSizesOkayToFinalize) {
             rho = GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
             m_designMassFlowRate = m_designVolumeFlowRate * rho;
 

@@ -59,12 +59,6 @@
 namespace EnergyPlus {
 
 namespace Boilers {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
     // Boiler normalized efficiency curve types
     enum class EfficiencyCurveType
     {
@@ -98,12 +92,8 @@ namespace Boilers {
         Default = NotSet,
     };
 
-    // DERIVED TYPE DEFINITIONS
-
     // MODULE VARIABLE DECLARATIONS:
     extern int NumBoilers; // Number of boilers
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
     // Types
     class BoilerObject : public PlantComponent
@@ -182,7 +172,7 @@ namespace Boilers {
 
     private:
         int m_fuelType;                                                 // resource type assignment
-        int m_boilerTypeEnumerator;                                     // plant loop type identifier
+        int m_boilerType;                                               // boiler type identifier
         int m_loopIndex;                                                // plant loop connection
         int m_loopSideIndex;                                            // plant loop side connection
         int m_branchIndex;                                              // plant loop branch connection
@@ -217,7 +207,7 @@ namespace Boilers {
         bool m_hasFaultyBoilerFoulingFactor;                            // True if the boiler has fouling fault
         int m_faultyBoilerFoulingFactorIndex;                           // Index of the fault object corresponding to the boiler
 
-        void initialise(); // number of the current boiler being simulated
+        void initialise();
 
         void calculate(Real64 const MyLoad,    // W - hot water demand to be met by boiler
                        bool const RunFlag,     // TRUE if boiler operating
