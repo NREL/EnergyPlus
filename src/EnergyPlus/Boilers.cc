@@ -329,7 +329,7 @@ namespace Boilers {
                 ErrorsFound = true;
             }
             boiler.Name = cAlphaArgs(1);
-            boiler.m_boilerTypeEnumerator = TypeOf_Boiler_Simple;
+            boiler.m_boilerType = TypeOf_Boiler_Simple;
 
             // get the fuel type enumerator from the string given by the user
             boiler.m_fuelType = AssignResourceTypeNum(cAlphaArgs(2));
