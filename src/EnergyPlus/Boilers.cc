@@ -153,7 +153,12 @@ namespace Boilers {
 
     bool BoilerObject::hasTwoVariableEfficiencyCurve()
     {
-        return CurveManager::PerfCurve(m_curveEfficiencyIndex).NumDims == 2;
+        if (m_curveEfficiencyIndex > 0) {
+            return CurveManager::PerfCurve(m_curveEfficiencyIndex).NumDims == 2;
+        }
+        else {
+            return false;
+        }
     }
 
     void BoilerObject::clearOperatingVariables()
