@@ -88,7 +88,7 @@ namespace Boilers {
     //       AUTHOR         Dan Fisher, Taecheol Kim
     //       DATE WRITTEN   1998, 2000
     //       MODIFIED       na
-    //       RE-ENGINEERED  na
+    //       RE-ENGINEERED  Sept 2018 - Andrew Hale: Refactor for object oriented design
 
     // PURPOSE OF THIS MODULE:
     // Perform boiler simulation for plant simulation
@@ -263,7 +263,7 @@ namespace Boilers {
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 1998
         //       MODIFIED:        R. Raustad - FSEC, June 2008: added boiler efficiency curve object
-        //       RE-ENGINEERED:   na
+        //       RE-ENGINEERED:   Sept 2018 - Andrew Hale: Refactor for object oriented design
 
         // PURPOSE OF THIS SUBROUTINE:
         // get all boiler data from input file
@@ -546,6 +546,7 @@ namespace Boilers {
         //       DATE WRITTEN   April 2002
         //       MODIFIED       na
         //       RE-ENGINEERED  Brent Griffith, rework for plant upgrade
+        //                      Sept 2018 - Andrew Hale: Refactor for object oriented design
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the Boiler components
@@ -680,7 +681,7 @@ namespace Boilers {
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2002
         //       MODIFIED       November 2013 Daeho Kang, add component sizing table entries
-        //       RE-ENGINEERED  na
+        //       RE-ENGINEERED  Sept 2018 - Andrew Hale: Refactor for object oriented design
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing Boiler Components for which capacities and flow rates
@@ -857,7 +858,7 @@ namespace Boilers {
         //                      Jun. 2008, R. Raustad, FSEC. Added boiler efficiency curve object
         //                      Aug. 2011, B. Griffith, NREL. Added switch for temperature to use in curve
         //                      Nov. 2016, R. Zhang, LBNL. Applied the boiler fouling fault model
-        //       RE-ENGINEERED  na
+        //       RE-ENGINEERED  Sept 2018 - Andrew Hale: Refactor for object oriented design
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the boiler fuel consumption and the associated
