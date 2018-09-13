@@ -711,7 +711,10 @@ namespace Boilers {
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ReportSizingManager::ReportSizingOutput;
-        using namespace OutputReportPredefined;
+        using OutputReportPredefined::PreDefTableEntry;
+        using OutputReportPredefined::pdchMechType;
+        using OutputReportPredefined::pdchMechNomEff;
+        using OutputReportPredefined::pdchMechNomCap;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeBoiler");
