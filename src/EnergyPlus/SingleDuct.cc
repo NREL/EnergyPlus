@@ -6028,26 +6028,26 @@ namespace SingleDuct {
         // ATMixer properties only affect coil sizing when the mixer is on the inlet side of zone equipment
         if (SingleDuct::SysATMixer(inletATMixerIndex).MixerType == DataHVACGlobals::ATMixer_SupplySide) {
             // check if user has selected No to account for DOAS system
-            if (FinalZoneSizing.allocated()) {
+            if (FinalZoneSizing.allocated() && SingleDuct::SysATMixer(inletATMixerIndex).printWarning) {
                 if (!FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOANeutralSup) {
                     ShowWarningError("AirTerminal:SingleDuct:Mixer: " + SingleDuct::SysATMixer(inletATMixerIndex).Name);
-                    ShowContinueError(" Sizing:Zone object sets input Account for Dedicated Outdoor Air System = No.");
                     ShowContinueError(
-                        " This supply side Air Terminal Mixer will not adjust coil sizing and may result in inappropriately sized coils.");
+                        " Supply side Air Terminal Mixer does not adjust zone equipment coil sizing and may result in inappropriately sized coils.");
                     ShowContinueError(" Set Account for Dedicated Outdoor Air System = Yes in Sizing:Zone object for zone = " +
                                       FinalZoneSizing(curZoneEqNum).ZoneName);
                 }
+                SingleDuct::SysATMixer(inletATMixerIndex).printWarning = false;
             }
             return; // do nothing else if this is a supply side ATMixer
         }
         // check if user has selected Yes to account for DOAS system
-        if (FinalZoneSizing.allocated()) {
+        if (FinalZoneSizing.allocated() && SingleDuct::SysATMixer(inletATMixerIndex).printWarning) {
             if (FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOANeutralSup) {
                 ShowWarningError("AirTerminal:SingleDuct:Mixer: " + SingleDuct::SysATMixer(inletATMixerIndex).Name);
-                ShowContinueError(" Sizing:Zone object sets input Account for Dedicated Outdoor Air System = Yes.");
-                ShowContinueError(" This inlet side Air Terminal Mixer will also adjust coil sizing and may result in inappropriately sized coils.");
+                ShowContinueError(" Inlet side Air Terminal Mixer automatically adjusts zone equipment coil sizing.");
                 ShowContinueError(" Set Account for Dedicated Outdoor Air System = No in Sizing:Zone object for zone = " +
                                   FinalZoneSizing(curZoneEqNum).ZoneName);
+                SingleDuct::SysATMixer(inletATMixerIndex).printWarning = false;
             }
         }
 

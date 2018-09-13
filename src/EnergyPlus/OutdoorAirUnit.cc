@@ -1567,6 +1567,7 @@ namespace OutdoorAirUnit {
         ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
         ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
         ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
+        ZoneEqSizing(CurZoneEqNum).OAVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
 
         if (OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize) {
             if (OutAirUnit(OAUnitNum).SFanType != DataHVACGlobals::FanType_SystemModelObject) {

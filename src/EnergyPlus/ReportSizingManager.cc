@@ -1716,10 +1716,10 @@ namespace ReportSizingManager {
                             } else {
                                 DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
                             }
-                            CoilInTemp =
-                                setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
-                            CoilInHumRat =
-                                setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                            CoilInTemp = setHeatCoilInletTempForZoneEqSizing(
+                                setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                            CoilInHumRat = setHeatCoilInletHumRatForZoneEqSizing(
+                                setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         }
                         if ((TermUnitSingDuct || TermUnitPIU) && (CurTermUnitSizingNum > 0)) {
                             CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
@@ -3444,6 +3444,14 @@ namespace ReportSizingManager {
 
         } else if (SizingType == CoolingCapacitySizing) {
             if (coilSelectionReportObj->isCompTypeCoil(CompType)) {
+                if (CoilInTemp > 0.0) { // set inlet air properties used during capacity sizing if available
+                    coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, CoilInTemp, CurSysNum, CurZoneEqNum);
+                    coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, CoilInHumRat);
+                }
+                if (CoilOutTemp > 0.0) { // set outlet air properties used during capacity sizing if available
+                    coilSelectionReportObj->setCoilLvgAirTemp(CompName, CompType, CoilOutTemp);
+                    coilSelectionReportObj->setCoilLvgAirHumRat(CompName, CompType, CoilOutHumRat);
+                }
                 coilSelectionReportObj->setCoilCoolingCapacity(CompName,
                                                                CompType,
                                                                SizingResult,
