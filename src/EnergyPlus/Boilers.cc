@@ -888,7 +888,6 @@ namespace Boilers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 operatingEfficiency;   // boiler efficiency
         Real64 operatingCapacity;     // W - boiler nominal capacity
-        Real64 theoreticalFuelUse;    // Theoretical (stoichiometric) fuel use
         Real64 efficiencyCurveOutput; // Output of boiler efficiency curve
         Real64 Cp;
 
@@ -995,9 +994,6 @@ namespace Boilers {
         m_operatingPartLoadRatio = min(m_operatingPartLoadRatio, m_designMaxPartLoadRatio);
         m_operatingPartLoadRatio = max(m_operatingPartLoadRatio, m_designMinPartLoadRatio);
 
-        // calculate theoretical fuel use based on nominal thermal efficiency
-        theoreticalFuelUse = m_operatingLoad / operatingEfficiency;
-
         // calculate normalized efficiency based on curve object type
         if (m_curveEfficiencyIndex > 0) {
             if (hasTwoVariableEfficiencyCurve()) {
@@ -1017,6 +1013,9 @@ namespace Boilers {
             efficiencyCurveOutput = 1.0;
         }
 
+        // include the efficiency curve in the operating efficiency
+        operatingEfficiency *= efficiencyCurveOutput;
+
         // warn if efficiency curve produces zero or negative results
         if (!WarmupFlag && efficiencyCurveOutput <= 0.0) {
             if (m_operatingLoad > 0.0) {
@@ -1033,7 +1032,7 @@ namespace Boilers {
                         }
                     }
                     ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(efficiencyCurveOutput, 5));
-                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(efficiencyCurveOutput * operatingEfficiency, 5) +
+                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(operatingEfficiency, 5) +
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp("...Curve output reset to 0.01 and simulation continues.");
                 } else {
@@ -1048,7 +1047,7 @@ namespace Boilers {
         }
 
         // warn if overall efficiency greater than 1.1
-        if (!WarmupFlag && efficiencyCurveOutput * operatingEfficiency > 1.1) {
+        if (!WarmupFlag && operatingEfficiency > 1.1) {
             if (m_operatingLoad > 0.0 && m_curveEfficiencyIndex > 0) {
                 if (m_calculatedEfficiencyError < 1) {
                     ++m_calculatedEfficiencyError;
@@ -1064,22 +1063,24 @@ namespace Boilers {
                         }
                     }
                     ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(efficiencyCurveOutput, 5));
-                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(efficiencyCurveOutput * operatingEfficiency, 5) +
+                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(operatingEfficiency, 5) +
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp("...Curve output reset to 1.1 and simulation continues.");
                 } else {
                     ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + Name +
                                                        "\": Calculated Boiler Efficiency is greater than 1.1 warning continues...",
                                                    m_calculatedEfficiencyErrorIndex,
-                                                   efficiencyCurveOutput * operatingEfficiency,
-                                                   efficiencyCurveOutput * operatingEfficiency);
+                                                   operatingEfficiency,
+                                                   operatingEfficiency);
                 }
             }
+            // TODO: this should set the operating efficiency, since this is what is checked above
             efficiencyCurveOutput = 1.1;
         }
 
-        // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
-        m_operatingFuelUseRate = theoreticalFuelUse / efficiencyCurveOutput;
+        // calculate fuel used based on boiler operating efficiency, nominalEfficiency * curve (=1.0 when no curve used)
+        m_operatingFuelUseRate = m_operatingLoad / operatingEfficiency;
+
         // TODO: add output variable for operating efficiency
         if (m_operatingLoad > 0.0) {
             m_operatingParasiticElectricalPower = m_designParasiticElectricalLoad * m_operatingPartLoadRatio;
