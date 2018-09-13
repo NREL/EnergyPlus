@@ -75,7 +75,10 @@
 \fi
 
 % this is a great package for printing units in a standard way, we should move this way
-\usepackage{siunitx}
+\usepackage[per-mode=symbol]{siunitx}
+
+% add some helper unit macros
+\DeclareSIUnit\volumeFlowRate{\meter\cubic\per\second}
 
 % some additional macros
 \newcommand{\PB}[1]{\left(#1\right)}
