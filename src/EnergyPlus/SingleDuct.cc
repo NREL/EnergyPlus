@@ -2106,7 +2106,7 @@ namespace SingleDuct {
 
             if (Sys(SysNum).HWLoopNum > 0 && Sys(SysNum).ReheatComp_Num != HCoilType_SteamAirHeating) { // protect early calls before plant is setup
                 rho = GetDensityGlycol(PlantLoop(Sys(SysNum).HWLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobals::HWInitConvTemp,
                                        PlantLoop(Sys(SysNum).HWLoopNum).FluidIndex,
                                        RoutineName);
             } else {
@@ -3382,7 +3382,10 @@ namespace SingleDuct {
                 MaxDeviceAirMassFlowReheat = Sys(SysNum).AirMassFlowRateMax;
             } else if (Sys(SysNum).DamperHeatingAction == ReverseActionWithLimits) {
                 MaxDeviceAirMassFlowReheat = Sys(SysNum).AirMassFlowDuringReheatMax;
+            } else if (Sys(SysNum).DamperHeatingAction == Normal) {
+                MaxDeviceAirMassFlowReheat = Sys(SysNum).ZoneMinAirFrac * Sys(SysNum).AirMassFlowRateMax;
             } else {
+                // used for AIRTERMINAL_SINGLEDUCT_VAV_NOREHEAT or SingleDuctVAVNoReheat
                 MaxDeviceAirMassFlowReheat = Sys(SysNum).AirMassFlowRateMax;
             }
 

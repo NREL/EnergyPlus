@@ -116,8 +116,13 @@
 #include <SwimmingPool.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
+#include <WCECommon.hpp>
+#include <WCEMultiLayerOptics.hpp>
+#include <WCESingleLayerOptics.hpp>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <WindowManagerExteriorData.hh>
+#include <WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -171,6 +176,10 @@ namespace HeatBalanceSurfaceManager {
     using namespace ScheduleManager;
     using namespace SolarShading;
     using namespace DaylightingManager;
+    using namespace WindowManager;
+    using namespace FenestrationCommon;
+    using namespace SingleLayerOptics;
+    using namespace MultiLayerOptics;
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -185,8 +194,8 @@ namespace HeatBalanceSurfaceManager {
         bool CalculateZoneMRTfirstTime(true);          // Flag for first time calculations
         bool calcHeatBalanceInsideSurfFirstTime(true); // Used for trapping errors or other problems
     }                                                  // namespace
-    // DERIVED TYPE DEFINITIONS:
-    // na
+                                                       // DERIVED TYPE DEFINITIONS:
+                                                       // na
 
     // MODULE VARIABLE DECLARATIONS:
     // na
@@ -1096,7 +1105,7 @@ namespace HeatBalanceSurfaceManager {
                             vistranAreaNonNorth += TransVisNorm * windowAreaWMult;
                         }
                         // shading
-                        if (curWSC != 0) {
+                        if (Surface(iSurf).HasShadeControl) {
                             PreDefTableEntry(pdchFenSwitchable, surfName, "Yes");
                             // shading report
                             PreDefTableEntry(pdchWscName, surfName, WindowShadingControl(curWSC).Name);
@@ -2563,7 +2572,11 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
-            CalcInteriorSolarDistribution();
+            if (inExtWindowModel->isExternalLibraryModel() && winOpticalModel->isSimplifiedModel()) {
+                CalcInteriorSolarDistributionWCE();
+            } else {
+                CalcInteriorSolarDistribution();
+            }
 
             for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
 
@@ -2759,7 +2772,7 @@ namespace HeatBalanceSurfaceManager {
                             } else { // Exterior window
 
                                 if (SurfaceWindow(SurfNum).WindowModelType != WindowBSDFModel &&
-                                    SurfaceWindow(SurfNum).WindowModelType != WindowEQLModel) {
+                                    SurfaceWindow(SurfNum).WindowModelType != WindowEQLModel && !inExtWindowModel->isExternalLibraryModel()) {
                                     TotGlassLay = Construct(ConstrNum).TotGlassLayers;
                                     for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                         AbsDiffWin(Lay) = Construct(ConstrNum).AbsDiff(Lay);
@@ -2852,7 +2865,16 @@ namespace HeatBalanceSurfaceManager {
                                         QRadSWwinAbsTot(SurfNum) += QRadSWwinAbsLayer(Lay, SurfNum);
                                     }
                                     QRadSWwinAbsTotEnergy(SurfNum) = QRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
-
+                                    // Need to do it this way for now beaucse of scheduled surface gains. They do work only with
+                                    // BSDF windows and overwriting absorbtances will work only for ordinary windows
+                                    // } else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel &&
+                                    //   SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel &&
+                                    //   inExtWindowModel->isExternalLibraryModel() ) {
+                                    //   TotSolidLay = Construct( ConstrNum ).TotSolidLayers;
+                                    //   for ( Lay = 1; Lay <= TotSolidLay; ++Lay ) {
+                                    //     QRadSWwinAbs( Lay, SurfNum ) = AWinSurf( Lay, SurfNum ) *
+                                    //       ( QRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone ) );
+                                    //   }
                                 } else if (SurfaceWindow(SurfNum).WindowModelType == WindowBSDFModel) {
                                     TotSolidLay = Construct(ConstrNum).TotSolidLayers;
                                     CurrentState = SurfaceWindow(SurfNum).ComplexFen.CurrentState;
@@ -2906,7 +2928,28 @@ namespace HeatBalanceSurfaceManager {
                                         QRadSWwinAbsTot(SurfNum) += QRadSWwinAbsLayer(Lay, SurfNum);
                                     }
                                     QRadSWwinAbsTotEnergy(SurfNum) = QRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
-                                } // IF (SurfaceWindow(SurfNum)%WindowModelType /= WindowBSDFModel) THEN
+                                } else if (inExtWindowModel->isExternalLibraryModel()) {
+                                    std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(SurfNum2, BSDFHemisphere::Incoming);
+                                    Real64 Theta = incomingAngle.first;
+                                    Real64 Phi = incomingAngle.second;
+
+                                    std::shared_ptr<CMultiLayerScattered> aLayer =
+                                        CWindowConstructionsSimplified::instance().getEquivalentLayer(WavelengthRange::Solar, ConstrNum);
+
+                                    size_t totLayers = aLayer->getNumOfLayers();
+                                    for (size_t Lay = 1; Lay <= totLayers; ++Lay) {
+
+                                        Real64 AbWinDiff = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi);
+
+                                        QRadSWwinAbs(Lay, SurfNum) = AbWinDiff * (SkySolarInc + GndSolarInc) + AWinSurf(Lay, SurfNum) * BeamSolar;
+
+                                        // Total solar absorbed in solid layer (W), for reporting
+                                        QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+
+                                        // Total solar absorbed in all glass layers (W), for reporting
+                                        QRadSWwinAbsTot(SurfNum) += QRadSWwinAbsLayer(Lay, SurfNum);
+                                    }
+                                }
 
                                 // Solar absorbed by window frame and dividers
                                 FrDivNum = Surface(SurfNum).FrameDivider;
@@ -3574,7 +3617,7 @@ namespace HeatBalanceSurfaceManager {
                         TotGlassLayers = Construct(ConstrNum).TotGlassLayers;
                     }
                     ShadeFlag = SurfaceWindow(SurfNum).ShadingFlag;
-                    if (ShadeFlag <= 0) { // No window shading
+                    if (ShadeFlag <= 0 || SurfaceWindow(SurfNum).WindowModelType == WindowBSDFModel) { // No window shading
                         for (IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                             // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                             InitialDifSolInAbsReport(SurfNum) += InitialDifSolwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;

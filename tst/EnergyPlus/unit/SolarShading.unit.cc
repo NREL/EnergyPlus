@@ -297,7 +297,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_polygon_contains_point)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 {
-    std::string const idf_objects = delimited_string({"  Version,8.9;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.0;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -321,8 +321,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
                                                       "    ,                        !- Name                                                 ",
                                                       "    1,                       !- Begin Month                                          ",
                                                       "    1,                       !- Begin Day of Month                                   ",
+                                                      "    ,                        !- Begin Year                                           ",
                                                       "    12,                      !- End Month                                            ",
                                                       "    31,                      !- End Day of Month                                     ",
+                                                      "    ,                        !- End Year                                             ",
                                                       "    ,                        !- Day of Week for Start Day                            ",
                                                       "    ,                        !- Use Weather File Holidays and Special Days           ",
                                                       "    ,                        !- Use Weather File Daylight Saving Period              ",
@@ -562,7 +564,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
                                                       "    Zn001:Wall-South,        !- Building Surface Name                                ",
                                                       "    ,                        !- Outside Boundary Condition Object                    ",
                                                       "    0.5000000,               !- View Factor to Ground                                ",
-                                                      "    ,                        !- Shading Control Name                                 ",
                                                       "    TestFrameAndDivider,     !- Frame and Divider Name                               ",
                                                       "    1.0,                     !- Multiplier                                           ",
                                                       "    4,                       !- Number of Vertices                                   ",
@@ -673,7 +674,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 {
-    std::string const idf_objects = delimited_string({"  Version,8.9;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.0;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -699,8 +700,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
                                                       "    ,                        !- Name                                                 ",
                                                       "    1,                       !- Begin Month                                          ",
                                                       "    1,                       !- Begin Day of Month                                   ",
+                                                      "    ,                        !- Begin Year                                           ",
                                                       "    12,                      !- End Month                                            ",
                                                       "    31,                      !- End Day of Month                                     ",
+                                                      "    ,                        !- End Year                                             ",
                                                       "    ,                        !- Day of Week for Start Day                            ",
                                                       "    ,                        !- Use Weather File Holidays and Special Days           ",
                                                       "    ,                        !- Use Weather File Daylight Saving Period              ",
@@ -953,7 +956,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
                                                       "    Zn001:Wall-South,        !- Building Surface Name                                ",
                                                       "    ,                        !- Outside Boundary Condition Object                    ",
                                                       "    0.5000000,               !- View Factor to Ground                                ",
-                                                      "    ,                        !- Shading Control Name                                 ",
                                                       "    TestFrameAndDivider,     !- Frame and Divider Name                               ",
                                                       "    1.0,                     !- Multiplier                                           ",
                                                       "    4,                       !- Number of Vertices                                   ",
@@ -1076,7 +1078,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 {
-    std::string const idf_objects = delimited_string({"  Version,8.9;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.0;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -1105,8 +1107,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
                                                       "    ,                        !- Name                                                 ",
                                                       "    1,                       !- Begin Month                                          ",
                                                       "    1,                       !- Begin Day of Month                                   ",
+                                                      "    ,                        !- Begin Year",
                                                       "    12,                      !- End Month                                            ",
                                                       "    31,                      !- End Day of Month                                     ",
+                                                      "    ,                        !- End Year",
                                                       "    ,                        !- Day of Week for Start Day                            ",
                                                       "    ,                        !- Use Weather File Holidays and Special Days           ",
                                                       "    ,                        !- Use Weather File Daylight Saving Period              ",
@@ -1356,7 +1360,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
                                                       "    Zn001:Wall-South,        !- Building Surface Name                                ",
                                                       "    ,                        !- Outside Boundary Condition Object                    ",
                                                       "    0.5000000,               !- View Factor to Ground                                ",
-                                                      "    ,                        !- Shading Control Name                                 ",
                                                       "    TestFrameAndDivider,     !- Frame and Divider Name                               ",
                                                       "    1.0,                     !- Multiplier                                           ",
                                                       "    4,                       !- Number of Vertices                                   ",

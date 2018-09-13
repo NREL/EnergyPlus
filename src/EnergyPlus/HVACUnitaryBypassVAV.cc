@@ -1551,7 +1551,7 @@ namespace HVACUnitaryBypassVAV {
 
                     if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow > 0.0) {
                         FluidDensity = GetDensityGlycol(PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                                                        DataGlobals::HWInitConvTemp,
                                                         PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
                                                         RoutineName);
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
@@ -1651,7 +1651,7 @@ namespace HVACUnitaryBypassVAV {
                         }
                         if (CoilMaxVolFlowRate != AutoSize) {
                             FluidDensity = GetDensityGlycol(PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                            DataGlobals::CWInitConvTemp,
+                                                            DataGlobals::HWInitConvTemp,
                                                             PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
                                                             RoutineName);
                             CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;

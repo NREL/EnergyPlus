@@ -1050,6 +1050,10 @@ namespace DataHeatBalance {
               AbsDiffFrontEQL(CFSMAXNL, 0.0), AbsDiffBackEQL(CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0)
         {
         }
+
+        bool isGlazingConstruction() const;
+
+        void SetFlagForWindowConstructionWithShadeOrBlindLayer();
     };
 
     struct SpectralDataProperties
@@ -1736,7 +1740,7 @@ namespace DataHeatBalance {
         Array1D_int MateZonePtr;             // Zone connected by refrigeration door (MateZone > ZonePtr)
         Array1D_string DoorMixingObjectName; // Used in one error statement and eio
         Array1D_string DoorProtTypeName;     // Used in eio
-        // Note, for mixing and crossmixing, this type dimensioned by number of mixing objects.
+                                             // Note, for mixing and crossmixing, this type dimensioned by number of mixing objects.
         // For ref door mixing, dimensioned by number of zones.
 
         // Default Constructor
@@ -1757,7 +1761,7 @@ namespace DataHeatBalance {
         bool BalanceMixing;          // flag to allow mixing to be adjusted for zone mass balance
         int InfiltrationTreatment;   // determines how infiltration is treated for zone mass balance
         int InfiltrationZoneType;    // specifies which types of zones allow infiltration to be changed
-        // Note, unique global object
+                                     // Note, unique global object
 
         // Default Constructor
         ZoneAirMassFlowConservation() : EnforceZoneMassBalance(false), BalanceMixing(false), InfiltrationTreatment(0), InfiltrationZoneType(0)
@@ -1784,7 +1788,7 @@ namespace DataHeatBalance {
         Array1D_int ZoneMixingSourcesPtr;      // source zones pointer
         Array1D_int ZoneMixingReceivingPtr;    // receiving zones pointer
         Array1D<Real64> ZoneMixingReceivingFr; // receiving zones fraction
-        // Note, this type dimensioned by number of zones
+                                               // Note, this type dimensioned by number of zones
 
         // Default Constructor
         ZoneMassConservationData()
@@ -2230,7 +2234,7 @@ namespace DataHeatBalance {
         Real64 OABalanceFanElec;       // Fan Electricity {W} due to OA air balance
         Real64 SumEnthalpyM = 0.0;     // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;     // Zone sum of EnthalpyH
-        // Default Constructor
+                                       // Default Constructor
         AirReportVars()
             : MeanAirTemp(0.0), OperativeTemp(0.0), MeanAirHumRat(0.0), MeanAirDewPointTemp(0.0), ThermOperativeTemp(0.0), InfilHeatGain(0.0),
               InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0), InfilTotalGain(0.0), InfilTotalLoss(0.0), InfilVolumeCurDensity(0.0),

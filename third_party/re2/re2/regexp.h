@@ -276,44 +276,45 @@ class Regexp {
 
   // Flags for parsing.  Can be ORed together.
   enum ParseFlags {
-    NoParseFlags = 0,
-    FoldCase     = 1<<0,   // Fold case during matching (case-insensitive).
-    Literal      = 1<<1,   // Treat s as literal string instead of a regexp.
-    ClassNL      = 1<<2,   // Allow char classes like [^a-z] and \D and \s
-                           // and [[:space:]] to match newline.
-    DotNL        = 1<<3,   // Allow . to match newline.
-    MatchNL      = ClassNL | DotNL,
-    OneLine      = 1<<4,   // Treat ^ and $ as only matching at beginning and
-                           // end of text, not around embedded newlines.
-                           // (Perl's default)
-    Latin1       = 1<<5,   // Regexp and text are in Latin1, not UTF-8.
-    NonGreedy    = 1<<6,   // Repetition operators are non-greedy by default.
-    PerlClasses  = 1<<7,   // Allow Perl character classes like \d.
-    PerlB        = 1<<8,   // Allow Perl's \b and \B.
-    PerlX        = 1<<9,   // Perl extensions:
-                           //   non-capturing parens - (?: )
-                           //   non-greedy operators - *? +? ?? {}?
-                           //   flag edits - (?i) (?-i) (?i: )
-                           //     i - FoldCase
-                           //     m - !OneLine
-                           //     s - DotNL
-                           //     U - NonGreedy
-                           //   line ends: \A \z
-                           //   \Q and \E to disable/enable metacharacters
-                           //   (?P<name>expr) for named captures
-                           //   \C to match any single byte
-    UnicodeGroups = 1<<10, // Allow \p{Han} for Unicode Han group
-                           //   and \P{Han} for its negation.
-    NeverNL      = 1<<11,  // Never match NL, even if the regexp mentions
-                           //   it explicitly.
-    NeverCapture = 1<<12,  // Parse all parens as non-capturing.
+    NoParseFlags  = 0,
+    FoldCase      = 1<<0,   // Fold case during matching (case-insensitive).
+    Literal       = 1<<1,   // Treat s as literal string instead of a regexp.
+    ClassNL       = 1<<2,   // Allow char classes like [^a-z] and \D and \s
+                            // and [[:space:]] to match newline.
+    DotNL         = 1<<3,   // Allow . to match newline.
+    MatchNL       = ClassNL | DotNL,
+    OneLine       = 1<<4,   // Treat ^ and $ as only matching at beginning and
+                            // end of text, not around embedded newlines.
+                            // (Perl's default)
+    Latin1        = 1<<5,   // Regexp and text are in Latin1, not UTF-8.
+    NonGreedy     = 1<<6,   // Repetition operators are non-greedy by default.
+    PerlClasses   = 1<<7,   // Allow Perl character classes like \d.
+    PerlB         = 1<<8,   // Allow Perl's \b and \B.
+    PerlX         = 1<<9,   // Perl extensions:
+                            //   non-capturing parens - (?: )
+                            //   non-greedy operators - *? +? ?? {}?
+                            //   flag edits - (?i) (?-i) (?i: )
+                            //     i - FoldCase
+                            //     m - !OneLine
+                            //     s - DotNL
+                            //     U - NonGreedy
+                            //   line ends: \A \z
+                            //   \Q and \E to disable/enable metacharacters
+                            //   (?P<name>expr) for named captures
+                            //   \C to match any single byte
+    UnicodeGroups = 1<<10,  // Allow \p{Han} for Unicode Han group
+                            //   and \P{Han} for its negation.
+    NeverNL       = 1<<11,  // Never match NL, even if the regexp mentions
+                            //   it explicitly.
+    NeverCapture  = 1<<12,  // Parse all parens as non-capturing.
 
     // As close to Perl as we can get.
-    LikePerl     = ClassNL | OneLine | PerlClasses | PerlB | PerlX |
-                   UnicodeGroups,
+    LikePerl      = ClassNL | OneLine | PerlClasses | PerlB | PerlX |
+                    UnicodeGroups,
 
     // Internal use only.
-    WasDollar    = 1<<15,  // on kRegexpEndText: was $ in regexp text
+    WasDollar     = 1<<13,  // on kRegexpEndText: was $ in regexp text
+    AllParseFlags = (1<<14)-1,
   };
 
   // Get.  No set, Regexps are logically immutable once created.
@@ -435,7 +436,9 @@ class Regexp {
   // begin with a non-empty fixed string (perhaps after ASCII
   // case-folding).  If so, returns the prefix and the sub-regexp that
   // follows it.
-  bool RequiredPrefix(string* prefix, bool *foldcase, Regexp** suffix);
+  // Callers should expect *prefix, *foldcase and *suffix to be "zeroed"
+  // regardless of the return value.
+  bool RequiredPrefix(string* prefix, bool* foldcase, Regexp** suffix);
 
  private:
   // Constructor allocates vectors as appropriate for operator.
@@ -459,6 +462,10 @@ class Regexp {
 
   // Computes whether Regexp is already simple.
   bool ComputeSimple();
+
+  // Constructor that generates a Star, Plus or Quest,
+  // squashing the pair if sub is also a Star, Plus or Quest.
+  static Regexp* StarPlusOrQuest(RegexpOp op, Regexp* sub, ParseFlags flags);
 
   // Constructor that generates a concatenation or alternation,
   // enforcing the limit on the number of subexpressions for
@@ -500,7 +507,7 @@ class Regexp {
     DCHECK(n >= 0 && static_cast<uint16_t>(n) == n);
     if (n > 1)
       submany_ = new Regexp*[n];
-    nsub_ = n;
+    nsub_ = static_cast<uint16_t>(n);
   }
 
   // Add Rune to LiteralString
@@ -528,7 +535,7 @@ class Regexp {
   // exponential blowup in space requirements.
   // uint16_t to control space usage.
   // The standard regexp routines will never generate a
-  // ref greater than the maximum repeat count (1000),
+  // ref greater than the maximum repeat count (kMaxRepeat),
   // but even so, Incref and Decref consult an overflow map
   // when ref_ reaches kMaxRef.
   uint16_t ref_;
@@ -616,25 +623,29 @@ class CharClassBuilder {
   CharClassBuilder& operator=(const CharClassBuilder&) = delete;
 };
 
-// Tell g++ that bitwise ops on ParseFlags produce ParseFlags.
-inline Regexp::ParseFlags operator|(Regexp::ParseFlags a, Regexp::ParseFlags b)
-{
-  return static_cast<Regexp::ParseFlags>(static_cast<int>(a) | static_cast<int>(b));
+// Bitwise ops on ParseFlags produce ParseFlags.
+inline Regexp::ParseFlags operator|(Regexp::ParseFlags a,
+                                    Regexp::ParseFlags b) {
+  return static_cast<Regexp::ParseFlags>(
+      static_cast<int>(a) | static_cast<int>(b));
 }
 
-inline Regexp::ParseFlags operator^(Regexp::ParseFlags a, Regexp::ParseFlags b)
-{
-  return static_cast<Regexp::ParseFlags>(static_cast<int>(a) ^ static_cast<int>(b));
+inline Regexp::ParseFlags operator^(Regexp::ParseFlags a,
+                                    Regexp::ParseFlags b) {
+  return static_cast<Regexp::ParseFlags>(
+      static_cast<int>(a) ^ static_cast<int>(b));
 }
 
-inline Regexp::ParseFlags operator&(Regexp::ParseFlags a, Regexp::ParseFlags b)
-{
-  return static_cast<Regexp::ParseFlags>(static_cast<int>(a) & static_cast<int>(b));
+inline Regexp::ParseFlags operator&(Regexp::ParseFlags a,
+                                    Regexp::ParseFlags b) {
+  return static_cast<Regexp::ParseFlags>(
+      static_cast<int>(a) & static_cast<int>(b));
 }
 
-inline Regexp::ParseFlags operator~(Regexp::ParseFlags a)
-{
-  return static_cast<Regexp::ParseFlags>(~static_cast<int>(a));
+inline Regexp::ParseFlags operator~(Regexp::ParseFlags a) {
+  // Attempting to produce a value out of enum's range has undefined behaviour.
+  return static_cast<Regexp::ParseFlags>(
+      ~static_cast<int>(a) & static_cast<int>(Regexp::AllParseFlags));
 }
 
 }  // namespace re2

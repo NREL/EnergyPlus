@@ -46,7 +46,7 @@
 ! Environmental Emissions: No
 ! Utility Tariffs: No
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -136,8 +136,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period

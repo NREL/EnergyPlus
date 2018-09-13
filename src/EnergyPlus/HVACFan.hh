@@ -136,6 +136,9 @@ namespace HVACFan {
         // Mass Flow Rate Control Variables
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
 
+        // FEI
+        static Real64 report_fei(Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
+
     private: // methods
         void init();
 
@@ -238,6 +241,7 @@ namespace HVACFan {
         Real64 m_massFlowRateMinAvail;
         Real64 m_rhoAirStdInit;
         //	bool oneTimePowerCurveCheck_; // one time flag used for error message
+        Real64 m_designPointFEI; // Fan Energy Index for the fan at the design operating point
 
     }; // class FanSystem
 

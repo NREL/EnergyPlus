@@ -14,6 +14,7 @@ C_p \rho \Delta x \frac{T_i^{j+1}-T_i^j}{\Delta t} =
                       k_E\frac{T_{i-1}^{j+1}-T_{i}^{j+1}}{\Delta x} + 
                       k_W\frac{T_{i+1}^{j}-T_{i}^{j}}{\Delta x} +
                       k_E\frac{T_{i-1}^{j}-T_{i}^{j}}{\Delta x}\right)
+\label{eq:InternalNodeImplicitEquation}
 \end{equation}
 
 Where:
@@ -58,7 +59,7 @@ The fully implicit scheme is also based on an Adams-Moulton solution approach. I
 {C_p}\rho {\rm{\Delta x}}\frac{{T_i^{j + 1} - T_i^j}}{{{\rm{\Delta }}t}} = \left( {{k_W}\frac{{\left( {T_{i + 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}} + {k_E}\frac{{\left( {T_{i - 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}}} \right)
 \end{equation}
 
-For both schemes, EnergyPlus uses the following four types of nodes, as shown in the figure below (1) interior surface nodes, (2) interior nodes, (3) material interface nodes and (4) external surface nodes. The grid for each material is established by specifying a half node for each edge of a material and equal size nodes for the rest of the material. Equations such as are formed for all nodes in a construction. The formulation of all node types is basically the same.
+For both schemes, EnergyPlus uses the following four types of nodes, as shown in the figure below (1) interior surface nodes, (2) interior nodes, (3) material interface nodes and (4) external surface nodes. The grid for each material is established by specifying a half node for each edge of a material and equal size nodes for the rest of the material. Equations such as~\ref{eq:InternalNodeImplicitEquation} are formed for all nodes in a construction. The formulation of all node types is basically the same.
 
 \begin{figure}[hbtp] % fig 15
 \centering
@@ -119,9 +120,9 @@ The actual formulation of the hysteresis model is captured in Figure~\ref{fig:PC
 
 \begin{figure}
   \centering
-  \label{fig:PCMHysteresis}
   \includegraphics[width=0.8\textwidth]{media/PCMModel.png}
   \caption{Hysteresis PCM Model Curves}
+  \label{fig:PCMHysteresis}
 \end{figure}
 
 The iteration scheme assures that the correct enthalpy, and therefore the correct Cp is used in each time step, and the enthalpy of the material is accounted for accurately. Of course, if the material is regular, the user input constant Cp is used.
