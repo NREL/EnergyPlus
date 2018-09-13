@@ -165,7 +165,7 @@ namespace Boilers {
               m_efficiencyCurveTemperatureMode(TemperatureEvaluationModeType::Default), m_curveEfficiencyIndex(0),
               m_efficiencyCurveType(EfficiencyCurveType::Default), m_designOutletTemperatureLimit(0.0), m_designParasiticElectricalLoad(0.0),
               m_efficiencyCurveOutputError(0), m_efficiencyCurveOutputErrorIndex(0), m_calculatedEfficiencyError(0),
-              m_calculatedEfficiencyErrorIndex(0), m_doOneTimeInitialisation(true), m_doEnvironmentInitialisation(true),
+              m_calculatedEfficiencyErrorIndex(0), m_doOneTimeInitialization(true), m_doEnvironmentInitialization(true),
               m_hasFaultyBoilerFoulingFactor(false), m_faultyBoilerFoulingFactorIndex(0)
         {
         }
@@ -202,12 +202,12 @@ namespace Boilers {
         int m_calculatedEfficiencyError;                                // calculated efficiency >1.1 recurring warning error counter
         int m_calculatedEfficiencyErrorIndex;                           // calculated efficiency >1.1 recurring warning error message index
         std::string m_endUseSubcategory;                                // identifier use for the end use subcategory
-        bool m_doOneTimeInitialisation;                                 // do the one time initialisation, i.e. locate on plantloops etc.
-        bool m_doEnvironmentInitialisation;                             // do the environment initialisation, i.e. get inlet conditions etc.
+        bool m_doOneTimeInitialization;                                 // do the one time initialization, i.e. locate on plantloops etc.
+        bool m_doEnvironmentInitialization;                             // do the environment initialization, i.e. get inlet conditions etc.
         bool m_hasFaultyBoilerFoulingFactor;                            // True if the boiler has fouling fault
         int m_faultyBoilerFoulingFactorIndex;                           // Index of the fault object corresponding to the boiler
 
-        void initialise();
+        void initialize();
 
         void calculate(Real64 const MyLoad,    // W - hot water demand to be met by boiler
                        bool const RunFlag,     // TRUE if boiler operating

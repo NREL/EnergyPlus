@@ -140,7 +140,7 @@ namespace Boilers {
                                 bool const RunFlag,
                                 int const EquipFlowCtrl)
     {
-        initialise();
+        initialize();
         calculate(CurLoad, RunFlag, EquipFlowCtrl);
         update();
         report();
@@ -160,7 +160,7 @@ namespace Boilers {
 
     void BoilerObject::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        initialise();
+        initialize();
         doSizing();
     }
 
@@ -539,7 +539,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerObject::initialise() // number of the current boiler being simulated
+    void BoilerObject::initialize() // number of the current boiler being simulated
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -574,11 +574,11 @@ namespace Boilers {
         bool FatalError;
         bool errFlag;
 
-        // clear all operating variables to ensure they are updated following the initialisation
+        // clear all operating variables to ensure they are updated following the initialization
         clearOperatingVariables();
 
         // Init more variables
-        if (m_doOneTimeInitialisation) {
+        if (m_doOneTimeInitialization) {
             // Locate the boilers on the plant loops for later usage
             errFlag = false;
             ScanPlantLoopsForObject(Name,
@@ -603,10 +603,10 @@ namespace Boilers {
                     LoopFlowStatus_NeedyIfLoopOn;
             }
 
-            m_doOneTimeInitialisation = false;
+            m_doOneTimeInitialization = false;
         }
 
-        if (m_doEnvironmentInitialisation && BeginEnvrnFlag && PlantFirstSizesOkayToFinalize) {
+        if (m_doEnvironmentInitialization && BeginEnvrnFlag && PlantFirstSizesOkayToFinalize) {
             rho = GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
             m_designMassFlowRate = m_designVolumeFlowRate * rho;
 
@@ -649,11 +649,11 @@ namespace Boilers {
                 }
             }
 
-            m_doEnvironmentInitialisation = false;
+            m_doEnvironmentInitialization = false;
         }
 
         if (!BeginEnvrnFlag) {
-            m_doEnvironmentInitialisation = true;
+            m_doEnvironmentInitialization = true;
         }
 
         // every iteration inits.  (most in calc routine)
@@ -926,7 +926,7 @@ namespace Boilers {
         if (PlantLoop(m_loopIndex).LoopSide(m_loopSideIndex).FlowLock == 0) {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((m_designFlowMode == FlowModeType::Constant) || (m_designFlowMode == FlowModeType::NotModulated)) {
-                // fix the flow rate at the design level and initialise the outlet temperature to the inlet temperature
+                // fix the flow rate at the design level and initialize the outlet temperature to the inlet temperature
                 m_operatingMassFlowRate = m_designMassFlowRate;
 
                 // update the outlet temperature if the boiler is operating
@@ -949,7 +949,7 @@ namespace Boilers {
                     }
                 }
 
-                // calculate the temperature difference and initialise the mass flow rate to 0.0
+                // calculate the temperature difference and initialize the mass flow rate to 0.0
                 Real64 const operatingTemperatureDifference = m_operatingOutletTemperature - m_operatingInletTemperature;
                 m_operatingMassFlowRate = 0.0;
 
