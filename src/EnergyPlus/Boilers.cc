@@ -96,19 +96,6 @@ namespace Boilers {
     // METHODOLOGY EMPLOYED:
     // The BLAST/DOE-2 empirical model based on mfg. data
 
-    // Using/Aliasing
-    using DataBranchAirLoopPlant::ControlType_SeriesActive;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SecInHour;
-    using DataHVACGlobals::SmallWaterVolFlow;
-    using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::Node;
-    using DataPlant::PlantLoop;
-    using DataPlant::TypeOf_Boiler_Simple;
-    using General::RoundSigDigits;
-    using General::TrimSigDigits;
-    using PlantUtilities::ScanPlantLoopsForObject;
-
     // MODULE VARIABLE DECLARATIONS:
     int NumBoilers(0); // Number of boilers
     bool GetBoilerInputFlag(true);
@@ -291,6 +278,7 @@ namespace Boilers {
         using General::RoundSigDigits;
         using GlobalNames::VerifyUniqueBoilerName;
         using NodeInputManager::GetOnlySingleNode;
+        using DataPlant::TypeOf_Boiler_Simple;
 
         // Locals
         // PARAMETERS
@@ -565,6 +553,8 @@ namespace Boilers {
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::BeginEnvrnFlag;
+        using DataLoopNode::Node;
+        using DataPlant::PlantLoop;
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
         using DataPlant::PlantFirstSizesOkayToFinalize;
@@ -574,6 +564,7 @@ namespace Boilers {
         using EMSManager::iTemperatureSetPoint;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
+        using PlantUtilities::ScanPlantLoopsForObject;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitBoiler");
@@ -706,8 +697,11 @@ namespace Boilers {
         using DataPlant::PlantLoop;
         using DataSizing::AutoVsHardSizingThreshold;
         using DataSizing::PlantSizData;
+        using DataHVACGlobals::SmallWaterVolFlow;
+        using DataGlobals::DisplayExtraWarnings;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
+        using General::RoundSigDigits;
         using OutputReportPredefined::pdchMechNomCap;
         using OutputReportPredefined::pdchMechNomEff;
         using OutputReportPredefined::pdchMechType;
@@ -890,6 +884,8 @@ namespace Boilers {
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
+        using DataLoopNode::Node;
+        using DataPlant::PlantLoop;
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::SingleSetPoint;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1105,6 +1101,7 @@ namespace Boilers {
 
     void BoilerObject::update()
     {
+        using DataLoopNode::Node;
         using PlantUtilities::SafeCopyPlantNode;
 
         // copy the date from the inlet to outlet
@@ -1116,6 +1113,9 @@ namespace Boilers {
 
     void BoilerObject::report()
     {
+        using DataGlobals::SecInHour;
+        using DataHVACGlobals::TimeStepSys;
+
         Real64 const reportingConstant(TimeStepSys * SecInHour); // constant for converting power to energy
 
         // update integrated values based on the operating conditions
