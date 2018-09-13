@@ -275,7 +275,16 @@ namespace Boilers {
         using DataGlobalConstants::AssignResourceTypeNum;
         using DataGlobalConstants::GetResourceTypeChar;
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
+
+        // Data for field names, blank numerics
+        using DataIPShortCuts::cAlphaFieldNames;
+        using DataIPShortCuts::cNumericFieldNames;
+        using DataIPShortCuts::lNumericFieldBlanks;
+        using DataIPShortCuts::lAlphaFieldBlanks;
+        using DataIPShortCuts::cAlphaArgs;
+        using DataIPShortCuts::rNumericArgs;
+        using DataIPShortCuts::cCurrentModuleObject;
+
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
         using DataSizing::AutoSize;
