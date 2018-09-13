@@ -114,17 +114,17 @@ namespace Boilers {
         {
         }
 
-        std::string Name; // user identifier
-        Real64 m_operatingLoad;                                         // W - Boiler Load
-        Real64 m_operatingHeatingEnergy;                                // J - Boiler energy integrated over time
-        Real64 m_operatingParasiticElectricalPower;                     // W - Parasitic electrical power (e.g. forced draft fan)
-        Real64 m_operatingParasiticElectricalConsumption;               // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-        Real64 m_operatingMassFlowRate;                                 // kg/s - Boiler mass flow rate
-        Real64 m_operatingInletTemperature;                             // C - Boiler inlet temperature
-        Real64 m_operatingOutletTemperature;                            // C - Boiler outlet temperature
-        Real64 m_operatingPartLoadRatio;                                // Boiler operating part-load ratio
-        Real64 m_operatingFuelUseRate;                                  // W - Boiler fuel used
-        Real64 m_operatingFuelUse;                                      // J - Boiler Fuel consumed integrated over time
+        std::string Name;                                 // user identifier
+        Real64 m_operatingLoad;                           // W - Boiler Load
+        Real64 m_operatingHeatingEnergy;                  // J - Boiler energy integrated over time
+        Real64 m_operatingParasiticElectricalPower;       // W - Parasitic electrical power (e.g. forced draft fan)
+        Real64 m_operatingParasiticElectricalConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
+        Real64 m_operatingMassFlowRate;                   // kg/s - Boiler mass flow rate
+        Real64 m_operatingInletTemperature;               // C - Boiler inlet temperature
+        Real64 m_operatingOutletTemperature;              // C - Boiler outlet temperature
+        Real64 m_operatingPartLoadRatio;                  // Boiler operating part-load ratio
+        Real64 m_operatingFuelUseRate;                    // W - Boiler fuel used
+        Real64 m_operatingFuelUse;                        // J - Boiler Fuel consumed integrated over time
 
         // member functions
         static PlantComponent *factory(std::string objectName);
@@ -164,18 +164,19 @@ namespace Boilers {
 
         // Default Constructor
         BoilerObject()
-            : m_fuelType(0), m_boilerTypeEnumerator(0), m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0),
-              m_designNominalCapacity(0.0), m_designNominalCapacityWasAutoSized(false), m_designEfficiency(0.0),
-              m_designFlowMode(FlowModeType::Default), m_outletSetpointMissingError(false), m_outletSetpointMissingErrorDone(false),
-              m_designVolumeFlowRate(0.0), m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0), m_designSizingFactor(0.0),
-              m_nodeHotWaterInletIndex(0), m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0), m_designMaxPartLoadRatio(0.0),
-              m_designOptimalPartLoadRatio(0.0), m_efficiencyCurveTemperatureMode(TemperatureEvaluationModeType::Default), m_curveEfficiencyIndex(0),
+            : m_operatingLoad(0.0), m_operatingHeatingEnergy(0.0), m_operatingParasiticElectricalPower(0.0),
+              m_operatingParasiticElectricalConsumption(0.0), m_operatingMassFlowRate(0.0), m_operatingInletTemperature(0.0),
+              m_operatingPartLoadRatio(0.0), m_operatingFuelUseRate(0.0), m_operatingFuelUse(0.0), m_fuelType(0), m_boilerTypeEnumerator(0),
+              m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_designNominalCapacity(0.0),
+              m_designNominalCapacityWasAutoSized(false), m_designEfficiency(0.0), m_designFlowMode(FlowModeType::Default),
+              m_outletSetpointMissingError(false), m_outletSetpointMissingErrorDone(false), m_designVolumeFlowRate(0.0),
+              m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0), m_designSizingFactor(0.0), m_nodeHotWaterInletIndex(0),
+              m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0), m_designMaxPartLoadRatio(0.0), m_designOptimalPartLoadRatio(0.0),
+              m_efficiencyCurveTemperatureMode(TemperatureEvaluationModeType::Default), m_curveEfficiencyIndex(0),
               m_efficiencyCurveType(EfficiencyCurveType::Default), m_designOutletTemperatureLimit(0.0), m_designParasiticElectricalLoad(0.0),
               m_efficiencyCurveOutputError(0), m_efficiencyCurveOutputErrorIndex(0), m_calculatedEfficiencyError(0),
               m_calculatedEfficiencyErrorIndex(0), m_doOneTimeInitialisation(true), m_doEnvironmentInitialisation(true),
-              m_hasFaultyBoilerFoulingFactor(false), m_faultyBoilerFoulingFactorIndex(0), m_operatingLoad(0.0), m_operatingHeatingEnergy(0.0),
-              m_operatingParasiticElectricalPower(0.0), m_operatingParasiticElectricalConsumption(0.0), m_operatingMassFlowRate(0.0),
-              m_operatingInletTemperature(0.0), m_operatingPartLoadRatio(0.0), m_operatingFuelUseRate(0.0), m_operatingFuelUse(0.0)
+              m_hasFaultyBoilerFoulingFactor(false), m_faultyBoilerFoulingFactorIndex(0)
         {
         }
 
