@@ -2503,7 +2503,7 @@
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
     ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
-    Yes,                     !- Account for Dedicated Outdoor Air System
+    No,                      !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     14.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
     15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
@@ -2539,7 +2539,7 @@
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
     ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
-    Yes,                     !- Account for Dedicated Outdoor Air System
+    No,                      !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     14.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
     15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
@@ -2575,7 +2575,7 @@
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
     ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
-    Yes,                     !- Account for Dedicated Outdoor Air System
+    No,                      !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     14.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
     15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
