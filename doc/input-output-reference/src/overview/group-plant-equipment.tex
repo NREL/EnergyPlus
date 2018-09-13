@@ -3894,10 +3894,13 @@ This alpha field contains the curve name which describes the normalized heating 
 \mathrm{Quadratic} \to Eff ={}& {A_0} + {A_1} \cdot PLR + {A_2}\cdot PL{R^2}\\
 \mathrm{Cubic} \to Eff ={}& {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot PL{R^3}\\
 \mathrm{BiQuadratic} \to Eff ={}& {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}\cdot {T_w}^2 + {A_5}\cdot PLR\cdot {T_w}\\
-\mathrm{QuadraticLinear} \to Eff ={}& {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}\cdot PLR\cdot {T_w} + {A_5}\cdot PL{R^2}\cdot {T_w}\\
 \begin{split}
-\mathrm{Bicubic} \to Eff ={}& A_0 + A_1 \cdot PLR + A_2 \cdot PLR^2 + A_3 \cdot T_w + A_4 T_w^2 + A_5 \cdot PLR \cdot T_w + A_6 \cdot PLR^3 +\\
-&A_7 \cdot T_w^3 + A_8 \cdot PLR^2 \cdot T_w + A_9 \cdot PLR \cdot T_w^2
+\mathrm{QuadraticLinear} \to Eff ={}& {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}\cdot PLR\cdot {T_w} + {}\\
+&{A_5}\cdot PL{R^2}\cdot {T_w}
+\end{split}\\
+\begin{split}
+\mathrm{Bicubic} \to Eff ={}& A_0 + A_1 \cdot PLR + A_2 \cdot PLR^2 + A_3 \cdot T_w + A_4 T_w^2 + A_5 \cdot PLR \cdot T_w + {}\\
+&A_6 \cdot PLR^3 + A_7 \cdot T_w^3 + A_8 \cdot PLR^2 \cdot T_w + A_9 \cdot PLR \cdot T_w^2
 \end{split}
 \end{align}
 \noindent where
@@ -3971,7 +3974,6 @@ An example of this statement in an IDF is:
       EnteringBoiler,      !- Efficiency Curve Temperature Evaluation Variable
       0.89,                !- Nominal Thermal Efficiency
       CondensingBoilerEff, !- Boiler Efficiency Curve Name
-      75,                  !- Design Boiler Water Outlet Temp {C}
       0.0021,              !- Max Design Boiler Water Flow Rate {m3/s}
       0.10,                !- Minimum Part Load Ratio
       1.00,                !- Maximum Part Load Ratio
@@ -3988,9 +3990,9 @@ An example of this statement in an IDF is:
       1.124970374,             !- Coefficient1 Constant
       0.014963852,             !- Coefficient2 x
      -0.02599835,              !- Coefficient3 x**2
-      0.0,                     !-Coefficient4y
-     -1.40464E-6,              !-Coefficient5y**2
-     -0.00153624,              !- Coefficient6x*y
+      0.0,                     !- Coefficient4 y
+     -1.40464E-6,              !- Coefficient5 y**2
+     -0.00153624,              !- Coefficient6 x*y
       0.1,                     !- Minimum Value of x
       1.0,                     !- Maximum Value of x
       30.0,                    !- Minimum Value of y
@@ -4002,119 +4004,40 @@ An example of this statement in an IDF is:
 Outputs available from the boiler:
 
 \begin{itemize}
-\item
-  HVAC,Average,Boiler Heating Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler Heating Energy {[}J{]}
-\item
-  Zone,Meter,Boilers:EnergyTransfer {[}J{]}
-\item
-  HVAC,Average,Boiler Inlet Temperature {[}C{]}
-\item
-  HVAC,Average,Boiler Outlet Temperature {[}C{]}
-\item
-  HVAC,Average,Boiler Mass Flow Rate {[}kg/s{]}
-\item
-  HVAC,Average,Boiler Parasitic Electric Power {[}W{]}
-\item
-  HVAC,Sum,Boiler Ancillary Electric Energy {[}J{]}
-\item
-  HVAC,Average,Boiler Part Load Ratio
+\item HVAC,Average,Boiler Heating Rate [W]
+\item HVAC,Sum,Boiler Heating Energy [J]
+\item Zone,Meter,Boilers:EnergyTransfer [J]
+\item HVAC,Average,Boiler Inlet Temperature [C]
+\item HVAC,Average,Boiler Outlet Temperature [C]
+\item HVAC,Average,Boiler Mass Flow Rate [kg/s]
+\item HVAC,Average,Boiler Parasitic Electric Power [W]
+\item HVAC,Sum,Boiler Ancillary Electric Energy [J]
+\item HVAC,Average,Boiler Part Load Ratio
 \end{itemize}
 
-\noindent One of the following blocks will be applicable based on fuel type:
-
-Electric:
+If the fuel type is electric, the following block will be applicable:
 \begin{itemize}
-\item
-  HVAC,Average,Boiler Electric Power {[}W{]}
-\item
-  HVAC,Sum,Boiler Electric Energy {[}J{]}
+\item HVAC,Average,Boiler Electric Power [W]
+\item HVAC,Sum,Boiler Electric Energy [J]
 \end{itemize}
 
-Gas:
+Otherwise a block of the following format is applicable:
 \begin{itemize}
-\item
-  HVAC,Average,Boiler Gas Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler Gas Energy {[}J{]}
+\item HVAC,Average,Boiler \textless{}Fuel Type\textgreater{} Rate [W]
+\item HVAC,Sum,Boiler \textless{}Fuel Type\textgreater{} Energy [J]
 \end{itemize}
 
-Propane:
-\begin{itemize}
-\item
-  HVAC,Average,Boiler Propane Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler Propane Energy {[}J{]}
-\end{itemize}
+\paragraph{Boiler Heating Rate [W]}\label{boiler-heating-rate-w}
 
-FuelOil\#1:
-\begin{itemize}
-\item
-  HVAC,Average,Boiler FuelOil\#1 Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler FuelOil\#1 Energy {[}J{]}
-\end{itemize}
-
-FuelOil\#2:
-\begin{itemize}
-\item
-  HVAC,Average,Boiler FuelOil\#2 Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler FuelOil\#2 Energy {[}J{]}
-\end{itemize}
-
-Coal:
-\begin{itemize}
-\item
-  HVAC,Average,Boiler Coal Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler Coal Energy {[}J{]}
-\end{itemize}
-
-Diesel:
-\begin{itemize}
-\item
-  HVAC,Average,Boiler Diesel Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler Diesel Energy {[}J{]}
-\end{itemize}
-
-Gasoline:
-\begin{itemize}
-\item
-  HVAC,Average,Boiler Gasoline Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler Gasoline Energy {[}J{]}
-\end{itemize}
-
-OtherFuel1:
-\begin{itemize}
-\item
-  HVAC,Average,Boiler OtherFuel1 Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler OtherFuel1 Energy {[}J{]}
-\end{itemize}
-
-OtherFuel2:
-\begin{itemize}
-\item
-  HVAC,Average,Boiler OtherFuel2 Rate {[}W{]}
-\item
-  HVAC,Sum,Boiler OtherFuel2 Energy {[}J{]}
-\end{itemize}
-
-\paragraph{Boiler Heating Rate {[}W{]}}\label{boiler-heating-rate-w}
-
-\paragraph{Boiler Heating Energy {[}J{]}}\label{boiler-heating-energy-j}
+\paragraph{Boiler Heating Energy [J]}\label{boiler-heating-energy-j}
 
 These outputs are the heating output (load) of the boiler. Energy is metered on Boilers:EnergyTransfer, EnergyTransfer:Plant, and EnergyTransfer:Facility.
 
-\paragraph{Boiler Inlet Temperature {[}C{]}}\label{boiler-inlet-temperature-c}
+\paragraph{Boiler Inlet Temperature [C]}\label{boiler-inlet-temperature-c}
 
-\paragraph{Boiler Outlet Temperature {[}C{]}}\label{boiler-outlet-temperature-c}
+\paragraph{Boiler Outlet Temperature [C]}\label{boiler-outlet-temperature-c}
 
-\paragraph{Boiler Mass Flow Rate {[}kg/s{]}}\label{boiler-mass-flow-rate-kgs}
+\paragraph{Boiler Mass Flow Rate [kg/s]}\label{boiler-mass-flow-rate-kgs}
 
 These outputs are the hot water inlet and outlet temperatures and flow rate for the boiler.
 
@@ -4122,17 +4045,17 @@ These outputs are the hot water inlet and outlet temperatures and flow rate for 
 
 This output is the operating part-load ratio of the boiler. The part-load ratio is calculated as the boiler load divided by the boiler nominal capacity. The part-load ratio is limited by the minimum and maximum part-load ratio inputs specified by the user.
 
-\paragraph{Boiler \textless{}Fuel Type\textgreater{} Rate {[}W{]}}\label{boiler-fuel-type-rate-w}
+\paragraph{Boiler \textless{}Fuel Type\textgreater{} Rate [W]}\label{boiler-fuel-type-rate-w}
 
-\paragraph{Boiler \textless{}Fuel Type\textgreater{} Energy {[}J{]}}\label{boiler-fuel-type-energy-j}
+\paragraph{Boiler \textless{}Fuel Type\textgreater{} Energy [J]}\label{boiler-fuel-type-energy-j}
 
-\paragraph{Boiler Electric Power {[}W{]}}\label{boiler-electric-power-w}
+\paragraph{Boiler Electric Power [W]}\label{boiler-electric-power-w}
 
 These outputs are the energy input to the boiler. Valid fuel types are: Electric, Gas (natural gas), Propane, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, OtherFuel1, OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
-\paragraph{Boiler Ancillary Electric Power {[}W{]}}\label{boiler-ancillary-electric-power-w}
+\paragraph{Boiler Ancillary Electric Power [W]}\label{boiler-ancillary-electric-power-w}
 
-\paragraph{Boiler Ancillary Electric Energy {[}J{]}}\label{boiler-ancillary-electric-energy-j}
+\paragraph{Boiler Ancillary Electric Energy [J]}\label{boiler-ancillary-electric-energy-j}
 
 These outputs are the parasitic electric power and parasitic electric consumption associated with the boiler. Used when simulating a forced draft fan or other electric component. Consumption is metered on Heating:Electricity and Electricity:Plant.
 
