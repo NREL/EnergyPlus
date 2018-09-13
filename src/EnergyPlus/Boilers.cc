@@ -277,13 +277,13 @@ namespace Boilers {
         using DataGlobals::AnyEnergyManagementSystemInModel;
 
         // Data for field names, blank numerics
-        using DataIPShortCuts::cAlphaFieldNames;
-        using DataIPShortCuts::cNumericFieldNames;
-        using DataIPShortCuts::lNumericFieldBlanks;
-        using DataIPShortCuts::lAlphaFieldBlanks;
         using DataIPShortCuts::cAlphaArgs;
-        using DataIPShortCuts::rNumericArgs;
+        using DataIPShortCuts::cAlphaFieldNames;
         using DataIPShortCuts::cCurrentModuleObject;
+        using DataIPShortCuts::cNumericFieldNames;
+        using DataIPShortCuts::lAlphaFieldBlanks;
+        using DataIPShortCuts::lNumericFieldBlanks;
+        using DataIPShortCuts::rNumericArgs;
 
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
@@ -297,9 +297,9 @@ namespace Boilers {
         static std::string const RoutineName("GetBoilerInput: ");
 
         // LOCAL VARIABLES
-        int BoilerNum(0);               // boiler identifier
-        int NumAlphas;                  // Number of elements in the alpha array
-        int NumNums;                    // Number of elements in the numeric array
+        int boilerIndex(0);               // boiler identifier
+        int numberOfAlphas;                  // Number of elements in the alpha array
+        int numberofNumeric;                    // Number of elements in the numeric array
         int IOStat;                     // IO Status when calling get input subroutine
         static bool ErrorsFound(false); // Flag to show errors were found during GetInput
         bool errFlag;                   // Flag to show errors were found during function call
@@ -320,13 +320,13 @@ namespace Boilers {
 
         // load arrays with boiler data
         for (auto &boiler : Boiler) {
-            ++BoilerNum;
+            ++boilerIndex;
             inputProcessor->getObjectItem(cCurrentModuleObject,
-                                          BoilerNum,
+                                          boilerIndex,
                                           cAlphaArgs,
-                                          NumAlphas,
+                                          numberOfAlphas,
                                           rNumericArgs,
-                                          NumNums,
+                                          numberofNumeric,
                                           IOStat,
                                           lNumericFieldBlanks,
                                           lAlphaFieldBlanks,
@@ -369,7 +369,6 @@ namespace Boilers {
 
             {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
-
                 if (SELECT_CASE_var == "ENTERINGBOILER") {
                     boiler.m_efficiencyCurveTemperatureMode = TemperatureEvaluationModeType::Entering;
                 } else if (SELECT_CASE_var == "LEAVINGBOILER") {
@@ -467,7 +466,7 @@ namespace Boilers {
                 }
             }
 
-            if (NumAlphas > 7) {
+            if (numberOfAlphas > 7) {
                 boiler.m_endUseSubcategory = cAlphaArgs(8);
             } else {
                 boiler.m_endUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since
@@ -709,73 +708,75 @@ namespace Boilers {
         using DataSizing::PlantSizData;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
+        using OutputReportPredefined::pdchMechNomCap;
+        using OutputReportPredefined::pdchMechNomEff;
+        using OutputReportPredefined::pdchMechType;
+        using OutputReportPredefined::PreDefTableEntry;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ReportSizingManager::ReportSizingOutput;
-        using OutputReportPredefined::PreDefTableEntry;
-        using OutputReportPredefined::pdchMechType;
-        using OutputReportPredefined::pdchMechNomEff;
-        using OutputReportPredefined::pdchMechNomCap;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeBoiler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PltSizNum(0);            // Plant Sizing index corresponding to CurLoopNum
-        bool ErrorsFound(false);     // If errors detected in input
-        Real64 rho;                  // water density at initialization temperature
-        Real64 Cp;                   // water specific heat capacity at design outlet temperature
-        Real64 tmpNomCap;            // local nominal capacity cooling power
-        Real64 tmpBoilerVolFlowRate; // local boiler design volume flow rate
-        Real64 NomCapUser(0.0);      // Hardsized nominal capacity for reporting
-        Real64 VolFlowRateUser(0.0); // Hardsized volume flow for reporting
+        int plantSizingIndex(0);         // Plant Sizing index corresponding to CurLoopNum
+        bool ErrorsFound(false);         // If errors detected in input
+        Real64 rho;                      // water density at initialization temperature
+        Real64 Cp;                       // water specific heat capacity at design outlet temperature
+        Real64 tmpNominalCapacity;       // local nominal capacity cooling power
+        Real64 tmpVolumeFlowRate;        // local boiler design volume flow rate
+        Real64 userNominalCapacity(0.0); // Hardsized nominal capacity for reporting
+        Real64 userVolumeFlowRate(0.0);  // Hardsized volume flow for reporting
 
-        tmpNomCap = m_designNominalCapacity;
-        tmpBoilerVolFlowRate = m_designVolumeFlowRate;
+        tmpNominalCapacity = m_designNominalCapacity;
+        tmpVolumeFlowRate = m_designVolumeFlowRate;
 
-        PltSizNum = PlantLoop(m_loopIndex).PlantSizNum;
+        plantSizingIndex = PlantLoop(m_loopIndex).PlantSizNum;
 
-        if (PltSizNum > 0) {
-            if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
+        if (plantSizingIndex > 0) {
+            if (PlantSizData(plantSizingIndex).DesVolFlowRate >= SmallWaterVolFlow) {
                 // TODO: why not use the PlantSizing temperature?
                 rho = GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
                 Cp = GetSpecificHeatGlycol(
                     PlantLoop(m_loopIndex).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
 
                 // TODO: should the capacity be calculated from the design volume flow rate once it has been calculated? (switch order of autosize)
-                tmpNomCap = Cp * rho * m_designSizingFactor * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
+                tmpNominalCapacity =
+                    Cp * rho * m_designSizingFactor * PlantSizData(plantSizingIndex).DeltaT * PlantSizData(plantSizingIndex).DesVolFlowRate;
             } else {
-                if (m_designNominalCapacityWasAutoSized) tmpNomCap = 0.0;
+                if (m_designNominalCapacityWasAutoSized) tmpNominalCapacity = 0.0;
             }
             if (PlantFirstSizesOkayToFinalize) {
                 if (m_designNominalCapacityWasAutoSized) {
-                    m_designNominalCapacity = tmpNomCap;
+                    m_designNominalCapacity = tmpNominalCapacity;
                     if (PlantFinalSizesOkayToReport) {
-                        ReportSizingOutput("Boiler:HotWater", Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        ReportSizingOutput("Boiler:HotWater", Name, "Design Size Nominal Capacity [W]", tmpNominalCapacity);
                     }
                     if (PlantFirstSizesOkayToReport) {
-                        ReportSizingOutput("Boiler:HotWater", Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        ReportSizingOutput("Boiler:HotWater", Name, "Initial Design Size Nominal Capacity [W]", tmpNominalCapacity);
                     }
                 } else { // Hard-sized with sizing data
-                    if (m_designNominalCapacity > 0.0 && tmpNomCap > 0.0) {
-                        NomCapUser = m_designNominalCapacity;
+                    if (m_designNominalCapacity > 0.0 && tmpNominalCapacity > 0.0) {
+                        userNominalCapacity = m_designNominalCapacity;
                         if (PlantFinalSizesOkayToReport) {
                             ReportSizingOutput("Boiler:HotWater",
                                                Name,
                                                "Design Size Nominal Capacity [W]",
-                                               tmpNomCap,
+                                               tmpNominalCapacity,
                                                "User-Specified Nominal Capacity [W]",
-                                               NomCapUser);
+                                               userNominalCapacity);
                             if (DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNominalCapacity - userNominalCapacity) / userNominalCapacity) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeBoilerHotWater: Potential issue with equipment sizing for " + Name);
-                                    ShowContinueError("User-Specified Nominal Capacity of " + RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + RoundSigDigits(tmpNomCap, 2) + " [W]");
+                                    ShowContinueError("User-Specified Nominal Capacity of " + RoundSigDigits(userNominalCapacity, 2) + " [W]");
+                                    ShowContinueError("differs from Design Size Nominal Capacity of " + RoundSigDigits(tmpNominalCapacity, 2) +
+                                                      " [W]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
-                        tmpNomCap = NomCapUser;
+                        tmpNominalCapacity = userNominalCapacity;
                     }
                 }
             }
@@ -791,44 +792,45 @@ namespace Boilers {
             }
         }
 
-        if (PltSizNum > 0) {
-            if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
+        if (plantSizingIndex > 0) {
+            if (PlantSizData(plantSizingIndex).DesVolFlowRate >= SmallWaterVolFlow) {
                 // TODO: should this be calculated before design capacity and then used in that calculation?
-                tmpBoilerVolFlowRate = PlantSizData(PltSizNum).DesVolFlowRate * m_designSizingFactor;
+                tmpVolumeFlowRate = PlantSizData(plantSizingIndex).DesVolFlowRate * m_designSizingFactor;
             } else {
-                if (m_designVolumeFlowRateWasAutoSized) tmpBoilerVolFlowRate = 0.0;
+                if (m_designVolumeFlowRateWasAutoSized) tmpVolumeFlowRate = 0.0;
             }
             if (PlantFirstSizesOkayToFinalize) {
                 if (m_designVolumeFlowRateWasAutoSized) {
-                    m_designVolumeFlowRate = tmpBoilerVolFlowRate;
+                    m_designVolumeFlowRate = tmpVolumeFlowRate;
                     if (PlantFinalSizesOkayToReport) {
-                        ReportSizingOutput("Boiler:HotWater", Name, "Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
+                        ReportSizingOutput("Boiler:HotWater", Name, "Design Size Design Water Flow Rate [m3/s]", tmpVolumeFlowRate);
                     }
                     if (PlantFirstSizesOkayToReport) {
-                        ReportSizingOutput("Boiler:HotWater", Name, "Initial Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
+                        ReportSizingOutput("Boiler:HotWater", Name, "Initial Design Size Design Water Flow Rate [m3/s]", tmpVolumeFlowRate);
                     }
                 } else {
-                    if (m_designVolumeFlowRate > 0.0 && tmpBoilerVolFlowRate > 0.0) {
-                        VolFlowRateUser = m_designVolumeFlowRate;
+                    if (m_designVolumeFlowRate > 0.0 && tmpVolumeFlowRate > 0.0) {
+                        userVolumeFlowRate = m_designVolumeFlowRate;
                         if (PlantFinalSizesOkayToReport) {
                             ReportSizingOutput("Boiler:HotWater",
                                                Name,
                                                "Design Size Design Water Flow Rate [m3/s]",
-                                               tmpBoilerVolFlowRate,
+                                               tmpVolumeFlowRate,
                                                "User-Specified Design Water Flow Rate [m3/s]",
-                                               VolFlowRateUser);
+                                               userVolumeFlowRate);
                             if (DisplayExtraWarnings) {
-                                if ((std::abs(tmpBoilerVolFlowRate - VolFlowRateUser) / VolFlowRateUser) > AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpVolumeFlowRate - userVolumeFlowRate) / userVolumeFlowRate) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeBoilerHotWater: Potential issue with equipment sizing for " + Name);
-                                    ShowContinueError("User-Specified Design Water Flow Rate of " + RoundSigDigits(VolFlowRateUser, 2) + " [m3/s]");
-                                    ShowContinueError("differs from Design Size Design Water Flow Rate of " +
-                                                      RoundSigDigits(tmpBoilerVolFlowRate, 2) + " [m3/s]");
+                                    ShowContinueError("User-Specified Design Water Flow Rate of " + RoundSigDigits(userVolumeFlowRate, 2) +
+                                                      " [m3/s]");
+                                    ShowContinueError("differs from Design Size Design Water Flow Rate of " + RoundSigDigits(tmpVolumeFlowRate, 2) +
+                                                      " [m3/s]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
-                        tmpBoilerVolFlowRate = VolFlowRateUser;
+                        tmpVolumeFlowRate = userVolumeFlowRate;
                     }
                 }
             }
@@ -844,7 +846,7 @@ namespace Boilers {
             }
         }
 
-        RegisterPlantCompDesignFlow(m_nodeHotWaterInletIndex, tmpBoilerVolFlowRate);
+        RegisterPlantCompDesignFlow(m_nodeHotWaterInletIndex, tmpVolumeFlowRate);
 
         if (PlantFinalSizesOkayToReport) {
             // create predefined report
