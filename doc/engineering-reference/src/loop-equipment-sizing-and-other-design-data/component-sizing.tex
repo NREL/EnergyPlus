@@ -1486,25 +1486,22 @@ All boilers on a loop are sized to meet the full loop load multipled by a compon
 \subsubsection{Nominal Capacity}\label{nominal-capacity}
 
 \begin{equation}
-\dot Q_{boiler,nom} = C_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des} \cdot \dot V_{loop,des} \cdot f_{size}
+\dot Q_{boiler,nom} = C_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des} \cdot \dot{V}_{loop,des} \cdot f_{size}
 \end{equation}
 
-where
-
-\( C_{p,w} \) is the specific heat of water at the boiler design outlet temperature;
-
-\( \rho_w \) is the density of water at standard conditions (5.05 \(^{o}\)C);
-
-\( \Delta T_{loop,des} \) is the hot water loop design temperature decrease;
-
-\( \dot V_{loop,des} \) is the loop design volumetric flow rate.
-
-\( f_{size} \) is the boiler's sizing factor.
+\noindent where
+\begin{description}[labelwidth=1cm, leftmargin=!]
+\item[$C_{p,w}$] is the specific heat of water at the boiler design outlet temperature.
+\item[$\rho_w$] is the density of water at standard conditions (\SI{5.05}{\celsius}).
+\item[$\Delta T_{loop,des}$] is the hot water loop design temperature decrease.
+\item[$\dot{V}_{loop,des}$] is the loop design volumetric flow rate.
+\item[$f_{size}$] is the boiler's sizing factor.
+\end{description}
 
 \subsubsection{Design Water Volume Flow Rate}\label{design-boiler-water-flow-rate-1}
 
 \begin{equation}
-\dot V_{des} = \dot V_{loop,des} \cdot f_{size}
+\dot{V}_{des} = \dot{V}_{loop,des} \cdot f_{size}
 \end{equation}
 
 \subsection{Plant Heat Exchanger Sizing}\label{plant-heat-exchanger-sizing}
