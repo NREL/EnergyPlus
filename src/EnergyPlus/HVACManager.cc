@@ -380,9 +380,6 @@ namespace HVACManager {
         NumOfSysTimeSteps = 1;
         FracTimeStepZone = TimeStepSys / TimeStepZone;
 
-        bool anyEMSRan;
-        ManageEMS(emsCallFromBeginTimestepBeforePredictor, anyEMSRan); // calling point
-
         SetOutAirNodes();
 
         ManageRefrigeratedCaseRacks();
@@ -508,6 +505,7 @@ namespace HVACManager {
             // Update the plant and condenser loop capacitance model temperature history.
             UpdateNodeThermalHistory();
 
+            bool anyEMSRan;
             ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
 
             // This is where output processor data is updated for System Timestep reporting
