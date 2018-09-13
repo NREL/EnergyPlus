@@ -255,6 +255,9 @@ namespace DataSizing {
     extern Real64 DataCoilSizingAirInHumRat;          // saves sizing data for use in coil object reporting
     extern Real64 DataCoilSizingAirOutTemp;           // saves sizing data for use in coil object reporting
     extern Real64 DataCoilSizingAirOutHumRat;         // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingFanCoolLoad;          // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingCapFT;                // saves sizing data for use in coil object reporting
+    extern Real64 DataDesAccountForFanHeat;           // include fan heat when true
     extern Real64 DataDesInletWaterTemp;              // coil inlet water temperture used for warning messages
     extern Real64 DataDesInletAirHumRat;              // coil inlet air humidity ratio used for warning messages
     extern Real64 DataDesInletAirTemp;                // coil inlet air temperature used for warning messages
