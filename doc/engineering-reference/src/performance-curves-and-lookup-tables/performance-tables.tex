@@ -298,23 +298,17 @@ Table:MultiVariableLookup,
 \subsection{Table:Lookup}\label{table-lookup}
 
 Lookup tables provide a method to evaluate a group of data that may or
-may not conform to a fundamental equation. Only tabular data which
-conform to existing performance curve equations are currently allowed
-(i.e., that lookup table name is entered where any valid performance
-curve is allowed therefore the table data must conform to the model's
-fundamental equation for that specific curve). Efforts to include this
-lookup table in the energy management system would allow custom use of
-lookup tables, however, calling lookup tables from the EMS system is not
-currently possible. Lookup tables can interpolate the actual data using
-a linear interpolation or piecewise cubic spline. As with other table or
-curve objects, the lookup table can be used anywhere a valid curve
-object name is allowed. Care must be taken to ensure the table data
+may not conform to a fundamental equation. Lookup tables can interpolate
+the actual data using a linear interpolation or piecewise cubic spline.
+As with curve objects, the lookup table can be used anywhere a valid
+curve object name is allowed so long as they share the same number of
+independent variables. Care must be taken to ensure the table data
 format is consistent with the associate model that is using the
 performance curve (e.g., DX cooling coil capacity as a function of
 temperature where independent variable X1 = indoor wet-bulb temperature
 and independent variable X2 = outdoor dry-bulb temperature).
 
-An interpolative lookup can be specified to be either linear or cubic
+A lookup table can be specified to use either linear or cubic interpolation
 independently for each dimension (input variable). For performance
 points outside the defined grid space, an extrapolation method--constant
 or linear--can be set independently for each dimension. Finally, each
@@ -363,13 +357,12 @@ i.e., if there is no \(x_{-1}\), we substitute \(x_0\) into the
 \(f^\prime(x_0)\) formula.
 
 If a mix of interpolation methods are specified among the included
-dimensions, the library will perform that mix as requested.
-
-If the lookup point is beyond the grid edge on any axis, the library
+dimensions, the interpolator will perform that mix as requested.
+If the lookup point is beyond the grid edge on any axis, the interpolator
 will perform the requested extrapolation method (linear or constant) on
 that dimension while proceeding with interpolation along any in-bounds
 dimension. If a ``do-not-extrapolate-beyond'' boundary is specified, the
-library will perform a constant extrapolation from that boundary outward
+interpolator will perform a constant extrapolation from that boundary outward
 (in that dimension), and it will return the resulting numerical answer
 along with a warning that the request was outside the boundaries.
 

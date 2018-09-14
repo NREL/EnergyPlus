@@ -1047,24 +1047,25 @@ for three independent variables (\texttt{iv1}, \texttt{iv2},
 
 \subsubsection{Example IDF}\label{example-idf}
 
-\begin{verbatim}
+\begin{lstlisting}
 Table:Lookup,
-!- Name
-!- Interpolation Method
-!- Extrapolation Method
-!- Curve Type
-!- Independent Variable List Name
-!- Normalize Output
-!- Minimum Output
-!- Maximum Output
-!- Output Unit Type
-!- External File Name
-!- External File Column Number
-!- External File Starting Row Number
-!- Output Value 1
-!- ...
-!- Output Value N
-\end{verbatim}
+  HPACCoolCapFT,           !- Name
+  HPACCoolCapFT_IndependentVariableList,  !- Independent Variable List Name
+  Yes,                     !- Normalize Output
+  ,                        !- Normalization Value
+  0,                       !- Minimum Output
+  40000,                   !- Maximum Output
+  Dimensionless,           !- Output Unit Type
+  ,                        !- External File Name
+  ,                        !- External File Column Number
+  ,                        !- External File Starting Row Number
+  24421.69383, 22779.73113, 21147.21662, 19794.00525, 19524.15032, 18178.81244, 16810.36004,
+  25997.3589,  24352.1562,  22716.4017,  21360.49033, 21090.0954,  19742.05753, 18370.84513,
+  28392.31868, 26742.74198, 25102.61348, 23743.0571,  23471.93318, 22120.2503,  20745.3119,
+  29655.22876, 28003.546,   26361.31143, 25000,       24728.52506, 23375.08713, 21998.35468,
+  31094.97495, 29441.02425, 27796.52175, 26433.32038, 26161.46745, 24806.13958, 23427.47518,
+  33988.3473,  32330.1846,  30681.4701,  29314.75872, 29042.2038,  27683.36592, 26301.11353;
+\end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs}
 
@@ -1176,13 +1177,12 @@ of an independent variable.
 
 \subsubsection{Example IDF}\label{example-idf-1}
 
-\begin{verbatim}
+\begin{lstlisting}
 Table:IndependentVariableList,
-!- Name
-!- Independent Variable 1 Name
-!- ...
-!- Independent Variable N Name
-\end{verbatim}
+  HPACCoolCapFT_IndependentVariableList,  !- Name
+  HPACCoolCapFT_Tewb,                     !- Independent Variable 1 Name
+  HPACCoolCapFT_Todb;                     !- Independent Variable 2 Name
+\end{lstlisting}
 
 \subsection{Table:IndependentVariable}\label{tableindependentvariable}
 
@@ -1227,10 +1227,10 @@ closest point along the table's boundary.
 \emph{Linear}: Value is linearly extrapolated in all dimensions from
 the interpolated value at the closest point along the table's
 boundary.
-\item
-\emph{Unavailable}: The object using this curve is assumed to be not
-operable outside of the provided range of values. This will override
-any corresponding availability schedules of applicable equipment.
+%\item
+%\emph{Unavailable}: The object using this curve is assumed to be not
+%operable outside of the provided range of values. This will override
+%any corresponding availability schedules of applicable equipment.
 \end{itemize}
 
 \paragraph{Field: Minimum Value}\label{field-minimum-value}
@@ -1252,6 +1252,18 @@ extrapolation is held constant and a warning will be issued. If
 extrapolation method is ``Unavailable'', the corresponding equipment
 will be disabled for all values greater than the highest independent
 variable value, regardless of the maximum value set here.
+
+\paragraph{Field: Normalization
+Value}\label{field-normalization-value}
+
+The value of this independent variable where nominal or rated output is
+defined. This will be used to normalize the data so that the outputs of
+any Table:Lookup at this value (and the corresponding Normalization
+Values of the other independent variables described in the same
+Table:IndependentVariableList object) are equal to 1.0. If left blank, no
+normalization will be calculated. If this field is left blank all other
+Table:IndependentVariable objects within the same Table:IndependentVariableList
+must also be left blank.
 
 \paragraph{Field: Unit Type}\label{field-unit-type}
 
@@ -1277,18 +1289,6 @@ Distance
 \item
 Power
 \end{itemize}
-
-\paragraph{Field: Normalization
-Value}\label{field-normalization-value}
-
-The value of this independent variable where nominal or rated output is
-defined. This will be used to normalize the data so that the outputs of
-any Table:Lookup at this value (and the corresponding Normalization
-Values of the other independent variables described in the same
-Table:IndependentVariableList object) are equal to 1.0. If left blank, no
-normalization will be calculated. If this field is left blank all other
-Table:IndependentVariable objects within the same Table:IndependentVariableList
-must also be left blank.
 
 \paragraph{Field: External File
 Name}\label{field-external-file-name-1}
@@ -1430,14 +1430,22 @@ is not the case).
 
 \subsubsection{Example IDF}\label{example-idf-2}
 
-\begin{verbatim}
+\begin{lstlisting}
 Table:IndependentVariable,
-!- Name
-!- Minimum Value
-!- Maximum Value
-!- Unit Type
-!- Normalization Value
-!- Value 1
-!- ...
-!- Value N
-\end{verbatim}
+  HPACCoolCapFT_Tewb,      !- Name
+  Cubic,                   !- Interpolation Method
+  Constant,                !- Extrapolation Method
+  12.77778,                !- Minimum Value
+  23.88889,                !- Maximum Value
+  19.44449,                !- Normalization Value
+  Temperature,             !- Unit Type
+  ,                        !- External File Name
+  ,                        !- External File Column Number
+  ,                        !- External File Starting Row Number
+  12.77778,                !- Value 1
+  15.00000,                !- Value 2
+  18.00000,                !- Value 3
+  19.44449,                !- Value 4
+  21.00000,                !- Value 5
+  23.88889;                !- Value 6
+\end{lstlisting}
