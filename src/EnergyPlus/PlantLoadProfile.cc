@@ -87,13 +87,6 @@ namespace PlantLoadProfile {
     // For this reason the plant load profile can only be called for simulation by the non-zone equipment
     // manager (see NonZoneEquipmentManager.cc).
 
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataPlant::PlantLoop;
-    using PlantUtilities::InitComponentNodes;
-    using PlantUtilities::ScanPlantLoopsForObject;
-    using PlantUtilities::SetComponentFlowRate;
-
     // MODULE VARIABLE DECLARATIONS:
     bool GetPlantLoadProfileInputFlag(true);
     int NumOfPlantProfile;
@@ -178,8 +171,12 @@ namespace PlantLoadProfile {
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::SysSizingCalc;
         using DataLoopNode::Node;
+        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
+        using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegisterPlantCompDesignFlow;
+        using PlantUtilities::ScanPlantLoopsForObject;
+        using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleMaxValue;
 
@@ -275,6 +272,7 @@ namespace PlantLoadProfile {
 
     void PlantProfileObject::calculate()
     {
+        using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
         static std::string const RoutineName("CalculatePlantProfile");
