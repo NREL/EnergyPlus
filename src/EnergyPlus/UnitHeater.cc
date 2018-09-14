@@ -1037,6 +1037,14 @@ namespace UnitHeater {
         CompType = "ZoneHVAC:UnitHeater";
         CompName = UnitHeat(UnitHeatNum).Name;
         DataZoneNumber = UnitHeat(UnitHeatNum).ZonePtr;
+        if (UnitHeat(UnitHeatNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataFanIndex = UnitHeat(UnitHeatNum).Fan_Index;
+        // unit heater is always blow thru
+        DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
         if (CurZoneEqNum > 0) {
             if (UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
@@ -1914,6 +1922,12 @@ namespace UnitHeater {
         // FLOW:
         UnitHeat(UnitHeatNum).HeatEnergy = UnitHeat(UnitHeatNum).HeatPower * TimeStepSys * SecInHour;
         UnitHeat(UnitHeatNum).ElecEnergy = UnitHeat(UnitHeatNum).ElecPower * TimeStepSys * SecInHour;
+
+        if (UnitHeat(UnitHeatNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, UnitHeat(UnitHeatNum).FirstPass);
+            }
+        }
     }
 
     Real64 CalcUnitHeaterResidual(Real64 const PartLoadRatio, // heating coil part load ratio
