@@ -1455,6 +1455,14 @@ namespace FanCoilUnits {
         CompType = FanCoil(FanCoilNum).UnitType;
         CompName = FanCoil(FanCoilNum).Name;
         DataZoneNumber = FanCoil(FanCoilNum).ControlZoneNum;
+        if (FanCoil(FanCoilNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = FanCoil(FanCoilNum).FanIndex;
+        // fan coil unit is always blow thru
+        DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
         if (CurZoneEqNum > 0) {
             if (FanCoil(FanCoilNum).HVACSizingIndex > 0) {
@@ -2210,14 +2218,14 @@ namespace FanCoilUnits {
         Real64 MinSAMassFlowRate;     // minimum supply air mass flow rate [kg/s]
         Real64 MaxSAMassFlowRate;     // maximum supply air mass flow rate [kg/s]
         // Real64 FCOutletTempOn;        // ASHRAE outlet air temperature when coil is on [C]
-        Real64 HWFlow;                // hot water mass flow rate solution [kg/s]		Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
-        Real64 MdotLockH;             // saved value of locked chilled water mass flow rate [kg/s]
-        Real64 MdotLockC;             // saved value of locked hot water mass flow rate [kg/s]
-        Real64 CWFlow;                // cold water mass flow rate solution [kg/s]
-        Real64 CWFlowBypass;          // cold water bypassed mass flow rate [kg/s]
-        Real64 HWFlowBypass;          // hot water bypassed mass flow rate [kg/s]
-        bool ColdFlowLocked;          // if true cold water flow is locked
-        bool HotFlowLocked;           // if true Hot water flow is locked
+        Real64 HWFlow;       // hot water mass flow rate solution [kg/s]
+        Real64 MdotLockH;    // saved value of locked chilled water mass flow rate [kg/s]
+        Real64 MdotLockC;    // saved value of locked hot water mass flow rate [kg/s]
+        Real64 CWFlow;       // cold water mass flow rate solution [kg/s]
+        Real64 CWFlowBypass; // cold water bypassed mass flow rate [kg/s]
+        Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
+        bool ColdFlowLocked; // if true cold water flow is locked
+        bool HotFlowLocked;  // if true Hot water flow is locked
         // initialize local variables
         UnitOn = true;
         ControlNode = 0;
@@ -4466,6 +4474,12 @@ namespace FanCoilUnits {
         FanCoil(FanCoilNum).SensCoolEnergy = FanCoil(FanCoilNum).SensCoolPower * ReportingConstant;
         FanCoil(FanCoilNum).TotCoolEnergy = FanCoil(FanCoilNum).TotCoolPower * ReportingConstant;
         FanCoil(FanCoilNum).ElecEnergy = FanCoil(FanCoilNum).ElecPower * ReportingConstant;
+
+        if (FanCoil(FanCoilNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, FanCoil(FanCoilNum).FirstPass);
+            }
+        }
     }
 
     int GetFanCoilZoneInletAirNode(int const FanCoilNum)
