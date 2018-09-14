@@ -329,7 +329,6 @@ namespace PlantLoadProfile {
 
     void PlantProfileData::report()
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004
@@ -346,18 +345,17 @@ namespace PlantLoadProfile {
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
+        Real64 const reportingConstant(TimeStepSys * SecInHour); // constant for converting power to energy
 
-        // FLOW:
-        this->m_operatingEnergy = this->m_operatingPower * TimeStepSys * SecInHour;
+        // update integrated values based on the operating conditions
+        m_operatingEnergy = m_operatingPower * reportingConstant;
 
-        if (this->m_operatingEnergy >= 0.0) {
-            this->m_operatingHeatingEnergy = this->m_operatingEnergy;
-            this->m_operatingCoolingEnergy = 0.0;
+        if (m_operatingEnergy >= 0.0) {
+            m_operatingHeatingEnergy = m_operatingEnergy;
+            m_operatingCoolingEnergy = 0.0;
         } else {
-            this->m_operatingHeatingEnergy = 0.0;
-            this->m_operatingCoolingEnergy = std::abs(this->m_operatingEnergy);
+            m_operatingHeatingEnergy = 0.0;
+            m_operatingCoolingEnergy = std::abs(m_operatingEnergy);
         }
     }
 
