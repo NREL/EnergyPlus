@@ -1712,6 +1712,14 @@ namespace UnitVentilator {
         ZoneHeatingOnlyFan = false;
         DoWaterCoilSizing = false;
         CoilNum = 0;
+        if (UnitVent(UnitVentNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = UnitVent(UnitVentNum).Fan_Index;
+        // unit ventilator is always blow thru
+        DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
         if (UnitVent(UnitVentNum).CoilOption == BothOption) {
             ZoneCoolingOnlyFan = true;
@@ -3700,6 +3708,12 @@ namespace UnitVentilator {
         UnitVent(UnitVentNum).SensCoolEnergy = UnitVent(UnitVentNum).SensCoolPower * TimeStepSys * SecInHour;
         UnitVent(UnitVentNum).TotCoolEnergy = UnitVent(UnitVentNum).TotCoolPower * TimeStepSys * SecInHour;
         UnitVent(UnitVentNum).ElecEnergy = UnitVent(UnitVentNum).ElecPower * TimeStepSys * SecInHour;
+
+        if (UnitVent(UnitVentNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, UnitVent(UnitVentNum).FirstPass);
+            }
+        }
     }
 
     int GetUnitVentilatorOutAirNode(int const UnitVentNum)

@@ -4846,6 +4846,17 @@ namespace PackagedTerminalHeatPump {
         CompType = PTUnit(PTUnitNum).UnitType;
         CompName = PTUnit(PTUnitNum).Name;
         DataZoneNumber = PTUnit(PTUnitNum).ZonePtr;
+        if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = PTUnit(PTUnitNum).FanIndex;
+        if (PTUnit(PTUnitNum).FanPlace == BlowThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        } else if (PTUnit(PTUnitNum).FanPlace == DrawThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+        }
 
         if (CurZoneEqNum > 0) {
             if (PTUnit(PTUnitNum).HVACSizingIndex > 0) {
@@ -6720,19 +6731,8 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-
-            if (!SysSizingCalc) {
-
-                if (CurZoneEqNum > 0) {
-                    ZoneEqSizing(CurZoneEqNum).AirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).SystemAirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).Capacity = false;
-                    ZoneEqSizing(CurZoneEqNum).CoolingCapacity = false;
-                    ZoneEqSizing(CurZoneEqNum).HeatingCapacity = false;
-                }
-                PTUnit(PTUnitNum).FirstPass = false;
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, PTUnit(PTUnitNum).FirstPass);
             }
         }
 
