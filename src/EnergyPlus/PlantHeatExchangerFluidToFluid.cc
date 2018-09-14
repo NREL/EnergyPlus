@@ -891,6 +891,8 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // Using/Aliasing
         using namespace DataSizing;
+        using DataGlobals::CWInitConvTemp;
+        using DataGlobals::HWInitConvTemp;
         using DataHVACGlobals::SmallWaterVolFlow;
         using DataPlant::PlantFinalSizesOkayToReport;
         using DataPlant::PlantFirstSizesOkayToReport;
@@ -965,20 +967,20 @@ namespace PlantHeatExchangerFluidToFluid {
         if (FluidHX(CompNum).DemandSideLoop.DesignVolumeFlowRateWasAutoSized) {
             if (PltSizNumDmdSide > 0) {
                 if (tmpSupSideDesignVolFlowRate > SmallWaterVolFlow) {
+                    const int supplyLoopType(PlantSizData(PltSizNumSupSide).LoopType);
+                    const int demandLoopType(PlantSizData(PltSizNumDmdSide).LoopType);
+
                     Real64 supplyLoopInitTemp(0.0);
                     Real64 demandLoopInitTemp(0.0);
 
-                    switch (PlantSizData(PltSizNumSupSide).LoopType) {
-                    case HeatingLoop:
+                    if (supplyLoopType == HeatingLoop) {
                         supplyLoopInitTemp = HWInitConvTemp;
-                        break;
-                    case CondenserLoop:
-                    case CoolingLoop:
+                    }
+                    else if (supplyLoopType == CondenserLoop || supplyLoopType == CoolingLoop) {
                         supplyLoopInitTemp = CWInitConvTemp;
-                        break;
-                    default:
+                    }
+                    else {
                         assert(false);
-                        break;
                     }
 
                     // calculate the supply side capacity per volume flow rate
@@ -993,17 +995,14 @@ namespace PlantHeatExchangerFluidToFluid {
                                            RoutineName);
                     tmpSupSideCapPerVolFlowRate = Cp * rho * tmpDeltaTSupLoop;
 
-                    switch (PlantSizData(PltSizNumDmdSide).LoopType) {
-                    case HeatingLoop:
+                    if (demandLoopType == HeatingLoop) {
                         demandLoopInitTemp = HWInitConvTemp;
-                        break;
-                    case CondenserLoop:
-                    case CoolingLoop:
+                    }
+                    else if (demandLoopType == CondenserLoop || demandLoopType == CoolingLoop) {
                         demandLoopInitTemp = CWInitConvTemp;
-                        break;
-                    default:
+                    }
+                    else {
                         assert(false);
-                        break;
                     }
 
                     // calculate the demand side capacity per volume flow rate
