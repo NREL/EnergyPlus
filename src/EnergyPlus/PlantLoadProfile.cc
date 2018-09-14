@@ -318,21 +318,13 @@ namespace PlantLoadProfile {
 
         // Using/Aliasing
         using DataLoopNode::Node;
+        using PlantUtilities::SafeCopyPlantNode;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // copy data from inlet to outlet
+        SafeCopyPlantNode(m_nodeInletIndex, m_nodeOutletIndex);
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int OutletNode;
-
-        // FLOW:
-
-        OutletNode = this->m_nodeOutletIndex;
-
-        // Set outlet node variables that are possibly changed
-        Node(OutletNode).Temp = this->m_operatingOutletTemperature;
-
-        // DSU? enthalpy? quality etc? central routine? given inlet node, fluid type, delta T, properly fill all node vars?
+        // update the outlet temperature
+        Node(m_nodeOutletIndex).Temp = m_operatingOutletTemperature;
     }
 
     void PlantProfileData::report()
