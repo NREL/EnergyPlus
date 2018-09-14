@@ -125,6 +125,18 @@ namespace PlantLoadProfile {
         this->initialize();
     }
 
+    void PlantProfileData::clearOperatingVariables()
+    {
+        m_operatingVolumeFlowRate = 0.0;
+        m_operatingMassFlowRate = 0.0;
+        m_operatingPower = 0.0;
+        m_operatingEnergy = 0.0;
+        m_operatingCoolingEnergy = 0.0;
+        m_operatingHeatingEnergy = 0.0;
+        m_operatingInletTemperature = 0.0;
+        m_operatingOutletTemperature = 0.0;
+    }
+
     void PlantProfileData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool const EP_UNUSED(FirstHVACIteration),
                                     Real64 &EP_UNUSED(CurLoad),
@@ -206,7 +218,8 @@ namespace PlantLoadProfile {
         Real64 FluidDensityInit;
         bool errFlag;
 
-        // FLOW:
+        // clear all operating variables to ensure they are updated following the initialization
+        clearOperatingVariables();
 
         // Do the one time initializations
         if (this->m_doOneTimeInitialization) {
