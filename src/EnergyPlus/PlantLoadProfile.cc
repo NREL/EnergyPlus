@@ -89,9 +89,7 @@ namespace PlantLoadProfile {
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
-    using DataGlobals::BeginEnvrnFlag;
     using DataPlant::PlantLoop;
-    using DataPlant::TypeOf_PlantLoadProfile;
     using PlantUtilities::InitComponentNodes;
     using PlantUtilities::ScanPlantLoopsForObject;
     using PlantUtilities::SetComponentFlowRate;
@@ -142,7 +140,6 @@ namespace PlantLoadProfile {
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool const EP_UNUSED(RunFlag))
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004
@@ -164,7 +161,6 @@ namespace PlantLoadProfile {
 
     void PlantProfileData::initialize()
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004
@@ -179,15 +175,13 @@ namespace PlantLoadProfile {
         // actual available flow is set.
 
         // Using/Aliasing
+        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::SysSizingCalc;
         using DataLoopNode::Node;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleMaxValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("InitPlantProfile");
@@ -299,7 +293,6 @@ namespace PlantLoadProfile {
 
     void PlantProfileData::update()
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2004
@@ -372,6 +365,7 @@ namespace PlantLoadProfile {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using DataGlobals::AnyEnergyManagementSystemInModel;
+        using DataPlant::TypeOf_PlantLoadProfile;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataLoopNode;
