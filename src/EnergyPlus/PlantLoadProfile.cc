@@ -156,23 +156,10 @@ namespace PlantLoadProfile {
         // This is a very simple simulation.  InitPlantProfile does the work of getting the scheduled load and flow rate.
         // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
 
-        // USE STATEMENTS:
-
-        // Using/Aliasing
-        using FluidProperties::GetSpecificHeatGlycol;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("SimulatePlantProfile");
-        Real64 DeltaTemp;
-
         this->initialize();
         this->calculate();
         this->update();
         this->report();
-
     } // simulate()
 
     void PlantProfileData::initialize()
@@ -291,6 +278,8 @@ namespace PlantLoadProfile {
 
     void PlantProfileData::calculate()
     {
+        using FluidProperties::GetSpecificHeatGlycol;
+
         static std::string const RoutineName("CalculatePlantProfile");
 
         // set the outlet temperature to the inlet temperature
