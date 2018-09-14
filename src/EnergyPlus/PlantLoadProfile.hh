@@ -72,6 +72,10 @@ namespace PlantLoadProfile {
         }
 
         std::string Name;                    // Name of Plant Load Profile object
+        bool m_emsHasPowerOverride;    // if true, then EMS is calling to override power level
+        Real64 m_emsPowerOverride;     // value EMS is directing to use for power [W]
+        bool m_emsHasMassFlowRateOverride;
+        Real64 m_emsMassFlowRateOverride;
         Real64 m_operatingPower;             // Power required to meet the load (W)
         Real64 m_operatingEnergy;            // Energy required to meet the load (J)
         Real64 m_operatingHeatingEnergy;     // Heating Energy required to meet the load (J)
@@ -91,12 +95,12 @@ namespace PlantLoadProfile {
 
         // Default Constructor
         PlantProfileObject()
-            : m_operatingPower(0.0), m_operatingEnergy(0.0), m_operatingHeatingEnergy(0.0), m_operatingCoolingEnergy(0.0),
+            : m_emsHasPowerOverride(false), m_emsPowerOverride(0.0), m_emsHasMassFlowRateOverride(false), m_emsMassFlowRateOverride(0.0),
+              m_operatingPower(0.0), m_operatingEnergy(0.0), m_operatingHeatingEnergy(0.0), m_operatingCoolingEnergy(0.0),
               m_operatingInletTemperature(0.0), m_operatingOutletTemperature(0.0), m_operatingVolumeFlowRate(0.0), m_operatingMassFlowRate(0.0),
               m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_doOneTimeInitialization(true),
               m_doEnvironmentInitialization(true), m_doInitSizing(true), m_nodeInletIndex(0), m_nodeOutletIndex(0), m_loadScheduleIndex(0),
-              m_peakVolumeFlowRate(0.0), m_flowRateFractionScheduleIndex(0), m_emsHasPowerOverride(false), m_emsPowerOverride(0.0),
-              m_emsHasMassFlowRateOverride(false), m_emsMassFlowRateOverride(0.0)
+              m_peakVolumeFlowRate(0.0), m_flowRateFractionScheduleIndex(0)
         {
         }
 
@@ -114,10 +118,6 @@ namespace PlantLoadProfile {
         int m_loadScheduleIndex;         // Pointer to schedule object
         Real64 m_peakVolumeFlowRate;   // Peak volumetric flow rate, also water consumption rate (m3/s)
         int m_flowRateFractionScheduleIndex; // Pointer to schedule object
-        bool m_emsHasPowerOverride;    // if true, then EMS is calling to override power level
-        Real64 m_emsPowerOverride;     // value EMS is directing to use for power [W]
-        bool m_emsHasMassFlowRateOverride;
-        Real64 m_emsMassFlowRateOverride;
 
         void initialize();
 

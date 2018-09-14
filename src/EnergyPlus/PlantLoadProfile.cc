@@ -226,13 +226,12 @@ namespace PlantLoadProfile {
                                m_branchIndex,
                                m_componentIndex);
 
-            // TODO: this seems wrong, this will change it for all following iterations.
-            //       Perhaps this should just change a flag that prevents override on a
-            //       BeginEnvrnFlag run?
+            // Ensure no EMS overrides during environment initialization
             m_emsHasMassFlowRateOverride = false;
             m_emsMassFlowRateOverride = 0.0;
             m_emsHasPowerOverride = false;
             m_emsPowerOverride = 0.0;
+
             m_doEnvironmentInitialization = false;
         }
 
