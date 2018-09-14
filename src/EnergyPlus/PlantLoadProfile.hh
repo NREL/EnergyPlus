@@ -124,18 +124,18 @@ namespace PlantLoadProfile {
 
         void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
-        void InitPlantProfile();
+        void initialize();
 
-        void UpdatePlantProfile();
+        void update();
 
-        void ReportPlantProfile();
+        void report();
     };
 
     // Object Data
     extern Array1D<PlantProfileData> PlantProfile;
 
     // This could be static inside the class
-    void GetPlantProfileInput();
+    void getPlantProfileInput();
 
     // As could this
     void clear_state();
