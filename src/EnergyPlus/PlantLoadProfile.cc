@@ -106,10 +106,10 @@ namespace PlantLoadProfile {
     PlantComponent *PlantProfileData::factory(std::string objectName)
     {
         if (GetPlantLoadProfileInputFlag) {
-            GetPlantProfileInput();
+            getPlantProfileInput();
             GetPlantLoadProfileInputFlag = false;
         }
-        // Now look for this particular pipe in the list
+        // Now look for this particular plant profile in the list
         for (auto &plp : PlantProfile) {
             if (plp.Name == objectName) {
                 return &plp;
@@ -117,13 +117,12 @@ namespace PlantLoadProfile {
         }
         // If we didn't find it, fatal
         ShowFatalError("PlantLoadProfile::factory: Error getting inputs for pipe named: " + objectName);
-        // Shut up the compiler
         return nullptr;
     }
 
     void PlantProfileData::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->InitPlantProfile();
+        this->initialize();
     }
 
     void PlantProfileData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -157,25 +156,25 @@ namespace PlantLoadProfile {
         static std::string const RoutineName("SimulatePlantProfile");
         Real64 DeltaTemp;
 
-        this->InitPlantProfile();
+        this->initialize();
 
-        if (this->MassFlowRate > 0.0) {
+        if (this->m_operatingMassFlowRate > 0.0) {
             Real64 Cp =
-                GetSpecificHeatGlycol(PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
-            DeltaTemp = this->Power / (this->MassFlowRate * Cp);
+                GetSpecificHeatGlycol(PlantLoop(this->m_loopIndex).FluidName, this->m_operatingInletTemperature, PlantLoop(this->m_loopIndex).FluidIndex, RoutineName);
+            DeltaTemp = this->m_operatingPower / (this->m_operatingMassFlowRate * Cp);
         } else {
-            this->Power = 0.0;
+            this->m_operatingPower = 0.0;
             DeltaTemp = 0.0;
         }
 
-        this->OutletTemp = this->InletTemp - DeltaTemp;
+        this->m_operatingOutletTemperature = this->m_operatingInletTemperature - DeltaTemp;
 
-        this->UpdatePlantProfile();
-        this->ReportPlantProfile();
+        this->update();
+        this->report();
 
     } // simulate()
 
-    void PlantProfileData::InitPlantProfile()
+    void PlantProfileData::initialize()
     {
 
         // SUBROUTINE INFORMATION:
@@ -210,75 +209,75 @@ namespace PlantLoadProfile {
         // FLOW:
 
         // Do the one time initializations
-        if (this->SetLoopIndexFlag) {
+        if (this->m_doOneTimeInitialization) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(
-                    this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, _, _, _, _, _, errFlag);
+                    this->Name, this->m_plantProfileType, this->m_loopIndex, this->m_loopSideIndex, this->m_branchIndex, this->m_componentIndex, _, _, _, _, _, errFlag);
                 if (errFlag) {
                     ShowFatalError("InitPlantProfile: Program terminated for previous conditions.");
                 }
 
-                this->SetLoopIndexFlag = false;
+                this->m_doOneTimeInitialization = false;
             }
         }
 
-        if (!SysSizingCalc && this->InitSizing) {
-            RegisterPlantCompDesignFlow(InletNode, this->PeakVolFlowRate);
-            this->InitSizing = false;
+        if (!SysSizingCalc && this->m_doInitSizing) {
+            RegisterPlantCompDesignFlow(m_nodeInletIndex, this->m_peakVolumeFlowRate);
+            this->m_doInitSizing = false;
         }
 
-        if (BeginEnvrnFlag && this->Init) {
+        if (BeginEnvrnFlag && this->m_doInit) {
             // Clear node initial conditions
             // DSU? can we centralize these temperature inits
             //    Node(InletNode)%Temp = 0.0
-            Node(OutletNode).Temp = 0.0;
+            Node(m_nodeOutletIndex).Temp = 0.0;
 
             FluidDensityInit =
-                GetDensityGlycol(PlantLoop(this->WLoopNum).FluidName, DataGlobals::InitConvTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+                GetDensityGlycol(PlantLoop(this->m_loopIndex).FluidName, DataGlobals::InitConvTemp, PlantLoop(this->m_loopIndex).FluidIndex, RoutineName);
 
-            Real64 MaxFlowMultiplier = GetScheduleMaxValue(this->FlowRateFracSchedule);
+            Real64 MaxFlowMultiplier = GetScheduleMaxValue(this->m_flowRateFractionScheduleIndex);
 
             InitComponentNodes(0.0,
-                               this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier,
-                               this->InletNode,
-                               this->OutletNode,
-                               this->WLoopNum,
-                               this->WLoopSideNum,
-                               this->WLoopBranchNum,
-                               this->WLoopCompNum);
+                               this->m_peakVolumeFlowRate * FluidDensityInit * MaxFlowMultiplier,
+                               this->m_nodeInletIndex,
+                               this->m_nodeOutletIndex,
+                               this->m_loopIndex,
+                               this->m_loopSideIndex,
+                               this->m_branchIndex,
+                               this->m_componentIndex);
 
-            this->EMSOverrideMassFlow = false;
-            this->EMSMassFlowValue = 0.0;
-            this->EMSOverridePower = false;
-            this->EMSPowerValue = 0.0;
-            this->Init = false;
+            this->m_emsHasMassFlowRateOverride = false;
+            this->m_emsMassFlowRateOverride = 0.0;
+            this->m_emsHasPowerOverride = false;
+            this->m_emsPowerOverride = 0.0;
+            this->m_doInit = false;
         }
 
-        if (!BeginEnvrnFlag) this->Init = true;
+        if (!BeginEnvrnFlag) this->m_doInit = true;
 
-        this->InletTemp = Node(InletNode).Temp;
-        this->Power = GetCurrentScheduleValue(this->LoadSchedule);
+        this->m_operatingInletTemperature = Node(m_nodeInletIndex).Temp;
+        this->m_operatingPower = GetCurrentScheduleValue(this->m_loadScheduleIndex);
 
-        if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
+        if (this->m_emsHasPowerOverride) this->m_operatingPower = this->m_emsPowerOverride;
 
-        FluidDensityInit = GetDensityGlycol(PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+        FluidDensityInit = GetDensityGlycol(PlantLoop(this->m_loopIndex).FluidName, this->m_operatingInletTemperature, PlantLoop(this->m_loopIndex).FluidIndex, RoutineName);
 
         // Get the scheduled mass flow rate
-        this->VolFlowRate = this->PeakVolFlowRate * GetCurrentScheduleValue(this->FlowRateFracSchedule);
+        this->m_operatingVolumeFlowRate = this->m_peakVolumeFlowRate * GetCurrentScheduleValue(this->m_flowRateFractionScheduleIndex);
 
-        this->MassFlowRate = this->VolFlowRate * FluidDensityInit;
+        this->m_operatingMassFlowRate = this->m_operatingVolumeFlowRate * FluidDensityInit;
 
-        if (this->EMSOverrideMassFlow) this->MassFlowRate = this->EMSMassFlowValue;
+        if (this->m_emsHasMassFlowRateOverride) this->m_operatingMassFlowRate = this->m_emsMassFlowRateOverride;
 
         // Request the mass flow rate from the plant component flow utility routine
-        SetComponentFlowRate(this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
+        SetComponentFlowRate(this->m_operatingMassFlowRate, m_nodeInletIndex, m_nodeOutletIndex, this->m_loopIndex, this->m_loopSideIndex, this->m_branchIndex, this->m_componentIndex);
 
-        this->VolFlowRate = this->MassFlowRate / FluidDensityInit;
+        this->m_operatingVolumeFlowRate = this->m_operatingMassFlowRate / FluidDensityInit;
 
     } // InitPlantProfile()
 
-    void PlantProfileData::UpdatePlantProfile()
+    void PlantProfileData::update()
     {
 
         // SUBROUTINE INFORMATION:
@@ -304,15 +303,15 @@ namespace PlantLoadProfile {
 
         // FLOW:
 
-        OutletNode = this->OutletNode;
+        OutletNode = this->m_nodeOutletIndex;
 
         // Set outlet node variables that are possibly changed
-        Node(OutletNode).Temp = this->OutletTemp;
+        Node(OutletNode).Temp = this->m_operatingOutletTemperature;
 
         // DSU? enthalpy? quality etc? central routine? given inlet node, fluid type, delta T, properly fill all node vars?
     }
 
-    void PlantProfileData::ReportPlantProfile()
+    void PlantProfileData::report()
     {
 
         // SUBROUTINE INFORMATION:
@@ -335,19 +334,19 @@ namespace PlantLoadProfile {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // FLOW:
-        this->Energy = this->Power * TimeStepSys * SecInHour;
+        this->m_operatingEnergy = this->m_operatingPower * TimeStepSys * SecInHour;
 
-        if (this->Energy >= 0.0) {
-            this->HeatingEnergy = this->Energy;
-            this->CoolingEnergy = 0.0;
+        if (this->m_operatingEnergy >= 0.0) {
+            this->m_operatingHeatingEnergy = this->m_operatingEnergy;
+            this->m_operatingCoolingEnergy = 0.0;
         } else {
-            this->HeatingEnergy = 0.0;
-            this->CoolingEnergy = std::abs(this->Energy);
+            this->m_operatingHeatingEnergy = 0.0;
+            this->m_operatingCoolingEnergy = std::abs(this->m_operatingEnergy);
         }
     }
 
     // Functions
-    void GetPlantProfileInput()
+    void getPlantProfileInput()
     {
 
         // SUBROUTINE INFORMATION:
