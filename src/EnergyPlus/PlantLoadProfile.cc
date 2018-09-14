@@ -169,18 +169,7 @@ namespace PlantLoadProfile {
         Real64 DeltaTemp;
 
         this->initialize();
-
-        if (this->m_operatingMassFlowRate > 0.0) {
-            Real64 Cp =
-                GetSpecificHeatGlycol(PlantLoop(this->m_loopIndex).FluidName, this->m_operatingInletTemperature, PlantLoop(this->m_loopIndex).FluidIndex, RoutineName);
-            DeltaTemp = this->m_operatingPower / (this->m_operatingMassFlowRate * Cp);
-        } else {
-            this->m_operatingPower = 0.0;
-            DeltaTemp = 0.0;
-        }
-
-        this->m_operatingOutletTemperature = this->m_operatingInletTemperature - DeltaTemp;
-
+        this->calculate();
         this->update();
         this->report();
 
@@ -299,6 +288,24 @@ namespace PlantLoadProfile {
         // back calculate the volume flow in case EMS has overridden mass flow rate
         m_operatingVolumeFlowRate = m_operatingMassFlowRate / FluidDensityInit;
 
+    }
+
+    void PlantProfileData::calculate() {
+        static std::string const RoutineName("CalculatePlantProfile");
+
+        // set the outlet temperature to the inlet temperature
+        m_operatingOutletTemperature = m_operatingInletTemperature;
+
+        if (m_operatingMassFlowRate > 0.0) {
+            Real64 deltaTemperature;
+            Real64 const Cp =
+                GetSpecificHeatGlycol(PlantLoop(m_loopIndex).FluidName, m_operatingInletTemperature, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
+
+            deltaTemperature = m_operatingPower / (m_operatingMassFlowRate * Cp);
+            m_operatingOutletTemperature -= deltaTemperature;
+        } else {
+            m_operatingPower = 0.0;
+        }
     }
 
     void PlantProfileData::update()

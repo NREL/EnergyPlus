@@ -131,6 +131,8 @@ namespace PlantLoadProfile {
         void report();
 
         void clearOperatingVariables();
+
+        void calculate();
     };
 
     // Object Data
