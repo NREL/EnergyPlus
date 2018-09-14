@@ -265,32 +265,32 @@ namespace PlantLoadProfile {
 
         if (m_emsHasPowerOverride) {
             m_operatingPower = m_emsPowerOverride;
-        }
-        else {
+        } else {
             m_operatingPower = GetCurrentScheduleValue(m_loadScheduleIndex);
         }
 
-        FluidDensityInit = GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, m_operatingInletTemperature, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
+        FluidDensityInit =
+            GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, m_operatingInletTemperature, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
 
         // Get the scheduled volume flow rate
         m_operatingVolumeFlowRate = m_peakVolumeFlowRate * GetCurrentScheduleValue(m_flowRateFractionScheduleIndex);
 
         if (m_emsHasMassFlowRateOverride) {
             m_operatingMassFlowRate = m_emsMassFlowRateOverride;
-        }
-        else {
+        } else {
             m_operatingMassFlowRate = m_operatingVolumeFlowRate * FluidDensityInit;
         }
 
         // Request the mass flow rate from the plant component flow utility routine
-        SetComponentFlowRate(m_operatingMassFlowRate, m_nodeInletIndex, m_nodeOutletIndex, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex);
+        SetComponentFlowRate(
+            m_operatingMassFlowRate, m_nodeInletIndex, m_nodeOutletIndex, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex);
 
         // back calculate the volume flow in case EMS has overridden mass flow rate
         m_operatingVolumeFlowRate = m_operatingMassFlowRate / FluidDensityInit;
-
     }
 
-    void PlantProfileData::calculate() {
+    void PlantProfileData::calculate()
+    {
         static std::string const RoutineName("CalculatePlantProfile");
 
         // set the outlet temperature to the inlet temperature
