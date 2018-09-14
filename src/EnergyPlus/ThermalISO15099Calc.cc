@@ -2628,8 +2628,8 @@ namespace ThermalISO15099Calc {
                 auto nmix1 = nmix(i);
                 auto press1 = (pressure(i) + pressure(i + 1)) / 2.0;
                 for (auto j = 1; j <= maxgas; ++j) {
-                    iprop1(j) = iprop(i, j);
-                    frct1(j) = frct(i, j);
+                    iprop1(j) = iprop(j, i);
+                    frct1(j) = frct(j, i);
                 }
 
                 Real64 con;

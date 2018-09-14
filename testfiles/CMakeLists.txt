@@ -141,6 +141,7 @@ ADD_SIMULATION_TEST(IDF_FILE ChangeoverBypassVAV_MaxTemp.idf EPW_FILE USA_FL_Mia
 ADD_SIMULATION_TEST(IDF_FILE ChillerPartLoadCurve_RefBldgLargeOfficeNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CmplxGlz_Daylighting_SouthVB45deg.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CmplxGlz_Daylighting_SouthVerticalVB45deg.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE CmplxGlz_InShadeGasMix.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CmplxGlz_MeasuredDeflectionAndShading.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CmplxGlz_SchedSurfGains.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CmplxGlz_SingleZone_Deflection.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

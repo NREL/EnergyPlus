@@ -389,8 +389,8 @@ namespace ThermalEN673Calc {
                     //   write(18, 22222) iprop(i+1, j), tempDens, gvis(iprop(i+1,j), 1), gcon(iprop(i+1,j), 1), gcp(iprop(i+1,j), 1)
                     dT(i) = 15.0 / (nlayer - 1); // set initial temperature distribution
                     for (j = 1; j <= nmix(i + 1); ++j) {
-                        ipropg(j) = iprop(j, i + 1);
-                        frctg(j) = frct(j, i + 1);
+                        ipropg(j) = iprop(i + 1, j);
+                        frctg(j) = frct(i + 1, j);
                     }
                     GASSES90(Tm,
                              ipropg,
@@ -457,8 +457,8 @@ namespace ThermalEN673Calc {
                                 Tm = (theta(2 * i) + theta(2 * i + 1)) / 2.0;
                             }
                             for (j = 1; j <= nmix(i + 1); ++j) {
-                                ipropg(j) = iprop(j, i + 1);
-                                frctg(j) = frct(j, i + 1);
+                                ipropg(j) = iprop(i + 1, j);
+                                frctg(j) = frct(i + 1, j);
                             } // j, gas mix
                             GASSES90(Tm,
                                      ipropg,
