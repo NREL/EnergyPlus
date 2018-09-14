@@ -347,9 +347,6 @@ namespace HeatBalanceManager {
             ManageHeatBalanceGetInputFlag = false;
         }
 
-        bool anyRan;
-        ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan); // EMS calling point
-
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(); // Initialize all heat balance related parameters
 
@@ -361,7 +358,7 @@ namespace HeatBalanceManager {
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance();
-
+        bool anyRan;
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
         RecKeepHeatBalance();                                             // Do any heat balance related record keeping
 
