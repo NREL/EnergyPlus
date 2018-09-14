@@ -182,7 +182,7 @@ namespace PlantLoadProfile {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("InitPlantProfile");
-        Real64 FluidDensityInit;
+        Real64 fluidDensity;
         bool errFlag;
 
         // clear all operating variables to ensure they are updated following the initialization
@@ -208,18 +208,17 @@ namespace PlantLoadProfile {
         }
 
         if (m_doEnvironmentInitialization && BeginEnvrnFlag) {
+            Real64 const maxFlowMultiplier(GetScheduleMaxValue(m_flowRateFractionScheduleIndex));
+            Real64 const fluidDensityInit(GetDensityGlycol(PlantLoop(m_loopIndex).FluidName,
+                                                           DataGlobals::InitConvTemp,
+                                                           PlantLoop(m_loopIndex).FluidIndex,
+                                                           RoutineName)); // the init temperature should depend on the loop
+
             // Clear node initial conditions
-            // DSU? can we centralize these temperature inits
-            //    Node(InletNode)%Temp = 0.0
             Node(m_nodeOutletIndex).Temp = 0.0;
 
-            FluidDensityInit =
-                GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::InitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
-
-            Real64 const maxFlowMultiplier(GetScheduleMaxValue(m_flowRateFractionScheduleIndex));
-
             InitComponentNodes(0.0,
-                               m_peakVolumeFlowRate * FluidDensityInit * maxFlowMultiplier,
+                               m_peakVolumeFlowRate * fluidDensityInit * maxFlowMultiplier,
                                m_nodeInletIndex,
                                m_nodeOutletIndex,
                                m_loopIndex,
@@ -244,13 +243,14 @@ namespace PlantLoadProfile {
         // every iteration will initialize, set operating conditions
         m_operatingInletTemperature = Node(m_nodeInletIndex).Temp;
 
+        // TODO: these should be moved to the calculate routine
         if (m_emsHasPowerOverride) {
             m_operatingPower = m_emsPowerOverride;
         } else {
             m_operatingPower = GetCurrentScheduleValue(m_loadScheduleIndex);
         }
 
-        FluidDensityInit =
+        fluidDensity =
             GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, m_operatingInletTemperature, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
 
         // Get the scheduled volume flow rate
@@ -259,7 +259,7 @@ namespace PlantLoadProfile {
         if (m_emsHasMassFlowRateOverride) {
             m_operatingMassFlowRate = m_emsMassFlowRateOverride;
         } else {
-            m_operatingMassFlowRate = m_operatingVolumeFlowRate * FluidDensityInit;
+            m_operatingMassFlowRate = m_operatingVolumeFlowRate * fluidDensity;
         }
 
         // Request the mass flow rate from the plant component flow utility routine
@@ -267,7 +267,7 @@ namespace PlantLoadProfile {
             m_operatingMassFlowRate, m_nodeInletIndex, m_nodeOutletIndex, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex);
 
         // back calculate the volume flow in case EMS has overridden mass flow rate
-        m_operatingVolumeFlowRate = m_operatingMassFlowRate / FluidDensityInit;
+        m_operatingVolumeFlowRate = m_operatingMassFlowRate / fluidDensity;
     }
 
     void PlantProfileObject::calculate()
@@ -378,7 +378,7 @@ namespace PlantLoadProfile {
 
         // LOCAL VARIABLES
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        int IOStatus;                   // Used in GetObjectItem
+        int IOStat;                   // Used in GetObjectItem
         int numberOfAlphas;             // Number of Alphas for each GetObjectItem call
         int numberOfNumeric;            // Number of Numbers for each GetObjectItem call
         int profileIndex(0);            // PLANT LOAD PROFILE (PlantProfile) object number
@@ -405,7 +405,7 @@ namespace PlantLoadProfile {
                                           numberOfAlphas,
                                           rNumericArgs,
                                           numberOfNumeric,
-                                          IOStatus,
+                                          IOStat,
                                           lNumericFieldBlanks,
                                           _,
                                           cAlphaFieldNames,
