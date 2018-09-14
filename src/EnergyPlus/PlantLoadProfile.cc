@@ -384,9 +384,9 @@ namespace PlantLoadProfile {
         // LOCAL VARIABLES
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int IOStatus;                   // Used in GetObjectItem
-        int numberOfAlphas;                  // Number of Alphas for each GetObjectItem call
-        int numberOfNumeric;                 // Number of Numbers for each GetObjectItem call
-        int profileIndex(0);                 // PLANT LOAD PROFILE (PlantProfile) object number
+        int numberOfAlphas;             // Number of Alphas for each GetObjectItem call
+        int numberOfNumeric;            // Number of Numbers for each GetObjectItem call
+        int profileIndex(0);            // PLANT LOAD PROFILE (PlantProfile) object number
 
         cCurrentModuleObject = "LoadProfile:Plant";
         NumOfPlantProfile = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -428,8 +428,8 @@ namespace PlantLoadProfile {
             plp.m_loadScheduleIndex = GetScheduleIndex(cAlphaArgs(4));
 
             if (plp.m_loadScheduleIndex == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(4) + " called " +
-                                cAlphaArgs(4) + " was not found.");
+                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(4) +
+                                " called " + cAlphaArgs(4) + " was not found.");
                 ErrorsFound = true;
             }
 
@@ -438,8 +438,8 @@ namespace PlantLoadProfile {
             plp.m_flowRateFractionScheduleIndex = GetScheduleIndex(cAlphaArgs(5));
 
             if (plp.m_flowRateFractionScheduleIndex == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(5) + " called " +
-                                cAlphaArgs(5) + " was not found.");
+                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(5) +
+                                " called " + cAlphaArgs(5) + " was not found.");
                 ErrorsFound = true;
             }
 
@@ -447,19 +447,11 @@ namespace PlantLoadProfile {
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), cCurrentModuleObject + " Nodes");
 
             // Setup report variables
-            SetupOutputVariable("Plant Load Profile Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                plp.m_operatingMassFlowRate,
-                                "System",
-                                "Average",
-                                plp.Name);
+            SetupOutputVariable(
+                "Plant Load Profile Mass Flow Rate", OutputProcessor::Unit::kg_s, plp.m_operatingMassFlowRate, "System", "Average", plp.Name);
 
-            SetupOutputVariable("Plant Load Profile Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                plp.m_operatingPower,
-                                "System",
-                                "Average",
-                                plp.Name);
+            SetupOutputVariable(
+                "Plant Load Profile Heat Transfer Rate", OutputProcessor::Unit::W, plp.m_operatingPower, "System", "Average", plp.Name);
 
             SetupOutputVariable("Plant Load Profile Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
@@ -498,18 +490,9 @@ namespace PlantLoadProfile {
                                 "Plant");
 
             if (AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Plant Load Profile",
-                                 plp.Name,
-                                 "Mass Flow Rate",
-                                 "[kg/s]",
-                                 plp.m_emsHasMassFlowRateOverride,
-                                 plp.m_emsMassFlowRateOverride);
-                SetupEMSActuator("Plant Load Profile",
-                                 plp.Name,
-                                 "Power",
-                                 "[W]",
-                                 plp.m_emsHasPowerOverride,
-                                 plp.m_emsPowerOverride);
+                SetupEMSActuator(
+                    "Plant Load Profile", plp.Name, "Mass Flow Rate", "[kg/s]", plp.m_emsHasMassFlowRateOverride, plp.m_emsMassFlowRateOverride);
+                SetupEMSActuator("Plant Load Profile", plp.Name, "Power", "[W]", plp.m_emsHasPowerOverride, plp.m_emsPowerOverride);
             }
 
             if (ErrorsFound) {
