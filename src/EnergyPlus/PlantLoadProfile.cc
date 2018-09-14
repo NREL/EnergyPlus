@@ -113,7 +113,7 @@ namespace PlantLoadProfile {
 
     void PlantProfileObject::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize();
+        initialize();
     }
 
     void PlantProfileObject::clearOperatingVariables()
@@ -146,10 +146,10 @@ namespace PlantLoadProfile {
         // This is a very simple simulation.  InitPlantProfile does the work of getting the scheduled load and flow rate.
         // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
 
-        this->initialize();
-        this->calculate();
-        this->update();
-        this->report();
+        initialize();
+        calculate();
+        update();
+        report();
     } // simulate()
 
     void PlantProfileObject::initialize()
