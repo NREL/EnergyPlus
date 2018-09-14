@@ -60,9 +60,9 @@
 
 // EnergyPlus Headers
 #include <BranchInputManager.hh>
-#include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <DataAirflowNetwork.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataDefineEquip.hh>
@@ -2032,12 +2032,17 @@ namespace SimAirServingZones {
                 fanModelTypeEnum supFanModelType = fanModelTypeNotYetSet;
                 fanModelTypeEnum retFanModelType = fanModelTypeNotYetSet;
 
+                bool FoundCentralCoolCoil = false;
                 for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
 
                     for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                         CompTypeNum = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                         if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num == OAMixer_Num) {
                             FoundOASys = true;
+                        }
+                        if (CompTypeNum == WaterCoil_SimpleCool || CompTypeNum == WaterCoil_Cooling || CompTypeNum == WaterCoil_DetailedCool ||
+                            CompTypeNum == WaterCoil_CoolingHXAsst || CompTypeNum == DXSystem) {
+                            FoundCentralCoolCoil = true;
                         }
                         if (CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel) {
                             if (PrimaryAirSystem(AirLoopNum).OASysExists && !PrimaryAirSystem(AirLoopNum).isAllOA) {
@@ -2088,6 +2093,11 @@ namespace SimAirServingZones {
                 } else if (supFanModelType == objectVectorOOFanSystemModel) {
                     PrimaryAirSystem(AirLoopNum).supFanVecIndex = SupFanIndex;
                     PrimaryAirSystem(AirLoopNum).supFanModelTypeEnum = objectVectorOOFanSystemModel;
+                }
+                if (FoundCentralCoolCoil) { // parent systems with fan will need to set the fan placement
+                    PrimaryAirSystem(AirLoopNum).supFanLocation = fanPlacement::DrawThru;
+                } else {
+                    PrimaryAirSystem(AirLoopNum).supFanLocation = fanPlacement::BlowThru;
                 }
 
                 if (retFanModelType == structArrayLegacyFanModels) {
