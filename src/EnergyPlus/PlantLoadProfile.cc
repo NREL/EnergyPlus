@@ -99,9 +99,9 @@ namespace PlantLoadProfile {
     int NumOfPlantProfile;
 
     // Object Data
-    Array1D<PlantProfileData> PlantProfile;
+    Array1D<PlantProfileObject> PlantProfile;
 
-    PlantComponent *PlantProfileData::factory(std::string objectName)
+    PlantComponent *PlantProfileObject::factory(std::string objectName)
     {
         if (GetPlantLoadProfileInputFlag) {
             getPlantProfileInput();
@@ -118,12 +118,12 @@ namespace PlantLoadProfile {
         return nullptr;
     }
 
-    void PlantProfileData::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PlantProfileObject::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize();
     }
 
-    void PlantProfileData::clearOperatingVariables()
+    void PlantProfileObject::clearOperatingVariables()
     {
         m_operatingVolumeFlowRate = 0.0;
         m_operatingMassFlowRate = 0.0;
@@ -135,7 +135,7 @@ namespace PlantLoadProfile {
         m_operatingOutletTemperature = 0.0;
     }
 
-    void PlantProfileData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PlantProfileObject::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool const EP_UNUSED(FirstHVACIteration),
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool const EP_UNUSED(RunFlag))
@@ -159,7 +159,7 @@ namespace PlantLoadProfile {
         this->report();
     } // simulate()
 
-    void PlantProfileData::initialize()
+    void PlantProfileObject::initialize()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -230,6 +230,9 @@ namespace PlantLoadProfile {
                                m_branchIndex,
                                m_componentIndex);
 
+            // TODO: this seems wrong, this will change it for all following iterations.
+            //       Perhaps this should just change a flag that prevents override on a
+            //       BeginEnvrnFlag run?
             m_emsHasMassFlowRateOverride = false;
             m_emsMassFlowRateOverride = 0.0;
             m_emsHasPowerOverride = false;
@@ -270,7 +273,7 @@ namespace PlantLoadProfile {
         m_operatingVolumeFlowRate = m_operatingMassFlowRate / FluidDensityInit;
     }
 
-    void PlantProfileData::calculate()
+    void PlantProfileObject::calculate()
     {
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -291,7 +294,7 @@ namespace PlantLoadProfile {
         }
     }
 
-    void PlantProfileData::update()
+    void PlantProfileObject::update()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -316,7 +319,7 @@ namespace PlantLoadProfile {
         Node(m_nodeOutletIndex).Temp = m_operatingOutletTemperature;
     }
 
-    void PlantProfileData::report()
+    void PlantProfileObject::report()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -348,7 +351,7 @@ namespace PlantLoadProfile {
         }
     }
 
-    void getPlantProfileInput()
+    void PlantProfileObject::getPlantProfileInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis

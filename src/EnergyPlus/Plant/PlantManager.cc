@@ -974,7 +974,7 @@ namespace PlantManager {
                             this_comp.TypeOf_Num = TypeOf_PlantLoadProfile;
                             this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
                             this_comp.CurOpSchemeType = DemandOpSchemeType;
-                            this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory(CompNames(CompNum));
+                            this_comp.compPtr = PlantLoadProfile::PlantProfileObject::factory(CompNames(CompNum));
                         } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:System")) {
                             this_comp.TypeOf_Num = TypeOf_GrndHtExchgSystem;
                             this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;

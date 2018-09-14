@@ -59,70 +59,65 @@
 namespace EnergyPlus {
 
 namespace PlantLoadProfile {
-    // Using/Aliasing
-
-    // Data
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
     // MODULE VARIABLE DECLARATIONS:
     extern int NumOfPlantProfile;
 
-    // SUBROUTINE SPECIFICATIONS:
-
     // Types
-
-    struct PlantProfileData : public PlantComponent
+    class PlantProfileObject : public PlantComponent
     {
-        virtual ~PlantProfileData()
+        // Members
+    public:
+        virtual ~PlantProfileObject()
         {
         }
 
-        // Members
-        std::string Name;   // Name of Plant Load Profile object
+        std::string Name;                    // Name of Plant Load Profile object
+        Real64 m_operatingPower;             // Power required to meet the load (W)
+        Real64 m_operatingEnergy;            // Energy required to meet the load (J)
+        Real64 m_operatingHeatingEnergy;     // Heating Energy required to meet the load (J)
+        Real64 m_operatingCoolingEnergy;     // Cooling Energy required to meet the load (J)
+        Real64 m_operatingInletTemperature;  // Inlet temperature (C)
+        Real64 m_operatingOutletTemperature; // Outlet temperature (C)
+        Real64 m_operatingVolumeFlowRate;    // Volumetric flow rate (m3/s)
+        Real64 m_operatingMassFlowRate;      // Mass flow rate (kg/s)
+
+        // member functions
+        static PlantComponent *factory(std::string objectName);
+        static void getPlantProfileInput();
+
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        // Default Constructor
+        PlantProfileObject()
+            : m_operatingPower(0.0), m_operatingEnergy(0.0), m_operatingHeatingEnergy(0.0), m_operatingCoolingEnergy(0.0),
+              m_operatingInletTemperature(0.0), m_operatingOutletTemperature(0.0), m_operatingVolumeFlowRate(0.0), m_operatingMassFlowRate(0.0),
+              m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_doOneTimeInitialization(true),
+              m_doEnvironmentInitialization(true), m_doInitSizing(true), m_nodeInletIndex(0), m_nodeOutletIndex(0), m_loadScheduleIndex(0),
+              m_peakVolumeFlowRate(0.0), m_flowRateFractionScheduleIndex(0), m_emsHasPowerOverride(false), m_emsPowerOverride(0.0),
+              m_emsHasMassFlowRateOverride(false), m_emsMassFlowRateOverride(0.0)
+        {
+        }
+
+    private:
         int m_plantProfileType;        // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
         int m_loopIndex;       // water plant loop index number                      !DSU
         int m_loopSideIndex;   // water plant loop side index                        !DSU
         int m_branchIndex; // water plant loop branch index                      !DSU
         int m_componentIndex;   // water plant loop component index                   !DSU
+        bool m_doOneTimeInitialization;
         bool m_doEnvironmentInitialization;          // Flag for initialization:  TRUE means do the init
         bool m_doInitSizing;    // Flag for initialization of plant sizing
         int m_nodeInletIndex;
-        Real64 m_operatingInletTemperature; // Inlet temperature (C)
         int m_nodeOutletIndex;
-        Real64 m_operatingOutletTemperature;        // Outlet temperature (C)
         int m_loadScheduleIndex;         // Pointer to schedule object
-        bool m_emsHasPowerOverride;    // if true, then EMS is calling to override power level
-        Real64 m_emsPowerOverride;     // value EMS is directing to use for power [W]
         Real64 m_peakVolumeFlowRate;   // Peak volumetric flow rate, also water consumption rate (m3/s)
         int m_flowRateFractionScheduleIndex; // Pointer to schedule object
-        Real64 m_operatingVolumeFlowRate;       // Volumetric flow rate (m3/s)
-        Real64 m_operatingMassFlowRate;      // Mass flow rate (kg/s)
+        bool m_emsHasPowerOverride;    // if true, then EMS is calling to override power level
+        Real64 m_emsPowerOverride;     // value EMS is directing to use for power [W]
         bool m_emsHasMassFlowRateOverride;
         Real64 m_emsMassFlowRateOverride;
-        // Report variables
-        Real64 m_operatingPower;         // Power required to meet the load (W)
-        Real64 m_operatingEnergy;        // Energy required to meet the load (J)
-        Real64 m_operatingHeatingEnergy; // Heating Energy required to meet the load (J)
-        Real64 m_operatingCoolingEnergy; // Cooling Energy required to meet the load (J)
-        bool m_doOneTimeInitialization;
-
-        // Default Constructor
-        PlantProfileData()
-            : m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_doEnvironmentInitialization(true), m_doInitSizing(true), m_nodeInletIndex(0), m_operatingInletTemperature(0.0),
-              m_nodeOutletIndex(0), m_operatingOutletTemperature(0.0), m_loadScheduleIndex(0), m_emsHasPowerOverride(false), m_emsPowerOverride(0.0), m_peakVolumeFlowRate(0.0),
-              m_flowRateFractionScheduleIndex(0), m_operatingVolumeFlowRate(0.0), m_operatingMassFlowRate(0.0), m_emsHasMassFlowRateOverride(false), m_emsMassFlowRateOverride(0.0), m_operatingPower(0.0),
-              m_operatingEnergy(0.0), m_operatingHeatingEnergy(0.0), m_operatingCoolingEnergy(0.0), m_doOneTimeInitialization(true)
-        {
-        }
-
-        // Functions
-        static PlantComponent *factory(std::string objectName);
-
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
-
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
         void initialize();
 
@@ -136,12 +131,8 @@ namespace PlantLoadProfile {
     };
 
     // Object Data
-    extern Array1D<PlantProfileData> PlantProfile;
+    extern Array1D<PlantProfileObject> PlantProfile;
 
-    // This could be static inside the class
-    void getPlantProfileInput();
-
-    // As could this
     void clear_state();
 
 } // namespace PlantLoadProfile
