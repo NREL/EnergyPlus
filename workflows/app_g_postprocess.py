@@ -8,7 +8,10 @@ from eplaunch.workflows.base import BaseEPLaunchWorkflow1, EPLaunchWorkflowRespo
 class AppGPostProcessWorkflow(BaseEPLaunchWorkflow1):
 
     def name(self):
-        return "AppGPostProcess"
+        return "AppGPostProcess-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}"
+
+    def context(self):
+        return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"
 
     def description(self):
         return "Run Appendix G Post Processor"
