@@ -9,35 +9,31 @@ The LoadProfile:Plant object must be connected on the demand side of the plant l
 The LoadProfile:Plant object calculates the outlet water temperature based on the inlet water temperature from the plant loop and user inputs for the scheduled plant load and the requested flow rate.~ The calculation can be expressed with the equation:
 
 \begin{equation}
-{T_{out}} = {T_{in}} - \frac{{{Q_{load}}}}{{\dot m{c_p}}}
+T_{out} = T_{in} - \frac{Q_{load}}{\dot{m} \cdot c_p}
 \end{equation}
 
-where
+\noindent where
+\begin{description}[labelwidth=1cm, leftmargin=!]
+\item[$T_{out}$] is the outlet water temperature (\si{\celsius}).
+\item[$T_{in}$] is the inlet water temperature (\si{\celsius}).
+\item[$Q_{load}$] is the scheduled plant load (\si{\W}).
+\item[$\dot{m}$] is the water mass flow rate (\si{\kg\per\s}).
+\item[$c_p$] is the specific heat of water (\si{\kJ\per\kg\per\K}).
+\end{description}
 
-\({T_{out}}\) ~ = the outlet water temperature
+The user requested flow rate is not always available from the plant loop. The actual flow rate used in the calculation is the lesser of the user requested value and the plant available value.
 
-\({T_{in}}\) ~ = the inlet water temperature
-
-\({Q_{load}}\) ~ = the scheduled plant load
-
-\(\dot m\) ~ = the water mass flow rate
-
-\({c_p}\) ~ = the specific heat of water
-
-The user requested flow rate is not always available from the plant loop.~ The actual flow rate used in the calculation is the lesser of the user requested value and the plant available value.
-
-Note that the LoadProfile:Plant object can still request and receive flow even if the scheduled plant load is zero.~ In this case the outlet temperature will be the same as the inlet temperature.~ This allows users to drive the plant loop flow without necessarily affecting the loop temperature.
+Note that the LoadProfile:Plant object can still request and receive flow even if the scheduled plant load is zero. In this case the outlet temperature will be the same as the inlet temperature. This allows users to drive the plant loop flow without necessarily affecting the loop temperature.
 
 For reporting purposes the energy consumption of the object is calculated using the equation:
 
 \begin{equation}
-E = {Q_{load}}\Delta t
+E = Q_{load} \cdot \Delta t
 \end{equation}
 
-where
-
-\(E\) ~ = the energy consumption
-
-\({Q_{load}}\) ~ = the scheduled plant load
-
-\(\Delta t\) ~ = the time step interval
+\noindent where
+\begin{description}[labelwidth=1cm, leftmargin=!]
+\item[$E$] is the energy consumption (\si{\J}).
+\item[$Q_{load}$] is the scheduled plant load (\si{\W}).
+\item[$\Delta t$] is the time step interval (\si{\s}).
+\end{description}
