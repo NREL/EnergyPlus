@@ -15,7 +15,7 @@
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
 !  Version,
-!    8.8;                    !- Version Identifier
+!    9.0;                    !- Version Identifier
 
   Curve:Biquadratic,
     ExhAbsorb_CapFt,         !- Name

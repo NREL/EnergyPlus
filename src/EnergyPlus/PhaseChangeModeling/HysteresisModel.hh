@@ -48,92 +48,98 @@
 #ifndef HYSTERESISPHASECHANGE_HH_INCLUDED
 #define HYSTERESISPHASECHANGE_HH_INCLUDED
 
+#include <string>
 #include <vector>
 
 #include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-	namespace HysteresisPhaseChange {
+namespace HysteresisPhaseChange {
 
-		struct PhaseChangeStates {
-			// keeping these as ints to allow output variable reporting; could refine later into enum class
-			static const int LIQUID = -2;
-			static const int MELTING = -1;
-			static const int TRANSITION = 0;
-			static const int FREEZING = 1;
-			static const int CRYSTALLIZED = 2;
-		};
+    struct PhaseChangeStates
+    {
+        // keeping these as ints to allow output variable reporting; could refine later into enum class
+        static const int LIQUID = -2;
+        static const int MELTING = -1;
+        static const int TRANSITION = 0;
+        static const int FREEZING = 1;
+        static const int CRYSTALLIZED = 2;
+    };
 
-		extern int numHysteresisModels;
+    extern int numHysteresisModels;
 
-		class HysteresisPhaseChange {
+    class HysteresisPhaseChange
+    {
 
-			Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2 );
+        Real64 getEnthalpy(Real64 T, Real64 Tc, Real64 tau1, Real64 tau2);
 
-			Real64 specHeat( Real64 temperaturePrev, Real64 temperatureCurrent, Real64 criticalTemperature, Real64 tau1,
-							 Real64 tau2, Real64 EnthalpyOld, Real64 EnthalpyNew );
+        Real64 specHeat(Real64 temperaturePrev,
+                        Real64 temperatureCurrent,
+                        Real64 criticalTemperature,
+                        Real64 tau1,
+                        Real64 tau2,
+                        Real64 EnthalpyOld,
+                        Real64 EnthalpyNew);
 
-		public:
+    public:
+        // members are pretty much all accessed outside of the class in one way or another (by the static factory, etc.)
+        std::string name;
+        Real64 enthalpyM;
+        Real64 enthalpyF;
 
-			// members are pretty much all accessed outside of the class in one way or another (by the static factory, etc.)
-			std::string name;
-			Real64 enthalpyM;
-			Real64 enthalpyF;
+        // input parameters
+        Real64 totalLatentHeat;
+        Real64 specificHeatLiquid;
+        Real64 deltaTempMeltingHigh;
+        Real64 peakTempMelting;
+        Real64 deltaTempMeltingLow;
+        Real64 specificHeatSolid;
+        Real64 deltaTempFreezingHigh;
+        Real64 peakTempFreezing;
+        Real64 deltaTempFreezingLow;
 
-			// input parameters
-			Real64 totalLatentHeat;
-			Real64 specificHeatLiquid;
-			Real64 deltaTempMeltingHigh;
-			Real64 peakTempMelting;
-			Real64 deltaTempMeltingLow;
-			Real64 specificHeatSolid;
-			Real64 deltaTempFreezingHigh;
-			Real64 peakTempFreezing;
-			Real64 deltaTempFreezingLow;
+        // additional thermal propreties
+        Real64 fullySolidThermalConductivity;
+        Real64 fullyLiquidThermalConductivity;
+        Real64 fullySolidDensity;
+        Real64 fullyLiquidDensity;
 
-			// additional thermal propreties
-			Real64 fullySolidThermalConductivity;
-			Real64 fullyLiquidThermalConductivity;
-			Real64 fullySolidDensity;
-			Real64 fullyLiquidDensity;
+        // history and state terms
+        bool phaseChangeTransition;
+        Real64 enthOld;
+        Real64 enthNew;
+        Real64 enthRev;
+        Real64 CpOld;
+        Real64 specHeatTransition;
 
-			// history and state terms
-			bool phaseChangeTransition;
-			Real64 enthOld;
-			Real64 enthNew;
-			Real64 enthRev;
-			Real64 CpOld;
-			Real64 specHeatTransition;
+        // the factory for this class
+        static HysteresisPhaseChange *factory(const std::string &objectName);
 
-			// the factory for this class
-			static HysteresisPhaseChange *factory( const std::string &objectName );
+        // the Cp calculation function for this class
+        Real64 getCurrentSpecificHeat(
+            Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse, int prevPhaseChangeState, int &phaseChangeState);
 
-			// the Cp calculation function for this class
-			Real64 getCurrentSpecificHeat( Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse,
-										   int prevPhaseChangeState, int &phaseChangeState );
+        // the conductivity calculation function for this class
+        Real64 getConductivity(Real64 T);
 
-			// the conductivity calculation function for this class
-			Real64 getConductivity( Real64 T );
+        // the density calculation function for this class
+        Real64 getDensity(Real64 T);
 
-			// the density calculation function for this class
-			Real64 getDensity( Real64 T );
+        // and the destructor
+        virtual ~HysteresisPhaseChange()
+        {
+        }
+    };
 
-			// and the destructor
-			virtual
-			~HysteresisPhaseChange() {}
+    extern std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
-		};
+    void readAllHysteresisModels();
 
-		extern std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
+    void clear_state();
 
-		void readAllHysteresisModels();
-
-		void clear_state();
-
-	} // namespace HysteresisPhaseChange
+} // namespace HysteresisPhaseChange
 
 } // namespace EnergyPlus
 
 #endif
-

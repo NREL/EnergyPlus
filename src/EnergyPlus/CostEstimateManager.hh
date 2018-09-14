@@ -55,34 +55,30 @@ namespace EnergyPlus {
 
 namespace CostEstimateManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
+    // na
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
+    // SUBROUTINE SPECIFICATIONS FOR MODULE
 
-	// Functions
+    // Functions
 
-	void
-	SimCostEstimate();
+    void SimCostEstimate();
 
-	void
-	GetCostEstimateInput();
+    void GetCostEstimateInput();
 
-	void
-	CheckCostEstimateInput( bool & ErrorsFound ); // Set to true if errors in input, fatal at end of routine
+    void CheckCostEstimateInput(bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
 
-	void
-	CalcCostEstimate();
+    void CalcCostEstimate();
 
-} // CostEstimateManager
+} // namespace CostEstimateManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

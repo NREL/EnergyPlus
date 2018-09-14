@@ -52,108 +52,98 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace EnergyPlus {
 
 namespace GlobalNames {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumChillers;
-	extern int NumBoilers;
-	extern int NumBaseboards;
-	extern int NumCoils;
-	extern int CurMaxChillers;
-	extern int CurMaxBoilers;
-	extern int CurMaxBaseboards;
-	extern int CurMaxCoils;
-	extern int numAirDistUnits; // count of air distribution units
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumChillers;
+    extern int NumBoilers;
+    extern int NumBaseboards;
+    extern int NumCoils;
+    extern int CurMaxChillers;
+    extern int CurMaxBoilers;
+    extern int CurMaxBaseboards;
+    extern int CurMaxCoils;
+    extern int numAirDistUnits; // count of air distribution units
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
+    // SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
 
-	// Types
+    // Types
 
-	struct ComponentNameData
-	{
-		// Members
-		std::string CompType; // Component Type
-		std::string CompName; // Component Name (user supplied)
+    struct ComponentNameData
+    {
+        // Members
+        std::string CompType; // Component Type
+        std::string CompName; // Component Name (user supplied)
 
-		// Default Constructor
-		ComponentNameData()
-		{}
+        // Default Constructor
+        ComponentNameData()
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern std::unordered_map<std::string, std::string> ChillerNames;
+    extern std::unordered_map<std::string, std::string> BoilerNames;
+    extern std::unordered_map<std::string, std::string> BaseboardNames;
+    extern std::unordered_map<std::string, std::string> CoilNames;
+    extern std::unordered_map<std::string, std::string> aDUNames;
 
-	// Object Data
-	extern Array1D< ComponentNameData > ChillerNames;
-	extern Array1D< ComponentNameData > BoilerNames;
-	extern Array1D< ComponentNameData > BaseboardNames;
-	extern Array1D< ComponentNameData > CoilNames;
-	extern Array1D< ComponentNameData > aDUNames;
+    // Functions
 
-	// Functions
+    // for unit tests
+    void clear_state();
 
-	// for unit tests
-	void
-	clear_state();
+    void IntraObjUniquenessCheck(std::string &NameToVerify,
+                                 std::string const &CurrentModuleObject,
+                                 std::string const &FieldName,
+                                 std::unordered_set<std::string> &UniqueStrings,
+                                 bool &ErrorsFound);
 
-	void
-	VerifyUniqueChillerName(
-		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
-		bool & ErrorFound,
-		std::string const & StringToDisplay
-	);
+    bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
+                                     std::string &object_name,
+                                     std::string const &object_type,
+                                     std::string const &field_name,
+                                     bool &ErrorsFound);
 
-	void
-	VerifyUniqueBaseboardName(
-		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
-		bool & ErrorFound,
-		std::string const & StringToDisplay
-	);
+    bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
+                                     std::string &object_name,
+                                     std::string const &object_type,
+                                     bool &ErrorsFound);
 
-	void
-	VerifyUniqueBoilerName(
-		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
-		bool & ErrorFound,
-		std::string const & StringToDisplay
-	);
+    void
+    VerifyUniqueChillerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
 
-	void
-	VerifyUniqueCoilName(
-		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
-		bool & ErrorFound,
-		std::string const & StringToDisplay
-	);
+    void
+    VerifyUniqueBaseboardName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
 
-	void 
-	VerifyUniqueADUName(
-		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
-		bool & ErrorFound,
-		std::string const & StringToDisplay
-	);
+    void
+    VerifyUniqueBoilerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
 
-	// Clears the global data in GlobalNames.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+    void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
 
-} // GlobalNames
+    void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
 
-} // EnergyPlus
+    // Clears the global data in GlobalNames.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
+
+} // namespace GlobalNames
+
+} // namespace EnergyPlus
 
 #endif

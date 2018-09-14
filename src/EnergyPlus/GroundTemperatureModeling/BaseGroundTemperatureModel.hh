@@ -49,50 +49,39 @@
 #define BaseGroundTemperatureModel_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
-namespace EnergyPlus{
+namespace EnergyPlus {
 
-	// Base class
-	class BaseGroundTempsModel
-	{
-		public:
-			// Public Members
-			int objectType;
-			std::string objectName;
-			bool errorsFound;
+// Base class
+class BaseGroundTempsModel
+{
+public:
+    // Public Members
+    int objectType;
+    std::string objectName;
+    bool errorsFound;
 
-			// Destructor
-			virtual
-			~BaseGroundTempsModel()
-			{}
+    // Destructor
+    virtual ~BaseGroundTempsModel()
+    {
+    }
 
-			// Default Constructor
-		BaseGroundTempsModel() :
-			objectType( 0 ),
-			errorsFound( false )
+    // Default Constructor
+    BaseGroundTempsModel() : objectType(0), errorsFound(false)
 
-			{}
+    {
+    }
 
-		// Virtual method for retrieving the ground temp
-		virtual Real64
-		getGroundTemp()=0;
+    // Virtual method for retrieving the ground temp
+    virtual Real64 getGroundTemp() = 0;
 
-		virtual Real64
-		getGroundTempAtTimeInSeconds(
-			Real64 const,
-			Real64 const
-		)=0;
+    virtual Real64 getGroundTempAtTimeInSeconds(Real64 const, Real64 const) = 0;
 
-		virtual Real64
-		getGroundTempAtTimeInMonths(
-			Real64 const,
-			int const
-		)=0;
+    virtual Real64 getGroundTempAtTimeInMonths(Real64 const, int const) = 0;
+};
 
-	};
-
-}
+} // namespace EnergyPlus
 
 #endif

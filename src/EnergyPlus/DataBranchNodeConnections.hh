@@ -52,120 +52,114 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DataBranchNodeConnections {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumCompSets; // Number of Component Sets found in branches
-	extern int NumNodeConnectionErrors; // Count of node connection errors
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumCompSets;             // Number of Component Sets found in branches
+    extern int NumNodeConnectionErrors; // Count of node connection errors
 
-	extern int NumOfNodeConnections;
-	extern int MaxNumOfNodeConnections;
-	extern int NodeConnectionAlloc;
-	extern int NumOfActualParents;
-	extern int NumOfAirTerminalNodes;
-	extern int MaxNumOfAirTerminalNodes;
-	extern int EqNodeConnectionAlloc;
+    extern int NumOfNodeConnections;
+    extern int MaxNumOfNodeConnections;
+    extern int NodeConnectionAlloc;
+    extern int NumOfActualParents;
+    extern int NumOfAirTerminalNodes;
+    extern int MaxNumOfAirTerminalNodes;
+    extern int EqNodeConnectionAlloc;
 
-	// Types
+    // Types
 
-	struct ComponentListData
-	{
-		// Members
-		std::string ParentCType; // Parent Object Type (Cannot be SPLITTER or MIXER)
-		std::string ParentCName; // Parent Object Name
-		std::string CType; // Component Type (Cannot be SPLITTER or MIXER)
-		std::string CName; // Component Name
-		std::string InletNodeName; // Inlet Node ID
-		std::string OutletNodeName; // Outlet Node ID
-		std::string Description; // Description of Component List Type
-		bool InfoFilled; // true when all information has been filled
+    struct ComponentListData
+    {
+        // Members
+        std::string ParentCType;    // Parent Object Type (Cannot be SPLITTER or MIXER)
+        std::string ParentCName;    // Parent Object Name
+        std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
+        std::string CName;          // Component Name
+        std::string InletNodeName;  // Inlet Node ID
+        std::string OutletNodeName; // Outlet Node ID
+        std::string Description;    // Description of Component List Type
+        bool InfoFilled;            // true when all information has been filled
 
-		// Default Constructor
-		ComponentListData() :
-			InfoFilled( false )
-		{}
+        // Default Constructor
+        ComponentListData() : InfoFilled(false)
+        {
+        }
+    };
 
-	};
+    struct NodeConnectionDef
+    {
+        // Members
+        int NodeNumber;             // Node number of this node connection
+        std::string NodeName;       // Node Name of this node connection
+        std::string ObjectType;     // Object/Component Type of this node connection
+        std::string ObjectName;     // Name of the Object/Component Type of this node connection
+        std::string ConnectionType; // Connection Type (must be valid) for this node connection
+        int FluidStream;            // Fluid Stream for this node connection
+        bool ObjectIsParent;        // Indicator whether the object is a parent or not
 
-	struct NodeConnectionDef
-	{
-		// Members
-		int NodeNumber; // Node number of this node connection
-		std::string NodeName; // Node Name of this node connection
-		std::string ObjectType; // Object/Component Type of this node connection
-		std::string ObjectName; // Name of the Object/Component Type of this node connection
-		std::string ConnectionType; // Connection Type (must be valid) for this node connection
-		int FluidStream; // Fluid Stream for this node connection
-		bool ObjectIsParent; // Indicator whether the object is a parent or not
+        // Default Constructor
+        NodeConnectionDef() : NodeNumber(0), FluidStream(0), ObjectIsParent(false)
+        {
+        }
+    };
 
-		// Default Constructor
-		NodeConnectionDef() :
-			NodeNumber( 0 ),
-			FluidStream( 0 ),
-			ObjectIsParent( false )
-		{}
+    struct ParentListData
+    {
+        // Members
+        std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
+        std::string CName;          // Component Name
+        std::string InletNodeName;  // Inlet Node ID
+        std::string OutletNodeName; // Outlet Node ID
+        std::string Description;    // Description of Component List Type
+        bool InfoFilled;            // true when all information has been filled
 
-	};
+        // Default Constructor
+        ParentListData() : InfoFilled(false)
+        {
+        }
+    };
 
-	struct ParentListData
-	{
-		// Members
-		std::string CType; // Component Type (Cannot be SPLITTER or MIXER)
-		std::string CName; // Component Name
-		std::string InletNodeName; // Inlet Node ID
-		std::string OutletNodeName; // Outlet Node ID
-		std::string Description; // Description of Component List Type
-		bool InfoFilled; // true when all information has been filled
+    struct EqNodeConnectionDef
+    {
+        // Members
+        std::string NodeName;       // Node Name of this node connection
+        std::string ObjectType;     // Object/Component Type of this node connection
+        std::string ObjectName;     // Name of the Object/Component Type of this node connection
+        std::string InputFieldName; // Input Field Name for this connection
+        std::string ConnectionType; // Connection Type (must be valid) for this node connection
 
-		// Default Constructor
-		ParentListData() :
-			InfoFilled( false )
-		{}
+        // Default Constructor
+        EqNodeConnectionDef()
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<ComponentListData> CompSets;
+    extern Array1D<ParentListData> ParentNodeList;
+    extern Array1D<NodeConnectionDef> NodeConnections;
+    extern Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
+    extern Array1D_bool NonConnectedNodes;
 
-	struct EqNodeConnectionDef
-	{
-		// Members
-		std::string NodeName; // Node Name of this node connection
-		std::string ObjectType; // Object/Component Type of this node connection
-		std::string ObjectName; // Name of the Object/Component Type of this node connection
-		std::string InputFieldName; // Input Field Name for this connection
-		std::string ConnectionType; // Connection Type (must be valid) for this node connection
+    // Clears the global data in DataBranchNodeConnections.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
 
-		// Default Constructor
-		EqNodeConnectionDef()
-		{}
+} // namespace DataBranchNodeConnections
 
-	};
-
-	// Object Data
-	extern Array1D< ComponentListData > CompSets;
-	extern Array1D< ParentListData > ParentNodeList;
-	extern Array1D< NodeConnectionDef > NodeConnections;
-	extern Array1D< EqNodeConnectionDef > AirTerminalNodeConnections;
-	extern Array1D_bool NonConnectedNodes;
-
-	// Clears the global data in DataBranchNodeConnections.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
-
-} // DataBranchNodeConnections
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

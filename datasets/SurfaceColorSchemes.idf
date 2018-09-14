@@ -5,7 +5,7 @@
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
 !  Version,
-!    8.8;                    !- Version Identifier
+!    9.0;                    !- Version Identifier
 
   OutputControl:SurfaceColorScheme,
     Default;                 !- Name
@@ -61,9 +61,9 @@
     13,                      !- Color for Drawing Element 10
     Photovoltaics,           !- Drawing Element 11 Type
     174,                     !- Color for Drawing Element 11
-    TDD:Dome,                !- Drawing Element 12 Type
+    TubularDaylightDomes,    !- Drawing Element 12 Type
     143,                     !- Color for Drawing Element 12
-    TDD:Diffuser,            !- Drawing Element 13 Type
+    TubularDaylightDiffusers, !- Drawing Element 13 Type
     143,                     !- Color for Drawing Element 13
     DaylightReferencePoint1, !- Drawing Element 14 Type
     10,                      !- Color for Drawing Element 14

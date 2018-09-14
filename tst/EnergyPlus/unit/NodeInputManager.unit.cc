@@ -52,12 +52,12 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <DataEnvironment.hh>
+#include <DataLoopNode.hh>
+#include <EMSManager.hh>
 #include <HeatBalanceManager.hh>
 #include <NodeInputManager.hh>
-#include <DataLoopNode.hh>
 #include <OutAirNodeManager.hh>
-#include <EMSManager.hh>
-#include <DataEnvironment.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::NodeInputManager;
@@ -66,82 +66,80 @@ using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1 ) {
-	
-		std::string const idf_objects = delimited_string( { 
-			"Version,8.5;",
-
-			"OutdoorAir:Node, Test node;",
-
-			"EnergyManagementSystem:Sensor,",
-			"test_node_wb,",
-			"Test Node, ",
-			"System Node Wetbulb Temperature;",
-
-			"EnergyManagementSystem:Sensor,",
-			"test_node_rh,",
-			"Test Node, ",
-			"System Node Relative Humidity;",
-
-			"EnergyManagementSystem:Sensor,",
-			"test_node_dp,",
-			"Test Node, ",
-			"System Node Dewpoint Temperature;",
-
-			"EnergyManagementSystem:Sensor,",
-			"test_node_cp,",
-			"Test Node, ",
-			"System Node Specific Heat;",
-		});
-
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
-		OutAirNodeManager::SetOutAirNodes();
-
-		NodeInputManager::SetupNodeVarsForReporting();
-
-		EMSManager::CheckIfAnyEMS();
-
-		EMSManager::FinishProcessingUserInput = true;
-
-		bool anyEMSRan;
-		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation,anyEMSRan );
-
-		DataLoopNode::Node( 1 ).Temp = 20.0;
-		DataLoopNode::Node( 1 ).HumRat = 0.01;
-		DataEnvironment::OutBaroPress = 100000;
-
-		NodeInputManager::CalcMoreNodeInfo();
-
-		EXPECT_NEAR( DataLoopNode::MoreNodeInfo( 1 ).RelHumidity, 67.65, 0.01 );
-		EXPECT_NEAR( DataLoopNode::MoreNodeInfo( 1 ).AirDewPointTemp, 13.84, 0.01 );
-		EXPECT_NEAR( DataLoopNode::MoreNodeInfo( 1 ).WetBulbTemp, 16.11, 0.01 );
-		EXPECT_NEAR( DataLoopNode::MoreNodeInfo( 1 ).SpecificHeat, 1023.43, 0.01);
-
-	}
-
-
-TEST_F( EnergyPlusFixture, CheckUniqueNodesTest_Test1 )
+TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 {
-	bool UniqueNodeError( false ); 
 
-	InitUniqueNodeCheck( "Context" );
-	// set up initial list using names
-	CheckUniqueNodes( "NodeFieldName", "NodeName", UniqueNodeError, "TestInputNode1", _ , "ObjectName" );
-	CheckUniqueNodes( "NodeFieldName", "NodeName", UniqueNodeError, "TestOutputNode1", _ , "ObjectName" );
-	CheckUniqueNodes( "NodeFieldName", "NodeName", UniqueNodeError, "TestInputNode2", _ , "ObjectName" );
-	CheckUniqueNodes( "NodeFieldName", "NodeName", UniqueNodeError, "TestOutputNode2", _ , "ObjectName" );
+    std::string const idf_objects = delimited_string({
+        "Version,8.5;",
 
-	// now to test if a new node is in the list - should not be an error and should be false
-	CheckUniqueNodes( "NodeFieldName", "NodeName", UniqueNodeError, "NonUsedNode", _ , "ObjectName");
-	EXPECT_FALSE( UniqueNodeError );
+        "OutdoorAir:Node, Test node;",
 
-	//try one that is already in the list - should be an error and show up as true
-	CheckUniqueNodes( "NodeFieldName", "NodeName", UniqueNodeError, "TestInputNode2", _ , "ObjectName" );
-	EXPECT_TRUE( UniqueNodeError );
+        "EnergyManagementSystem:Sensor,",
+        "test_node_wb,",
+        "Test Node, ",
+        "System Node Wetbulb Temperature;",
 
-	EndUniqueNodeCheck( "Context" );
+        "EnergyManagementSystem:Sensor,",
+        "test_node_rh,",
+        "Test Node, ",
+        "System Node Relative Humidity;",
 
+        "EnergyManagementSystem:Sensor,",
+        "test_node_dp,",
+        "Test Node, ",
+        "System Node Dewpoint Temperature;",
+
+        "EnergyManagementSystem:Sensor,",
+        "test_node_cp,",
+        "Test Node, ",
+        "System Node Specific Heat;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    OutAirNodeManager::SetOutAirNodes();
+
+    NodeInputManager::SetupNodeVarsForReporting();
+
+    EMSManager::CheckIfAnyEMS();
+
+    EMSManager::FinishProcessingUserInput = true;
+
+    bool anyEMSRan;
+    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyEMSRan);
+
+    DataLoopNode::Node(1).Temp = 20.0;
+    DataLoopNode::Node(1).HumRat = 0.01;
+    DataEnvironment::OutBaroPress = 100000;
+
+    NodeInputManager::CalcMoreNodeInfo();
+
+    EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).RelHumidity, 67.65, 0.01);
+    EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).AirDewPointTemp, 13.84, 0.01);
+    EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).WetBulbTemp, 16.11, 0.01);
+    EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).SpecificHeat, 1023.43, 0.01);
 }
 
+TEST_F(EnergyPlusFixture, CheckUniqueNodesTest_Test1)
+{
+    bool UniqueNodeError(false);
+
+    InitUniqueNodeCheck("Context");
+    // set up initial list using names
+    CheckUniqueNodes("NodeFieldName", "NodeName", UniqueNodeError, "TestInputNode1", _, "ObjectName");
+    CheckUniqueNodes("NodeFieldName", "NodeName", UniqueNodeError, "TestOutputNode1", _, "ObjectName");
+    CheckUniqueNodes("NodeFieldName", "NodeName", UniqueNodeError, "TestInputNode2", _, "ObjectName");
+    CheckUniqueNodes("NodeFieldName", "NodeName", UniqueNodeError, "TestOutputNode2", _, "ObjectName");
+
+    // now to test if a new node is in the list - should not be an error and should be false
+    CheckUniqueNodes("NodeFieldName", "NodeName", UniqueNodeError, "NonUsedNode", _, "ObjectName");
+    EXPECT_FALSE(UniqueNodeError);
+
+    // try one that is already in the list - should be an error and show up as true
+    CheckUniqueNodes("NodeFieldName", "NodeName", UniqueNodeError, "TestInputNode2", _, "ObjectName");
+    EXPECT_TRUE(UniqueNodeError);
+
+    EndUniqueNodeCheck("Context");
 }
+
+} // namespace EnergyPlus

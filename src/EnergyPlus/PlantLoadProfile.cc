@@ -52,7 +52,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <PlantLoadProfile.hh>
 #include <BranchNodeConnections.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -61,9 +60,10 @@
 #include <DataPrecisionGlobals.hh>
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
+#include <PlantLoadProfile.hh>
 #include <PlantUtilities.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -71,395 +71,444 @@
 namespace EnergyPlus {
 
 namespace PlantLoadProfile {
-	// MODULE INFORMATION:
-	//       AUTHOR         Peter Graham Ellis
-	//       DATE WRITTEN   January 2004
-	//       MODIFIED       Brent Griffith, plant rewrite, general fluid types
-	//                      allow flow requests with out load requests
-	//       RE-ENGINEERED  na
-
-	// PURPOSE OF THIS MODULE:
-	// This module simulates a scheduled load profile on the demand side of the plant loop.
-
-	// METHODOLOGY EMPLOYED:
-	// The plant load profile object provides a scheduled load on the plant loop.  Unlike most plant equipment
-	// on the demand side, i.e. zone equipment, this object does not have a zone associated with it.
-	// For this reason the plant load profile can only be called for simulation by the non-zone equipment
-	// manager (see NonZoneEquipmentManager.cc).
-
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-	using DataGlobals::BeginEnvrnFlag;
-	using DataPlant::PlantLoop;
-	using DataPlant::TypeOf_PlantLoadProfile;
-	using DataPlant::ScanPlantLoopsForObject;
-	using PlantUtilities::SetComponentFlowRate;
-	using PlantUtilities::InitComponentNodes;
-
-	// MODULE VARIABLE DECLARATIONS:
-	bool GetPlantLoadProfileInputFlag( true );
-	int NumOfPlantProfile;
-
-	// Object Data
-	Array1D< PlantProfileData > PlantProfile;
-
-	PlantComponent *
-	PlantProfileData::factory( std::string objectName ) {
-		if ( GetPlantLoadProfileInputFlag ) {
-			GetPlantProfileInput();
-			GetPlantLoadProfileInputFlag = false;
-		}
-		// Now look for this particular pipe in the list
-		for ( auto & plp : PlantProfile ) {
-			if ( plp.Name == objectName ) {
-				return &plp;
-			}
-		}
-		// If we didn't find it, fatal
-		ShowFatalError( "PlantLoadProfile::factory: Error getting inputs for pipe named: " + objectName );
-		// Shut up the compiler
-		return nullptr;
-	}
-
-	void
-	PlantProfileData::onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) )
-	{
-		this->InitPlantProfile( );
-	}
-
-	void
-	PlantProfileData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ),
-				    bool const EP_UNUSED( FirstHVACIteration ),
-				    Real64 & EP_UNUSED( CurLoad ),
-		       		    bool const EP_UNUSED( RunFlag ) )
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   January 2004
-		//       MODIFIED       Brent Griffith, generalize fluid cp
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Simulates the plant load profile object.
-
-		// METHODOLOGY EMPLOYED:
-		// This is a very simple simulation.  InitPlantProfile does the work of getting the scheduled load and flow rate.
-		// Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
-		using FluidProperties::GetSpecificHeatGlycol;
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static std::string const RoutineName( "SimulatePlantProfile" );
-		Real64 DeltaTemp;
-
-		this->InitPlantProfile( );
-
-		if ( this->MassFlowRate > 0.0 ) {
-			Real64 Cp = GetSpecificHeatGlycol( PlantLoop( this->WLoopNum ).FluidName, this->InletTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
-			DeltaTemp = this->Power / ( this->MassFlowRate * Cp );
-		} else {
-			this->Power = 0.0;
-			DeltaTemp = 0.0;
-		}
-
-		this->OutletTemp = this->InletTemp - DeltaTemp;
-
-		this->UpdatePlantProfile( );
-		this->ReportPlantProfile( );
+    // MODULE INFORMATION:
+    //       AUTHOR         Peter Graham Ellis
+    //       DATE WRITTEN   January 2004
+    //       MODIFIED       Brent Griffith, plant rewrite, general fluid types
+    //                      allow flow requests with out load requests
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS MODULE:
+    // This module simulates a scheduled load profile on the demand side of the plant loop.
+
+    // METHODOLOGY EMPLOYED:
+    // The plant load profile object provides a scheduled load on the plant loop.  Unlike most plant equipment
+    // on the demand side, i.e. zone equipment, this object does not have a zone associated with it.
+    // For this reason the plant load profile can only be called for simulation by the non-zone equipment
+    // manager (see NonZoneEquipmentManager.cc).
+
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
+    using DataGlobals::BeginEnvrnFlag;
+    using DataPlant::PlantLoop;
+    using DataPlant::TypeOf_PlantLoadProfile;
+    using PlantUtilities::InitComponentNodes;
+    using PlantUtilities::ScanPlantLoopsForObject;
+    using PlantUtilities::SetComponentFlowRate;
+
+    // MODULE VARIABLE DECLARATIONS:
+    bool GetPlantLoadProfileInputFlag(true);
+    int NumOfPlantProfile;
+
+    // Object Data
+    Array1D<PlantProfileData> PlantProfile;
+
+    PlantComponent *PlantProfileData::factory(std::string objectName)
+    {
+        if (GetPlantLoadProfileInputFlag) {
+            GetPlantProfileInput();
+            GetPlantLoadProfileInputFlag = false;
+        }
+        // Now look for this particular pipe in the list
+        for (auto &plp : PlantProfile) {
+            if (plp.Name == objectName) {
+                return &plp;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("PlantLoadProfile::factory: Error getting inputs for pipe named: " + objectName);
+        // Shut up the compiler
+        return nullptr;
+    }
+
+    void PlantProfileData::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+        this->InitPlantProfile();
+    }
+
+    void PlantProfileData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                    bool const EP_UNUSED(FirstHVACIteration),
+                                    Real64 &EP_UNUSED(CurLoad),
+                                    bool const EP_UNUSED(RunFlag))
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   January 2004
+        //       MODIFIED       Brent Griffith, generalize fluid cp
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Simulates the plant load profile object.
+
+        // METHODOLOGY EMPLOYED:
+        // This is a very simple simulation.  InitPlantProfile does the work of getting the scheduled load and flow rate.
+        // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
+
+        // USE STATEMENTS:
+
+        // Using/Aliasing
+        using FluidProperties::GetSpecificHeatGlycol;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static std::string const RoutineName("SimulatePlantProfile");
+        Real64 DeltaTemp;
+
+        this->InitPlantProfile();
+
+        if (this->MassFlowRate > 0.0) {
+            Real64 Cp =
+                GetSpecificHeatGlycol(PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            DeltaTemp = this->Power / (this->MassFlowRate * Cp);
+        } else {
+            this->Power = 0.0;
+            DeltaTemp = 0.0;
+        }
+
+        this->OutletTemp = this->InletTemp - DeltaTemp;
+
+        this->UpdatePlantProfile();
+        this->ReportPlantProfile();
+
+    } // simulate()
 
-	} // simulate()
+    void PlantProfileData::InitPlantProfile()
+    {
 
-	void
-	PlantProfileData::InitPlantProfile()
-	{
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   January 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   January 2004
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+        // PURPOSE OF THIS SUBROUTINE:
+        // Initializes the plant load profile object during the plant simulation.
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Initializes the plant load profile object during the plant simulation.
+        // METHODOLOGY EMPLOYED:
+        // Inlet and outlet nodes are initialized.  The scheduled load and flow rate is obtained, flow is requested, and the
+        // actual available flow is set.
 
-		// METHODOLOGY EMPLOYED:
-		// Inlet and outlet nodes are initialized.  The scheduled load and flow rate is obtained, flow is requested, and the
-		// actual available flow is set.
+        // Using/Aliasing
+        using DataGlobals::SysSizingCalc;
+        using DataLoopNode::Node;
+        using FluidProperties::GetDensityGlycol;
+        using PlantUtilities::RegisterPlantCompDesignFlow;
+        using ScheduleManager::GetCurrentScheduleValue;
+        using ScheduleManager::GetScheduleMaxValue;
 
-		// Using/Aliasing
-		using DataGlobals::SysSizingCalc;
-		using PlantUtilities::RegisterPlantCompDesignFlow;
-		using DataLoopNode::Node;
-		using ScheduleManager::GetCurrentScheduleValue;
-		using ScheduleManager::GetScheduleMaxValue;
-		using FluidProperties::GetDensityGlycol;
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static std::string const RoutineName("InitPlantProfile");
+        Real64 FluidDensityInit;
+        bool errFlag;
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static std::string const RoutineName( "InitPlantProfile" );
-		Real64 FluidDensityInit;
-		bool errFlag;
+        // FLOW:
 
-		// FLOW:
+        // Do the one time initializations
+        if (this->SetLoopIndexFlag) {
+            if (allocated(PlantLoop)) {
+                errFlag = false;
+                ScanPlantLoopsForObject(
+                    this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, _, _, _, _, _, errFlag);
+                if (errFlag) {
+                    ShowFatalError("InitPlantProfile: Program terminated for previous conditions.");
+                }
 
-		// Do the one time initializations
-		if ( this->SetLoopIndexFlag ) {
-			if ( allocated( PlantLoop ) ) {
-				errFlag = false;
-				ScanPlantLoopsForObject( this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, _, _, _, _, _, errFlag );
-				if ( errFlag ) {
-					ShowFatalError( "InitPlantProfile: Program terminated for previous conditions." );
-				}
+                this->SetLoopIndexFlag = false;
+            }
+        }
 
-				this->SetLoopIndexFlag = false;
-			}
-		}
+        if (!SysSizingCalc && this->InitSizing) {
+            RegisterPlantCompDesignFlow(InletNode, this->PeakVolFlowRate);
+            this->InitSizing = false;
+        }
 
-		if ( ! SysSizingCalc && this->InitSizing ) {
-			RegisterPlantCompDesignFlow( InletNode, this->PeakVolFlowRate );
-			this->InitSizing = false;
-		}
+        if (BeginEnvrnFlag && this->Init) {
+            // Clear node initial conditions
+            // DSU? can we centralize these temperature inits
+            //    Node(InletNode)%Temp = 0.0
+            Node(OutletNode).Temp = 0.0;
 
-		if ( BeginEnvrnFlag && this->Init ) {
-			// Clear node initial conditions
-			//DSU? can we centralize these temperature inits
-			//    Node(InletNode)%Temp = 0.0
-			Node( OutletNode ).Temp = 0.0;
+            FluidDensityInit =
+                GetDensityGlycol(PlantLoop(this->WLoopNum).FluidName, DataGlobals::InitConvTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
-			FluidDensityInit = GetDensityGlycol( PlantLoop( this->WLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
+            Real64 MaxFlowMultiplier = GetScheduleMaxValue(this->FlowRateFracSchedule);
 
-			Real64 MaxFlowMultiplier = GetScheduleMaxValue( this->FlowRateFracSchedule );
+            InitComponentNodes(0.0,
+                               this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier,
+                               this->InletNode,
+                               this->OutletNode,
+                               this->WLoopNum,
+                               this->WLoopSideNum,
+                               this->WLoopBranchNum,
+                               this->WLoopCompNum);
 
-			InitComponentNodes( 0.0, this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, this->InletNode, this->OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum );
+            this->EMSOverrideMassFlow = false;
+            this->EMSMassFlowValue = 0.0;
+            this->EMSOverridePower = false;
+            this->EMSPowerValue = 0.0;
+            this->Init = false;
+        }
 
-			this->EMSOverrideMassFlow = false;
-			this->EMSMassFlowValue = 0.0;
-			this->EMSOverridePower = false;
-			this->EMSPowerValue = 0.0;
-			this->Init = false;
+        if (!BeginEnvrnFlag) this->Init = true;
 
-		}
+        this->InletTemp = Node(InletNode).Temp;
+        this->Power = GetCurrentScheduleValue(this->LoadSchedule);
 
-		if ( ! BeginEnvrnFlag ) this->Init = true;
+        if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
 
-		this->InletTemp = Node( InletNode ).Temp;
-		this->Power = GetCurrentScheduleValue( this->LoadSchedule );
+        FluidDensityInit = GetDensityGlycol(PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
-		if ( this->EMSOverridePower ) this->Power = this->EMSPowerValue;
+        // Get the scheduled mass flow rate
+        this->VolFlowRate = this->PeakVolFlowRate * GetCurrentScheduleValue(this->FlowRateFracSchedule);
 
-		FluidDensityInit = GetDensityGlycol( PlantLoop( this->WLoopNum ).FluidName, this->InletTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
+        this->MassFlowRate = this->VolFlowRate * FluidDensityInit;
 
-		// Get the scheduled mass flow rate
-		this->VolFlowRate = this->PeakVolFlowRate * GetCurrentScheduleValue( this->FlowRateFracSchedule );
+        if (this->EMSOverrideMassFlow) this->MassFlowRate = this->EMSMassFlowValue;
 
-		this->MassFlowRate = this->VolFlowRate * FluidDensityInit;
+        // Request the mass flow rate from the plant component flow utility routine
+        SetComponentFlowRate(this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
 
-		if ( this->EMSOverrideMassFlow ) this->MassFlowRate = this->EMSMassFlowValue;
+        this->VolFlowRate = this->MassFlowRate / FluidDensityInit;
 
-		// Request the mass flow rate from the plant component flow utility routine
-		SetComponentFlowRate( this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum );
+    } // InitPlantProfile()
 
-		this->VolFlowRate = this->MassFlowRate / FluidDensityInit;
+    void PlantProfileData::UpdatePlantProfile()
+    {
 
-	} // InitPlantProfile()
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   January 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-	void
-	PlantProfileData::UpdatePlantProfile()
-	{
+        // PURPOSE OF THIS SUBROUTINE:
+        // Updates the node variables with local variables.
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   January 2004
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Updates the node variables with local variables.
-
-		// METHODOLOGY EMPLOYED:
-		// Standard EnergyPlus methodology.
-
-		// Using/Aliasing
-		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int OutletNode;
-
-		// FLOW:
-
-		OutletNode = this->OutletNode;
-
-		// Set outlet node variables that are possibly changed
-		Node( OutletNode ).Temp = this->OutletTemp;
-
-		//DSU? enthalpy? quality etc? central routine? given inlet node, fluid type, delta T, properly fill all node vars?
-
-	}
-
-	void
-	PlantProfileData::ReportPlantProfile()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   January 2004
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Calculates report variables.
-
-		// METHODOLOGY EMPLOYED:
-		// Standard EnergyPlus methodology.
-
-		// Using/Aliasing
-		using DataGlobals::SecInHour;
-		using DataHVACGlobals::TimeStepSys;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// FLOW:
-		this->Energy = this->Power * TimeStepSys * SecInHour;
-
-		if ( this->Energy >= 0.0 ) {
-			this->HeatingEnergy = this->Energy;
-			this->CoolingEnergy = 0.0;
-		} else {
-			this->HeatingEnergy = 0.0;
-			this->CoolingEnergy = std::abs( this->Energy );
-		}
-
-	}
-
-	// Functions
-	void
-	GetPlantProfileInput()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   January 2004
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Gets the plant load profile input from the input file and sets up the objects.
-
-		// METHODOLOGY EMPLOYED:
-		// Standard EnergyPlus methodology.
-
-		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using ScheduleManager::GetScheduleIndex;
-		using NodeInputManager::GetOnlySingleNode;
-		using BranchNodeConnections::TestCompSet;
-		using DataGlobals::AnyEnergyManagementSystemInModel;
-		using namespace DataLoopNode;
-		using namespace DataIPShortCuts; // Data for field names, blank numerics
-
-		// Locals
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
-		int NumAlphas; // Number of Alphas for each GetObjectItem call
-		int NumNumbers; // Number of Numbers for each GetObjectItem call
-		int ProfileNum; // PLANT LOAD PROFILE (PlantProfile) object number
-		//  CHARACTER(len=MaxNameLength)   :: FoundBranchName
-		//  INTEGER                        :: BranchControlType
-
-		// FLOW:
-		cCurrentModuleObject = "LoadProfile:Plant";
-		NumOfPlantProfile = GetNumObjectsFound( cCurrentModuleObject );
-
-		if ( NumOfPlantProfile > 0 ) {
-			PlantProfile.allocate( NumOfPlantProfile );
-
-			for ( ProfileNum = 1; ProfileNum <= NumOfPlantProfile; ++ProfileNum ) {
-				GetObjectItem( cCurrentModuleObject, ProfileNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-
-				// PlantProfile name
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), PlantProfile, ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
-				PlantProfile( ProfileNum ).Name = cAlphaArgs( 1 );
-				PlantProfile( ProfileNum ).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
-
-				PlantProfile( ProfileNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				PlantProfile( ProfileNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-
-				PlantProfile( ProfileNum ).LoadSchedule = GetScheduleIndex( cAlphaArgs( 4 ) );
-
-				if ( PlantProfile( ProfileNum ).LoadSchedule == 0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  The Schedule for " + cAlphaFieldNames( 4 ) + " called " + cAlphaArgs( 4 ) + " was not found." );
-					ErrorsFound = true;
-				}
-
-				PlantProfile( ProfileNum ).PeakVolFlowRate = rNumericArgs( 1 );
-
-				PlantProfile( ProfileNum ).FlowRateFracSchedule = GetScheduleIndex( cAlphaArgs( 5 ) );
-
-				if ( PlantProfile( ProfileNum ).FlowRateFracSchedule == 0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  The Schedule for " + cAlphaFieldNames( 5 ) + " called " + cAlphaArgs( 5 ) + " was not found." );
-
-					ErrorsFound = true;
-				}
-
-				// Check plant connections
-				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), cCurrentModuleObject + " Nodes" );
-
-				// Setup report variables
-				SetupOutputVariable( "Plant Load Profile Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantProfile( ProfileNum ).MassFlowRate, "System", "Average", PlantProfile( ProfileNum ).Name );
-
-				SetupOutputVariable( "Plant Load Profile Heat Transfer Rate", OutputProcessor::Unit::W, PlantProfile( ProfileNum ).Power, "System", "Average", PlantProfile( ProfileNum ).Name );
-
-				SetupOutputVariable( "Plant Load Profile Heat Transfer Energy", OutputProcessor::Unit::J, PlantProfile( ProfileNum ).Energy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "ENERGYTRANSFER", "Heating", _, "Plant" ); // is EndUseKey right?
-
-				SetupOutputVariable( "Plant Load Profile Heating Energy", OutputProcessor::Unit::J, PlantProfile( ProfileNum ).HeatingEnergy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "Heating", _, "Plant" );
-
-				SetupOutputVariable( "Plant Load Profile Cooling Energy", OutputProcessor::Unit::J, PlantProfile( ProfileNum ).CoolingEnergy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "Cooling", _, "Plant" );
-
-				if ( AnyEnergyManagementSystemInModel ) {
-					SetupEMSActuator( "Plant Load Profile", PlantProfile( ProfileNum ).Name, "Mass Flow Rate", "[kg/s]", PlantProfile( ProfileNum ).EMSOverrideMassFlow, PlantProfile( ProfileNum ).EMSMassFlowValue );
-					SetupEMSActuator( "Plant Load Profile", PlantProfile( ProfileNum ).Name, "Power", "[W]", PlantProfile( ProfileNum ).EMSOverridePower, PlantProfile( ProfileNum ).EMSPowerValue );
-				}
-
-				if ( ErrorsFound ) ShowFatalError( "Errors in " + cCurrentModuleObject + " input." );
-
-			} // ProfileNum
-		}
-
-	}
-
-	void
-	clear_state(){
-		NumOfPlantProfile = 0;
-		GetPlantLoadProfileInputFlag = true;
-		PlantProfile.deallocate();
-	}
-
+        // METHODOLOGY EMPLOYED:
+        // Standard EnergyPlus methodology.
+
+        // Using/Aliasing
+        using DataLoopNode::Node;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int OutletNode;
+
+        // FLOW:
+
+        OutletNode = this->OutletNode;
+
+        // Set outlet node variables that are possibly changed
+        Node(OutletNode).Temp = this->OutletTemp;
+
+        // DSU? enthalpy? quality etc? central routine? given inlet node, fluid type, delta T, properly fill all node vars?
+    }
+
+    void PlantProfileData::ReportPlantProfile()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   January 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculates report variables.
+
+        // METHODOLOGY EMPLOYED:
+        // Standard EnergyPlus methodology.
+
+        // Using/Aliasing
+        using DataGlobals::SecInHour;
+        using DataHVACGlobals::TimeStepSys;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // FLOW:
+        this->Energy = this->Power * TimeStepSys * SecInHour;
+
+        if (this->Energy >= 0.0) {
+            this->HeatingEnergy = this->Energy;
+            this->CoolingEnergy = 0.0;
+        } else {
+            this->HeatingEnergy = 0.0;
+            this->CoolingEnergy = std::abs(this->Energy);
+        }
+    }
+
+    // Functions
+    void GetPlantProfileInput()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   January 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Gets the plant load profile input from the input file and sets up the objects.
+
+        // METHODOLOGY EMPLOYED:
+        // Standard EnergyPlus methodology.
+
+        // Using/Aliasing
+        using BranchNodeConnections::TestCompSet;
+        using DataGlobals::AnyEnergyManagementSystemInModel;
+        using NodeInputManager::GetOnlySingleNode;
+        using ScheduleManager::GetScheduleIndex;
+        using namespace DataLoopNode;
+        using namespace DataIPShortCuts; // Data for field names, blank numerics
+
+        // Locals
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int IOStatus;                   // Used in GetObjectItem
+        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
+        int ProfileNum;                 // PLANT LOAD PROFILE (PlantProfile) object number
+        //  CHARACTER(len=MaxNameLength)   :: FoundBranchName
+        //  INTEGER                        :: BranchControlType
+
+        // FLOW:
+        cCurrentModuleObject = "LoadProfile:Plant";
+        NumOfPlantProfile = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+
+        if (NumOfPlantProfile > 0) {
+            PlantProfile.allocate(NumOfPlantProfile);
+
+            for (ProfileNum = 1; ProfileNum <= NumOfPlantProfile; ++ProfileNum) {
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              ProfileNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              _,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
+                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+
+                PlantProfile(ProfileNum).Name = cAlphaArgs(1);
+                PlantProfile(ProfileNum).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
+
+                PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(
+                    cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(
+                    cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+
+                PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(cAlphaArgs(4));
+
+                if (PlantProfile(ProfileNum).LoadSchedule == 0) {
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(4) + " called " +
+                                    cAlphaArgs(4) + " was not found.");
+                    ErrorsFound = true;
+                }
+
+                PlantProfile(ProfileNum).PeakVolFlowRate = rNumericArgs(1);
+
+                PlantProfile(ProfileNum).FlowRateFracSchedule = GetScheduleIndex(cAlphaArgs(5));
+
+                if (PlantProfile(ProfileNum).FlowRateFracSchedule == 0) {
+                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(5) + " called " +
+                                    cAlphaArgs(5) + " was not found.");
+
+                    ErrorsFound = true;
+                }
+
+                // Check plant connections
+                TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), cCurrentModuleObject + " Nodes");
+
+                // Setup report variables
+                SetupOutputVariable("Plant Load Profile Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    PlantProfile(ProfileNum).MassFlowRate,
+                                    "System",
+                                    "Average",
+                                    PlantProfile(ProfileNum).Name);
+
+                SetupOutputVariable("Plant Load Profile Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    PlantProfile(ProfileNum).Power,
+                                    "System",
+                                    "Average",
+                                    PlantProfile(ProfileNum).Name);
+
+                SetupOutputVariable("Plant Load Profile Heat Transfer Energy",
+                                    OutputProcessor::Unit::J,
+                                    PlantProfile(ProfileNum).Energy,
+                                    "System",
+                                    "Sum",
+                                    PlantProfile(ProfileNum).Name,
+                                    _,
+                                    "ENERGYTRANSFER",
+                                    "Heating",
+                                    _,
+                                    "Plant"); // is EndUseKey right?
+
+                SetupOutputVariable("Plant Load Profile Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    PlantProfile(ProfileNum).HeatingEnergy,
+                                    "System",
+                                    "Sum",
+                                    PlantProfile(ProfileNum).Name,
+                                    _,
+                                    "PLANTLOOPHEATINGDEMAND",
+                                    "Heating",
+                                    _,
+                                    "Plant");
+
+                SetupOutputVariable("Plant Load Profile Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    PlantProfile(ProfileNum).CoolingEnergy,
+                                    "System",
+                                    "Sum",
+                                    PlantProfile(ProfileNum).Name,
+                                    _,
+                                    "PLANTLOOPCOOLINGDEMAND",
+                                    "Cooling",
+                                    _,
+                                    "Plant");
+
+                if (AnyEnergyManagementSystemInModel) {
+                    SetupEMSActuator("Plant Load Profile",
+                                     PlantProfile(ProfileNum).Name,
+                                     "Mass Flow Rate",
+                                     "[kg/s]",
+                                     PlantProfile(ProfileNum).EMSOverrideMassFlow,
+                                     PlantProfile(ProfileNum).EMSMassFlowValue);
+                    SetupEMSActuator("Plant Load Profile",
+                                     PlantProfile(ProfileNum).Name,
+                                     "Power",
+                                     "[W]",
+                                     PlantProfile(ProfileNum).EMSOverridePower,
+                                     PlantProfile(ProfileNum).EMSPowerValue);
+                }
+
+                if (ErrorsFound) ShowFatalError("Errors in " + cCurrentModuleObject + " input.");
+
+            } // ProfileNum
+        }
+    }
+
+    void clear_state()
+    {
+        NumOfPlantProfile = 0;
+        GetPlantLoadProfileInputFlag = true;
+        PlantProfile.deallocate();
+    }
 
 } // namespace PlantLoadProfile
 

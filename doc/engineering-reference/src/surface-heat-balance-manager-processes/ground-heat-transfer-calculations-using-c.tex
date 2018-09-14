@@ -45,11 +45,17 @@ F-Factor is the heat transfer through the floor, induced by a unit temperature d
 
 Therefore,
 
-U\(_{eff}\) = (P\(_{exp}\) * F-factor) / Area
+\begin{equation}
+U_{eff} = (P_{exp} \cdot \text{F-factor}) / Area
+\end{equation}
 
-1 / U\(_{eff}\) = R\(_{eff}\) + R\(_{film,in}\) + R\(_{film,out}\)
+\begin{equation}
+1 / U_{eff} = R_{eff} + R_{film,in} + R_{film,out}
+\end{equation}
 
-R\(_{eff}\) = Area / (P\(_{exp}\) * F-factor) - R\(_{film,in}\) - R\(_{film,out}\)
+\begin{equation}
+R_{eff} = Area / (P_{exp} \cdot \text{F-factor}) - R_{film,in} - R_{film,out}
+\end{equation}
 
 Where,
 
@@ -63,7 +69,9 @@ Approximate the thermal mass of the floor construction with a 6-inch (0.15 m) he
 
 We have,
 
-R\(_{fic}\) = R\(_{eff}\) -- R\(_{con}\)
+\begin{equation}
+R_{fic} = R_{eff} -- R_{con}
+\end{equation}
 
 Where,
 
@@ -85,7 +93,9 @@ R\(_{con}\) = 0.15/1.95 = 0.077 m\(^{2}\)·K/W
 
 Finally,
 
-R\(_{fic}\) = R\(_{eff}\) -- 0.077
+\begin{equation}
+R_{fic} = R_{eff} -- 0.077
+\end{equation}
 
 \begin{figure}[hbtp] % fig 32
 \centering
@@ -99,9 +109,13 @@ For slabs-on-grade as shown in the figure above, the exposed perimeter is (2A + 
 
 The steady state heat transfer through the underground wall is calculated as,
 
-Q = Area * U\(_{eff}\) * (T\(_{air,out}\) -- T\(_{air,in}\))
+\begin{equation}
+Q = Area * U_{eff} * (T_{air,out} -- T_{air,in})
+\end{equation}
 
-1 / U\(_{eff}\) = R\(_{eff}\) + R\(_{film,out}\) + R\(_{film,in}\)
+\begin{equation}
+1 / U_{eff} = R_{eff} + R_{film,out} + R_{film,in}
+\end{equation}
 
 Where,
 
@@ -117,7 +131,9 @@ R\(_{film,in}\) and R\(_{film,out}\) are the air film resistance of the inside a
 
 C-factor is the time rate of steady-state heat flow through unit area of the construction, induced by a unit temperature difference between the body surfaces. The C-Factor unit is W/m\(^{2}\)·K. The C-factor does not include soil or air films.
 
-R\(_{eff}\) = 1/C-factor + R\(_{soil}\)
+\begin{equation}
+R_{eff} = 1/C-factor + R_{soil}
+\end{equation}
 
 R\(_{soil}\) is the effective R-value of the soil. Reference values from Table C6.10.1 of the SI version of the ASHRAE Standard 90.1-2010 are as follows:
 
@@ -129,11 +145,15 @@ R\(_{soil}\) is the effective R-value of the soil. Reference values from Table C
 
 A fairly good linear regression (R\(^{2}\) = 0.9967) for the above data is,
 
-R\(_{soil}\) = 0.0607 + 0.3479 * Depth
+\begin{equation}
+R_{soil} = 0.0607 + 0.3479 * Depth
+\end{equation}
 
 Approximate the thermal mass of the wall construction with a 6-inch (0.15 m) heavy concrete, and use a fictitious insulation layer with no thermal mass to match the thermal resistance of the construction. Then we have the thermal resistance of the insulation layer,
 
-R\(_{fic}\) = R\(_{eff}\) -- R\(_{con}\)
+\begin{equation}
+R_{fic} = R_{eff} -- R_{con}
+\end{equation}
 
 Where,
 

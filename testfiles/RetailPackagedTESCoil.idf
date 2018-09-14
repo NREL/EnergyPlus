@@ -41,7 +41,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 5
 
-  Version,8.9;
+  Version,9.0;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -64,15 +64,16 @@
     RunPeriod 1,             !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Monday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1.0000;                  !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
 ! ***HOLIDAYS & DAYLIGHT SAVINGS***
 
@@ -223,7 +224,7 @@
     -6.00,                   !- Time Zone {hr}
     190;                     !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -253,7 +254,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
+! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2Â°C WB=25.5Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name
@@ -1189,7 +1190,6 @@
     Front_Entry_Wall_South,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1205,7 +1205,6 @@
     Front_Retail_Wall_South, !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -1221,7 +1220,6 @@
     Point_Of_Sale_Wall_South,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
@@ -5874,7 +5872,7 @@
     CoolCharge-Charge-Cap-fT,!- Name
     LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
     4,                       !- Number of Interpolation Points
-    TriQuadratic,            !- Curve Type
+    ,                        !- Curve Type
     SingleLineIndependentVariableWithMatrix,  !- Table Data Format
     ,                        !- External File Name
     Ascending,               !- X1 Sort Order
@@ -5890,6 +5888,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.5,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -5897,6 +5897,7 @@
     Dimensionless,           !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     2,                       !- Number of Values for Independent Variable X1
@@ -6424,7 +6425,7 @@
     CoolCharge-Charge-EIR-fT,!- Name
     LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
     4,                       !- Number of Interpolation Points
-    TriQuadratic,            !- Curve Type
+    ,                        !- Curve Type
     SingleLineIndependentVariableWithMatrix,  !- Table Data Format
     ,                        !- External File Name
     Ascending,               !- X1 Sort Order
@@ -6440,6 +6441,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.5,                     !- Minimum Table Output
     2.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -6447,6 +6450,7 @@
     Dimensionless,           !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     2,                       !- Number of Values for Independent Variable X1
@@ -7464,6 +7468,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7471,6 +7477,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7561,6 +7568,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.5,                     !- Minimum Table Output
     1.7,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7568,6 +7577,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7633,6 +7643,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.7,                     !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7640,6 +7652,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7717,6 +7730,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.8,                     !- Minimum Table Output
     1.27,                    !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7724,6 +7739,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7801,6 +7817,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.6,                     !- Minimum Table Output
     1.6,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7808,6 +7826,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -7898,6 +7917,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -7905,6 +7926,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -8083,6 +8105,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -8090,6 +8114,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1
@@ -8155,6 +8180,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.0,                     !- Minimum Table Output
     3.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -8162,6 +8189,7 @@
     Temperature,             !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     3,                       !- Number of Values for Independent Variable X1

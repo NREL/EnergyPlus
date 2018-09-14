@@ -52,22 +52,22 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ThermalComfort;
@@ -88,767 +88,805 @@ using namespace ObjexxFCL;
 
 using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
-
-TEST_F( EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1 )
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 {
-	NumOfZones = 1;
-	ZoneSysEnergyDemand.allocate( NumOfZones );
-	ThermalComfortSetPoint.allocate( NumOfZones );
-	TempControlType.allocate( 1 );
-	AirModel.allocate( NumOfZones );
-	AirModel( 1 ).AirModelType = RoomAirModel_Mixing;
-	ZTAV.allocate( NumOfZones );
-	ZoneThermostatSetPointLo.allocate( NumOfZones );
-	ZoneThermostatSetPointHi.allocate( NumOfZones );
-	TimeStepZone = 0.25;
-	ThermalComfortInASH55.allocate( NumOfZones );
-	ThermalComfortInASH55( 1 ).ZoneIsOccupied = true;
+    NumOfZones = 1;
+    ZoneSysEnergyDemand.allocate(NumOfZones);
+    ThermalComfortSetPoint.allocate(NumOfZones);
+    TempControlType.allocate(1);
+    AirModel.allocate(NumOfZones);
+    AirModel(1).AirModelType = RoomAirModel_Mixing;
+    ZTAV.allocate(NumOfZones);
+    ZoneThermostatSetPointLo.allocate(NumOfZones);
+    ZoneThermostatSetPointHi.allocate(NumOfZones);
+    TimeStepZone = 0.25;
+    ThermalComfortInASH55.allocate(NumOfZones);
+    ThermalComfortInASH55(1).ZoneIsOccupied = true;
+    Zone.allocate(NumOfZones);
 
-	// SingleHeatingSetPoint thermostat
+    // SingleHeatingSetPoint thermostat
 
-	TempControlType( 1 ) = SingleHeatingSetPoint;
+    TempControlType(1) = SingleHeatingSetPoint;
 
-	//heating
-	ZTAV( 1 ) = 21.1; // 70F
-	ZoneThermostatSetPointLo( 1 ) = 22.2; // 72F
-	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 500.0; // must be greater than zero
-	CalcIfSetPointMet();
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetHeating );
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetHeatingOccupied );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCooling );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
+    // heating
+    ZTAV(1) = 21.1;                                     // 70F
+    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
-	//cooling
-	ZTAV( 1 ) = 25.0; // 77F
-	ZoneThermostatSetPointHi( 1 ) = 23.9; // 75F
-	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = -500.0; // must be less than zero
-	CalcIfSetPointMet();
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeating );
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeatingOccupied );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCooling );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
+    // cooling
+    ZTAV(1) = 25.0;                                      // 77F
+    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
-	// SingleCoolingSetPoint thermostat
+    // SingleCoolingSetPoint thermostat
 
-	TempControlType( 1 ) = SingleCoolingSetPoint;
+    TempControlType(1) = SingleCoolingSetPoint;
 
-	//heating
-	ZTAV( 1 ) = 21.1; // 70F
-	ZoneThermostatSetPointLo( 1 ) = 22.2; // 72F
-	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 500.0; // must be greater than zero
-	CalcIfSetPointMet();
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeating );
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeatingOccupied );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCooling );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
+    // heating
+    ZTAV(1) = 21.1;                                     // 70F
+    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
-	//cooling
-	ZTAV( 1 ) = 25.0; // 77F
-	ZoneThermostatSetPointHi( 1 ) = 23.9; // 75F
-	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = -500.0; // must be less than zero
-	CalcIfSetPointMet();
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeating );
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeatingOccupied );
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCooling );
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
+    // cooling
+    ZTAV(1) = 25.0;                                      // 77F
+    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
-	// SingleHeatCoolSetPoint thermostat
+    // SingleHeatCoolSetPoint thermostat
 
-	TempControlType( 1 ) = SingleHeatCoolSetPoint;
+    TempControlType(1) = SingleHeatCoolSetPoint;
 
-	//heating
-	ZTAV( 1 ) = 21.1; // 70F
-	ZoneThermostatSetPointLo( 1 ) = 22.2; // 72F
-	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 500.0; // must be greater than zero
-	CalcIfSetPointMet();
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetHeating );
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetHeatingOccupied );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCooling );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
+    // heating
+    ZTAV(1) = 21.1;                                     // 70F
+    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
-	//cooling
-	ZTAV( 1 ) = 25.0; // 77F
-	ZoneThermostatSetPointHi( 1 ) = 23.9; // 75F
-	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = -500.0; // must be less than zero
-	CalcIfSetPointMet();
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeating );
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeatingOccupied );
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCooling );
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
+    // cooling
+    ZTAV(1) = 25.0;                                      // 77F
+    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
-	// DualSetPointWithDeadBand thermostat
+    // DualSetPointWithDeadBand thermostat
 
-	TempControlType( 1 ) = DualSetPointWithDeadBand;
+    TempControlType(1) = DualSetPointWithDeadBand;
 
-	//heating
-	ZTAV( 1 ) = 21.1; // 70F
-	ZoneThermostatSetPointLo( 1 ) = 22.2; // 72F
-	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 500.0; // must be greater than zero
-	CalcIfSetPointMet();
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetHeating );
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetHeatingOccupied );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCooling );
-	EXPECT_EQ( 0., ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
+    // heating
+    ZTAV(1) = 21.1;                                     // 70F
+    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
-	//cooling
-	ZTAV( 1 ) = 25.0; // 77F
-	ZoneThermostatSetPointHi( 1 ) = 23.9; // 75F
-	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = -500.0; // must be less than zero
-	CalcIfSetPointMet();
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeating );
-	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeatingOccupied );
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCooling );
-	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
+    // cooling
+    ZTAV(1) = 25.0;                                      // 77F
+    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCoolingOccupied);
 }
 
-TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger )
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 {
 
-	std::string const idf_objects = delimited_string( {
-		"Version,8.3;",
-		"  People,                                                                 ",
-		"    Space People,   !- Name                                      ",
-		"    Space,     !- Zone or ZoneList Name                     ",
-		"    PeopleSchedule,          !- Number of People Schedule Name            ",
-		"    People,                  !- Number of People Calculation Method       ",
-		"    5.0,                     !- Number of People                          ",
-		"    ,                        !- People per Zone Floor Area {person/m2}    ",
-		"    ,                        !- Zone Floor Area per Person {m2/person}    ",
-		"    0.3,                     !- Fraction Radiant                          ",
-		"    AUTOCALCULATE,           !- Sensible Heat Fraction                    ",
-		"    Activity Schedule,       !- Activity Level Schedule Name              ",
-		"    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}   ",
-		"    Yes,                     !- Enable ASHRAE 55 Comfort Warnings         ",
-		"    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type ",
-		"    ,                        !- Surface Name/Angle Factor List Name       ",
-		"    Work efficiency,         !- Work Efficiency Schedule Name             ",
-		"    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
-		"    ,                        !- Clothing Insulation Calculation Method Sch",
-		"    Clothing Schedule,       !- Clothing Insulation Schedule Name         ",
-		"    AirVelocitySchedule,     !- Air Velocity Schedule Name                ",
-		"    Fanger;                  !- Thermal Comfort Model 1 Type              ",
-		"                                                                          ",
-		"  Schedule:Compact,                                                       ",
-		"    PeopleSchedule,          !- Name                                      ",
-		"    Any Number,              !- Schedule Type Limits Name                 ",
-		"    Through: 12/30,          !- Field 1                                   ",
-		"    For: AllDays,            !- Field 2                                   ",
-		"    Until: 24:00,1.0,        !- Field 3                                   ",
-		"    Through: 12/31,          !- Field 1                                   ",
-		"    For: AllDays,            !- Field 2                                   ",
-		"    Until: 24:00,0.3;        !- Field 3                                   ",
-		"                                                                          ",
-		"  Schedule:Compact,                                                       ",
-		"    Activity Schedule,       !- Name                                      ",
-		"    Any Number,              !- Schedule Type Limits Name                 ",
-		"    Through: 12/31,          !- Field 1                                   ",
-		"    For: AllDays,            !- Field 2                                   ",
-		"    Until: 24:00,70;         !- Field 3                                   ",
-		"                                                                          ",
-		"  Schedule:Compact,                                                       ",
-		"    Clothing Schedule,       !- Name                                      ",
-		"    Any Number,              !- Schedule Type Limits Name                 ",
-		"    Through: 12/31,          !- Field 9                                   ",
-		"    For: AllDays,            !- Field 10                                  ",
-		"    Until: 24:00,1.0;         !- Field 11                                 ",
-		"                                                                          ",
-		"  Schedule:Compact,                                                       ",
-		"    AirVelocitySchedule,     !- Name                                      ",
-		"    Any Number,              !- Schedule Type Limits Name                 ",
-		"    Through: 12/31,          !- Field 1                                   ",
-		"    For: AllDays,            !- Field 2                                   ",
-		"    Until: 24:00,0.0;        !- Field 3                                   ",
-		"                                                                          ",
-		"  Schedule:Compact,                                                       ",
-		"    Work efficiency,         !- Name                                      ",
-		"    Any Number,              !- Schedule Type Limits Name                 ",
-		"    Through: 12/31,          !- Field 9                                   ",
-		"    For: AllDays,            !- Field 10                                  ",
-		"    Until: 24:00,0.0;         !- Field 11                                 ",
-		"                                                                          ",
-		" Output:Diagnostics, DisplayExtraWarnings;",
-		" Timestep, 4;",
-		" BUILDING, AirloopHVAC_VentilationRateProcedure, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
-		" SimulationControl, NO, NO, NO, YES, NO;",
-		"ScheduleTypeLimits,",
-		"  Any Number;              !- Name",
-		"  Site:Location,",
-		"    Miami Intl Ap FL USA TMY3 WMO=722020E,    !- Name",
-		"    25.82,                 !- Latitude {deg}",
-		"    -80.30,                !- Longitude {deg}",
-		"    -5.00,                 !- Time Zone {hr}",
-		"    11;                    !- Elevation {m}",
+    std::string const idf_objects = delimited_string({
+        "Version,8.3;",
+        "  People,                                                                 ",
+        "    Space People,   !- Name                                      ",
+        "    Space,     !- Zone or ZoneList Name                     ",
+        "    PeopleSchedule,          !- Number of People Schedule Name            ",
+        "    People,                  !- Number of People Calculation Method       ",
+        "    5.0,                     !- Number of People                          ",
+        "    ,                        !- People per Zone Floor Area {person/m2}    ",
+        "    ,                        !- Zone Floor Area per Person {m2/person}    ",
+        "    0.3,                     !- Fraction Radiant                          ",
+        "    AUTOCALCULATE,           !- Sensible Heat Fraction                    ",
+        "    Activity Schedule,       !- Activity Level Schedule Name              ",
+        "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}   ",
+        "    Yes,                     !- Enable ASHRAE 55 Comfort Warnings         ",
+        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type ",
+        "    ,                        !- Surface Name/Angle Factor List Name       ",
+        "    Work efficiency,         !- Work Efficiency Schedule Name             ",
+        "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
+        "    ,                        !- Clothing Insulation Calculation Method Sch",
+        "    Clothing Schedule,       !- Clothing Insulation Schedule Name         ",
+        "    AirVelocitySchedule,     !- Air Velocity Schedule Name                ",
+        "    Fanger;                  !- Thermal Comfort Model 1 Type              ",
+        "                                                                          ",
+        "  Schedule:Compact,                                                       ",
+        "    PeopleSchedule,          !- Name                                      ",
+        "    Any Number,              !- Schedule Type Limits Name                 ",
+        "    Through: 12/30,          !- Field 1                                   ",
+        "    For: AllDays,            !- Field 2                                   ",
+        "    Until: 24:00,1.0,        !- Field 3                                   ",
+        "    Through: 12/31,          !- Field 1                                   ",
+        "    For: AllDays,            !- Field 2                                   ",
+        "    Until: 24:00,0.3;        !- Field 3                                   ",
+        "                                                                          ",
+        "  Schedule:Compact,                                                       ",
+        "    Activity Schedule,       !- Name                                      ",
+        "    Any Number,              !- Schedule Type Limits Name                 ",
+        "    Through: 12/31,          !- Field 1                                   ",
+        "    For: AllDays,            !- Field 2                                   ",
+        "    Until: 24:00,70;         !- Field 3                                   ",
+        "                                                                          ",
+        "  Schedule:Compact,                                                       ",
+        "    Clothing Schedule,       !- Name                                      ",
+        "    Any Number,              !- Schedule Type Limits Name                 ",
+        "    Through: 12/31,          !- Field 9                                   ",
+        "    For: AllDays,            !- Field 10                                  ",
+        "    Until: 24:00,1.0;         !- Field 11                                 ",
+        "                                                                          ",
+        "  Schedule:Compact,                                                       ",
+        "    AirVelocitySchedule,     !- Name                                      ",
+        "    Any Number,              !- Schedule Type Limits Name                 ",
+        "    Through: 12/31,          !- Field 1                                   ",
+        "    For: AllDays,            !- Field 2                                   ",
+        "    Until: 24:00,0.0;        !- Field 3                                   ",
+        "                                                                          ",
+        "  Schedule:Compact,                                                       ",
+        "    Work efficiency,         !- Name                                      ",
+        "    Any Number,              !- Schedule Type Limits Name                 ",
+        "    Through: 12/31,          !- Field 9                                   ",
+        "    For: AllDays,            !- Field 10                                  ",
+        "    Until: 24:00,0.0;         !- Field 11                                 ",
+        "                                                                          ",
+        " Output:Diagnostics, DisplayExtraWarnings;",
+        " Timestep, 4;",
+        " BUILDING, AirloopHVAC_VentilationRateProcedure, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
+        " SimulationControl, NO, NO, NO, YES, NO;",
+        "ScheduleTypeLimits,",
+        "  Any Number;              !- Name",
+        "  Site:Location,",
+        "    Miami Intl Ap FL USA TMY3 WMO=722020E,    !- Name",
+        "    25.82,                 !- Latitude {deg}",
+        "    -80.30,                !- Longitude {deg}",
+        "    -5.00,                 !- Time Zone {hr}",
+        "    11;                    !- Elevation {m}",
 
-		"SizingPeriod:DesignDay,",
-		" Miami Intl Ap Ann Clg .4% Condns DB/MCWB, !- Name",
-		" 7,                        !- Month",
-		" 21,                       !- Day of Month",
-		" SummerDesignDay,          !- Day Type",
-		" 31.7,                     !- Maximum Dry - Bulb Temperature{ C }",
-		" 10.0,                      !- Daily Dry - Bulb Temperature Range{ deltaC }",
-		" ,                         !- Dry - Bulb Temperature Range Modifier Type",
-		" ,                         !- Dry - Bulb Temperature Range Modifier Day Schedule Name",
-		" Wetbulb,                  !- Humidity Condition Type",
-		" 22.7,                     !- Wetbulb or DewPoint at Maximum Dry - Bulb{ C }",
-		" ,                         !- Humidity Condition Day Schedule Name",
-		" ,                         !- Humidity Ratio at Maximum Dry - Bulb{ kgWater / kgDryAir }",
-		" ,                         !- Enthalpy at Maximum Dry - Bulb{ J / kg }",
-		" ,                         !- Daily Wet - Bulb Temperature Range{ deltaC }",
-		" 101217.,                  !- Barometric Pressure{ Pa }",
-		" 3.8,                      !- Wind Speed{ m / s }",
-		" 340,                      !- Wind Direction{ deg }",
-		" No,                       !- Rain Indicator",
-		" No,                       !- Snow Indicator",
-		" No,                       !- Daylight Saving Time Indicator",
-		" ASHRAEClearSky,           !- Solar Model Indicator",
-		" ,                         !- Beam Solar Day Schedule Name",
-		" ,                         !- Diffuse Solar Day Schedule Name",
-		" ,                         !- ASHRAE Clear Sky Optical Depth for Beam Irradiance( taub ) { dimensionless }",
-		" ,                         !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance( taud ) { dimensionless }",
-		" 1.00;                     !- Sky Clearness",
+        "SizingPeriod:DesignDay,",
+        " Miami Intl Ap Ann Clg .4% Condns DB/MCWB, !- Name",
+        " 7,                        !- Month",
+        " 21,                       !- Day of Month",
+        " SummerDesignDay,          !- Day Type",
+        " 31.7,                     !- Maximum Dry - Bulb Temperature{ C }",
+        " 10.0,                      !- Daily Dry - Bulb Temperature Range{ deltaC }",
+        " ,                         !- Dry - Bulb Temperature Range Modifier Type",
+        " ,                         !- Dry - Bulb Temperature Range Modifier Day Schedule Name",
+        " Wetbulb,                  !- Humidity Condition Type",
+        " 22.7,                     !- Wetbulb or DewPoint at Maximum Dry - Bulb{ C }",
+        " ,                         !- Humidity Condition Day Schedule Name",
+        " ,                         !- Humidity Ratio at Maximum Dry - Bulb{ kgWater / kgDryAir }",
+        " ,                         !- Enthalpy at Maximum Dry - Bulb{ J / kg }",
+        " ,                         !- Daily Wet - Bulb Temperature Range{ deltaC }",
+        " 101217.,                  !- Barometric Pressure{ Pa }",
+        " 3.8,                      !- Wind Speed{ m / s }",
+        " 340,                      !- Wind Direction{ deg }",
+        " No,                       !- Rain Indicator",
+        " No,                       !- Snow Indicator",
+        " No,                       !- Daylight Saving Time Indicator",
+        " ASHRAEClearSky,           !- Solar Model Indicator",
+        " ,                         !- Beam Solar Day Schedule Name",
+        " ,                         !- Diffuse Solar Day Schedule Name",
+        " ,                         !- ASHRAE Clear Sky Optical Depth for Beam Irradiance( taub ) { dimensionless }",
+        " ,                         !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance( taud ) { dimensionless }",
+        " 1.00;                     !- Sky Clearness",
 
-		"SizingPeriod:DesignDay,",
-		" Miami Intl Ap Ann Htg 99.6% Condns DB, !- Name",
-		" 1,                        !- Month",
-		" 21,                       !- Day of Month",
-		" WinterDesignDay,          !- Day Type",
-		" 8.7,                      !- Maximum Dry - Bulb Temperature{ C }",
-		" 0.0,                      !- Daily Dry - Bulb Temperature Range{ deltaC }",
-		" ,                         !- Dry - Bulb Temperature Range Modifier Type",
-		" ,                         !- Dry - Bulb Temperature Range Modifier Day Schedule Name",
-		" Wetbulb,                  !- Humidity Condition Type",
-		" 8.7,                      !- Wetbulb or DewPoint at Maximum Dry - Bulb{ C }",
-		" ,                         !- Humidity Condition Day Schedule Name",
-		" ,                         !- Humidity Ratio at Maximum Dry - Bulb{ kgWater / kgDryAir }",
-		" ,                         !- Enthalpy at Maximum Dry - Bulb{ J / kg }",
-		" ,                         !- Daily Wet - Bulb Temperature Range{ deltaC }",
-		" 101217.,                  !- Barometric Pressure{ Pa }",
-		" 3.8,                      !- Wind Speed{ m / s }",
-		" 340,                      !- Wind Direction{ deg }",
-		" No,                       !- Rain Indicator",
-		" No,                       !- Snow Indicator",
-		" No,                       !- Daylight Saving Time Indicator",
-		" ASHRAEClearSky,           !- Solar Model Indicator",
-		" ,                         !- Beam Solar Day Schedule Name",
-		" ,                         !- Diffuse Solar Day Schedule Name",
-		" ,                         !- ASHRAE Clear Sky Optical Depth for Beam Irradiance( taub ) { dimensionless }",
-		" ,                         !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance( taud ) { dimensionless }",
-		" 0.00;                     !- Sky Clearness",
+        "SizingPeriod:DesignDay,",
+        " Miami Intl Ap Ann Htg 99.6% Condns DB, !- Name",
+        " 1,                        !- Month",
+        " 21,                       !- Day of Month",
+        " WinterDesignDay,          !- Day Type",
+        " 8.7,                      !- Maximum Dry - Bulb Temperature{ C }",
+        " 0.0,                      !- Daily Dry - Bulb Temperature Range{ deltaC }",
+        " ,                         !- Dry - Bulb Temperature Range Modifier Type",
+        " ,                         !- Dry - Bulb Temperature Range Modifier Day Schedule Name",
+        " Wetbulb,                  !- Humidity Condition Type",
+        " 8.7,                      !- Wetbulb or DewPoint at Maximum Dry - Bulb{ C }",
+        " ,                         !- Humidity Condition Day Schedule Name",
+        " ,                         !- Humidity Ratio at Maximum Dry - Bulb{ kgWater / kgDryAir }",
+        " ,                         !- Enthalpy at Maximum Dry - Bulb{ J / kg }",
+        " ,                         !- Daily Wet - Bulb Temperature Range{ deltaC }",
+        " 101217.,                  !- Barometric Pressure{ Pa }",
+        " 3.8,                      !- Wind Speed{ m / s }",
+        " 340,                      !- Wind Direction{ deg }",
+        " No,                       !- Rain Indicator",
+        " No,                       !- Snow Indicator",
+        " No,                       !- Daylight Saving Time Indicator",
+        " ASHRAEClearSky,           !- Solar Model Indicator",
+        " ,                         !- Beam Solar Day Schedule Name",
+        " ,                         !- Diffuse Solar Day Schedule Name",
+        " ,                         !- ASHRAE Clear Sky Optical Depth for Beam Irradiance( taub ) { dimensionless }",
+        " ,                         !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance( taud ) { dimensionless }",
+        " 0.00;                     !- Sky Clearness",
 
-		"Zone,",
-		"  Space,                   !- Name",
-		"  0.0000,                  !- Direction of Relative North {deg}",
-		"  0.0000,                  !- X Origin {m}",
-		"  0.0000,                  !- Y Origin {m}",
-		"  0.0000,                  !- Z Origin {m}",
-		"  1,                       !- Type",
-		"  1,                       !- Multiplier",
-		"  2.4,                     !- Ceiling Height {m}",
-		"  ,                        !- Volume {m3}",
-		"  autocalculate,           !- Floor Area {m2}",
-		"  ,                        !- Zone Inside Convection Algorithm",
-		"  ,                        !- Zone Outside Convection Algorithm",
-		"  Yes;                     !- Part of Total Floor Area",
+        "Zone,",
+        "  Space,                   !- Name",
+        "  0.0000,                  !- Direction of Relative North {deg}",
+        "  0.0000,                  !- X Origin {m}",
+        "  0.0000,                  !- Y Origin {m}",
+        "  0.0000,                  !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  2.4,                     !- Ceiling Height {m}",
+        "  ,                        !- Volume {m3}",
+        "  autocalculate,           !- Floor Area {m2}",
+        "  ,                        !- Zone Inside Convection Algorithm",
+        "  ,                        !- Zone Outside Convection Algorithm",
+        "  Yes;                     !- Part of Total Floor Area",
 
-		"ZoneGroup,",
-		" Zone Group,               !- Name",
-		" Zone List,                !- Zone List Name",
-		" 10;                       !- Zone List Multiplier",
+        "ZoneGroup,",
+        " Zone Group,               !- Name",
+        " Zone List,                !- Zone List Name",
+        " 10;                       !- Zone List Multiplier",
 
-		"ZoneList,",
-		" Zone List,                !- Name",
-		" Spacex10;                 !- Zone 1 Name",
+        "ZoneList,",
+        " Zone List,                !- Name",
+        " Spacex10;                 !- Zone 1 Name",
 
-		"Zone,",
-		"  Spacex10,                !- Name",
-		"  0.0000,                  !- Direction of Relative North {deg}",
-		"  0.0000,                  !- X Origin {m}",
-		"  0.0000,                  !- Y Origin {m}",
-		"  0.0000,                  !- Z Origin {m}",
-		"  1,                       !- Type",
-		"  1,                       !- Multiplier",
-		"  2.4,                     !- Ceiling Height {m}",
-		"  ,                        !- Volume {m3}",
-		"  autocalculate,           !- Floor Area {m2}",
-		"  ,                        !- Zone Inside Convection Algorithm",
-		"  ,                        !- Zone Outside Convection Algorithm",
-		"  Yes;                     !- Part of Total Floor Area",
+        "Zone,",
+        "  Spacex10,                !- Name",
+        "  0.0000,                  !- Direction of Relative North {deg}",
+        "  0.0000,                  !- X Origin {m}",
+        "  0.0000,                  !- Y Origin {m}",
+        "  0.0000,                  !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  2.4,                     !- Ceiling Height {m}",
+        "  ,                        !- Volume {m3}",
+        "  autocalculate,           !- Floor Area {m2}",
+        "  ,                        !- Zone Inside Convection Algorithm",
+        "  ,                        !- Zone Outside Convection Algorithm",
+        "  Yes;                     !- Part of Total Floor Area",
 
-		"People,",
-		" Spacex10 People,          !- Name",
-		" Spacex10,                 !- Zone or ZoneList Name",
-		" OnSched,                  !- Number of People Schedule Name",
-		" people,                   !- Number of People Calculation Method",
-		" 11,                       !- Number of People",
-		" ,                         !- People per Zone Floor Area{ person / m2 }",
-		" ,                         !- Zone Floor Area per Person{ m2 / person }",
-		" 0.3,                      !- Fraction Radiant",
-		" AutoCalculate,            !- Sensible Heat Fraction",
-		" Activity Schedule;        !- Activity Level Schedule Name",
+        "People,",
+        " Spacex10 People,          !- Name",
+        " Spacex10,                 !- Zone or ZoneList Name",
+        " OnSched,                  !- Number of People Schedule Name",
+        " people,                   !- Number of People Calculation Method",
+        " 11,                       !- Number of People",
+        " ,                         !- People per Zone Floor Area{ person / m2 }",
+        " ,                         !- Zone Floor Area per Person{ m2 / person }",
+        " 0.3,                      !- Fraction Radiant",
+        " AutoCalculate,            !- Sensible Heat Fraction",
+        " Activity Schedule;        !- Activity Level Schedule Name",
 
-		"Lights,",
-		" Space Lights,             !- Name",
-		" Space,                    !- Zone or ZoneList Name",
-		" OnSched,                  !- Schedule Name",
-		" Watts/Area,               !- Design Level Calculation Method",
-		" ,                         !- Lighting Level{ W }",
-		" 10.0,                     !- Watts per Zone Floor Area{ W / m2 }",
-		" ,                         !- Watts per Person{ W / person }",
-		" 0.0,                      !- Return Air Fraction",
-		" 0.59,                     !- Fraction Radiant",
-		" 0.2,                      !- Fraction Visible",
-		" 0,                        !- Fraction Replaceable",
-		" GeneralLights;            !- End - Use Subcategory",
+        "Lights,",
+        " Space Lights,             !- Name",
+        " Space,                    !- Zone or ZoneList Name",
+        " OnSched,                  !- Schedule Name",
+        " Watts/Area,               !- Design Level Calculation Method",
+        " ,                         !- Lighting Level{ W }",
+        " 10.0,                     !- Watts per Zone Floor Area{ W / m2 }",
+        " ,                         !- Watts per Person{ W / person }",
+        " 0.0,                      !- Return Air Fraction",
+        " 0.59,                     !- Fraction Radiant",
+        " 0.2,                      !- Fraction Visible",
+        " 0,                        !- Fraction Replaceable",
+        " GeneralLights;            !- End - Use Subcategory",
 
-		"Lights,",
-		" Space Lights x10,         !- Name",
-		" Spacex10,                 !- Zone or ZoneList Name",
-		" OnSched,                  !- Schedule Name",
-		" Watts/Area,               !- Design Level Calculation Method",
-		" ,                         !- Lighting Level{ W }",
-		" 10.0,                     !- Watts per Zone Floor Area{ W / m2 }",
-		" ,                         !- Watts per Person{ W / person }",
-		" 0.0,                      !- Return Air Fraction",
-		" 0.59,                     !- Fraction Radiant",
-		" 0.2,                      !- Fraction Visible",
-		" 0,                        !- Fraction Replaceable",
-		" GeneralLights;            !- End - Use Subcategory",
+        "Lights,",
+        " Space Lights x10,         !- Name",
+        " Spacex10,                 !- Zone or ZoneList Name",
+        " OnSched,                  !- Schedule Name",
+        " Watts/Area,               !- Design Level Calculation Method",
+        " ,                         !- Lighting Level{ W }",
+        " 10.0,                     !- Watts per Zone Floor Area{ W / m2 }",
+        " ,                         !- Watts per Person{ W / person }",
+        " 0.0,                      !- Return Air Fraction",
+        " 0.59,                     !- Fraction Radiant",
+        " 0.2,                      !- Fraction Visible",
+        " 0,                        !- Fraction Replaceable",
+        " GeneralLights;            !- End - Use Subcategory",
 
-		"ElectricEquipment,",
-		" Space ElecEq,             !- Name",
-		" Space,                    !- Zone or ZoneList Name",
-		" OnSched,                  !- Schedule Name",
-		" Watts/Area,               !- Design Level Calculation Method",
-		" ,                         !- Design Level{ W }",
-		" 20.0,                     !- Watts per Zone Floor Area{ W / m2 }",
-		" ,                         !- Watts per Person{ W / person }",
-		" 0.1,                      !- Fraction Latent",
-		" 0.3,                      !- Fraction Radiant",
-		" 0.1;                      !- Fraction Lost",
+        "ElectricEquipment,",
+        " Space ElecEq,             !- Name",
+        " Space,                    !- Zone or ZoneList Name",
+        " OnSched,                  !- Schedule Name",
+        " Watts/Area,               !- Design Level Calculation Method",
+        " ,                         !- Design Level{ W }",
+        " 20.0,                     !- Watts per Zone Floor Area{ W / m2 }",
+        " ,                         !- Watts per Person{ W / person }",
+        " 0.1,                      !- Fraction Latent",
+        " 0.3,                      !- Fraction Radiant",
+        " 0.1;                      !- Fraction Lost",
 
-		"ElectricEquipment,",
-		" Space ElecEq x10,         !- Name",
-		" Spacex10,                 !- Zone or ZoneList Name",
-		" OnSched,                  !- Schedule Name",
-		" Watts/Area,               !- Design Level Calculation Method",
-		" ,                         !- Design Level{ W }",
-		" 20.0,                     !- Watts per Zone Floor Area{ W / m2 }",
-		" ,                         !- Watts per Person{ W / person }",
-		" 0.1,                      !- Fraction Latent",
-		" 0.3,                      !- Fraction Radiant",
-		" 0.1;                      !- Fraction Lost",
+        "ElectricEquipment,",
+        " Space ElecEq x10,         !- Name",
+        " Spacex10,                 !- Zone or ZoneList Name",
+        " OnSched,                  !- Schedule Name",
+        " Watts/Area,               !- Design Level Calculation Method",
+        " ,                         !- Design Level{ W }",
+        " 20.0,                     !- Watts per Zone Floor Area{ W / m2 }",
+        " ,                         !- Watts per Person{ W / person }",
+        " 0.1,                      !- Fraction Latent",
+        " 0.3,                      !- Fraction Radiant",
+        " 0.1;                      !- Fraction Lost",
 
-		"Schedule:Compact,",
-		" OnSched,                  !- Name",
-		" Fraction,                 !- Schedule Type Limits Name",
-		" Through: 12/31,           !- Field 1",
-		" For: AllDays,             !- Field 2",
-		" Until: 24:00, 1.0;        !- Field 26",
+        "Schedule:Compact,",
+        " OnSched,                  !- Name",
+        " Fraction,                 !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 1.0;        !- Field 26",
 
-		"ScheduleTypeLimits,",
-		" Fraction,                 !- Name",
-		" 0.0,                      !- Lower Limit Value",
-		" 1.0,                      !- Upper Limit Value",
-		" CONTINUOUS;               !- Numeric Type",
+        "ScheduleTypeLimits,",
+        " Fraction,                 !- Name",
+        " 0.0,                      !- Lower Limit Value",
+        " 1.0,                      !- Upper Limit Value",
+        " CONTINUOUS;               !- Numeric Type",
 
-		"Construction,",
-		" INT-WALL-1,               !- Name",
-		" GP02,                     !- Outside Layer",
-		" AL21,                     !- Layer 2",
-		" GP02;                     !- Layer 3",
+        "Construction,",
+        " INT-WALL-1,               !- Name",
+        " GP02,                     !- Outside Layer",
+        " AL21,                     !- Layer 2",
+        " GP02;                     !- Layer 3",
 
-		"Material,",
-		" GP02,                     !- Name",
-		" MediumSmooth,             !- Roughness",
-		" 1.5900001E-02,            !- Thickness{ m }",
-		" 0.1600000,                !- Conductivity{ W / m - K }",
-		" 801.0000,                 !- Density{ kg / m3 }",
-		" 837.0000,                 !- Specific Heat{ J / kg - K }",
-		" 0.9000000,                !- Thermal Absorptance",
-		" 0.7500000,                !- Solar Absorptance",
-		" 0.7500000;                !- Visible Absorptance",
+        "Material,",
+        " GP02,                     !- Name",
+        " MediumSmooth,             !- Roughness",
+        " 1.5900001E-02,            !- Thickness{ m }",
+        " 0.1600000,                !- Conductivity{ W / m - K }",
+        " 801.0000,                 !- Density{ kg / m3 }",
+        " 837.0000,                 !- Specific Heat{ J / kg - K }",
+        " 0.9000000,                !- Thermal Absorptance",
+        " 0.7500000,                !- Solar Absorptance",
+        " 0.7500000;                !- Visible Absorptance",
 
-		"Material:AirGap,",
-		" AL21,                     !- Name",
-		" 0.1570000;                !- Thermal Resistance{ m2 - K / W }",
+        "Material:AirGap,",
+        " AL21,                     !- Name",
+        " 0.1570000;                !- Thermal Resistance{ m2 - K / W }",
 
-		"Construction,",
-		"FLOOR-SLAB-1,              !- Name",
-		"CC03,                      !- Outside Layer",
-		"CP01;                      !- Layer 2",
+        "Construction,",
+        "FLOOR-SLAB-1,              !- Name",
+        "CC03,                      !- Outside Layer",
+        "CP01;                      !- Layer 2",
 
-		"Material,",
-		" CC03,                     !- Name",
-		" MediumRough,              !- Roughness",
-		" 0.1016000,                !- Thickness{ m }",
-		" 1.310000,                 !- Conductivity{ W / m - K }",
-		" 2243.000,                 !- Density{ kg / m3 }",
-		" 837.0000,                 !- Specific Heat{ J / kg - K }",
-		" 0.9000000,                !- Thermal Absorptance",
-		" 0.6500000,                !- Solar Absorptance",
-		" 0.6500000;                !- Visible Absorptance",
+        "Material,",
+        " CC03,                     !- Name",
+        " MediumRough,              !- Roughness",
+        " 0.1016000,                !- Thickness{ m }",
+        " 1.310000,                 !- Conductivity{ W / m - K }",
+        " 2243.000,                 !- Density{ kg / m3 }",
+        " 837.0000,                 !- Specific Heat{ J / kg - K }",
+        " 0.9000000,                !- Thermal Absorptance",
+        " 0.6500000,                !- Solar Absorptance",
+        " 0.6500000;                !- Visible Absorptance",
 
-		"Material:NoMass,",
-		" CP01,                     !- Name",
-		" Rough,                    !- Roughness",
-		" 0.3670000,                !- Thermal Resistance{ m2 - K / W }",
-		" 0.9000000,                !- Thermal Absorptance",
-		" 0.7500000,                !- Solar Absorptance",
-		" 0.7500000;                !- Visible Absorptance",
+        "Material:NoMass,",
+        " CP01,                     !- Name",
+        " Rough,                    !- Roughness",
+        " 0.3670000,                !- Thermal Resistance{ m2 - K / W }",
+        " 0.9000000,                !- Thermal Absorptance",
+        " 0.7500000,                !- Solar Absorptance",
+        " 0.7500000;                !- Visible Absorptance",
 
-		"Construction,",
-		" CLNG-1,                   !- Name",
-		" MAT-CLNG-1;               !- Outside Layer",
+        "Construction,",
+        " CLNG-1,                   !- Name",
+        " MAT-CLNG-1;               !- Outside Layer",
 
-		"Material:NoMass,",
-		" MAT-CLNG-1,               !- Name",
-		" Rough,                    !- Roughness",
-		" 0.652259290,              !- Thermal Resistance{ m2 - K / W }",
-		" 0.65,                     !- Thermal Absorptance",
-		" 0.65,                     !- Solar Absorptance",
-		" 0.65;                     !- Visible Absorptance",
+        "Material:NoMass,",
+        " MAT-CLNG-1,               !- Name",
+        " Rough,                    !- Roughness",
+        " 0.652259290,              !- Thermal Resistance{ m2 - K / W }",
+        " 0.65,                     !- Thermal Absorptance",
+        " 0.65,                     !- Solar Absorptance",
+        " 0.65;                     !- Visible Absorptance",
 
-		"BuildingSurface:Detailed,",
-		" FRONT-1,                  !- Name",
-		" WALL,                     !- Surface Type",
-		" INT-WALL-1,               !- Construction Name",
-		" Space,                    !- Zone Name",
-		" Outdoors,                 !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" SunExposed,               !- Sun Exposure",
-		" WindExposed,              !- Wind Exposure",
-		" 0.50000,                  !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 0.0, 0.0, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
-		" 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 2 {m}",
-		" 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 3 {m}",
-		" 30.5, 0.0, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " FRONT-1,                  !- Name",
+        " WALL,                     !- Surface Type",
+        " INT-WALL-1,               !- Construction Name",
+        " Space,                    !- Zone Name",
+        " Outdoors,                 !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " SunExposed,               !- Sun Exposure",
+        " WindExposed,              !- Wind Exposure",
+        " 0.50000,                  !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 0.0, 0.0, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
+        " 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 2 {m}",
+        " 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 3 {m}",
+        " 30.5, 0.0, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" C1-1,                     !- Name",
-		" CEILING,                  !- Surface Type",
-		" CLNG-1,                   !- Construction Name",
-		" Space,                    !- Zone Name",
-		" Outdoors,                 !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 3.7, 3.7, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
-		" 0.0, 0.0, 2.4,            !- X, Y, Z == > Vertex 2 {m}",
-		" 30.5, 0.0, 2.4,           !- X, Y, Z == > Vertex 3 {m}",
-		" 26.8, 3.7, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " C1-1,                     !- Name",
+        " CEILING,                  !- Surface Type",
+        " CLNG-1,                   !- Construction Name",
+        " Space,                    !- Zone Name",
+        " Outdoors,                 !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 3.7, 3.7, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
+        " 0.0, 0.0, 2.4,            !- X, Y, Z == > Vertex 2 {m}",
+        " 30.5, 0.0, 2.4,           !- X, Y, Z == > Vertex 3 {m}",
+        " 26.8, 3.7, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" F1-1,                     !- Name",
-		" FLOOR,                    !- Surface Type",
-		" FLOOR-SLAB-1,             !- Construction Name",
-		" Space,                    !- Zone Name",
-		" Outdoors,                   !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 1 {m}",
-		" 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
-		" 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
-		" 3.7, 3.7, 0.0;            !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " F1-1,                     !- Name",
+        " FLOOR,                    !- Surface Type",
+        " FLOOR-SLAB-1,             !- Construction Name",
+        " Space,                    !- Zone Name",
+        " Outdoors,                   !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 1 {m}",
+        " 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
+        " 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
+        " 3.7, 3.7, 0.0;            !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" SB12,                     !- Name",
-		" WALL,                     !- Surface Type",
-		" INT-WALL-1,               !- Construction Name",
-		" Space,                    !- Zone Name",
-		" Adiabatic,                !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 30.5, 0.0, 2.4,           !- X, Y, Z == > Vertex 1 {m}",
-		" 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
-		" 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 3 {m}",
-		" 26.8, 3.7, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " SB12,                     !- Name",
+        " WALL,                     !- Surface Type",
+        " INT-WALL-1,               !- Construction Name",
+        " Space,                    !- Zone Name",
+        " Adiabatic,                !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 30.5, 0.0, 2.4,           !- X, Y, Z == > Vertex 1 {m}",
+        " 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
+        " 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 3 {m}",
+        " 26.8, 3.7, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" SB14,                     !- Name",
-		" WALL,                     !- Surface Type",
-		" INT-WALL-1,               !- Construction Name",
-		" Space,                    !- Zone Name",
-		" Adiabatic,                !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 3.7, 3.7, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
-		" 3.7, 3.7, 0.0,            !- X, Y, Z == > Vertex 2 {m}",
-		" 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
-		" 0.0, 0.0, 2.4;            !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " SB14,                     !- Name",
+        " WALL,                     !- Surface Type",
+        " INT-WALL-1,               !- Construction Name",
+        " Space,                    !- Zone Name",
+        " Adiabatic,                !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 3.7, 3.7, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
+        " 3.7, 3.7, 0.0,            !- X, Y, Z == > Vertex 2 {m}",
+        " 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
+        " 0.0, 0.0, 2.4;            !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" SB15,                     !- Name",
-		" WALL,                     !- Surface Type",
-		" INT-WALL-1,               !- Construction Name",
-		" Space,                    !- Zone Name",
-		" Adiabatic,                !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 26.8, 3.7, 2.4,           !- X, Y, Z == > Vertex 1 {m}",
-		" 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
-		" 3.7, 3.7, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
-		" 3.7, 3.7, 2.4;            !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " SB15,                     !- Name",
+        " WALL,                     !- Surface Type",
+        " INT-WALL-1,               !- Construction Name",
+        " Space,                    !- Zone Name",
+        " Adiabatic,                !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 26.8, 3.7, 2.4,           !- X, Y, Z == > Vertex 1 {m}",
+        " 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
+        " 3.7, 3.7, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
+        " 3.7, 3.7, 2.4;            !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" FRONT-1x10,               !- Name",
-		" WALL,                     !- Surface Type",
-		" INT-WALL-1,               !- Construction Name",
-		" Spacex10,                 !- Zone Name",
-		" Outdoors,                 !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" SunExposed,               !- Sun Exposure",
-		" WindExposed,              !- Wind Exposure",
-		" 0.50000,                  !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 0.0, 0.0, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
-		" 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 2 {m}",
-		" 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 3 {m}",
-		" 30.5, 0.0, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " FRONT-1x10,               !- Name",
+        " WALL,                     !- Surface Type",
+        " INT-WALL-1,               !- Construction Name",
+        " Spacex10,                 !- Zone Name",
+        " Outdoors,                 !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " SunExposed,               !- Sun Exposure",
+        " WindExposed,              !- Wind Exposure",
+        " 0.50000,                  !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 0.0, 0.0, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
+        " 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 2 {m}",
+        " 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 3 {m}",
+        " 30.5, 0.0, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" C1-1x10,                  !- Name",
-		" CEILING,                  !- Surface Type",
-		" CLNG-1,                   !- Construction Name",
-		" Spacex10,                 !- Zone Name",
-		" Outdoors,                 !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 3.7, 3.7, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
-		" 0.0, 0.0, 2.4,            !- X, Y, Z == > Vertex 2 {m}",
-		" 30.5, 0.0, 2.4,           !- X, Y, Z == > Vertex 3 {m}",
-		" 26.8, 3.7, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " C1-1x10,                  !- Name",
+        " CEILING,                  !- Surface Type",
+        " CLNG-1,                   !- Construction Name",
+        " Spacex10,                 !- Zone Name",
+        " Outdoors,                 !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 3.7, 3.7, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
+        " 0.0, 0.0, 2.4,            !- X, Y, Z == > Vertex 2 {m}",
+        " 30.5, 0.0, 2.4,           !- X, Y, Z == > Vertex 3 {m}",
+        " 26.8, 3.7, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" F1-1x10,                  !- Name",
-		" FLOOR,                    !- Surface Type",
-		" FLOOR-SLAB-1,             !- Construction Name",
-		" Spacex10,                 !- Zone Name",
-		" Outdoors,                   !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 1 {m}",
-		" 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
-		" 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
-		" 3.7, 3.7, 0.0;            !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " F1-1x10,                  !- Name",
+        " FLOOR,                    !- Surface Type",
+        " FLOOR-SLAB-1,             !- Construction Name",
+        " Spacex10,                 !- Zone Name",
+        " Outdoors,                   !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 1 {m}",
+        " 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
+        " 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
+        " 3.7, 3.7, 0.0;            !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" SB12x10,                  !- Name",
-		" WALL,                     !- Surface Type",
-		" INT-WALL-1,               !- Construction Name",
-		" Spacex10,                 !- Zone Name",
-		" Adiabatic,                !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 30.5, 0.0, 2.4,           !- X, Y, Z == > Vertex 1 {m}",
-		" 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
-		" 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 3 {m}",
-		" 26.8, 3.7, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " SB12x10,                  !- Name",
+        " WALL,                     !- Surface Type",
+        " INT-WALL-1,               !- Construction Name",
+        " Spacex10,                 !- Zone Name",
+        " Adiabatic,                !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 30.5, 0.0, 2.4,           !- X, Y, Z == > Vertex 1 {m}",
+        " 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
+        " 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 3 {m}",
+        " 26.8, 3.7, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" SB14x10,                  !- Name",
-		" WALL,                     !- Surface Type",
-		" INT-WALL-1,               !- Construction Name",
-		" Spacex10,                 !- Zone Name",
-		" Adiabatic,                !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 3.7, 3.7, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
-		" 3.7, 3.7, 0.0,            !- X, Y, Z == > Vertex 2 {m}",
-		" 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
-		" 0.0, 0.0, 2.4;            !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " SB14x10,                  !- Name",
+        " WALL,                     !- Surface Type",
+        " INT-WALL-1,               !- Construction Name",
+        " Spacex10,                 !- Zone Name",
+        " Adiabatic,                !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 3.7, 3.7, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
+        " 3.7, 3.7, 0.0,            !- X, Y, Z == > Vertex 2 {m}",
+        " 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
+        " 0.0, 0.0, 2.4;            !- X, Y, Z == > Vertex 4 {m}",
 
-		"BuildingSurface:Detailed,",
-		" SB15x10,                  !- Name",
-		" WALL,                     !- Surface Type",
-		" INT-WALL-1,               !- Construction Name",
-		" Spacex10,                 !- Zone Name",
-		" Adiabatic,                !- Outside Boundary Condition",
-		" ,                         !- Outside Boundary Condition Object",
-		" NoSun,                    !- Sun Exposure",
-		" NoWind,                   !- Wind Exposure",
-		" 0.0,                      !- View Factor to Ground",
-		" 4,                        !- Number of Vertices",
-		" 26.8, 3.7, 2.4,           !- X, Y, Z == > Vertex 1 {m}",
-		" 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
-		" 3.7, 3.7, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
-		" 3.7, 3.7, 2.4;            !- X, Y, Z == > Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        " SB15x10,                  !- Name",
+        " WALL,                     !- Surface Type",
+        " INT-WALL-1,               !- Construction Name",
+        " Spacex10,                 !- Zone Name",
+        " Adiabatic,                !- Outside Boundary Condition",
+        " ,                         !- Outside Boundary Condition Object",
+        " NoSun,                    !- Sun Exposure",
+        " NoWind,                   !- Wind Exposure",
+        " 0.0,                      !- View Factor to Ground",
+        " 4,                        !- Number of Vertices",
+        " 26.8, 3.7, 2.4,           !- X, Y, Z == > Vertex 1 {m}",
+        " 26.8, 3.7, 0.0,           !- X, Y, Z == > Vertex 2 {m}",
+        " 3.7, 3.7, 0.0,            !- X, Y, Z == > Vertex 3 {m}",
+        " 3.7, 3.7, 2.4;            !- X, Y, Z == > Vertex 4 {m}",
 
-		"Output:Table:SummaryReports,",
-		"  AllSummary; !- Report 1 Name",
-		" ",
+        "Output:Table:SummaryReports,",
+        "  AllSummary; !- Report 1 Name",
+        " ",
 
+    });
 
-	} );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    OutputProcessor::TimeValue.allocate(2);
+    DataGlobals::DDOnlySimulation = true;
 
-	OutputProcessor::TimeValue.allocate( 2 );
-	DataGlobals::DDOnlySimulation = true;
+    ManageSimulation();
 
-	ManageSimulation();
+    //	compare_err_stream( "" );
 
-//	compare_err_stream( "" );
+    ZTAVComf(1) = 25.0;
+    MRT(1) = 26.0;
+    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-	ZTAVComf( 1 ) = 25.0;
-	MRT( 1 ) = 26.0;
-	ZoneAirHumRatAvgComf( 1 ) = 0.00529; // 0.002 to 0.006
+    CalcThermalComfortFanger();
 
-	CalcThermalComfortFanger();
+    EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -1.262, 0.005);
+    EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 38.3, 0.1);
 
-	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPMV, -1.262, 0.005 );
-	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 38.3, 0.1 );
+    ZTAVComf(1) = 26.0;
+    MRT(1) = 27.0;
+    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-	ZTAVComf( 1 ) = 26.0;
-	MRT( 1 ) = 27.0;
-	ZoneAirHumRatAvgComf( 1 ) = 0.00529; // 0.002 to 0.006
+    CalcThermalComfortFanger();
 
-	CalcThermalComfortFanger();
+    EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -0.860, 0.005);
+    EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 20.6, 0.1);
 
-	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPMV, -0.860, 0.005 );
-	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 20.6, 0.1 );
+    ZTAVComf(1) = 27.0;
+    MRT(1) = 28.0;
+    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-	ZTAVComf( 1 ) = 27.0;
-	MRT( 1 ) = 28.0;
-	ZoneAirHumRatAvgComf( 1 ) = 0.00529; // 0.002 to 0.006
+    CalcThermalComfortFanger();
 
-	CalcThermalComfortFanger();
+    EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -0.460, 0.005);
+    EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 9.4, 0.1);
 
-	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPMV, -0.460, 0.005 );
-	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 9.4, 0.1 );
+    ZTAVComf(1) = 25.0;
+    MRT(1) = 26.0;
+    ZoneAirHumRatAvgComf(1) = 0.00629; // 0.002 to 0.006
 
-	ZTAVComf( 1 ) = 25.0;
-	MRT( 1 ) = 26.0;
-	ZoneAirHumRatAvgComf( 1 ) = 0.00629; // 0.002 to 0.006
+    CalcThermalComfortFanger();
 
-	CalcThermalComfortFanger();
-
-	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPMV, -1.201, 0.005 );
-	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 35.3, 0.1 );
+    EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -1.201, 0.005);
+    EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 35.3, 0.1);
 }
 
-TEST_F( EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT )
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
 {
 
-	int ZoneNum( 1 );
-	int SurfNum( 1 );
-	Real64 RadTemp;
-	
-	TH.deallocate();
-	Surface.deallocate();
-	Construct.deallocate();
-	Zone.deallocate();
-	AngleFactorList.allocate( 1 );
-	TotSurfaces = 3;
-	NumOfZones = 1;
-	TH.allocate( 2, 2, TotSurfaces );
-	Surface.allocate( TotSurfaces );
-	Construct.allocate( TotSurfaces );
-	Zone.allocate( 1 );
-	
-	Surface( 1 ).Area = 20.0;
-	Surface( 2 ).Area = 15.0;
-	Surface( 3 ).Area = 10.0;
-	Surface( 1 ).HeatTransSurf = true;
-	Surface( 2 ).HeatTransSurf = true;
-	Surface( 3 ).HeatTransSurf = true;
-	Surface( 1 ).Construction = 1;
-	Surface( 2 ).Construction = 2;
-	Surface( 3 ).Construction = 3;
-	Construct( 1 ).InsideAbsorpThermal = 1.0;
-	Construct( 2 ).InsideAbsorpThermal = 0.9;
-	Construct( 3 ).InsideAbsorpThermal = 0.8;
-	Surface( 1 ).Zone = 1;
-	Surface( 2 ).Zone = 1;
-	Surface( 3 ).Zone = 1;
-	Zone( 1 ).SurfaceFirst = 1;
-	Zone( 1 ).SurfaceLast = 3;
-	TH( 2, 1, 1 ) = 20.0;
-	TH( 2, 1, 2 ) = 15.0;
-	TH( 2, 1, 3 ) = 10.0;
-	
-	SurfNum = 1;
-	ThermalComfort::clear_state( );
-	RadTemp = CalcSurfaceWeightedMRT( ZoneNum, SurfNum );
-	EXPECT_NEAR( RadTemp, 16.6, 0.1 );
-	
-	SurfNum = 2;
-	ThermalComfort::clear_state( );
-	RadTemp = CalcSurfaceWeightedMRT( ZoneNum, SurfNum );
-	EXPECT_NEAR( RadTemp, 16.1, 0.1 );
+    int ZoneNum(1);
+    int SurfNum(1);
+    Real64 RadTemp;
 
-	SurfNum = 3;
-	ThermalComfort::clear_state( );
-	RadTemp = CalcSurfaceWeightedMRT( ZoneNum, SurfNum );
-	EXPECT_NEAR( RadTemp, 14.0, 0.1 );
-	
+    TH.deallocate();
+    Surface.deallocate();
+    Construct.deallocate();
+    Zone.deallocate();
+    AngleFactorList.allocate(1);
+    TotSurfaces = 3;
+    NumOfZones = 1;
+    TH.allocate(2, 2, TotSurfaces);
+    Surface.allocate(TotSurfaces);
+    Construct.allocate(TotSurfaces);
+    Zone.allocate(1);
+
+    Surface(1).Area = 20.0;
+    Surface(2).Area = 15.0;
+    Surface(3).Area = 10.0;
+    Surface(1).HeatTransSurf = true;
+    Surface(2).HeatTransSurf = true;
+    Surface(3).HeatTransSurf = true;
+    Surface(1).Construction = 1;
+    Surface(2).Construction = 2;
+    Surface(3).Construction = 3;
+    Construct(1).InsideAbsorpThermal = 1.0;
+    Construct(2).InsideAbsorpThermal = 0.9;
+    Construct(3).InsideAbsorpThermal = 0.8;
+    Surface(1).Zone = 1;
+    Surface(2).Zone = 1;
+    Surface(3).Zone = 1;
+    Zone(1).SurfaceFirst = 1;
+    Zone(1).SurfaceLast = 3;
+    TH(2, 1, 1) = 20.0;
+    TH(2, 1, 2) = 15.0;
+    TH(2, 1, 3) = 10.0;
+
+    SurfNum = 1;
+    ThermalComfort::clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
+    EXPECT_NEAR(RadTemp, 16.6, 0.1);
+
+    SurfNum = 2;
+    ThermalComfort::clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
+    EXPECT_NEAR(RadTemp, 16.1, 0.1);
+
+    SurfNum = 3;
+    ThermalComfort::clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
+    EXPECT_NEAR(RadTemp, 14.0, 0.1);
 }
 
-TEST_F( EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT )
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
 {
 
-	Real64 RadTemp;
-	
-	AngleFactorList.allocate( 1 );
-	AngleFactorList( 1 ).TotAngleFacSurfaces = 3;
-	AngleFactorList( 1 ).SurfacePtr.allocate( AngleFactorList( 1 ).TotAngleFacSurfaces );
-	AngleFactorList( 1 ).AngleFactor.allocate( AngleFactorList( 1 ).TotAngleFacSurfaces );
+    Real64 RadTemp;
 
-	AngleFactorList( 1 ).SurfacePtr( 1 ) = 1;
-	AngleFactorList( 1 ).SurfacePtr( 2 ) = 2;
-	AngleFactorList( 1 ).SurfacePtr( 3 ) = 3;
-	AngleFactorList( 1 ).AngleFactor( 1 ) = 0.5;
-	AngleFactorList( 1 ).AngleFactor( 2 ) = 0.3;
-	AngleFactorList( 1 ).AngleFactor( 3 ) = 0.2;
-	
-	TH.deallocate();
-	TotSurfaces = AngleFactorList( 1 ).TotAngleFacSurfaces;
-	TH.allocate( 2, 2, TotSurfaces );
-	Surface.deallocate();
-	Construct.deallocate();
-	Surface.allocate( TotSurfaces );
-	Construct.allocate( TotSurfaces );
+    AngleFactorList.allocate(1);
+    AngleFactorList(1).TotAngleFacSurfaces = 3;
+    AngleFactorList(1).SurfacePtr.allocate(AngleFactorList(1).TotAngleFacSurfaces);
+    AngleFactorList(1).AngleFactor.allocate(AngleFactorList(1).TotAngleFacSurfaces);
 
-	TH( 2, 1, 1 ) = 20.0;
-	TH( 2, 1, 2 ) = 15.0;
-	TH( 2, 1, 3 ) = 10.0;
-	Surface( 1 ).Construction = 1;
-	Surface( 2 ).Construction = 2;
-	Surface( 3 ).Construction = 3;
-	Construct( 1 ).InsideAbsorpThermal = 1.0;
-	Construct( 2 ).InsideAbsorpThermal = 0.9;
-	Construct( 3 ).InsideAbsorpThermal = 0.8;
+    AngleFactorList(1).SurfacePtr(1) = 1;
+    AngleFactorList(1).SurfacePtr(2) = 2;
+    AngleFactorList(1).SurfacePtr(3) = 3;
+    AngleFactorList(1).AngleFactor(1) = 0.5;
+    AngleFactorList(1).AngleFactor(2) = 0.3;
+    AngleFactorList(1).AngleFactor(3) = 0.2;
 
-	RadTemp = CalcAngleFactorMRT( 1 );
-	EXPECT_NEAR( RadTemp, 16.9, 0.1 );
+    TH.deallocate();
+    TotSurfaces = AngleFactorList(1).TotAngleFacSurfaces;
+    TH.allocate(2, 2, TotSurfaces);
+    Surface.deallocate();
+    Construct.deallocate();
+    Surface.allocate(TotSurfaces);
+    Construct.allocate(TotSurfaces);
 
-	
+    TH(2, 1, 1) = 20.0;
+    TH(2, 1, 2) = 15.0;
+    TH(2, 1, 3) = 10.0;
+    Surface(1).Construction = 1;
+    Surface(2).Construction = 2;
+    Surface(3).Construction = 3;
+    Construct(1).InsideAbsorpThermal = 1.0;
+    Construct(2).InsideAbsorpThermal = 0.9;
+    Construct(3).InsideAbsorpThermal = 0.8;
+
+    RadTemp = CalcAngleFactorMRT(1);
+    EXPECT_NEAR(RadTemp, 16.9, 0.1);
 }
 
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveASH55Test)
+{
+    // 5381
+    useEpwData = true;
 
+    DailyAveOutTemp(1) = 8.704166667;
+    DailyAveOutTemp(2) = 9.895833333;
+    DailyAveOutTemp(3) = 12.2;
+    DailyAveOutTemp(4) = 8.445833333;
+    DailyAveOutTemp(5) = 7.8;
+    DailyAveOutTemp(6) = 7.158333333;
+    DailyAveOutTemp(7) = 8.0125;
+    DailyAveOutTemp(8) = 8.279166667;
+    DailyAveOutTemp(9) = 8.166666667;
+    DailyAveOutTemp(10) = 7.141666667;
+    DailyAveOutTemp(11) = 7.433333333;
+    DailyAveOutTemp(12) = 9.0625;
+    DailyAveOutTemp(13) = 9.741666667;
+    DailyAveOutTemp(14) = 9.545833333;
+    DailyAveOutTemp(15) = 11.43333333;
+    DailyAveOutTemp(16) = 12.375;
+    DailyAveOutTemp(17) = 12.59583333;
+    DailyAveOutTemp(18) = 12.6625;
+    DailyAveOutTemp(19) = 13.50833333;
+    DailyAveOutTemp(20) = 12.99583333;
+    DailyAveOutTemp(21) = 11.58333333;
+    DailyAveOutTemp(22) = 11.72083333;
+    DailyAveOutTemp(23) = 9.1875;
+    DailyAveOutTemp(24) = 6.8;
+    DailyAveOutTemp(25) = 9.391666667;
+    DailyAveOutTemp(26) = 8.1125;
+    DailyAveOutTemp(27) = 8.4;
+    DailyAveOutTemp(28) = 8.475;
+    DailyAveOutTemp(29) = 7.941666667;
+    DailyAveOutTemp(30) = 9.316666667;
+
+    DataGlobals::BeginDayFlag = true;
+
+    CalcThermalComfortAdaptiveASH55(false);
+    EXPECT_NEAR(ThermalComfort::runningAverageASH, 9.29236111, 0.001);
+    useEpwData = false;
+    DataGlobals::BeginDayFlag = false;
+}

@@ -51,14 +51,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataZoneEnergyDemands.hh>
 #include <DataLoopNode.hh>
-#include <ScheduleManager.hh>
-#include <Psychrometrics.hh>
-#include <InputProcessor.hh>
-#include <HWBaseboardRadiator.hh>
-#include <FluidProperties.hh>
 #include <DataPlant.hh>
+#include <DataZoneEnergyDemands.hh>
+#include <FluidProperties.hh>
+#include <HWBaseboardRadiator.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <Psychrometrics.hh>
+#include <ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -66,7 +66,6 @@ using namespace EnergyPlus;
 using namespace DataZoneEnergyDemands;
 using namespace ScheduleManager;
 using namespace Psychrometrics;
-using namespace InputProcessor;
 using namespace HWBaseboardRadiator;
 using namespace DataLoopNode;
 using namespace FluidProperties;
@@ -74,132 +73,130 @@ using namespace DataPlant;
 
 using namespace ObjexxFCL;
 
-TEST_F( EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
+TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 {
-	Real64 LoadMet;
-	int BBNum;
+    Real64 LoadMet;
+    int BBNum;
 
-	Node.allocate( 1 );
-	HWBaseboard.allocate( 1 );
-	ZoneSysEnergyDemand.allocate( 1 );
-	CurDeadBandOrSetback.allocate( 1 );
-	PlantLoop.allocate( 1 );
-	QBBRadSource.allocate( 1 );
+    Node.allocate(1);
+    HWBaseboard.allocate(1);
+    ZoneSysEnergyDemand.allocate(1);
+    CurDeadBandOrSetback.allocate(1);
+    PlantLoop.allocate(1);
+    QBBRadSource.allocate(1);
 
-	Node( 1 ).MassFlowRate = 0.40;
-	CurDeadBandOrSetback( 1 ) = false;
-	ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 12000.;
-	BBNum = 1;
-	LoadMet = 0.0;
-	HWBaseboard( 1 ).ZonePtr = 1;
-	HWBaseboard( 1 ).AirInletTemp = 21.;
-	HWBaseboard( 1 ).WaterInletTemp = 82.;
-	HWBaseboard( 1 ).WaterInletNode = 1;
-	HWBaseboard( 1 ).WaterMassFlowRateMax = 0.40;
-	HWBaseboard( 1 ).AirMassFlowRateStd = 0.5;
-	HWBaseboard( 1 ).SchedPtr = -1;
-	HWBaseboard( 1 ).LoopNum = 1;
-	HWBaseboard( 1 ).UA = 370;
-	PlantLoop( 1 ).FluidName = "Water";
-	PlantLoop( 1 ).FluidIndex = 1;
-	PlantLoop( 1 ).FluidType = 2;
-	QBBRadSource( 1 ) = 0.0;
+    Node(1).MassFlowRate = 0.40;
+    CurDeadBandOrSetback(1) = false;
+    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 12000.;
+    BBNum = 1;
+    LoadMet = 0.0;
+    HWBaseboard(1).ZonePtr = 1;
+    HWBaseboard(1).AirInletTemp = 21.;
+    HWBaseboard(1).WaterInletTemp = 82.;
+    HWBaseboard(1).WaterInletNode = 1;
+    HWBaseboard(1).WaterMassFlowRateMax = 0.40;
+    HWBaseboard(1).AirMassFlowRateStd = 0.5;
+    HWBaseboard(1).SchedPtr = -1;
+    HWBaseboard(1).LoopNum = 1;
+    HWBaseboard(1).UA = 370;
+    PlantLoop(1).FluidName = "Water";
+    PlantLoop(1).FluidIndex = 1;
+    PlantLoop(1).FluidType = 2;
+    QBBRadSource(1) = 0.0;
 
-	CalcHWBaseboard( BBNum, LoadMet );
+    CalcHWBaseboard(BBNum, LoadMet);
 
-	EXPECT_NEAR( 14746.226690452937, HWBaseboard( 1 ).TotPower, 0.000001);
-	EXPECT_NEAR( 50.349854486072232, HWBaseboard( 1 ).AirOutletTemp, 0.000001 );
-	EXPECT_NEAR( 73.224991258180438, HWBaseboard( 1 ).WaterOutletTemp, 0.000001 );
-	EXPECT_NEAR( 0.5, HWBaseboard( 1 ).AirMassFlowRate, 0.000001 );
+    EXPECT_NEAR(14746.226690452937, HWBaseboard(1).TotPower, 0.000001);
+    EXPECT_NEAR(50.349854486072232, HWBaseboard(1).AirOutletTemp, 0.000001);
+    EXPECT_NEAR(73.224991258180438, HWBaseboard(1).WaterOutletTemp, 0.000001);
+    EXPECT_NEAR(0.5, HWBaseboard(1).AirMassFlowRate, 0.000001);
 
-	Node.deallocate();
-	HWBaseboard.deallocate();
-	ZoneSysEnergyDemand.deallocate();
-	CurDeadBandOrSetback.deallocate();
-	PlantLoop.deallocate();
-	QBBRadSource.deallocate();
-
+    Node.deallocate();
+    HWBaseboard.deallocate();
+    ZoneSysEnergyDemand.deallocate();
+    CurDeadBandOrSetback.deallocate();
+    PlantLoop.deallocate();
+    QBBRadSource.deallocate();
 }
 
-TEST_F( EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest ) {
-	Real64 LoadMet;
-	int BBNum;
+TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
+{
+    Real64 LoadMet;
+    int BBNum;
 
-	BBNum = 1;
-	LoadMet = 0.0;
+    BBNum = 1;
+    LoadMet = 0.0;
 
-	Node.allocate( 2 );
-	HWBaseboard.allocate( 1 );
-	ZoneSysEnergyDemand.allocate( 1 );
-	CurDeadBandOrSetback.allocate( 1 );
-	PlantLoop.allocate( 1 );
-	QBBRadSource.allocate( 1 );
+    Node.allocate(2);
+    HWBaseboard.allocate(1);
+    ZoneSysEnergyDemand.allocate(1);
+    CurDeadBandOrSetback.allocate(1);
+    PlantLoop.allocate(1);
+    QBBRadSource.allocate(1);
 
+    CurDeadBandOrSetback(1) = false;
+    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0; // zero load test
 
-	CurDeadBandOrSetback( 1 ) = false;
-	ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0; // zero load test
+    HWBaseboard(1).EquipID = "HWRadiativeConvectiveBB";
+    HWBaseboard(1).EquipType = TypeOf_Baseboard_Rad_Conv_Water;
+    HWBaseboard(1).ZonePtr = 1;
+    HWBaseboard(1).AirInletTemp = 21.0;
+    HWBaseboard(1).WaterInletTemp = 82.;
+    HWBaseboard(1).WaterInletNode = 1;
+    HWBaseboard(1).WaterOutletNode = 2;
+    HWBaseboard(1).WaterMassFlowRateMax = 0.40;
+    HWBaseboard(1).AirMassFlowRateStd = 0.5;
+    HWBaseboard(1).SchedPtr = -1;
+    HWBaseboard(1).LoopNum = 1;
+    HWBaseboard(1).LoopSideNum = 1;
+    HWBaseboard(1).BranchNum = 1;
+    HWBaseboard(1).UA = 400.0;
+    PlantLoop(1).FluidName = "Water";
+    PlantLoop(1).FluidIndex = 1;
+    PlantLoop(1).FluidType = 2;
+    QBBRadSource(1) = 0.0;
 
-	HWBaseboard( 1 ).EquipID = "HWRadiativeConvectiveBB";
-	HWBaseboard( 1 ).EquipType = TypeOf_Baseboard_Rad_Conv_Water;
-	HWBaseboard( 1 ).ZonePtr = 1;
-	HWBaseboard( 1 ).AirInletTemp = 21.0;
-	HWBaseboard( 1 ).WaterInletTemp = 82.;
-	HWBaseboard( 1 ).WaterInletNode = 1;
-	HWBaseboard( 1 ).WaterOutletNode = 2;
-	HWBaseboard( 1 ).WaterMassFlowRateMax = 0.40;
-	HWBaseboard( 1 ).AirMassFlowRateStd = 0.5;
-	HWBaseboard( 1 ).SchedPtr = -1;
-	HWBaseboard( 1 ).LoopNum = 1;
-	HWBaseboard( 1 ).LoopSideNum = 1;
-	HWBaseboard( 1 ).BranchNum = 1;
-	HWBaseboard( 1 ).UA = 400.0;
-	PlantLoop( 1 ).FluidName = "Water";
-	PlantLoop( 1 ).FluidIndex = 1;
-	PlantLoop( 1 ).FluidType = 2;
-	QBBRadSource( 1 ) = 0.0;
+    Node(HWBaseboard(1).WaterInletNode).MassFlowRate = 0.2;
+    Node(HWBaseboard(1).WaterInletNode).MassFlowRateMax = 0.4;
+    Node(HWBaseboard(1).WaterOutletNode).MassFlowRate = 0.2;
+    Node(HWBaseboard(1).WaterOutletNode).MassFlowRateMax = 0.4;
 
-	Node( HWBaseboard( 1 ).WaterInletNode ).MassFlowRate = 0.2;
-	Node( HWBaseboard( 1 ).WaterInletNode ).MassFlowRateMax = 0.4;
-	Node( HWBaseboard( 1 ).WaterOutletNode ).MassFlowRate = 0.2;
-	Node( HWBaseboard( 1 ).WaterOutletNode ).MassFlowRateMax = 0.4;
+    TotNumLoops = 1;
+    PlantLoop.allocate(TotNumLoops);
+    for (int l = 1; l <= TotNumLoops; ++l) {
+        auto &loop(PlantLoop(l));
+        loop.LoopSide.allocate(1);
+        auto &loopside(PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+    PlantLoop(1).Name = "HotWaterLoop";
+    PlantLoop(1).FluidName = "HotWater";
+    PlantLoop(1).FluidIndex = 1;
+    PlantLoop(1).FluidName = "WATER";
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = HWBaseboard(1).EquipID;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = HWBaseboard(1).EquipType;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWBaseboard(1).WaterInletNode;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWBaseboard(1).WaterOutletNode;
 
-	TotNumLoops = 1;
-	PlantLoop.allocate( TotNumLoops );
-	for ( int l = 1; l <= TotNumLoops; ++l ) {
-		auto & loop( PlantLoop( l ) );
-		loop.LoopSide.allocate( 1 );
-		auto & loopside( PlantLoop( l ).LoopSide( 1 ) );
-		loopside.TotalBranches = 1;
-		loopside.Branch.allocate( 1 );
-		auto & loopsidebranch( PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
-		loopsidebranch.TotalComponents = 1;
-		loopsidebranch.Comp.allocate( 1 );
-	}
-	PlantLoop( 1 ).Name = "HotWaterLoop";
-	PlantLoop( 1 ).FluidName = "HotWater";
-	PlantLoop( 1 ).FluidIndex = 1;
-	PlantLoop( 1 ).FluidName = "WATER";
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = HWBaseboard( 1 ).EquipID;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = HWBaseboard( 1 ).EquipType;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = HWBaseboard( 1 ).WaterInletNode;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = HWBaseboard( 1 ).WaterOutletNode;
+    // zero zone load case, so zero LoadMet must be returned
+    CalcHWBaseboard(BBNum, LoadMet);
 
-	// zero zone load case, so zero LoadMet must be returned
-	CalcHWBaseboard( BBNum, LoadMet );
+    EXPECT_EQ(0.0, LoadMet);
+    EXPECT_EQ(0.0, HWBaseboard(1).TotPower);
+    EXPECT_EQ(0.0, Node(HWBaseboard(1).WaterInletNode).MassFlowRate);
+    EXPECT_EQ(HWBaseboard(1).AirInletTemp, HWBaseboard(1).AirOutletTemp);
+    EXPECT_EQ(HWBaseboard(1).WaterInletTemp, HWBaseboard(1).WaterOutletTemp);
+    EXPECT_EQ(0.0, HWBaseboard(1).AirMassFlowRate);
 
-	EXPECT_EQ( 0.0, LoadMet );
-	EXPECT_EQ( 0.0, HWBaseboard( 1 ).TotPower );
-	EXPECT_EQ( 0.0, Node( HWBaseboard( 1 ).WaterInletNode ).MassFlowRate );
-	EXPECT_EQ( HWBaseboard( 1 ).AirInletTemp, HWBaseboard( 1 ).AirOutletTemp );
-	EXPECT_EQ( HWBaseboard( 1 ).WaterInletTemp, HWBaseboard( 1 ).WaterOutletTemp);
-	EXPECT_EQ( 0.0, HWBaseboard( 1 ).AirMassFlowRate );
-
-	// clear
-	Node.deallocate();
-	HWBaseboard.deallocate();
-	ZoneSysEnergyDemand.deallocate();
-	CurDeadBandOrSetback.deallocate();
-	PlantLoop.deallocate();
-	QBBRadSource.deallocate();
-
+    // clear
+    Node.deallocate();
+    HWBaseboard.deallocate();
+    ZoneSysEnergyDemand.deallocate();
+    CurDeadBandOrSetback.deallocate();
+    PlantLoop.deallocate();
+    QBBRadSource.deallocate();
 }
