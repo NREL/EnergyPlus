@@ -66,7 +66,7 @@ and:
   \(f_{motor\ in\ air}\) : motor in air stream fraction
 \end{itemize} 
 
-The design fan temperature rise (\emph{C}) due to fan heat is added to the cooling coil inlet air temperature or cooling coil outlet air temperature during sizing calculations as appropriate. The calculation uses a straight-forward inversion of the classic \(Q = \dot{m}*Cp*\Delta{T}\) equation as:
+The design fan temperature rise (\emph{C}) due to fan heat is added to the cooling coil inlet air temperature or subtracted from the cooling coil outlet air temperature during sizing calculations as appropriate for blow-through or draw-through fan configurations, respectively. The calculation uses a straight-forward inversion of the classic \(Q = \dot{m}*Cp*\Delta{T}\) equation as:
 
 \begin{equation}
 T_{fan,heat,des} = \dot{Q}_{fan,heat,des} / ( {C}_{p,air} * \rho_{air} * \dot{V}_{fan,des} )
@@ -194,11 +194,11 @@ To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperat
 
 \begin{itemize}
 \item
-  \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the design cooling peak. Plus the design fan temperature rise due to fan heat, + T_{fan,heat,des}, for blow through configuration - see Section \ref{design-fan-heat})
+  \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the design cooling peak. Plus the design fan temperature rise due to fan heat, + \(T_{fan,heat,des}\), for blow through configuration - see Section \ref{design-fan-heat})
 \item
   \(W_{air,in,des} = W_{mix,cool,at-peak}\) (the mixed humidity ratio at the design cooling peak)
 \item
-  \(T_{air,out,des} = T_{cc,exit}\) (calculated above in the Initial Calculation section. Minus the design fan temperature rise due to fan heat, - T_{fan,heat,des}, for draw through configuration - see Section \ref{design-fan-heat})
+  \(T_{air,out,des} = T_{cc,exit}\) (calculated above in the Initial Calculation section. Minus the design fan temperature rise due to fan heat, - \(T_{fan,heat,des}\), for draw through configuration - see Section \ref{design-fan-heat})
 \item
   \(W_{air,out,des} = W_{sup,cool}\) (the specified Central Cooling Design Supply Air Humidity Ratio from the Sizing:System object)
 \end{itemize}
@@ -211,11 +211,11 @@ The oustide air fraction is calculated as (where V\(_{cc,air}\) is calculated as
 \item
   \(f_{oa} = \frac{\dot V_{air,out,des}}{\dot{V}_{cc,air}}\)
 \item
-  \(T_{air,in,des} = f_{oa}T_{precool} + \left(1-f_{oa}\right)T_{ret,cool,at-peak}\) (Precool temperature is the specified Precool Design Temperature from System:Sizing Manager; T\_ret\_cool\_at-peak is the return temperature at the system cooling peak load. Plus the design fan temperature rise due to fan heat, + T_{fan,heat,des}, for blow through configuration - see Section \ref{design-fan-heat})
+  \(T_{air,in,des} = f_{oa}T_{precool} + \left(1-f_{oa}\right)T_{ret,cool,at-peak}\) (Precool temperature is the specified Precool Design Temperature from System:Sizing Manager; T\_ret\_cool\_at-peak is the return temperature at the system cooling peak load. Plus the design fan temperature rise due to fan heat, + \(T_{fan,heat,des}\), for blow through configuration - see Section \ref{design-fan-heat})
 \item
   \(W_{air,in,des} = f_{oa}W_{precool} + \left(1-f_{oa}\right)W_{ret,cool,at-peak}\) (Precool humidity ratio is the specified Precool Design Humidity Ratio from System:Sizing Manager; W\_ret\_cool\_at-peak is the return humidity ratio at the system cooling peak load)
 \item
-  \(T_{air,out,des} = T_{cc,exit}\) (calculated above in the Initial Calculation section. Minus the design fan temperature rise due to fan heat, - T_{fan,heat,des}, for draw through configuration - see Section \ref{design-fan-heat}))
+  \(T_{air,out,des} = T_{cc,exit}\) (calculated above in the Initial Calculation section. Minus the design fan temperature rise due to fan heat, - \(T_{fan,heat,des}\), for draw through configuration - see Section \ref{design-fan-heat}))
 \item
   \(W_{air,out,des} = W_{sup,cool}\) (the specified Central Cooling Design Supply Air Humidity Ratio from the Sizing:System object)
 \end{itemize}
@@ -312,9 +312,9 @@ The inlet air temperature depends on whether the coil is in the outside air stre
 \item
   Coil in outside air stream: \(T_{air,in,des} = T_{out,cool,at-peak}\) (the outside air temperature set at the design cooling peak).
 \item
-  Coil in main air stream, no preconditioning of outside air: \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the cooling design peak. Plus the design fan temperature rise due to fan heat, + T_{fan,heat,des}, for blow through configuration - see Section \ref{design-fan-heat}).
+  Coil in main air stream, no preconditioning of outside air: \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the cooling design peak. Plus the design fan temperature rise due to fan heat, + \(T_{fan,heat,des}\), for blow through configuration - see Section \ref{design-fan-heat}).
 \item
-  Coil in main air stream, outside air preconditioned. The outside air fraction is calculated as \(f_{oa} = \dot V_{air,out,des}/\dot V_{cc,air}\) , where \(\dot V_{cc,air}\) is calculated above. Then \(T_{air,in,des} = f_{oa}T_{precool}+\left(1-f_{oa}\right)T_{ret,cool,at-peak}\) , where \(T_{precool}\) is the specified \emph{Precool Design Temperature} from \emph{System:Sizing}, \(T_{ret,cool,at-peak}\) is the return temperature at the system cooling peak load. Plus the design fan temperature rise due to fan heat, + T_{fan,heat,des}, for blow through configuration - see Section \ref{design-fan-heat}).
+  Coil in main air stream, outside air preconditioned. The outside air fraction is calculated as \(f_{oa} = \dot V_{air,out,des}/\dot V_{cc,air}\) , where \(\dot V_{cc,air}\) is calculated above. Then \(T_{air,in,des} = f_{oa}T_{precool}+\left(1-f_{oa}\right)T_{ret,cool,at-peak}\) , where \(T_{precool}\) is the specified \emph{Precool Design Temperature} from \emph{System:Sizing}, \(T_{ret,cool,at-peak}\) is the return temperature at the system cooling peak load. Plus the design fan temperature rise due to fan heat, + \(T_{fan,heat,des}\), for blow through configuration - see Section \ref{design-fan-heat}).
 \end{itemize}
 
 \subsubsection{Design Air Inlet Temperature - Zone Coils}\label{design-air-inlet-temperature---zone-coils}
@@ -682,19 +682,19 @@ If the entering air enthalpy is less than the exiting air enthalpy, a reference 
 \emph{If H\(_{in}\) \textgreater{} H\(_{out}\) Then}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
+{\dot {Q}_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
 \end{equation}
 
 \emph{Else}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {m_{air,rated}}(48000 - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
+{\dot {Q}_{coil,rated,total}} = {m_{air,rated}}(48000 - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
 \end{equation}
 
 \emph{End If}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {\dot Q_{coil,rated,total}} + \dot{Q}_{fan,heat,des}
+{\dot{Q}_{coil,rated,total}} = {\dot{Q}_{coil,rated,total}} + \dot{Q}_{fan,heat,des}
 \end{equation}
 
 Where:
@@ -1110,7 +1110,7 @@ The rated cooling capacity is obtained by dividing the peak cooling capacity by 
 \emph{Q\(_{fan,heat,des}\)} = design fan heat (W) - see Section \ref{design-fan-heat}
 
 \begin{equation}
-CCap_{peak} = \rho_{air} \cdot \dot V_{air,rated} \cdot (h_{mix} - h_{sup}) + \dot {Q}_{fan,heat,des}
+CCap_{peak} = \rho_{air} \cdot \dot V_{air,rated} \cdot (h_{mix} - h_{sup}) + \dot{Q}_{fan,heat,des}
 \end{equation}
 
 \begin{equation}
@@ -1359,19 +1359,19 @@ If the entering air enthalpy is less than the exiting air enthalpy, a reference 
 \emph{If H\(_{in}\) \textgreater{} H\(_{out}\) Then}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
+{\dot{Q}_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
 \end{equation}
 
 \emph{Else}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {m_{air,rated}}(48000 - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
+{\dot{Q}_{coil,rated,total}} = {m_{air,rated}}(48000 - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
 \end{equation}
 
 \emph{End If}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {\dot Q_{coil,rated,total}} + \dot{Q}_{fan,heat,des}
+{\dot{Q}_{coil,rated,total}} = {\dot{Q}_{coil,rated,total}} + \dot{Q}_{fan,heat,des}
 \end{equation}
 
 Where:

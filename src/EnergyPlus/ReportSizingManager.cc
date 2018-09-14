@@ -1487,7 +1487,7 @@ namespace ReportSizingManager {
 
                     if (AutosizeDes < DataDesInletWaterTemp && DataWaterFlowUsedForSizing > 0.0) { // flow here is water vol flow rate
                         ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
-                                         "\", Cooling Coil has leaving air temperature > entering water temperature.");
+                                         "\", Cooling Coil has leaving air temperature < entering water temperature.");
                         ShowContinueError("    Tair,out  =  " + RoundSigDigits(AutosizeDes, 3));
                         ShowContinueError("    Twater,in = " + RoundSigDigits(DataDesInletWaterTemp, 3));
                         AutosizeDes = DataDesInletWaterTemp + 0.5;
@@ -2526,7 +2526,7 @@ namespace ReportSizingManager {
                     }
                     if (AutosizeDes < DataDesInletWaterTemp && DataWaterFlowUsedForSizing > 0.0) {
                         ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
-                                         "\", Cooling Coil has leaving air temperature > entering water temperature.");
+                                         "\", Cooling Coil has leaving air temperature < entering water temperature.");
                         ShowContinueError("    Tair,out  =  " + RoundSigDigits(AutosizeDes, 3));
                         ShowContinueError("    Twater,in = " + RoundSigDigits(DataDesInletWaterTemp, 3));
                         AutosizeDes = DataDesInletWaterTemp + 0.5;
