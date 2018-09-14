@@ -305,6 +305,23 @@ namespace CurveManager {
         }
     };
 
+    // Table file objects
+    class TableFile
+    {
+    public:
+        TableFile() = default;
+        TableFile(std::string path);
+        std::string filePath;
+        std::vector<std::vector<std::string>> contents;
+        std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
+        void load(std::string path);
+        std::vector<double>& getArray(std::pair<std::size_t, std::size_t> colAndRow);
+
+    private:
+        std::size_t numRows;
+        std::size_t numColumns;
+    };
+
     // Container for Btwxt N-d Objects
     class BtwxtManager
     {
@@ -324,6 +341,7 @@ namespace CurveManager {
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> target);
         std::map<std::string, const json&> independentVarRefs;
+        std::map<std::string, TableFile> tableFiles;
     private:
         std::map<std::string, std::size_t> gridMap;
         std::vector<Btwxt::RegularGridInterpolator> grids;

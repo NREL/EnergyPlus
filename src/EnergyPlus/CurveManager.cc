@@ -49,6 +49,8 @@
 #include <cmath>
 #include <string>
 #include <algorithm>
+#include <fstream>
+#include <limits>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -3177,9 +3179,46 @@ namespace CurveManager {
                             }
                         }
 
+
+
                         std::vector<double> axis;
-                        for (auto value : indVarInstance.at("values")) {
-                            axis.push_back(value.at("value"));
+
+                        if (indVarInstance.count("external_file_name")) {
+                            std::string filePath = indVarInstance.at("external_file_name");
+                            if (!indVarInstance.count("external_file_column_number")) {
+                                ShowSevereError(contextString + ": No column number defined for external file \"" + filePath + "\"");
+                                ErrorsFound = true;
+                            }
+                            if (!indVarInstance.count("external_file_starting_row_number")) {
+                                ShowSevereError(contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                                ErrorsFound = true;
+                            }
+
+                            std::size_t colNum = indVarInstance.at("external_file_column_number").get<std::size_t>() - 1;
+                            std::size_t rowNum = indVarInstance.at("external_file_starting_row_number").get<std::size_t>() - 1;
+
+                            if (!btwxtManager.tableFiles.count(filePath)) {
+                                btwxtManager.tableFiles.emplace(filePath, filePath);
+                            }
+
+                            axis = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
+
+                            // remove NANs
+                            axis.erase(std::remove_if(axis.begin(), axis.end(), [](const double &x){return isnan(x);}), axis.end());
+
+                            // sort
+                            std::sort(axis.begin(), axis.end());
+
+                            // remove duplicates
+                            axis.erase(std::unique(axis.begin(), axis.end()), axis.end());
+
+                        } else if (indVarInstance.count("values")) {
+                            for (auto value : indVarInstance.at("values")) {
+                                axis.push_back(value.at("value"));
+                            }
+                        } else {
+                            ShowSevereError(contextString + ": No values defined.");
+                            ErrorsFound = true;
                         }
 
                         Btwxt::Method interpMethod, extrapMethod;
@@ -3190,6 +3229,10 @@ namespace CurveManager {
                         }
 
                         if (indVarInstance.count("extrapolation_method")) {
+                            if (indVarInstance.at("extrapolation_method") == "Unavailable") {
+                                ShowSevereError(contextString + ": Extrapolation method \"Unavailable\" is not yet available.");
+                                ErrorsFound = true;
+                            }
                             extrapMethod = BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method"));
                         } else {
                             extrapMethod = Btwxt::Method::LINEAR;
@@ -3217,7 +3260,7 @@ namespace CurveManager {
                         if (indVarInstance.count("normalization_value")) {
                             normalizationValue = indVarInstance.at("normalization_value");
                         } else {
-                            normalizationValue = NAN;
+                            normalizationValue = std::numeric_limits<double>::quiet_NaN();
                         }
 
                         varListNormalizeTargets[varListName].push_back(normalizationValue);
@@ -3230,7 +3273,7 @@ namespace CurveManager {
 
                     } else {
                         // Independent variable does not exist
-                        ShowSevereError("Table:IndependentVariableList: No Table:IndependentVariable found for " + indVarName + ".");
+                        ShowSevereError(contextString + ": No Table:IndependentVariable found.");
                         ErrorsFound = true;
                     }
 
@@ -3252,7 +3295,8 @@ namespace CurveManager {
                 PerfCurve(CurveNum).ObjectType = "Table:Lookup";
                 PerfCurve(CurveNum).InterpolationType = BtwxtMethod;
 
-                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
+                std::string
+                    indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
 
                 std::string contextString = "Table:Lookup \"" + PerfCurve(CurveNum).Name + "\"";
                 Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
@@ -3270,25 +3314,25 @@ namespace CurveManager {
                 int numDims = btwxtManager.getNumGridDims(gridIndex);
                 PerfCurve(CurveNum).NumDims = numDims;
 
-                for (int i=1; i <= std::min(6, numDims); ++i) {
+                for (int i = 1; i <= std::min(6, numDims); ++i) {
                     double vMin, vMax;
                     std::tie(vMin, vMax) = varListLimits.at(indVarListName)[i - 1];
-                    if (i == 1) {
+                    if (i==1) {
                         PerfCurve(CurveNum).Var1Min = vMin;
                         PerfCurve(CurveNum).Var1Max = vMax;
-                    } else if (i == 2) {
+                    } else if (i==2) {
                         PerfCurve(CurveNum).Var2Min = vMin;
                         PerfCurve(CurveNum).Var2Max = vMax;
-                    } else if (i == 3) {
+                    } else if (i==3) {
                         PerfCurve(CurveNum).Var3Min = vMin;
                         PerfCurve(CurveNum).Var3Max = vMax;
-                    } else if (i == 4) {
+                    } else if (i==4) {
                         PerfCurve(CurveNum).Var4Min = vMin;
                         PerfCurve(CurveNum).Var4Max = vMax;
-                    } else if (i == 5) {
+                    } else if (i==5) {
                         PerfCurve(CurveNum).Var5Min = vMin;
                         PerfCurve(CurveNum).Var5Max = vMax;
-                    } else if (i == 6) {
+                    } else if (i==6) {
                         PerfCurve(CurveNum).Var6Min = vMin;
                         PerfCurve(CurveNum).Var6Max = vMax;
                     }
@@ -3310,13 +3354,11 @@ namespace CurveManager {
                     PerfCurve(CurveNum).CurveMaxPresent = false;
                 }
 
-                std::vector<double> lookupValues;
-
                 // Normalize data
                 Real64 normalizationFactor = 1.0;
                 bool normalize = false;
                 if (fields.count("normalize_output")) {
-                    if (UtilityRoutines::SameString(fields.at("normalize_output"),"YES")) {
+                    if (UtilityRoutines::SameString(fields.at("normalize_output"), "YES")) {
                         normalize = true;
                     }
                 }
@@ -3327,39 +3369,70 @@ namespace CurveManager {
 
                 PerfCurve(CurveNum).NormalizationValue = normalizationFactor;
 
-                if (fields.count("values")) {
-                    for (auto value : fields.at("values")) {
-                        lookupValues.push_back(value.at("output_value").get<Real64>()/normalizationFactor);
+                std::vector<double> lookupValues;
+                if (fields.count("external_file_name")) {
+                    std::string filePath = fields.at("external_file_name");
+
+                    if (!fields.count("external_file_column_number")) {
+                        ShowSevereError(contextString + ": No column number defined for external file \"" + filePath + "\"");
+                        ErrorsFound = true;
                     }
-                }
+                    if (!fields.count("external_file_starting_row_number")) {
+                        ShowSevereError(contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                        ErrorsFound = true;
+                    }
 
-              PerfCurve(CurveNum).GridValueIndex = btwxtManager.addOutputValues(gridIndex, lookupValues);
+                    std::size_t colNum = fields.at("external_file_column_number").get<std::size_t>() - 1;
+                    std::size_t rowNum = fields.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
-              if (normalize) {
-                auto const normalizeTarget = varListNormalizeTargets.at(indVarListName);
+                    if (!btwxtManager.tableFiles.count(filePath)) {
+                        btwxtManager.tableFiles.emplace(filePath, filePath);
+                    }
 
-                bool pointsSpecified = false;
-                bool pointsUnspecified = false;
-                for (auto value : normalizeTarget) {
-                  if (isnan(value)) {
-                    pointsUnspecified = true;
-                  } else {
-                    pointsSpecified = true;
-                  }
-                }
-                if (pointsSpecified && pointsUnspecified) {
-                    ShowSevereError(contextString + ": Table is to be normalized, but not all independent variables define a normalization value. Make sure either:");
-                    ShowContinueError("  a) a normalization value is defined for each independent variable, or");
-                    ShowContinueError("  b) no normalization values are defined (to use the Table:Lookup normalization value).");
+                    lookupValues = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
+
+                    // remove NANs
+                    lookupValues.erase(std::remove_if(lookupValues.begin(), lookupValues.end(),  [](const double &x){return isnan(x);}), lookupValues.end());
+
+                } else if (fields.count("values")) {
+                    for (auto value : fields.at("values")) {
+                        lookupValues.push_back(value.at("output_value").get<Real64>() / normalizationFactor);
+                    }
+                } else {
+                    ShowSevereError(contextString + ": No values defined.");
                     ErrorsFound = true;
-                } else if (pointsSpecified) {
-                    btwxtManager.normalizeGridValues(gridIndex,PerfCurve(CurveNum).GridValueIndex,normalizeTarget);
                 }
+
+                PerfCurve(CurveNum).GridValueIndex = btwxtManager.addOutputValues(gridIndex, lookupValues);
+
+                if (normalize) {
+                    auto const normalizeTarget = varListNormalizeTargets.at(indVarListName);
+
+                    bool pointsSpecified = false;
+                    bool pointsUnspecified = false;
+                    for (auto value : normalizeTarget) {
+                        if (isnan(value)) {
+                            pointsUnspecified = true;
+                        } else {
+                            pointsSpecified = true;
+                        }
+                    }
+                    if (pointsSpecified && pointsUnspecified) {
+                        ShowSevereError(
+                            contextString +
+                            ": Table is to be normalized, but not all independent variables define a normalization value. Make sure either:");
+                        ShowContinueError("  a) a normalization value is defined for each independent variable, or");
+                        ShowContinueError("  b) no normalization values are defined (to use the Table:Lookup normalization value).");
+                        ErrorsFound = true;
+                    } else if (pointsSpecified) {
+                        btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget);
+                    }
 
               }
 
             }
         }
+        btwxtManager.tableFiles.clear();
     }
 
     int BtwxtManager::getGridIndex(std::string indVarListName, bool &ErrorsFound) {
@@ -3368,7 +3441,7 @@ namespace CurveManager {
             gridIndex = gridMap.at(indVarListName);
         } else {
             // Independent variable list does not exist
-            ShowSevereError("Table:Lookup: No Table:IndependentVariableList found for " + indVarListName + ".");
+            ShowSevereError("Table:Lookup \"" + indVarListName + "\" : No Table:IndependentVariableList found.");
             ErrorsFound = true;
         }
         return gridIndex;
@@ -3393,6 +3466,75 @@ namespace CurveManager {
 
     void BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target) {
         grids[gridIndex].normalize_values_at_target(outputIndex, target);
+    }
+
+    TableFile::TableFile(std::string path) {
+        load(path);
+    }
+
+    void TableFile::load(std::string path) {
+        filePath = path;
+        std::ifstream file(filePath);
+        std::string line("");
+        numRows = 0;
+        numColumns = 0;
+        while (getline(file, line)) {
+            ++numRows;
+            std::size_t pos(0);
+            std::size_t colNum(1);
+            while ((pos = line.find(",")) != std::string::npos) {
+                if (colNum > numColumns) {
+                    numColumns = colNum;
+                    contents.resize(numColumns);
+                }
+                contents[colNum - 1].push_back(line.substr(0, pos));
+                line.erase(0, pos + 1);
+                ++colNum;
+            }
+            // Anything after the last comma
+            if (line.size() > 0) {
+                if (colNum > numColumns) {
+                    numColumns = colNum;
+                    contents.resize(numColumns);
+                }
+                contents[colNum - 1].push_back(line);
+                ++colNum;
+            }
+            // flesh out columns if row ends early
+            while (colNum <= numColumns) {
+                contents[colNum - 1].push_back("");
+                ++colNum;
+            }
+        }
+    }
+
+    std::vector<double>& TableFile::getArray(std::pair<std::size_t, std::size_t> colAndRow) {
+        if (!arrays.count(colAndRow)) {
+            // create the column from the data if it doesn't exist already
+            std::size_t col = colAndRow.first;  // 0 indexed
+            std::size_t row = colAndRow.second;  // 0 indexed
+            auto &content = contents[col];
+            if (col >= numColumns) {
+                ShowSevereError("File \"" + filePath + "\" : Requested column (" + General::RoundSigDigits(col+1) + ") exceeds the number of columns (" + General::RoundSigDigits(numColumns) + ").");
+            }
+            if (row >= numRows) {
+                ShowSevereError("File \"" + filePath + "\" : Requested starting row (" + General::RoundSigDigits(row+1) + ") exceeds the number of rows (" + General::RoundSigDigits(numRows) + ").");
+            }
+            std::vector<double> array(numRows - row);
+            std::transform(content.begin() + row, content.end(), array.begin(), [](const std::string &str) {
+                // Convert strings to double
+                // see https://stackoverflow.com/a/16575025/1344457
+                char *pEnd;
+                double ret = std::strtod(&str[0], &pEnd);
+                if (*pEnd || str.size() == 0) {
+                    return std::numeric_limits<double>::quiet_NaN();
+                } else {
+                    return ret;
+                }
+            });
+            arrays[colAndRow] = array;
+        }
+        return arrays.at(colAndRow);
     }
 
     void InitCurveReporting()

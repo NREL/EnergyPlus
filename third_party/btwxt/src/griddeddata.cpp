@@ -121,6 +121,9 @@ void GriddedData::set_dimension_sizes() {
   num_values = 1;
   for (std::size_t dim = ndims - 1; /* dim >= 0 */ dim < ndims; --dim) {
     std::size_t length = grid_axes[dim].get_length();
+    if (length == 0) {
+      showMessage(MsgLevel::MSG_ERR, stringify("Dimension ", dim, " has an axis of length zero."));
+    }
     dimension_lengths[dim] = length;
     dimension_step_size[dim] = num_values;
     num_values *= length;
@@ -242,6 +245,9 @@ void GriddedData::set_axis_interp_method(const std::size_t &dim,
 
 void GriddedData::normalize_value_table(std::size_t table_num, double scalar) {
   auto &table = value_tables[table_num];
+  if (scalar == 0.0) {
+    showMessage(MsgLevel::MSG_ERR, "Attempt to normalize values by zero.");
+  }
   scalar = 1.0/scalar;
   std::transform(table.begin(), table.end(), table.begin(),
                  std::bind(std::multiplies<double>(), std::placeholders::_1, scalar));
