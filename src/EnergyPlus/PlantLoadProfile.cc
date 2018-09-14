@@ -222,73 +222,84 @@ namespace PlantLoadProfile {
         clearOperatingVariables();
 
         // Do the one time initializations
-        if (this->m_doOneTimeInitialization) {
-            if (allocated(PlantLoop)) {
+        if (m_doOneTimeInitialization) {
+            if (allocated(PlantLoop)) { // TODO: is this check needed?
                 errFlag = false;
                 ScanPlantLoopsForObject(
-                    this->Name, this->m_plantProfileType, this->m_loopIndex, this->m_loopSideIndex, this->m_branchIndex, this->m_componentIndex, _, _, _, _, _, errFlag);
+                    Name, m_plantProfileType, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex, _, _, _, _, _, errFlag);
                 if (errFlag) {
                     ShowFatalError("InitPlantProfile: Program terminated for previous conditions.");
                 }
 
-                this->m_doOneTimeInitialization = false;
+                m_doOneTimeInitialization = false;
             }
         }
 
-        if (!SysSizingCalc && this->m_doInitSizing) {
-            RegisterPlantCompDesignFlow(m_nodeInletIndex, this->m_peakVolumeFlowRate);
-            this->m_doInitSizing = false;
+        if (!SysSizingCalc && m_doInitSizing) {
+            RegisterPlantCompDesignFlow(m_nodeInletIndex, m_peakVolumeFlowRate);
+            m_doInitSizing = false;
         }
 
-        if (BeginEnvrnFlag && this->m_doInit) {
+        if (m_doEnvironmentInitialization && BeginEnvrnFlag) {
             // Clear node initial conditions
             // DSU? can we centralize these temperature inits
             //    Node(InletNode)%Temp = 0.0
             Node(m_nodeOutletIndex).Temp = 0.0;
 
             FluidDensityInit =
-                GetDensityGlycol(PlantLoop(this->m_loopIndex).FluidName, DataGlobals::InitConvTemp, PlantLoop(this->m_loopIndex).FluidIndex, RoutineName);
+                GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, DataGlobals::InitConvTemp, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
 
-            Real64 MaxFlowMultiplier = GetScheduleMaxValue(this->m_flowRateFractionScheduleIndex);
+            Real64 const maxFlowMultiplier(GetScheduleMaxValue(m_flowRateFractionScheduleIndex));
 
             InitComponentNodes(0.0,
-                               this->m_peakVolumeFlowRate * FluidDensityInit * MaxFlowMultiplier,
-                               this->m_nodeInletIndex,
-                               this->m_nodeOutletIndex,
-                               this->m_loopIndex,
-                               this->m_loopSideIndex,
-                               this->m_branchIndex,
-                               this->m_componentIndex);
+                               m_peakVolumeFlowRate * FluidDensityInit * maxFlowMultiplier,
+                               m_nodeInletIndex,
+                               m_nodeOutletIndex,
+                               m_loopIndex,
+                               m_loopSideIndex,
+                               m_branchIndex,
+                               m_componentIndex);
 
-            this->m_emsHasMassFlowRateOverride = false;
-            this->m_emsMassFlowRateOverride = 0.0;
-            this->m_emsHasPowerOverride = false;
-            this->m_emsPowerOverride = 0.0;
-            this->m_doInit = false;
+            m_emsHasMassFlowRateOverride = false;
+            m_emsMassFlowRateOverride = 0.0;
+            m_emsHasPowerOverride = false;
+            m_emsPowerOverride = 0.0;
+            m_doEnvironmentInitialization = false;
         }
 
-        if (!BeginEnvrnFlag) this->m_doInit = true;
+        if (!BeginEnvrnFlag) {
+            m_doEnvironmentInitialization = true;
+        }
 
-        this->m_operatingInletTemperature = Node(m_nodeInletIndex).Temp;
-        this->m_operatingPower = GetCurrentScheduleValue(this->m_loadScheduleIndex);
+        // every iteration will initialize, set operating conditions
+        m_operatingInletTemperature = Node(m_nodeInletIndex).Temp;
 
-        if (this->m_emsHasPowerOverride) this->m_operatingPower = this->m_emsPowerOverride;
+        if (m_emsHasPowerOverride) {
+            m_operatingPower = m_emsPowerOverride;
+        }
+        else {
+            m_operatingPower = GetCurrentScheduleValue(m_loadScheduleIndex);
+        }
 
-        FluidDensityInit = GetDensityGlycol(PlantLoop(this->m_loopIndex).FluidName, this->m_operatingInletTemperature, PlantLoop(this->m_loopIndex).FluidIndex, RoutineName);
+        FluidDensityInit = GetDensityGlycol(PlantLoop(m_loopIndex).FluidName, m_operatingInletTemperature, PlantLoop(m_loopIndex).FluidIndex, RoutineName);
 
-        // Get the scheduled mass flow rate
-        this->m_operatingVolumeFlowRate = this->m_peakVolumeFlowRate * GetCurrentScheduleValue(this->m_flowRateFractionScheduleIndex);
+        // Get the scheduled volume flow rate
+        m_operatingVolumeFlowRate = m_peakVolumeFlowRate * GetCurrentScheduleValue(m_flowRateFractionScheduleIndex);
 
-        this->m_operatingMassFlowRate = this->m_operatingVolumeFlowRate * FluidDensityInit;
-
-        if (this->m_emsHasMassFlowRateOverride) this->m_operatingMassFlowRate = this->m_emsMassFlowRateOverride;
+        if (m_emsHasMassFlowRateOverride) {
+            m_operatingMassFlowRate = m_emsMassFlowRateOverride;
+        }
+        else {
+            m_operatingMassFlowRate = m_operatingVolumeFlowRate * FluidDensityInit;
+        }
 
         // Request the mass flow rate from the plant component flow utility routine
-        SetComponentFlowRate(this->m_operatingMassFlowRate, m_nodeInletIndex, m_nodeOutletIndex, this->m_loopIndex, this->m_loopSideIndex, this->m_branchIndex, this->m_componentIndex);
+        SetComponentFlowRate(m_operatingMassFlowRate, m_nodeInletIndex, m_nodeOutletIndex, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex);
 
-        this->m_operatingVolumeFlowRate = this->m_operatingMassFlowRate / FluidDensityInit;
+        // back calculate the volume flow in case EMS has overridden mass flow rate
+        m_operatingVolumeFlowRate = m_operatingMassFlowRate / FluidDensityInit;
 
-    } // InitPlantProfile()
+    }
 
     void PlantProfileData::update()
     {

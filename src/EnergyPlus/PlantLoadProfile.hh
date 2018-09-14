@@ -86,7 +86,7 @@ namespace PlantLoadProfile {
         int m_loopSideIndex;   // water plant loop side index                        !DSU
         int m_branchIndex; // water plant loop branch index                      !DSU
         int m_componentIndex;   // water plant loop component index                   !DSU
-        bool m_doInit;          // Flag for initialization:  TRUE means do the init
+        bool m_doEnvironmentInitialization;          // Flag for initialization:  TRUE means do the init
         bool m_doInitSizing;    // Flag for initialization of plant sizing
         int m_nodeInletIndex;
         Real64 m_operatingInletTemperature; // Inlet temperature (C)
@@ -110,7 +110,7 @@ namespace PlantLoadProfile {
 
         // Default Constructor
         PlantProfileData()
-            : m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_doInit(true), m_doInitSizing(true), m_nodeInletIndex(0), m_operatingInletTemperature(0.0),
+            : m_loopIndex(0), m_loopSideIndex(0), m_branchIndex(0), m_componentIndex(0), m_doEnvironmentInitialization(true), m_doInitSizing(true), m_nodeInletIndex(0), m_operatingInletTemperature(0.0),
               m_nodeOutletIndex(0), m_operatingOutletTemperature(0.0), m_loadScheduleIndex(0), m_emsHasPowerOverride(false), m_emsPowerOverride(0.0), m_peakVolumeFlowRate(0.0),
               m_flowRateFractionScheduleIndex(0), m_operatingVolumeFlowRate(0.0), m_operatingMassFlowRate(0.0), m_emsHasMassFlowRateOverride(false), m_emsMassFlowRateOverride(0.0), m_operatingPower(0.0),
               m_operatingEnergy(0.0), m_operatingHeatingEnergy(0.0), m_operatingCoolingEnergy(0.0), m_doOneTimeInitialization(true)
