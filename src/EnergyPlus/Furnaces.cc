@@ -4731,9 +4731,9 @@ namespace Furnaces {
         // Using/Aliasing
         using DataAirflowNetwork::AirflowNetworkControlMultizone;
         using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataAirLoop::AirLoopControlInfo;
         using DataAirLoop::AirToZoneNodeInfo;
-        using DataAirLoop::AirLoopAFNInfo;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::TempControlType;
         using DataPlant::PlantLoop;
@@ -6013,6 +6013,24 @@ namespace Furnaces {
         DXCoolCap = 0.0;
         UnitaryHeatCap = 0.0;
         SuppHeatCap = 0.0;
+
+        if (Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex = Furnace(FurnaceNum).FanIndex;
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
+        } else {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = Furnace(FurnaceNum).FanIndex;
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
+        }
+        if (Furnace(FurnaceNum).FanPlace == BlowThru) {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+        } else if (Furnace(FurnaceNum).FanPlace == DrawThru) {
+            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+        }
+
         if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
             SimDXCoil(BlankString, On, true, Furnace(FurnaceNum).CoolingCoilIndex, 1, 0.0);
         } else if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
@@ -9487,8 +9505,13 @@ namespace Furnaces {
                         CompOnMassFlow > 0.0) {
                         ratio = max(Furnace(FurnaceNum).MaxCoolAirMassFlow, Furnace(FurnaceNum).MaxHeatAirMassFlow) / CompOnMassFlow;
                         AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio = AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio * ratio;
-                     }
+                    }
                 }
+            }
+        }
+        if (Furnace(FurnaceNum).FirstPass) {
+            if (!SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(0, DataSizing::CurSysNum, Furnace(FurnaceNum).FirstPass);
             }
         }
         DataHVACGlobals::OnOffFanPartLoadFraction =

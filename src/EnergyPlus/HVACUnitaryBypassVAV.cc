@@ -2016,7 +2016,23 @@ namespace HVACUnitaryBypassVAV {
 
         // Using/Aliasing
         using namespace DataSizing;
+        using DataAirSystems::PrimaryAirSystem;
         using ReportSizingManager::ReportSizingOutput;
+
+        if (CurSysNum > 0 && CurOASysNum == 0) {
+            if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                PrimaryAirSystem(CurSysNum).supFanVecIndex = CBVAV(CBVAVNum).FanIndex;
+                PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+            } else {
+                PrimaryAirSystem(CurSysNum).SupFanNum = CBVAV(CBVAVNum).FanIndex;
+                PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            }
+            if (CBVAV(CBVAVNum).FanPlace == BlowThru) {
+                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            } else if (CBVAV(CBVAVNum).FanPlace == DrawThru) {
+                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            }
+        }
 
         if (CBVAV(CBVAVNum).MaxCoolAirVolFlow == AutoSize) {
 
@@ -4155,6 +4171,15 @@ namespace HVACUnitaryBypassVAV {
         CBVAV(CBVAVNum).LatCoolEnergy = CBVAV(CBVAVNum).LatCoolEnergyRate * ReportingConstant;
         CBVAV(CBVAVNum).LatHeatEnergy = CBVAV(CBVAVNum).LatHeatEnergyRate * ReportingConstant;
         CBVAV(CBVAVNum).ElecConsumption = CBVAV(CBVAVNum).ElecPower * ReportingConstant;
+
+        if (CBVAV(CBVAVNum).FirstPass) {
+            if (!SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, CBVAV(CBVAVNum).FirstPass);
+            }
+        }
+
+        // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
+        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
     }
 
     void CalcNonDXHeatingCoils(int const CBVAVNum,            // Changeover bypass VAV unit index

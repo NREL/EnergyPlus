@@ -826,6 +826,8 @@ namespace DataSurfaces {
 
         int getTotLayers() const;
 
+        Real64 get_average_height() const;
+
     private: // Methods
              // Computed Shape Category
         ShapeCat computed_shapeCat() const;

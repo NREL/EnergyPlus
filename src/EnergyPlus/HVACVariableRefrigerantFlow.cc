@@ -61,6 +61,7 @@
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
+#include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -1595,131 +1596,121 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).CoolCapFT = GetCurveIndex(cAlphaArgs(3));
             if (VRF(VRFNum).CoolCapFT > 0) {
                 // Verify Curve Object, only legal type is biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).CoolCapFT,   // Curve index
-                    {2},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(3));    // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).CoolCapFT, // Curve index
+                                                            {2},                   // Valid dimensions
+                                                            RoutineName,           // Routine name
+                                                            cCurrentModuleObject,  // Object Type
+                                                            VRF(VRFNum).Name,      // Object Name
+                                                            cAlphaFieldNames(3));  // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(RoutineName + cCurrentModuleObject,
-                        VRF(VRFNum).Name,
-                        VRF(VRFNum).CoolCapFT,
-                        cAlphaFieldNames(3),
-                        cAlphaArgs(3),
-                        RatedInletWetBulbTemp,
-                        RatedOutdoorAirTemp);
+                                                VRF(VRFNum).Name,
+                                                VRF(VRFNum).CoolCapFT,
+                                                cAlphaFieldNames(3),
+                                                cAlphaArgs(3),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
             VRF(VRFNum).CoolBoundaryCurvePtr = GetCurveIndex(cAlphaArgs(4));
             if (VRF(VRFNum).CoolBoundaryCurvePtr > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).CoolBoundaryCurvePtr,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(4));    // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).CoolBoundaryCurvePtr, // Curve index
+                                                            {1},                              // Valid dimensions
+                                                            RoutineName,                      // Routine name
+                                                            cCurrentModuleObject,             // Object Type
+                                                            VRF(VRFNum).Name,                 // Object Name
+                                                            cAlphaFieldNames(4));             // Field Name
             }
 
             VRF(VRFNum).CoolCapFTHi = GetCurveIndex(cAlphaArgs(5));
             if (VRF(VRFNum).CoolCapFTHi > 0) {
                 // Verify Curve Object, only legal type is biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).CoolCapFTHi,   // Curve index
-                    {2},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(5));    // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).CoolCapFTHi, // Curve index
+                                                            {2},                     // Valid dimensions
+                                                            RoutineName,             // Routine name
+                                                            cCurrentModuleObject,    // Object Type
+                                                            VRF(VRFNum).Name,        // Object Name
+                                                            cAlphaFieldNames(5));    // Field Name
             }
 
             VRF(VRFNum).CoolEIRFT = GetCurveIndex(cAlphaArgs(6));
             if (VRF(VRFNum).CoolEIRFT > 0) {
                 // Verify Curve Object, only legal type is biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).CoolEIRFT,   // Curve index
-                    {2},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(6));    // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).CoolEIRFT, // Curve index
+                                                            {2},                   // Valid dimensions
+                                                            RoutineName,           // Routine name
+                                                            cCurrentModuleObject,  // Object Type
+                                                            VRF(VRFNum).Name,      // Object Name
+                                                            cAlphaFieldNames(6));  // Field Name
             }
 
             VRF(VRFNum).EIRCoolBoundaryCurvePtr = GetCurveIndex(cAlphaArgs(7));
             if (VRF(VRFNum).EIRCoolBoundaryCurvePtr > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).EIRCoolBoundaryCurvePtr,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(7));    // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).EIRCoolBoundaryCurvePtr, // Curve index
+                                                            {1},                                 // Valid dimensions
+                                                            RoutineName,                         // Routine name
+                                                            cCurrentModuleObject,                // Object Type
+                                                            VRF(VRFNum).Name,                    // Object Name
+                                                            cAlphaFieldNames(7));                // Field Name
             }
 
             VRF(VRFNum).CoolEIRFTHi = GetCurveIndex(cAlphaArgs(8));
             if (VRF(VRFNum).CoolEIRFTHi > 0) {
                 // Verify Curve Object, only legal type is biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).CoolEIRFTHi,   // Curve index
-                    {2},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(8));    // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).CoolEIRFTHi, // Curve index
+                                                            {2},                     // Valid dimensions
+                                                            RoutineName,             // Routine name
+                                                            cCurrentModuleObject,    // Object Type
+                                                            VRF(VRFNum).Name,        // Object Name
+                                                            cAlphaFieldNames(8));    // Field Name
             }
 
             VRF(VRFNum).CoolEIRFPLR1 = GetCurveIndex(cAlphaArgs(9));
             if (VRF(VRFNum).CoolEIRFPLR1 > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).CoolEIRFPLR1,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(9));    // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).CoolEIRFPLR1, // Curve index
+                                                            {1},                      // Valid dimensions
+                                                            RoutineName,              // Routine name
+                                                            cCurrentModuleObject,     // Object Type
+                                                            VRF(VRFNum).Name,         // Object Name
+                                                            cAlphaFieldNames(9));     // Field Name
             }
 
             VRF(VRFNum).CoolEIRFPLR2 = GetCurveIndex(cAlphaArgs(10));
             if (VRF(VRFNum).CoolEIRFPLR2 > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).CoolEIRFPLR2,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(10));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).CoolEIRFPLR2, // Curve index
+                                                            {1},                      // Valid dimensions
+                                                            RoutineName,              // Routine name
+                                                            cCurrentModuleObject,     // Object Type
+                                                            VRF(VRFNum).Name,         // Object Name
+                                                            cAlphaFieldNames(10));    // Field Name
             }
 
             VRF(VRFNum).CoolCombRatioPTR = GetCurveIndex(cAlphaArgs(11));
             if (VRF(VRFNum).CoolCombRatioPTR > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).CoolCombRatioPTR,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(11));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).CoolCombRatioPTR, // Curve index
+                                                            {1},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            cCurrentModuleObject,         // Object Type
+                                                            VRF(VRFNum).Name,             // Object Name
+                                                            cAlphaFieldNames(11));        // Field Name
             }
 
             VRF(VRFNum).CoolPLFFPLR = GetCurveIndex(cAlphaArgs(12));
             if (VRF(VRFNum).CoolPLFFPLR > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).CoolPLFFPLR,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(12));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).CoolPLFFPLR, // Curve index
+                                                            {1},                     // Valid dimensions
+                                                            RoutineName,             // Routine name
+                                                            cCurrentModuleObject,    // Object Type
+                                                            VRF(VRFNum).Name,        // Object Name
+                                                            cAlphaFieldNames(12));   // Field Name
                 if (!ErrorsFound) {
                     //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
                     MinCurveVal = 999.0;
@@ -1775,31 +1766,30 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).HeatCapFT = GetCurveIndex(cAlphaArgs(13));
             if (VRF(VRFNum).HeatCapFT > 0) {
                 // Verify Curve Object, only legal type is biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).HeatCapFT,   // Curve index
-                    {2},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(13));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HeatCapFT, // Curve index
+                                                            {2},                   // Valid dimensions
+                                                            RoutineName,           // Routine name
+                                                            cCurrentModuleObject,  // Object Type
+                                                            VRF(VRFNum).Name,      // Object Name
+                                                            cAlphaFieldNames(13)); // Field Name
 
                 if (!ErrorsFound) {
                     if (UtilityRoutines::SameString(cAlphaArgs(19), "WETBULBTEMPERATURE")) {
                         checkCurveIsNormalizedToOne(RoutineName + cCurrentModuleObject,
-                            VRF(VRFNum).Name,
-                            VRF(VRFNum).HeatCapFT,
-                            cAlphaFieldNames(13),
-                            cAlphaArgs(13),
-                            RatedInletAirTempHeat,
-                            RatedOutdoorWetBulbTempHeat);
+                                                    VRF(VRFNum).Name,
+                                                    VRF(VRFNum).HeatCapFT,
+                                                    cAlphaFieldNames(13),
+                                                    cAlphaArgs(13),
+                                                    RatedInletAirTempHeat,
+                                                    RatedOutdoorWetBulbTempHeat);
                     } else if (UtilityRoutines::SameString(cAlphaArgs(19), "DRYBULBTEMPERATURE")) {
                         checkCurveIsNormalizedToOne(RoutineName + cCurrentModuleObject,
-                            VRF(VRFNum).Name,
-                            VRF(VRFNum).HeatCapFT,
-                            cAlphaFieldNames(13),
-                            cAlphaArgs(13),
-                            RatedInletAirTempHeat,
-                            RatedOutdoorAirTempHeat);
+                                                    VRF(VRFNum).Name,
+                                                    VRF(VRFNum).HeatCapFT,
+                                                    cAlphaFieldNames(13),
+                                                    cAlphaArgs(13),
+                                                    RatedInletAirTempHeat,
+                                                    RatedOutdoorAirTempHeat);
                     }
                 }
             }
@@ -1807,61 +1797,56 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).HeatBoundaryCurvePtr = GetCurveIndex(cAlphaArgs(14));
             if (VRF(VRFNum).HeatBoundaryCurvePtr > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).HeatBoundaryCurvePtr,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(14));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HeatBoundaryCurvePtr, // Curve index
+                                                            {1},                              // Valid dimensions
+                                                            RoutineName,                      // Routine name
+                                                            cCurrentModuleObject,             // Object Type
+                                                            VRF(VRFNum).Name,                 // Object Name
+                                                            cAlphaFieldNames(14));            // Field Name
             }
 
             VRF(VRFNum).HeatCapFTHi = GetCurveIndex(cAlphaArgs(15));
             if (VRF(VRFNum).HeatCapFTHi > 0) {
                 // Verify Curve Object, only legal type is biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).HeatCapFTHi,   // Curve index
-                    {2},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(15));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HeatCapFTHi, // Curve index
+                                                            {2},                     // Valid dimensions
+                                                            RoutineName,             // Routine name
+                                                            cCurrentModuleObject,    // Object Type
+                                                            VRF(VRFNum).Name,        // Object Name
+                                                            cAlphaFieldNames(15));   // Field Name
             }
 
             VRF(VRFNum).HeatEIRFT = GetCurveIndex(cAlphaArgs(16));
             if (VRF(VRFNum).HeatEIRFT > 0) {
                 // Verify Curve Object, only legal type is biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).HeatEIRFT,   // Curve index
-                    {2},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(16));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HeatEIRFT, // Curve index
+                                                            {2},                   // Valid dimensions
+                                                            RoutineName,           // Routine name
+                                                            cCurrentModuleObject,  // Object Type
+                                                            VRF(VRFNum).Name,      // Object Name
+                                                            cAlphaFieldNames(16)); // Field Name
             }
 
             VRF(VRFNum).EIRHeatBoundaryCurvePtr = GetCurveIndex(cAlphaArgs(17));
             if (VRF(VRFNum).EIRHeatBoundaryCurvePtr > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).EIRHeatBoundaryCurvePtr,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(17));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).EIRHeatBoundaryCurvePtr, // Curve index
+                                                            {1},                                 // Valid dimensions
+                                                            RoutineName,                         // Routine name
+                                                            cCurrentModuleObject,                // Object Type
+                                                            VRF(VRFNum).Name,                    // Object Name
+                                                            cAlphaFieldNames(17));               // Field Name
             }
 
             VRF(VRFNum).HeatEIRFTHi = GetCurveIndex(cAlphaArgs(18));
             if (VRF(VRFNum).HeatEIRFTHi > 0) {
                 // Verify Curve Object, only legal type is biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).HeatEIRFTHi,   // Curve index
-                    {2},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(18));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HeatEIRFTHi, // Curve index
+                                                            {2},                     // Valid dimensions
+                                                            RoutineName,             // Routine name
+                                                            cCurrentModuleObject,    // Object Type
+                                                            VRF(VRFNum).Name,        // Object Name
+                                                            cAlphaFieldNames(18));   // Field Name
             }
 
             if (UtilityRoutines::SameString(cAlphaArgs(19), "WETBULBTEMPERATURE")) {
@@ -1878,48 +1863,44 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).HeatEIRFPLR1 = GetCurveIndex(cAlphaArgs(20));
             if (VRF(VRFNum).HeatEIRFPLR1 > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).HeatEIRFPLR1,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(20));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HeatEIRFPLR1, // Curve index
+                                                            {1},                      // Valid dimensions
+                                                            RoutineName,              // Routine name
+                                                            cCurrentModuleObject,     // Object Type
+                                                            VRF(VRFNum).Name,         // Object Name
+                                                            cAlphaFieldNames(20));    // Field Name
             }
 
             VRF(VRFNum).HeatEIRFPLR2 = GetCurveIndex(cAlphaArgs(21));
             if (VRF(VRFNum).HeatEIRFPLR2 > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).HeatEIRFPLR2,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(21));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HeatEIRFPLR2, // Curve index
+                                                            {1},                      // Valid dimensions
+                                                            RoutineName,              // Routine name
+                                                            cCurrentModuleObject,     // Object Type
+                                                            VRF(VRFNum).Name,         // Object Name
+                                                            cAlphaFieldNames(21));    // Field Name
             }
 
             VRF(VRFNum).HeatCombRatioPTR = GetCurveIndex(cAlphaArgs(22));
             if (VRF(VRFNum).HeatCombRatioPTR > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).HeatCombRatioPTR,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(22));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HeatCombRatioPTR, // Curve index
+                                                            {1},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            cCurrentModuleObject,         // Object Type
+                                                            VRF(VRFNum).Name,             // Object Name
+                                                            cAlphaFieldNames(22));        // Field Name
             }
             VRF(VRFNum).HeatPLFFPLR = GetCurveIndex(cAlphaArgs(23));
             if (VRF(VRFNum).HeatPLFFPLR > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, or cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).HeatPLFFPLR,   // Curve index
-                    {1},                     // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(23));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HeatPLFFPLR, // Curve index
+                                                            {1},                     // Valid dimensions
+                                                            RoutineName,             // Routine name
+                                                            cCurrentModuleObject,    // Object Type
+                                                            VRF(VRFNum).Name,        // Object Name
+                                                            cAlphaFieldNames(23));   // Field Name
 
                 if (!ErrorsFound) {
                     MinCurveVal = 999.0;
@@ -2019,13 +2000,12 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).PCFLengthCoolPtr = GetCurveIndex(cAlphaArgs(29));
             if (VRF(VRFNum).PCFLengthCoolPtr > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).PCFLengthCoolPtr,   // Curve index
-                    {1, 2},                  // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(29));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).PCFLengthCoolPtr, // Curve index
+                                                            {1, 2},                       // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            cCurrentModuleObject,         // Object Type
+                                                            VRF(VRFNum).Name,             // Object Name
+                                                            cAlphaFieldNames(29));        // Field Name
             }
             VRF(VRFNum).PCFHeightCool = rNumericArgs(13);
 
@@ -2033,13 +2013,12 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).PCFLengthHeatPtr = GetCurveIndex(cAlphaArgs(30));
             if (VRF(VRFNum).PCFLengthHeatPtr > 0) {
                 // Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    VRF(VRFNum).PCFLengthHeatPtr,   // Curve index
-                    {1, 2},                  // Valid dimensions
-                    RoutineName,             // Routine name
-                    cCurrentModuleObject,    // Object Type
-                    VRF(VRFNum).Name,        // Object Name
-                    cAlphaFieldNames(30));   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).PCFLengthHeatPtr, // Curve index
+                                                            {1, 2},                       // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            cCurrentModuleObject,         // Object Type
+                                                            VRF(VRFNum).Name,             // Object Name
+                                                            cAlphaFieldNames(30));        // Field Name
             }
 
             VRF(VRFNum).PCFHeightHeat = rNumericArgs(15);
@@ -2076,14 +2055,13 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(33)) {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(33));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
-                    // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        VRF(VRFNum).DefrostEIRPtr,   // Curve index
-                        {2},                     // Valid dimensions
-                        RoutineName,             // Routine name
-                        cCurrentModuleObject,    // Object Type
-                        VRF(VRFNum).Name,        // Object Name
-                        cAlphaFieldNames(33));   // Field Name
+                    // Verify Curve Object, expected type is BiQuadratic
+                    ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).DefrostEIRPtr, // Curve index
+                                                                {2},                       // Valid dimensions
+                                                                RoutineName,               // Routine name
+                                                                cCurrentModuleObject,      // Object Type
+                                                                VRF(VRFNum).Name,          // Object Name
+                                                                cAlphaFieldNames(33));     // Field Name
                 } else {
                     if (VRF(VRFNum).DefrostStrategy == ReverseCycle) {
                         ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\" " + cAlphaFieldNames(33) +
@@ -2304,13 +2282,12 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFNum).HRCAPFTCool = GetCurveIndex(cAlphaArgs(40));
                 if (VRF(VRFNum).HRCAPFTCool > 0) {
                     // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        VRF(VRFNum).HRCAPFTCool,   // Curve index
-                        {1, 2},                  // Valid dimensions
-                        RoutineName,             // Routine name
-                        cCurrentModuleObject,    // Object Type
-                        VRF(VRFNum).Name,        // Object Name
-                        cAlphaFieldNames(40));   // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HRCAPFTCool, // Curve index
+                                                                {1, 2},                  // Valid dimensions
+                                                                RoutineName,             // Routine name
+                                                                cCurrentModuleObject,    // Object Type
+                                                                VRF(VRFNum).Name,        // Object Name
+                                                                cAlphaFieldNames(40));   // Field Name
                 }
                 if (!lNumericFieldBlanks(31)) {
                     VRF(VRFNum).HRInitialCoolCapFrac = rNumericArgs(31);
@@ -2324,13 +2301,12 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFNum).HREIRFTCool = GetCurveIndex(cAlphaArgs(41));
                 if (VRF(VRFNum).HREIRFTCool > 0) {
                     // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        VRF(VRFNum).HREIRFTCool,   // Curve index
-                        {1, 2},                  // Valid dimensions
-                        RoutineName,             // Routine name
-                        cCurrentModuleObject,    // Object Type
-                        VRF(VRFNum).Name,        // Object Name
-                        cAlphaFieldNames(41));   // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HREIRFTCool, // Curve index
+                                                                {1, 2},                  // Valid dimensions
+                                                                RoutineName,             // Routine name
+                                                                cCurrentModuleObject,    // Object Type
+                                                                VRF(VRFNum).Name,        // Object Name
+                                                                cAlphaFieldNames(41));   // Field Name
                 }
                 VRF(VRFNum).HRInitialCoolEIRFrac = rNumericArgs(33);
                 VRF(VRFNum).HRCoolEIRTC = rNumericArgs(34);
@@ -2342,13 +2318,12 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFNum).HRCAPFTHeat = GetCurveIndex(cAlphaArgs(42));
                 if (VRF(VRFNum).HRCAPFTHeat > 0) {
                     // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        VRF(VRFNum).HRCAPFTHeat,   // Curve index
-                        {1, 2},                  // Valid dimensions
-                        RoutineName,             // Routine name
-                        cCurrentModuleObject,    // Object Type
-                        VRF(VRFNum).Name,        // Object Name
-                        cAlphaFieldNames(42));   // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HRCAPFTHeat, // Curve index
+                                                                {1, 2},                  // Valid dimensions
+                                                                RoutineName,             // Routine name
+                                                                cCurrentModuleObject,    // Object Type
+                                                                VRF(VRFNum).Name,        // Object Name
+                                                                cAlphaFieldNames(42));   // Field Name
                 }
                 VRF(VRFNum).HRInitialHeatCapFrac = rNumericArgs(35);
                 VRF(VRFNum).HRHeatCapTC = rNumericArgs(36);
@@ -2360,13 +2335,12 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFNum).HREIRFTHeat = GetCurveIndex(cAlphaArgs(43));
                 if (VRF(VRFNum).HREIRFTHeat > 0) {
                     // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        VRF(VRFNum).HREIRFTHeat,   // Curve index
-                        {1, 2},                  // Valid dimensions
-                        RoutineName,             // Routine name
-                        cCurrentModuleObject,    // Object Type
-                        VRF(VRFNum).Name,        // Object Name
-                        cAlphaFieldNames(43));   // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).HREIRFTHeat, // Curve index
+                                                                {1, 2},                  // Valid dimensions
+                                                                RoutineName,             // Routine name
+                                                                cCurrentModuleObject,    // Object Type
+                                                                VRF(VRFNum).Name,        // Object Name
+                                                                cAlphaFieldNames(43));   // Field Name
                 }
                 VRF(VRFNum).HRInitialHeatEIRFrac = rNumericArgs(37);
                 VRF(VRFNum).HRHeatEIRTC = rNumericArgs(38);
@@ -2540,7 +2514,8 @@ namespace HVACVariableRefrigerantFlow {
 
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFieldNames(6) + " type for this object = " + CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType);
+                        ShowContinueError("...illegal " + cAlphaFieldNames(6) +
+                                          " type for this object = " + CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -2568,7 +2543,8 @@ namespace HVACVariableRefrigerantFlow {
 
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFieldNames(7) + " type for this object = " + CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType);
+                        ShowContinueError("...illegal " + cAlphaFieldNames(7) +
+                                          " type for this object = " + CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -2629,6 +2605,7 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(10)) {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(10));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
+                    // Verify Curve Object, expected type is BiQuadratic
                     ErrorsFound |= CurveManager::CheckCurveDims(
                         VRF(VRFNum).DefrostEIRPtr,   // Curve index
                         {2},                     // Valid dimensions
@@ -2711,13 +2688,12 @@ namespace HVACVariableRefrigerantFlow {
                         }
                         ErrorsFound = true;
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            indexOUEvapCapCurve,     // Curve index
-                            {2},                     // Valid dimensions
-                            RoutineName,             // Routine name
-                            cCurrentModuleObject,    // Object Type
-                            VRF(VRFNum).Name,        // Object Name
-                            cAlphaFieldNames(Count2Index + 2 * NumCompSpd));   // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(indexOUEvapCapCurve,                             // Curve index
+                                                                    {2},                                             // Valid dimensions
+                                                                    RoutineName,                                     // Routine name
+                                                                    cCurrentModuleObject,                            // Object Type
+                                                                    VRF(VRFNum).Name,                                // Object Name
+                                                                    cAlphaFieldNames(Count2Index + 2 * NumCompSpd)); // Field Name
 
                         if (!ErrorsFound) {
                             VRF(VRFNum).OUCoolingCAPFT(NumCompSpd) = indexOUEvapCapCurve;
@@ -2739,13 +2715,12 @@ namespace HVACVariableRefrigerantFlow {
                         }
                         ErrorsFound = true;
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            indexOUCompPwrCurve,     // Curve index
-                            {2},                     // Valid dimensions
-                            RoutineName,             // Routine name
-                            cCurrentModuleObject,    // Object Type
-                            VRF(VRFNum).Name,        // Object Name
-                            cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1));   // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(indexOUCompPwrCurve,                                 // Curve index
+                                                                    {2},                                                 // Valid dimensions
+                                                                    RoutineName,                                         // Routine name
+                                                                    cCurrentModuleObject,                                // Object Type
+                                                                    VRF(VRFNum).Name,                                    // Object Name
+                                                                    cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1)); // Field Name
 
                         if (!ErrorsFound) {
                             VRF(VRFNum).OUCoolingPWRFT(NumCompSpd) = indexOUCompPwrCurve;
@@ -2948,7 +2923,8 @@ namespace HVACVariableRefrigerantFlow {
                     VRF(VRFNum).C3Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff3;
                 } else {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
-                    ShowContinueError("...illegal " + cAlphaFieldNames(6) + " type for this object = " + CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType);
+                    ShowContinueError("...illegal " + cAlphaFieldNames(6) +
+                                      " type for this object = " + CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType);
                     ShowContinueError("... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }
@@ -2973,7 +2949,8 @@ namespace HVACVariableRefrigerantFlow {
                     VRF(VRFNum).C3Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff3;
                 } else {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
-                    ShowContinueError("...illegal " + cAlphaFieldNames(7) + " type for this object = " + CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType);
+                    ShowContinueError("...illegal " + cAlphaFieldNames(7) +
+                                      " type for this object = " + CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType);
                     ShowContinueError("... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }
@@ -3033,10 +3010,10 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(10)) {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(10));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
-                    // Verify Curve Object, only legal type is linear, quadratic, or cubic
+                    // Verify Curve Object, expected type is BiQuadratic
                     ErrorsFound |= CurveManager::CheckCurveDims(
                         VRF(VRFNum).DefrostEIRPtr,  // Curve index
-                        {1},                        // Valid dimensions
+                        {2},                        // Valid dimensions
                         RoutineName,                // Routine name
                         cCurrentModuleObject,       // Object Type
                         VRF(VRFNum).Name,           // Object Name
@@ -3106,13 +3083,12 @@ namespace HVACVariableRefrigerantFlow {
                         }
                         ErrorsFound = true;
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            indexOUEvapCapCurve,  // Curve index
-                            {2},                        // Valid dimensions
-                            RoutineName,                // Routine name
-                            cCurrentModuleObject,       // Object Type
-                            VRF(VRFNum).Name,           // Object Name
-                            cAlphaFieldNames(Count2Index + 2 * NumCompSpd));      // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(indexOUEvapCapCurve,                             // Curve index
+                                                                    {2},                                             // Valid dimensions
+                                                                    RoutineName,                                     // Routine name
+                                                                    cCurrentModuleObject,                            // Object Type
+                                                                    VRF(VRFNum).Name,                                // Object Name
+                                                                    cAlphaFieldNames(Count2Index + 2 * NumCompSpd)); // Field Name
 
                         if (!ErrorsFound) {
                             VRF(VRFNum).OUCoolingCAPFT(NumCompSpd) = indexOUEvapCapCurve;
@@ -3134,13 +3110,12 @@ namespace HVACVariableRefrigerantFlow {
                         }
                         ErrorsFound = true;
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            indexOUCompPwrCurve,  // Curve index
-                            {2},                        // Valid dimensions
-                            RoutineName,                // Routine name
-                            cCurrentModuleObject,       // Object Type
-                            VRF(VRFNum).Name,           // Object Name
-                            cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1));      // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(indexOUCompPwrCurve,                                 // Curve index
+                                                                    {2},                                                 // Valid dimensions
+                                                                    RoutineName,                                         // Routine name
+                                                                    cCurrentModuleObject,                                // Object Type
+                                                                    VRF(VRFNum).Name,                                    // Object Name
+                                                                    cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1)); // Field Name
 
                         if (!ErrorsFound) {
                             VRF(VRFNum).OUCoolingPWRFT(NumCompSpd) = indexOUCompPwrCurve;
@@ -6073,6 +6048,19 @@ namespace HVACVariableRefrigerantFlow {
         CompType = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
         CompName = VRFTU(VRFTUNum).Name;
         DataZoneNumber = VRFTU(VRFTUNum).ZoneNum;
+
+        if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = VRFTU(VRFTUNum).FanIndex;
+        if (VRFTU(VRFTUNum).FanPlace == BlowThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        } else if (VRFTU(VRFTUNum).FanPlace == DrawThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+        }
+
         if (CurZoneEqNum > 0) {
             if (VRFTU(VRFTUNum).HVACSizingIndex > 0) {
                 zoneHVACIndex = VRFTU(VRFTUNum).HVACSizingIndex;
@@ -7629,23 +7617,13 @@ namespace HVACVariableRefrigerantFlow {
         VRFTU(VRFTUNum).LatentHeatingEnergy = VRFTU(VRFTUNum).LatentHeatingRate * ReportingConstant;
 
         if (VRFTU(VRFTUNum).firstPass) {
-
             if (!MySizeFlag(VRFTUNum)) {
-
-                ZoneEqSizing(VRFTU(VRFTUNum).ZoneNum).SystemAirFlow = false;
-                ZoneEqSizing(VRFTU(VRFTUNum).ZoneNum).AirVolFlow = 0.0;
-                ZoneEqSizing(VRFTU(VRFTUNum).ZoneNum).CoolingAirFlow = false;
-                ZoneEqSizing(VRFTU(VRFTUNum).ZoneNum).CoolingAirVolFlow = 0.0;
-                ZoneEqSizing(VRFTU(VRFTUNum).ZoneNum).HeatingAirFlow = false;
-                ZoneEqSizing(VRFTU(VRFTUNum).ZoneNum).HeatingAirVolFlow = 0.0;
-                ZoneEqSizing(VRFTU(VRFTUNum).ZoneNum).OAVolFlow = 0.0;
-                ZoneEqSizing(CurZoneEqNum).CoolingCapacity = false;
-                ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = 0.0;
-                ZoneEqSizing(CurZoneEqNum).HeatingCapacity = false;
-                ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = 0.0;
-                VRFTU(VRFTUNum).firstPass = false;
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, VRFTU(VRFTUNum).firstPass);
             }
         }
+
+        // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
+        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
     }
 
     void ReportVRFCondenser(int const VRFCond) // index to VRF condensing unit

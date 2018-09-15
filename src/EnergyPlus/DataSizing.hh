@@ -182,6 +182,13 @@ namespace DataSizing {
     extern int const GlobalCoolingSizingFactorMode;
     extern int const LoopComponentSizingFactorMode;
 
+    enum class zoneFanPlacement
+    {
+        zoneFanPlaceNotSet,
+        zoneBlowThru,
+        zoneDrawThru
+    };
+
     // DERIVED TYPE DEFINITIONS:
 
     // INTERFACE BLOCK SPECIFICATIONS
@@ -244,6 +251,13 @@ namespace DataSizing {
     extern bool DataScalableCapSizingON;              // boolean determines scalable zone capacity sizing is specified
     extern bool DataSysScalableFlowSizingON;          // boolean determines scalable system flow sizing is specified
     extern bool DataSysScalableCapSizingON;           // boolean determines scalable system capacity sizing is specified
+    extern Real64 DataCoilSizingAirInTemp;            // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingAirInHumRat;          // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingAirOutTemp;           // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingAirOutHumRat;         // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingFanCoolLoad;          // saves sizing data for use in coil object reporting
+    extern Real64 DataCoilSizingCapFT;                // saves sizing data for use in coil object reporting
+    extern Real64 DataDesAccountForFanHeat;           // include fan heat when true
     extern Real64 DataDesInletWaterTemp;              // coil inlet water temperture used for warning messages
     extern Real64 DataDesInletAirHumRat;              // coil inlet air humidity ratio used for warning messages
     extern Real64 DataDesInletAirTemp;                // coil inlet air temperature used for warning messages
@@ -302,6 +316,10 @@ namespace DataSizing {
     extern Real64 DataWaterCoilSizCoolDeltaT;         // used for sizing cooling coil water design flow rate
     extern Real64 DataWaterCoilSizHeatDeltaT;         // used for sizing heating coil water design flow rate
     extern bool DataNomCapInpMeth;                    // True if heating coil is sized by CoilPerfInpMeth == NomCap
+    extern int DataFanEnumType;                       // Fan type used during sizing
+    extern int DataFanIndex;                          // Fan index used during sizing
+    extern zoneFanPlacement DataFanPlacement;         // identifies location of fan wrt coil
+
     // Types
 
     struct ZoneSizingInputData
@@ -1197,6 +1215,7 @@ namespace DataSizing {
     // Clears the global data in DataSizing.
     // Needed for unit tests, should not be normally called.
     void clear_state();
+    void resetHVACSizingGlobals(int const curZoneEqNum, int const curSysNum, bool &firstPassFlag);
 
 } // namespace DataSizing
 
