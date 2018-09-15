@@ -392,7 +392,10 @@ class EPlusRunManager(object):
 class EnergyPlusWorkflowSI(BaseEPLaunchWorkflow1):
 
     def name(self):
-        return "EnergyPlus 8.9 SI"
+        return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH} SI"
+
+    def context(self):
+        return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"
 
     def description(self):
         return "Run EnergyPlus with SI unit system"
@@ -423,7 +426,10 @@ class EnergyPlusWorkflowSI(BaseEPLaunchWorkflow1):
 class EnergyPlusWorkflowIP(BaseEPLaunchWorkflow1):
 
     def name(self):
-        return "EnergyPlus 8.9 IP"
+        return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH} IP"
+
+    def context(self):
+        return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"
 
     def description(self):
         return "Run EnergyPlus with IP unit system"
