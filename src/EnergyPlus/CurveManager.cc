@@ -3474,7 +3474,13 @@ namespace CurveManager {
 
     void TableFile::load(std::string path) {
         filePath = path;
-        std::ifstream file(filePath);
+        bool fileFound;
+        std::string fullPath;
+        DataSystemVariables::CheckForActualFileName(path, fileFound, fullPath);
+        if (!fileFound) {
+            ShowFatalError("File \"" + filePath + "\" : File not found.");
+        }
+        std::ifstream file(fullPath);
         std::string line("");
         numRows = 0;
         numColumns = 0;
@@ -3515,10 +3521,10 @@ namespace CurveManager {
             std::size_t row = colAndRow.second;  // 0 indexed
             auto &content = contents[col];
             if (col >= numColumns) {
-                ShowSevereError("File \"" + filePath + "\" : Requested column (" + General::RoundSigDigits(col+1) + ") exceeds the number of columns (" + General::RoundSigDigits(numColumns) + ").");
+                ShowFatalError("File \"" + filePath + "\" : Requested column (" + General::RoundSigDigits(col+1) + ") exceeds the number of columns (" + General::RoundSigDigits(numColumns) + ").");
             }
             if (row >= numRows) {
-                ShowSevereError("File \"" + filePath + "\" : Requested starting row (" + General::RoundSigDigits(row+1) + ") exceeds the number of rows (" + General::RoundSigDigits(numRows) + ").");
+                ShowFatalError("File \"" + filePath + "\" : Requested starting row (" + General::RoundSigDigits(row+1) + ") exceeds the number of rows (" + General::RoundSigDigits(numRows) + ").");
             }
             std::vector<double> array(numRows - row);
             std::transform(content.begin() + row, content.end(), array.begin(), [](const std::string &str) {
