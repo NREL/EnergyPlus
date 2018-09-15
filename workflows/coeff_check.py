@@ -9,7 +9,10 @@ from eplaunch.workflows.base import BaseEPLaunchWorkflow1, EPLaunchWorkflowRespo
 class CoeffCheckWorkflow(BaseEPLaunchWorkflow1):
 
     def name(self):
-        return "CoeffCheck"
+        return "CoeffCheck-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}"
+
+    def context(self):
+        return "EnergyPlus-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"
 
     def description(self):
         return "Run Coeff Check"

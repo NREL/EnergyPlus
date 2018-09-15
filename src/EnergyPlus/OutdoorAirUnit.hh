@@ -138,13 +138,14 @@ namespace OutdoorAirUnit {
         Real64 MaxWaterMassFlow;
         Real64 MinVolWaterFlow;
         Real64 MinWaterMassFlow;
+        bool FirstPass;
         // End Of Equipment list data
 
         // Default Constructor
         OAEquipList()
             : ComponentType_Num(0), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0), CoilWaterOutletNode(0),
               CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0), MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0),
-              MinVolWaterFlow(0.0), MinWaterMassFlow(0.0)
+              MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
         }
     };
@@ -220,6 +221,7 @@ namespace OutdoorAirUnit {
         Real64 LatHeatingRate;    // rate of latent heating delivered to the zone [W]
         Real64 TotHeatingEnergy;  // total heating energy delivered by the ERV supply air to the zone [J]
         Real64 TotHeatingRate;    // rate of total heating delivered to the zone [W]
+        bool FirstPass;           // detects first time through for resetting sizing data
 
         // Default Constructor
         OAUnitData()
@@ -230,7 +232,8 @@ namespace OutdoorAirUnit {
               EFanMaxAirVolFlow(0.0), HiCtrlTempSchedPtr(0), LoCtrlTempSchedPtr(0), OperatingMode(0), ControlCompTypeNum(0), CompErrIndex(0),
               AirMassFlow(0.0), FlowError(false), NumComponents(0), CompOutSetTemp(0.0), AvailStatus(0), TotCoolingRate(0.0), TotCoolingEnergy(0.0),
               SensCoolingRate(0.0), SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), ElecFanRate(0.0), ElecFanEnergy(0.0),
-              SensHeatingEnergy(0.0), SensHeatingRate(0.0), LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0)
+              SensHeatingEnergy(0.0), SensHeatingRate(0.0), LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0),
+              FirstPass(true)
         {
         }
     };
