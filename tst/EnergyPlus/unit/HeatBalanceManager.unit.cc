@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <DataDaylighting.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -1488,6 +1489,34 @@ TEST_F(EnergyPlusFixture, EMSConstructionTest)
         "  1,                       !- Multiplier",
         "  autocalculate,           !- Ceiling Height {m}",
         "  autocalculate;           !- Volume {m3}",
+        "  Daylighting:Controls,",
+        "    Daylighting Control,!- Name",
+        "    Zone,          !- Zone Name",
+        "    SplitFlux,               !- Daylighting Method",
+        "    ,                        !- Availability Schedule Name",
+        "    Continuous,              !- Lighting Control Type",
+        "    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control",
+        "    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control",
+        "    1,                       !- Number of Stepped Control Steps",
+        "    1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control",
+        "    ,                        !- Glare Calculation Daylighting Reference Point Name",
+        "    ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
+        "    22,                      !- Maximum Allowable Discomfort Glare Index",
+        "    ,                        !- DElight Gridding Resolution {m2}",
+        "    Reference Point 1,  !- Daylighting Reference Point 1 Name",
+        "    1,                       !- Fraction of Zone Controlled by Reference Point 1",
+        "    500;                     !- Illuminance Setpoint at Reference Point 1 {lux}",
+        "",
+        "  Daylighting:ReferencePoint,",
+        "    Reference Point 1,  !- Name",
+        "    Zone,          !- Zone Name",
+        "    12,                      !- X-Coordinate of Reference Point {m}",
+        "    2.5,                     !- Y-Coordinate of Reference Point {m}",
+        "    0.8;                     !- Z-Coordinate of Reference Point {m}",
+        "  ShadowCalculation,",
+        "    TimestepFrequency,       !- Calculation Method",
+        "    30,                      !- Calculation Frequency",
+        "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
         "EnergyManagementSystem:ConstructionIndexVariable, Win_1, WINDOWCONSTRUCTION1;",
         "EnergyManagementSystem:ConstructionIndexVariable, Win_2, WINDOWCONSTRUCTION2;",
         "  EnergyManagementSystem:Actuator,",
@@ -1520,8 +1549,8 @@ TEST_F(EnergyPlusFixture, EMSConstructionTest)
 
     // Test 1 - Set time of day to morning - should use high transmittance window
     DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 10;
-    DataGlobals::CurrentTime = 10.0;
+    DataGlobals::HourOfDay = 11;
+    DataGlobals::CurrentTime = 11.0;
     WeatherManager::SetCurrentWeather();
     HeatBalanceManager::ManageHeatBalance();
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
@@ -1532,6 +1561,8 @@ TEST_F(EnergyPlusFixture, EMSConstructionTest)
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win1ConstNum);
     Real64 transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
+    Real64 refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
+    EXPECT_GT(refPtIllum, 3000.0);
 
     // Test 2 - Set time of day to afternoon - should use low transmittance window
     DataGlobals::TimeStep = 1;
@@ -1545,6 +1576,8 @@ TEST_F(EnergyPlusFixture, EMSConstructionTest)
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
+    refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
+    EXPECT_LT(refPtIllum, 1000.0);
 }
 
 } // namespace EnergyPlus
