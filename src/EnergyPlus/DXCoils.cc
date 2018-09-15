@@ -13523,17 +13523,18 @@ namespace DXCoils {
         Real64 SpecHumIn;
         Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
 
-        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing &&
-            DXCoil(DXCoilNum).reportCoilFinalSizes) {
-            Real64 ratedSensCap(0.0);
-            ratedSensCap = DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1);
-            coilSelectionReportObj->setCoilFinalSizes(DXCoil(DXCoilNum).Name,
-                                                      DXCoil(DXCoilNum).DXCoilType,
-                                                      DXCoil(DXCoilNum).RatedTotCap(1),
-                                                      ratedSensCap,
-                                                      DXCoil(DXCoilNum).RatedAirVolFlowRate(1),
-                                                      -999.0);
-            DXCoil(DXCoilNum).reportCoilFinalSizes = false;
+        if (DXCoil(DXCoilNum).reportCoilFinalSizes) {
+            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+                Real64 ratedSensCap(0.0);
+                ratedSensCap = DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1);
+                coilSelectionReportObj->setCoilFinalSizes(DXCoil(DXCoilNum).Name,
+                                                          DXCoil(DXCoilNum).DXCoilType,
+                                                          DXCoil(DXCoilNum).RatedTotCap(1),
+                                                          ratedSensCap,
+                                                          DXCoil(DXCoilNum).RatedAirVolFlowRate(1),
+                                                          -999.0);
+                DXCoil(DXCoilNum).reportCoilFinalSizes = false;
+            }
         }
 
         ReportingConstant = TimeStepSys * SecInHour;

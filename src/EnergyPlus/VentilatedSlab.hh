@@ -298,6 +298,7 @@ namespace VentilatedSlab {
         std::string AvailManagerListName; // Name of an availability manager list object
         int AvailStatus;
         int HVACSizingIndex; // index of a HVACSizing object for a ventilator slab
+        bool FirstPass;      // detects first time through for resetting sizing data
         // Default Constructor
         VentilatedSlabData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0), ControlType(0),
@@ -317,7 +318,7 @@ namespace VentilatedSlab {
               RadCoolingPower(0.0), RadCoolingEnergy(0.0), HeatCoilPower(0.0), HeatCoilEnergy(0.0), TotCoolCoilPower(0.0), TotCoolCoilEnergy(0.0),
               SensCoolCoilPower(0.0), SensCoolCoilEnergy(0.0), LateCoolCoilPower(0.0), LateCoolCoilEnergy(0.0), ElecFanPower(0.0), ElecFanEnergy(0.0),
               AirMassFlowRate(0.0), AirVolFlow(0.0), SlabInTemp(0.0), SlabOutTemp(0.0), ReturnAirTemp(0.0), FanOutletTemp(0.0), ZoneInletTemp(0.0),
-              AvailStatus(0), HVACSizingIndex(0)
+              AvailStatus(0), HVACSizingIndex(0), FirstPass(true)
         {
         }
     };
