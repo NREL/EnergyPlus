@@ -5816,7 +5816,7 @@ For a given coil geometry, the bypass factor is only a function of air mass flow
 For each simulation time step when the DX cooling coil operates, the total cooling capacity and coil bypass factor at the actual operating conditions are calculated. The coil bypass factor is used to calculate the operating sensible heat ratio (SHR) of the cooling coil using the following equations. Here is where the differnce in models occur for the VRF DX cooling coil and single-speed DX cooling coil. The original coil model (ref: Coil:Cooling:DX:SingleSpeed) calculates the full load outlet air enthalpy and, considering the bypass factor, finds the coil surface temperture (h\(_{ADP}\)) at full load (i.e., PLR = 1). Conversely, the VRF coil model modulates refrigerant flow to the VRF DX cooling coil which is why this model uses the full load coil capacity multipled by the part-load ratio (the modulated refrigerant flow). The effectively finds the coil surface temperature for a variable refrigerant flow DX cooling coil and the operating sensible heat ratio (SHR) can be calculated.
 
 \begin{equation}
-{h_{ADP}} = {h_{in}} - \frac{{\left( {{\dot{Q}_{total}}/ \dot{m}} \right)}}{{1 - BF}} ~~for a single-speed DX coil model (h\(_{ADP1}\) in figure below)
+{h_{ADP}} = {h_{in}} - \frac{{\left( {{\dot{Q}_{total}}/ \dot{m}} \right)}}{{1 - BF}} ~~for a single-speed DX coil model (h_{ADP1} in figure below)
 \end{equation}
 
 \begin{equation}
