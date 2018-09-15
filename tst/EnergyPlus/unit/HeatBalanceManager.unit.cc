@@ -1341,7 +1341,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi");
 }
 
-TEST_F(EnergyPlusFixture, EMSConstructionTest)
+TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
 {
 
     DataIPShortCuts::lAlphaFieldBlanks = true;
