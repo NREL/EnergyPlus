@@ -270,6 +270,7 @@ namespace SingleDuct {
         int AirLoopNum;                 // System sizing adjustments
         Real64 DesignPrimaryAirVolRate; // System sizing adjustments, filled from design OA spec using sizing mode flags.
         int OAPerPersonMode;            // mode for how per person rates are determined, DCV or design.
+        bool printWarning;              // flag to print warnings only once
         // Default Constructor
         AirTerminalMixerData()
             : MixerType(0), ZoneHVACUnitType(0), SecInNode(0), PriInNode(0), MixedAirOutNode(0), ZoneInletNode(0), ZoneAirTemp(0.0),
@@ -277,7 +278,7 @@ namespace SingleDuct {
               DOASEnthalpy(0.0), DOASPressure(0.0), DOASMassFlowRate(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0), MixedAirEnthalpy(0.0),
               MixedAirPressure(0.0), MixedAirMassFlowRate(0.0), MassFlowRateMaxAvail(0.0), ADUNum(0), TermUnitSizingIndex(0), OneTimeInitFlag(true),
               OneTimeInitFlag2(true), ZoneEqNum(0), CtrlZoneInNodeIndex(0), ZoneNum(0), NoOAFlowInputFromUser(true), OARequirementsPtr(0),
-              AirLoopNum(0), DesignPrimaryAirVolRate(0.0), OAPerPersonMode(0)
+              AirLoopNum(0), DesignPrimaryAirVolRate(0.0), OAPerPersonMode(0), printWarning(true)
         {
         }
 
@@ -420,6 +421,11 @@ namespace SingleDuct {
 
     void SetATMixerPriFlow(int const ATMixerNum,                         // Air terminal mixer index
                            Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
+    );
+
+    void setATMixerSizingProperties(int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
+                                    int const &controlledZoneNum, // controlled zone number
+                                    int const &curZoneEqNum       // current zone equipment being simulated
     );
 
     //        End of Reporting subroutines for the Sys Module

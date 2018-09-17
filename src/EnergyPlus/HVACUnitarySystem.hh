@@ -874,9 +874,9 @@ namespace HVACUnitarySystem {
 
     void CheckUnitarySysCoilInOASysExists(std::string const &UnitarySysName);
 
-    void GetUnitarySystemOAHeatCoolCoil(std::string const &UnitarySystemName, // Name of Unitary System object
-                                        Optional_bool OACoolingCoil = _,      // Cooling coil in OA stream
-                                        Optional_bool OAHeatingCoil = _       // Heating coil in OA stream
+    void GetUnitarySystemHeatCoolCoil(std::string const &UnitarySystemName, // Name of Unitary System object
+                                      bool &CoolingCoil,                    // Cooling coil in OA stream
+                                      bool &HeatingCoil                     // Heating coil in OA stream
     );
 
     int GetUnitarySystemDXCoolingCoilIndex(std::string const &UnitarySystemName); // Name of Unitary System object

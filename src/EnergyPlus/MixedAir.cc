@@ -598,7 +598,7 @@ namespace MixedAir {
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
-        using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
+        using HVACUnitarySystem::GetUnitarySystemHeatCoolCoil;
         using HVACUnitarySystem::SimUnitarySystem;
         using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
@@ -752,11 +752,10 @@ namespace MixedAir {
                     OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(
                         CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, CompIndex, OAUCoilOutTemp, ZoneEquipFlag);
                 }
-                if (AirLoopInputsFilled)
-                    OutsideAirSys(OASysNum).compPointer[CompIndex]->getUnitarySystemOAHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil, 0);
+                if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil, 0);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
                     if (AirLoopInputsFilled) {
-                        OutsideAirSys(OASysNum).compPointer[CompIndex]->checkUnitarySysCoilInOASysExists(CompName, 0);
+                        UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(CompName, 0);
                         MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
                     }
                 }
@@ -764,7 +763,7 @@ namespace MixedAir {
                 if (Sim) {
                     SimUnitarySystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
                 }
-                if (AirLoopInputsFilled) GetUnitarySystemOAHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil);
+                if (AirLoopInputsFilled) GetUnitarySystemHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
                     if (AirLoopInputsFilled) {
                         CheckUnitarySysCoilInOASysExists(CompName);

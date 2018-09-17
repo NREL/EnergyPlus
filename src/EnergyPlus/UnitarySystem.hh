@@ -731,12 +731,12 @@ namespace UnitarySystems {
                                      int const CompOn               // Determines if compressor is on or off
         );
 
-        void checkUnitarySysCoilInOASysExists(std::string const &UnitarySysName, int const ZoneOAUnitNum);
+        static void checkUnitarySysCoilInOASysExists(std::string const &UnitarySysName, int const ZoneOAUnitNum);
 
-        void getUnitarySystemOAHeatCoolCoil(std::string const &UnitarySysName, // Name of Unitary System object
-                                            bool OACoolingCoil,                // Cooling coil in OA stream
-                                            bool OAHeatingCoil,                // Heating coil in OA stream
-                                            int const ZoneOAUnitNum            // index to ZoneHVAC:OutdoorAirUnit
+        static void getUnitarySysHeatCoolCoil(std::string const &UnitarySysName, // Name of Unitary System object
+                                              bool &CoolingCoil,                 // Cooling coil exists
+                                              bool &HeatingCoil,                 // Heating coil exists
+                                              int const ZoneOAUnitNum            // index to zone OA unit
         );
 
         static Real64 calcUnitarySystemWaterFlowResidual(Real64 const PartLoadRatio,    // water mass flow rate [kg/s]
