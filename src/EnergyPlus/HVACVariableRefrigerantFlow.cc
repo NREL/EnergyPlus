@@ -6063,6 +6063,20 @@ namespace HVACVariableRefrigerantFlow {
 
         if (CurZoneEqNum > 0) {
             if (VRFTU(VRFTUNum).HVACSizingIndex > 0) {
+                // initialize OA flow for sizing other inputs (e.g., capacity)
+                if (VRFTU(VRFTUNum).CoolOutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = VRFTU(VRFTUNum).CoolOutAirVolFlow;
+                }
+                if (VRFTU(VRFTUNum).HeatOutAirVolFlow != AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, VRFTU(VRFTUNum).HeatOutAirVolFlow);
+                }
+                if (VRFTU(VRFTUNum).ATMixerExists) {            // set up ATMixer conditions for scalable capacity sizing
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                    SingleDuct::setATMixerSizingProperties(VRFTU(VRFTUNum).ATMixerIndex, VRFTU(VRFTUNum).ZoneNum, CurZoneEqNum);
+                }
+
                 zoneHVACIndex = VRFTU(VRFTUNum).HVACSizingIndex;
 
                 SizingMethod = CoolingAirflowSizing;
@@ -6409,6 +6423,12 @@ namespace HVACVariableRefrigerantFlow {
                     }
                 }
             }
+        }
+        ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(VRFTU(VRFTUNum).CoolOutAirVolFlow, VRFTU(VRFTUNum).HeatOutAirVolFlow);
+
+        if (VRFTU(VRFTUNum).ATMixerExists) {            // set up ATMixer conditions for use in component sizing
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+            SingleDuct::setATMixerSizingProperties(VRFTU(VRFTUNum).ATMixerIndex, VRFTU(VRFTUNum).ZoneNum, CurZoneEqNum);
         }
 
         IsAutoSize = false;
