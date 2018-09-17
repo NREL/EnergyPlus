@@ -597,7 +597,7 @@ namespace MixedAir {
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
-        using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
+        using HVACUnitarySystem::GetUnitarySystemHeatCoolCoil;
         using HVACUnitarySystem::SimUnitarySystem;
         using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
@@ -746,7 +746,7 @@ namespace MixedAir {
                 if (Sim) {
                     SimUnitarySystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
                 }
-                if (AirLoopInputsFilled) GetUnitarySystemOAHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil);
+                if (AirLoopInputsFilled) GetUnitarySystemHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
                     if (AirLoopInputsFilled) {
                         CheckUnitarySysCoilInOASysExists(CompName);

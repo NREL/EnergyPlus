@@ -230,9 +230,8 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     Environment(NumOfEnvrn).KindOfEnvrn = ksReadAllWeatherData;
     RPReadAllWeatherData = true;
     WeathSimReq = true;
-    RunPeriodInput(TotRunPers).startJulianDate = 1; // JulianDay( 1, 1, 0 );
-    RunPeriodInput(TotRunPers).endJulianDate = 365; // JulianDay( 12, 31, 0 );
-    RunPeriodInput(TotRunPers).monWeekDay = 0;
+    // RunPeriod is initialized to be one year of simulation
+    //RunPeriodInput(TotRunPers).monWeekDay = 0; // Why do this?
 
     SetupEnvironmentTypes();
 
@@ -258,10 +257,8 @@ void FiniteDiffGroundTempsModel::getWeatherData()
         NumOfWarmupDays = 0;
 
         annualAveAirTemp_num = 0.0;
-        // Protect against array bounds error
-        int maxSimDays = min(NumDaysInYear, NumOfDayInEnvrn);
 
-        while ((DayOfSim < maxSimDays) || (WarmupFlag)) { // Begin day loop ...
+        while ((DayOfSim < NumDaysInYear) || (WarmupFlag)) { // Begin day loop ...
 
             ++DayOfSim;
 

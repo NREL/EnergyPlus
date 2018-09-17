@@ -9983,11 +9983,11 @@ namespace WeatherManager {
                     // Environment crosses year boundaries
                     env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
                     env.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, runPer.isLeapYear ? 1 : 0);
-                    env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, isLeapYear(runPer.endYear) ? 1 : 0);
+                    env.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, isLeapYear(runPer.endYear) && WFAllowsLeapYears ? 1 : 0);
                     env.TotalDays = 366 - env.StartJDay + env.EndJDay + 365 * std::max(env.NumSimYears - 2, 0);
                     if (WFAllowsLeapYears) {
                         // First year
-                        if (env.StartJDay < 28) {
+                        if (env.StartJDay < 59) {
                             if (isLeapYear(env.StartYear)) {
                                 ++env.TotalDays;
                             }
@@ -9998,12 +9998,7 @@ namespace WeatherManager {
                                 ++env.TotalDays;
                             }
                         }
-                        // Last year
-                        if (env.EndJDay > 28) {
-                            if (isLeapYear(env.EndYear)) {
-                                ++env.TotalDays;
-                            }
-                        }
+                        // Last year not needed, the end ordinal date will take this into account
                     }
                     env.RawSimDays = env.TotalDays;
                 }
