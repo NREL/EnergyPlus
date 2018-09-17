@@ -2208,6 +2208,7 @@ namespace HVACUnitarySystem {
             select_EqSizing = &UnitarySysEqSizing(CurSysNum);
         } else if (CurZoneEqNum > 0) {
             select_EqSizing = &ZoneEqSizing(CurZoneEqNum);
+            ZoneEqUnitarySys = true;
         } else {
             assert(false);
         }
@@ -2226,6 +2227,7 @@ namespace HVACUnitarySystem {
         EqSizing.HeatingCapacity = false;
         EqSizing.DesCoolingLoad = 0.0;
         EqSizing.DesHeatingLoad = 0.0;
+        EqSizing.OAVolFlow = 0.0; // UnitarySys doesn't have OA
 
         bool anyEMSRan;
         ManageEMS(emsCallFromUnitarySystemSizing, anyEMSRan); // calling point
@@ -2255,10 +2257,36 @@ namespace HVACUnitarySystem {
             if (UnitarySystem(UnitarySysNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 PrimaryAirSystem(CurSysNum).supFanVecIndex = UnitarySystem(UnitarySysNum).FanIndex;
                 PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                DataSizing::DataFanIndex = UnitarySystem(UnitarySysNum).FanIndex;
             } else {
                 PrimaryAirSystem(CurSysNum).SupFanNum = UnitarySystem(UnitarySysNum).FanIndex;
                 PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                DataSizing::DataFanIndex = UnitarySystem(UnitarySysNum).FanIndex;
             }
+            if (UnitarySystem(UnitarySysNum).FanPlace == BlowThru) {
+                PrimaryAirSystem(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            } else if (UnitarySystem(UnitarySysNum).FanPlace == DrawThru) {
+                PrimaryAirSystem(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            }
+        } else if (CurZoneEqNum > 0 && UnitarySystem(UnitarySysNum).FanExists) {
+            if (UnitarySystem(UnitarySysNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            } else {
+                DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            }
+            DataSizing::DataFanIndex = UnitarySystem(UnitarySysNum).FanIndex;
+            if (UnitarySystem(UnitarySysNum).FanPlace == BlowThru) {
+                DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+            } else if (UnitarySystem(UnitarySysNum).FanPlace == DrawThru) {
+                DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+            }
+        }
+
+        if (UnitarySystem(UnitarySysNum).ATMixerExists && CurZoneEqNum > 0) { // set up ATMixer conditions for scalable capacity sizing
+            SingleDuct::setATMixerSizingProperties(
+                UnitarySystem(UnitarySysNum).ATMixerIndex, UnitarySystem(UnitarySysNum).ControlZoneNum, CurZoneEqNum);
         }
 
         // STEP 1: find the autosized cooling air flow rate and capacity
@@ -2611,6 +2639,11 @@ namespace HVACUnitarySystem {
                 UnitarySystem(UnitarySysNum).MaxNoCoolHeatAirVolFlow / UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow;
         }
 
+        if (UnitarySystem(UnitarySysNum).ATMixerExists && CurZoneEqNum > 0) { // set up ATMixer conditions for use in component sizing
+            SingleDuct::setATMixerSizingProperties(
+                UnitarySystem(UnitarySysNum).ATMixerIndex, UnitarySystem(UnitarySysNum).ControlZoneNum, CurZoneEqNum);
+        }
+
         // Change the Volume Flow Rates to Mass Flow Rates
         UnitarySystem(UnitarySysNum).DesignMassFlowRate = UnitarySystem(UnitarySysNum).DesignFanVolFlowRate * StdRhoAir;
         UnitarySystem(UnitarySysNum).MaxCoolAirMassFlow = UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * StdRhoAir;
@@ -2676,6 +2709,7 @@ namespace HVACUnitarySystem {
             DXCoolCap = GetCoilCapacityVariableSpeed(
                 cAllCoilTypes(UnitarySystem(UnitarySysNum).CoolingCoilType_Num), UnitarySystem(UnitarySysNum).CoolingCoilName, ErrFound);
             EqSizing.DesCoolingLoad = DXCoolCap;
+            EqSizing.DesHeatingLoad = DXCoolCap;
 
             for (Iter = NumSpeeds; Iter >= 1; --Iter) {
                 UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
@@ -10722,14 +10756,14 @@ namespace HVACUnitarySystem {
         // Using/Aliasing
         using DataAirflowNetwork::AirflowNetworkControlMultizone;
         using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::KickOffSimulation;
+        using DataGlobals::WarmupFlag;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiMode;
         using DXCoils::SimDXCoilMultiSpeed;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -12054,13 +12088,13 @@ namespace HVACUnitarySystem {
         // Using/Aliasing
         using DataAirflowNetwork::AirflowNetworkControlMultizone;
         using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::KickOffSimulation;
+        using DataGlobals::WarmupFlag;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiSpeed;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -13924,8 +13958,8 @@ namespace HVACUnitarySystem {
         using DataAirflowNetwork::AirflowNetworkControlMultiADS;
         using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
         using DataAirflowNetwork::SimulateAirflowNetwork;
-        using DataAirLoop::AirLoopFlow;
         using DataAirLoop::AirLoopAFNInfo;
+        using DataAirLoop::AirLoopFlow;
         using Psychrometrics::PsyHFnTdbW;
 
         // Locals
@@ -14151,28 +14185,21 @@ namespace HVACUnitarySystem {
                     OASysEqSizing(CurOASysNum).Capacity = false;
                     OASysEqSizing(CurOASysNum).CoolingCapacity = false;
                     OASysEqSizing(CurOASysNum).HeatingCapacity = false;
+                    UnitarySystem(UnitarySysNum).FirstPass = false;
                 } else if (CurSysNum > 0) {
-                    UnitarySysEqSizing(CurSysNum).AirFlow = false;
-                    UnitarySysEqSizing(CurSysNum).CoolingAirFlow = false;
-                    UnitarySysEqSizing(CurSysNum).HeatingAirFlow = false;
-                    UnitarySysEqSizing(CurSysNum).Capacity = false;
-                    UnitarySysEqSizing(CurSysNum).CoolingCapacity = false;
-                    UnitarySysEqSizing(CurSysNum).HeatingCapacity = false;
                     AirLoopControlInfo(CurSysNum).UnitarySysSimulating = false;
+                    DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, UnitarySystem(UnitarySysNum).FirstPass);
                 } else if (CurZoneEqNum > 0) {
-                    ZoneEqSizing(CurZoneEqNum).AirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).Capacity = false;
-                    ZoneEqSizing(CurZoneEqNum).CoolingCapacity = false;
-                    ZoneEqSizing(CurZoneEqNum).HeatingCapacity = false;
+                    DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, UnitarySystem(UnitarySysNum).FirstPass);
+                } else {
+                    UnitarySystem(UnitarySysNum).FirstPass = false;
                 }
-                UnitarySystem(UnitarySysNum).FirstPass = false;
             }
         }
 
         DataHVACGlobals::OnOffFanPartLoadFraction =
             1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
+        DataSizing::ZoneEqUnitarySys = false;
     }
 
     void UnitarySystemHeatRecovery(int const UnitarySysNum) // Number of the current electric UnitarySystem being simulated
@@ -16114,38 +16141,33 @@ namespace HVACUnitarySystem {
         }
     }
 
-    void GetUnitarySystemOAHeatCoolCoil(std::string const &UnitarySystemName, // Name of Unitary System object
-                                        Optional_bool OACoolingCoil,          // Cooling coil in OA stream
-                                        Optional_bool OAHeatingCoil           // Heating coil in OA stream
+    void GetUnitarySystemHeatCoolCoil(std::string const &UnitarySystemName, // Name of Unitary System object
+                                      bool &CoolingCoil,                    // Cooling coil in system
+                                      bool &HeatingCoil                     // Heating coil in system
     )
     {
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   April 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Determined weather Unitary system in OA stream has heating or cooling coils
-
-        // Locals
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int UnitarySysNum;
+        // Determined weather Unitary system has heating or cooling coils
 
         if (GetInputFlag) { // First time subroutine has been entered
             GetUnitarySystemInput();
             GetInputFlag = false;
         }
 
-        for (UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum) {
+        for (int UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum) {
             if (UtilityRoutines::SameString(UnitarySystemName, UnitarySystem(UnitarySysNum).Name)) {
                 if (UnitarySystem(UnitarySysNum).CoolCoilExists) {
-                    OACoolingCoil = true;
+                    CoolingCoil = true;
                 }
                 if (UnitarySystem(UnitarySysNum).HeatCoilExists || UnitarySystem(UnitarySysNum).SuppCoilExists) {
-                    OAHeatingCoil = true;
+                    HeatingCoil = true;
                 }
+                break;
             }
         }
     }

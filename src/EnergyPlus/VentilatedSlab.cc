@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <BranchNodeConnections.hh>
+#include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -1830,6 +1831,14 @@ namespace VentilatedSlab {
         CompType = cMO_VentilatedSlab;
         CompName = VentSlab(Item).Name;
         DataZoneNumber = VentSlab(Item).ZonePtr;
+        if (VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = VentSlab(Item).Fan_Index;
+        // ventilated slab unit is always blow thru
+        DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
         if (VentSlab(Item).HVACSizingIndex > 0) {
             zoneHVACIndex = VentSlab(Item).HVACSizingIndex;
@@ -4692,6 +4701,12 @@ namespace VentilatedSlab {
 
         VentSlab(Item).ReturnAirTemp = Node(VentSlab(Item).ReturnAirNode).Temp;
         VentSlab(Item).FanOutletTemp = Node(VentSlab(Item).FanOutletNode).Temp;
+
+        if (VentSlab(Item).FirstPass) { // reset sizing flags so other zone equipment can size normally
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, VentSlab(Item).FirstPass);
+            }
+        }
     }
 
     //*****************************************************************************************

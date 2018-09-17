@@ -34,6 +34,44 @@ Otherwise \(\dot{V}_{fan,max} = \max\left(\text{DesHeatVolFlow}_{zone},\text{Des
 
 If the max fan flow rate is less than \emph{SmallAirVolFlow} the max flow rate is set to zero.
 
+\subsection{Design Fan Heat}\label{design-fan-heat}
+
+The design fan heat added to the air stream is calculated using fan model inputs of maximum volume flow rate, pressure rise, fan total efficiency and motor efficiency. For multi-speed fans, the highest air volume flow rate is used in the calculation. Fan heat is accounted for when sizing cooling coils.
+
+Where:
+
+\begin{equation}
+P_{fan,des} = ( \dot{V}_{fan,des} * \Delta P ) / e_{tot,des}
+\end{equation}
+\begin{equation}
+\dot{Q}_{fan,heat,des} = e_{motor,des} * P_{fan,des} + (P_{fan,des} - (e_{motor,des} * P_{fan,des})) * f_{motor\ in\ air}
+\end{equation}
+
+and:
+
+\begin{itemize}
+\item
+  \(P_{fan,des}\) : fan design total power (W)
+\item
+  \(\dot{V}_{fan,des}\) : fan design volume flow rate (m3/s)
+\item
+  \(\Delta P\) : fan pressure rise (Pa)
+\item
+  \(e_{tot,des}\) : fan total efficiency
+\item
+  \(\dot{Q}_{fan,heat,des}\) : design fan heat to air stream (W)
+\item
+  \(e_{motor,des}\) : fan motor efficiency
+\item
+  \(f_{motor\ in\ air}\) : motor in air stream fraction
+\end{itemize} 
+
+The design fan temperature rise (\emph{C}) due to fan heat is added to the cooling coil inlet air temperature or subtracted from the cooling coil outlet air temperature during sizing calculations as appropriate for blow-through or draw-through fan configurations, respectively. The calculation uses a straight-forward inversion of the classic \(Q = \dot{m}*Cp*\Delta{T}\) equation as:
+
+\begin{equation}
+T_{fan,heat,des} = \dot{Q}_{fan,heat,des} / ( {C}_{p,air} * \rho_{air} * \dot{V}_{fan,des} )
+\end{equation}
+
 \subsection{Coil:Cooling:Water}\label{coilcoolingwater}
 
 The sizing is done in function \emph{SizeWaterCoil} of module \emph{WaterCoils}.
@@ -107,7 +145,7 @@ Design coil load (cooling capacity) is not an input for Coil:Cooling:Water. It i
 The design load is calculated as:
 
 \begin{equation}
-\dot{Q}_{coil,des} = \dot{m}_{a,coil,des}\left(h_{a,coil,des,in}-h_{a,coil,des,out}\right)
+\dot{Q}_{coil,des} = \dot{m}_{a,coil,des}\left(h_{a,coil,des,in}-h_{a,coil,des,out}\right) + \dot{Q}_{fan,heat,des}
 \end{equation}
 
 Where:
@@ -116,9 +154,11 @@ Where:
 \item
   \(h_{a,coil,des,in}\) : is the coil design inlet air enthalpy (J/kg)
 \item
-  \(h_{a,coil,des,out}\) : is the coil design outlet air enthalpy (J/kg), and
+  \(h_{a,coil,des,out}\) : is the coil design outlet air enthalpy (J/kg)
 \item
   \(\dot{m}_{a,coil,des}\) : is the coil design air mass flow rate (kg/s)
+\item
+  \(\dot{Q}_{fan,heat,des}\) : is the design fan heat (W) - see Section \ref{design-fan-heat}
 \end{itemize}
 
 The design air mass flow rate depends on the location of the coil. If the coil is in the outside air stream, the flow rate is set to:
@@ -154,11 +194,11 @@ To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperat
 
 \begin{itemize}
 \item
-  \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the design cooling peak)
+  \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the design cooling peak. Plus the design fan temperature rise due to fan heat, + \(T_{fan,heat,des}\), for blow through configuration - see Section \ref{design-fan-heat})
 \item
   \(W_{air,in,des} = W_{mix,cool,at-peak}\) (the mixed humidity ratio at the design cooling peak)
 \item
-  \(T_{air,out,des} = T_{cc,exit}\) (calculated above in the Initial Calculation section)
+  \(T_{air,out,des} = T_{cc,exit}\) (calculated above in the Initial Calculation section. Minus the design fan temperature rise due to fan heat, - \(T_{fan,heat,des}\), for draw through configuration - see Section \ref{design-fan-heat})
 \item
   \(W_{air,out,des} = W_{sup,cool}\) (the specified Central Cooling Design Supply Air Humidity Ratio from the Sizing:System object)
 \end{itemize}
@@ -171,11 +211,11 @@ The oustide air fraction is calculated as (where V\(_{cc,air}\) is calculated as
 \item
   \(f_{oa} = \frac{\dot V_{air,out,des}}{\dot{V}_{cc,air}}\)
 \item
-  \(T_{air,in,des} = f_{oa}T_{precool} + \left(1-f_{oa}\right)T_{ret,cool,at-peak}\) (Precool temperature is the specified Precool Design Temperature from System:Sizing Manager; T\_ret\_cool\_at-peak is the return temperature at the system cooling peak load)
+  \(T_{air,in,des} = f_{oa}T_{precool} + \left(1-f_{oa}\right)T_{ret,cool,at-peak}\) (Precool temperature is the specified Precool Design Temperature from System:Sizing Manager; T\_ret\_cool\_at-peak is the return temperature at the system cooling peak load. Plus the design fan temperature rise due to fan heat, + \(T_{fan,heat,des}\), for blow through configuration - see Section \ref{design-fan-heat})
 \item
   \(W_{air,in,des} = f_{oa}W_{precool} + \left(1-f_{oa}\right)W_{ret,cool,at-peak}\) (Precool humidity ratio is the specified Precool Design Humidity Ratio from System:Sizing Manager; W\_ret\_cool\_at-peak is the return humidity ratio at the system cooling peak load)
 \item
-  \(T_{air,out,des} = T_{cc,exit}\) (calculated above in the Initial Calculation section)
+  \(T_{air,out,des} = T_{cc,exit}\) (calculated above in the Initial Calculation section. Minus the design fan temperature rise due to fan heat, - \(T_{fan,heat,des}\), for draw through configuration - see Section \ref{design-fan-heat}))
 \item
   \(W_{air,out,des} = W_{sup,cool}\) (the specified Central Cooling Design Supply Air Humidity Ratio from the Sizing:System object)
 \end{itemize}
@@ -196,7 +236,7 @@ Where PsyHFnTdbW is the EnergyPlus function for calculation air specific enthalp
 If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit or an ZoneHVAC:FourPipeFanCoil, the cooling load (cooling capacity) is passed down from the terminal unit or fan coil sizing calculations. Otherwise the load is defined as:
 
 \begin{equation}
-\dot{Q}_{coil,des} = \dot{m}_{a,coil,des}\left(h_{a,coil,des,in}-h_{a,coil,des,out}\right)
+\dot{Q}_{coil,des} = \dot{m}_{a,coil,des}\left(h_{a,coil,des,in}-h_{a,coil,des,out}\right) + \dot{Q}_{fan,heat,des}
 \end{equation}
 
 Where:
@@ -205,9 +245,11 @@ Where:
 \item
   \(h_{a,coil,des,in}\) : is the coil design inlet air enthalpy (J/kg)
 \item
-  \(h_{a,coil,des,out}\) : is the coil design outlet air enthalpy (J/kg), and
+  \(h_{a,coil,des,out}\) : is the coil design outlet air enthalpy (J/kg)
 \item
   \(\dot{m}_{a,coil,des}\) : is the coil design air mass flow rate (kg/s)
+\item
+  \(\dot{Q}_{fan,heat,des}\) : is the design fan heat (W) - see Section \ref{design-fan-heat}
 \end{itemize}
 
 The enthalpies are given by:
@@ -270,19 +312,19 @@ The inlet air temperature depends on whether the coil is in the outside air stre
 \item
   Coil in outside air stream: \(T_{air,in,des} = T_{out,cool,at-peak}\) (the outside air temperature set at the design cooling peak).
 \item
-  Coil in main air stream, no preconditioning of outside air: \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the cooling design peak).
+  Coil in main air stream, no preconditioning of outside air: \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the cooling design peak. Plus the design fan temperature rise due to fan heat, + \(T_{fan,heat,des}\), for blow through configuration - see Section \ref{design-fan-heat}).
 \item
-  Coil in main air stream, outside air preconditioned. The outside air fraction is calculated as \(f_{oa} = \dot V_{air,out,des}/\dot V_{cc,air}\) , where \(\dot V_{cc,air}\) is calculated above. Then \(T_{air,in,des} = f_{oa}T_{precool}+\left(1-f_{oa}\right)T_{ret,cool,at-peak}\) , where \(T_{precool}\) is the specified \emph{Precool Design Temperature} from \emph{System:Sizing}, and \(T_{ret,cool,at-peak}\) is the return temperature at the system cooling peak load.
+  Coil in main air stream, outside air preconditioned. The outside air fraction is calculated as \(f_{oa} = \dot V_{air,out,des}/\dot V_{cc,air}\) , where \(\dot V_{cc,air}\) is calculated above. Then \(T_{air,in,des} = f_{oa}T_{precool}+\left(1-f_{oa}\right)T_{ret,cool,at-peak}\) , where \(T_{precool}\) is the specified \emph{Precool Design Temperature} from \emph{System:Sizing}, \(T_{ret,cool,at-peak}\) is the return temperature at the system cooling peak load. Plus the design fan temperature rise due to fan heat, + \(T_{fan,heat,des}\), for blow through configuration - see Section \ref{design-fan-heat}).
 \end{itemize}
 
 \subsubsection{Design Air Inlet Temperature - Zone Coils}\label{design-air-inlet-temperature---zone-coils}
 
-The design inlet temperature depends on whether the coil is in a terminal unit or a zonal unit, and where the coil is positioned within the unit.
+The design inlet temperature depends on whether the coil is in a terminal unit or a zonal unit, and where the coil is positioned within the unit. The design fan temperature rise is added to coil inlet temperature for blow-through or subtracted from the coil outlet air temperature for draw-through. Fan heat in either case results in a higher design coil load - see Section \ref{design-fan-heat}.  
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  For the AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction terminal unit the design inlet temperature is set to the zone temperature at the time of the zone cooling peak, since the coil is located in the induced air stream.
+  For the AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction terminal unit the design inlet temperature is set to the zone temperature at the time of the zone cooling peak, since the coil is located in the induced air stream: \(T_{air,in,des} = T_{zone,cool,peak}\)
 \item
   For fan coil units the design inlet temperature is set to the mixed air temperature: \(T_{air,in,des} = f_{oa}T_{oa,coolpeak} + \left(1-f_{oa}\right)T_{z,coolpeak}\) , where \(f_{oa} = \rho_a \dot V_{z,oa,des} / \dot m_{z,cool,des}\)
 \item
@@ -544,13 +586,15 @@ The 4\(^{th}\) and 5\(^{th}\) coefficient (TCC4 and TCC5) used in the above equa
 The enthalpy of the entering air is then compared with the enthalpy of the exiting air. The calculations for air enthalpy are identical to that done for \emph{Coil:Cooling:Water}. If the entering air enthalpy is less than the exiting air enthalpy, a reference value of 48,000 J/kg is used as the entering air enthalpy. If the TotCapTempModFac calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil total cooling capacity is set equal to 0.
 
 \begin{equation}
-  \dot{Q}_{coil,des,total}   = \left\{
-                                  \begin{array}{cl}
-                                    \frac{\dot{m}_{air,des}\PB{H_{in}-H_{out}}}{TotCapTempModFac}  & if H_{in}>H_{out} \\
-                                    \frac{\dot{m}_{air,des}\PB{48000 -H_{out}}}{TotCapTempModFac}  & otherwise
-                                  \end{array}
-                                \right.
+  \dot{Q}_{coil,des,total}   = \frac{\dot{m}_{air,des}\PB{H_{in}-H_{out}}}{TotCapTempModFac} + \dot{Q}_{fan,heat,des}
 \end{equation}
+
+Where:
+
+\begin{itemize}
+\item
+  \(\dot{Q}_{fan,heat,des}\) : is the design fan heat (W) - see Section \ref{design-fan-heat}
+\end{itemize}
 
 \subsubsection{Rated Sensible Cooling Capacity}\label{rated-sensible-cooling-capacity}
 
@@ -595,13 +639,15 @@ The 5\(^{th}\) and 6\(^{th}\) coefficient (SCC5 and SCC6) used in the above equa
 The dry-bulb temperature of the entering air is then compared with the dry-bulb temperature of the exiting air. The calculations for air dry-bulb temperature are identical to that done for \emph{Coil:Cooling:Water}. If the entering air dry-bulb temperature is less than the exiting air dry-bulb temperature, a reference value of 24\(^{\circ}\)C is used as the entering air dry-bulb temperature. If the SensCapTempModFac calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil sensible cooling capacity is set equal to 0.
 
 \begin{equation}
-  \dot{Q}_{coil,des,sensible} = \left\{
-                                  \begin{array}{cl}
-                                    \frac{\dot{m}_{air,des}C_{p,air,des}\PB{T_{DB,in}-T_{DB,out}}}{SensCapTempModFac}  & if T_{DB,in}>T_{DB,out} \\
-                                    \frac{\dot{m}_{air,des}C_{p,air,des}\PB{24       -T_{DB,out}}}{SensCapTempModFac}  & otherwise
-                                  \end{array}
-                                \right.
+  \dot{Q}_{coil,des,sensible} = \frac{\dot{m}_{air,des}C_{p,air,des}\PB{T_{DB,in}-T_{DB,out}}}{SensCapTempModFac} +\dot{Q}_{fan,heat,des}
 \end{equation}
+
+Where:
+
+\begin{itemize}
+\item
+  \(\dot{Q}_{fan,heat,des}\) : is the design fan heat (W) - see Section \ref{design-fan-heat}
+\end{itemize}
 
 \subsection{Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit Sizing}\label{coilcoolingwatertoairheatpumpvariablespeedequationfit-sizing}
 
@@ -636,16 +682,27 @@ If the entering air enthalpy is less than the exiting air enthalpy, a reference 
 \emph{If H\(_{in}\) \textgreater{} H\(_{out}\) Then}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
+{\dot {Q}_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
 \end{equation}
 
 \emph{Else}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {m_{air,rated}}(48000 - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
+{\dot {Q}_{coil,rated,total}} = {m_{air,rated}}(48000 - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
 \end{equation}
 
 \emph{End If}
+
+\begin{equation}
+{\dot{Q}_{coil,rated,total}} = {\dot{Q}_{coil,rated,total}} + \dot{Q}_{fan,heat,des}
+\end{equation}
+
+Where:
+
+\begin{itemize}
+\item
+  \(\dot{Q}_{fan,heat,des}\) : is the design fan heat (W) - see Section \ref{design-fan-heat}
+\end{itemize}
 
 \subsection{Coil:Heating:WaterToAirHeatPump:EquationFit Sizing}\label{coilheatingwatertoairheatpumpequationfit-sizing}
 
@@ -1050,8 +1107,10 @@ The rated cooling capacity is obtained by dividing the peak cooling capacity by 
 \emph{CapModFac} = \emph{CurveValue}(CCapFTemp,\emph{T\(_{mix,wb}\)},\emph{T\(_{outside}\)})
 \end{equation}
 
+\emph{Q\(_{fan,heat,des}\)} = design fan heat (W) - see Section \ref{design-fan-heat}
+
 \begin{equation}
-CCap_{peak} = \rho_{air} \cdot \dot V_{air,rated} \cdot (h_{mix} - h_{sup})
+CCap_{peak} = \rho_{air} \cdot \dot V_{air,rated} \cdot (h_{mix} - h_{sup}) + \dot{Q}_{fan,heat,des}
 \end{equation}
 
 \begin{equation}
@@ -1300,16 +1359,28 @@ If the entering air enthalpy is less than the exiting air enthalpy, a reference 
 \emph{If H\(_{in}\) \textgreater{} H\(_{out}\) Then}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
+{\dot{Q}_{coil,rated,total}} = {m_{air,rated}}({H_{in}} - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
 \end{equation}
 
 \emph{Else}
 
 \begin{equation}
-{\dot Q_{coil,rated,total}} = {m_{air,rated}}(48000 - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
+{\dot{Q}_{coil,rated,total}} = {m_{air,rated}}(48000 - {H_{out}})/TotCapTempModFra{c_{NominalSpeed}}
 \end{equation}
 
 \emph{End If}
+
+\begin{equation}
+{\dot{Q}_{coil,rated,total}} = {\dot{Q}_{coil,rated,total}} + \dot{Q}_{fan,heat,des}
+\end{equation}
+
+Where:
+
+\begin{itemize}
+\item
+  \(\dot{Q}_{fan,heat,des}\) : is the design fan heat (W) - see Section \ref{design-fan-heat}
+\end{itemize}
+
 
 The other sizing procedures, e.g.~evaporative condenser pump, etc., are the same as Coil:Cooling:DX:SingleSpeed.
 
