@@ -4881,7 +4881,7 @@ namespace SizingManager {
                 Real64 curHeatLoad = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatLoadSeq(TimeStepInDay);
                 if (curHeatLoad > 0.0) {
                     sumHeatLoad += curHeatLoad;
-                    wghtdHeatZoneTemp += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curCoolLoad;
+                    wghtdHeatZoneTemp += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curHeatLoad;
                     wghtdHeatHumRat += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepInDay) * curHeatLoad;
                 }
             }

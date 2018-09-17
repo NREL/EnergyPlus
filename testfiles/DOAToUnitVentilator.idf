@@ -1823,7 +1823,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    13.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
@@ -1854,7 +1859,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    13.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name

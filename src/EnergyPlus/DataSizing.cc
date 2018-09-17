@@ -256,6 +256,7 @@ namespace DataSizing {
     bool ZoneEqUnitVent(false);                     // TRUE if a unit ventilator unit is being simulated
     bool ZoneEqVentedSlab(false);                   // TRUE if a ventilated slab is being simulated
     bool ZoneEqDXCoil(false);                       // TRUE if a ZoneHVAC DX coil is being simulated
+    bool ZoneEqUnitarySys(false);                   // TRUE if a zone UnitarySystem is being simulated
     bool ZoneCoolingOnlyFan(false);                 // TRUE if a ZoneHVAC DX cooling coil is only coil in parent
     bool ZoneHeatingOnlyFan(false);                 // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
     bool ZoneSizingRunDone(false);                  // True if a zone sizing run has been successfully completed.
@@ -418,6 +419,7 @@ namespace DataSizing {
         ZoneEqUnitVent = false;
         ZoneEqVentedSlab = false;
         ZoneEqDXCoil = false;
+        ZoneEqUnitarySys = false;
         ZoneCoolingOnlyFan = false;
         ZoneHeatingOnlyFan = false;
         ZoneSizingRunDone = false;
