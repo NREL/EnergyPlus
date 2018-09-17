@@ -284,6 +284,57 @@ TEST_F(InputProcessorFixture, decode_encode_2)
     EXPECT_EQ(expected, encoded);
 }
 
+TEST_F(InputProcessorFixture, decode_encode_3)
+{
+    auto const idf(delimited_string({
+      "Schedule:File,",
+      "  Test Schedule File,      !- Name",
+      "  Any Number,              !- Schedule Type Limits Name",
+      R"(  C:\Users\research\newarea\functional\bad\testing\New Temperatures.csv,  !- File Name)",
+      "  2,                       !- Column Number",
+      "  1,                       !- Rows to Skip at Top",
+      "  8760,                    !- Number of Hours of Data",
+      "  Comma,                   !- Column Separator",
+      "  ,                        !- Interpolate to Timestep",
+      "  10;                      !- Minutes per Item",
+    }));
+
+    auto const expected(delimited_string({
+      "Building,",
+      "  Bldg,",
+      "  0.0,",
+      "  Suburbs,",
+      "  0.04,",
+      "  0.4,",
+      "  FullExterior,",
+      "  25.0,",
+      "  6.0;",
+      "",
+      "GlobalGeometryRules,",
+      "  UpperLeftCorner,",
+      "  Counterclockwise,",
+      "  Relative,",
+      "  Relative,",
+      "  Relative;",
+      "",
+      "Schedule:File,",
+      "  Test Schedule File,",
+      "  Any Number,",
+      R"(  C:\Users\research\newarea\functional\bad\testing\New Temperatures.csv,)",
+      "  2.0,",
+      "  1.0,",
+      "  8760.0,",
+      "  Comma,",
+      "  ,",
+      "  10.0;",
+      ""
+    }));
+
+    ASSERT_TRUE(process_idf(idf));
+    std::string encoded = encodeIDF();
+    EXPECT_EQ(expected, encoded);
+}
+
 TEST_F(InputProcessorFixture, parse_empty_fields)
 {
     std::string const idf(delimited_string({
@@ -1407,16 +1458,16 @@ TEST_F(InputProcessorFixture, parse_string)
     index = 0;
     success = true;
     output_string = parse_string(R"(\b\t/\\\";)", index, success);
-    EXPECT_EQ("\b\t/\\\"", output_string);
+    EXPECT_EQ(R"(\b\t/\\\")", output_string);
     EXPECT_EQ(9ul, index);
     EXPECT_TRUE(success);
 
     index = 0;
     success = true;
     output_string = parse_string(R"(test \n string)", index, success);
-    EXPECT_EQ("", output_string);
-    EXPECT_EQ(7ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_EQ(R"(test \n string)", output_string);
+    EXPECT_EQ(14ul, index);
+    EXPECT_TRUE(success);
 
     index = 0;
     success = true;
