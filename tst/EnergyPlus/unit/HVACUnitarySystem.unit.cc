@@ -202,6 +202,7 @@ protected:
         FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.006;
 
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 20.0;
+        FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 20.0;
         FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 30.0;
         FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.007;
         FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * StdRhoAir;
@@ -2590,7 +2591,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTest
     CurSysNum = 0;
     CurOASysNum = 0;
     CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
 
     UnitarySystem.allocate(HVACUnitarySystem::NumUnitarySystem);
     MultiOrVarSpeedCoolCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
@@ -2678,6 +2679,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTest
     FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = 1.005;
 
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 15.0;
+    FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 15.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.001;
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 30.0;
 
@@ -8567,7 +8569,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     // when load exceeds capacity the ASHRAE model is the only model that uses these variables, and flow is determined by Heat/CoolWaterFlowRatio *
     // max other models will show 0 here and in this case water flow will equal max flow * PartLoadRatio
     EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.01374, 0.0001); // heating coil water flow ratio, heating coil is on
-    EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.0, 0.0001);     // cooling coil water flow ratio, cooling coil is off
+    EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.0, 0.0001);    // cooling coil water flow ratio, cooling coil is off
     EXPECT_NEAR(UnitarySystem(1).FanPartLoadRatio,
                 UnitarySystem(1).MaxNoCoolHeatAirMassFlow / UnitarySystem(1).MaxHeatAirMassFlow,
                 0.0001);                                                    // fan PLR at minimum speed
@@ -8598,7 +8600,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     EXPECT_NEAR(UnitarySystem(1).HeatCoilWaterFlowRatio, 0.0667, 0.0001);                     // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(UnitarySystem(1).CoolCoilWaterFlowRatio, 0.0, 0.0001);                        // cooling coil water flow ratio, cooling coil is off
     EXPECT_NEAR(UnitarySystem(1).FanPartLoadRatio,
-                0.6198,
+                0.6197,
                 0.0001); // fan PLR above minimum and below maximum speed (0-1 means fraction between no load flow and full flow)
     EXPECT_NEAR(Node(OutletNode).Temp, UnitarySystem(1).DesignMaxOutletTemp, 0.01); // outlet temperature modulated to meet max limit
 
