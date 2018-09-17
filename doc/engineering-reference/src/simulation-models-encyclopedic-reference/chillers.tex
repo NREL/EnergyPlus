@@ -1265,17 +1265,16 @@ This model simulates the thermal performance of the chiller and the power consum
 
 The chiller model uses user-supplied performance information at reference conditions along with three performance curves (curve objects) for cooling capacity and efficiency to determine chiller operation at off-reference conditions. The three performance curves are:
 
-1)~~Cooling Capacity Function of Temperature Curve
-
-2)~~Energy Input to Cooling Output Ratio Function of Temperature Curve
-
-3)~~Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve
+\begin{enumerate}
+\item Cooling Capacity Function of Temperature Curve
+\item Energy Input to Cooling Output Ratio Function of Temperature Curve
+\item Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve
+\end{enumerate}
 
 The cooling capacity function of temperature curve is a biquadratic performance curve with two independent variables: the leaving chilled water temperature and the entering condenser fluid temperature. The output of this curve is multiplied by the reference capacity to give the full-load cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 \begin{equation}
 ChillerCapFTemp = a + b\left( {{T_{cw,l}}} \right) + c{\left( {{T_{cw,l}}} \right)^2} + d\left( {{T_{cond,e}}} \right) + e{\left( {{T_{cond,e}}} \right)^2} + f\left( {{T_{cw,l}}} \right)\left( {{T_{cond,e}}} \right)
-
 \end{equation}
 
 where:
