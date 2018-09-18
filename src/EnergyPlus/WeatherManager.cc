@@ -1171,8 +1171,10 @@ namespace WeatherManager {
                             // Following builds Environment start/end for ASHRAE 55 warnings
                             gio::write(StDate, DateFormat) << Environment(Envrn).StartMonth << Environment(Envrn).StartDay;
                             gio::write(EnDate, DateFormat) << Environment(Envrn).EndMonth << Environment(Envrn).EndDay;
-                            StDate += "/" + RoundSigDigits(Environment(Envrn).StartYear);
-                            EnDate += "/" + RoundSigDigits(Environment(Envrn).EndYear);
+                            if (Environment(Envrn).KindOfEnvrn == ksRunPeriodWeather) {
+                                StDate += "/" + RoundSigDigits(Environment(Envrn).StartYear);
+                                EnDate += "/" + RoundSigDigits(Environment(Envrn).EndYear);
+                            }
                             EnvironmentStartEnd = StDate + " - " + EnDate;
 
                             if (Environment(Envrn).DayOfWeek == 0) { // Use Sunday
@@ -1210,12 +1212,10 @@ namespace WeatherManager {
                                     AlpUseSnow = "No";
                                 }
                                 cTotalEnvDays = RoundSigDigits(Environment(Envrn).TotalDays);
-                
+
                                 gio::write(OutputFileInits, EnvNameFormat)
-                                    << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate << ValidDayNames(TWeekDay)
-                                    << cTotalEnvDays << "Use RunPeriod Specified Day" << AlpUseDST
-                                    << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
- 
+                                    << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate << ValidDayNames(TWeekDay) << cTotalEnvDays
+                                    << "Use RunPeriod Specified Day" << AlpUseDST << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
                             }
 
                             if (!DoingSizing && !KickOffSimulation) {
@@ -6111,8 +6111,13 @@ namespace WeatherManager {
             if (RunPeriodInput(Loop).startMonth == 2 && RunPeriodInput(Loop).startDay == 29) {
                 // Requested start date is a leap year
                 if (RunPeriodInput(Loop).startYear == 0) { // No input starting year
-                    RunPeriodInput(Loop).startYear =
-                        findLeapYearForWeekday(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).startWeekDay);
+                    if (inputWeekday) {
+                        RunPeriodInput(Loop).startYear =
+                            findLeapYearForWeekday(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).startWeekDay);
+                    } else {
+                        // 2012 is the default year, 1/1 is a Sunday
+                        RunPeriodInput(Loop).startWeekDay = calculateDayOfWeek(2012, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
+                    }
                 } else {                                               // Have an input start year
                     if (!isLeapYear(RunPeriodInput(Loop).startYear)) { // Start year is not a leap year
                         ShowSevereError(cCurrentModuleObject + ": object #" + TrimSigDigits(Loop) + ", start year (" +
@@ -6142,8 +6147,14 @@ namespace WeatherManager {
                     ErrorsFound = true;
                 } else {                                       // Month/day is valid
                     if (RunPeriodInput(Loop).startYear == 0) { // No input starting year
-                        RunPeriodInput(Loop).startYear =
-                            findYearForWeekday(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).startWeekDay);
+                        if (inputWeekday) {
+                            RunPeriodInput(Loop).startYear =
+                                findYearForWeekday(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).startWeekDay);
+                        } else {
+                            // 2017 is the default year, 1/1 is a Sunday
+                            RunPeriodInput(Loop).startWeekDay =
+                                calculateDayOfWeek(2017, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
+                        }
                     } else { // Have an input starting year
                         WeekDay weekday =
                             calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
