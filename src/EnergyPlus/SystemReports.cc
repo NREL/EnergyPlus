@@ -3835,7 +3835,6 @@ namespace SystemReports {
             AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR_MULTISPEED,
             AIRLOOPHVAC_UNITARYHEATPUMP_WATERTOAIR,
             AIRLOOPHVAC_UNITARYSYSTEM,
-            AIRLOOPHVAC_UNITARYSYSTEM_LEGACY,
             AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_COOL,
             AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_HEAT,
             AIRTERMINAL_DUALDUCT_VAV_COOL,
@@ -3925,7 +3924,6 @@ namespace SystemReports {
             {"AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED", AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR_MULTISPEED},
             {"AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR", AIRLOOPHVAC_UNITARYHEATPUMP_WATERTOAIR},
             {"AIRLOOPHVAC:UNITARYSYSTEM", AIRLOOPHVAC_UNITARYSYSTEM},
-            {"AIRLOOPHVAC:UNITARYSYSTEM:LEGACY", AIRLOOPHVAC_UNITARYSYSTEM_LEGACY},
             {"AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:COOL", AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_COOL},
             {"AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:HEAT", AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_HEAT},
             {"AIRTERMINAL:DUALDUCT:VAV:COOL", AIRTERMINAL_DUALDUCT_VAV_COOL},
@@ -4155,9 +4153,6 @@ namespace SystemReports {
             // DX Systems
             break;
         case AIRLOOPHVAC_UNITARYSYSTEM:
-            // All energy transfers accounted for in subcomponent models
-            break;
-        case AIRLOOPHVAC_UNITARYSYSTEM_LEGACY:
             // All energy transfers accounted for in subcomponent models
             break;
         case AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR:
@@ -4624,7 +4619,7 @@ namespace SystemReports {
                             ZFAUZoneVentLoad += 0.0;
                         }
 
-                    } else if (SELECT_CASE_var == ZoneUnitarySystem_Num) {
+                    } else if (SELECT_CASE_var == ZoneUnitarySys_Num) {
                         // add accounting for OA when unitary system is used as zone equipment
 
                     } else if (SELECT_CASE_var == OutdoorAirUnit_Num) {

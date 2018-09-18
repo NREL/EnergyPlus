@@ -112,7 +112,6 @@ namespace DataZoneEquipment {
     extern int const BBElectric_Num;
     extern int const RefrigerationAirChillerSet_Num;
     extern int const UserDefinedZoneHVACForcedAir_Num;
-    extern int const ZoneUnitarySystem_Num; // AirloopHVAC:UnitarySystem:Legacy configured as zone equipment
     extern int const CoolingPanel_Num;
     extern int const ZoneUnitarySys_Num; // UnitarySystem configured as zone equipment
     extern int const TotalNumZoneEquipType;
@@ -394,7 +393,7 @@ namespace DataZoneEquipment {
         Array1D_int EquipType_Num;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
-        std::vector <UnitarySystems::UnitarySys *> compPointer;
+        std::vector<UnitarySystems::UnitarySys *> compPointer;
         Array1D_int CoolingPriority;
         Array1D_int HeatingPriority;
         Array1D_int CoolingCapacity;      // Current cooling capacity (negative) [W]

@@ -215,7 +215,7 @@ namespace UnitarySystems {
     {
     }
 
-    // Clears the global data in HVACUnitarySystem.
+    // Clears the global data in UnitarySystem.
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
@@ -1528,11 +1528,11 @@ namespace UnitarySystems {
             SingleDuct::setATMixerSizingProperties(this->m_ATMixerIndex, this->ControlZoneNum, DataSizing::CurZoneEqNum);
         }
 
+        PrintFlag = false;
         // STEP 1: find the DataSizing::AutoSized cooling air flow rate and capacity
         if (this->m_CoolCoilExists) {
             if (!this->m_HeatCoilExists) DataSizing::ZoneCoolingOnlyFan = true;
             FieldNum = 3; // N3 , \field Cooling Supply Air Flow Rate
-            PrintFlag = false;
             SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = this->m_MaxCoolAirVolFlow;
@@ -14837,12 +14837,12 @@ namespace UnitarySystems {
         }
 
         for (int UnitarySysNum = 0; UnitarySysNum < numUnitarySystems; ++UnitarySysNum) {
-            if (UtilityRoutines::SameString(UnitarySysName, unitarySys[UnitarySysNum - 1].Name)) {
+            if (UtilityRoutines::SameString(UnitarySysName, unitarySys[UnitarySysNum].Name)) {
                 if (unitarySys[UnitarySysNum].m_ThisSysInputShouldBeGotten) getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
                 if (unitarySys[UnitarySysNum].m_CoolCoilExists) {
                     CoolingCoil = true;
                 }
-                if (unitarySys[UnitarySysNum - 1].m_HeatCoilExists || unitarySys[UnitarySysNum - 1].m_SuppCoilExists) {
+                if (unitarySys[UnitarySysNum].m_HeatCoilExists || unitarySys[UnitarySysNum].m_SuppCoilExists) {
                     HeatingCoil = true;
                 }
                 break;

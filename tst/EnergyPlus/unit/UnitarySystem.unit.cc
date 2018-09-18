@@ -141,7 +141,7 @@ protected:
         DataZoneEquipment::ZoneEquipList(1).EquipName(1) = "UNITARY SYSTEM MODEL";
         DataZoneEquipment::ZoneEquipList(1).CoolingPriority(1) = 1;
         DataZoneEquipment::ZoneEquipList(1).HeatingPriority(1) = 1;
-        DataZoneEquipment::ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySystem_Num;
+        DataZoneEquipment::ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
         DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = NumNodes;
         DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(NumNodes);
         DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(NumNodes);
@@ -159,11 +159,14 @@ protected:
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolVolFlow = 1.5;
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatVolFlow = 1.2;
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInTemp = 25.0;
+        DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtCoolPeak = 25.0;
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInHumRat = 0.009;
+        DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.009;
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 15.0;
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.006;
 
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatCoilInTemp = 20.0;
+        DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak = 20.0;
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).HeatDesTemp = 30.0;
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).HeatDesHumRat = 0.007;
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatMassFlow =
@@ -2221,36 +2224,36 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     // autosized air flow and capacity, unitary sytsem capacity matches coils
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.5);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.5);
-    EXPECT_NEAR(thisSys->m_DesignCoolingCapacity, 31732.204, 0.001);
+    EXPECT_NEAR(thisSys->m_DesignCoolingCapacity, 32771.114, 0.001);
     EXPECT_EQ(thisSys->m_DesignCoolingCapacity, VariableSpeedCoils::VarSpeedCoil(1).RatedCapCoolTotal);
-    EXPECT_NEAR(thisSys->m_DesignHeatingCapacity, 31732.204, 0.001);
+    EXPECT_NEAR(thisSys->m_DesignHeatingCapacity, 32771.114, 0.001);
     EXPECT_EQ(thisSys->m_DesignHeatingCapacity, VariableSpeedCoils::VarSpeedCoil(2).RatedCapHeat);
     // variable speed coils size air flow differently than other models. The design air volume flow rate is back calculated from design capacity
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate,
               VariableSpeedCoils::VarSpeedCoil(1).RatedCapCoolTotal * VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowPerRatedTotCap(10));
-    EXPECT_NEAR(VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate, 1.77264, 0.00001); // different than unitary system air volume flow rate
+    EXPECT_NEAR(VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate, 1.83068, 0.00001); // different than unitary system air volume flow rate
     EXPECT_NEAR(VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate, 1.70, 0.01);       // VS DX heating coil was not autosized
 
     // checks on autosized cooling air flow rates
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.177264, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.183068, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(1), thisSys->m_CoolVolumeFlowRate[1]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.354529, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.366136, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(2), thisSys->m_CoolVolumeFlowRate[2]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.531793, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.549204, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(3), thisSys->m_CoolVolumeFlowRate[3]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[4], 0.709058, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[4], 0.732272, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(4), thisSys->m_CoolVolumeFlowRate[4]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[5], 0.886323, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[5], 0.915341, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(5), thisSys->m_CoolVolumeFlowRate[5]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[6], 1.063587, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[6], 1.098409, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(6), thisSys->m_CoolVolumeFlowRate[6]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[7], 1.240852, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[7], 1.281477, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(7), thisSys->m_CoolVolumeFlowRate[7]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[8], 1.418116, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[8], 1.464545, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(8), thisSys->m_CoolVolumeFlowRate[8]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[9], 1.595381, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[9], 1.647614, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(9), thisSys->m_CoolVolumeFlowRate[9]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[10], 1.772646, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[10], 1.830682, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(10), thisSys->m_CoolVolumeFlowRate[10]);
 
     // checks on autosized heating air flow rates
@@ -2914,7 +2917,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
 
     UnitarySys thisSys;
     UnitarySystems::numUnitarySystems = 1;
@@ -2922,7 +2925,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     thisSys.UnitType = "AirLoopHVAC:UnitarySystem";
     thisSys.m_MultiOrVarSpeedCoolCoil = false;
     thisSys.m_MultiOrVarSpeedHeatCoil = false;
-    thisSys.UnitarySystemType_Num = DataHVACGlobals::UnitarySystem_AnyCoilType;
+    thisSys.UnitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
     thisSys.m_RequestAutoSize = true;
 
     DataSizing::ZoneSizingRunDone = true;
@@ -2995,7 +2998,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatMassFlow = 1.005;
 
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatCoilInTemp = 15.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak = 15.0;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatCoilInHumRat = 0.001;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.001;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).HeatDesTemp = 30.0;
 
     for (int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerHeatingCapacity; ++iSizingType) {
@@ -3635,8 +3640,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc =
-        true; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
+    DataGlobals::SysSizingCalc = true; // DISABLE SIZING - don't call UnitarySystem::sizeUnitarySystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -4476,8 +4480,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc =
-        false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
+    DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeUnitarySystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -4934,8 +4937,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc =
-        false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
+    DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeUnitarySystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -6439,11 +6441,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
                 0.001);
 
     // 3 cooling speeds with autosized MSHP design spec yielding equally distributed air flow at 1/3 per speed
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.031395, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.032796, 0.000001);
     EXPECT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(1), thisSys->m_CoolVolumeFlowRate[1], 0.000001);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.062790, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.065592, 0.000001);
     EXPECT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(2), thisSys->m_CoolVolumeFlowRate[2], 0.000001);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.094185, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.098388, 0.000001);
     EXPECT_NEAR(DXCoils::DXCoil(1).MSRatedAirVolFlowRate(3), thisSys->m_CoolVolumeFlowRate[3], 0.000001);
 
     EXPECT_NEAR(UnitarySystems::designSpecMSHP[0].coolingVolFlowRatio[0], 0.333333, 0.000001);
@@ -6461,25 +6463,25 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
                 0.000001);
 
     // 10 heating speeds with autosized MSHP design spec yielding equally distributed air flow at 1/10 per speed
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[1], 0.007890, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[1], 0.008242, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(1), thisSys->m_HeatVolumeFlowRate[1]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[2], 0.015780, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[2], 0.016484, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(2), thisSys->m_HeatVolumeFlowRate[2]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[3], 0.023670, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[3], 0.024726, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(3), thisSys->m_HeatVolumeFlowRate[3]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[4], 0.031560, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[4], 0.032968, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(4), thisSys->m_HeatVolumeFlowRate[4]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[5], 0.039450, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[5], 0.041210, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(5), thisSys->m_HeatVolumeFlowRate[5]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[6], 0.047339, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[6], 0.049452, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(6), thisSys->m_HeatVolumeFlowRate[6]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[7], 0.055229, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[7], 0.057694, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(7), thisSys->m_HeatVolumeFlowRate[7]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[8], 0.063119, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[8], 0.065936, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(8), thisSys->m_HeatVolumeFlowRate[8]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[9], 0.071009, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[9], 0.074178, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(9), thisSys->m_HeatVolumeFlowRate[9]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[10], 0.078899, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[10], 0.082420, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(10), thisSys->m_HeatVolumeFlowRate[10]);
 }
 
@@ -6720,8 +6722,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
     DataZoneEquipment::GetZoneEquipmentData1(); // read zone equipment configuration and list objects
 
@@ -6744,7 +6746,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "FluidWaterLoop";
     DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant:: PlantLoop(1).FluidName = "WATER";
+    DataPlant::PlantLoop(1).FluidName = "WATER";
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "SYS 1 HEAT PUMP COOLING MODE";
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 6;
@@ -6766,13 +6768,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
 
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc =
-        false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
+    DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeUnitarySystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -6785,8 +6786,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 20.0;       // set zone temperature during heating season used to determine system delivered capacity
-    DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
+    DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
+    DataEnvironment::OutDryBulbTemp = 35.0;         // initialize weather
     DataEnvironment::OutHumRat = 0.1;
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
@@ -6797,23 +6798,26 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 1000.0; // heating load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 2000.0;
-    DataZoneEnergyDemands:: ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 1000.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 1000.0;
     DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP = 0.0;
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired.allocate(1);
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP.allocate(1);
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP.allocate(1);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
     DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP(1) =
         DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP;
 
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands:: CurDeadBandOrSetback(1) = false;
+    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
@@ -6839,25 +6843,30 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
     // UnitarySysNum ).SenLoadLoss;
 
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
 
     // test model performance
-    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 0.01);                           // Watts
+    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 0.01);    // Watts
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow * thisSys->m_PartLoadFrac); // cycling fan
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -1000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -2000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 24.0;       // set zone temperature during cooling season used to determine system delivered capacity
-    DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
+    DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
+    DataEnvironment::OutDryBulbTemp = 35.0;         // initialize weather
     DataEnvironment::OutHumRat = 0.1;
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
@@ -6872,9 +6881,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
     // UnitarySysNum ).SenLoadLoss;
 
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - (Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio)));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - (Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio)));
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
@@ -7039,8 +7050,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
     DataZoneEquipment::GetZoneEquipmentData1(); // read zone equipment configuration and list objects
 
@@ -7068,7 +7079,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "WATER COOLING COIL";
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 9;
-    DataPlant:: PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 10;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 10;
 
     DataPlant::PlantLoop(2).Name = "HotWaterLoop";
     DataPlant::PlantLoop(2).FluidName = "FluidWaterLoop";
@@ -7088,13 +7099,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
 
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc =
-        false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
+    DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeUnitarySystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -7107,8 +7117,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate;
 
     // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 20.0;       // set zone temperature during heating season used to determine system delivered capacity
-    DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
+    DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
+    DataEnvironment::OutDryBulbTemp = 35.0;         // initialize weather
     DataEnvironment::OutHumRat = 0.1;
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
@@ -7125,9 +7135,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP.allocate(1);
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP.allocate(1);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
     DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP(1) =
         DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP;
 
@@ -7174,48 +7187,54 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
     // UnitarySysNum ).SenLoadLoss;
 
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
 
     // test model performance
-    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 2.0);  // Watts (2.0 = 0.001 * load)
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // low speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
+    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 2.0); // Watts (2.0 = 0.001 * load)
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);                 // low speed fan flow
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);       // inlet = outlet flow rate
     // these next 2 variables are used to modulate the coil PLR irrespective of the fan PLR - they are non-zero when the model is called and CAN be 0
     // when load exceeds capacity the ASHRAE model is the only model that uses these variables, and flow is determined by Heat/CoolWaterFlowRatio *
     // max other models will show 0 here and in this case water flow will equal max flow * PartLoadRatio
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.01374, 0.0001); // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);     // cooling coil water flow ratio, cooling coil is off
-    EXPECT_NEAR(thisSys->FanPartLoadRatio,
-                thisSys->MaxNoCoolHeatAirMassFlow / thisSys->MaxHeatAirMassFlow,
-                0.0001);                                                    // fan PLR at minimum speed
+    EXPECT_NEAR(thisSys->FanPartLoadRatio, thisSys->MaxNoCoolHeatAirMassFlow / thisSys->MaxHeatAirMassFlow,
+                0.0001);                                                          // fan PLR at minimum speed
     EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature does not exceed max limit
 
     // increase heating load so that upper temperature limit is reached
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 6000.0; // heating load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 8000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 6000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // Heating Test 2 - moderate load, operate above min fan flow, modulate water flow to meet load
     thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
     CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 6.0); // Watts
-    EXPECT_GT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);       // air flow higher than low speed fan flow
-    EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow);             // air flow lower than high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);            // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0667, 0.0001);                     // heating coil water flow ratio, heating coil is on
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);                        // cooling coil water flow ratio, cooling coil is off
+    EXPECT_GT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // air flow higher than low speed fan flow
+    EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow);       // air flow lower than high speed fan flow
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0667, 0.0001); // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);    // cooling coil water flow ratio, cooling coil is off
     EXPECT_NEAR(thisSys->FanPartLoadRatio,
                 0.6198,
                 0.0001); // fan PLR above minimum and below maximum speed (0-1 means fraction between no load flow and full flow)
@@ -7225,64 +7244,77 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 10000.0; // heating load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 12000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 10000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // Heating Test 3 - high load, operate at max fan flow, modulate water flow to meet load
     thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
     CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 10.0); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.2532, 0.001);                       // heating coil water flow ratio, heating coil is on
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);                         // cooling coil water flow ratio, cooling coil is off
-    EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0); // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);        // inlet = outlet flow rate
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.2532, 0.001); // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);   // cooling coil water flow ratio, cooling coil is off
+    EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0);                   // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
     EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
 
     // increase heating load again to push water flow rate towards max
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 12000.0; // heating load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 14000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 12000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // Heating Test 4 - very high load, operate at max fan and water flow, load not met
     thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
     CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
 
     // test model performance
-    EXPECT_GT(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);                            // Watts - system CANNOT meet load
-    EXPECT_NEAR(Qsens_sys, 11316.64, 0.1);                                                                        // system maxed out on capacity
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);                                // inlet = outlet flow rate
+    EXPECT_GT(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);   // Watts - system CANNOT meet load
+    EXPECT_NEAR(Qsens_sys, 11316.64, 0.1);                                                                      // system maxed out on capacity
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);  // inlet = outlet flow rate
     EXPECT_EQ(DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate, thisSys->MaxHeatCoilFluidFlow); // water coil water flow rate at max
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio,
                 0.0,
                 0.0001); // heating coil water flow ratio not set, heating coil is on since function returned when load exceeded capacity
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001); // cooling coil water flow ratio, cooling coil is off
-    EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0); // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
+    EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0);                 // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
     EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
-    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, 25.85, 0.01);                        // system allowed to exceed max outlet air temp to meet additional load
+    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, 25.85, 0.01); // system allowed to exceed max outlet air temp to meet additional load
 
     // COOLING LOAD
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -2000.0; // cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -2000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -4000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // zone summer dry-bulb temp
@@ -7304,98 +7336,114 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
     // UnitarySysNum ).SenLoadLoss;
 
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
 
     // test model performance
-    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 3.0);  // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // low speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                         // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.103, 0.001);                        // cooling coil water flow ratio, cooling coil is on
-    EXPECT_NEAR(thisSys->FanPartLoadRatio,
-                thisSys->MaxNoCoolHeatAirMassFlow / thisSys->MaxCoolAirMassFlow,
-                0.0001);                                                    // fan PLR at minimum speed
+    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 3.0); // Watts
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);                 // low speed fan flow
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);       // inlet = outlet flow rate
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);  // heating coil water flow ratio, heating coil is off
+    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.103, 0.001); // cooling coil water flow ratio, cooling coil is on
+    EXPECT_NEAR(thisSys->FanPartLoadRatio, thisSys->MaxNoCoolHeatAirMassFlow / thisSys->MaxCoolAirMassFlow,
+                0.0001);                                                          // fan PLR at minimum speed
     EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature is not below min limit
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -9000.0; // cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -9000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -11000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // Cooling Test 2 - moderate load, operate above min fan flow, modulate water flow to meet load
     thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
     CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 9.0); // Watts
-    EXPECT_GT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);       // air flow higher than low speed fan flow
-    EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);             // air flow lower than high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);            // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                        // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.392, 0.001);                       // cooling coil water flow ratio, cooling coil is on
-    EXPECT_NEAR(thisSys->FanPartLoadRatio, 0.5117, 0.0001);                           // fan PLR above minimum speed
-    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp, 0.01);           // outlet temperature modulated to meet max limit
+    EXPECT_GT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // air flow higher than low speed fan flow
+    EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);       // air flow lower than high speed fan flow
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                            // heating coil water flow ratio, heating coil is off
+    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.392, 0.001);                           // cooling coil water flow ratio, cooling coil is on
+    EXPECT_NEAR(thisSys->FanPartLoadRatio, 0.5117, 0.0001);                               // fan PLR above minimum speed
+    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp, 0.01); // outlet temperature modulated to meet max limit
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -18000.0; // cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -18000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -20000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // Cooling Test 3 - high load, operate at max fan flow, modulate water flow to meet load
     thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
     CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 18.0); // Watts
-    EXPECT_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);              // air flow at high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                         // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.795, 0.001);                        // cooling coil water flow ratio, cooling coil is on
-    EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                               // fan PLR at maximum speed
-    EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp);                    // outlet temperature below minimum temperature limit
+    EXPECT_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);                        // air flow at high speed fan flow
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                    // heating coil water flow ratio, heating coil is off
+    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.795, 0.001);                   // cooling coil water flow ratio, cooling coil is on
+    EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                          // fan PLR at maximum speed
+    EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -22000.0; // cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -22000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -24000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) =
+        DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     // Cooling Test 4 - very high load, operate at max fan and water flow, load not met
     thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
     CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
+    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
+        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
 
     // test model performance
-    EXPECT_LT(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);                            // Watts - system CANNOT meet load
-    EXPECT_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);                                 // air flow at high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);                                // inlet = outlet flow rate
+    EXPECT_LT(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);   // Watts - system CANNOT meet load
+    EXPECT_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);                         // air flow at high speed fan flow
+    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);  // inlet = outlet flow rate
     EXPECT_EQ(DataLoopNode::Node(thisSys->CoolCoilFluidInletNode).MassFlowRate, thisSys->MaxCoolCoilFluidFlow); // water coil water flow rate at max
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001); // heating coil water flow ratio, heating coil is off
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio,
                 0.0,
                 0.001); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
-    EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);            // fan PLR at maximum speed
+    EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                          // fan PLR at maximum speed
     EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
 }
 
@@ -7912,7 +7960,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
 
     OutputReportPredefined::SetPredefinedTables();
 
@@ -8774,7 +8822,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     DXCoils::DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(1).MSRatedAirVolFlowRate(Iter) * DataEnvironment::StdRhoAir;
     DXCoils::DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoils::DXCoil(2).MSRatedAirVolFlowRate(Iter) * DataEnvironment::StdRhoAir;
     Iter = 3;
-    thisSys->m_CoolVolumeFlowRate[Iter] = thisSys->m_MaxCoolAirVolFlow * UnitarySystems::designSpecMSHP[0].coolingVolFlowRatio[Iter-1];
+    thisSys->m_CoolVolumeFlowRate[Iter] = thisSys->m_MaxCoolAirVolFlow * UnitarySystems::designSpecMSHP[0].coolingVolFlowRatio[Iter - 1];
     thisSys->m_CoolMassFlowRate[Iter] = thisSys->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
     thisSys->m_MSCoolingSpeedRatio[Iter] =
         thisSys->m_CoolVolumeFlowRate[Iter] / thisSys->m_CoolVolumeFlowRate[UnitarySystems::designSpecMSHP[0].numOfSpeedCooling];
@@ -9742,7 +9790,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
         "    Through: 12/31,          !- Field 1",
         "    For: AllDays,            !- Field 22",
         "    Until: 24:00,15.6;       !- Field 23",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
@@ -9769,526 +9817,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
 
     ASSERT_FALSE(DXCoils::DXCoil(1).MSHPHeatRecActive); // electricity
     ASSERT_TRUE(DXCoils::DXCoil(2).MSHPHeatRecActive);  // natural gas
-                                               // Minimum Outdoor Temperature for Compressor Operation blank field defaults to -25.0 C
+                                                        // Minimum Outdoor Temperature for Compressor Operation blank field defaults to -25.0 C
     EXPECT_EQ(DXCoils::DXCoil(1).MinOATCompressor, -25.0);
     // Minimum Outdoor Temperature for Compressor read from input field as -8.0 C
     EXPECT_EQ(DXCoils::DXCoil(2).MinOATCompressor, -8.0);
     // Unitary System mines data from coil objects
     EXPECT_EQ(DXCoils::DXCoil(1).MinOATCompressor, thisSys->m_MinOATCompressorCooling);
     EXPECT_EQ(DXCoils::DXCoil(2).MinOATCompressor, thisSys->m_MinOATCompressorHeating);
-}
-
-TEST_F(EnergyPlusFixture, UnitarySysModel_ASHRAEModel_WaterCoils)
-{
-
-    bool ErrorsFound(false);
-    bool FirstHVACIteration(false);
-    Real64 CpAir(0.0);       // specific heat of air
-    Real64 Qsens_sys(0.0);   // UnitarySystem delivered sensible capacity wrt zone
-    Real64 MinHumRatio(0.0); // track minimum of outlet node or zone humidity ratio
-    Real64 ZoneTemp(0.0);    // control zone temperature
-    int InletNode(0);        // UnitarySystem inlet node number
-    int OutletNode(0);       // UnitarySystem outlet node number
-    int ControlZoneNum(0);   // index to control zone
-
-    std::string const idf_objects = delimited_string({
-
-        "Zone,",
-        "  EAST ZONE,                !- Name",
-        "  0,                        !- Direction of Relative North{ deg }",
-        "  0,                        !- X Origin{ m }",
-        "  0,                        !- Y Origin{ m }",
-        "  0,                        !- Z Origin{ m }",
-        "  1,                        !- Type",
-        "  1,                        !- Multiplier",
-        "  autocalculate,            !- Ceiling Height{ m }",
-        "  autocalculate;            !- Volume{ m3 }",
-        "  ",
-
-        "ZoneHVAC:EquipmentConnections,",
-        "EAST ZONE,                  !- Zone Name",
-        "  Zone2Equipment,           !- Zone Conditioning Equipment List Name",
-        "  Zone 2 Inlet Node,        !- Zone Air Inlet Node or NodeList Name",
-        "  Zone Exhaust Node,        !- Zone Air Exhaust Node or NodeList Name",
-        "  Zone 2 Node,              !- Zone Air Node Name",
-        "  Zone 2 Outlet Node;       !- Zone Return Air Node Name",
-        "  ",
-
-        "ZoneHVAC:EquipmentList,",
-        "  Zone2Equipment,           !- Name",
-        "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
-        "  Unitary System Model,     !- Zone Equipment 1 Name",
-        "  1,                        !- Zone Equipment 1 Cooling Sequence",
-        "  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
-        "  ",
-
-        "AirLoopHVAC:UnitarySystem,",
-        "  Unitary System Model,    !- Name",
-        "  SingleZoneVAV,           !- Control Type",
-        "  East Zone,               !- Controlling Zone or Thermostat Location",
-        "  None,                    !- Dehumidification Control Type",
-        "  FanAndCoilAvailSched,    !- Availability Schedule Name",
-        "  Zone Exhaust Node,       !- Air Inlet Node Name",
-        "  Zone 2 Inlet Node,       !- Air Outlet Node Name",
-        "  Fan:OnOff,               !- Supply Fan Object Type",
-        "  Supply Fan 1,            !- Supply Fan Name",
-        "  BlowThrough,             !- Fan Placement",
-        "  ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name",
-        "  Coil:Heating:Water,      !- Heating Coil Object Type",
-        "  Water Heating Coil,      !- Heating Coil Name",
-        "  ,                        !- DX Heating Coil Sizing Ratio",
-        "  Coil:Cooling:Water,      !- Cooling Coil Object Type",
-        "  Water Cooling Coil,      !- Cooling Coil Name",
-        "  ,                        !- Use DOAS DX Cooling Coil",
-        "  15.0,                    !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
-        "  ,                        !- Latent Load Control",
-        "  ,                        !- Supplemental Heating Coil Object Type",
-        "  ,                        !- Supplemental Heating Coil Name",
-        "  SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation",
-        "  1.6,                     !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
-        "  ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
-        "  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
-        "  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
-        "  SupplyAirFlowRate,       !- Supply air Flow Rate Method During Heating Operation",
-        "  1.6,                     !- Supply Air Flow Rate During Heating Operation{ m3/s }",
-        "  ,                        !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
-        "  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate",
-        "  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
-        "  SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
-        "  0.8,                     !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
-        "  ,                        !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
-        "  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
-        "  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate",
-        "  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
-        "  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
-        "  25.0;                    !- Maximum Supply Air Temperature{ C }",
-
-        "Fan:OnOff,",
-        "  Supply Fan 1,            !- Name",
-        "  FanAndCoilAvailSched,    !- Availability Schedule Name",
-        "  0.7,                     !- Fan Total Efficiency",
-        "  600.0,                   !- Pressure Rise{ Pa }",
-        "  1.6,                     !- Maximum Flow Rate{ m3 / s }",
-        "  0.9,                     !- Motor Efficiency",
-        "  1.0,                     !- Motor In Airstream Fraction",
-        "  Zone Exhaust Node,       !- Air Inlet Node Name",
-        "  Water Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
-
-        "Coil:Cooling:Water,",
-        "  Water Cooling Coil,      !- Name",
-        "  FanAndCoilAvailSched,    !- Availability Schedule Namev",
-        "  0.0002,                  !- Design Water Flow Rate { m3 / s }",
-        "  1.6000,                  !- Design Air Flow Rate { m3 / s }",
-        "  7.22,                    !- Design Inlet Water Temperature { Cv }",
-        "  24.340,                  !- Design Inlet Air Temperature { C }",
-        "  14.000,                  !- Design Outlet Air Temperature { C }",
-        "  0.0095,                  !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-        "  0.0090,                  !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
-        "  ChWInletNode,            !- Water Inlet Node Name",
-        "  ChWOutletNode,           !- Water Outlet Node Name",
-        "  Water Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
-        "  Water Heating Coil Air Inlet Node, !- Air Outlet Node Name",
-        "  SimpleAnalysis,          !- Type of Analysis",
-        "  CrossFlow;               !- Heat Exchanger Configuration",
-
-        "Coil:Heating:Water,",
-        "  Water Heating Coil,      !- Name",
-        "  FanAndCoilAvailSched,    !- Availability Schedule Name",
-        "  300.0,                   !- U - Factor Times Area Value { W / K }",
-        "  0.0006,                  !- Maximum Water Flow Rate { m3 / s }",
-        "  HWInletNode,             !- Water Inlet Node Name",
-        "  HWOutletNode,            !- Water Outlet Node Name",
-        "  Water Heating Coil Air Inlet Node, !- Air Inlet Node Name",
-        "  Zone 2 Inlet Node,       !- Air Outlet Node Name",
-        "  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
-        "  5000.0,                  !- Rated Capacity { W }",
-        "  82.2,                    !- Rated Inlet Water Temperature { C }",
-        "  16.6,                    !- Rated Inlet Air Temperature { C }",
-        "  71.1,                    !- Rated Outlet Water Temperature { C }",
-        "  32.2,                    !- Rated Outlet Air Temperature { C }",
-        "  ;                        !- Rated Ratio for Air and Water Convection",
-
-        "ScheduleTypeLimits,",
-        "  Any Number;              !- Name",
-
-        "Schedule:Compact,",
-        "  FanAndCoilAvailSched,    !- Name",
-        "  Any Number,              !- Schedule Type Limits Name",
-        "  Through: 12/31,          !- Field 1",
-        "  For: AllDays,            !- Field 2",
-        "  Until: 24:00, 1.0;       !- Field 3",
-
-        "Schedule:Compact,",
-        "  ContinuousFanSchedule,   !- Name",
-        "  Any Number,              !- Schedule Type Limits Name",
-        "  Through: 12/31,          !- Field 1",
-        "  For: AllDays,            !- Field 2",
-        "  Until: 24:00, 1.0;       !- Field 3",
-
-        });
-
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
-
-    HeatBalanceManager::GetZoneData(ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
-
-    DataZoneEquipment::GetZoneEquipmentData1(); // read zone equipment configuration and list objects
-
-    DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
-
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
-        loop.LoopSide.allocate(2);
-        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
-        loopside.TotalBranches = 1;
-        loopside.Branch.allocate(1);
-        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
-        loopsidebranch.TotalComponents = 1;
-        loopsidebranch.Comp.allocate(1);
-    }
-    DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
-    DataPlant::PlantLoop(1).FluidName = "FluidWaterLoop";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "WATER COOLING COIL";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 9;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 10;
-
-    DataPlant::PlantLoop(2).Name = "HotWaterLoop";
-    DataPlant::PlantLoop(2).FluidName = "FluidWaterLoop";
-    DataPlant::PlantLoop(2).FluidIndex = 1;
-    DataPlant::PlantLoop(2).FluidName = "WATER";
-    DataPlant:: PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = "WATER HEATING COIL";
-    DataPlant:: PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 6;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 7;
-
-    UnitarySys mySys;
-    UnitarySys *thisSys;
-    std::string compName = "UNITARY SYSTEM MODEL";
-    int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
-    bool zoneEquipment = true;
-    thisSys = mySys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
-
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
-    thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-
-    OutputReportPredefined::SetPredefinedTables();
-    EXPECT_FALSE(ErrorsFound); // expect no errors
-
-    ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
-    EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
-
-    DataGlobals::SysSizingCalc =
-        false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
-
-    InletNode = thisSys->AirInNode;
-    OutletNode = thisSys->AirOutNode;
-    ControlZoneNum = thisSys->NodeNumOfControlledZone;
-
-    // set up unitary system inlet condtions
-    DataLoopNode::Node(InletNode).Temp = 20.0;    // zone winter dry-bulb temp
-    DataLoopNode::Node(InletNode).HumRat = 0.005; // dry winter condition
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate;
-
-    // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 20.0;       // set zone temperature during heating season used to determine system delivered capacity
-    DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 30.0;
-
-    // initialize other incidentals that are used within the UnitarySystem module during calculations
-    DataSizing::CurZoneEqNum = 1;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 2000.0; // heating load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 4000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 2000.0;
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP = 0.0;
-
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP(1) =
-        DataZoneEnergyDemands::ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP;
-
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    // fill the schedule values
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // availability
-    ScheduleManager::Schedule(2).CurrentValue = 1.0; // constant fan
-    DataGlobals::BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
-
-    // call once to initialize some variables (i.e., min air flow rate not correct on first pass)
-    int AirLoopNum = 0;
-    int CompIndex = 1;
-    bool HeatActive = false;
-    bool CoolActive = true;
-    int const ZoneOAUnitNum = 0;
-    Real64 const OAUCoilOutTemp = 0.0;
-    bool const ZoneEquipment = false;
-
-    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
-    // reset air flow control since schedule value was not update prior to GetInput usage
-    thisSys->m_AirFlowControl = UnitarySys::UseCompFlow::UseCompressorOffFlow;
-
-    // 4 general tests for heating and cooling:
-    // 1 - low load, min fan speed and coil modulates to meet load
-    // 2 - moderate load, fan speed and water flow modulate to meet load. Outlet air temp is typically at limit
-    // 3 - high load, max fan speed, water modulate to meet load
-    // 4 - very high load, max fan speed and water flow rate, load not met
-    //
-    // HEATING LOAD
-    // Heating Test 1 - low load, operate at min fan flow, modulate water flow to meet load
-    // system output should match RemainingOutputRequired = 2000.0 W (heating mode)
-    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
-
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-
-    // calculation at end of CalcUnitarySystemToLoad():
-    //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
-    // UnitarySysNum ).SenLoadLoss;
-
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
-
-    // test model performance
-    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 2.0);  // Watts (2.0 = 0.001 * load)
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // low speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
-                                                                                               // these next 2 variables are used to modulate the coil PLR irrespective of the fan PLR - they are non-zero when the model is called and CAN be 0
-                                                                                               // when load exceeds capacity the ASHRAE model is the only model that uses these variables, and flow is determined by Heat/CoolWaterFlowRatio *
-                                                                                               // max other models will show 0 here and in this case water flow will equal max flow * PartLoadRatio
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.01374, 0.0001); // heating coil water flow ratio, heating coil is on
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);     // cooling coil water flow ratio, cooling coil is off
-    EXPECT_NEAR(thisSys->FanPartLoadRatio,
-        thisSys->MaxNoCoolHeatAirMassFlow / thisSys->MaxHeatAirMassFlow,
-        0.0001);                                                    // fan PLR at minimum speed
-    EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature does not exceed max limit
-
-                                                                            // increase heating load so that upper temperature limit is reached
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 6000.0; // heating load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 8000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 6000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
-
-    // Heating Test 2 - moderate load, operate above min fan flow, modulate water flow to meet load
-    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
-
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
-
-    // test model performance
-    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 6.0); // Watts
-    EXPECT_GT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);       // air flow higher than low speed fan flow
-    EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow);             // air flow lower than high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);            // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0667, 0.0001);                     // heating coil water flow ratio, heating coil is on
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);                        // cooling coil water flow ratio, cooling coil is off
-    EXPECT_NEAR(thisSys->FanPartLoadRatio,
-        0.6198,
-        0.0001); // fan PLR above minimum and below maximum speed (0-1 means fraction between no load flow and full flow)
-    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp, 0.01); // outlet temperature modulated to meet max limit
-
-                                                                                    // increase heating load again so that upper temperature limit is exceeded to meet load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 10000.0; // heating load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 12000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 10000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
-
-    // Heating Test 3 - high load, operate at max fan flow, modulate water flow to meet load
-    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
-
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
-
-    // test model performance
-    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 10.0); // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.2532, 0.001);                       // heating coil water flow ratio, heating coil is on
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);                         // cooling coil water flow ratio, cooling coil is off
-    EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0); // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
-    EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
-
-                                                                            // increase heating load again to push water flow rate towards max
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 12000.0; // heating load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 14000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 12000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
-
-    // Heating Test 4 - very high load, operate at max fan and water flow, load not met
-    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
-
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
-
-    // test model performance
-    EXPECT_GT(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);                            // Watts - system CANNOT meet load
-    EXPECT_NEAR(Qsens_sys, 11316.64, 0.1);                                                                        // system maxed out on capacity
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);                                // inlet = outlet flow rate
-    EXPECT_EQ(DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate, thisSys->MaxHeatCoilFluidFlow); // water coil water flow rate at max
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio,
-        0.0,
-        0.0001); // heating coil water flow ratio not set, heating coil is on since function returned when load exceeded capacity
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001); // cooling coil water flow ratio, cooling coil is off
-    EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0); // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
-    EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
-    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, 25.85, 0.01);                        // system allowed to exceed max outlet air temp to meet additional load
-
-                                                                            // COOLING LOAD
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -2000.0; // cooling load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -2000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -4000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
-
-    // set zone temperature
-    DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // zone summer dry-bulb temp
-    DataLoopNode::Node(InletNode).Temp = 24.0;      // system inlet node dry-bulb temp
-    DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
-    DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 30.0;
-
-    // Cooling Test 1 - low load, operate at min fan flow, modulate water flow to meet load
-    // system output should match RemainingOutputRequired = -2000.0 W (cooling mode)
-    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
-
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-
-    // calculation at end of CalcUnitarySystemToLoad():
-    //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
-    // UnitarySysNum ).SenLoadLoss;
-
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
-
-    // test model performance
-    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 3.0);  // Watts
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // low speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                         // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.103, 0.001);                        // cooling coil water flow ratio, cooling coil is on
-    EXPECT_NEAR(thisSys->FanPartLoadRatio,
-        thisSys->MaxNoCoolHeatAirMassFlow / thisSys->MaxCoolAirMassFlow,
-        0.0001);                                                    // fan PLR at minimum speed
-    EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature is not below min limit
-
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -9000.0; // cooling load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -9000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -11000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
-
-    // Cooling Test 2 - moderate load, operate above min fan flow, modulate water flow to meet load
-    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
-
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
-
-    // test model performance
-    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 9.0); // Watts
-    EXPECT_GT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow);       // air flow higher than low speed fan flow
-    EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);             // air flow lower than high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);            // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                        // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.392, 0.001);                       // cooling coil water flow ratio, cooling coil is on
-    EXPECT_NEAR(thisSys->FanPartLoadRatio, 0.5117, 0.0001);                           // fan PLR above minimum speed
-    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp, 0.01);           // outlet temperature modulated to meet max limit
-
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -18000.0; // cooling load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -18000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -20000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
-
-    // Cooling Test 3 - high load, operate at max fan flow, modulate water flow to meet load
-    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
-
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
-
-    // test model performance
-    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 18.0); // Watts
-    EXPECT_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);              // air flow at high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);             // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                         // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.795, 0.001);                        // cooling coil water flow ratio, cooling coil is on
-    EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                               // fan PLR at maximum speed
-    EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp);                    // outlet temperature below minimum temperature limit
-
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -22000.0; // cooling load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -22000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -24000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
-
-    // Cooling Test 4 - very high load, operate at max fan and water flow, load not met
-    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
-
-    ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
-
-    // test model performance
-    EXPECT_LT(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);                            // Watts - system CANNOT meet load
-    EXPECT_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);                                 // air flow at high speed fan flow
-    EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);                                // inlet = outlet flow rate
-    EXPECT_EQ(DataLoopNode::Node(thisSys->CoolCoilFluidInletNode).MassFlowRate, thisSys->MaxCoolCoilFluidFlow); // water coil water flow rate at max
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001); // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio,
-        0.0,
-        0.001); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
-    EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);            // fan PLR at maximum speed
-    EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
@@ -10440,7 +9975,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
 
-    // With Test Fan 3 fan heat - this fails before the #6026 fix in HVACUnitarySystem (and in ReportSizingManager)
+    // With Test Fan 3 fan heat - this fails before the #6026 fix in UnitarySystem (and in ReportSizingManager)
     thisSys.m_FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
     thisSys.m_FanIndex = 2; // Fan:SystemModel is zero-based subscripts, so 2 is 3
     Real64 expectedSize = 18976.394 + locDesignHeatGain3;

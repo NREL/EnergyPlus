@@ -277,8 +277,6 @@ SET( SRC
   HVACStandAloneERV.hh
   HVACUnitaryBypassVAV.cc
   HVACUnitaryBypassVAV.hh
-  HVACUnitarySystem.cc
-  HVACUnitarySystem.hh
   HVACVariableRefrigerantFlow.cc
   HVACVariableRefrigerantFlow.hh
   HWBaseboardRadiator.cc

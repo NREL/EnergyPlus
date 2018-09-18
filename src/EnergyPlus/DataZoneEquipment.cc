@@ -131,10 +131,9 @@ namespace DataZoneEquipment {
     int const BBElectric_Num(27);
     int const RefrigerationAirChillerSet_Num(28);
     int const UserDefinedZoneHVACForcedAir_Num(29);
-    int const ZoneUnitarySystem_Num(30); // AirloopHVAC:UnitarySystem:Legacy configured as zone equipment
-    int const CoolingPanel_Num(31);
-    int const ZoneUnitarySys_Num(32);
-    int const TotalNumZoneEquipType(32);
+    int const CoolingPanel_Num(30);
+    int const ZoneUnitarySys_Num(31);
+    int const TotalNumZoneEquipType(31);
     // **NOTE**... if you add another zone equipment object, then increment
     // TotalNumZoneEquipType above to match the total number of zone equipment types
     // End zone equip objects
@@ -645,9 +644,6 @@ namespace DataZoneEquipment {
                             UnitarySystems::UnitarySys thisSys;
                             ZoneEquipList(ControlledZoneNum).compPointer[ZoneEquipTypeNum] = thisSys.factory(
                                 DataHVACGlobals::UnitarySys_AnyCoilType, ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum), true, 0);
-
-                        } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") { // Unitary System
-                            ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySystem_Num;
 
                         } else if (SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX") { // Zone dehumidifier
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneDXDehumidifier_Num;

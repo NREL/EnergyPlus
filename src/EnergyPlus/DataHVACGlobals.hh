@@ -183,7 +183,6 @@ namespace DataHVACGlobals {
     extern int const UnitarySys_HeatPump_AirToAir;
     extern int const UnitarySys_HeatPump_WaterToAir;
     extern int const UnitarySys_AnyCoilType;
-    extern int const UnitarySystem_AnyCoilType;
     extern Array1D_string const cFurnaceTypes;
 
     // parameters describing coil types

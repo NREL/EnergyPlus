@@ -70,7 +70,6 @@
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -105,6 +104,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
@@ -137,7 +137,6 @@
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
-#include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -204,9 +203,9 @@
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -380,7 +379,6 @@ void EnergyPlusFixture::clear_all_states()
     HVACSingleDuctInduc::clear_state();
     HVACStandAloneERV::clear_state();
     HVACUnitaryBypassVAV::clear_state();
-    HVACUnitarySystem::clear_state();
     HVACVariableRefrigerantFlow::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();

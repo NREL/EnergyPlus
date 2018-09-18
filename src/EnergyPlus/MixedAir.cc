@@ -84,7 +84,6 @@
 #include <HVACDXSystem.hh>
 #include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <HVACUnitarySystem.hh>
 #include <HeatRecovery.hh>
 #include <HeatingCoils.hh>
 #include <Humidifiers.hh>
@@ -203,10 +202,9 @@ namespace MixedAir {
     int const Fan_ComponentModel(18); // cpw22Aug2010 (new)
     int const DXHeatPumpSystem(19);
     int const Coil_UserDefined(20);
-    int const UnitarySystemHVAC(21);
-    int const Humidifier(22);
-    int const Fan_System_Object(23);
-    int const UnitarySystemModel(24);
+    int const Humidifier(21);
+    int const Fan_System_Object(22);
+    int const UnitarySystemModel(23);
 
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -597,9 +595,6 @@ namespace MixedAir {
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
-        using HVACUnitarySystem::GetUnitarySystemHeatCoolCoil;
-        using HVACUnitarySystem::SimUnitarySystem;
         using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
@@ -756,17 +751,6 @@ namespace MixedAir {
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
                     if (AirLoopInputsFilled) {
                         UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(CompName, 0);
-                        MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
-                    }
-                }
-            } else if (SELECT_CASE_var == UnitarySystemHVAC) { // AirLoopHVAC:UnitarySystem:Legacy
-                if (Sim) {
-                    SimUnitarySystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
-                }
-                if (AirLoopInputsFilled) GetUnitarySystemHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil);
-                if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
-                    if (AirLoopInputsFilled) {
-                        CheckUnitarySysCoilInOASysExists(CompName);
                         MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
                     }
                 }
@@ -1219,8 +1203,6 @@ namespace MixedAir {
                         UnitarySystems::UnitarySys thisSys;
                         OutsideAirSys(OASysNum).compPointer[CompNum] =
                             thisSys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
-                    } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY") {
-                        OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystemHVAC;
                     } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Coil_UserDefined;
                         // Heat recovery

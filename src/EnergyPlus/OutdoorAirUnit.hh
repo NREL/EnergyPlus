@@ -80,7 +80,6 @@ namespace OutdoorAirUnit {
     extern int const HeatXchngr;
     extern int const Desiccant;
     extern int const DXHeatPumpSystem;
-    extern int const UnitarySystemHVAC;
     extern int const UnirarySystemModel;
 
     //  Control Types
