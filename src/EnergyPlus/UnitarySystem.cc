@@ -1404,7 +1404,6 @@ namespace UnitarySystems {
         // and heating capacities of a DX heat pump system will be identical. In real life the ARI
         // heating and cooling capacities are close but not identical.
 
-        // Using/Aliasing
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeUnitarySystem");
 

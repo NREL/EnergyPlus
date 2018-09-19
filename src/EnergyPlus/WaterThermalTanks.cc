@@ -12136,7 +12136,6 @@ namespace WaterThermalTanks {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
         using DataSurfaces::Surface;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
