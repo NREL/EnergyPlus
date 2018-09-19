@@ -429,7 +429,7 @@ namespace UtilityRoutines {
     }
 } // namespace UtilityRoutines
 
-void AbortEnergyPlus()
+int AbortEnergyPlus()
 {
 
     // SUBROUTINE INFORMATION:
@@ -597,7 +597,7 @@ void AbortEnergyPlus()
     // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
     // indicating that E+ terminated with an error.
     if (NumExternalInterfaces > 0) CloseSocket(-1);
-    std::exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
 }
 
 void CloseMiscOpenFiles()
@@ -709,6 +709,11 @@ void CloseOutOpenFiles()
 
     bool exists;
     bool opened;
+    std::string name;
+    const std::string stdin_name("stdin");
+    const std::string stdout_name("stdout");
+    const std::string stderr_name("stderr");
+    bool not_special(false);
     int UnitNumber;
     int ios;
 
@@ -719,12 +724,18 @@ void CloseOutOpenFiles()
             exists = flags.exists();
             opened = flags.open();
             ios = flags.ios();
+            name = flags.name();
         }
-        if (exists && opened && ios == 0) gio::close(UnitNumber);
+        if (exists && opened && ios == 0) {
+            not_special = name.compare(stdin_name) != 0;
+            not_special = not_special && (name.compare(stdout_name) != 0);
+            not_special = not_special && (name.compare(stderr_name) != 0);
+            if (not_special) gio::close(UnitNumber);
+        }
     }
 }
 
-void EndEnergyPlus()
+int EndEnergyPlus()
 {
 
     // SUBROUTINE INFORMATION:
@@ -750,8 +761,8 @@ void EndEnergyPlus()
     using namespace DataTimings;
     using namespace DataErrorTracking;
     using ExternalInterface::CloseSocket;
-    using ExternalInterface::NumExternalInterfaces;
     using ExternalInterface::haveExternalInterfaceBCVTB;
+    using ExternalInterface::NumExternalInterfaces;
     using General::RoundSigDigits;
     using SolarShading::ReportSurfaceErrors;
 
@@ -844,7 +855,7 @@ void EndEnergyPlus()
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation
     if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
-    std::exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
 
 int GetNewUnitNumber()
@@ -1429,7 +1440,8 @@ void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit
     if (len(Message) < 50) {
         ShowErrorMessage(" **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
                              CreateSysTimeIntervalString(),
-                         OutUnit1, OutUnit2);
+                         OutUnit1,
+                         OutUnit2);
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
                                             CreateSysTimeIntervalString());
@@ -1437,7 +1449,8 @@ void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit
     } else {
         ShowErrorMessage(" **   ~~~   ** " + Message);
         ShowErrorMessage(" **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(),
-                         OutUnit1, OutUnit2);
+                         OutUnit1,
+                         OutUnit2);
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
                                             CreateSysTimeIntervalString());
@@ -1646,8 +1659,8 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Messag
     }
 
     ++TotalSevereErrors;
-    StoreRecurringErrorMessage(" ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits,
-                               ReportSumUnits);
+    StoreRecurringErrorMessage(
+        " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
 }
 
 void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
@@ -1704,8 +1717,8 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Messa
     }
 
     ++TotalWarningErrors;
-    StoreRecurringErrorMessage(" ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits,
-                               ReportSumUnits);
+    StoreRecurringErrorMessage(
+        " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
 }
 
 void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
@@ -1761,8 +1774,8 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Mess
         if (has(Message, MessageSearch(Loop))) ++MatchCounts(Loop);
     }
 
-    StoreRecurringErrorMessage(" **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits,
-                               ReportSumUnits);
+    StoreRecurringErrorMessage(
+        " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
 }
 
 void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation

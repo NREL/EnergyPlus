@@ -87,7 +87,8 @@ namespace SimAirServingZones {
     extern int const Unglazed_SolarCollector;
     extern int const EvapCooler;
     extern int const UnitarySystem;
-    extern int const Furnace_UnitarySys;
+    extern int const Furnace_UnitarySys_HeatOnly;
+    extern int const Furnace_UnitarySys_HeatCool;
     extern int const Humidifier;
     extern int const Duct;
     extern int const UnitarySystem_BypassVAVSys;
@@ -213,6 +214,14 @@ namespace SimAirServingZones {
                           int CtrlZoneNum,        // controlled zone number
                           Real64 &SystemCoolingEv // system ventilation efficiency
     );
+
+    void CheckWaterCoilIsOnAirLoop(int const CoilTypeNum, std::string const CompType, std::string const CompName, bool &WaterCoilOnAirLoop);
+
+    bool CheckWaterCoilOnPrimaryAirLoopBranch(int const CoilTypeNum, std::string const CompName);
+
+    bool CheckWaterCoilOnOASystem(int const CoilTypeNum, std::string const CompName);
+
+    bool CheckWaterCoilSystemOnAirLoopOrOASystem(int const CoilTypeNum, std::string const CompName);
 
     //        End of Utility subroutines for the SimAir Module
     // *****************************************************************************

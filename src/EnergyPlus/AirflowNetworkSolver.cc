@@ -116,7 +116,6 @@ namespace AirflowNetworkSolver {
     using Psychrometrics::PsyCpAirFnWTdb;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace DataAirflowNetwork;
 
     // Data
@@ -728,7 +727,7 @@ namespace AirflowNetworkSolver {
                 DUMPVD("AU:", AU, NNZE, Unit21);
                 DUMPVR("AF:", SUMF, NetworkNumOfNodes, Unit21);
             }
-                // Solve linear system for approximate PZ.
+            // Solve linear system for approximate PZ.
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
             FACSKY(newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM);     // noel
             SLVSKY(newAU, AD, newAU, PZ, newIK, NetworkNumOfNodes, NSYM); // noel
@@ -1281,8 +1280,8 @@ namespace AirflowNetworkSolver {
             Corr = MultizoneSurfaceData(i).Factor;
         }
         CompNum = AirflowNetworkCompData(j).TypeNum;
-        RhozNorm = PsyRhoAirFnPbTdbW(MultizoneSurfaceCrackData(CompNum).StandardP, MultizoneSurfaceCrackData(CompNum).StandardT,
-                                     MultizoneSurfaceCrackData(CompNum).StandardW);
+        RhozNorm = PsyRhoAirFnPbTdbW(
+            MultizoneSurfaceCrackData(CompNum).StandardP, MultizoneSurfaceCrackData(CompNum).StandardT, MultizoneSurfaceCrackData(CompNum).StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * MultizoneSurfaceCrackData(CompNum).StandardT;
 
         expn = MultizoneSurfaceCrackData(CompNum).FlowExpo;
@@ -1702,15 +1701,15 @@ namespace AirflowNetworkSolver {
         }
     }
 
-    void AFECFR(int const j,                   // Component number
-                int const EP_UNUSED(LFLAG),    // Initialization flag.If = 1, use laminar relationship
-                Real64 const EP_UNUSED(PDROP), // Total pressure drop across a component (P1 - P2) [Pa]
-                int const EP_UNUSED(i),        // Linkage number
-                int const EP_UNUSED(n),        // Node 1 number
-                int const EP_UNUSED(M),        // Node 2 number
-                Array1A<Real64> F,             // Airflow through the component [kg/s]
-                Array1A<Real64> DF,            // Partial derivative:  DF/DP
-                int &NF                        // Number of flows, either 1 or 2
+    void AFECFR(int const j,        // Component number
+                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
+                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+                int const i,        // Linkage number
+                int const n,        // Node 1 number
+                int const M,        // Node 2 number
+                Array1A<Real64> F,  // Airflow through the component [kg/s]
+                Array1A<Real64> DF, // Partial derivative:  DF/DP
+                int &NF             // Number of flows, either 1 or 2
     )
     {
 
@@ -1732,13 +1731,11 @@ namespace AirflowNetworkSolver {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::LoopCompCycRatio;
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
+        using DataHVACGlobals::NumPrimaryAirSys;
         using DataLoopNode::Node;
 
         // Argument array dimensioning
@@ -1768,32 +1765,37 @@ namespace AirflowNetworkSolver {
 
         // FLOW:
         CompNum = AirflowNetworkCompData(j).TypeNum;
+        int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
         NF = 1;
         if (DisSysCompCVFData(CompNum).FanTypeNum == FanType_SimpleOnOff) {
-            if (LoopFanOperationMode == CycFanCycComp && LoopSystemOnMassFlowrate > 0.0) {
-                F(1) = LoopSystemOnMassFlowrate;
+            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate == 0.0) {
+                GenericDuct(0.1, 0.001, LFLAG, PDROP, n, M, F, DF, NF);
+            } else if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
+                F(1) = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             } else {
                 F(1) = Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate * DisSysCompCVFData(CompNum).Ctrl;
                 if (MultiSpeedHPIndicator == 2) {
-                    F(1) = LoopSystemOnMassFlowrate * LoopCompCycRatio + LoopSystemOffMassFlowrate * (1.0 - LoopCompCycRatio);
+                    F(1) = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate * AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
+                           AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate * (1.0 - AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
                 }
             }
         } else if (DisSysCompCVFData(CompNum).FanTypeNum == FanType_SimpleConstVolume) {
-            if (DisSysCompCVFData(CompNum).FlowRate > 0) {
+            if (Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate > 0.0) {
                 F(1) = DisSysCompCVFData(CompNum).FlowRate * DisSysCompCVFData(CompNum).Ctrl;
-            } else {
-                F(1) = Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate * DisSysCompCVFData(CompNum).Ctrl;
+            } else if (NumPrimaryAirSys > 1 && Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate <= 0.0) {
+                GenericDuct(0.1, 0.001, LFLAG, PDROP, n, M, F, DF, NF);
             }
+
             if (MultiSpeedHPIndicator == 2) {
-                F(1) = LoopSystemOnMassFlowrate;
+                F(1) = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             }
         } else if (DisSysCompCVFData(CompNum).FanTypeNum == FanType_SimpleVAV) {
             // Check VAV termals with a damper
             SumTermFlow = 0.0;
             SumFracSuppLeak = 0.0;
             for (k = 1; k <= NetworkNumOfLinks; ++k) {
-                if (AirflowNetworkLinkageData(k).VAVTermDamper) {
+                if (AirflowNetworkLinkageData(k).VAVTermDamper && AirflowNetworkLinkageData(k).AirLoopNum == DisSysCompCVFData(CompNum).AirLoopNum) {
                     k1 = AirflowNetworkNodeData(AirflowNetworkLinkageData(k).NodeNums(1)).EPlusNodeNum;
                     if (Node(k1).MassFlowRate > 0.0) {
                         SumTermFlow += Node(k1).MassFlowRate;
@@ -1803,7 +1805,8 @@ namespace AirflowNetworkSolver {
                     // Calculate supply leak sensible losses
                     Node1 = AirflowNetworkLinkageData(k).NodeNums(1);
                     Node2 = AirflowNetworkLinkageData(k).NodeNums(2);
-                    if ((AirflowNetworkNodeData(Node2).EPlusZoneNum > 0) && (AirflowNetworkNodeData(Node1).EPlusNodeNum == 0)) {
+                    if ((AirflowNetworkNodeData(Node2).EPlusZoneNum > 0) && (AirflowNetworkNodeData(Node1).EPlusNodeNum == 0) &&
+                        (AirflowNetworkNodeData(Node1).AirLoopNum == DisSysCompCVFData(CompNum).AirLoopNum)) {
                         SumFracSuppLeak += DisSysCompELRData(AirflowNetworkCompData(AirflowNetworkLinkageData(k).CompNum).TypeNum).ELR;
                     }
                 }
@@ -2880,7 +2883,8 @@ namespace AirflowNetworkSolver {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = MultizoneSurfaceData(i).Factor;
-            RhozNorm = PsyRhoAirFnPbTdbW(MultizoneCompExhaustFanData(CompNum).StandardP, MultizoneCompExhaustFanData(CompNum).StandardT,
+            RhozNorm = PsyRhoAirFnPbTdbW(MultizoneCompExhaustFanData(CompNum).StandardP,
+                                         MultizoneCompExhaustFanData(CompNum).StandardT,
                                          MultizoneCompExhaustFanData(CompNum).StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * MultizoneCompExhaustFanData(CompNum).StandardT;
 
@@ -3265,15 +3269,16 @@ namespace AirflowNetworkSolver {
         DF(2) = 0.0;
     }
 
-    void AFEOAF(int const j,            // Component number
-                int const LFLAG,        // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP,     // Total pressure drop across a component (P1 - P2) [Pa]
-                int const EP_UNUSED(i), // Linkage number
-                int const n,            // Node 1 number
-                int const M,            // Node 2 number
-                Array1A<Real64> F,      // Airflow through the component [kg/s]
-                Array1A<Real64> DF,     // Partial derivative:  DF/DP
-                int &NF                 // Number of flows, either 1 or 2
+    void AFEOAF(int const j,        // Component number
+                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
+                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+                                    //		int const EP_UNUSED( i ), // Linkage number
+                int const i,        // Linkage number
+                int const n,        // Node 1 number
+                int const M,        // Node 2 number
+                Array1A<Real64> F,  // Airflow through the component [kg/s]
+                Array1A<Real64> DF, // Partial derivative:  DF/DP
+                int &NF             // Number of flows, either 1 or 2
     )
     {
 
@@ -3281,10 +3286,7 @@ namespace AirflowNetworkSolver {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
@@ -3323,6 +3325,7 @@ namespace AirflowNetworkSolver {
 
         // FLOW:
         CompNum = AirflowNetworkCompData(j).TypeNum;
+        int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
         InletNode = DisSysCompOutdoorAirData(CompNum).InletNode;
         if (Node(InletNode).MassFlowRate > VerySmallMassFlow) {
@@ -3330,15 +3333,16 @@ namespace AirflowNetworkSolver {
             NF = 1;
             F(1) = Node(InletNode).MassFlowRate;
             DF(1) = 0.0;
-            if (LoopFanOperationMode == CycFanCycComp && LoopOnOffFanPartLoadRatio > 0.0) {
-                F(1) = F(1) / LoopOnOffFanPartLoadRatio;
+            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                F(1) = F(1) / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             return;
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = PsyRhoAirFnPbTdbW(DisSysCompOutdoorAirData(CompNum).StandardP, DisSysCompOutdoorAirData(CompNum).StandardT,
+            RhozNorm = PsyRhoAirFnPbTdbW(DisSysCompOutdoorAirData(CompNum).StandardP,
+                                         DisSysCompOutdoorAirData(CompNum).StandardT,
                                          DisSysCompOutdoorAirData(CompNum).StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * DisSysCompOutdoorAirData(CompNum).StandardT;
 
@@ -3405,15 +3409,16 @@ namespace AirflowNetworkSolver {
         }
     }
 
-    void AFEREL(int const j,            // Component number
-                int const LFLAG,        // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP,     // Total pressure drop across a component (P1 - P2) [Pa]
-                int const EP_UNUSED(i), // Linkage number
-                int const n,            // Node 1 number
-                int const M,            // Node 2 number
-                Array1A<Real64> F,      // Airflow through the component [kg/s]
-                Array1A<Real64> DF,     // Partial derivative:  DF/DP
-                int &NF                 // Number of flows, either 1 or 2
+    void AFEREL(int const j,        // Component number
+                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
+                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+                int const i,        // Linkage number
+                                    //		int const EP_UNUSED( i ), // Linkage number
+                int const n,        // Node 1 number
+                int const M,        // Node 2 number
+                Array1A<Real64> F,  // Airflow through the component [kg/s]
+                Array1A<Real64> DF, // Partial derivative:  DF/DP
+                int &NF             // Number of flows, either 1 or 2
     )
     {
 
@@ -3421,6 +3426,7 @@ namespace AirflowNetworkSolver {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
+        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
 
@@ -3432,7 +3438,7 @@ namespace AirflowNetworkSolver {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
+        int const CycFanCycComp(1); // fan cycles with compressor operation
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -3458,20 +3464,28 @@ namespace AirflowNetworkSolver {
 
         // FLOW:
         CompNum = AirflowNetworkCompData(j).TypeNum;
+        int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
         OutletNode = DisSysCompReliefAirData(CompNum).OutletNode;
-        if (Node(OutletNode).MassFlowRate > VerySmallMassFlow && PressureSetFlag == PressureCtrlRelief) {
+        if (Node(OutletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             NF = 1;
-            F(1) = ReliefMassFlowRate;
             DF(1) = 0.0;
+            if (PressureSetFlag == PressureCtrlRelief) {
+                F(1) = ReliefMassFlowRate;
+            } else {
+                F(1) = Node(OutletNode).MassFlowRate;
+                if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                    F(1) = F(1) / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+                }
+            }
             return;
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = PsyRhoAirFnPbTdbW(DisSysCompReliefAirData(CompNum).StandardP, DisSysCompReliefAirData(CompNum).StandardT,
-                                         DisSysCompReliefAirData(CompNum).StandardW);
+            RhozNorm = PsyRhoAirFnPbTdbW(
+                DisSysCompReliefAirData(CompNum).StandardP, DisSysCompReliefAirData(CompNum).StandardT, DisSysCompReliefAirData(CompNum).StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * DisSysCompReliefAirData(CompNum).StandardT;
 
             expn = DisSysCompReliefAirData(CompNum).FlowExpo;
@@ -3661,6 +3675,151 @@ namespace AirflowNetworkSolver {
             } else {
                 F(1) = FT;
                 DF(1) = FT * expn / PDROP;
+            }
+        }
+    }
+
+    void GenericDuct(Real64 const Length,   // Duct length
+                     Real64 const Diameter, // Duct diameter
+                     int const LFLAG,       // Initialization flag.If = 1, use laminar relationship
+                     Real64 const PDROP,    // Total pressure drop across a component (P1 - P2) [Pa]
+                     int const n,           // Node 1 number
+                     int const M,           // Node 2 number
+                     Array1A<Real64> F,     // Airflow through the component [kg/s]
+                     Array1A<Real64> DF,    // Partial derivative:  DF/DP
+                     int &NF                // Number of flows, either 1 or 2
+    )
+    {
+
+        // This subroutine solve air flow as a duct if fan has zero flow rate
+
+        // Argument array dimensioning
+        F.dim(2);
+        DF.dim(2);
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 const C(0.868589);
+        Real64 const EPS(0.001);
+        Real64 const Rough(0.0001);
+        Real64 const InitLamCoef(128.0);
+        Real64 const LamDynCoef(64.0);
+        Real64 const LamFriCoef(0.0001);
+        Real64 const TurDynCoef(0.0001);
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 A0;
+        Real64 A1;
+        Real64 A2;
+        Real64 B;
+        Real64 D;
+        Real64 S2;
+        Real64 CDM;
+        Real64 FL;
+        Real64 FT;
+        Real64 FTT;
+        Real64 RE;
+
+        // Formats
+        static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
+
+        // FLOW:
+        // Get component properties
+        Real64 ed = Rough / Diameter;
+        Real64 area = Diameter * Diameter * Pi / 4.0;
+        Real64 ld = Length / Diameter;
+        Real64 g = 1.14 - 0.868589 * std::log(ed);
+        Real64 AA1 = g;
+
+        NF = 1;
+        if (LFLAG == 1) {
+            // Initialization by linear relation.
+            if (PDROP >= 0.0) {
+                DF(1) = (2.0 * RHOZ(n) * area * Diameter) / (VISCZ(n) * InitLamCoef * ld);
+            } else {
+                DF(1) = (2.0 * RHOZ(M) * area * Diameter) / (VISCZ(M) * InitLamCoef * ld);
+            }
+            F(1) = -DF(1) * PDROP;
+        } else {
+            // Standard calculation.
+            if (PDROP >= 0.0) {
+                // Flow in positive direction.
+                // Laminar flow coefficient !=0
+                if (LamFriCoef >= 0.001) {
+                    A2 = LamFriCoef / (2.0 * RHOZ(n) * area * area);
+                    A1 = (VISCZ(n) * LamDynCoef * ld) / (2.0 * RHOZ(n) * area * Diameter);
+                    A0 = -PDROP;
+                    CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
+                    FL = (CDM - A1) / (2.0 * A2);
+                    CDM = 1.0 / CDM;
+                } else {
+                    CDM = (2.0 * RHOZ(n) * area * Diameter) / (VISCZ(n) * LamDynCoef * ld);
+                    FL = CDM * PDROP;
+                }
+                RE = FL * Diameter / (VISCZ(n) * area);
+                // Turbulent flow; test when Re>10.
+                if (RE >= 10.0) {
+                    S2 = std::sqrt(2.0 * RHOZ(n) * PDROP) * area;
+                    FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
+                    while (true) {
+                        FT = FTT;
+                        B = (9.3 * VISCZ(n) * area) / (FT * Rough);
+                        D = 1.0 + g * B;
+                        g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
+                        FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
+                        if (std::abs(FTT - FT) / FTT < EPS) break;
+                    }
+                    FT = FTT;
+                } else {
+                    FT = FL;
+                }
+            } else {
+                // Flow in negative direction.
+                // Laminar flow coefficient !=0
+                if (LamFriCoef >= 0.001) {
+                    A2 = LamFriCoef / (2.0 * RHOZ(M) * area * area);
+                    A1 = (VISCZ(M) * LamDynCoef * ld) / (2.0 * RHOZ(M) * area * Diameter);
+                    A0 = PDROP;
+                    CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
+                    FL = -(CDM - A1) / (2.0 * A2);
+                    CDM = 1.0 / CDM;
+                } else {
+                    CDM = (2.0 * RHOZ(M) * area * Diameter) / (VISCZ(M) * LamDynCoef * ld);
+                    FL = CDM * PDROP;
+                }
+                RE = -FL * Diameter / (VISCZ(M) * area);
+                // Turbulent flow; test when Re>10.
+                if (RE >= 10.0) {
+                    S2 = std::sqrt(-2.0 * RHOZ(M) * PDROP) * area;
+                    FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
+                    while (true) {
+                        FT = FTT;
+                        B = (9.3 * VISCZ(M) * area) / (FT * Rough);
+                        D = 1.0 + g * B;
+                        g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
+                        FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
+                        if (std::abs(FTT - FT) / FTT < EPS) break;
+                    }
+                    FT = -FTT;
+                } else {
+                    FT = FL;
+                }
+            }
+            // Select laminar or turbulent flow.
+            if (std::abs(FL) <= std::abs(FT)) {
+                F(1) = FL;
+                DF(1) = CDM;
+            } else {
+                F(1) = FT;
+                DF(1) = 0.5 * FT / PDROP;
             }
         }
     }
@@ -4390,7 +4549,9 @@ namespace AirflowNetworkSolver {
                 } else {
                     ShowRecurringWarningErrorAtEnd("The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " +
                                                        MultizoneCompDetOpeningData(CompNum).Name + " is 0 error continues.",
-                                                   MultizoneCompDetOpeningData(CompNum).WidthErrIndex, ActLw, ActLw);
+                                                   MultizoneCompDetOpeningData(CompNum).WidthErrIndex,
+                                                   ActLw,
+                                                   ActLw);
                 }
                 ActLw = 1.0e-6;
             }
@@ -4404,7 +4565,9 @@ namespace AirflowNetworkSolver {
                 } else {
                     ShowRecurringWarningErrorAtEnd("The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " +
                                                        MultizoneCompDetOpeningData(CompNum).Name + " is 0 error continues.",
-                                                   MultizoneCompDetOpeningData(CompNum).HeightErrIndex, ActLh, ActLh);
+                                                   MultizoneCompDetOpeningData(CompNum).HeightErrIndex,
+                                                   ActLh,
+                                                   ActLh);
                 }
                 ActLh = 1.0e-6;
             }
@@ -5427,4 +5590,4 @@ namespace AirflowNetworkSolver {
 
 } // namespace AirflowNetworkSolver
 
-} // EnergyPlus
+} // namespace EnergyPlus

@@ -71,8 +71,8 @@
 #include <InputProcessing/InputValidation.hh>
 #include <SortAndStringUtilities.hh>
 #include <UtilityRoutines.hh>
-#include <milo/dtoa.hpp>
-#include <milo/itoa.hpp>
+#include <milo/dtoa.h>
+#include <milo/itoa.h>
 
 namespace EnergyPlus {
 // Module containing the input processor routines
@@ -861,7 +861,7 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType, // Object Type 
     if (obj_iter == epJSON.end() || obj_iter.value().find(ObjName) == obj_iter.value().end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            return -1;
+            return -1; // indicates object type not found, see function GeneralRoutines::ValidateComponent
         }
         obj = &epJSON[tmp_umit->second];
     } else {
@@ -880,8 +880,7 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType, // Object Type 
     }
 
     if (!found) {
-        // ShowWarningError("Didn't find name, need to probably use search key");
-        return -1;
+        return 0; // indicates object name not found, see function GeneralRoutines::ValidateComponent
     }
     return getIDFObjNum(ObjType, object_item_num); // if incoming input is idf, then return idf object order
 }
@@ -899,7 +898,7 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType,     // Object T
     if (epJSON.find(ObjType) == epJSON.end() || obj_iter.value().find(ObjName) == obj_iter.value().end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            return -1;
+            return -1; // indicates object type not found, see function GeneralRoutines::ValidateComponent
         }
         obj = &epJSON[tmp_umit->second];
     } else {
@@ -920,8 +919,7 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType,     // Object T
     }
 
     if (!found) {
-        // ShowWarningError("Didn't find name, need to probably use search key");
-        return -1;
+        return 0; // indicates object field name or value not found
     }
     return getIDFObjNum(ObjType, object_item_num); // if incoming input is idf, then return idf object order
 }
@@ -1262,9 +1260,17 @@ void InputProcessor::preProcessorCheck(bool &PreP_Fatal) // True if a preprocess
         getObjectDefMaxArgs(DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         DataIPShortCuts::cAlphaArgs({1, NumAlphas}) = BlankString;
         for (CountP = 1; CountP <= NumPrePM; ++CountP) {
-            getObjectItem(DataIPShortCuts::cCurrentModuleObject, CountP, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs,
-                          NumNumbers, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks,
-                          DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames);
+            getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                          CountP,
+                          DataIPShortCuts::cAlphaArgs,
+                          NumAlphas,
+                          DataIPShortCuts::rNumericArgs,
+                          NumNumbers,
+                          IOStat,
+                          DataIPShortCuts::lNumericFieldBlanks,
+                          DataIPShortCuts::lAlphaFieldBlanks,
+                          DataIPShortCuts::cAlphaFieldNames,
+                          DataIPShortCuts::cNumericFieldNames);
             if (DataIPShortCuts::cAlphaArgs(1).empty()) DataIPShortCuts::cAlphaArgs(1) = "Unknown";
             if (NumAlphas > 3) {
                 Multiples = "s";
