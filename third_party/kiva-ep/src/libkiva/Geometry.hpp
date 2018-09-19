@@ -1,13 +1,13 @@
-/* Copyright (c) 2012-2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+/* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
-#include <boost/geometry/multi/geometries/multi_polygon.hpp>
 #include <boost/geometry/multi/geometries/multi_point.hpp>
+#include <boost/geometry/multi/geometries/multi_polygon.hpp>
 
 #include "Functions.hpp"
 #include "libkiva_export.h"
@@ -24,22 +24,11 @@ typedef boost::geometry::model::box<Point> Box;
 typedef boost::geometry::model::point<double, 3, boost::geometry::cs::cartesian> Point3;
 typedef boost::geometry::model::polygon<Point3, true, false> Polygon3;
 
-namespace geom
-{
-  enum Direction
-  {
-    X_NEG,
-    X_POS,
-    Y_NEG,
-    Y_POS
-  };
+namespace geom {
+enum Direction { X_NEG, X_POS, Y_NEG, Y_POS };
 
-  enum Turn
-  {
-    LEFT,
-    RIGHT
-  };
-}
+enum Turn { LEFT, RIGHT };
+} // namespace geom
 
 bool isRectilinear(Polygon poly);
 Polygon offset(Polygon poly, double dist);
@@ -61,12 +50,10 @@ bool LIBKIVA_EXPORT comparePointsY(Point first, Point second);
 bool LIBKIVA_EXPORT pointOnPoly(Point point, Polygon poly);
 bool LIBKIVA_EXPORT isConvex(Polygon poly);
 
-
 double LIBKIVA_EXPORT getDistance(Point a, Point b);
 
 double getAngle(Point a, Point b, Point c);
 
-
-}
+} // namespace Kiva
 
 #endif /* GEOMETRY_H_ */
