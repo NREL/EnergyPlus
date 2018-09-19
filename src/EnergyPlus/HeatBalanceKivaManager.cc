@@ -74,6 +74,7 @@
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
+#include <Vectors.hh>
 #include <WeatherManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
 
@@ -736,21 +737,46 @@ namespace HeatBalanceKivaManager {
                     for (auto &wl : wallSurfaces) {
 
                         auto &v = Surfaces(wl).Vertex;
+                        auto numVs = v.size();
                         // Enforce quadrilateralism
-                        if (v.size() != 4) {
-                            ErrorsFound = true;
-                            ShowSevereError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name +
-                                            "\", only quadrilateral wall surfaces are allowed to reference Foundation Outside Boundary Conditions.");
-                            ShowContinueError("Surface=\"" + Surfaces(wl).Name + "\", has " + General::TrimSigDigits(v.size()) + " vertices.");
+                        if (numVs > 4) {
+                            ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", wall surfaces with more than four vertices referencing");
+                            ShowContinueError("...Foundation Outside Boundary Conditions may not be interpreted correctly in the 2D finite difference model.");
+                            ShowContinueError("Surface=\"" + Surfaces(wl).Name + "\", has " + General::TrimSigDigits(numVs) + " vertices.");
+                            ShowContinueError("Consider separating the wall into separate surfaces, each spanning from the floor slab to the top of the foundation wall.");
                         }
 
-                        // sort vertices by Z-value
-                        std::vector<int> zs = {0, 1, 2, 3};
-                        sort(zs.begin(), zs.end(), [v](int a, int b) { return v[a].z < v[b].z; });
+                        // get coplanar points with floor to determine perimeter
+                        std::vector<int> coplanarPoints = Vectors::PointsInPlane(
+                                Surfaces(surfNum).Vertex,
+                                Surfaces(surfNum).Sides,
+                                Surfaces(wl).Vertex,
+                                Surfaces(wl).Sides,
+                                ErrorsFound
+                        );
 
-                        Real64 perimeter = distance(v[zs[0]], v[zs[1]]);
+                        Real64 perimeter = 0.0;
 
-                        Real64 surfHeight = (v[zs[2]].z + v[zs[2]].z) / 2.0 - (v[zs[0]].z + v[zs[1]].z) / 2.0;
+                        // if there are two consecutive coplanar points, add the distance
+                        // between them to the overall perimeter for this wall
+                        for (std::size_t i = 0; i < coplanarPoints.size(); ++i) {
+                            int p(coplanarPoints[i]);
+                            int pC = p == (int)v.size() ? 1 : p + 1; // next consecutive point
+                            int p2 = i == coplanarPoints.size() - 1 ? coplanarPoints[0] : coplanarPoints[i + 1]; // next coplanar point
+
+                            if (p2 == pC) { // if next coplanar point is the next consecutive point
+                                perimeter += distance(v(p), v(p2));
+                            }
+                        }
+
+                        if (perimeter == 0.0) {
+                            ErrorsFound = true;
+                            ShowSevereError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\".");
+                            ShowContinueError("   Wall Surface=\"" + Surfaces(wl).Name + "\", does not have any vertices that are");
+                            ShowContinueError("   coplanar with the corresponding Floor Surface=\"" + Surfaces(surfNum).Name + "\".");
+                        }
+
+                        Real64 surfHeight = Surfaces(wl).get_average_height();
                         // round to avoid numerical precision differences
                         surfHeight = std::round((surfHeight)*1000.0) / 1000.0;
 
@@ -956,6 +982,14 @@ namespace HeatBalanceKivaManager {
 
                     if (remainingExposedPerimeter < 0.001) {
                         assignKivaInstances = false;
+                        if (remainingExposedPerimeter < - 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError("For Floor Surface=\"" + Surfaces(surfNum).Name + "\", the Wall surfaces referencing");
+                            ShowContinueError("  the same Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\" have");
+                            ShowContinueError("  a combined length greater than the exposed perimeter of the foundation.");
+                            ShowContinueError("  Ensure that each Wall surface shares at least one edge with the corresponding");
+                            ShowContinueError("  Floor surface.");
+                        }
                     }
                 }
 

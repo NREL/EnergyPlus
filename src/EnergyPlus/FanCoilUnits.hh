@@ -215,6 +215,7 @@ namespace FanCoilUnits {
         Real64 DesZoneCoolingLoad; // used for reporting in watts
         Real64 DesZoneHeatingLoad; // used for reporting in watts
         int DSOAPtr;               // design specification outdoor air object index
+        bool FirstPass;            // detects first time through for resetting sizing data
 
         // SZVAV Model inputs
         std::string Name;                // name of unit
@@ -258,20 +259,19 @@ namespace FanCoilUnits {
             : UnitType_Num(0), SchedPtr(0), SchedOutAirPtr(0), FanType_Num(0), SpeedFanSel(0), CapCtrlMeth_Num(0), PLR(0.0), MaxIterIndexH(0),
               BadMassFlowLimIndexH(0), MaxIterIndexC(0), BadMassFlowLimIndexC(0), FanAirVolFlow(0.0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0),
               LowSpeedRatio(0.0), MedSpeedRatio(0.0), SpeedFanRatSel(0.0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), AirInNode(0), AirOutNode(0),
-              OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), FanIndex(0), CCoilName_Index(0), CCoilType_Num(0), 
-              CCoilPlantTypeOfNum(0), ControlCompTypeNum(0), CompErrIndex(0), MaxColdWaterVolFlow(0.0), MinColdWaterVolFlow(0.0), MinColdWaterFlow(0.0),
-              ColdControlOffset(0.0), HCoilName_Index(0), HCoilType_Num(0), MaxHotWaterVolFlow(0.0), MinHotWaterVolFlow(0.0), MinHotWaterFlow(0.0),
-              HotControlOffset(0.0), DesignHeatingCapacity(0.0), AvailStatus(0), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
-              HVACSizingIndex(0), SpeedRatio(0.0), FanOpModeSchedPtr(0), FanOpMode(1), ASHRAETempControl(false), QUnitOutNoHC(0.0),
-              QUnitOutMaxH(0.0), QUnitOutMaxC(0.0), LimitErrCountH(0), LimitErrCountC(0), ConvgErrCountH(0), ConvgErrCountC(0), HeatPower(0.0),
-              HeatEnergy(0.0), TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0),
-              DesCoolingLoad(0.0), DesHeatingLoad(0.0), DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0), 
-              MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), MaxNoCoolHeatAirMassFlow(0.0),
-              MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
-              CoolCoilFluidInletNode(0), CoolCoilFluidOutletNodeNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0),
-              CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0),
-              HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0),
-              CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), 
+              OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), FanIndex(0), CCoilName_Index(0), CCoilType_Num(0),
+              CCoilPlantTypeOfNum(0), ControlCompTypeNum(0), CompErrIndex(0), MaxColdWaterVolFlow(0.0), MinColdWaterVolFlow(0.0),
+              MinColdWaterFlow(0.0), ColdControlOffset(0.0), HCoilName_Index(0), HCoilType_Num(0), MaxHotWaterVolFlow(0.0), MinHotWaterVolFlow(0.0),
+              MinHotWaterFlow(0.0), HotControlOffset(0.0), DesignHeatingCapacity(0.0), AvailStatus(0), ATMixerIndex(0), ATMixerType(0),
+              ATMixerPriNode(0), ATMixerSecNode(0), HVACSizingIndex(0), SpeedRatio(0.0), FanOpModeSchedPtr(0), FanOpMode(1), ASHRAETempControl(false),
+              QUnitOutNoHC(0.0), QUnitOutMaxH(0.0), QUnitOutMaxC(0.0), LimitErrCountH(0), LimitErrCountC(0), ConvgErrCountH(0), ConvgErrCountC(0),
+              HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0),
+              ElecEnergy(0.0), DesCoolingLoad(0.0), DesHeatingLoad(0.0), DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0),
+              FirstPass(true), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0),
+              MaxNoCoolHeatAirMassFlow(0.0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
+              CoolCoilFluidInletNode(0), CoolCoilFluidOutletNodeNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0),
+              CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0),
+              HeatCoilCompNum(0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0),
               ControlZoneNum(0), NodeNumOfControlledZone(0), ATMixerExists(false), ATMixerOutNode(0), FanPartLoadRatio(0.0),
               HeatCoilWaterFlowRatio(0.0), ControlZoneMassFlowFrac(1.0), MaxIterIndex(0), RegulaFalsiFailedIndex(0)
         {
@@ -307,11 +307,12 @@ namespace FanCoilUnits {
 
     void GetFanCoilUnits();
 
-    void InitFanCoilUnits(int const FanCoilNum, // number of the current fan coil unit being simulated
-                          int const ZoneNum     // number of zone being served
-    );
+    void InitFanCoilUnits(int const FanCoilNum,         // number of the current fan coil unit being simulated
+                          int const ZoneNum,            // number of zone being served
+                          int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
 
-    void SizeFanCoilUnit(int const FanCoilNum);
+    void SizeFanCoilUnit(int const FanCoilNum,
+                         int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
 
     void SizeCoilWaterFlowRate(std::string const &WaterCoilType,
                                std::string const &WaterCoilName,
