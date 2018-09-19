@@ -4378,8 +4378,7 @@ namespace MixedAir {
 
         if (AirLoopNum > 0) {
             // Check lockout with heating for any airloop - will lockout economizer even on airloops without a unitary system
-            if ((this->Lockout == LockoutWithHeatingPossible) || (this->HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum))
-                {
+            if (this->Lockout == LockoutWithHeatingPossible) {
                 // For all system types (even ones that don't set AirLoopEconoLockout) lock out economizer if unfavorable for heating
                 if (AirLoopControlInfo(AirLoopNum).CheckHeatRecoveryBypassStatus && AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated) {
 
