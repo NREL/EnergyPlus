@@ -93,6 +93,7 @@ namespace OutputReportPredefined {
     extern int pdchFanDeltaP;
     extern int pdchFanVolFlow;
     extern int pdchFanMotorIn;
+    extern int pdchFanEnergyIndex;
     extern int pdchFanEndUse;
     extern int pdchFanPwr;
     extern int pdchFanPwrPerFlow;

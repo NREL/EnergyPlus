@@ -1,6 +1,6 @@
 \section{Sky Radiance Model}\label{sky-radiance-model}
 
-In EnergyPlus the calculation of diffuse solar radiation from the sky incident on an exterior surface takes into account the anisotropic radiance distribution of the sky. For this distribution, the diffuse sky irradiance on a surface is given by
+In EnergyPlus the calculation of diffuse solar radiation from the sky incident on an exterior surface takes into account the anisotropic radiance distribution of the sky. For this distribution, the diffuse sky irradiance on a surface is given by:
 
 \begin{equation}
 AnisoSkyMultiplie{r_{surface}}\cdot DiffuseSolarIrradiance
@@ -43,13 +43,13 @@ The \emph{horizon brightening} is assumed to be a linear source at the horizon a
 
 \caption{Variables in Anisotropic Sky Model and Shadowing of Sky Diffuse Radiation \label{table:variables-in-anisotropic-sky-model}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & C++ variable \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Variables in Anisotropic Sky Model and Shadowing of Sky Diffuse Radiation} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & C++ variable \tabularnewline
 \midrule
 \endhead
 
@@ -63,7 +63,7 @@ a, b & intermediate variables & - & - \tabularnewline
 $F_1$, $F_2$ & Circumsolar and horizon brightening coefficients & - & F1, F2 \tabularnewline
 $\alpha$ & Incidence angle of sun on surface & radians & IncAng \tabularnewline
 Z & Solar zenith angle & radians & ZenithAng \tabularnewline
-$Delta$ & Sky brightness factor & - & Delta \tabularnewline
+$\Delta$ & Sky brightness factor & - & Delta \tabularnewline
 $\varepsilon$ & Sky clearness factor & - & Epsilon \tabularnewline
 m & relative optical air mass & - & AirMass \tabularnewline
 $I_o$ & Extraterrestrial solar irradiance & W/m\(^{2}\) & - \tabularnewline
@@ -97,13 +97,13 @@ where
 
 \begin{equation}
 \begin{array}{rcl}
-    I_{horizon} & = \rm{irradiance on surface from sky horizon} & = I_h F_2\sin S \\
-    I_{dome}    & = \rm{irradiance on surface from sky dome}    & = I_h (1 - F_1)(1 + \cos S)/2 \\
-    I_{circumsolar} & = \rm{irradiance on surface from circumsolar region} & = I_h F_1 a/b
+    I_{horizon} & = \rm{irradiance~on~surface~from~sky~horizon} & = I_h F_2\sin S \\
+    I_{dome}    & = \rm{irradiance~on~surface~from~sky~dome}    & = I_h (1 - F_1)(1 + \cos S)/2 \\
+    I_{circumsolar} & = \rm{irradiance~on~surface~from~circumsolar~region} & = I_h F_1 a/b
 \end{array}
 \end{equation}
 
-AnisoSkyMult is then \emph{I\(_{sky}\)} /DifSolarRad.
+AnisoSkyMult is then \emph{I\(_{sky}\)}/DifSolarRad.
 
 In the above equations:
 
@@ -111,7 +111,7 @@ I\(_{horizon}\) = horizontal solar irradiance (W/m\(^{2}\))
 
 \emph{S} = surface tilt (radians)
 
-\emph{a} = max(0,cos\emph{$alpha$})
+\emph{a} = max(0,cos\emph{$\alpha$})
 
 \emph{b} = max(0.087, cos\emph{Z})
 
@@ -121,11 +121,11 @@ I\(_{horizon}\) = horizontal solar irradiance (W/m\(^{2}\))
 
 where
 
-\emph{$alpha$} = incidence angle of sun on the surface (radians)
+\emph{$\alpha$} = incidence angle of sun on the surface (radians)
 
 \emph{Z} = solar zenith angle (radians).
 
-The brightening coefficients are a function of sky conditions; they are given by
+The brightening coefficients are a function of sky conditions; they are given by:
 
 \begin{equation}
 \begin{array}{rl}
@@ -134,7 +134,7 @@ The brightening coefficients are a function of sky conditions; they are given by
 \end{array}
 \end{equation}
 
-Here the sky brightness factor is
+Here the sky brightness factor is:
 
 \begin{equation}
 \Delta  = {I_h}m/{I_o}
@@ -158,7 +158,7 @@ I = direct normal solar irradiance
 
 $\kappa$ = 1.041 for Z in radians
 
-The factors \emph{F\(_{ij}\)} ~are shown in the following table. The F\(_{ij}\) values in this table were provided by R. Perez, private communication, 5/21/99. These values have higher precision than those listed in Table \# 6 of Perez et al., 1990.
+The factors \emph{F\(_{ij}\)} ~are shown in the following table. The F\(_{ij}\) values in this table were provided by R. Perez, private communication, 5/21/99. These values have higher precision than those listed in Table 6 of Perez et al., 1990.
 
 % table 22
 {\scriptsize
@@ -189,10 +189,10 @@ Sky diffuse solar shadowing on an exterior surface is calculated as follows in s
 For the horizon source the following ratio is calculated by dividing the horizon line into 24 intervals of equal length:
 
 \begin{equation}
-{R_{horiz}} = \frac{{{\rm{Irradiance from horizon with obstructions}}}}{{{\rm{Irradiance from horizon without obstructions}}}} = \frac{{\sum\limits_{i = 1}^{24} {{I_i}S{F_i}} }}{{\sum\limits_{i = 1}^{24} {{I_i}} }}
+{R_{horiz}} = \frac{{{\rm{Irradiance~from~horizon~with~obstructions}}}}{{{\rm{Irradiance~from~horizon~without~obstructions}}}} = \frac{{\sum\limits_{i = 1}^{24} {{I_i}S{F_i}} }}{{\sum\limits_{i = 1}^{24} {{I_i}} }}
 \end{equation}
 
-where I\(_{i}\) is the unobstructed irradiance on the surface from the i\(^{th}\) interval, SF\(_{i}\) is the sunlit fraction from radiation coming from the \emph{i}\(^{th}\) interval, and the sums are over intervals whose center lies in front of the surface. \emph{SF\(_{i}\)} is calculated using the beam solar shadowing method as though the sun were located at the \emph{i}\(^{th}\) horizon point. Here
+where I\(_{i}\) is the unobstructed irradiance on the surface from the i\(^{th}\) interval, SF\(_{i}\) is the sunlit fraction from radiation coming from the \emph{i}\(^{th}\) interval, and the sums are over intervals whose center lies in front of the surface. \emph{SF\(_{i}\)} is calculated using the beam solar shadowing method as though the sun were located at the \emph{i}\(^{th}\) horizon point. Here:
 
 \begin{equation}
 {I_i} = E({\theta_i})d\theta \cos {\alpha_i}
@@ -208,13 +208,13 @@ where
 
 $\alpha$\(_{i}\) = incidence angle on surface of radiation from \emph{$\theta$\(_{i}\)}
 
-The corresponding ratio for the isotropic sky dome is given by
+The corresponding ratio for the isotropic sky dome is given by:
 
 \begin{equation}
-{R_{dome}} = \frac{{{\rm{Irradiance from dome with obstructions}}}}{{{\rm{Irradiance from dome without obstructions}}}} = \frac{{\sum\limits_{i = 1}^{24} {\sum\limits_{j = 1}^6 {{I_{ij}}S{F_{ij}}} } }}{{\sum\limits_{i = 1}^{24} {\sum\limits_{j = 1}^6 {{I_{ij}}} } }}
+{R_{dome}} = \frac{{{\rm{Irradiance~from~dome~with~obstructions}}}}{{{\rm{Irradiance~from~dome~without~obstructions}}}} = \frac{{\sum\limits_{i = 1}^{24} {\sum\limits_{j = 1}^6 {{I_{ij}}S{F_{ij}}} } }}{{\sum\limits_{i = 1}^{24} {\sum\limits_{j = 1}^6 {{I_{ij}}} } }}
 \end{equation}
 
-where (\emph{i,j}) is a grid of 144 points (6 in altitude by 24 in azimuth) covering the sky dome, \emph{I\(_{ij}\)} is the unobstructed irradiance on the surface from the sky element at the \emph{ij}\(^{th}\) point, \emph{SF\(_{ij}\)} is the sunlit fraction for radiation coming from the \emph{ij}\(^{th}\) element, and the sum is over points lying in front of the surface. Here
+where (\emph{i,j}) is a grid of 144 points (6 in altitude by 24 in azimuth) covering the sky dome, \emph{I\(_{ij}\)} is the unobstructed irradiance on the surface from the sky element at the \emph{ij}\(^{th}\) point, \emph{SF\(_{ij}\)} is the sunlit fraction for radiation coming from the \emph{ij}\(^{th}\) element, and the sum is over points lying in front of the surface. Here:
 
 \begin{equation}
 {I_{ij}} = E({\theta_i},{\phi_j})\cos {\phi_j}d\theta d\phi \cos {\alpha_{ij}}
@@ -234,23 +234,23 @@ where
 
 $\alpha$\(_{j}\) = incidence angle on surface of radiation from (\emph{$\theta$\(_{i}\)},\emph{$\phi$\(_{j}\)})
 
-Because the circumsolar region is assumed to be concentrated at the solar disk, the circumsolar ratio is
+Because the circumsolar region is assumed to be concentrated at the solar disk, the circumsolar ratio is:
 
 \begin{equation}
-{R_{circumsolar}} = \frac{{{\rm{Irradiance from circumsolar region with obstructions}}}}{{{\rm{Irradiance from circumsolar without obstructions}}}} = S{F_{sun}}
+{R_{circumsolar}} = \frac{{{\rm{Irradiance~from~circumsolar~region~with~obstructions}}}}{{{\rm{Irradiance~from~circumsolar~without~obstructions}}}} = S{F_{sun}}
 \end{equation}
 
-where \emph{SF\(_{sun}\)} is the beam sunlit fraction. The total sky diffuse irradiance on the surface with shadowing is then
+where \emph{SF\(_{sun}\)} is the beam sunlit fraction. The total sky diffuse irradiance on the surface with shadowing is then:
 
 \begin{equation}
 {I'_{sky}} = {R_{horizon}}{I_{horizon}} + {R_{dome}}{I_{dome}} + {R_{circumsolar}}{I_{circumsolar}}
 \end{equation}
 
-\emph{R\(_{horizon}\)} and \emph{R\(_{dome}\)} are calculated once for each surface since they are independent of sun position.
+If the Sky Diffuse Modeling Algorithm (ShadowCalculation object) is set to SimpleSkyDiffuseModeling, then \emph{R\(_{horizon}\)} and \emph{R\(_{dome}\)} are calculated once for each surface since they are independent of sun position, or else if the Sky Diffuse Modeling Algorithm is set to DetailedSkyDiffuseModeling, then \emph{R\(_{horizon}\)} and \emph{R\(_{dome}\)} are calculated every timestep for each surface.
 
 With shadowing we then have:
 
-AnisoSkyMult = \emph{I'\(_{sky}\)} /DifSolarRad.
+AnisoSkyMult = \emph{I'\(_{sky}\)}/DifSolarRad.
 
 \subsection{Shadowing of Sky Long-Wave Radiation}\label{shadowing-of-sky-long-wave-radiation}
 

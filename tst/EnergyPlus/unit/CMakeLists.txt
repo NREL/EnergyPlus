@@ -41,6 +41,7 @@ set( test_src
   DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
+  DataSizing.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DaylightingManager.unit.cc
@@ -134,6 +135,7 @@ set( test_src
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  RunPeriod.unit.cc
   RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
