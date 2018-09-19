@@ -29,13 +29,13 @@ The solar radiation transmitted by a system of glass layers and the solar radiat
 \begin{longtable}[c]{p{1.0in}p{2.5in}p{1.0in}p{1.5in}}
 \caption{Variables in Window Calculations \label{table:variables-in-window-calculations}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & C++ variable \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Variables in Window Calculations} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & C++ variable \tabularnewline
 \midrule
 \endhead
 
@@ -55,14 +55,14 @@ $\varphi$ & Angle of incidence (angle between surface normal and direction of in
 $\tau$ & Transmittivity or transmittance & - & tf0 \tabularnewline
 $\rho$ & Reflectivity or reflectance & - & rf0, rb0 \tabularnewline
 $\alpha$ & Spectral absorption coefficient & m\(^{-1}\) & - \tabularnewline
-d & Glass thickness & M & Material\%Thickness \tabularnewline
+d & Glass thickness & M & Material.Thickness \tabularnewline
 n & Index of refraction & - & ngf, ngb \tabularnewline
 $\kappa$ & Extinction coefficient & - & - \tabularnewline
 $\beta$ & Intermediate variable & - & betaf, betab \tabularnewline
 P, p & A general property, such as transmittance & - & - \tabularnewline
-$\tau$\(_{sh}\) & Shade transmittance & - & Material\%Trans \tabularnewline
-$\rho$\(_{sh}\) & Shade reflectance & - & Material\%ReflectShade \tabularnewline
-$\alpha$\(_{sh}\) & Shade absorptance & - & Material\%AbsorpSolar \tabularnewline
+$\tau$\(_{sh}\) & Shade transmittance & - & Material.Trans \tabularnewline
+$\rho$\(_{sh}\) & Shade reflectance & - & Material.ReflectShade \tabularnewline
+$\alpha$\(_{sh}\) & Shade absorptance & - & Material.AbsorpSolar \tabularnewline
 $\tau$\(_{bl}\) $\rho$\(_{bl}\) $\alpha$\(_{bl}\) & Blind transmittance, reflectance, absorptance & - & - \tabularnewline
 Q, G, J & Source, irradiance and radiosity for blind optical properties calculation & W/m\(^{2}\) & - \tabularnewline
 F\(_{ij}\) & View factor between segments i and j & - & - \tabularnewline
@@ -79,10 +79,10 @@ E\(_s (\lambda)\) & Solar spectral irradiance function & W/m\(^2\)-micron & E \t
 R($\lambda$) & Photopic response function of the eye & - & y30 \tabularnewline
 $\varphi$' & Relative azimuth angle (angle between screen surface normal and vertical plane through sun, Ref. Figure 87) & Rad & SunAzimuthToScreenNormal \tabularnewline
 $\alpha$' & Relative altitude angle (angle between screen surface horizontal normal plane and direction of incident beam radiation, Ref. Figure 87) & Rad & SunAltitudeToScreenNormal \tabularnewline
-$\rho$\(_{sc}\) & Beam-to-diffuse solar reflectance of screen material & - & Screens\%ReflectCylinder \tabularnewline
-$\gamma$ & Screen material aspect ratio & - & Screens\%ScreenDiameterTo SpacingRatio \tabularnewline
+$\rho$\(_{sc}\) & Beam-to-diffuse solar reflectance of screen material & - & Screens.ReflectCylinder \tabularnewline
+$\gamma$ & Screen material aspect ratio & - & Screens.ScreenDiameterTo SpacingRatio \tabularnewline
 Α & Spectral absorption coefficient & m\(^{-1}\) & - \tabularnewline
-D & Glass thickness & M & Material\%Thickness \tabularnewline
+D & Glass thickness & M & Material.Thickness \tabularnewline
 N & Index of refraction & - & ngf, ngb \tabularnewline
 Κ & Extinction coefficient & - & - \tabularnewline
 Β & Intermediate variable & - & betaf, betab \tabularnewline

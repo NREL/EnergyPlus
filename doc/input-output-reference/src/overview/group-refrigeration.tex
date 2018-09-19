@@ -2204,6 +2204,54 @@ Some compressor manufactures rate their equipment according to a constant subcoo
 
 This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature System''). A new meter for reporting is created for each unique subcategory (Ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.  If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
+\paragraph{Field: Mode-of-Operation}\label{field-mode-of-operation}
+
+The type of mode of operation. Valid choices are \textbf{Subcritical} and \textbf{Transcritical}.~ If this input field is blank, the default will be Subcritical. If Transcritical is selected as mode of operation, the next two input fields are required to model transcritical cycle operation electric power consumption and cooling capacity.
+
+\paragraph{Field: Transcritical-Compressor-Power-Curve-Name}\label{field-transcritical-compressor-power-curve-name}
+
+This field is the name of the curve object that describes the transcritical operation compressor power as a function of the saturated suction temperature and the gas cooler pressure. The curve is of the bicubic form(ref: Curve:Bicubic).~ However, the input order of the coefficients for the EnergyPlus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
+
+N1 is ARI C1 and N2 is ARI C2.
+
+N3 is ARI C4 and N4 is ARI C3.
+
+N5 is ARI C6 and N6 is ARI C5,
+
+N7 is ARI C7.
+
+N8 is ARI C10, N9 is ARI C8, and N10 is ARI C9.
+
+N11 is the Minimum saturated suction temperature.
+
+N12 is the Maximum saturated suction temperature.
+
+N13 is the the Minimum gas cooler pressure and N14 is the Maximum gas cooler pressure.
+
+If \textbf{Transcritical} is selected as \textit{Mode of Operation}, then this input field is required.
+
+\paragraph{Field: Transcritical-Compressor-Capacity-Curve-Name}\label{field-transcritical-compressor-capacity-curve-name}
+
+This field is the name of the curve object that describes the transcritical compressor operation cooling capacity as a function of the saturated suction temperature and the gas cooler outlet enthalpy. The curve is of the bicubic form(ref: Curve:Bicubic).~ However, the input order of the coefficients for the EnergyPlus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
+
+N1 is ARI C1 and N2 is ARI C2.
+
+N3 is ARI C4 and N4 is ARI C3.
+
+N5 is ARI C6 and N6 is ARI C5,
+
+N7 is ARI C7.
+
+N8 is ARI C10, N9 is ARI C8, and N10 is ARI C9.
+
+N11 is the Minimum saturated suction temperature.
+ 
+N12 is the Maximum saturated suction temperature.
+
+N13 is the the Minimum gas cooler outlet enthalpy and N14 is the Maximum gas cooler outlet enthalpy.
+
+If \textbf{Transcritical} is selected as \textit{Mode of Operation}, then this input field is required.
+
 The following is an example input for a refrigeration compressor.
 
 \begin{lstlisting}
