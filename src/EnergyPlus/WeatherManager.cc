@@ -6116,7 +6116,9 @@ namespace WeatherManager {
                             findLeapYearForWeekday(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).startWeekDay);
                     } else {
                         // 2012 is the default year, 1/1 is a Sunday
-                        RunPeriodInput(Loop).startWeekDay = calculateDayOfWeek(2012, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
+                        RunPeriodInput(Loop).startYear = 2012;
+                        RunPeriodInput(Loop).startWeekDay =
+                            calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
                     }
                 } else {                                               // Have an input start year
                     if (!isLeapYear(RunPeriodInput(Loop).startYear)) { // Start year is not a leap year
@@ -6152,8 +6154,9 @@ namespace WeatherManager {
                                 findYearForWeekday(RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay, RunPeriodInput(Loop).startWeekDay);
                         } else {
                             // 2017 is the default year, 1/1 is a Sunday
+                            RunPeriodInput(Loop).startYear = 2017;
                             RunPeriodInput(Loop).startWeekDay =
-                                calculateDayOfWeek(2017, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
+                                calculateDayOfWeek(RunPeriodInput(Loop).startYear, RunPeriodInput(Loop).startMonth, RunPeriodInput(Loop).startDay);
                         }
                     } else { // Have an input starting year
                         WeekDay weekday =
