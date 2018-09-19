@@ -178,7 +178,7 @@ namespace DaylightingManager {
     // MODULE VARIABLE DECLARATIONS:
     int TotWindowsWithDayl(0);                    // Total number of exterior windows in all daylit zones
     int OutputFileDFS(0);                         // Unit number for daylight factors
-    Array1D<Real64> DaylIllum(MaxRefPoints, 0.0); // Daylight illuminance at reference points (lux)
+    Array1D<Real64> DaylIllum;                    // Daylight illuminance at reference points (lux)
     Real64 PHSUN(0.0);                            // Solar altitude (radians)
     Real64 SPHSUN(0.0);                           // Sine of solar altitude
     Real64 CPHSUN(0.0);                           // Cosine of solar altitude
@@ -4474,21 +4474,22 @@ namespace DaylightingManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
             ZoneNum = Surface(SurfNum).Zone;
+            int numRefPoints = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
                 if (!SurfaceWindow(SurfNum).SurfDayLightInit) {
-                    SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
-                    SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                    SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numRefPoints);
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                    SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numRefPoints);
                     SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                    SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numRefPoints);
                     SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                    SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
                     SurfaceWindow(SurfNum).SurfDayLightInit = true;
                 }
@@ -4498,19 +4499,19 @@ namespace DaylightingManager {
                     ZoneNumAdj = Surface(SurfNumAdj).Zone;
                     if (ZoneDaylight(ZoneNumAdj).TotalDaylRefPoints > 0) {
                         if (!SurfaceWindow(SurfNum).SurfDayLightInit) {
-                            SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
-                            SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                            SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numRefPoints);
                             SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                            SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numRefPoints);
                             SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                            SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numRefPoints);
                             SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                            SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
                             SurfaceWindow(SurfNum).SurfDayLightInit = true;
                         }
@@ -6343,7 +6344,7 @@ namespace DaylightingManager {
         int ISky;   // Sky type index
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
-        static Vector2<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
+        Array1D<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
         static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
@@ -6353,8 +6354,8 @@ namespace DaylightingManager {
         static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
-        static Vector2<Real64> GLRNDX; // Glare index at reference point
-        static Vector2<Real64> GLRNEW; // New glare index at reference point
+        Array1D<Real64> GLRNDX; // Glare index at reference point
+        Array1D<Real64> GLRNEW; // New glare index at reference point
         int IL;                        // Reference point index
         int IWin;                      // Window index
         int IS;                        // IS=1 for unshaded window, =2 for shaded window
@@ -6399,13 +6400,15 @@ namespace DaylightingManager {
 
         if (ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) return;
 
+        NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
+
         // Three arrays to save original clear and dark (fully switched) states'
         //  zone/window daylighting properties.
         if (firstTime) {
             int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(ZoneDaylight, &ZoneDaylightCalc::NumOfDayltgExtWins)));
-            tmpIllumFromWinAtRefPt.allocate(d1, 2, 2);
-            tmpBackLumFromWinAtRefPt.allocate(d1, 2, 2);
-            tmpSourceLumFromWinAtRefPt.allocate(d1, 2, 2);
+            tmpIllumFromWinAtRefPt.allocate(d1, 2, NREFPT);
+            tmpBackLumFromWinAtRefPt.allocate(d1, 2, NREFPT);
+            tmpSourceLumFromWinAtRefPt.allocate(d1, 2, NREFPT);
             firstTime = false;
         }
         tmpIllumFromWinAtRefPt = 0.0;
@@ -6413,7 +6416,10 @@ namespace DaylightingManager {
         tmpSourceLumFromWinAtRefPt = 0.0;
 
         // FLOW:
-        NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
+        SetPnt.allocate(NREFPT);
+        DaylIllum.allocate(NREFPT);
+        GLRNDX.allocate(NREFPT);
+        GLRNEW.allocate(NREFPT);
 
         // Initialize reference point illuminance and window background luminance
         for (IL = 1; IL <= NREFPT; ++IL) {
@@ -10659,7 +10665,7 @@ namespace DaylightingManager {
 
                 ZoneDaylight(ZoneNum).NumOfDayltgExtWins = ZoneExtWin(ZoneNum);
                 WinSize = ZoneExtWin(ZoneNum);
-                RefSize = 2;
+                RefSize = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
                 ZoneDaylight(ZoneNum).DaylIllFacSky.allocate(24, MaxSlatAngs + 1, 4, RefSize, WinSize);
                 ZoneDaylight(ZoneNum).DaylSourceFacSky.allocate(24, MaxSlatAngs + 1, 4, RefSize, WinSize);
                 ZoneDaylight(ZoneNum).DaylBackFacSky.allocate(24, MaxSlatAngs + 1, 4, RefSize, WinSize);
