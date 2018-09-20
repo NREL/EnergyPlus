@@ -45,11 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::UnitHeater Unit Tests
-
-// Google Test Headers
-#include <gtest/gtest.h>
-
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -68,7 +63,7 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, RecurringWarningTest)
 {
 
-    //void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
+    // void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
     //    int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
     //    Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
     //    Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
@@ -77,7 +72,7 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
     //    std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
     //    std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
     //)
-    
+
     std::string myMessage1 = "Test message 1";
     // proper call to ShowRecurringWarningErrorAtEnd to set up new recurring warning
     int ErrIndex1 = 0;
@@ -126,7 +121,6 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
     EXPECT_EQ(" ** Warning ** " + myMessage4, DataErrorTracking::RecurringErrors(5).Message);
 }
 
-
 TEST_F(EnergyPlusFixture, DisplayMessageTest)
 {
     DisplayString("Testing");
@@ -147,5 +141,3 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
 }
-
-} // namespace EnergyPlus
