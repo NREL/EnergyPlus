@@ -21,7 +21,7 @@ compilers:
     cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
 
   - name: cppcheck
-    compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*" --suppress="syntaxError:*" --suppress="*:*sqlite*" --suppress="invalidscanf:*DElight*" --suppress="uninitMemberVar:*DElight*" --suppress="invalidScanfArgType_int:*DElight*" --suppress="uninitMemberVar:*jsoncpp*" --suppress="*:*re2*" --suppress="*:*eigen*"
+    compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*" --suppress="syntaxError:*" --suppress="*:*sqlite*" --suppress="invalidscanf:*DElight*" --suppress="uninitMemberVar:*DElight*" --suppress="invalidScanfArgType_int:*DElight*" --suppress="uninitMemberVar:*jsoncpp*" --suppress="*:*re2*" --suppress="*:*eigen*" --suppress="constStatement:*kiva-ep*"
 
   - name: "gcc"
     version: "4.8"

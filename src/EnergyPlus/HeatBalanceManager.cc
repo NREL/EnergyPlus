@@ -347,6 +347,8 @@ namespace HeatBalanceManager {
             ManageHeatBalanceGetInputFlag = false;
         }
 
+        // Suggest new calling point here ManageEMS(emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan);
+
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(); // Initialize all heat balance related parameters
 
@@ -5248,6 +5250,11 @@ namespace HeatBalanceManager {
                 e.ThetaFace = 296.15;
                 e.EffInsSurfTemp = 23.0;
             }
+        }
+
+        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            HeatBalanceSurfaceManager::InitEMSControlledConstructions();
+            HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties();
         }
 
         if (TotStormWin > 0) {

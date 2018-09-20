@@ -61,7 +61,6 @@
 #include <HVACControllers.hh>
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACDXSystem.hh>
-#include <HVACUnitarySystem.hh>
 #include <HeatingCoils.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <PlantChillers.hh>
@@ -1010,34 +1009,7 @@ namespace FaultsManager {
                         HVACDXHeatPumpSystem::DXHeatPumpSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
                     }
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "AirLoopHVAC:UnitarySystem")) {
-                    // Read in DXCoolingSystem input if not done yet
-                    if (HVACUnitarySystem::GetInputFlag) {
-                        HVACUnitarySystem::GetUnitarySystemInput();
-                        HVACUnitarySystem::GetInputFlag = false;
-                    }
-
-                    // Check the coil name and coil type
-                    int UnitarySysNum =
-                        UtilityRoutines::FindItemInList(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, HVACUnitarySystem::UnitarySystem);
-                    if (UnitarySysNum <= 0) {
-                        ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                        cAlphaArgs(5) + "\" not found.");
-                        ErrorsFound = true;
-                    } else {
-                        // Link the unitary system with the fault model
-
-                        if (HVACUnitarySystem::UnitarySystem(UnitarySysNum).ControlType != HVACUnitarySystem::SetPointBased) {
-                            // The fault model is only applicable to the unitary system controlled on leaving air temperature
-                            ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                             cAlphaArgs(5) +
-                                             "\". The specified unitary system is not controlled on leaving air temperature. The coil SAT sensor "
-                                             "fault model will not be applied.");
-                        } else {
-                            // Link the fault model with the coil that is controlled on leaving air temperature
-                            HVACUnitarySystem::UnitarySystem(UnitarySysNum).FaultyCoilSATFlag = true;
-                            HVACUnitarySystem::UnitarySystem(UnitarySysNum).FaultyCoilSATIndex = jFault_CoilSAT;
-                        }
-                    }
+                    // UnitarySystem model connects to FaultManager via function call to FaultsManager::SetFaultyCoilSATSensor
                 }
             }
         } // End read faults input of Fault_type 113
@@ -2083,6 +2055,22 @@ namespace FaultsManager {
         FaultsCondenserSWTSensor.deallocate();
         FaultsTowerFouling.deallocate();
         FaultsCoilSATSensor.deallocate();
+    }
+
+    void SetFaultyCoilSATSensor(std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex)
+    {
+
+        FaultyCoilSATFlag = false;
+        FaultyCoilSATIndex = 0;
+        if (NumFaultyCoilSATSensor == 0) return;
+        for (int jFault_CoilSAT = 1; jFault_CoilSAT <= NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
+            if (UtilityRoutines::SameString(FaultsCoilSATSensor(jFault_CoilSAT).CoilType, CompType) &&
+                UtilityRoutines::SameString(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, CompName)) {
+                FaultyCoilSATFlag = true;
+                FaultyCoilSATIndex = jFault_CoilSAT;
+                break;
+            }
+        }
     }
 
 } // namespace FaultsManager

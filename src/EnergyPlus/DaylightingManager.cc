@@ -161,6 +161,18 @@ namespace DaylightingManager {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
+    bool CalcDayltghCoefficients_firstTime(true);
+    bool refFirstTime(true);
+    bool DayltgInteriorIllum_firstTime(true); // true first time routine is called
+    bool FirstTimeDaylFacCalc(true);
+    bool VeryFirstTime(true);
+    bool mapFirstTime(true);
+    bool CheckTDDs_firstTime(true);
+    bool DayltgExtHorizIllum_firstTime(true); // flag for first time thru to initialize
+    bool DayltgInteriorMapIllum_FirstTimeFlag(true);
+    bool ReportIllumMap_firstTime(true);
+    bool SQFirstTime(true);
+
 
     // Surface count crossover for using octree algorithm
     // The octree gives lower computational complexity for much higher performance
@@ -234,6 +246,25 @@ namespace DaylightingManager {
     {
         // this will need a lot more, but it is a start
         ZoneDaylight.deallocate();
+        CalcDayltghCoefficients_firstTime = true;
+        CheckTDDZone.deallocate();
+        TDDTransVisBeam.deallocate();
+        TDDFluxInc.deallocate();
+        TDDFluxTrans.deallocate();
+        RefErrIndex.deallocate();
+        refFirstTime = true;
+        ComplexWind.deallocate();
+        IllumMap.deallocate();
+        IllumMapCalc.deallocate();
+        DayltgInteriorIllum_firstTime = true;
+        FirstTimeDaylFacCalc = true;
+        VeryFirstTime = true;
+        mapFirstTime = true;
+        CheckTDDs_firstTime = true;
+        DayltgExtHorizIllum_firstTime = true;
+        DayltgInteriorMapIllum_FirstTimeFlag = true;
+        ReportIllumMap_firstTime = true;
+        SQFirstTime = true;
     }
 
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
@@ -521,8 +552,6 @@ namespace DaylightingManager {
         int IHR;     // Hour of day counter
         int IWin;    // Window counter
         int loop;    // DO loop indices
-        static bool firstTime(true);
-        static bool FirstTimeDaylFacCalc(true);
         Real64 DaylFac1; // sky daylight factor at ref pt 1
         Real64 DaylFac2; // sky daylight factor at ref pt 2
 
@@ -548,11 +577,11 @@ namespace DaylightingManager {
             "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')");
 
         // FLOW:
-        if (firstTime) {
+        if (CalcDayltghCoefficients_firstTime) {
             GetDaylightingParametersInput();
             CheckTDDsAndLightShelvesInDaylitZones();
             AssociateWindowShadingControlWithDaylighting();
-            firstTime = false;
+            CalcDayltghCoefficients_firstTime = false;
             if (allocated(CheckTDDZone)) CheckTDDZone.deallocate();
         } // End of check if firstTime
 
@@ -908,7 +937,6 @@ namespace DaylightingManager {
         int IWin;    // Window counter
         int PipeNum; // TDD pipe object number
         int loopwin; // loop index for exterior windows associated with a daylit zone
-        static bool VeryFirstTime(true);
         int TZoneNum;
         bool ErrorsFound;
         int MapNum;
@@ -1052,7 +1080,6 @@ namespace DaylightingManager {
         Real64 DAXY;               // Area of window element
         Real64 SkyObstructionMult; // Ratio of obstructed to unobstructed sky diffuse at a ground point
         int ExtWinType;            // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
-        static bool refFirstTime(true);
         int BRef;
         int ILB;
         bool hitIntObs;        // True iff interior obstruction hit
@@ -1461,7 +1488,6 @@ namespace DaylightingManager {
         //		Array2D< Real64 > MapWindowSolidAngAtRefPt; //Inactive Only allocated and assigning to: Also only 1 value used at a time
         //		Array2D< Real64 > MapWindowSolidAngAtRefPtWtd; // Only 1 value used at a time: Replaced by below
         Real64 MapWindowSolidAngAtRefPtWtd;
-        static bool mapFirstTime(true);
         static bool MySunIsUpFlag(false);
         int WinEl; // window elements counter
 
@@ -5564,11 +5590,10 @@ namespace DaylightingManager {
         int ShelfNum; // light shelf object number
         int SurfNum;  // daylight device surface number
         bool ErrorsFound;
-        static bool firstTime(true);
 
-        if (firstTime) {
+        if (CheckTDDs_firstTime) {
             CheckTDDZone.dimension(NumOfZones, true);
-            firstTime = false;
+            CheckTDDs_firstTime = false;
         }
 
         ErrorsFound = false;
@@ -5963,7 +5988,6 @@ namespace DaylightingManager {
         static Array1D<Real64> TH(NTH);     // Azimuth of sky element (radians)
         int ISky;                           // Sky type index
         static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
-        static bool firstTime(true);        // flag for first time thru to initialize
 
         // FLOW:
         // Integrate to obtain illuminance from sky.
@@ -5971,7 +5995,7 @@ namespace DaylightingManager {
         // is L(TH,PH)*SIN(PH)*COS(PH)*DTH*DPH, where L(TH,PH) is the luminance
         // of the patch in cd/m2.
         //  Init
-        if (firstTime) {
+        if (DayltgExtHorizIllum_firstTime) {
             for (IPH = 1; IPH <= NPH; ++IPH) {
                 PH(IPH) = (IPH - 0.5) * DPH;
                 SPHCPH(IPH) = std::sin(PH(IPH)) * std::cos(PH(IPH)); // DA = COS(PH)*DTH*DPH
@@ -5979,7 +6003,7 @@ namespace DaylightingManager {
             for (ITH = 1; ITH <= NTH; ++ITH) {
                 TH(ITH) = (ITH - 0.5) * DTH;
             }
-            firstTime = false;
+            DayltgExtHorizIllum_firstTime = false;
         }
 
         HISK = 0.0;
@@ -6393,20 +6417,21 @@ namespace DaylightingManager {
         static Array3D<Real64> tmpIllumFromWinAtRefPt;
         static Array3D<Real64> tmpBackLumFromWinAtRefPt;
         static Array3D<Real64> tmpSourceLumFromWinAtRefPt;
-        static bool firstTime(true); // true first time routine is called
 
         static bool blnCycle(false);
+        bool breakOuterLoop(false);
+        bool continueOuterLoop(false);
 
         if (ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) return;
 
         // Three arrays to save original clear and dark (fully switched) states'
         //  zone/window daylighting properties.
-        if (firstTime) {
+        if (DayltgInteriorIllum_firstTime) {
             int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(ZoneDaylight, &ZoneDaylightCalc::NumOfDayltgExtWins)));
             tmpIllumFromWinAtRefPt.allocate(d1, 2, 2);
             tmpBackLumFromWinAtRefPt.allocate(d1, 2, 2);
             tmpSourceLumFromWinAtRefPt.allocate(d1, 2, 2);
-            firstTime = false;
+            DayltgInteriorIllum_firstTime = false;
         }
         tmpIllumFromWinAtRefPt = 0.0;
         tmpBackLumFromWinAtRefPt = 0.0;
@@ -6789,6 +6814,8 @@ namespace DaylightingManager {
             // Fourth loop over windows to determine which to switch
             // iterate in the order that the shades are specified in WindowShadeControl
             count = 0;
+            breakOuterLoop = false;
+            continueOuterLoop = false;
             for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
@@ -6800,11 +6827,15 @@ namespace DaylightingManager {
                     if (ASETIL(igroup) < 1.0) {
 
                         ICtrl = Surface(IWin).WindowShadingControlPtr;
-                        if (!Surface(IWin).HasShadeControl) continue;
-
-                        if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
-                            WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp)
+                        if (!Surface(IWin).HasShadeControl) {
+                            continueOuterLoop = true;
                             continue;
+                        }
+                        if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
+                            WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp) {
+                            continueOuterLoop = true;
+                            continue;
+                        }
 
                         IConst = Surface(IWin).Construction;
                         if (SurfaceWindow(IWin).StormWinFlag == 1) IConst = Surface(IWin).StormWinConstruction;
@@ -6853,13 +6884,14 @@ namespace DaylightingManager {
                             ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpSourceLumFromWinAtRefPt(loop, IS, IL);
                         } // IL
                     }     // ASETIL < 1
+                    // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
+                    if (DaylIllum(1) <= SetPnt(1)) {
+                        breakOuterLoop = true;
+                        break;
+                    }
                 }
-
-                // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
-                if (DaylIllum(1) <= SetPnt(1)) {
-                    break;
-                }
-
+                if (breakOuterLoop) break;
+                if (continueOuterLoop) continue;
             } // End of fourth window loop
 
         } // ISWFLG /= 0 .AND. DaylIllum(1) > SETPNT(1)
@@ -6899,6 +6931,7 @@ namespace DaylightingManager {
             // Glare is too high at a ref pt.  Loop through windows.
             int count = 0;
 
+            continueOuterLoop = false;
             for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
@@ -6914,10 +6947,15 @@ namespace DaylightingManager {
                     // Check if window is eligible for glare control
                     // TH 1/21/2010. Switchable glazings already in partially switched state
                     //  should be allowed to further dim to control glare
-                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
-
+                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) {
+                        continueOuterLoop = false;
+                        continue;
+                    }
                     ICtrl = Surface(IWin).WindowShadingControlPtr;
-                    if (!Surface(IWin).HasShadeControl) continue;
+                    if (!Surface(IWin).HasShadeControl) {
+                        continueOuterLoop = false;
+                        continue;
+                    }
                     if (WindowShadingControl(ICtrl).GlareControlIsActive) {
                         atLeastOneGlareControlIsActive = true;
 
@@ -6967,6 +7005,7 @@ namespace DaylightingManager {
                         }
                     }
                 }
+                if (continueOuterLoop) continue;
 
                 if (atLeastOneGlareControlIsActive) {
 
@@ -7002,6 +7041,7 @@ namespace DaylightingManager {
 
                 // restore the count to the value prior to the last loop through the group of exterior windows
                 count = countBeforeListOfExtWinLoop;
+                breakOuterLoop = false;
 
                 for (auto IWin : listOfExtWin) {
                     ++count;
@@ -7125,11 +7165,13 @@ namespace DaylightingManager {
                                             continue;
                                         } else {
                                             // Glare still OK but glazing already in clear state, no more lighten
+                                            breakOuterLoop = true;
                                             break;
                                         }
                                     } else {
                                         // Glare too high, exit and use previous switching state
                                         tmpSWFactor += tmpSWIterStep;
+                                        breakOuterLoop = true;
                                         break;
                                     }
                                 }
@@ -7171,14 +7213,16 @@ namespace DaylightingManager {
                             } else {
                                 // For un-switchable glazing or switchable glazing but not MeetDaylightIlluminaceSetpoint control,
                                 // it is in shaded state and glare is ok - job is done, exit the window loop - IWin
+                                breakOuterLoop = true;
                                 break;
                             }
                         }
 
                     } // End of check if window glare control is active
                 }     // end of for(auto IWin : listOfExtWin)
-            }         // for group
-        }             // GlareFlag
+                if (breakOuterLoop) break;
+            } // for group
+        }     // GlareFlag
 
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off
@@ -9542,7 +9586,6 @@ namespace DaylightingManager {
         Real64 GTOT2;
         static Array1D<Real64> BACLUM;
         static Array1D<Real64> GLRNDX;
-        static bool FirstTimeFlag(true);
         int ILB;
 
         int IConst;
@@ -9556,11 +9599,11 @@ namespace DaylightingManager {
         int MapNum;
         int ILM;
 
-        if (FirstTimeFlag) {
+        if (DayltgInteriorMapIllum_FirstTimeFlag) {
             daylight_illum.allocate(MaxMapRefPoints);
             BACLUM.allocate(MaxMapRefPoints);
             GLRNDX.allocate(MaxMapRefPoints);
-            FirstTimeFlag = false;
+            DayltgInteriorMapIllum_FirstTimeFlag = false;
         }
 
         if (WarmupFlag) return;
@@ -9981,7 +10024,6 @@ namespace DaylightingManager {
         //  REAL(r64)           :: NumOut
         int IllumOut;
 
-        static bool firstTime(true);
         static Array1D_bool FirstTimeMaps;
         static Array1D_bool EnvrnPrint;
         static Array1D_string SavedMnDy;
@@ -9997,13 +10039,12 @@ namespace DaylightingManager {
         int SQMonth;
         int SQDayOfMonth;
         int IllumIndex;
-        static bool SQFirstTime(true);
         //		static bool CommaDelimited( true ); //Unused Set but never used
         // BSLLC Finish
 
         // FLOW:
-        if (firstTime) {
-            firstTime = false;
+        if (ReportIllumMap_firstTime) {
+            ReportIllumMap_firstTime = false;
             FirstTimeMaps.dimension(TotIllumMaps, true);
             EnvrnPrint.dimension(TotIllumMaps, true);
             RefPts.allocate(NumOfZones, MaxRefPoints);
@@ -10759,7 +10800,8 @@ namespace DaylightingManager {
         // J. Glazer - 2018
         // Allow a way to map back to the original "loop" index that is used in many other places in the
         // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
-        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 && ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
+        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 &&
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
             int count = 0;
             for (auto listOfExtWin : ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins) {
                 for (auto IWinShdOrd : listOfExtWin) {

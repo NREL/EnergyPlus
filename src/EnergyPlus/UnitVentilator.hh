@@ -213,6 +213,7 @@ namespace UnitVentilator {
         int ATMixerPriNode;      // primary inlet air node number for the mixer
         int ATMixerSecNode;      // secondary air inlet node number for the mixer
         int ATMixerOutNode;      // outlet air node number for the mixer
+        bool FirstPass;          // detects first time through for resetting sizing data
         // for unit ventilator object
 
         // Default Constructor
@@ -229,7 +230,7 @@ namespace UnitVentilator {
               ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
               TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanPartLoadRatio(0.0),
               PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0),
-              ATMixerSecNode(0), ATMixerOutNode(0)
+              ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)
         {
         }
     };

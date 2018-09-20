@@ -183,6 +183,8 @@ An example of this object in an IDF is:
 
 \subsubsection{Outputs}\label{outputs-043}
 
+The Ideal Loads air system outdoor air load variables are only calculated when there is active heating or cooling (or humidification/dehumidification).
+
 \begin{itemize}
 \item
   HVAC,Sum,Zone Ideal Loads Supply Air Sensible Heating Energy {[}J{]}
@@ -298,7 +300,7 @@ An example of this object in an IDF is:
 
 \paragraph{Ideal Loads Output Variable Overview}\label{ideal-loads-output-variable-overview}
 
-All of the ZoneHVAC:IdealLoadsAirSystem loads and energy use are reported for Sensible Heating, Latent Heating, Total Heating, Sensible Cooling, Latent Cooling, and Total Cooling. To explain the relationship between the various outputs, Total Cooling Energy will be used.
+All of the ZoneHVAC:IdealLoadsAirSystem loads and energy use are reported for Sensible Heating, Latent Heating, Total Heating, Sensible Cooling, Latent Cooling, and Total Cooling. To explain the relationship between the various outputs, Total Cooling Energy will be used. Note that the outdoor air load variables are only calculated when there is active heating or cooling (or humidification/dehumidification).
 
 \emph{Zone Ideal Loads Supply Air Total Cooling Energy} is the district cooling energy consumed by the ideal loads system ``cooling coil'' to cool and dehumidify the supply air.
 
@@ -488,7 +490,7 @@ The volume flow rate of the supply air stream in m3/s using the standard density
 
 What is a fan coil unit? Like many HVAC terms, ``fan coil unit'' is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. The hydronic heating coil may be replaced with an electric heating coil. Typically these units are small (200 -- 1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, \emph{ZoneHVAC:UnitVentilator} should be used.
 
-The heating or cooling output of the unit ventilator is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit.
+The heating or cooling output of the fan coil unit is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit.
 
 Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45\% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans are typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
 
