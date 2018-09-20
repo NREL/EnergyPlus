@@ -572,30 +572,6 @@ std::string IdfParser::parse_string(std::string const &idf, size_t &index, bool 
             complete = true;
             decrement_both_index(index, index_into_cur_line);
             break;
-        } else if (c == '\\') {
-            if (index == idf.size()) break;
-            char next_c = idf[index];
-            increment_both_index(index, index_into_cur_line);
-            if (next_c == '"') {
-                s += '"';
-            } else if (next_c == '\\') {
-                s += '\\';
-            } else if (next_c == '/') {
-                s += '/';
-            } else if (next_c == 'b') {
-                s += '\b';
-            } else if (next_c == 't') {
-                s += '\t';
-            } else if (next_c == 'n') {
-                complete = false;
-                break;
-            } else if (next_c == 'r') {
-                complete = false;
-                break;
-            } else {
-                s += c;
-                s += next_c;
-            }
         } else {
             s += c;
         }
