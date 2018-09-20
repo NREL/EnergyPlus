@@ -1554,7 +1554,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     OutAirNodeManager::OutsideAirNodeList(2) = 2;
     OutAirNodeManager::OutsideAirNodeList(3) = 3;
     EMSActuatorUsed(1).ComponentTypeName = "Outdoor Air System Node";
-    EMSActuatorUsed(2).ComponentTypeName = "Outdoor Air System Node";
+    EMSActuatorUsed(2).ComponentTypeName = "";
     EMSActuatorUsed(3).ComponentTypeName = "Outdoor Air System Node";
     EMSActuatorUsed(1).UniqueIDName = NodeID(1);
     EMSActuatorUsed(2).UniqueIDName = NodeID(2);
@@ -1562,9 +1562,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
 
     SetupNodeSetPointsAsActuators();
 
-    EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
     EXPECT_TRUE(Node(1).IsLocalNode);
-    EXPECT_TRUE(Node(2).IsLocalNode);
+    EXPECT_FALSE(Node(2).IsLocalNode);
     EXPECT_TRUE(Node(3).IsLocalNode);
 
 }

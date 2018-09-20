@@ -1537,7 +1537,6 @@ namespace EMSManager {
         } // NumOfNodes > 0
 
         if (NumOutsideAirNodes > 0) {
-            DataGlobals::AnyLocalEnvironmentsInModel = true;
             for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= NumOutsideAirNodes; ++OutsideAirNodeNum) {
                 NodeNum = OutsideAirNodeList(OutsideAirNodeNum);
                 SetupEMSActuator("Outdoor Air System Node",
