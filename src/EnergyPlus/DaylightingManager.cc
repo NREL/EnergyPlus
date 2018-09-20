@@ -176,17 +176,18 @@ namespace DaylightingManager {
     int const octreeCrossover(100); // Octree surface count crossover
 
     // MODULE VARIABLE DECLARATIONS:
-    int TotWindowsWithDayl(0);                    // Total number of exterior windows in all daylit zones
-    int OutputFileDFS(0);                         // Unit number for daylight factors
-    Array1D<Real64> DaylIllum;                    // Daylight illuminance at reference points (lux)
-    Real64 PHSUN(0.0);                            // Solar altitude (radians)
-    Real64 SPHSUN(0.0);                           // Sine of solar altitude
-    Real64 CPHSUN(0.0);                           // Cosine of solar altitude
-    Real64 THSUN(0.0);                            // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
-    Array1D<Real64> PHSUNHR(24, 0.0);             // Hourly values of PHSUN
-    Array1D<Real64> SPHSUNHR(24, 0.0);            // Hourly values of the sine of PHSUN
-    Array1D<Real64> CPHSUNHR(24, 0.0);            // Hourly values of the cosine of PHSUN
-    Array1D<Real64> THSUNHR(24, 0.0);             // Hourly values of THSUN
+    int TotWindowsWithDayl(0);         // Total number of exterior windows in all daylit zones
+    int OutputFileDFS(0);              // Unit number for daylight factors
+    Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
+    int maxNumRefPtInAnyZone;          // The most number of reference points that any single zone has
+    Real64 PHSUN(0.0);                 // Solar altitude (radians)
+    Real64 SPHSUN(0.0);                // Sine of solar altitude
+    Real64 CPHSUN(0.0);                // Cosine of solar altitude
+    Real64 THSUN(0.0);                 // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
+    Array1D<Real64> PHSUNHR(24, 0.0);  // Hourly values of PHSUN
+    Array1D<Real64> SPHSUNHR(24, 0.0); // Hourly values of the sine of PHSUN
+    Array1D<Real64> CPHSUNHR(24, 0.0); // Hourly values of the cosine of PHSUN
+    Array1D<Real64> THSUNHR(24, 0.0);  // Hourly values of THSUN
 
     // In the following I,J,K arrays:
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
@@ -4471,10 +4472,14 @@ namespace DaylightingManager {
             DayltgSetupAdjZoneListsAndPointers();
         }
 
+        maxNumRefPtInAnyZone = 0;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
             ZoneNum = Surface(SurfNum).Zone;
             int numRefPoints = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
+            if (numRefPoints > maxNumRefPtInAnyZone) {
+                maxNumRefPtInAnyZone = numRefPoints;
+            }
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
                 if (!SurfaceWindow(SurfNum).SurfDayLightInit) {
                     SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numRefPoints);
@@ -6344,7 +6349,7 @@ namespace DaylightingManager {
         int ISky;   // Sky type index
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
-        Array1D<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
+        Array1D<Real64> SetPnt;              // Illuminance setpoint at reference points (lux)
         static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
@@ -6354,8 +6359,8 @@ namespace DaylightingManager {
         static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
-        Array1D<Real64> GLRNDX; // Glare index at reference point
-        Array1D<Real64> GLRNEW; // New glare index at reference point
+        Array1D<Real64> GLRNDX;        // Glare index at reference point
+        Array1D<Real64> GLRNEW;        // New glare index at reference point
         int IL;                        // Reference point index
         int IWin;                      // Window index
         int IS;                        // IS=1 for unshaded window, =2 for shaded window
@@ -6417,7 +6422,7 @@ namespace DaylightingManager {
 
         // FLOW:
         SetPnt.allocate(NREFPT);
-        DaylIllum.allocate(NREFPT);
+        DaylIllum.allocate(maxNumRefPtInAnyZone);
         GLRNDX.allocate(NREFPT);
         GLRNEW.allocate(NREFPT);
 
@@ -10761,7 +10766,8 @@ namespace DaylightingManager {
         // J. Glazer - 2018
         // Allow a way to map back to the original "loop" index that is used in many other places in the
         // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
-        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 && ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
+        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 &&
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
             int count = 0;
             for (auto listOfExtWin : ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins) {
                 for (auto IWinShdOrd : listOfExtWin) {
