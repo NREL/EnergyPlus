@@ -164,6 +164,7 @@ set( test_src
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
   UnitHeater.unit.cc
+  UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
