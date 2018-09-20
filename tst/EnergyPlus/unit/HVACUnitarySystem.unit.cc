@@ -175,7 +175,7 @@ protected:
         ZoneEquipList(1).EquipData.allocate(ZoneEquipList(1).NumOfEquipTypes);
         ZoneEquipList(1).CoolingPriority.allocate(ZoneEquipList(1).NumOfEquipTypes);
         ZoneEquipList(1).HeatingPriority.allocate(ZoneEquipList(1).NumOfEquipTypes);
-        ZoneEquipList(1).EquipType(1) = "AIRLOOPHVAC:UNITARYSYSTEM";
+        ZoneEquipList(1).EquipType(1) = "AIRLOOPHVAC:UNITARYSYSTEM:LEGACY";
         ZoneEquipList(1).EquipName(1) = "UNITARY SYSTEM MODEL";
         ZoneEquipList(1).CoolingPriority(1) = 1;
         ZoneEquipList(1).HeatingPriority(1) = 1;
@@ -261,7 +261,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_TwoSpeedDXCoolCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -447,7 +447,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultiSpeedDXCoolCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -692,7 +692,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultiStageGasHeatCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -886,7 +886,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultiStageElecHeatCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -1075,7 +1075,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_ElecHeatCoil_Only)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -1236,7 +1236,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultiStageGasHeatCoil_Only_ContFan)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -1431,7 +1431,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,           !- Name",
         "  Setpoint,                       !- Control Type",
         "  East Zone,                      !- Controlling Zone or Thermostat Location",
@@ -1888,26 +1888,26 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance)
     EXPECT_NEAR(Node(2).Temp, 16.0, 0.001);
 
     // expect design spec data to match inputs
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(1), 0.1000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(1), 0.1010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(2), 0.2000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(2), 0.2010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(3), 0.3000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(3), 0.3010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(4), 0.4000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(4), 0.4010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(5), 0.5000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(5), 0.5010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(6), 0.6000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(6), 0.6010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(7), 0.7000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(7), 0.7010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(8), 0.8000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(8), 0.8010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(9), 0.9000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(9), 0.9010, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(10), 1.0000, 0.00001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(10), 1.0000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(1), 0.1000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(1), 0.1010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(2), 0.2000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(2), 0.2010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(3), 0.3000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(3), 0.3010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(4), 0.4000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(4), 0.4010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(5), 0.5000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(5), 0.5010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(6), 0.6000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(6), 0.6010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(7), 0.7000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(7), 0.7010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(8), 0.8000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(8), 0.8010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(9), 0.9000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(9), 0.9010, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(10), 1.0000, 0.00001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(10), 1.0000, 0.00001);
 
     // autosized air flow and capacity, unitary system capacity matches coils
     EXPECT_EQ(UnitarySystem(1).MaxCoolAirVolFlow, 1.5);
@@ -1967,9 +1967,9 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance)
 
     // spot check MSHP volume flow rate data
     EXPECT_EQ(UnitarySystem(1).CoolVolumeFlowRate(7),
-              UnitarySystem(1).CoolVolumeFlowRate(10) * HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(7));
+              UnitarySystem(1).CoolVolumeFlowRate(10) * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(7));
     EXPECT_EQ(UnitarySystem(1).HeatVolumeFlowRate(7),
-              UnitarySystem(1).HeatVolumeFlowRate(10) * HVACUnitarySystem::DesignSpecMSHP(1).HeatingVolFlowRatio(7));
+              UnitarySystem(1).HeatVolumeFlowRate(10) * HVACUnitarySystem::DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(7));
 }
 
 TEST_F(ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl)
@@ -1977,7 +1977,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl)
 
     std::string const idf_objects = delimited_string({
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Unitary System Model,    !- Name",
         "  Setpoint,                !- Control Type",
         "  East Zone,               !- Controlling Zone or Thermostat Location",
@@ -2594,11 +2594,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTest
     DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
 
     UnitarySystem.allocate(HVACUnitarySystem::NumUnitarySystem);
+    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem:Legacy";
     MultiOrVarSpeedCoolCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
     MultiOrVarSpeedCoolCoil = false;
     MultiOrVarSpeedHeatCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
     MultiOrVarSpeedHeatCoil = false;
-    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem";
     UnitarySystem(UnitarySysNum).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
     UnitarySystem(UnitarySysNum).RequestAutoSize = true;
 
@@ -3124,12 +3124,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInput)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -3434,7 +3434,6 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInput)
 
 TEST_F(EnergyPlusFixture, UnitarySystem_VSDXCoilSizing)
 {
-    UnitarySystemData thisUnSys;
 
     bool ErrorsFound(false);
 
@@ -3463,12 +3462,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VSDXCoilSizing)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,  !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -3836,12 +3835,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VarSpeedCoils)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -4268,12 +4267,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VarSpeedCoils_CyclingFan)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -4706,12 +4705,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  GasHeat DXAC Furnace 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -4898,7 +4897,7 @@ TEST_F(EnergyPlusFixture, HVACUnitarySystem_ReportingTest)
         "ZoneHVAC:EquipmentList,",
         "  SPACE2-1 Equipment,                                      !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem,                               !- Zone Equipment Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy,                               !- Zone Equipment Object Type",
         "  Sys 2 Furnace DX Cool MultiSpd Unitary System,           !- Zone Equipment Name",
         "  1,                                                       !- Zone Equipment Cooling Sequence",
         "  1;                                                       !- Zone Equipment Heating or No-Load Sequence",
@@ -5003,7 +5002,7 @@ TEST_F(EnergyPlusFixture, HVACUnitarySystem_ReportingTest)
         "  Until: 24:00,                                            !- Field 3",
         "  1;                                                       !- Field 4",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Sys 2 Furnace DX Cool MultiSpd Unitary System,           !- Name",
         "  Load,                                                    !- Control Type",
         "  SPACE2-1,                                                !- Controlling Zone or Thermostat Location",
@@ -5384,12 +5383,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  Multispeed DXAC,         !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Multispeed DXAC,        !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -6036,18 +6035,18 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing)
     EXPECT_NEAR(UnitarySystem(1).CoolVolumeFlowRate(3), 0.098388, 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(3), UnitarySystem(1).CoolVolumeFlowRate(3), 0.000001);
 
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(1), 0.333333, 0.000001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(2), 0.666666, 0.000001);
-    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(3), 1.000000, 0.000001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(1), 0.333333, 0.000001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(2), 0.666666, 0.000001);
+    EXPECT_NEAR(HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(3), 1.000000, 0.000001);
 
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(1),
-                UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(1),
+                UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(1),
                 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(2),
-                UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(2),
+                UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(2),
                 0.000001);
     EXPECT_NEAR(DXCoil(1).MSRatedAirVolFlowRate(3),
-                UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP(1).CoolingVolFlowRatio(3),
+                UnitarySystem(1).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(3),
                 0.000001);
 
     // 10 heating speeds with autosized MSHP design spec yielding equally distributed air flow at 1/10 per speed
@@ -6135,7 +6134,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
         "Branch,",
         "  Air Loop Main Branch, !- Name",
         "  , !- Pressure Drop Curve Name",
-        "  AirLoopHVAC:UnitarySystem, !- Component 2 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Component 2 Object Type",
         "  DXAC Heat Pump 1, !- Component 2 Name",
         "  	Mixed Air Node, !- Component 2 Inlet Node Name",
         "  Air Loop Outlet Node; !- Component 2 Outlet Node Name",
@@ -6152,7 +6151,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
         "  Zone Equipment Inlet Node, !- Demand Side Inlet Node Names",
         "  Air Loop Outlet Node;    !- Supply Side Outlet Node Names",
         "  ",
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  DXAC Heat Pump 1, !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -6822,7 +6821,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
     PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
     PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
     PrimaryAirSystem(1).Branch(1).Comp(1).Name = "DXAC HEAT PUMP 1";
-    PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem";
+    PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem:Legacy";
 
     NumTempControlledZones = 1;
     TempControlledZone.allocate(NumTempControlledZones);
@@ -6880,61 +6879,69 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode)
     Node(InletNode).MassFlowRateMaxAvail = UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * StdRhoAir;
     Iter = 4;
     UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHP(1).CoolingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     Iter = 1;
     UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHP(1).CoolingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     Iter = 2;
     UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHP(1).CoolingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     Iter = 3;
     UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHP(1).CoolingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow * DesignSpecMSHPLegacy(1).CoolingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).CoolMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedCooling);
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedCooling);
     DXCoil(1).MSRatedAirMassFlowRate(Iter) = DXCoil(1).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
     DXCoil(2).MSRatedAirMassFlowRate(Iter) = DXCoil(2).MSRatedAirVolFlowRate(Iter) * StdRhoAir;
 
     Iter = 4;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHP(1).HeatingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
     Iter = 1;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHP(1).HeatingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
     Iter = 2;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHP(1).HeatingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
     Iter = 3;
     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
-        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHP(1).HeatingVolFlowRatio(Iter);
+        UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow * DesignSpecMSHPLegacy(1).HeatingVolFlowRatio(Iter);
     UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(Iter) =
-        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) / UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHP(1).NumOfSpeedHeating);
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) /
+        UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHPLegacy(1).NumOfSpeedHeating);
 
     UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).CoolMassFlowRate(1);
 
@@ -7065,12 +7072,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  Multispeed DXAC,         !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Multispeed DXAC,        !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -7934,13 +7941,13 @@ TEST_F(EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  WSHP Furnace,            !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  WSHP Furnace,           !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -8323,13 +8330,13 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,           !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  ASHRAE Model HVAC,        !- Zone Equipment 1 Name",
         "  1,                        !- Zone Equipment 1 Cooling Sequence",
         "  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
         "  ",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  ASHRAE Model HVAC,       !- Name",
         "  SingleZoneVAV,           !- Control Type",
         "  East Zone,               !- Controlling Zone or Thermostat Location",
@@ -8849,12 +8856,12 @@ TEST_F(EnergyPlusFixture, UnitarySystem_MultispeedDXHeatingCoilOnly)
         "ZoneHVAC:EquipmentList,",
         "  Zone2Equipment,          !- Name",
         "  SequentialLoad,                                          !- Load Distribution Scheme",
-        "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+        "  AirLoopHVAC:UnitarySystem:Legacy, !- Zone Equipment 1 Object Type",
         "  Multispeed DXAC,         !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  Multispeed DXAC,        !- Name",
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
@@ -9449,11 +9456,11 @@ TEST_F(EnergyPlusFixture, UnitarySystem_SizingWithFans)
     DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
     UnitarySystem.allocate(HVACUnitarySystem::NumUnitarySystem);
+    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem:Legacy";
     MultiOrVarSpeedCoolCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
     MultiOrVarSpeedCoolCoil = false;
     MultiOrVarSpeedHeatCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
     MultiOrVarSpeedHeatCoil = false;
-    UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem";
     UnitarySystem(UnitarySysNum).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
     UnitarySystem(UnitarySysNum).RequestAutoSize = true;
 
@@ -9521,7 +9528,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerInlet)
 
         "AirTerminal:SingleDuct:Mixer,",
         "    East Zone DOAS Air Terminal,   !- Name",
-        "    AirLoopHVAC:UnitarySystem,     !- ZoneHVAC Terminal Unit Object Type",
+        "    AirLoopHVAC:UnitarySystem:Legacy,     !- ZoneHVAC Terminal Unit Object Type",
         "    East Zone Unitary System,      !- ZoneHVAC Terminal Unit Name",
         "    East Zone Unitary System Inlet,!- Terminal Unit Outlet Node Name",
         "    East Zone Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
@@ -9554,7 +9561,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerInlet)
         "    East Zone Zone Air Node,  !- Zone Air Node Name",
         "    East Zone Return Outlet;  !- Zone Return Air Node Name",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  East Zone Unitary System,       !- Name",
         "  Setpoint,                       !- Control Type",
         "  ,                               !- Controlling Zone or Thermostat Location",
@@ -9654,7 +9661,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply)
 
         "AirTerminal:SingleDuct:Mixer,",
         "    East Zone DOAS Air Terminal,   !- Name",
-        "    AirLoopHVAC:UnitarySystem,     !- ZoneHVAC Terminal Unit Object Type",
+        "    AirLoopHVAC:UnitarySystem:Legacy,     !- ZoneHVAC Terminal Unit Object Type",
         "    East Zone Unitary System,      !- ZoneHVAC Terminal Unit Name",
         "    East Zone Supply Inlet,        !- Terminal Unit Outlet Node Name",
         "    East Zone Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
@@ -9687,7 +9694,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply)
         "    East Zone Zone Air Node,  !- Zone Air Node Name",
         "    East Zone Return Outlet;  !- Zone Return Air Node Name",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  East Zone Unitary System,       !- Name",
         "  Setpoint,                       !- Control Type",
         "  ,                               !- Controlling Zone or Thermostat Location",
@@ -9788,7 +9795,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipment)
         "ZoneHVAC:EquipmentList,",
         "    East Zone Equipment,     !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirLoopHVAC:UnitarySystem,  !- Zone Equipment 1 Object Type",
+        "    AirLoopHVAC:UnitarySystem:Legacy,  !- Zone Equipment 1 Object Type",
         "    East Zone Unitary System,   !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
@@ -9804,7 +9811,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipment)
         "    East Zone Zone Air Node,  !- Zone Air Node Name",
         "    East Zone Return Outlet;  !- Zone Return Air Node Name",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  East Zone Unitary System,       !- Name",
         "  Setpoint,                       !- Control Type",
         "  ,                               !- Controlling Zone or Thermostat Location",
@@ -9937,7 +9944,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipmentBlankCtrlZone)
         "ZoneHVAC:EquipmentList,",
         "    East Zone Equipment,     !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirLoopHVAC:UnitarySystem,  !- Zone Equipment 1 Object Type",
+        "    AirLoopHVAC:UnitarySystem:Legacy,  !- Zone Equipment 1 Object Type",
         "    East Zone Unitary System,   !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
@@ -9953,7 +9960,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipmentBlankCtrlZone)
         "    East Zone Zone Air Node,  !- Zone Air Node Name",
         "    East Zone Return Outlet;  !- Zone Return Air Node Name",
 
-        "AirLoopHVAC:UnitarySystem,",
+        "AirLoopHVAC:UnitarySystem:Legacy,",
         "  East Zone Unitary System,       !- Name",
         "  Load,                           !- Control Type",
         "  ,                               !- Controlling Zone or Thermostat Location",

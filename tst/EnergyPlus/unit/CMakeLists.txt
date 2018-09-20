@@ -93,7 +93,6 @@ set( test_src
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   HVACUnitaryBypassVAV.unit.cc
-  HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
   HybridModel.unit.cc
@@ -163,6 +162,7 @@ set( test_src
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
+  UnitarySystem.unit.cc
   UnitHeater.unit.cc
   UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
