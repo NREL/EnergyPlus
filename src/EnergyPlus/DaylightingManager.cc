@@ -161,6 +161,18 @@ namespace DaylightingManager {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
+    bool CalcDayltghCoefficients_firstTime(true);
+    bool refFirstTime(true);
+    bool DayltgInteriorIllum_firstTime(true); // true first time routine is called
+    bool FirstTimeDaylFacCalc(true);
+    bool VeryFirstTime(true);
+    bool mapFirstTime(true);
+    bool CheckTDDs_firstTime(true);
+    bool DayltgExtHorizIllum_firstTime(true); // flag for first time thru to initialize
+    bool DayltgInteriorMapIllum_FirstTimeFlag(true);
+    bool ReportIllumMap_firstTime(true);
+    bool SQFirstTime(true);
+
 
     // Surface count crossover for using octree algorithm
     // The octree gives lower computational complexity for much higher performance
@@ -229,6 +241,31 @@ namespace DaylightingManager {
     // MODULE SUBROUTINES:
 
     // Functions
+
+    void clear_state()
+    {
+        // this will need a lot more, but it is a start
+        ZoneDaylight.deallocate();
+        CalcDayltghCoefficients_firstTime = true;
+        CheckTDDZone.deallocate();
+        TDDTransVisBeam.deallocate();
+        TDDFluxInc.deallocate();
+        TDDFluxTrans.deallocate();
+        RefErrIndex.deallocate();
+        refFirstTime = true;
+        ComplexWind.deallocate();
+        IllumMap.deallocate();
+        IllumMapCalc.deallocate();
+        DayltgInteriorIllum_firstTime = true;
+        FirstTimeDaylFacCalc = true;
+        VeryFirstTime = true;
+        mapFirstTime = true;
+        CheckTDDs_firstTime = true;
+        DayltgExtHorizIllum_firstTime = true;
+        DayltgInteriorMapIllum_FirstTimeFlag = true;
+        ReportIllumMap_firstTime = true;
+        SQFirstTime = true;
+    }
 
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
     {
@@ -515,8 +552,6 @@ namespace DaylightingManager {
         int IHR;     // Hour of day counter
         int IWin;    // Window counter
         int loop;    // DO loop indices
-        static bool firstTime(true);
-        static bool FirstTimeDaylFacCalc(true);
         Real64 DaylFac1; // sky daylight factor at ref pt 1
         Real64 DaylFac2; // sky daylight factor at ref pt 2
 
@@ -532,7 +567,6 @@ namespace DaylightingManager {
         Real64 DFOcSky2;
         Real64 SlatAngle;
         int ISA;
-        int ICtrl;
         int ISlatAngle;
 
         static bool CreateDFSReportFile(true);
@@ -543,10 +577,11 @@ namespace DaylightingManager {
             "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')");
 
         // FLOW:
-        if (firstTime) {
+        if (CalcDayltghCoefficients_firstTime) {
             GetDaylightingParametersInput();
             CheckTDDsAndLightShelvesInDaylitZones();
-            firstTime = false;
+            AssociateWindowShadingControlWithDaylighting();
+            CalcDayltghCoefficients_firstTime = false;
             if (allocated(CheckTDDZone)) CheckTDDZone.deallocate();
         } // End of check if firstTime
 
@@ -796,7 +831,6 @@ namespace DaylightingManager {
 
             for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
-                ICtrl = Surface(IWin).WindowShadingControlPtr;
 
                 // For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
                 // component will not be calculated for these windows until the time-step loop.
@@ -805,7 +839,7 @@ namespace DaylightingManager {
                     if (SurfaceWindow(IWin).MovableSlats) {
                         // variable slat angle - MaxSlatangle sets
                         ISA = MaxSlatAngs + 1;
-                    } else if (ICtrl > 0) {
+                    } else if (Surface(IWin).HasShadeControl) {
                         // window shade or blind with fixed slat angle
                         ISA = 2;
                     } else {
@@ -903,7 +937,6 @@ namespace DaylightingManager {
         int IWin;    // Window counter
         int PipeNum; // TDD pipe object number
         int loopwin; // loop index for exterior windows associated with a daylit zone
-        static bool VeryFirstTime(true);
         int TZoneNum;
         bool ErrorsFound;
         int MapNum;
@@ -1047,7 +1080,6 @@ namespace DaylightingManager {
         Real64 DAXY;               // Area of window element
         Real64 SkyObstructionMult; // Ratio of obstructed to unobstructed sky diffuse at a ground point
         int ExtWinType;            // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
-        static bool refFirstTime(true);
         int BRef;
         int ILB;
         bool hitIntObs;        // True iff interior obstruction hit
@@ -1456,7 +1488,6 @@ namespace DaylightingManager {
         //		Array2D< Real64 > MapWindowSolidAngAtRefPt; //Inactive Only allocated and assigning to: Also only 1 value used at a time
         //		Array2D< Real64 > MapWindowSolidAngAtRefPtWtd; // Only 1 value used at a time: Replaced by below
         Real64 MapWindowSolidAngAtRefPtWtd;
-        static bool mapFirstTime(true);
         static bool MySunIsUpFlag(false);
         int WinEl; // window elements counter
 
@@ -1900,7 +1931,7 @@ namespace DaylightingManager {
         ShType = WSC_ST_NoShade; // 'NOSHADE'
         BlNum = 0;
         //		ScNum = 0; //Unused Set but never used
-        if (ICtrl > 0) ShType = WindowShadingControl(ICtrl).ShadingType;
+        if (Surface(IWin).HasShadeControl) ShType = WindowShadingControl(ICtrl).ShadingType;
         BlNum = SurfaceWindow(IWin).BlindNumber;
         //		ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
@@ -4516,7 +4547,7 @@ namespace DaylightingManager {
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
 
                 WindowShadingControlPtr = Surface(SurfNum).WindowShadingControlPtr;
-                if (WindowShadingControlPtr > 0) {
+                if (Surface(SurfNum).HasShadeControl) {
                     if (WindowShadingControl(WindowShadingControlPtr).GlareControlIsActive) {
                         // Error if GlareControlIsActive but window is not in a Daylighting:Detailed zone
                         if (ZoneDaylight(Surface(SurfNum).Zone).TotalDaylRefPoints == 0) {
@@ -5559,11 +5590,10 @@ namespace DaylightingManager {
         int ShelfNum; // light shelf object number
         int SurfNum;  // daylight device surface number
         bool ErrorsFound;
-        static bool firstTime(true);
 
-        if (firstTime) {
+        if (CheckTDDs_firstTime) {
             CheckTDDZone.dimension(NumOfZones, true);
-            firstTime = false;
+            CheckTDDs_firstTime = false;
         }
 
         ErrorsFound = false;
@@ -5632,6 +5662,26 @@ namespace DaylightingManager {
         } // ShelfNum
 
         if (ErrorsFound) ShowFatalError("CheckTDDsAndLightShelvesInDaylitZones: Errors in DAYLIGHTING input.");
+    }
+
+    void AssociateWindowShadingControlWithDaylighting()
+    {
+        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            int found = -1;
+            for (int jZone = 1; jZone <= NumOfZones; ++jZone) {
+                if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).DaylightingControlName, ZoneDaylight(jZone).Name)) {
+                    found = jZone;
+                    break;
+                }
+            }
+            if (found > 0) {
+                WindowShadingControl(iShadeCtrl).DaylightControlIndex = found;
+            } else {
+                ShowWarningError("AssociateWindowShadingControlWithDaylighting: Daylighting object name used in WindowShadingControl not found.");
+                ShowContinueError("..The WindowShadingControl object=\"" + WindowShadingControl(iShadeCtrl).Name +
+                                  "\" and referenes an object named: \"" + WindowShadingControl(iShadeCtrl).DaylightingControlName + "\"");
+            }
+        }
     }
 
     void GetLightWellData(bool &ErrorsFound) // If errors found in input
@@ -5938,7 +5988,6 @@ namespace DaylightingManager {
         static Array1D<Real64> TH(NTH);     // Azimuth of sky element (radians)
         int ISky;                           // Sky type index
         static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
-        static bool firstTime(true);        // flag for first time thru to initialize
 
         // FLOW:
         // Integrate to obtain illuminance from sky.
@@ -5946,7 +5995,7 @@ namespace DaylightingManager {
         // is L(TH,PH)*SIN(PH)*COS(PH)*DTH*DPH, where L(TH,PH) is the luminance
         // of the patch in cd/m2.
         //  Init
-        if (firstTime) {
+        if (DayltgExtHorizIllum_firstTime) {
             for (IPH = 1; IPH <= NPH; ++IPH) {
                 PH(IPH) = (IPH - 0.5) * DPH;
                 SPHCPH(IPH) = std::sin(PH(IPH)) * std::cos(PH(IPH)); // DA = COS(PH)*DTH*DPH
@@ -5954,7 +6003,7 @@ namespace DaylightingManager {
             for (ITH = 1; ITH <= NTH; ++ITH) {
                 TH(ITH) = (ITH - 0.5) * DTH;
             }
-            firstTime = false;
+            DayltgExtHorizIllum_firstTime = false;
         }
 
         HISK = 0.0;
@@ -6319,21 +6368,15 @@ namespace DaylightingManager {
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
         static Vector2<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
-        static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (first index),
-        //   bare/shaded window (second index)
+        static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
+        //   bare/shaded window (first index)
         static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
-        static Array2D<Real64> BFSKHR(2, 4); // Sky background luminance factor for sky type (first index),
-        //   bare/shaded window (second index)
+        static Array2D<Real64> BFSKHR(2, 4); // Sky background luminance factor for sky type (second index),
+        //   bare/shaded window (first index)
         static Vector2<Real64> BFSUHR;       // Sun background luminance factor for bare/shaded window
-        static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (first index),
-        //   bare/shaded window (second index)
-        static Vector2<Real64> SFSUHR;       // Sun source luminance factor for bare/shaded window
-        static Array2D<Real64> WDAYIL(2, 2); // Illuminance from window at reference point (first index)
-        //   for shade open/closed (second index)
-        static Array2D<Real64> WBACLU(2, 2); // Background illuminance from window at reference point (first index)
-        //   for shade open/closed (second index)
-        static Vector2<Real64> RDAYIL; // Illuminance from window at reference point after closing shade
-        static Vector2<Real64> RBACLU; // Background illuminance from window at reference point after closing shade
+        static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
+        //   bare/shaded window (first index)
+        static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
         static Vector2<Real64> GLRNDX; // Glare index at reference point
         static Vector2<Real64> GLRNEW; // New glare index at reference point
         int IL;                        // Reference point index
@@ -6345,17 +6388,15 @@ namespace DaylightingManager {
         int IConst;       // Window construction pointer
         int IConstShaded; // Pointer to shaded window construction
         int ICtrl;        // Window shading control pointer
-        Real64 DILLSW;    // Illuminance a ref point from windows that can be switched,
-        Real64 DILLUN;
-        //  and from those that can't (lux)
-        Real64 ASETIL;                    // Illuminance ratio (lux)
-        Real64 TVIS1;                     // Visible transmittance at normal incidence of unswitched glazing
-        Real64 TVIS2;                     // Visible transmittance at normal incidence of fully-switched glazing
-        Real64 VTRAT;                     // Ratio between switched and unswitched visible transmittance at normal incidence
-        Real64 BACL;                      // Window background (surround) luminance for glare calc (cd/m2)
-        Real64 SkyWeight;                 // Weighting factor used to average two different sky types
-        static Vector4<Real64> HorIllSky; // Horizontal illuminance for different sky types
-        Real64 HorIllSkyFac;              // Ratio between horizontal illuminance from sky horizontal irradiance and
+        Array1D<Real64> TVIS1(
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Visible transmittance at normal incidence of unswitched glazing
+        Array1D<Real64> TVIS2(
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Visible transmittance at normal incidence of fully-switched glazing
+        Real64 VTRAT;                                              // Ratio between switched and unswitched visible transmittance at normal incidence
+        Real64 BACL;                                               // Window background (surround) luminance for glare calc (cd/m2)
+        Real64 SkyWeight;                                          // Weighting factor used to average two different sky types
+        static Vector4<Real64> HorIllSky;                          // Horizontal illuminance for different sky types
+        Real64 HorIllSkyFac;                                       // Ratio between horizontal illuminance from sky horizontal irradiance and
         //   luminous efficacy and horizontal illuminance from averaged sky
         Real64 SlatAng; // Blind slat angle (rad)
         bool VarSlats;  // True if slats are movable, i.e., variable angle
@@ -6376,7 +6417,6 @@ namespace DaylightingManager {
         static Array3D<Real64> tmpIllumFromWinAtRefPt;
         static Array3D<Real64> tmpBackLumFromWinAtRefPt;
         static Array3D<Real64> tmpSourceLumFromWinAtRefPt;
-        static bool firstTime(true); // true first time routine is called
 
         static bool blnCycle(false);
 
@@ -6384,12 +6424,12 @@ namespace DaylightingManager {
 
         // Three arrays to save original clear and dark (fully switched) states'
         //  zone/window daylighting properties.
-        if (firstTime) {
+        if (DayltgInteriorIllum_firstTime) {
             int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(ZoneDaylight, &ZoneDaylightCalc::NumOfDayltgExtWins)));
             tmpIllumFromWinAtRefPt.allocate(d1, 2, 2);
             tmpBackLumFromWinAtRefPt.allocate(d1, 2, 2);
             tmpSourceLumFromWinAtRefPt.allocate(d1, 2, 2);
-            firstTime = false;
+            DayltgInteriorIllum_firstTime = false;
         }
         tmpIllumFromWinAtRefPt = 0.0;
         tmpBackLumFromWinAtRefPt = 0.0;
@@ -6687,7 +6727,7 @@ namespace DaylightingManager {
         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
             IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
             ICtrl = Surface(IWin).WindowShadingControlPtr;
-            if (ICtrl > 0 && ISWFLG == 0) {
+            if (Surface(IWin).HasShadeControl && ISWFLG == 0) {
                 if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                     SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened)
                     ISWFLG = 1;
@@ -6714,102 +6754,138 @@ namespace DaylightingManager {
         // unswitched state. Assumes some windows in a space may have this control and
         // others not.
 
+        Array1D<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
+        Array1D<Real64> DILLUN;         //  and from those that aren't (lux)
+        Array1D_bool previously_shaded; // array of flags to indicate that previously groups would have already shaded this window
+        DILLSW.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
+        DILLUN.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
+        previously_shaded.allocate(ZoneDaylight(ZoneNum).NumOfDayltgExtWins);
+
         // If daylight illuminance is above setpoint, allow switching
         if (ISWFLG != 0 && DaylIllum(1) > SetPnt(1)) {
 
             // Third loop over windows.  Get illuminance at ref pt 1 from
-            // windows that can be switched (DILLSW) and those that can't (DILLUN).
-            // Windows that can be switched are initially in the unswitched state.
+            // windows that can be switched (DILLSW) with a group and those that can't (DILLUN).
+            // Windows that can be switched are initially in the unswitched state. For subsequent
+            // groups the windows in previous groups are fully switched.
             DILLSW = 0.0;
             DILLUN = 0.0;
-            for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
-                IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
-                ICtrl = Surface(IWin).WindowShadingControlPtr;
-                IS = 1;
-                if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
-                if (ICtrl > 0) {
-                    if (SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened &&
-                        WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
-                        DILLSW += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
-                    } else {
-                        DILLUN += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
+            previously_shaded = false;
+
+            int count = 0;
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
+                for (auto IWin : listOfExtWin) {
+                    ++count;
+                    // need to map back to the original order of the "loop" to not change all the other data structures
+                    loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
+
+                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    IS = 1;
+                    if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                    if (Surface(IWin).HasShadeControl) {
+                        if (SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened &&
+                            WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp && !previously_shaded(loop)) {
+                            DILLSW(igroup) += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
+                            previously_shaded(loop) = true;
+                        } else {
+                            if (!previously_shaded(loop)) {
+                                DILLUN(igroup) += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
+                            } else {
+                                DILLUN(igroup) += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, 1); // use the shaded state if previously shaded
+                            }
+                        }
                     }
                 }
             } // End of third window loop, IWin
 
+            Array1D<Real64> ASETIL; // Illuminance ratio (lux)
+            ASETIL.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
+
             // Transmittance multiplier
-            ASETIL = (SetPnt(1) - DILLUN) / (DILLSW + 0.00001);
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
+                ASETIL(igroup) = (SetPnt(1) - DILLUN(igroup)) / (DILLSW(igroup) + 0.00001);
+            }
 
             // ASETIL < 1 means there's enough light, so check for switching
-            if (ASETIL < 1.0) {
 
-                // Fourth loop over windows to determine which to switch
-                for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
-                    IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
+            // Fourth loop over windows to determine which to switch
+            // iterate in the order that the shades are specified in WindowShadeControl
+            count = 0;
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
-                    ICtrl = Surface(IWin).WindowShadingControlPtr;
-                    if (ICtrl == 0) continue;
+                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
 
-                    if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
-                        WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp)
-                        continue;
+                for (auto IWin : listOfExtWin) {
+                    ++count;
+                    // need to map back to the original order of the "loop" to not change all the other data structures
+                    loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
+                    if (ASETIL(igroup) < 1.0) {
 
-                    IConst = Surface(IWin).Construction;
-                    if (SurfaceWindow(IWin).StormWinFlag == 1) IConst = Surface(IWin).StormWinConstruction;
-                    // Vis trans at normal incidence of unswitched glass
-                    TVIS1 = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        ICtrl = Surface(IWin).WindowShadingControlPtr;
+                        if (!Surface(IWin).HasShadeControl) continue;
 
-                    // Vis trans at normal incidence of fully switched glass
-                    IConstShaded = Surface(IWin).ShadedConstruction;
-                    TVIS2 = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
+                            WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp)
+                            continue;
 
-                    // Reset shading flag to indicate that window is shaded by being partially or fully switched
-                    SurfaceWindow(IWin).ShadingFlag = SwitchableGlazing;
+                        IConst = Surface(IWin).Construction;
+                        if (SurfaceWindow(IWin).StormWinFlag == 1) IConst = Surface(IWin).StormWinConstruction;
+                        // Vis trans at normal incidence of unswitched glass
+                        TVIS1(igroup) = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
 
-                    // ASETIL < 0 means illuminance from non-daylight-switchable windows exceeds setpoint,
-                    // so completely switch all daylight-switchable windows to minimize solar gain
-                    if (ASETIL <= 0.0) {
-                        SurfaceWindow(IWin).SwitchingFactor = 1.0;
-                        SurfaceWindow(IWin).VisTransSelected = TVIS2;
-                    } else {
-                        // Case where 0 < ASETIL < 1: darken glass in all
-                        // daylight-switchable windows to just meet illuminance setpoint
-                        // From this equation: SETPNT(1) = DILLUN + DILLSW/TVIS1 * VisTransSelected
-                        SurfaceWindow(IWin).VisTransSelected = max(TVIS2, ASETIL * TVIS1) + 0.000001;
-                        SurfaceWindow(IWin).SwitchingFactor = (TVIS1 - SurfaceWindow(IWin).VisTransSelected) / (TVIS1 - TVIS2 + 0.000001);
-                        // bound switching factor between 0 and 1
-                        SurfaceWindow(IWin).SwitchingFactor = min(1.0, SurfaceWindow(IWin).SwitchingFactor);
-                        SurfaceWindow(IWin).SwitchingFactor = max(0.0, SurfaceWindow(IWin).SwitchingFactor);
-                    }
+                        // Vis trans at normal incidence of fully switched glass
+                        IConstShaded = Surface(IWin).ShadedConstruction;
+                        TVIS2(igroup) = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
 
-                    // Adjust daylight quantities based on ratio between switched and unswitched visible transmittance
-                    for (IL = 1; IL <= NREFPT; ++IL) {
-                        // DaylIllum(IL) and BacLum(IL) were calculated at the clear state: IS = 1,
-                        //  and need to adjusted for intermediate switched state at VisTransSelected: IS = 2
-                        IS = 1;
-                        VTRAT = SurfaceWindow(IWin).VisTransSelected / (TVIS1 + 0.000001);
-                        DaylIllum(IL) += (VTRAT - 1.0) * ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
-                        ZoneDaylight(ZoneNum).BacLum(IL) += (VTRAT - 1.0) * ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
+                        // Reset shading flag to indicate that window is shaded by being partially or fully switched
+                        SurfaceWindow(IWin).ShadingFlag = SwitchableGlazing;
 
-                        // Adjust illum, background illum and source luminance for this window in intermediate switched state
-                        //  for later use in the DayltgGlare calc because SurfaceWindow(IWin)%ShadingFlag = SwitchableGlazing = 2
-                        IS = 2;
-                        VTRAT = SurfaceWindow(IWin).VisTransSelected / (TVIS2 + 0.000001);
-                        ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpIllumFromWinAtRefPt(loop, IS, IL);
-                        ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpBackLumFromWinAtRefPt(loop, IS, IL);
-                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpSourceLumFromWinAtRefPt(loop, IS, IL);
-                    } // IL
+                        // ASETIL < 0 means illuminance from non-daylight-switchable windows exceeds setpoint,
+                        // so completely switch all daylight-switchable windows to minimize solar gain
+                        if (ASETIL(igroup) <= 0.0) {
+                            SurfaceWindow(IWin).SwitchingFactor = 1.0;
+                            SurfaceWindow(IWin).VisTransSelected = TVIS2(igroup);
+                        } else {
+                            // Case where 0 < ASETIL < 1: darken glass in all
+                            // daylight-switchable windows to just meet illuminance setpoint
+                            // From this equation: SETPNT(1) = DILLUN + DILLSW/TVIS1 * VisTransSelected
+                            SurfaceWindow(IWin).VisTransSelected = max(TVIS2(igroup), ASETIL(igroup) * TVIS1(igroup)) + 0.000001;
+                            SurfaceWindow(IWin).SwitchingFactor =
+                                (TVIS1(igroup) - SurfaceWindow(IWin).VisTransSelected) / (TVIS1(igroup) - TVIS2(igroup) + 0.000001);
+                            // bound switching factor between 0 and 1
+                            SurfaceWindow(IWin).SwitchingFactor = min(1.0, SurfaceWindow(IWin).SwitchingFactor);
+                            SurfaceWindow(IWin).SwitchingFactor = max(0.0, SurfaceWindow(IWin).SwitchingFactor);
+                        }
 
-                    // If new daylight does not exceed the illuminance setpoint, done, no more checking other switchable glazings
-                    //  even though this should not happen because all switchable glazings suppose to be dimmed by a same ratio ASETIL
-                    //   In real world, this can be improved by setting priority of each switchable glazing to switch - NFP.
-                    if (DaylIllum(1) <= SetPnt(1)) {
-                        break;
-                    }
-                } // End of fourth window loop, IWin -- end of switching to control daylight illuminance
+                        // Adjust daylight quantities based on ratio between switched and unswitched visible transmittance
+                        for (IL = 1; IL <= NREFPT; ++IL) {
+                            // DaylIllum(IL) and BacLum(IL) were calculated at the clear state: IS = 1,
+                            //  and need to adjusted for intermediate switched state at VisTransSelected: IS = 2
+                            IS = 1;
+                            VTRAT = SurfaceWindow(IWin).VisTransSelected / (TVIS1(igroup) + 0.000001);
+                            DaylIllum(IL) += (VTRAT - 1.0) * ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
+                            ZoneDaylight(ZoneNum).BacLum(IL) += (VTRAT - 1.0) * ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
 
-            } // ASETIL < 1
-        }     // ISWFLG /= 0 .AND. DaylIllum(1) > SETPNT(1)
+                            // Adjust illum, background illum and source luminance for this window in intermediate switched state
+                            //  for later use in the DayltgGlare calc because SurfaceWindow(IWin)%ShadingFlag = SwitchableGlazing = 2
+                            IS = 2;
+                            VTRAT = SurfaceWindow(IWin).VisTransSelected / (TVIS2(igroup) + 0.000001);
+                            ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpIllumFromWinAtRefPt(loop, IS, IL);
+                            ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpBackLumFromWinAtRefPt(loop, IS, IL);
+                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpSourceLumFromWinAtRefPt(loop, IS, IL);
+                        } // IL
+                    }     // ASETIL < 1
+                }
+
+                // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
+                if (DaylIllum(1) <= SetPnt(1)) {
+                    break;
+                }
+
+            } // End of fourth window loop
+
+        } // ISWFLG /= 0 .AND. DaylIllum(1) > SETPNT(1)
 
         // Calculate glare index at each reference point assuming the daylight illuminance setpoint is
         //  met at both reference points, either by daylight or electric lights
@@ -6831,68 +6907,95 @@ namespace DaylightingManager {
             }
         }
 
+        Array3D<Real64> WDAYIL(
+            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point (second index)
+        //   for shade open/closed (first index), the number of shade deployment groups (third index)
+        Array3D<Real64> WBACLU(
+            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point (second index)
+        //   for shade open/closed (first index), the number of shade deployment groups (third index)
+        Array2D<Real64> RDAYIL(
+            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point after closing shade
+        Array2D<Real64> RBACLU(
+            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point after closing shade
+
         if (GlareFlag) {
             // Glare is too high at a ref pt.  Loop through windows.
-            for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
-                IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
+            int count = 0;
 
-                // Check if window is eligible for glare control
-                // TH 1/21/2010. Switchable glazings already in partially switched state
-                //  should be allowed to further dim to control glare
-                if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
+            for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
-                ICtrl = Surface(IWin).WindowShadingControlPtr;
-                if (ICtrl == 0) continue;
-                if (WindowShadingControl(ICtrl).GlareControlIsActive) {
+                std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
 
-                    // Illuminance (WDAYIL) and background luminance (WBACLU) contribution from this
-                    // window without shading (IS=1) and with shading (IS=2) for each ref pt
-                    //  For switchable windows, this may be partially switched rather than fully dark
-                    for (IL = 1; IL <= NREFPT; ++IL) {
-                        for (IS = 1; IS <= 2; ++IS) {
-                            WDAYIL(IS, IL) = ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
-                            WBACLU(IS, IL) = ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
-                        }
-                    }
+                int countBeforeListOfExtWinLoop = count;
+                bool atLeastOneGlareControlIsActive = false;
 
-                    // Recalculate illuminance and glare with shading on this window.
-                    //  For switchable glazings, this is the fully switched (dark) state
-                    for (IL = 1; IL <= NREFPT; ++IL) {
-                        if (SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) {
-                            // for non switchable glazings or switchable glazings not switched yet (still in clear state)
-                            //  SurfaceWindow(IWin)%ShadingFlag = GlassConditionallyLightened
-                            RDAYIL(IL) = DaylIllum(IL) - WDAYIL(1, IL) + WDAYIL(2, IL);
-                            RBACLU(IL) = ZoneDaylight(ZoneNum).BacLum(IL) - WBACLU(1, IL) + WBACLU(2, IL);
-                        } else {
-                            // switchable glazings already in partially switched state when calc the RDAYIL(IL) & RBACLU(IL)
-                            RDAYIL(IL) = DaylIllum(IL) - WDAYIL(2, IL) + tmpIllumFromWinAtRefPt(loop, 2, IL);
-                            RBACLU(IL) = ZoneDaylight(ZoneNum).BacLum(IL) - WBACLU(2, IL) + tmpBackLumFromWinAtRefPt(loop, 2, IL);
-                        }
-                    }
+                for (auto IWin : listOfExtWin) {
+                    ++count;
+                    // need to map back to the original order of the "loop" to not change all the other data structures
+                    loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
 
-                    if (SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) SurfaceWindow(IWin).ShadingFlag /= 10;
+                    // Check if window is eligible for glare control
+                    // TH 1/21/2010. Switchable glazings already in partially switched state
+                    //  should be allowed to further dim to control glare
+                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
 
-                    // For switchable glazings, it is switched to fully dark state,
-                    // update ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for use in DayltgGlare
-                    if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
+                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    if (!Surface(IWin).HasShadeControl) continue;
+                    if (WindowShadingControl(ICtrl).GlareControlIsActive) {
+                        atLeastOneGlareControlIsActive = true;
+
+                        // Illuminance (WDAYIL) and background luminance (WBACLU) contribution from this
+                        // window without shading (IS=1) and with shading (IS=2) for each ref pt
+                        //  For switchable windows, this may be partially switched rather than fully dark
                         for (IL = 1; IL <= NREFPT; ++IL) {
-                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                            for (IS = 1; IS <= 2; ++IS) {
+                                WDAYIL(IS, IL, igroup) = ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
+                                WBACLU(IS, IL, igroup) = ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
+                            }
                         }
 
-                        IConst = Surface(IWin).Construction;
-                        // Vis trans at normal incidence of unswitched glass
-                        TVIS1 = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        // Recalculate illuminance and glare with shading on this window.
+                        //  For switchable glazings, this is the fully switched (dark) state
+                        for (IL = 1; IL <= NREFPT; ++IL) {
+                            if (SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) {
+                                // for non switchable glazings or switchable glazings not switched yet (still in clear state)
+                                //  SurfaceWindow(IWin)%ShadingFlag = GlassConditionallyLightened
+                                RDAYIL(IL, igroup) = DaylIllum(IL) - WDAYIL(1, IL, igroup) + WDAYIL(2, IL, igroup);
+                                RBACLU(IL, igroup) = ZoneDaylight(ZoneNum).BacLum(IL) - WBACLU(1, IL, igroup) + WBACLU(2, IL, igroup);
+                            } else {
+                                // switchable glazings already in partially switched state when calc the RDAYIL(IL) & RBACLU(IL)
+                                RDAYIL(IL, igroup) = DaylIllum(IL) - WDAYIL(2, IL, igroup) + tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                RBACLU(IL, igroup) = ZoneDaylight(ZoneNum).BacLum(IL) - WBACLU(2, IL, igroup) + tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                            }
+                        }
 
-                        // Vis trans at normal incidence of fully switched glass
-                        IConstShaded = Surface(IWin).ShadedConstruction;
-                        TVIS2 = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        if (SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) SurfaceWindow(IWin).ShadingFlag /= 10;
+
+                        // For switchable glazings, it is switched to fully dark state,
+                        // update ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for use in DayltgGlare
+                        if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
+                            for (IL = 1; IL <= NREFPT; ++IL) {
+                                ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
+                                ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                            }
+
+                            IConst = Surface(IWin).Construction;
+                            // Vis trans at normal incidence of unswitched glass
+                            TVIS1(igroup) = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+
+                            // Vis trans at normal incidence of fully switched glass
+                            IConstShaded = Surface(IWin).ShadedConstruction;
+                            TVIS2(igroup) = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        }
                     }
+                }
+
+                if (atLeastOneGlareControlIsActive) {
 
                     // Re-calc daylight and glare at shaded state. For switchable glazings, it is the fully dark state.
                     for (IL = 1; IL <= NREFPT; ++IL) {
-                        BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL));
+                        BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL, igroup));
                         // DayltgGlare uses ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for shaded state
                         DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                     }
@@ -6918,169 +7021,187 @@ namespace DaylightingManager {
                             if (GLRNEW(2) > GLRNDX(2) || GLRNEW(1) > ZoneDaylight(ZoneNum).MaxGlareallowed) blnCycle = true;
                         }
                     }
+                }
 
-                    // Shading this window has not improved the glare situation.
-                    // Reset shading flag to no shading condition, go to next window.
-                    if (blnCycle) {
-                        //  for switchable glazings, reset properties to clear state or partial switched state?
+                // restore the count to the value prior to the last loop through the group of exterior windows
+                count = countBeforeListOfExtWinLoop;
+
+                for (auto IWin : listOfExtWin) {
+                    ++count;
+                    // need to map back to the original order of the "loop" to not change all the other data structures
+                    loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
+                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
+
+                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    if (!Surface(IWin).HasShadeControl) continue;
+                    if (WindowShadingControl(ICtrl).GlareControlIsActive) {
+
+                        // Shading this window has not improved the glare situation.
+                        // Reset shading flag to no shading condition, go to next window.
+                        if (blnCycle) {
+                            //  for switchable glazings, reset properties to clear state or partial switched state?
+                            if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
+                                SurfaceWindow(IWin).SwitchingFactor = 0.0;
+                                SurfaceWindow(IWin).VisTransSelected = TVIS1(igroup);
+
+                                // RESET properties for fully dark state
+                                for (IL = 1; IL <= NREFPT; ++IL) {
+                                    ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                    ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                                    ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
+                                }
+                            }
+
+                            SurfaceWindow(IWin).ShadingFlag = ShadeOff;
+                            continue;
+                        }
+
+                        // Shading this window has improved the glare situation.
+                        // Reset background luminance, glare index, and daylight illuminance at each ref pt.
+                        // For switchable glazings, this is fully switched, dark state
+                        for (IL = 1; IL <= NREFPT; ++IL) {
+                            ZoneDaylight(ZoneNum).BacLum(IL) = RBACLU(IL, igroup);
+                            GLRNDX(IL) = GLRNEW(IL);
+                            DaylIllum(IL) = RDAYIL(IL, igroup);
+                        }
+
+                        // TH comments (5/22/2009): seems for EC windows, if the calculated glare exceeds the max setpoint,
+                        //  the EC windows will be reset to fully dark state which significantly reduces the available daylight.
+                        //  A better way is to dim the EC windows as necessary just to meet the glare index, which will still
+                        //  provide more daylight while not exceeding the max glare! The question is then how to set the
+                        //  SwitchingFactor to just meet the glare index.
+                        //  This was addressed in CR 7984 for E+ 5.0. 1/19/2010
+
+                        // If switchable glazing, set switching factor to 1: fully switched.
                         if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
-                            SurfaceWindow(IWin).SwitchingFactor = 0.0;
-                            SurfaceWindow(IWin).VisTransSelected = TVIS1;
+                            // tmpSWFactor0 = SurfaceWindow( IWin ).SwitchingFactor; // save original
+                            // switching  factor
+                            ////Unused Set but never used
+                            SurfaceWindow(IWin).SwitchingFactor = 1.0;
+                            SurfaceWindow(IWin).VisTransSelected = TVIS2(igroup);
 
-                            // RESET properties for fully dark state
+                            // restore fully dark values
                             for (IL = 1; IL <= NREFPT; ++IL) {
+                                WDAYIL(2, IL, igroup) = tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                WBACLU(2, IL, igroup) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
                                 ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
                                 ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
                                 ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
                             }
                         }
 
-                        SurfaceWindow(IWin).ShadingFlag = ShadeOff;
-                        continue;
-                    }
-
-                    // Shading this window has improved the glare situation.
-                    // Reset background luminance, glare index, and daylight illuminance at each ref pt.
-                    // For switchable glazings, this is fully switched, dark state
-                    for (IL = 1; IL <= NREFPT; ++IL) {
-                        ZoneDaylight(ZoneNum).BacLum(IL) = RBACLU(IL);
-                        GLRNDX(IL) = GLRNEW(IL);
-                        DaylIllum(IL) = RDAYIL(IL);
-                    }
-
-                    // TH comments (5/22/2009): seems for EC windows, if the calculated glare exceeds the max setpoint,
-                    //  the EC windows will be reset to fully dark state which significantly reduces the available daylight.
-                    //  A better way is to dim the EC windows as necessary just to meet the glare index, which will still
-                    //  provide more daylight while not exceeding the max glare! The question is then how to set the
-                    //  SwitchingFactor to just meet the glare index.
-                    //  This was addressed in CR 7984 for E+ 5.0. 1/19/2010
-
-                    // If switchable glazing, set switching factor to 1: fully switched.
-                    if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
-                        //						tmpSWFactor0 = SurfaceWindow( IWin ).SwitchingFactor; // save original
-                        // switching  factor
-                        ////Unused Set but never used
-                        SurfaceWindow(IWin).SwitchingFactor = 1.0;
-                        SurfaceWindow(IWin).VisTransSelected = TVIS2;
-
-                        // restore fully dark values
-                        for (IL = 1; IL <= NREFPT; ++IL) {
-                            WDAYIL(2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
-                            WBACLU(2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
-                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
+                        // Check if glare now acceptable at each ref pt.
+                        GlareOK = false;
+                        if (NREFPT == 1) {
+                            if (GLRNDX(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
+                        } else if (NREFPT > 1) {
+                            if (GLRNDX(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed)
+                                GlareOK = true;
                         }
-                    }
 
-                    // Check if glare now acceptable at each ref pt.
-                    GlareOK = false;
-                    if (NREFPT == 1) {
-                        if (GLRNDX(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
-                    } else if (NREFPT > 1) {
-                        if (GLRNDX(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
-                    }
+                        if (GlareOK) {
+                            if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing &&
+                                WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
+                                // Added TH 1/14/2010
+                                // Only for switchable glazings with MeetDaylightIlluminanceSetpoint control
+                                // The glazing is in fully dark state, it might lighten a bit to provide more daylight
+                                //  while meeting maximum discomfort glare index
+                                // Iteration to find the right switching factor meeting the glare index
 
-                    if (GlareOK) {
-                        if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing &&
-                            WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
-                            // Added TH 1/14/2010
-                            // Only for switchable glazings with MeetDaylightIlluminanceSetpoint control
-                            // The glazing is in fully dark state, it might lighten a bit to provide more daylight
-                            //  while meeting maximum discomfort glare index
-                            // Iteration to find the right switching factor meeting the glare index
+                                // get fully dark state values
+                                tmpSWSL1 = tmpSourceLumFromWinAtRefPt(loop, 2, 1);
+                                if (NREFPT > 1) tmpSWSL2 = tmpSourceLumFromWinAtRefPt(loop, 2, 2);
 
-                            // get fully dark state values
-                            tmpSWSL1 = tmpSourceLumFromWinAtRefPt(loop, 2, 1);
-                            if (NREFPT > 1) tmpSWSL2 = tmpSourceLumFromWinAtRefPt(loop, 2, 2);
-
-                            // use simple fixed step search in iteraction, can be improved in future
-                            tmpSWFactor = 1.0 - tmpSWIterStep;
-                            while (tmpSWFactor > 0) {
-                                // calc new glare at new switching state
-                                for (IL = 1; IL <= NREFPT; ++IL) {
-                                    RDAYIL(IL) = DaylIllum(IL) + (WDAYIL(1, IL) - WDAYIL(2, IL)) * (1.0 - tmpSWFactor);
-                                    RBACLU(IL) = ZoneDaylight(ZoneNum).BacLum(IL) + (WBACLU(1, IL) - WBACLU(2, IL)) * (1.0 - tmpSWFactor);
-                                    BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL));
-                                    // needs to update SourceLumFromWinAtRefPt(IL,2,loop) before re-calc DayltgGlare
-                                    tmpMult = (TVIS1 - (TVIS1 - TVIS2) * tmpSWFactor) / TVIS2;
-                                    if (IL == 1) {
-                                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSWSL1 * tmpMult;
-                                    } else {
-                                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSWSL2 * tmpMult;
+                                // use simple fixed step search in iteraction, can be improved in future
+                                tmpSWFactor = 1.0 - tmpSWIterStep;
+                                while (tmpSWFactor > 0) {
+                                    // calc new glare at new switching state
+                                    for (IL = 1; IL <= NREFPT; ++IL) {
+                                        RDAYIL(IL, igroup) = DaylIllum(IL) + (WDAYIL(1, IL, igroup) - WDAYIL(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        RBACLU(IL, igroup) =
+                                            ZoneDaylight(ZoneNum).BacLum(IL) + (WBACLU(1, IL, igroup) - WBACLU(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL, igroup));
+                                        // needs to update SourceLumFromWinAtRefPt(IL,2,loop) before re-calc DayltgGlare
+                                        tmpMult = (TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor) / TVIS2(igroup);
+                                        if (IL == 1) {
+                                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSWSL1 * tmpMult;
+                                        } else {
+                                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSWSL2 * tmpMult;
+                                        }
+                                        // Calc new glare
+                                        DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                                     }
-                                    // Calc new glare
-                                    DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
-                                }
 
-                                // Check whether new glare is OK
-                                GlareOK = false;
-                                if (NREFPT == 1) {
-                                    if (GLRNEW(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
-                                } else if (NREFPT > 1) {
-                                    if (GLRNEW(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed)
-                                        GlareOK = true;
-                                }
+                                    // Check whether new glare is OK
+                                    GlareOK = false;
+                                    if (NREFPT == 1) {
+                                        if (GLRNEW(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed) GlareOK = true;
+                                    } else if (NREFPT > 1) {
+                                        if (GLRNEW(1) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed)
+                                            GlareOK = true;
+                                    }
 
-                                if (GlareOK) {
-                                    if (tmpSWFactor >= tmpSWIterStep) {
-                                        // Continue to lighten the glazing
-                                        tmpSWFactor -= tmpSWIterStep;
-                                        continue;
+                                    if (GlareOK) {
+                                        if (tmpSWFactor >= tmpSWIterStep) {
+                                            // Continue to lighten the glazing
+                                            tmpSWFactor -= tmpSWIterStep;
+                                            continue;
+                                        } else {
+                                            // Glare still OK but glazing already in clear state, no more lighten
+                                            break;
+                                        }
                                     } else {
-                                        // Glare still OK but glazing already in clear state, no more lighten
+                                        // Glare too high, exit and use previous switching state
+                                        tmpSWFactor += tmpSWIterStep;
                                         break;
                                     }
-                                } else {
-                                    // Glare too high, exit and use previous switching state
-                                    tmpSWFactor += tmpSWIterStep;
-                                    break;
                                 }
-                            }
 
-                            // Final re-calculation if needed
-                            if (!GlareOK) {
-                                // Glare too high, use previous state and re-calc
-                                for (IL = 1; IL <= NREFPT; ++IL) {
-                                    RDAYIL(IL) = DaylIllum(IL) + (WDAYIL(1, IL) - WDAYIL(2, IL)) * (1.0 - tmpSWFactor);
-                                    RBACLU(IL) = ZoneDaylight(ZoneNum).BacLum(IL) + (WBACLU(1, IL) - WBACLU(2, IL)) * (1.0 - tmpSWFactor);
-                                    BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL));
+                                // Final re-calculation if needed
+                                if (!GlareOK) {
+                                    // Glare too high, use previous state and re-calc
+                                    for (IL = 1; IL <= NREFPT; ++IL) {
+                                        RDAYIL(IL, igroup) = DaylIllum(IL) + (WDAYIL(1, IL, igroup) - WDAYIL(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        RBACLU(IL, igroup) =
+                                            ZoneDaylight(ZoneNum).BacLum(IL) + (WBACLU(1, IL, igroup) - WBACLU(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        BACL = max(SetPnt(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, RBACLU(IL, igroup));
 
-                                    // needs to update SourceLumFromWinAtRefPt(IL,2,IWin) before re-calc DayltgGlare
-                                    tmpMult = (TVIS1 - (TVIS1 - TVIS2) * tmpSWFactor) / TVIS2;
-                                    if (IL == 1) {
-                                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, 1) = tmpSWSL1 * tmpMult;
-                                    } else {
-                                        ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, 2) = tmpSWSL2 * tmpMult;
+                                        // needs to update SourceLumFromWinAtRefPt(IL,2,IWin) before re-calc DayltgGlare
+                                        tmpMult = (TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor) / TVIS2(igroup);
+                                        if (IL == 1) {
+                                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, 1) = tmpSWSL1 * tmpMult;
+                                        } else {
+                                            ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, 2) = tmpSWSL2 * tmpMult;
+                                        }
+                                        DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                                     }
-                                    DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                                 }
+
+                                // Update final results
+                                for (IL = 1; IL <= NREFPT; ++IL) {
+                                    ZoneDaylight(ZoneNum).BacLum(IL) = RBACLU(IL, igroup);
+                                    GLRNDX(IL) = GLRNEW(IL);
+                                    DaylIllum(IL) = RDAYIL(IL, igroup);
+
+                                    tmpMult = (TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor) / TVIS2(igroup);
+                                    // update report variables
+                                    ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL) * tmpMult;
+                                    ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL) * tmpMult;
+                                }
+                                SurfaceWindow(IWin).SwitchingFactor = tmpSWFactor;
+                                SurfaceWindow(IWin).VisTransSelected = TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor;
+
+                            } else {
+                                // For un-switchable glazing or switchable glazing but not MeetDaylightIlluminaceSetpoint control,
+                                // it is in shaded state and glare is ok - job is done, exit the window loop - IWin
+                                break;
                             }
-
-                            // Update final results
-                            for (IL = 1; IL <= NREFPT; ++IL) {
-                                ZoneDaylight(ZoneNum).BacLum(IL) = RBACLU(IL);
-                                GLRNDX(IL) = GLRNEW(IL);
-                                DaylIllum(IL) = RDAYIL(IL);
-
-                                tmpMult = (TVIS1 - (TVIS1 - TVIS2) * tmpSWFactor) / TVIS2;
-                                // update report variables
-                                ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL) * tmpMult;
-                                ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL) * tmpMult;
-                            }
-                            SurfaceWindow(IWin).SwitchingFactor = tmpSWFactor;
-                            SurfaceWindow(IWin).VisTransSelected = TVIS1 - (TVIS1 - TVIS2) * tmpSWFactor;
-
-                        } else {
-                            // For un-switchable glazing or switchable glazing but not MeetDaylightIlluminaceSetpoint control,
-                            // it is in shaded state and glare is ok - job is done, exit the window loop - IWin
-                            break;
                         }
-                    }
 
-                } // End of check if window glare control is active
-            }     // End of window loop, IWin
-        }         // GlareFlag
+                    } // End of check if window glare control is active
+                }     // end of for(auto IWin : listOfExtWin)
+            }         // for group
+        }             // GlareFlag
 
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off
@@ -7971,7 +8092,7 @@ namespace DaylightingManager {
 
                 // Check if window has shade or blind
                 ICtrl = Surface(IWin).WindowShadingControlPtr;
-                if (ICtrl > 0) {
+                if (Surface(IWin).HasShadeControl) {
                     ShType = WindowShadingControl(ICtrl).ShadingType;
                     BlNum = SurfaceWindow(IWin).BlindNumber;
                     //					ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
@@ -9444,7 +9565,6 @@ namespace DaylightingManager {
         Real64 GTOT2;
         static Array1D<Real64> BACLUM;
         static Array1D<Real64> GLRNDX;
-        static bool FirstTimeFlag(true);
         int ILB;
 
         int IConst;
@@ -9458,11 +9578,11 @@ namespace DaylightingManager {
         int MapNum;
         int ILM;
 
-        if (FirstTimeFlag) {
+        if (DayltgInteriorMapIllum_FirstTimeFlag) {
             daylight_illum.allocate(MaxMapRefPoints);
             BACLUM.allocate(MaxMapRefPoints);
             GLRNDX.allocate(MaxMapRefPoints);
-            FirstTimeFlag = false;
+            DayltgInteriorMapIllum_FirstTimeFlag = false;
         }
 
         if (WarmupFlag) return;
@@ -9766,7 +9886,7 @@ namespace DaylightingManager {
                 VTMULT = 1.0;
 
                 ICtrl = Surface(IWin).WindowShadingControlPtr;
-                if (ICtrl > 0) {
+                if (Surface(IWin).HasShadeControl) {
                     if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                         SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
                         // switchable windows in partial or fully switched state,
@@ -9801,7 +9921,7 @@ namespace DaylightingManager {
                     VTMULT = 1.0;
 
                     ICtrl = Surface(IWin).WindowShadingControlPtr;
-                    if (ICtrl > 0) {
+                    if (Surface(IWin).HasShadeControl) {
                         if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                             SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
                             // switchable windows in partial or fully switched state,
@@ -9883,7 +10003,6 @@ namespace DaylightingManager {
         //  REAL(r64)           :: NumOut
         int IllumOut;
 
-        static bool firstTime(true);
         static Array1D_bool FirstTimeMaps;
         static Array1D_bool EnvrnPrint;
         static Array1D_string SavedMnDy;
@@ -9899,13 +10018,12 @@ namespace DaylightingManager {
         int SQMonth;
         int SQDayOfMonth;
         int IllumIndex;
-        static bool SQFirstTime(true);
         //		static bool CommaDelimited( true ); //Unused Set but never used
         // BSLLC Finish
 
         // FLOW:
-        if (firstTime) {
-            firstTime = false;
+        if (ReportIllumMap_firstTime) {
+            ReportIllumMap_firstTime = false;
             FirstTimeMaps.dimension(TotIllumMaps, true);
             EnvrnPrint.dimension(TotIllumMaps, true);
             RefPts.allocate(NumOfZones, MaxRefPoints);
@@ -10293,7 +10411,6 @@ namespace DaylightingManager {
         int IntWinIndex;
         int ZoneAdjLoop;
         int NumOfIntWindowsCount;
-        int DayltgFacPtr;  // Daylighting factor pointer
         int ZoneExtWinCtr; // Exterior window counter
         int SurfNum;       // Surface number
         int loop;          // DO loop index
@@ -10480,7 +10597,6 @@ namespace DaylightingManager {
             } // End of check if a Daylighting:Detailed zone
         }     // End of primary zone loop
 
-        DayltgFacPtr = 0;
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             ZoneDaylight(ZoneNum).NumOfDayltgExtWins = 0;
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
@@ -10490,8 +10606,8 @@ namespace DaylightingManager {
                 if (ZoneExtWin(ZoneNum) == 0) continue;
                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums.allocate(ZoneExtWin(ZoneNum));
                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums = 0;
-                ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins.allocate(ZoneExtWin(ZoneNum));
-                ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins = 0;
+                ZoneDaylight(ZoneNum).MapShdOrdToLoopNum.allocate(ZoneExtWin(ZoneNum));
+                ZoneDaylight(ZoneNum).MapShdOrdToLoopNum = 0;
 
                 ZoneDaylight(ZoneNum).SolidAngAtRefPt.allocate(ZoneExtWin(ZoneNum), ZoneDaylight(ZoneNum).TotalDaylRefPoints);
                 ZoneDaylight(ZoneNum).SolidAngAtRefPt = 0.0;
@@ -10528,9 +10644,7 @@ namespace DaylightingManager {
                     if ((Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).ExtBoundCond == ExternalEnvironment) ||
                         SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
                         ++ZoneExtWinCtr;
-                        ++DayltgFacPtr;
                         ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = SurfNum;
-                        ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins(ZoneExtWinCtr) = DayltgFacPtr;
                     }
                 }
 
@@ -10544,9 +10658,7 @@ namespace DaylightingManager {
                             if ((Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
                                 SurfaceWindow(SurfNumAdj).OriginalClass == SurfaceClass_TDD_Diffuser) {
                                 ++ZoneExtWinCtr;
-                                ++DayltgFacPtr;
                                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = SurfNumAdj;
-                                ZoneDaylight(ZoneNum).DayltgFacPtrsForExtWins(ZoneExtWinCtr) = DayltgFacPtr;
 
                                 // If no daylighting in that zone, set up variables anyway:
                                 if (ZoneDaylight(ZoneNumAdj).TotalDaylRefPoints == 0) {
@@ -10597,7 +10709,13 @@ namespace DaylightingManager {
                 }
 
             } // End of check if a Daylighting:Detailed zone
-        }     // End of primary zone loop
+
+            if (TotWinShadingControl > 0) {
+                CreateShadeDeploymentOrder(ZoneNum);
+                MapShadeDeploymentOrderToLoopNumber(ZoneNum);
+            }
+
+        } // End of primary zone loop
 
         gio::write(OutputFileInits, Format_700);
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -10618,6 +10736,76 @@ namespace DaylightingManager {
         }
 
         ZoneExtWin.deallocate();
+    }
+
+    void CreateShadeDeploymentOrder(int &ZoneNum)
+    {
+        // J. Glazer - 2018
+        // create sorted list for shade deployment order
+        // first step is to create a sortable list of WindowShadingControl objects by sequence
+        std::vector<std::pair<int, int>> shadeControlSequence; // sequence, WindowShadingControl
+        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            if (WindowShadingControl(iShadeCtrl).ZoneIndex == ZoneNum) {
+                shadeControlSequence.push_back(std::make_pair(WindowShadingControl(iShadeCtrl).SequenceNumber, iShadeCtrl));
+            }
+        }
+        // sort the WindowShadingControl objects based on sequence number
+        sort(shadeControlSequence.begin(), shadeControlSequence.end());
+        // now make the deployment list of lists.
+        // each sublist is a group of surfaces that should be deployed together
+        // often the sublist is just a single item.
+        for (auto sequence : shadeControlSequence) {
+            int curShadeControl = sequence.second;
+            if (WindowShadingControl(curShadeControl).MultiSurfaceCtrlIsGroup) {
+                // add a group of surfaces since they should be deployed as a group
+                std::vector<int> group;
+                for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
+                    group.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
+                }
+                ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(group);
+            } else {
+                // add each individial surface as a separate list so they are deployed individually
+                for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
+                    std::vector<int> singleMemberVector;
+                    singleMemberVector.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
+                    ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(singleMemberVector);
+                }
+            }
+        }
+    }
+
+    void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum)
+    {
+        // J. Glazer - 2018
+        // Allow a way to map back to the original "loop" index that is used in many other places in the
+        // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
+        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 && ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
+            int count = 0;
+            for (auto listOfExtWin : ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins) {
+                for (auto IWinShdOrd : listOfExtWin) {
+                    ++count;
+                    if (count > ZoneDaylight(ZoneNum).NumOfDayltgExtWins)
+                        ShowWarningError("MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in zone " + Zone(ZoneNum).Name);
+                    bool found = false;
+                    for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
+                        int IWinLoop = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
+                        if (IWinShdOrd == IWinLoop) {
+                            ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count) = loop;
+                            found = true;
+                            break;
+                        }
+                    }
+                    // this should never occur.
+                    if (!found) ShowWarningError("MapShadeDeploymentOrderToLoopNumber: found unassociated window for zone " + Zone(ZoneNum).Name);
+                }
+            }
+            // double check MapShdOrdToLoopNum array, this should be unnessary but..
+            for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
+                if (ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(loop) == 0) {
+                    ShowWarningError("MapShadeDeploymentOrderToLoopNumber: found empty map for window in zone " + Zone(ZoneNum).Name);
+                }
+            }
+        }
     }
 
     void DayltgInterReflIllFrIntWins(int &ZoneNum) // Zone number

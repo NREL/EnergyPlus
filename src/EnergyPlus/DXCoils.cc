@@ -865,7 +865,6 @@ namespace DXCoils {
         using CurveManager::checkCurveIsNormalizedToOne;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using CurveManager::SetCurveOutputMinMaxValues;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::emsCallFromComponentGetInput;
@@ -1111,26 +1110,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                            {2},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(5));               // Field Name
 
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = BiQuadratic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFTemp(1),
-                                                    cAlphaFields(5),
-                                                    Alphas(5),
-                                                    RatedInletWetBulbTemp,
-                                                    RatedOutdoorAirTemp);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
-                        ShowContinueError("Curve type must be Biquadratic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).CCapFTemp(1),
+                                                cAlphaFields(5),
+                                                Alphas(5),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -1146,23 +1140,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
-                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFFlow(1),
-                                                    cAlphaFields(6),
-                                                    Alphas(6),
-                                                    1.0);
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(6));               // Field Name
 
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(6) +
-                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
 
@@ -1178,25 +1165,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).EIRFTemp(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                                                            {2},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(7));              // Field Name
 
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        DXCoil(DXCoilNum).EIRTempModFacCurveType(1) = BiQuadratic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).EIRFTemp(1),
-                                                    cAlphaFields(7),
-                                                    Alphas(7),
-                                                    RatedInletWetBulbTemp,
-                                                    RatedOutdoorAirTemp);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(7) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).EIRFTemp(1)));
-                        ShowContinueError("Curve type must be Biquadratic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).EIRFTemp(1),
+                                                cAlphaFields(7),
+                                                Alphas(7),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -1212,23 +1195,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).EIRFFlow(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                                                            {1},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(8));              // Field Name
 
-                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).EIRFFlow(1),
-                                                    cAlphaFields(8),
-                                                    Alphas(8),
-                                                    1.0);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(8) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).EIRFFlow(1)));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).EIRFFlow(1), cAlphaFields(8), Alphas(8), 1.0);
                 }
             }
 
@@ -1244,19 +1220,12 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-
-                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                        // curve output tested below
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(9) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                            {1},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            CurrentModuleObject,          // Object Type
+                                                            DXCoil(DXCoilNum).Name,       // Object Name
+                                                            cAlphaFields(9));             // Field Name
 
                 if (!ErrorsFound) {
                     //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -1453,18 +1422,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(15) + "=\"" + Alphas(15) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).SHRFTemp(1)));
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            DXCoil(DXCoilNum).SHRFTempCurveType(1) = BiQuadratic;
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(15) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).SHRFTemp(1)));
-                            ShowContinueError("Curve type must be Biquadratic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
+                                                                {2},                           // Valid dimensions
+                                                                RoutineName,                   // Routine name
+                                                                CurrentModuleObject,           // Object Type
+                                                                DXCoil(DXCoilNum).Name,        // Object Name
+                                                                cAlphaFields(15));             // Field Name
                 }
             }
 
@@ -1475,18 +1438,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(16) + "=\"" + Alphas(16) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is Quadratic and Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).SHRFFlow(1)));
-                        if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(16) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).SHRFFlow(1)));
-                            ShowContinueError("Curve type must be quadratic or cubic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
+                                                                {1},                           // Valid dimensions
+                                                                RoutineName,                   // Routine name
+                                                                CurrentModuleObject,           // Object Type
+                                                                DXCoil(DXCoilNum).Name,        // Object Name
+                                                                cAlphaFields(16));             // Field Name
                 }
             }
 
@@ -1673,26 +1630,21 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is BiQuadratic
-                                {
-                                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFTemp(PerfModeNum)));
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(PerfModeNum), // Curve index
+                                                                            {2},                                      // Valid dimensions
+                                                                            RoutineName,                              // Routine name
+                                                                            CurrentModuleObject,                      // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                   // Object Name
+                                                                            cAlphaFields2(2));                        // Field Name
 
-                                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(PerfModeNum) = BiQuadratic;
-                                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                                    DXCoil(DXCoilNum).Name,
-                                                                    DXCoil(DXCoilNum).CCapFTemp(PerfModeNum),
-                                                                    cAlphaFields2(2),
-                                                                    Alphas2(2),
-                                                                    RatedInletWetBulbTemp,
-                                                                    RatedOutdoorAirTemp);
-
-                                    } else {
-                                        ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
-                                        ShowContinueError("...illegal " + cAlphaFields2(2) +
-                                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFTemp(PerfModeNum)));
-                                        ShowContinueError("Curve type must be BiQuadratic.");
-                                        ErrorsFound = true;
-                                    }
+                                if (!ErrorsFound) {
+                                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                                DXCoil(DXCoilNum).Name,
+                                                                DXCoil(DXCoilNum).CCapFTemp(PerfModeNum),
+                                                                cAlphaFields2(2),
+                                                                Alphas2(2),
+                                                                RatedInletWetBulbTemp,
+                                                                RatedOutdoorAirTemp);
                                 }
                             }
 
@@ -1708,24 +1660,20 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is Quadratic
-                                {
-                                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFFlow(PerfModeNum)));
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(PerfModeNum), // Curve index
+                                                                            {1},                                      // Valid dimensions
+                                                                            RoutineName,                              // Routine name
+                                                                            CurrentModuleObject,                      // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                   // Object Name
+                                                                            cAlphaFields2(3));                        // Field Name
 
-                                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                                    DXCoil(DXCoilNum).Name,
-                                                                    DXCoil(DXCoilNum).CCapFFlow(PerfModeNum),
-                                                                    cAlphaFields2(3),
-                                                                    Alphas2(3),
-                                                                    1.0);
-
-                                    } else {
-                                        ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
-                                        ShowContinueError("...illegal " + cAlphaFields2(3) +
-                                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFFlow(PerfModeNum)));
-                                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                                        ErrorsFound = true;
-                                    }
+                                if (!ErrorsFound) {
+                                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                                DXCoil(DXCoilNum).Name,
+                                                                DXCoil(DXCoilNum).CCapFFlow(PerfModeNum),
+                                                                cAlphaFields2(3),
+                                                                Alphas2(3),
+                                                                1.0);
                                 }
                             }
 
@@ -1741,26 +1689,21 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is BiQuadratic
-                                {
-                                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).EIRFTemp(PerfModeNum)));
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(PerfModeNum), // Curve index
+                                                                            {2},                                     // Valid dimensions
+                                                                            RoutineName,                             // Routine name
+                                                                            CurrentModuleObject,                     // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                            cAlphaFields2(4));                       // Field Name
 
-                                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                                        DXCoil(DXCoilNum).EIRTempModFacCurveType(PerfModeNum) = BiQuadratic;
-                                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                                    DXCoil(DXCoilNum).Name,
-                                                                    DXCoil(DXCoilNum).EIRFTemp(PerfModeNum),
-                                                                    cAlphaFields2(4),
-                                                                    Alphas2(4),
-                                                                    RatedInletWetBulbTemp,
-                                                                    RatedOutdoorAirTemp);
-
-                                    } else {
-                                        ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
-                                        ShowContinueError("...illegal " + cAlphaFields2(4) +
-                                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).EIRFTemp(PerfModeNum)));
-                                        ShowContinueError("Curve type must be BiQuadratic.");
-                                        ErrorsFound = true;
-                                    }
+                                if (!ErrorsFound) {
+                                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                                DXCoil(DXCoilNum).Name,
+                                                                DXCoil(DXCoilNum).EIRFTemp(PerfModeNum),
+                                                                cAlphaFields2(4),
+                                                                Alphas2(4),
+                                                                RatedInletWetBulbTemp,
+                                                                RatedOutdoorAirTemp);
                                 }
                             }
 
@@ -1776,24 +1719,20 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is Quadratic
-                                {
-                                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).EIRFFlow(PerfModeNum)));
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(PerfModeNum), // Curve index
+                                                                            {1},                                     // Valid dimensions
+                                                                            RoutineName,                             // Routine name
+                                                                            CurrentModuleObject,                     // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                            cAlphaFields2(5));                       // Field Name
 
-                                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                                    DXCoil(DXCoilNum).Name,
-                                                                    DXCoil(DXCoilNum).EIRFFlow(PerfModeNum),
-                                                                    cAlphaFields2(5),
-                                                                    Alphas2(5),
-                                                                    1.0);
-
-                                    } else {
-                                        ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
-                                        ShowContinueError("...illegal " + cAlphaFields2(5) +
-                                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).EIRFFlow(PerfModeNum)));
-                                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                                        ErrorsFound = true;
-                                    }
+                                if (!ErrorsFound) {
+                                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                                DXCoil(DXCoilNum).Name,
+                                                                DXCoil(DXCoilNum).EIRFFlow(PerfModeNum),
+                                                                cAlphaFields2(5),
+                                                                Alphas2(5),
+                                                                1.0);
                                 }
                             }
 
@@ -1809,20 +1748,12 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                                {
-                                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).PLFFPLR(PerfModeNum)));
-
-                                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                                        // curve output tested below
-
-                                    } else {
-                                        ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
-                                        ShowContinueError("...illegal " + cAlphaFields2(6) +
-                                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).PLFFPLR(PerfModeNum)));
-                                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                                        ErrorsFound = true;
-                                    }
-                                }
+                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), // Curve index
+                                                                            {1},                                    // Valid dimensions
+                                                                            RoutineName,                            // Routine name
+                                                                            CurrentModuleObject,                    // Object Type
+                                                                            DXCoil(DXCoilNum).Name,                 // Object Name
+                                                                            cAlphaFields2(6));                      // Field Name
 
                                 if (!ErrorsFound) {
                                     //             Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -1940,18 +1871,12 @@ namespace DXCoils {
                                     ShowContinueError("...not found " + cAlphaFields2(9) + "=\"" + Alphas2(9) + "\".");
                                 } else {
                                     // Verify Curve Object, only legal type is BiQuadratic
-                                    {
-                                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).SHRFTemp(PerfModeNum)));
-                                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                                            DXCoil(DXCoilNum).SHRFTempCurveType(PerfModeNum) = BiQuadratic;
-                                        } else {
-                                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                                            ShowContinueError("...illegal " + cAlphaFields2(9) +
-                                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).SHRFTemp(PerfModeNum)));
-                                            ShowContinueError("Curve type must be Biquadratic.");
-                                            ErrorsFound = true;
-                                        }
-                                    }
+                                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp(PerfModeNum), // Curve index
+                                                                                {2},                                     // Valid dimensions
+                                                                                RoutineName,                             // Routine name
+                                                                                CurrentModuleObject,                     // Object Type
+                                                                                DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                                cAlphaFields2(9));                       // Field Name
                                 }
                             }
 
@@ -1962,18 +1887,12 @@ namespace DXCoils {
                                     ShowContinueError("...not found " + cAlphaFields2(10) + "=\"" + Alphas2(10) + "\".");
                                 } else {
                                     // Verify Curve Object, only legal type is BiQuadratic
-                                    {
-                                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).SHRFFlow(PerfModeNum)));
-                                        if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-
-                                        } else {
-                                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                                            ShowContinueError("...illegal " + cAlphaFields2(10) +
-                                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).SHRFFlow(PerfModeNum)));
-                                            ShowContinueError("Curve type must be quadratic or cubic.");
-                                            ErrorsFound = true;
-                                        }
-                                    }
+                                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow(PerfModeNum), // Curve index
+                                                                                {1},                                     // Valid dimensions
+                                                                                RoutineName,                             // Routine name
+                                                                                CurrentModuleObject,                     // Object Type
+                                                                                DXCoil(DXCoilNum).Name,                  // Object Name
+                                                                                cAlphaFields2(10));                      // Field Name
                                 }
                             }
                             if (DXCoil(DXCoilNum).SHRFTemp(PerfModeNum) > 0 && DXCoil(DXCoilNum).SHRFFlow(PerfModeNum) > 0) {
@@ -2138,20 +2057,22 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // only legal types are Quadratic, BiQuadratic and Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                            {1, 2},                         // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(5));               // Field Name
 
-                    if (SELECT_CASE_var == "QUADRATIC") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = Quadratic;
+                if (!ErrorsFound) {
+                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).CCapFTemp(1),
                                                     cAlphaFields(5),
                                                     Alphas(5),
                                                     RatedOutdoorAirTempHeat);
-
-                    } else if (SELECT_CASE_var == "BIQUADRATIC") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = BiQuadratic;
+                    } else {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).CCapFTemp(1),
@@ -2159,22 +2080,6 @@ namespace DXCoils {
                                                     Alphas(5),
                                                     RatedInletAirTempHeat,
                                                     RatedOutdoorAirTempHeat);
-
-                    } else if (SELECT_CASE_var == "CUBIC") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = Cubic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFTemp(1),
-                                                    cAlphaFields(5),
-                                                    Alphas(5),
-                                                    RatedOutdoorAirTempHeat);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
-                        ShowContinueError("Curve type must be Biquadratic, Quadratic or Cubic.");
-                        ErrorsFound = true;
                     }
                 }
             }
@@ -2191,24 +2096,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(6));               // Field Name
 
-                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFFlow(1),
-                                                    cAlphaFields(6),
-                                                    Alphas(6),
-                                                    1.0);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(6) +
-                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
 
@@ -2224,20 +2121,22 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // only legal types are Quadratic, BiQuadratic and Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).EIRFTemp(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                                                            {1, 2},                        // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(7));              // Field Name
 
-                    if (SELECT_CASE_var == "QUADRATIC") {
-                        DXCoil(DXCoilNum).EIRTempModFacCurveType(1) = Quadratic;
+                if (!ErrorsFound) {
+                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(1)).NumDims == 1) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).EIRFTemp(1),
                                                     cAlphaFields(7),
                                                     Alphas(7),
                                                     RatedOutdoorAirTempHeat);
-
-                    } else if (SELECT_CASE_var == "BIQUADRATIC") {
-                        DXCoil(DXCoilNum).EIRTempModFacCurveType(1) = BiQuadratic;
+                    } else {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).EIRFTemp(1),
@@ -2245,21 +2144,6 @@ namespace DXCoils {
                                                     Alphas(7),
                                                     RatedInletAirTempHeat,
                                                     RatedOutdoorAirTempHeat);
-
-                    } else if (SELECT_CASE_var == "CUBIC") {
-                        DXCoil(DXCoilNum).EIRTempModFacCurveType(1) = Cubic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).EIRFTemp(1),
-                                                    cAlphaFields(7),
-                                                    Alphas(7),
-                                                    RatedOutdoorAirTempHeat);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(7) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).EIRFTemp(1)));
-                        ShowContinueError("Curve type must be Biquadratic, Quadratic or Cubic.");
-                        ErrorsFound = true;
                     }
                 }
             }
@@ -2276,23 +2160,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).EIRFFlow(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                                                            {1},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(8));              // Field Name
 
-                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).EIRFFlow(1),
-                                                    cAlphaFields(8),
-                                                    Alphas(8),
-                                                    1.0);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(8) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).EIRFFlow(1)));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).EIRFFlow(1), cAlphaFields(8), Alphas(8), 1.0);
                 }
             }
 
@@ -2308,19 +2185,12 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-
-                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                        // curve output tested below
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(9) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                            {1},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            CurrentModuleObject,          // Object Type
+                                                            DXCoil(DXCoilNum).Name,       // Object Name
+                                                            cAlphaFields(9));             // Field Name
 
                 if (!ErrorsFound) {
                     //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -2374,25 +2244,21 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).DefrostEIRFT));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                                                                {2},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(10));              // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).DefrostEIRFT,
-                                                        cAlphaFields(10),
-                                                        Alphas(10),
-                                                        RatedInletAirTempHeat,
-                                                        RatedOutdoorAirTempHeat);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(10) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).DefrostEIRFT));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).DefrostEIRFT,
+                                                    cAlphaFields(10),
+                                                    Alphas(10),
+                                                    RatedInletAirTempHeat,
+                                                    RatedOutdoorAirTempHeat);
                     }
                 }
             }
@@ -2625,26 +2491,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                            {2},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(5));               // Field Name
 
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = BiQuadratic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFTemp(1),
-                                                    cAlphaFields(5),
-                                                    Alphas(5),
-                                                    RatedInletWetBulbTemp,
-                                                    RatedOutdoorAirTemp);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
-                        ShowContinueError("Curve type must be BiQuadratic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).CCapFTemp(1),
+                                                cAlphaFields(5),
+                                                Alphas(5),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -2660,25 +2521,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(6));               // Field Name
 
-                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFFlow(1),
-                                                    cAlphaFields(6),
-                                                    Alphas(6),
-                                                    1.0);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(cAlphaFields(6) + " = " + Alphas(6));
-                        ShowContinueError("...illegal " + cAlphaFields(6) +
-                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
 
@@ -2694,25 +2546,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).EIRFTemp(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                                                            {2},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(7));              // Field Name
 
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        DXCoil(DXCoilNum).EIRTempModFacCurveType(1) = BiQuadratic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).EIRFTemp(1),
-                                                    cAlphaFields(7),
-                                                    Alphas(7),
-                                                    RatedInletWetBulbTemp,
-                                                    RatedOutdoorAirTemp);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(7) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).EIRFTemp(1)));
-                        ShowContinueError("Curve type must be BiQuadratic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).EIRFTemp(1),
+                                                cAlphaFields(7),
+                                                Alphas(7),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -2728,23 +2576,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).EIRFFlow(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                                                            {1},                           // Valid dimensions
+                                                            RoutineName,                   // Routine name
+                                                            CurrentModuleObject,           // Object Type
+                                                            DXCoil(DXCoilNum).Name,        // Object Name
+                                                            cAlphaFields(8));              // Field Name
 
-                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).EIRFFlow(1),
-                                                    cAlphaFields(8),
-                                                    Alphas(8),
-                                                    1.0);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(8) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).EIRFFlow(1)));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).EIRFFlow(1), cAlphaFields(8), Alphas(8), 1.0);
                 }
             }
 
@@ -2760,19 +2601,12 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-
-                    if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                        // curve output tested below
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(9) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-                        ShowContinueError("Curve type must be Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                            {1},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            CurrentModuleObject,          // Object Type
+                                                            DXCoil(DXCoilNum).Name,       // Object Name
+                                                            cAlphaFields(9));             // Field Name
 
                 if (!ErrorsFound) {
                     //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -2835,25 +2669,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFTemp2));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp2, // Curve index
+                                                            {2},                          // Valid dimensions
+                                                            RoutineName,                  // Routine name
+                                                            CurrentModuleObject,          // Object Type
+                                                            DXCoil(DXCoilNum).Name,       // Object Name
+                                                            cAlphaFields(10));            // Field Name
 
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(2) = BiQuadratic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFTemp2,
-                                                    cAlphaFields(10),
-                                                    Alphas(10),
-                                                    RatedInletWetBulbTemp,
-                                                    RatedOutdoorAirTemp);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(10) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFTemp2));
-                        ShowContinueError("Curve type must be BiQuadratic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).CCapFTemp2,
+                                                cAlphaFields(10),
+                                                Alphas(10),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -2869,25 +2699,21 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).EIRFTemp2));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp2, // Curve index
+                                                            {2},                         // Valid dimensions
+                                                            RoutineName,                 // Routine name
+                                                            CurrentModuleObject,         // Object Type
+                                                            DXCoil(DXCoilNum).Name,      // Object Name
+                                                            cAlphaFields(11));           // Field Name
 
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        DXCoil(DXCoilNum).EIRTempModFacCurveType(2) = BiQuadratic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).EIRFTemp2,
-                                                    cAlphaFields(11),
-                                                    Alphas(11),
-                                                    RatedInletWetBulbTemp,
-                                                    RatedOutdoorAirTemp);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(11) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).EIRFTemp2));
-                        ShowContinueError("Curve type must be BiQuadratic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                DXCoil(DXCoilNum).Name,
+                                                DXCoil(DXCoilNum).EIRFTemp2,
+                                                cAlphaFields(11),
+                                                Alphas(11),
+                                                RatedInletWetBulbTemp,
+                                                RatedOutdoorAirTemp);
                 }
             }
 
@@ -3041,42 +2867,29 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(17) + "=\"" + Alphas(17) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).SHRFTemp(1)));
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            DXCoil(DXCoilNum).SHRFTempCurveType(1) = BiQuadratic;
-                            DXCoil(DXCoilNum).SHRFTempCurveType2 = DXCoil(DXCoilNum).SHRFTempCurveType(1);
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(17) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).SHRFTemp(1)));
-                            ShowContinueError("Curve type must be Biquadratic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
+                                                                {2},                           // Valid dimensions
+                                                                RoutineName,                   // Routine name
+                                                                CurrentModuleObject,           // Object Type
+                                                                DXCoil(DXCoilNum).Name,        // Object Name
+                                                                cAlphaFields(17));             // Field Name
                 }
             }
 
             if (!lAlphaBlanks(18) && NumAlphas > 17) {
                 DXCoil(DXCoilNum).SHRFFlow(1) = GetCurveIndex(Alphas(18)); // convert curve name to number
                 // DXCoil(DXCoilNum)%SHRFFlow2 = DXCoil(DXCoilNum)%SHRFFlow(1)
-                if (DXCoil(DXCoilNum).SHRFTemp(1) == 0) {
+                if (DXCoil(DXCoilNum).SHRFFlow(1) == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(18) + "=\"" + Alphas(18) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).SHRFFlow(1)));
-                        if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(18) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).SHRFFlow(1)));
-                            ShowContinueError("Curve type must be quadratic or cubic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
+                                                                {1},                           // Valid dimensions
+                                                                RoutineName,                   // Routine name
+                                                                CurrentModuleObject,           // Object Type
+                                                                DXCoil(DXCoilNum).Name,        // Object Name
+                                                                cAlphaFields(18));             // Field Name
                 }
             }
 
@@ -3087,18 +2900,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).SHRFTemp2));
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            DXCoil(DXCoilNum).SHRFTempCurveType2 = BiQuadratic;
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(19) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).SHRFTemp2));
-                            ShowContinueError("Curve type must be Biquadratic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp2, // Curve index
+                                                                {2},                         // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(19));           // Field Name
                 }
             }
 
@@ -3109,18 +2916,12 @@ namespace DXCoils {
                     ShowContinueError("...not found " + cAlphaFields(20) + "=\"" + Alphas(20) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).SHRFFlow2));
-                        if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(20) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).SHRFFlow2));
-                            ShowContinueError("Curve type must be quadratic or cubic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow2, // Curve index
+                                                                {1},                         // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(20));           // Field Name
                 }
             }
             if (DXCoil(DXCoilNum).SHRFTemp(1) > 0 && DXCoil(DXCoilNum).SHRFFlow(1) > 0 && DXCoil(DXCoilNum).SHRFTemp2 > 0 &&
@@ -3362,11 +3163,22 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCapFTemp));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFTemp, // Curve index
+                                                                {1, 2},                      // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(10));           // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            DXCoil(DXCoilNum).HCapFTempCurveType = BiQuadratic;
+                    if (!ErrorsFound) {
+                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCapFTemp,
+                                                        cAlphaFields(10),
+                                                        Alphas(10),
+                                                        InletAirTemp);
+                        } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCapFTemp,
@@ -3374,22 +3186,6 @@ namespace DXCoils {
                                                         Alphas(10),
                                                         InletAirTemp,
                                                         InletWaterTemp);
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            DXCoil(DXCoilNum).HCapFTempCurveType = Cubic;
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCapFTemp,
-                                                        cAlphaFields(10),
-                                                        Alphas(10),
-                                                        InletAirTemp);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(10) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCapFTemp));
-                            ShowContinueError("Curve type must be BiQuadratic or Cubic.");
-                            ErrorsFound = true;
                         }
                     }
                 }
@@ -3403,24 +3199,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCapFAirFlow));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
+                                                                {1},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(11));              // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCapFAirFlow,
-                                                        cAlphaFields(11),
-                                                        Alphas(11),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(11) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCapFAirFlow));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCapFAirFlow,
+                                                    cAlphaFields(11),
+                                                    Alphas(11),
+                                                    1.0);
                     }
                 }
             }
@@ -3433,24 +3225,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCapFWaterFlow));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFWaterFlow, // Curve index
+                                                                {1},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(12));                // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCapFWaterFlow,
-                                                        cAlphaFields(12),
-                                                        Alphas(12),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(12) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCapFWaterFlow));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCapFWaterFlow,
+                                                    cAlphaFields(12),
+                                                    Alphas(12),
+                                                    1.0);
                     }
                 }
             }
@@ -3463,11 +3251,22 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCOPFTemp));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFTemp, // Curve index
+                                                                {1, 2},                      // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(13));           // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            DXCoil(DXCoilNum).HCOPFTempCurveType = BiQuadratic;
+                    if (!ErrorsFound) {
+                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCOPFTemp,
+                                                        cAlphaFields(13),
+                                                        Alphas(13),
+                                                        InletAirTemp);
+                        } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCOPFTemp,
@@ -3475,22 +3274,6 @@ namespace DXCoils {
                                                         Alphas(13),
                                                         InletAirTemp,
                                                         InletWaterTemp);
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            DXCoil(DXCoilNum).HCOPFTempCurveType = Cubic;
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCOPFTemp,
-                                                        cAlphaFields(13),
-                                                        Alphas(13),
-                                                        InletAirTemp);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(13) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCOPFTemp));
-                            ShowContinueError("Curve type must be BiQuadratic or Cubic.");
-                            ErrorsFound = true;
                         }
                     }
                 }
@@ -3504,24 +3287,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCOPFAirFlow));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
+                                                                {1},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(14));              // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCOPFAirFlow,
-                                                        cAlphaFields(14),
-                                                        Alphas(14),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(14) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCOPFAirFlow));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCOPFAirFlow,
+                                                    cAlphaFields(14),
+                                                    Alphas(14),
+                                                    1.0);
                     }
                 }
             }
@@ -3534,24 +3313,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCOPFWaterFlow));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFWaterFlow, // Curve index
+                                                                {1},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(15));                // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCOPFWaterFlow,
-                                                        cAlphaFields(15),
-                                                        Alphas(15),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(15) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCOPFWaterFlow));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCOPFWaterFlow,
+                                                    cAlphaFields(15),
+                                                    Alphas(15),
+                                                    1.0);
                     }
                 }
             }
@@ -3564,20 +3339,12 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            // curve output tested below
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(16) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                                {1},                          // Valid dimensions
+                                                                RoutineName,                  // Routine name
+                                                                CurrentModuleObject,          // Object Type
+                                                                DXCoil(DXCoilNum).Name,       // Object Name
+                                                                cAlphaFields(16));            // Field Name
 
                     if (!ErrorsFound) {
                         //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -3793,11 +3560,22 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCapFTemp));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFTemp, // Curve index
+                                                                {1, 2},                      // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(6));            // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            DXCoil(DXCoilNum).HCapFTempCurveType = BiQuadratic;
+                    if (!ErrorsFound) {
+                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCapFTemp,
+                                                        cAlphaFields(6),
+                                                        Alphas(6),
+                                                        InletAirTemp);
+                        } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCapFTemp,
@@ -3805,22 +3583,6 @@ namespace DXCoils {
                                                         Alphas(6),
                                                         InletAirTemp,
                                                         InletWaterTemp);
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            DXCoil(DXCoilNum).HCapFTempCurveType = Cubic;
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCapFTemp,
-                                                        cAlphaFields(6),
-                                                        Alphas(6),
-                                                        InletAirTemp);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCapFTemp));
-                            ShowContinueError("Curve type must be BiQuadratic or Cubic.");
-                            ErrorsFound = true;
                         }
                     }
                 }
@@ -3834,24 +3596,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCapFAirFlow));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
+                                                                {1},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(7));               // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCapFAirFlow,
-                                                        cAlphaFields(7),
-                                                        Alphas(7),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(7) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCapFAirFlow));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCapFAirFlow,
+                                                    cAlphaFields(7),
+                                                    Alphas(7),
+                                                    1.0);
                     }
                 }
             }
@@ -3864,11 +3622,22 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCOPFTemp));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFTemp, // Curve index
+                                                                {1, 2},                      // Valid dimensions
+                                                                RoutineName,                 // Routine name
+                                                                CurrentModuleObject,         // Object Type
+                                                                DXCoil(DXCoilNum).Name,      // Object Name
+                                                                cAlphaFields(8));            // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            DXCoil(DXCoilNum).HCOPFTempCurveType = BiQuadratic;
+                    if (!ErrorsFound) {
+                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).HCOPFTemp,
+                                                        cAlphaFields(8),
+                                                        Alphas(8),
+                                                        InletAirTemp);
+                        } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCOPFTemp,
@@ -3876,22 +3645,6 @@ namespace DXCoils {
                                                         Alphas(8),
                                                         InletAirTemp,
                                                         InletWaterTemp);
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            DXCoil(DXCoilNum).HCOPFTempCurveType = Cubic;
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCOPFTemp,
-                                                        cAlphaFields(8),
-                                                        Alphas(8),
-                                                        InletAirTemp);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(8) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCOPFTemp));
-                            ShowContinueError("Curve type must be BiQuadratic or Cubic.");
-                            ErrorsFound = true;
                         }
                     }
                 }
@@ -3905,24 +3658,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).HCOPFAirFlow));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
+                                                                {1},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(9));               // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).HCOPFAirFlow,
-                                                        cAlphaFields(9),
-                                                        Alphas(9),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(9) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).HCOPFAirFlow));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).HCOPFAirFlow,
+                                                    cAlphaFields(9),
+                                                    Alphas(9),
+                                                    1.0);
                     }
                 }
             }
@@ -3935,20 +3684,12 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            // curve output tested below
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(10) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).PLFFPLR(1)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                                                                {1},                          // Valid dimensions
+                                                                RoutineName,                  // Routine name
+                                                                CurrentModuleObject,          // Object Type
+                                                                DXCoil(DXCoilNum).Name,       // Object Name
+                                                                cAlphaFields(10));            // Field Name
 
                     if (!ErrorsFound) {
                         //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -4256,25 +3997,21 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSCCapFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                                {2},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(13 + (I - 1) * 6));  // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).MSCCapFTemp(I),
-                                                        cAlphaFields(13 + (I - 1) * 6),
-                                                        Alphas(13 + (I - 1) * 6),
-                                                        RatedInletWetBulbTemp,
-                                                        RatedOutdoorAirTemp);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(13 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSCCapFTemp(I)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSCCapFTemp(I),
+                                                    cAlphaFields(13 + (I - 1) * 6),
+                                                    Alphas(13 + (I - 1) * 6),
+                                                    RatedInletWetBulbTemp,
+                                                    RatedOutdoorAirTemp);
                     }
                 }
 
@@ -4290,24 +4027,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSCCapFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
+                                                                {1},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(14 + (I - 1) * 6));  // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).MSCCapFFlow(I),
-                                                        cAlphaFields(14 + (I - 1) * 6),
-                                                        Alphas(14 + (I - 1) * 6),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(14 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSCCapFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSCCapFFlow(I),
+                                                    cAlphaFields(14 + (I - 1) * 6),
+                                                    Alphas(14 + (I - 1) * 6),
+                                                    1.0);
                     }
                 }
 
@@ -4323,25 +4056,21 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSEIRFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                                {2},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(15 + (I - 1) * 6)); // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).MSEIRFTemp(I),
-                                                        cAlphaFields(15 + (I - 1) * 6),
-                                                        Alphas(15 + (I - 1) * 6),
-                                                        RatedInletWetBulbTemp,
-                                                        RatedOutdoorAirTemp);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(15 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSEIRFTemp(1)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSEIRFTemp(I),
+                                                    cAlphaFields(15 + (I - 1) * 6),
+                                                    Alphas(15 + (I - 1) * 6),
+                                                    RatedInletWetBulbTemp,
+                                                    RatedOutdoorAirTemp);
                     }
                 }
 
@@ -4357,24 +4086,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSEIRFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
+                                                                {1},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(16 + (I - 1) * 6)); // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).MSEIRFFlow(I),
-                                                        cAlphaFields(16 + (I - 1) * 6),
-                                                        Alphas(16 + (I - 1) * 6),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(16 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSEIRFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSEIRFFlow(I),
+                                                    cAlphaFields(16 + (I - 1) * 6),
+                                                    Alphas(16 + (I - 1) * 6),
+                                                    1.0);
                     }
                 }
 
@@ -4390,20 +4115,12 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Quadratic or Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSPLFFPLR(I)));
-
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            // curve output tested below
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(17 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSPLFFPLR(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSPLFFPLR(I),  // Curve index
+                                                                {1},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(17 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
                         //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -4481,25 +4198,21 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                         // Verify Curve Object, only legal types are BiQuadratic
-                        {
-                            auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSWasteHeat(I)));
+                        ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                                    {2},                              // Valid dimensions
+                                                                    RoutineName,                      // Routine name
+                                                                    CurrentModuleObject,              // Object Type
+                                                                    DXCoil(DXCoilNum).Name,           // Object Name
+                                                                    cAlphaFields(18 + (I - 1) * 6));  // Field Name
 
-                            if (SELECT_CASE_var == "BIQUADRATIC") {
-                                CurveVal = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(I), RatedOutdoorAirTemp, RatedInletAirTemp);
-                                if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", curve values");
-                                    ShowContinueError(cAlphaFields(18 + (I - 1) * 6) + " = " + Alphas(18 + (I - 1) * 6));
-                                    ShowContinueError("..." + cAlphaFields(18 + (I - 1) * 6) +
-                                                      " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                    ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                                }
-
-                            } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                                ShowContinueError("...illegal " + cAlphaFields(18 + (I - 1) * 6) +
-                                                  " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSWasteHeat(I)));
-                                ShowContinueError("Curve type must be BiQuadratic.");
-                                ErrorsFound = true;
+                        if (!ErrorsFound) {
+                            CurveVal = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(I), RatedOutdoorAirTemp, RatedInletAirTemp);
+                            if (CurveVal > 1.10 || CurveVal < 0.90) {
+                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", curve values");
+                                ShowContinueError(cAlphaFields(18 + (I - 1) * 6) + " = " + Alphas(18 + (I - 1) * 6));
+                                ShowContinueError("..." + cAlphaFields(18 + (I - 1) * 6) +
+                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                             }
                         }
                     }
@@ -4632,24 +4345,21 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).DefrostEIRFT));
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).DefrostEIRFT,
-                                                        cAlphaFields(5),
-                                                        Alphas(5),
-                                                        RatedInletWetBulbTempHeat,
-                                                        RatedOutdoorAirTempHeat);
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                                                                {2},                            // Valid dimensions
+                                                                RoutineName,                    // Routine name
+                                                                CurrentModuleObject,            // Object Type
+                                                                DXCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(5));               // Field Name
 
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(5) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).DefrostEIRFT));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).DefrostEIRFT,
+                                                    cAlphaFields(5),
+                                                    Alphas(5),
+                                                    RatedInletWetBulbTempHeat,
+                                                    RatedOutdoorAirTempHeat);
                     }
                 }
             }
@@ -4750,8 +4460,6 @@ namespace DXCoils {
             DXCoil(DXCoilNum).MSPLFFPLR.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
             DXCoil(DXCoilNum).MSRatedCBF.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
             DXCoil(DXCoilNum).MSWasteHeatFrac.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
-            DXCoil(DXCoilNum).MSTotCapTempModFacCurveType.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
-            DXCoil(DXCoilNum).MSEIRTempModFacCurveType.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
             DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
             DXCoil(DXCoilNum).MSSecCoilSHRFT.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
             DXCoil(DXCoilNum).MSSecCoilSHRFF.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
@@ -4776,20 +4484,22 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // only legal types are Quadratic, BiQuadratic and Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSCCapFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                                {1, 2},                           // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(10 + (I - 1) * 6));  // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(I) = Quadratic;
+                    if (!ErrorsFound) {
+                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(I)).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSCCapFTemp(I),
                                                         cAlphaFields(10 + (I - 1) * 6),
                                                         Alphas(10 + (I - 1) * 6),
                                                         RatedOutdoorAirTempHeat);
-
-                        } else if (SELECT_CASE_var == "BIQUADRATIC") {
-                            DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(I) = BiQuadratic;
+                        } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSCCapFTemp(I),
@@ -4797,22 +4507,6 @@ namespace DXCoils {
                                                         Alphas(10 + (I - 1) * 6),
                                                         RatedInletAirTempHeat,
                                                         RatedOutdoorAirTempHeat);
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(I) = Cubic;
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).MSCCapFTemp(I),
-                                                        cAlphaFields(10 + (I - 1) * 6),
-                                                        Alphas(10 + (I - 1) * 6),
-                                                        RatedOutdoorAirTempHeat);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(10 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSCCapFTemp(I)));
-                            ShowContinueError("Curve type must be BiQuadratic, Quadratic or Cubic.");
-                            ErrorsFound = true;
                         }
                     }
                 }
@@ -4829,24 +4523,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSCCapFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
+                                                                {1},                              // Valid dimensions
+                                                                RoutineName,                      // Routine name
+                                                                CurrentModuleObject,              // Object Type
+                                                                DXCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(11 + (I - 1) * 6));  // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).MSCCapFFlow(I),
-                                                        cAlphaFields(11 + (I - 1) * 6),
-                                                        Alphas(11 + (I - 1) * 6),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(11 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSCCapFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSCCapFFlow(I),
+                                                    cAlphaFields(11 + (I - 1) * 6),
+                                                    Alphas(11 + (I - 1) * 6),
+                                                    1.0);
                     }
                 }
 
@@ -4862,20 +4552,22 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // only legal types are Quadratic, BiQuadratic and Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSEIRFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                                {1, 2},                          // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(12 + (I - 1) * 6)); // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            DXCoil(DXCoilNum).MSEIRTempModFacCurveType(I) = Quadratic;
+                    if (!ErrorsFound) {
+                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(I)).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSEIRFTemp(I),
                                                         cAlphaFields(12 + (I - 1) * 6),
                                                         Alphas(12 + (I - 1) * 6),
                                                         RatedOutdoorAirTempHeat);
-
-                        } else if (SELECT_CASE_var == "BIQUADRATIC") {
-                            DXCoil(DXCoilNum).MSEIRTempModFacCurveType(I) = BiQuadratic;
+                        } else {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSEIRFTemp(I),
@@ -4883,22 +4575,6 @@ namespace DXCoils {
                                                         Alphas(12 + (I - 1) * 6),
                                                         RatedInletAirTempHeat,
                                                         RatedOutdoorAirTempHeat);
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            DXCoil(DXCoilNum).MSEIRTempModFacCurveType(I) = Cubic;
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).MSEIRFTemp(I),
-                                                        cAlphaFields(12 + (I - 1) * 6),
-                                                        Alphas(12 + (I - 1) * 6),
-                                                        RatedOutdoorAirTempHeat);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(12 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSEIRFTemp(I)));
-                            ShowContinueError("Curve type must be BiQuadratic, Quadratic or Cubic.");
-                            ErrorsFound = true;
                         }
                     }
                 }
@@ -4915,24 +4591,20 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSEIRFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
+                                                                {1},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(13 + (I - 1) * 6)); // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                        DXCoil(DXCoilNum).Name,
-                                                        DXCoil(DXCoilNum).MSEIRFFlow(I),
-                                                        cAlphaFields(13 + (I - 1) * 6),
-                                                        Alphas(13 + (I - 1) * 6),
-                                                        1.0);
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(13 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSEIRFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
+                    if (!ErrorsFound) {
+                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                    DXCoil(DXCoilNum).Name,
+                                                    DXCoil(DXCoilNum).MSEIRFFlow(I),
+                                                    cAlphaFields(13 + (I - 1) * 6),
+                                                    Alphas(13 + (I - 1) * 6),
+                                                    1.0);
                     }
                 }
 
@@ -4948,20 +4620,12 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Quadratic or Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSPLFFPLR(I)));
-
-                        if (SELECT_CASE_var == "QUADRATIC" || SELECT_CASE_var == "CUBIC") {
-                            // curve output tested below
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(14 + (I - 1) * 6) +
-                                              " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSPLFFPLR(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSPLFFPLR(I),  // Curve index
+                                                                {1},                             // Valid dimensions
+                                                                RoutineName,                     // Routine name
+                                                                CurrentModuleObject,             // Object Type
+                                                                DXCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(14 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
                         //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -5006,25 +4670,21 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                         // Verify Curve Object, only legal types are BiQuadratic
-                        {
-                            auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).MSWasteHeat(I)));
+                        ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                                    {2},                              // Valid dimensions
+                                                                    RoutineName,                      // Routine name
+                                                                    CurrentModuleObject,              // Object Type
+                                                                    DXCoil(DXCoilNum).Name,           // Object Name
+                                                                    cAlphaFields(15 + (I - 1) * 6));  // Field Name
 
-                            if (SELECT_CASE_var == "BIQUADRATIC") {
-                                checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                            DXCoil(DXCoilNum).Name,
-                                                            DXCoil(DXCoilNum).MSWasteHeat(I),
-                                                            cAlphaFields(15 + (I - 1) * 6),
-                                                            Alphas(15 + (I - 1) * 6),
-                                                            RatedOutdoorAirTempHeat,
-                                                            RatedInletAirTempHeat);
-
-                            } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                                ShowContinueError("...illegal " + cAlphaFields(15 + (I - 1) * 6) +
-                                                  " type for this object = " + GetCurveType(DXCoil(DXCoilNum).MSWasteHeat(I)));
-                                ShowContinueError("Curve type must be BiQuadratic.");
-                                ErrorsFound = true;
-                            }
+                        if (!ErrorsFound) {
+                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                                        DXCoil(DXCoilNum).Name,
+                                                        DXCoil(DXCoilNum).MSWasteHeat(I),
+                                                        cAlphaFields(15 + (I - 1) * 6),
+                                                        Alphas(15 + (I - 1) * 6),
+                                                        RatedOutdoorAirTempHeat,
+                                                        RatedInletAirTempHeat);
                         }
                     }
                 }
@@ -5117,38 +4777,22 @@ namespace DXCoils {
 
             DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(Alphas(3));
             // Verify Curve Object, only legal type is Linear, Quadratic, Cubic, or BiQuadratic
-            {
-                auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
+            ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                        {1, 2},                         // Valid dimensions
+                                                        RoutineName,                    // Routine name
+                                                        CurrentModuleObject,            // Object Type
+                                                        DXCoil(DXCoilNum).Name,         // Object Name
+                                                        cAlphaFields(3));               // Field Name
 
-                if (SELECT_CASE_var == "LINEAR") {
-                    DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = Linear;
+            if (!ErrorsFound) {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).CCapFTemp(1),
                                                 cAlphaFields(3),
                                                 Alphas(3),
                                                 RatedInletWetBulbTemp);
-
-                } else if (SELECT_CASE_var == "QUADRATIC") {
-                    DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = Quadratic;
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                DXCoil(DXCoilNum).Name,
-                                                DXCoil(DXCoilNum).CCapFTemp(1),
-                                                cAlphaFields(3),
-                                                Alphas(3),
-                                                RatedInletWetBulbTemp);
-
-                } else if (SELECT_CASE_var == "CUBIC") {
-                    DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = Cubic;
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                DXCoil(DXCoilNum).Name,
-                                                DXCoil(DXCoilNum).CCapFTemp(1),
-                                                cAlphaFields(3),
-                                                Alphas(3),
-                                                RatedInletWetBulbTemp);
-
-                } else if (SELECT_CASE_var == "BIQUADRATIC") {
-                    DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = BiQuadratic;
+                } else {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).CCapFTemp(1),
@@ -5156,12 +4800,6 @@ namespace DXCoils {
                                                 Alphas(3),
                                                 RatedInletWetBulbTemp,
                                                 RatedOutdoorAirTemp);
-
-                } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError("...illegal " + cAlphaFields(3) + " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
-                    ShowContinueError("... Curve type must be Linear, Quadratic, Cubic, or BiQuadratic.");
-                    ErrorsFound = true;
                 }
             }
 
@@ -5177,24 +4815,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Linear, Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(4));               // Field Name
 
-                    if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFFlow(1),
-                                                    cAlphaFields(4),
-                                                    Alphas(4),
-                                                    1.0);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(4) +
-                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
-                        ShowContinueError("... Curve type must be Linear, Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(4), Alphas(4), 1.0);
                 }
             }
 
@@ -5285,48 +4915,24 @@ namespace DXCoils {
                 }
                 ErrorsFound = true;
             } else {
-                // Verify Curve Object, only legal type is Quadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                                                            {1, 2},                         // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(5));               // Field Name
 
-                    if (SELECT_CASE_var == "LINEAR") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = Linear;
+                if (!ErrorsFound) {
+                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).CCapFTemp(1),
                                                     cAlphaFields(5),
                                                     Alphas(5),
                                                     RatedInletAirTempHeat);
-
-                    } else if (SELECT_CASE_var == "QUADRATIC") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = Quadratic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFTemp(1),
-                                                    cAlphaFields(5),
-                                                    Alphas(5),
-                                                    RatedInletAirTempHeat);
-
-                    } else if (SELECT_CASE_var == "CUBIC") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = Cubic;
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFTemp(1),
-                                                    cAlphaFields(5),
-                                                    Alphas(5),
-                                                    RatedInletAirTempHeat);
-
-                    } else if (SELECT_CASE_var == "BIQUADRATIC") {
-                        DXCoil(DXCoilNum).TotCapTempModFacCurveType(1) = BiQuadratic;
+                    } else {
                         // Can't check this here, don't know if using outdoor dry-bulb or outdoor wet-bulb temp as input. Make this check in VRF TU
                         // GetInput.
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFTemp(1)));
-                        ShowContinueError("... Curve type must be Linear, Quadratic, Cubic or BiQuadratic.");
-                        ErrorsFound = true;
                     }
                 }
             }
@@ -5343,24 +4949,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
+                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                                                            {1},                            // Valid dimensions
+                                                            RoutineName,                    // Routine name
+                                                            CurrentModuleObject,            // Object Type
+                                                            DXCoil(DXCoilNum).Name,         // Object Name
+                                                            cAlphaFields(6));               // Field Name
 
-                    if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
-                                                    DXCoil(DXCoilNum).Name,
-                                                    DXCoil(DXCoilNum).CCapFFlow(1),
-                                                    cAlphaFields(6),
-                                                    Alphas(6),
-                                                    1.0);
-
-                    } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + GetCurveType(DXCoil(DXCoilNum).CCapFFlow(1)));
-                        ShowContinueError("... Curve type must be linear, Quadratic or Cubic.");
-                        ErrorsFound = true;
-                    }
+                if (!ErrorsFound) {
+                    checkCurveIsNormalizedToOne(
+                        RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
         }
@@ -5434,16 +5032,15 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 {
-                    auto const SELECT_CASE_var(GetCurveType(indexSHCurve));
-
-                    if (SELECT_CASE_var == "QUADRATIC") {
+                    if (CurveManager::PerfCurve(indexSHCurve).ObjectType == "Curve:Quadratic") {
                         DXCoil(DXCoilNum).C1Te = EnergyPlus::CurveManager::PerfCurve(indexSHCurve).Coeff1;
                         DXCoil(DXCoilNum).C2Te = EnergyPlus::CurveManager::PerfCurve(indexSHCurve).Coeff2;
                         DXCoil(DXCoilNum).C3Te = EnergyPlus::CurveManager::PerfCurve(indexSHCurve).Coeff3;
 
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(5) + " type for this object = " + GetCurveType(indexSHCurve));
+                        ShowContinueError("...illegal " + cAlphaFields(5) +
+                                          " type for this object = " + CurveManager::PerfCurve(indexSHCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -5531,16 +5128,15 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 {
-                    auto const SELECT_CASE_var(GetCurveType(indexSCCurve));
-
-                    if (SELECT_CASE_var == "QUADRATIC") {
+                    if (CurveManager::PerfCurve(indexSCCurve).ObjectType == "Curve:Quadratic") {
                         DXCoil(DXCoilNum).C1Tc = EnergyPlus::CurveManager::PerfCurve(indexSCCurve).Coeff1;
                         DXCoil(DXCoilNum).C2Tc = EnergyPlus::CurveManager::PerfCurve(indexSCCurve).Coeff2;
                         DXCoil(DXCoilNum).C3Tc = EnergyPlus::CurveManager::PerfCurve(indexSCCurve).Coeff3;
 
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError("...illegal " + cAlphaFields(5) + " type for this object = " + GetCurveType(indexSCCurve));
+                        ShowContinueError("...illegal " + cAlphaFields(5) +
+                                          " type for this object = " + CurveManager::PerfCurve(indexSCCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -8679,7 +8275,7 @@ namespace DXCoils {
 
         // get output of Heating Capacity and Heating COP curves (curves default to 1 if user has not specified curve name)
         if (Coil.HCapFTemp > 0) {
-            if (Coil.HCapFTempCurveType == Cubic) {
+            if (CurveManager::PerfCurve(Coil.HCapFTemp).NumDims == 1) {
                 HeatCapFTemp = CurveValue(Coil.HCapFTemp, InletAirTemp);
             } else {
                 HeatCapFTemp = CurveValue(Coil.HCapFTemp, InletAirTemp, InletWaterTemp);
@@ -8690,7 +8286,7 @@ namespace DXCoils {
                     ShowWarningMessage(Coil.DXCoilType + " \"" + Coil.Name + "\":");
                     ShowContinueError(" HPWH Heating Capacity Modifier curve (function of temperature) output is negative (" +
                                       TrimSigDigits(HeatCapFTemp, 3) + ").");
-                    if (Coil.HCapFTempCurveType == BiQuadratic) {
+                    if (CurveManager::PerfCurve(Coil.HCapFTemp).NumDims == 2) {
                         ShowContinueError(" Negative value occurs using an inlet air temperature of " + TrimSigDigits(InletAirTemp, 1) +
                                           " and an inlet water temperature of " + TrimSigDigits(InletWaterTemp, 1) + '.');
                     } else {
@@ -8714,7 +8310,7 @@ namespace DXCoils {
         }
 
         if (Coil.HCOPFTemp > 0) {
-            if (Coil.HCOPFTempCurveType == Cubic) {
+            if (CurveManager::PerfCurve(Coil.HCOPFTemp).NumDims == 1) {
                 HeatCOPFTemp = CurveValue(Coil.HCOPFTemp, InletAirTemp);
             } else {
                 HeatCOPFTemp = CurveValue(Coil.HCOPFTemp, InletAirTemp, InletWaterTemp);
@@ -8725,7 +8321,7 @@ namespace DXCoils {
                     ShowWarningMessage(Coil.DXCoilType + " \"" + Coil.Name + "\":");
                     ShowContinueError(" HPWH Heating COP Modifier curve (function of temperature) output is negative (" +
                                       TrimSigDigits(HeatCOPFTemp, 3) + ").");
-                    if (Coil.HCOPFTempCurveType == BiQuadratic) {
+                    if (CurveManager::PerfCurve(Coil.HCOPFTemp).NumDims == 2) {
                         ShowContinueError(" Negative value occurs using an inlet air temperature of " + TrimSigDigits(InletAirTemp, 1) +
                                           " and an inlet water temperature of " + TrimSigDigits(InletWaterTemp, 1) + '.');
                     } else {
@@ -9376,7 +8972,7 @@ namespace DXCoils {
                     TotCapTempModFac = 1.0;
                     TotCapFlowModFac = 1.0;
                 } else {
-                    if (DXCoil(DXCoilNum).TotCapTempModFacCurveType(Mode) == BiQuadratic) {
+                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
                         TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
                     } else {
                         TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), CondInletTemp);
@@ -9388,7 +8984,7 @@ namespace DXCoils {
                             ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name + "\":");
                             ShowContinueError(" Total Cooling Capacity Modifier curve (function of temperature) output is negative (" +
                                               TrimSigDigits(TotCapTempModFac, 3) + ").");
-                            if (DXCoil(DXCoilNum).TotCapTempModFacCurveType(Mode) == BiQuadratic) {
+                            if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
                                 ShowContinueError(" Negative value occurs using a condenser inlet air temperature of " +
                                                   TrimSigDigits(CondInletTemp, 1) + " and an inlet air wet-bulb temperature of " +
                                                   TrimSigDigits(InletAirWetBulbC, 1) + '.');
@@ -9760,7 +9356,7 @@ namespace DXCoils {
                         ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name + "\":");
                         ShowContinueError(" Energy Input Ratio Modifier curve (function of temperature) output is negative (" +
                                           TrimSigDigits(EIRTempModFac, 3) + ").");
-                        if (DXCoil(DXCoilNum).EIRTempModFacCurveType(Mode) == BiQuadratic) {
+                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 2) {
                             ShowContinueError(" Negative value occurs using a condenser inlet air temperature of " + TrimSigDigits(CondInletTemp, 1) +
                                               " and an inlet air wet-bulb temperature of " + TrimSigDigits(InletAirWetBulbC, 1) + '.');
                         } else {
@@ -10783,7 +10379,7 @@ namespace DXCoils {
             // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
-            if (DXCoil(DXCoilNum).TotCapTempModFacCurveType(Mode) == BiQuadratic) {
+            if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
                 {
                     auto const SELECT_CASE_var(DXCoil(DXCoilNum).HeatingPerformanceOATType);
                     if (SELECT_CASE_var == DryBulbIndicator) {
@@ -10921,12 +10517,10 @@ namespace DXCoils {
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-                if ((DXCoil(DXCoilNum).EIRTempModFacCurveType(1) == Quadratic) || (DXCoil(DXCoilNum).EIRTempModFacCurveType(1) == Cubic)) {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
-                } else if (DXCoil(DXCoilNum).EIRTempModFacCurveType(1) == BiQuadratic) {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
                 } else {
-                    assert(false);
+                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
                 EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
             } else {
@@ -13323,26 +12917,20 @@ namespace DXCoils {
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
                 // Low speed
-                if ((DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(SpeedNumLS) == Quadratic) ||
-                    (DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(SpeedNumLS) == Cubic)) {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS)).NumDims == 1) {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), OutdoorDryBulb);
-                } else if (DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(SpeedNumLS) == BiQuadratic) {
-                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
                 } else {
-                    assert(false);
+                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
                 //  Get total capacity modifying factor (function of mass flow) for off-rated conditions
                 TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFFlow(SpeedNumLS), AirMassFlowRatioLS);
                 // Calculate total heating capacity for off-rated conditions
                 TotCapLS = DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumLS) * TotCapFlowModFac * TotCapTempModFac;
                 // High speed
-                if ((DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(SpeedNumHS) == Quadratic) ||
-                    (DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(SpeedNumHS) == Cubic)) {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS)).NumDims == 1) {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), OutdoorDryBulb);
-                } else if (DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(SpeedNumHS) == BiQuadratic) {
-                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
                 } else {
-                    assert(false);
+                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
                 //  Get total capacity modifying factor (function of mass flow) for off-rated conditions
                 TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFFlow(SpeedNumHS), AirMassFlowRatioHS);
@@ -13353,21 +12941,17 @@ namespace DXCoils {
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
                 // Low Speed
-                if ((DXCoil(DXCoilNum).MSEIRTempModFacCurveType(SpeedNumLS) == Quadratic) ||
-                    (DXCoil(DXCoilNum).MSEIRTempModFacCurveType(SpeedNumLS) == Cubic)) {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), OutdoorDryBulb);
-                } else if (DXCoil(DXCoilNum).MSEIRTempModFacCurveType(SpeedNumLS) == BiQuadratic) {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
                 } else {
-                    assert(false);
+                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
                 EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumLS), AirMassFlowRatioLS);
                 EIRLS = 1.0 / DXCoil(DXCoilNum).MSRatedCOP(SpeedNumLS) * EIRTempModFac * EIRFlowModFac;
                 // High Speed
-                if ((DXCoil(DXCoilNum).MSEIRTempModFacCurveType(SpeedNumHS) == Quadratic) ||
-                    (DXCoil(DXCoilNum).MSEIRTempModFacCurveType(SpeedNumHS) == Cubic)) {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), OutdoorDryBulb);
-                } else if (DXCoil(DXCoilNum).MSEIRTempModFacCurveType(SpeedNumHS) == BiQuadratic) {
+                } else {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
                 EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumHS), AirMassFlowRatioHS);
@@ -13562,10 +13146,9 @@ namespace DXCoils {
                 // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
-                if ((DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(SpeedNum) == Quadratic) ||
-                    (DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(SpeedNum) == Cubic)) {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum)).NumDims == 1) {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), OutdoorDryBulb);
-                } else if (DXCoil(DXCoilNum).MSTotCapTempModFacCurveType(SpeedNum) == BiQuadratic) {
+                } else {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
 
@@ -13644,9 +13227,9 @@ namespace DXCoils {
                 // Model was extended to accept bi-quadratic curves. This allows sensitivity of the EIR
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quadratic curve if sufficient manufacturer data is available.
-                if ((DXCoil(DXCoilNum).MSEIRTempModFacCurveType(1) == Quadratic) || (DXCoil(DXCoilNum).MSEIRTempModFacCurveType(1) == Cubic)) {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(1)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(1), OutdoorDryBulb);
-                } else if (DXCoil(DXCoilNum).MSEIRTempModFacCurveType(1) == BiQuadratic) {
+                } else {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(1), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
                 EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(1), AirMassFlowRatioLS);
@@ -13833,6 +13416,7 @@ namespace DXCoils {
         // Fills some of the report variables for the DX coils
 
         // Using/Aliasing
+        using DataAirLoop::AirLoopAFNInfo;
         using DataAirLoop::LoopDXCoilRTF;
         using DataHVACGlobals::DXElecCoolingPower;
         using DataHVACGlobals::DXElecHeatingPower;
@@ -13847,17 +13431,18 @@ namespace DXCoils {
         Real64 SpecHumIn;
         Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
 
-        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing &&
-            DXCoil(DXCoilNum).reportCoilFinalSizes) {
-            Real64 ratedSensCap(0.0);
-            ratedSensCap = DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1);
-            coilSelectionReportObj->setCoilFinalSizes(DXCoil(DXCoilNum).Name,
-                                                      DXCoil(DXCoilNum).DXCoilType,
-                                                      DXCoil(DXCoilNum).RatedTotCap(1),
-                                                      ratedSensCap,
-                                                      DXCoil(DXCoilNum).RatedAirVolFlowRate(1),
-                                                      -999.0);
-            DXCoil(DXCoilNum).reportCoilFinalSizes = false;
+        if (DXCoil(DXCoilNum).reportCoilFinalSizes) {
+            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+                Real64 ratedSensCap(0.0);
+                ratedSensCap = DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1);
+                coilSelectionReportObj->setCoilFinalSizes(DXCoil(DXCoilNum).Name,
+                                                          DXCoil(DXCoilNum).DXCoilType,
+                                                          DXCoil(DXCoilNum).RatedTotCap(1),
+                                                          ratedSensCap,
+                                                          DXCoil(DXCoilNum).RatedAirVolFlowRate(1),
+                                                          -999.0);
+                DXCoil(DXCoilNum).reportCoilFinalSizes = false;
+            }
         }
 
         ReportingConstant = TimeStepSys * SecInHour;
@@ -13946,6 +13531,10 @@ namespace DXCoils {
         }
 
         LoopDXCoilRTF = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+        if (DXCoil(DXCoilNum).AirLoopNum > 0) {
+            AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
+                max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+        }
     }
 
     void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum)
@@ -16737,12 +16326,10 @@ namespace DXCoils {
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-                if ((DXCoil(DXCoilNum).EIRTempModFacCurveType(1) == Quadratic) || (DXCoil(DXCoilNum).EIRTempModFacCurveType(1) == Cubic)) {
+                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
-                } else if (DXCoil(DXCoilNum).EIRTempModFacCurveType(1) == BiQuadratic) {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
                 } else {
-                    assert(false);
+                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
                 EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
             } else {
@@ -17400,6 +16987,31 @@ namespace DXCoils {
             DXCoil(DXCoilNum).MSHPHeatRecActive = true;
         }
     }
+
+    void SetDXCoilAirLoopNumber(std::string const &CoilName, int const AirLoopNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         L. Gu
+        //       DATE WRITTEN   March, 2018
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AirLoopNum for AFN model with multiple AirLoops
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int WhichCoil;
+
+        if (GetCoilsInputFlag) {
+            GetDXCoils();
+            GetCoilsInputFlag = false;
+        }
+
+        WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
+        if (WhichCoil != 0) {
+            DXCoil(WhichCoil).AirLoopNum = AirLoopNum;
+        } else {
+            ShowSevereError("SetDXCoilAirLoopNumber: Could not find Coil \"Name=\"" + CoilName + "\"");
+        }
+    } // must match coil names for the coil type
 
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.

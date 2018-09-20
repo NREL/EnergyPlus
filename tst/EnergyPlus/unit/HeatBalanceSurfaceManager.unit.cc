@@ -322,7 +322,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.9;",
+        "  Version,9.0;",
 
         "  Building,",
         "    House with AirflowNetwork simulation,  !- Name",
@@ -355,8 +355,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    ,                        !- Name",
         "    1,                       !- Begin Month",
         "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    1,                       !- End Month",
         "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
         "    Tuesday,                 !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -368,8 +370,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    ,                        !- Name",
         "    7,                       !- Begin Month",
         "    7,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    7,                       !- End Month",
         "    7,                       !- End Day of Month",
+        "    ,                        !- End Year",
         "    Tuesday,                 !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -805,7 +809,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,8.9;",
+        delimited_string({"  Version,9.0;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -838,8 +842,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
                           "    ,                        !- Name",
                           "    1,                       !- Begin Month",
                           "    14,                      !- Begin Day of Month",
+                          "    ,                        !- Begin Year",
                           "    1,                       !- End Month",
                           "    14,                      !- End Day of Month",
+                          "    ,                        !- End Year",
                           "    Tuesday,                 !- Day of Week for Start Day",
                           "    Yes,                     !- Use Weather File Holidays and Special Days",
                           "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -851,8 +857,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
                           "    ,                        !- Name",
                           "    7,                       !- Begin Month",
                           "    7,                       !- Begin Day of Month",
+                          "    ,                        !- Begin Year",
                           "    7,                       !- End Month",
                           "    7,                       !- End Day of Month",
+                          "    ,                        !- End Year",
                           "    Tuesday,                 !- Day of Week for Start Day",
                           "    Yes,                     !- Use Weather File Holidays and Special Days",
                           "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -1343,7 +1351,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,8.9;",
+        "  Version,9.0;",
 
         "  Building,",
         "    House with Local Air Nodes,  !- Name",
@@ -1376,8 +1384,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    ,                        !- Name",
         "    1,                       !- Begin Month",
         "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    1,                       !- End Month",
         "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
         "    Tuesday,                 !- Day of Week for Start Day",
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -1389,11 +1399,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    ,                        !- Name",
         "    7,                       !- Begin Month",
         "    7,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
         "    7,                       !- End Month",
         "    7,                       !- End Day of Month",
+        "    ,                        !- End Year",
         "    Tuesday,                 !- Day of Week for Start Day",
-        "    Yes,                     !- Use Weather File Holidays and Special Days",
-        "    Yes,                     !- Use Weather File Daylight Saving Period",
         "    No,                      !- Apply Weekend Holiday Rule",
         "    Yes,                     !- Use Weather File Rain Indicators",
         "    No;                      !- Use Weather File Snow Indicators",
@@ -1958,7 +1968,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,8.9;",
+        delimited_string({"  Version,9.0;",
 
                           "  Building,",
                           "    House with AirflowNetwork simulation,  !- Name",
@@ -1991,8 +2001,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
                           "    ,                        !- Name",
                           "    1,                       !- Begin Month",
                           "    14,                      !- Begin Day of Month",
+                          "    ,                        !- Begin Year",
                           "    1,                       !- End Month",
                           "    14,                      !- End Day of Month",
+                          "    ,                        !- End Year",
                           "    Tuesday,                 !- Day of Week for Start Day",
                           "    Yes,                     !- Use Weather File Holidays and Special Days",
                           "    Yes,                     !- Use Weather File Daylight Saving Period",
@@ -2004,8 +2016,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
                           "    ,                        !- Name",
                           "    7,                       !- Begin Month",
                           "    7,                       !- Begin Day of Month",
+                          "    ,                        !- Begin Year",
                           "    7,                       !- End Month",
                           "    7,                       !- End Day of Month",
+                          "    ,                        !- End Year",
                           "    Tuesday,                 !- Day of Week for Start Day",
                           "    Yes,                     !- Use Weather File Holidays and Special Days",
                           "    Yes,                     !- Use Weather File Daylight Saving Period",

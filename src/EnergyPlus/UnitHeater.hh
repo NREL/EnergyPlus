@@ -141,6 +141,7 @@ namespace UnitHeater {
         Real64 FanPartLoadRatio; // fan part-load ratio for time step
         int ZonePtr;             // pointer to a zone served by a unit heater
         int HVACSizingIndex;     // index of a HVACSizing object for a unit heater
+        bool FirstPass;          // detects first time through for resetting sizing data
 
         // Default Constructor
         UnitHeaterData()
@@ -149,7 +150,8 @@ namespace UnitHeater {
               HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), MinHotSteamFlow(0.0), HotControlNode(0), HotControlOffset(0.0),
               HotCoilOutNodeNum(0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), PartLoadFrac(0.0), HeatPower(0.0), HeatEnergy(0.0),
-              ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanOffNoHeating(false), FanPartLoadRatio(0.0), ZonePtr(0), HVACSizingIndex(0)
+              ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanOffNoHeating(false), FanPartLoadRatio(0.0), ZonePtr(0), HVACSizingIndex(0),
+              FirstPass(true)
         {
         }
     };

@@ -2181,7 +2181,7 @@ There are two methods of assigning a shade to a window:
 
 3)~~~Define the WindowMaterial:Shade.
 
-4)~~~Define a WindowProperty:ShadingControl for the window in which you (a) specify that this WindowMaterial:Shade is the window's shading device and (b) specify how the shade is controlled.
+4)~~~Define a WindowShadingControl for the window in which you (a) specify that this WindowMaterial:Shade is the window's shading device and (b) specify how the shade is controlled.
 
 \paragraph{Method 2:}\label{method-2}
 
@@ -2193,9 +2193,9 @@ There are two methods of assigning a shade to a window:
 
 4)~~~Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Shade.
 
-5)~~~Define a WindowProperty:ShadingControl for the window in which you (a) reference the shaded construction and (b) specify how the shade is controlled.
+5)~~~Define a WindowShadingControl for the window in which you (a) reference the shaded construction and (b) specify how the shade is controlled.
 
-Note that WindowProperty:ShadingControl has to be used with either method, even if the shade is in place at all times. You will get an error message if you try to reference a shaded construction directly from FenestrationSurface:Detailed.
+Note that WindowShadingControl has to be used with either method, even if the shade is in place at all times. You will get an error message if you try to reference a shaded construction directly from FenestrationSurface:Detailed.
 
 \paragraph{Field: Name}\label{field-name-16-009}
 
@@ -2326,7 +2326,7 @@ There are two methods of assigning a blind to a window:
 
 3)~~~Define the WindowMaterial:Blind.
 
-4)~~~Define a WindowProperty:ShadingControl for the window in which you (a) specify that this WindowMaterial:Blind is the window's shading device and (b) specify how the blind is controlled.
+4)~~~Define a WindowShadingControl for the window in which you (a) specify that this WindowMaterial:Blind is the window's shading device and (b) specify how the blind is controlled.
 
 \paragraph{Method 2:}\label{method-2-1}
 
@@ -2338,15 +2338,15 @@ There are two methods of assigning a blind to a window:
 
 4)~~~Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Blind.
 
-5)~~~Define a WindowProperty:ShadingControl for the window in which you (a) reference the shaded construction and (b) specify how the blind is controlled.
+5)~~~Define a WindowShadingControl for the window in which you (a) reference the shaded construction and (b) specify how the blind is controlled.
 
-Note that WindowProperty:ShadingControl has to be used with either method, even if the blind is in place at all times. You will get an error message if you try to reference a construction with a blind directly from Window objects (FenestrationSurface:Detailed or Window).
+Note that WindowShadingControl has to be used with either method, even if the blind is in place at all times. You will get an error message if you try to reference a construction with a blind directly from Window objects (FenestrationSurface:Detailed or Window).
 
-Note also that WindowProperty:ShadingControl is used to determine not only when the blind is in place, but how its slat angle is controlled.
+Note also that WindowShadingControl is used to determine not only when the blind is in place, but how its slat angle is controlled.
 
 \paragraph{Field: Name}\label{field-name-17-007}
 
-Name of the blind. It is referenced as a layer in a window construction (ref: Construction object) or as a ``Material Name of Shading Device'' in a WindowProperty:ShadingControl object.
+Name of the blind. It is referenced as a layer in a window construction (ref: Construction object) or as a ``Material Name of Shading Device'' in a WindowShadingControl object.
 
 \paragraph{Field: Slat Orientation}\label{field-slat-orientation}
 
@@ -2368,7 +2368,7 @@ The distance between the faces of a slat (m). See Figure~\ref{fig:a-side-view-of
 
 The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). See Figure~\ref{fig:a-side-view-of-a-window-blind-with-horizontal}.
 
-If the WindowProperty:ShadingControl for the blind has Type of Slat Angle Control for Blinds = FixedSlatAngle, the slat angle is fixed at ``Slat Angle.''
+If the WindowShadingControl for the blind has Type of Slat Angle Control for Blinds = FixedSlatAngle, the slat angle is fixed at ``Slat Angle.''
 
 If Type of Slat Angle Control for Blinds = BlockBeamSolar, the program automatically adjusts the slat angle so as just block beam solar radiation. In this case the value of ``Slat Angle'' is used only when the blind is in place and there is no beam solar radiation incident on the blind.
 
@@ -2466,11 +2466,11 @@ Defined as for Material:WindowShade.
 
 \paragraph{Field: Minimum Slat Angle}\label{field-minimum-slat-angle}
 
-The minimum allowed slat angle (degrees). Used only if WindowProperty:ShadingControl (for the window that incorporates this blind) varies the slat angle (i.e., the WindowProperty:ShadingControl has Type of Slat Angle Control for Blinds = ScheduledSlatAngle or BlockBeamSolar). In this case, if the program tries to select a slat angle less than Minimum Slat Angle it will be reset to Minimum Slat Angle. (Note that if the Minimum Slat Angle itself is less than the minimum allowed by Slat Width, Slat Separation and Slat Thickness, it will be reset to that minimum.)
+The minimum allowed slat angle (degrees). Used only if WindowShadingControl (for the window that incorporates this blind) varies the slat angle (i.e., the WindowShadingControl has Type of Slat Angle Control for Blinds = ScheduledSlatAngle or BlockBeamSolar). In this case, if the program tries to select a slat angle less than Minimum Slat Angle it will be reset to Minimum Slat Angle. (Note that if the Minimum Slat Angle itself is less than the minimum allowed by Slat Width, Slat Separation and Slat Thickness, it will be reset to that minimum.)
 
 \paragraph{Field: Maximum Slat Angle}\label{field-maximum-slat-angle}
 
-The maximum allowed slat angle (degrees). Used only if WindowProperty:ShadingControl (for the window that incorporates this blind) varies the slat angle (i.e., the WindowProperty:ShadingControl has Type of Slat Angle Control for Blinds = ScheduledSlatAngle or BlockBeamSolar). In this case, if the program tries to select a slat angle greater than Maximum Slat Angle the slat angle will be reset to Maximum Slat Angle. (Note that if the Maximum Slat Angle itself is greater than the maximum allowed by Slat Width, Slat Separation and Slat Thickness, it will be reset to that maximum.)
+The maximum allowed slat angle (degrees). Used only if WindowShadingControl (for the window that incorporates this blind) varies the slat angle (i.e., the WindowShadingControl has Type of Slat Angle Control for Blinds = ScheduledSlatAngle or BlockBeamSolar). In this case, if the program tries to select a slat angle greater than Maximum Slat Angle the slat angle will be reset to Maximum Slat Angle. (Note that if the Maximum Slat Angle itself is greater than the maximum allowed by Slat Width, Slat Separation and Slat Thickness, it will be reset to that maximum.)
 
 An IDF example:
 
@@ -2530,7 +2530,9 @@ The type of shading layer. The options are:
 
 \begin{itemize}
 \item
-  Venetian -- for modeling venetian blinds
+  VenetianHorizontal -- for modeling horizontal venetian blinds
+\item
+  VenetianVertical -- for modeling vertical venetian blinds
 \item
   Woven -- for modeling shading systems with a regular weave
 \item
@@ -2543,7 +2545,7 @@ The type of shading layer. The options are:
 
 \paragraph{Field: Thickness}\label{field-thickness-7}
 
-The thickness (m) of the shading layer. This value is ignored for ShadingLayerType = Venetian, because the program will calculate the thickness based on the slat angle. This value is needed for ShadingLayerType = Woven and Perforated
+The thickness (m) of the shading layer. This value is ignored for ShadingLayerType = Venetian*, because the program will calculate the thickness based on the slat angle. This value is needed for ShadingLayerType = Woven and Perforated
 
 \paragraph{Field: Conductivity}\label{field-conductivity-4}
 
@@ -2551,7 +2553,7 @@ The conductivity (W/mK) of the shading layer material. Default: 1.0
 
 \begin{itemize}
 \item
-  Venetian -- the conductivity of the venetian blind slat material
+  Venetian* -- the conductivity of the venetian blind slat material
 \item
   Woven -- the conductivity of the woven shade material (such as the thread for a fabric shade)
 \item
@@ -2746,7 +2748,7 @@ There are two methods of assigning a screen to a window:
 
 3)~~~Define the WindowMaterial:Screen object.
 
-4)~~~Define a WindowProperty:ShadingControl for the window in which you (a) specify that this Material:WindowScreen is the window's shading device, and (b) specify how the screen is controlled.
+4)~~~Define a WindowShadingControl for the window in which you (a) specify that this Material:WindowScreen is the window's shading device, and (b) specify how the screen is controlled.
 
 \paragraph{Method 2:}\label{method-2-2}
 
@@ -2758,9 +2760,9 @@ There are two methods of assigning a screen to a window:
 
 4)~~~Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Screen.
 
-5)~~~Define a WindowProperty:ShadingControl for the window in which you (a) reference the shaded construction, and (b) specify how the screen is controlled.
+5)~~~Define a WindowShadingControl for the window in which you (a) reference the shaded construction, and (b) specify how the screen is controlled.
 
-Note that WindowProperty:ShadingControl has to be used with either method, even if the screen is in place at all times. You will get an error message if you try to reference a shaded construction directly from a FenestrationSurface:Detailed object.
+Note that WindowShadingControl has to be used with either method, even if the screen is in place at all times. You will get an error message if you try to reference a shaded construction directly from a FenestrationSurface:Detailed object.
 
 \paragraph{Field: Name}\label{field-name-19-004}
 
@@ -2839,7 +2841,7 @@ Effective area for air flow at the right side of the screen divided the vertical
 
 Angle of resolution, in degrees, for the overall screen beam transmittance (direct and reflected) output map. The comma-separated variable file eplusscreen.csv (Ref. OutputDetailsandExamples.pdf) will contain the direct beam and reflected beam solar radiation that is transmitted through the window screen as a function of incident sun angle (0 to 90 degrees relative solar azimuth and 0 to 90 degrees relative solar altitude) in sun angle increments specified by this input field. The default value is 0, which means no transmittance map is generated. Other valid choice inputs are 1, 2, 3 and 5 degrees.
 
-An IDF example for this object, along with Construction and WindowProperty:ShadingControl objects, is shown below:
+An IDF example for this object, along with Construction and WindowShadingControl objects, is shown below:
 
 \begin{lstlisting}
 
@@ -2865,8 +2867,10 @@ WindowMaterial:Screen,
       WinAirB1 - AIRSPACE RESISTANCE, !- Layer \#2
       GLASS - CLEAR SHEET 1 / 8 IN;   !- Layer \#3
 
-  WindowProperty:ShadingControl,
-      DOUBLE PANE WITH SCREEN, !- User Supplied Shading Control Name
+  WindowShadingControl,
+      DOUBLE PANE WITH SCREEN, !- Name
+      West Zone,               !- Zone Name
+      1,                       !- Shading Control Sequence Number
       ExteriorScreen,          !- Shading Type
       ,                        !- Name of construction with shading
       AlwaysOn,                !- Shading Control Type
@@ -2876,12 +2880,16 @@ WindowMaterial:Screen,
       NO,                      !- Glare Control Is Active
       EXTERIOR SCREEN,         !- Material Name of Shading Device
       ,                        !- Type of Slat Angle Control for Blinds
-      ;                        !- Slat Angle Schedule Name
+      ,                        !- Slat Angle Schedule Name
+      ,                        !- Setpoint 2 {W/m2 or deg C}
+      ,                        !- Daylighting Control Object Name
+      Sequential,              !- Multiple Surface Control Type
+      Zn001:Wall001:Win001;    !- Fenestration Surface 1 Name
 \end{lstlisting}
 
 \subsection{WindowMaterial:Shade:EquivalentLayer}\label{windowmaterialshadeequivalentlayer}
 
-This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittence is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank. The equivalent layer window shade model does not support WindowProperty:ShadingControl. 
+This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittence is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank. The equivalent layer window shade model does not support WindowShadingControl. 
 
 \subsubsection{Inputs}\label{inputs-26-002}
 
@@ -2956,7 +2964,7 @@ WindowMaterial:Shade:EquivalentLayer,
 
 Specifies the optical and thermal properties of equivalent layer window drape fabric materials.
 
-Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%. The equivalent layer window drapery fabric shade model does not support WindowProperty:ShadingControl.
+Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%. The equivalent layer window drapery fabric shade model does not support WindowShadingControl.
 
 \begin{figure}[hbtp] % fig 21
 \centering
@@ -3053,7 +3061,7 @@ This object specifies the properties of an Equivalent Layer window blind consist
 \end{figure}
 
 The input data required to characterize a venetian blind are: front and back side reflectance and transmittance of the slat, geometry (Slat width, w, slat spacing, s, slat crown, c, and slat angle, $\phi$, and long wave emittance and transmittance of the slat. Blinds can be located on the inside of the window, on the outside of the window, or between two layers of glass. The blind is assumed to cover all of the glazed part of the window.
-The equivalent layer window blind model allows three slat angle control types (see \textit{Slat Angle Control} input field) but does not support WindowProperty:ShadingControl. 
+The equivalent layer window blind model allows three slat angle control types (see \textit{Slat Angle Control} input field) but does not support WindowShadingControl. 
 
 \subsubsection{Inputs}\label{inputs-28-001}
 
@@ -3186,7 +3194,7 @@ WindowMaterial:Blind:EquivalentLayer,
 
 \subsection{WindowMaterial:Screen:EquivalentLayer}\label{windowmaterialscreenequivalentlayer}
 
-This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-diffuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.~ Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}.~ The calculation of effective solar properties requires a set of properties measured at normal incidence. The equivalent layer window screen shade model does not support WindowProperty:ShadingControl.
+This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-diffuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.~ Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}.~ The calculation of effective solar properties requires a set of properties measured at normal incidence. The equivalent layer window screen shade model does not support WindowShadingControl.
 
 \begin{figure}[hbtp] % fig 23
 \centering
@@ -3262,7 +3270,7 @@ WindowMaterial:Screen:EquivalentLayer,
 
 \subsection{WindowMaterial:Glazing:EquivalentLayer}\label{windowmaterialglazingequivalentlayer}
 
-Glass material properties for equivalent layer window model.~ Uses transmittance/reflectance input method.~ For exterior windows, ``front side'' is the side of the glass closest to the outside air and ``back side'' is the side closest to the zone the window is defined in. For interzone windows, ``front side'' is the side closest to the zone adjacent to the zone the window is defined in and ``back side'' is the side closest to the zone the window is defined in. The equivalent layer window glazing model does not support WindowProperty:ShadingControl.
+Glass material properties for equivalent layer window model.~ Uses transmittance/reflectance input method.~ For exterior windows, ``front side'' is the side of the glass closest to the outside air and ``back side'' is the side closest to the zone the window is defined in. For interzone windows, ``front side'' is the side closest to the zone adjacent to the zone the window is defined in and ``back side'' is the side closest to the zone the window is defined in. The equivalent layer window glazing model does not support WindowShadingControl.
 
 \subsubsection{Inputs}\label{inputs-30-001}
 
@@ -3514,7 +3522,7 @@ WindowMaterial:Gap:EquivalentLayer,
 
 \subsection{Material:RoofVegetation}\label{materialroofvegetation}
 
-This definition must be used in order to simulate the green roof (ecoroof) model. The material becomes the outside layer in a green roof construction (see example below). In the initial release of the green roof model, only one material may be used as a green roof layer though, of course, several constructions using that material may be used. In addition, the model has only been tested with the ConductionTransferFunction solution algorithm -- a warning will be issued for other solution algorithm choices. This model was developed for low-sloped exterior surfaces (roofs). It is not recommended for high-sloped exterior surfaces (e.g., walls).
+This definition must be used in order to simulate the green roof (ecoroof) model. The material becomes the outside layer in a green roof construction (see example below). In the initial release of the green roof model, only one material may be used as a green roof layer though, of course, several constructions using that material may be used. In addition, the model works only with the ConductionTransferFunction heat balance solution algorithm. This model was developed for low-sloped exterior surfaces (roofs). It is not recommended for high-sloped exterior surfaces (e.g., walls).
 
 \subsubsection{Inputs}\label{inputs-32-000}
 
@@ -3592,13 +3600,13 @@ The field allows for user input of the initial moisture content of the soil laye
 
 \paragraph{Field: Moisture Diffusion Calculation Method}\label{field-moisture-diffusion-calculation-method}
 
-The field allows for two models to be selected: \textbf{Simple} or \textbf{Advanced}.
+The field allows for two models to be selected: \textbf{Simple} or \textbf{Advanced}. EnergyPlus Currently supports only the \textbf{Simple} \textit{Moisture Diffusion Calculation Method}.
 
 \textbf{Simple} is the original Ecoroof model - based on a constant diffusion of moisture through the soil.~ This model starts with the soil in two layers.~ Every time the soil properties update is called, it will look at the two soils moisture layers and asses which layer has more moisture in it. It then takes moisture from the higher moisture layer and redistributes it to the lower moisture layer at a constant rate.
 
-\textbf{Advanced} is the later Ecoroof model. If you use it, you will need to increase your number of timesteps in hour for the simulation with a recommended value of 20. This moisture transport model is based on a project which looked at the way moisture transports through soil.~ It uses a finite difference method to divide the soil into layers (nodes). It redistributes the soil moisture according the model described in:
+\textbf{Advanced} is the later Ecoroof model. The model requires higher number of timesteps in hour for the simulation with a recommended value of 20. This moisture transport model is based on a project which looked at the way moisture transports through soil.~ It uses a finite difference method to divide the soil into layers (nodes). It redistributes the soil moisture according the model described in:
 
-Marcel G Schaap and Martinus Th. van Genuchten, 2006, `A modified Maulem-van Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near Saturation', Vadose Zone Journal 5 (1), p 27-34.
+Marcel G Schaap and Martinus Th. van Genuchten, 2006, `A modified Maulem-van Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near Saturation', Vadose Zone Journal 5 (1), p 27-34. However, currently \textbf{Advanced} \textit{Moisture Diffusion Calculation Method} is not supported in EnergyPlus.
 
 An IDF example:
 
@@ -3620,10 +3628,10 @@ Material:RoofVegetation,
       0.95,                    !- Thermal Absorptance
       0.8,                     !- Solar Absorptance
       0.7,                     !- Visible Absorptance
-     0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
+      0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
       0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer
       0.2,                     !- Initial Volumetric Moisture Content of the Soil Layer
-      Advanced;                !- Moisture Diffusion Calculation Method
+      Simple;                  !- Moisture Diffusion Calculation Method
 
 
     Material:RoofVegetation,
@@ -3642,10 +3650,10 @@ Material:RoofVegetation,
       0.95,                    !- Thermal Absorptance
       0.8,                     !- Solar Absorptance
       0.7,                     !- Visible Absorptance
-     0.4,          !- Saturation Volumetric Moisture Content of the Soil Layer
-      0.01,         !- Residual Volumetric Moisture Content of the Soil Layer
-      0.2,          !- Initial Volumetric Moisture Content of the Soil Layer
-      Advanced;                !- Moisture Diffusion Calculation Method
+      0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
+      0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer
+      0.2,                     !- Initial Volumetric Moisture Content of the Soil Layer
+      Simple;                 !- Moisture Diffusion Calculation Method
 \end{lstlisting}
 
 And construction using the ecoroof material:
@@ -4407,7 +4415,7 @@ Construction:WindowEquivalentLayer,
 
 \subsection{Construction:WindowDataFile}\label{constructionwindowdatafile}
 
-The WINDOW program, which does a thermal and optical analysis of a window under different design conditions, writes a data file (``Window data file'') containing a description of the window that was analyzed. The Construction:WindowDataFile object allows a window to be read in from the WINDOW data file---see ``Importing Windows from WINDOW.'' For information on adding a shading device to the window see ``WindowProperty:ShadingControl.''
+The WINDOW program, which does a thermal and optical analysis of a window under different design conditions, writes a data file (``Window data file'') containing a description of the window that was analyzed. The Construction:WindowDataFile object allows a window to be read in from the WINDOW data file---see ``Importing Windows from WINDOW.'' For information on adding a shading device to the window see ``WindowShadingControl.''
 
 \subsubsection{Inputs}\label{inputs-42}
 
@@ -4434,7 +4442,6 @@ FenestrationSurface:Detailed,
   DoubleClear,          !- Construction Name
   Zn001:Wall001,        !- Base Surface Name, and Target (if applicable)
   0.5,                  !- View Factor to Ground
-  ,                     !- Window Shading Control name
   ,                     !- Frame/Divider name
    1.0,                 !- Multiplier
   4,                    !- Number of vertices
