@@ -7415,7 +7415,7 @@ namespace DaylightingManager {
         Real64 TotReduction; // Electric lighting power reduction factor for a zone
         //  due to daylighting
         int NREFPT;   // Number of daylighting reference points in a zone
-        Real64 ZFTOT; // Fraction of zone's floor area that has daylighting controls
+        Real64 ZFTOT = 0.; // Fraction of zone's floor area that has daylighting controls
         int IL;       // Reference point index
         int LSYSTP;   // Lighting control type: 1=continuous dimming, 2=stepped,
         //  3=continuous dimming then off
@@ -7446,12 +7446,12 @@ namespace DaylightingManager {
         if (ScheduledAvailable) {
             NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
 
-            // Total fraction of zone that is daylit
-            ZFTOT = ZoneDaylight(ZoneNum).FracZoneDaylit(1);
-            if (NREFPT > 1) ZFTOT += ZoneDaylight(ZoneNum).FracZoneDaylit(2);
-
             // Loop over reference points
             for (IL = 1; IL <= NREFPT; ++IL) {
+
+                // Total fraction of zone that is daylit
+                ZFTOT += ZoneDaylight(ZoneNum).FracZoneDaylit(IL);
+                
                 DaylIllum(IL) = ZoneDaylight(ZoneNum).DaylIllumAtRefPt(IL);
                 if (DaylIllum(IL) >= ZoneDaylight(ZoneNum).IllumSetPoint(IL)) {
                     FL = 0.0;
