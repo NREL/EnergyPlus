@@ -45,13 +45,14 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::UnitHeater Unit Tests
-
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -62,7 +63,7 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, RecurringWarningTest)
 {
 
-    //void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
+    // void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
     //    int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
     //    Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
     //    Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
@@ -71,7 +72,7 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
     //    std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
     //    std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
     //)
-    
+
     std::string myMessage1 = "Test message 1";
     // proper call to ShowRecurringWarningErrorAtEnd to set up new recurring warning
     int ErrIndex1 = 0;
@@ -118,4 +119,25 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
     // index gets updated with correct value
     EXPECT_EQ(ErrIndex1, 5);
     EXPECT_EQ(" ** Warning ** " + myMessage4, DataErrorTracking::RecurringErrors(5).Message);
+}
+
+TEST_F(EnergyPlusFixture, DisplayMessageTest)
+{
+    DisplayString("Testing");
+    EXPECT_TRUE(has_cout_output(true));
+    // Open six files to get unit number beyond 6 - these all get closed later by EnergyPlusFixture
+    DataGlobals::OutputFileStandard = FindUnitNumber(DataStringGlobals::outputEsoFileName);
+    DataGlobals::OutputFileInits = FindUnitNumber(DataStringGlobals::outputEioFileName);
+    DataGlobals::OutputFileMeters = FindUnitNumber(DataStringGlobals::outputMtrFileName);
+    DataGlobals::OutputFileBNDetails = FindUnitNumber(DataStringGlobals::outputBndFileName);
+    DataGlobals::OutputFileZoneSizing = FindUnitNumber(DataStringGlobals::outputZszCsvFileName);
+    DataGlobals::OutputFileSysSizing = FindUnitNumber(DataStringGlobals::outputSszCsvFileName);
+    DisplayString("Testing");
+    EXPECT_TRUE(has_cout_output(true));
+    // repeat this one - before fix, this broke cout_stream
+    int unitNum; // found unit number
+    unitNum = FindUnitNumber(DataStringGlobals::outputSszCsvFileName);
+    EXPECT_FALSE(has_cout_output(true));
+    DisplayString("Testing");
+    EXPECT_TRUE(has_cout_output(true));
 }
