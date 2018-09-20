@@ -399,7 +399,7 @@ namespace ConvectionCoefficients {
                 }
 
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    HConvIn(SurfNum) = SurfaceGeometry::kivaManager.getConv(SurfNum);
+                    HConvIn(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].h;
                     Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
                     continue;
                 }

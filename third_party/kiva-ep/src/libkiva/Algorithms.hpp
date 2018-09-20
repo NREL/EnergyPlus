@@ -1,50 +1,41 @@
-/* Copyright (c) 2012-2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+/* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef ConvectionAlgorithms_HPP
 #define ConvectionAlgorithms_HPP
 
 #include <cmath>
+#include <map>
+
 //#include "PixelCounter.hpp"
 
+#define MEMOIZE_DECL(NAME)                                                                         \
+  namespace Memo {                                                                                 \
+  static std::map<double, double> NAME##_map;                                                      \
+  double NAME(double x);                                                                           \
+  }
+
 namespace Kiva {
+
+MEMOIZE_DECL(cos)
+MEMOIZE_DECL(pow025)
+MEMOIZE_DECL(pow089)
+MEMOIZE_DECL(pow0617)
+
+double cbrt_a(double x);
+
 // TODO: use defaulting inputs
-double getDOE2ConvectionCoeff(double tilt,
-                          double azimuth,
-                          double windDirection,
-                          double Tsurf,
-                          double Tamb,
-                          double Vair,
-                          double roughness);
+double getDOE2ConvectionCoeff(double Tsurf, double Tamb, double hfGlass, double roughness,
+                              double cosTilt);
 
-bool isWindward(double tilt, double azimuth, double windDirection);
+bool isWindward(double cosTilt, double azimuth, double windDirection);
 
-double getExteriorIRCoeff(double eSurf,
-                      double Tsurf,
-                      double Tamb,
-                      double eSky,
-                      double tilt);
+double getExteriorIRCoeff(double eSurf, double Tsurf, double Tamb, double Fqtr);
 
-/*
-double getExteriorSolarGain(double aSurf,
-                        double Idn,
-              double Idiff,
-              double Igh,
-              double orientation,
-              double azimuth,
-              double altitude
+double getEffectiveExteriorViewFactor(double eSky, double tilt);
 
+double getSimpleInteriorIRCoeff(double eSurf, double Tsurf, double Trad);
 
-                );
-*/
-
-double getEffectiveExteriorViewFactor(double eSky,
-                                  double tilt);
-
-double getSimpleInteriorIRCoeff(double eSurf,
-                            double Tsurf,
-                            double Tamb);
-
-}
+} // namespace Kiva
 
 #endif

@@ -69,16 +69,21 @@ Shift all later fields by one.
 # Object Change: `WindowProperty:ShadingControl`
 
 Change object type from `WindowProperty:ShadingControl` to `WindowShadingControl`
-Field F1 (A1) remains the same.
-Insert new field F2 (N1) as a blank, \field Shading Control Sequence Number.
-All remaining old Fields F2-F12 (A2-A10, N1-N2) shift by one to F3-F13 (A2-A10, N2-N3).
-Add the following new fields at the end, starting with F14:
-F14 (A11) ????? \field Daylighting Control Name.
-F15 (A12) "Sequential" \field Multiple Surface Control Type.
-F16 and following (A13ff) \field Fenestration Surface n Name: 
+Create one new object for every zone that has a window with a given WindowProperty:ShadingControl.
+For example, if WindowProperty:ShadingControl "ABC" is applied to windows in Zone1 and Zone2, then
+create two new WindowShadingControl objects: ABC-Zone1, ABC-Zone2.
+
+Field F1 (A1) Combine original name plus Zone Name.
+Intert new field F2 (A2) fill with the zone name
+Insert new field F3 (N1) as a blank, \field Shading Control Sequence Number.
+All remaining old Fields F2-F12 (A2-A10, N1-N2) shift by one to F4-F14 (A3-A11, N2-N3).
+Add the following new fields at the end, starting with F15:
+F15 (A12) Search for a Daylighting:Controls object that matches this Zone Name \field Daylighting Control Object Name.
+F16 (A13) "Sequential" \field Multiple Surface Control Type.
+F17 and following (A14ff) \field Fenestration Surface n Name: 
 a) Loop through all of the old Fenestration:Detailed, Window, and GlazedDoor objects, 
-b) If the "Shading Control Name" is not blank, and it matches the name (F1) of this object, then add the surface name as a new field here
-Order matters here, so need to maintain the same order that was previously used for control, which was ???
+b) If the "Shading Control Name" is not blank, and it matches the original shading control name (OldF1) and Zone Name (NewF2) of this object, then add the surface name as a new field here
+Order matters here, so need to maintain the same order that was previously used for control, which was the order of the fenestration surfaces within each zone.
 
 
 
