@@ -2996,8 +2996,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
         "	, !- Number of Vertices",
         "	251.4600375, 3.5052, 0, !- X, Y, Z Vertex 1 {m}",
         "	251.4600375, 0, 0, !- X, Y, Z Vertex 2 {m}",
-        "	253.9571375, 0, 0, !- X, Y, Z Vertex 3 {m}",
-        "	248.5215375, 0, 0, !- X, Y, Z Vertex 4 {m}",
+        "	249.9571375, 0, 0, !- X, Y, Z Vertex 3 {m}",
+        "	248.5215375, 1.0, 0, !- X, Y, Z Vertex 4 {m}",
         "	248.5215375, 3.5052, 0;                 !- X, Y, Z Vertex 5 {m}",
 
         "BuildingSurface:Detailed,",
@@ -3046,8 +3046,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     EXPECT_EQ(2, SurfNum);
     std::string const error_string = delimited_string({
         "   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", invalid Construction Name=\"TYPICAL\".",
-        "   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", After CheckConvexity, mismatch between Sides (4) and size of Vertex (5).",
-        "   **   ~~~   ** CheckConvexity is used to verify the convexity of a surface and detect collinear points.",
         "   ** Severe  ** BuildingSurface:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", invalid Construction Name=\"TYPICAL\".",
         "   ** Severe  ** RoofCeiling:Detailed=\"016W88_WATERMETER - FLOOR : A\", Vertex size mismatch between base surface :016W88_WATERMETER - FLOOR : A and outside boundary surface: 006W27_RESTROOMS - ROOFCEILING : A",
         "   **   ~~~   ** The vertex sizes are 5 for base surface and 4 for outside boundary surface. Please check inputs.",
@@ -3055,5 +3053,120 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
         "   **   ~~~   ** The vertex sizes are 4 for base surface and 5 for outside boundary surface. Please check inputs."
         });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
+{
+
+    // Test a multiple vertex surfaces in ProcessSurfaceVertices and CalcCoordinateTransformation for #6384
+
+    TotSurfaces = 2;
+    MaxVerticesPerSurface = 9;
+    Surface.allocate(TotSurfaces);
+    ShadeV.allocate(TotSurfaces);
+    Surface(1).Vertex.allocate(7);
+    Surface(2).Vertex.allocate(9);
+    SurfaceTmp.allocate(TotSurfaces);
+    SurfaceTmp(1).Vertex.allocate(7);
+    SurfaceTmp(2).Vertex.allocate(9);
+
+    int ThisSurf(0);
+
+    // Surface 1 - Rectangle with 7 points
+    ThisSurf = 1;
+    Surface(ThisSurf).Azimuth = 0.0;
+    Surface(ThisSurf).Tilt = 180.0;
+    Surface(ThisSurf).Sides = 7;
+    Surface(ThisSurf).GrossArea = 20.0;
+
+    Surface(ThisSurf).Vertex(1).x = 10.0;
+    Surface(ThisSurf).Vertex(1).y = 2.0;
+    Surface(ThisSurf).Vertex(1).z = 3.0;
+
+    Surface(ThisSurf).Vertex(2).x = 10.0;
+    Surface(ThisSurf).Vertex(2).y = 3.0;
+    Surface(ThisSurf).Vertex(2).z = 3.0;
+
+    Surface(ThisSurf).Vertex(3).x = 10.0;
+    Surface(ThisSurf).Vertex(3).y = 4.0;
+    Surface(ThisSurf).Vertex(3).z = 3.0;
+
+    Surface(ThisSurf).Vertex(4).x = 10.0;
+    Surface(ThisSurf).Vertex(4).y = 5.0;
+    Surface(ThisSurf).Vertex(4).z = 3.0;
+
+    Surface(ThisSurf).Vertex(5).x = 10.0;
+    Surface(ThisSurf).Vertex(5).y = 6.0;
+    Surface(ThisSurf).Vertex(5).z = 3.0;
+
+    Surface(ThisSurf).Vertex(6).x = 15.0;
+    Surface(ThisSurf).Vertex(6).y = 6.0;
+    Surface(ThisSurf).Vertex(6).z = 3.0;
+
+    Surface(ThisSurf).Vertex(7).x = 15.0;
+    Surface(ThisSurf).Vertex(7).y = 2.0;
+    Surface(ThisSurf).Vertex(7).z = 3.0;
+
+    SurfaceTmp(ThisSurf) = Surface(ThisSurf);
+    CheckConvexity(ThisSurf, SurfaceTmp(ThisSurf).Sides);
+    Surface(ThisSurf) = SurfaceTmp(ThisSurf);
+    EXPECT_EQ(4, Surface(ThisSurf).Sides);
+    EXPECT_EQ(10.0, Surface(ThisSurf).Vertex(2).x);
+    EXPECT_EQ(6.0, Surface(ThisSurf).Vertex(2).y);
+    EXPECT_EQ(15.0, Surface(ThisSurf).Vertex(3).x);
+    EXPECT_EQ(6.0, Surface(ThisSurf).Vertex(3).y);
+
+    // Surface 2 - Rectangle with 9 points
+    ThisSurf = 2;
+    Surface(ThisSurf).Azimuth = 0.0;
+    Surface(ThisSurf).Tilt = 0.0;
+    Surface(ThisSurf).Sides = 9;
+    Surface(ThisSurf).GrossArea = 30.0;
+
+    Surface(ThisSurf).Vertex(1).x = 10.0;
+    Surface(ThisSurf).Vertex(1).y = 2.0;
+    Surface(ThisSurf).Vertex(1).z = 0.0;
+
+    Surface(ThisSurf).Vertex(2).x = 10.0;
+    Surface(ThisSurf).Vertex(2).y = 3.0;
+    Surface(ThisSurf).Vertex(2).z = 0.0;
+
+    Surface(ThisSurf).Vertex(3).x = 10.0;
+    Surface(ThisSurf).Vertex(3).y = 4.0;
+    Surface(ThisSurf).Vertex(3).z = 0.0;
+
+    Surface(ThisSurf).Vertex(4).x = 10.0;
+    Surface(ThisSurf).Vertex(4).y = 5.0;
+    Surface(ThisSurf).Vertex(4).z = 0.0;
+
+    Surface(ThisSurf).Vertex(5).x = 10.0;
+    Surface(ThisSurf).Vertex(5).y = 6.0;
+    Surface(ThisSurf).Vertex(5).z = 0.0;
+
+    Surface(ThisSurf).Vertex(6).x = 10.0;
+    Surface(ThisSurf).Vertex(6).y = 7.0;
+    Surface(ThisSurf).Vertex(6).z = 0.0;
+
+    Surface(ThisSurf).Vertex(7).x = 10.0;
+    Surface(ThisSurf).Vertex(7).y = 8.0;
+    Surface(ThisSurf).Vertex(7).z = 0.0;
+
+    Surface(ThisSurf).Vertex(8).x = 15.0;
+    Surface(ThisSurf).Vertex(8).y = 8.0;
+    Surface(ThisSurf).Vertex(8).z = 0.0;
+
+    Surface(ThisSurf).Vertex(9).x = 15.0;
+    Surface(ThisSurf).Vertex(9).y = 2.0;
+    Surface(ThisSurf).Vertex(9).z = 0.0;
+
+    SurfaceTmp(ThisSurf) = Surface(ThisSurf);
+    CheckConvexity(ThisSurf, SurfaceTmp(ThisSurf).Sides);
+    Surface(ThisSurf) = SurfaceTmp(ThisSurf);
+    EXPECT_EQ(4, Surface(ThisSurf).Sides);
+    EXPECT_EQ(10.0, Surface(ThisSurf).Vertex(2).x);
+    EXPECT_EQ(8.0, Surface(ThisSurf).Vertex(2).y);
+    EXPECT_EQ(15.0, Surface(ThisSurf).Vertex(3).x);
+    EXPECT_EQ(8.0, Surface(ThisSurf).Vertex(3).y);
 
 }
