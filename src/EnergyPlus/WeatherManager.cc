@@ -6308,6 +6308,7 @@ namespace WeatherManager {
             }
 
             RunPeriodInput(Loop).dayOfWeek = static_cast<int>(RunPeriodInput(Loop).startWeekDay);
+            RunPeriodInput(Loop).isLeapYear = isLeapYear(RunPeriodInput(Loop).startYear);
 
             // calculate the annual start and end days from the user inputted month and day
             RunPeriodInput(Loop).monWeekDay = 0;
