@@ -361,10 +361,6 @@ namespace OutAirNodeManager {
                 // Set additional node properties
                 if (NumNums > 0) Node(NodeNums(1)).Height = Numbers(1);
 
-                if (NumAlphas > 1) {
-                    AnyLocalEnvironmentsInModel = true;
-                }
-
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {
                     Node(NodeNums(1)).OutAirDryBulbSchedNum = GetScheduleIndex(Alphas(2));
                     if (Node(NodeNums(1)).OutAirDryBulbSchedNum == 0) {
