@@ -2606,13 +2606,12 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(10));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
                     // Verify Curve Object, expected type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        VRF(VRFNum).DefrostEIRPtr,   // Curve index
-                        {2},                     // Valid dimensions
-                        RoutineName,             // Routine name
-                        cCurrentModuleObject,    // Object Type
-                        VRF(VRFNum).Name,        // Object Name
-                        cAlphaFieldNames(10));   // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).DefrostEIRPtr, // Curve index
+                                                                {2},                       // Valid dimensions
+                                                                RoutineName,               // Routine name
+                                                                cCurrentModuleObject,      // Object Type
+                                                                VRF(VRFNum).Name,          // Object Name
+                                                                cAlphaFieldNames(10));     // Field Name
                 } else {
                     if (VRF(VRFNum).DefrostStrategy == ReverseCycle && VRF(VRFNum).DefrostControl == OnDemand) {
                         ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
@@ -3011,13 +3010,12 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFNum).DefrostEIRPtr = GetCurveIndex(cAlphaArgs(10));
                 if (VRF(VRFNum).DefrostEIRPtr > 0) {
                     // Verify Curve Object, expected type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        VRF(VRFNum).DefrostEIRPtr,  // Curve index
-                        {2},                        // Valid dimensions
-                        RoutineName,                // Routine name
-                        cCurrentModuleObject,       // Object Type
-                        VRF(VRFNum).Name,           // Object Name
-                        cAlphaFieldNames(10));      // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(VRF(VRFNum).DefrostEIRPtr, // Curve index
+                                                                {2},                       // Valid dimensions
+                                                                RoutineName,               // Routine name
+                                                                cCurrentModuleObject,      // Object Type
+                                                                VRF(VRFNum).Name,          // Object Name
+                                                                cAlphaFieldNames(10));     // Field Name
                 } else {
                     if (VRF(VRFNum).DefrostStrategy == ReverseCycle && VRF(VRFNum).DefrostControl == OnDemand) {
                         ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
@@ -7324,7 +7322,6 @@ namespace HVACVariableRefrigerantFlow {
         // Simulates the unit components sequentially in the air flow direction.
 
         // Using/Aliasing
-        using DataSizing::AutoSize;
         using DXCoils::SimDXCoil;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
@@ -10315,7 +10312,6 @@ namespace HVACVariableRefrigerantFlow {
         // na
 
         // Using/Aliasing
-        using DataSizing::AutoSize;
         using DXCoils::SimDXCoil;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
