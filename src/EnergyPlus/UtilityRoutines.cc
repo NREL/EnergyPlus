@@ -1007,9 +1007,10 @@ int FindUnitNumber(std::string const &FileName) // File name to be searched.
         std::string::size_type TestFileLength;
         std::string::size_type Pos; // Position pointer
         for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-            // Skip preassigned units - gio::inquire breaks std::cout on Windows - see GlobalStreams::
-            if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) || (UnitNumber == 102))
+            // Skip preassigned units - gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams constructor
+            if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) || (UnitNumber == 102)) {
                 continue;
+            }
             {
                 IOFlags flags;
                 gio::inquire(UnitNumber, flags);
