@@ -159,8 +159,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -1146,7 +1148,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    WIN-CONTROL-GLARE,       !- Shading Control Name
     TestFrameAndDivider,     !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1162,7 +1163,6 @@
     Zn001:Wall003,           !- Building Surface Name
     Zn003:Wall004:Door001,   !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1178,7 +1178,6 @@
     Zn003:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     TestFrameAndDivider,     !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1194,7 +1193,6 @@
     Zn003:Wall004,           !- Building Surface Name
     Zn001:Wall003:Door001,   !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1210,7 +1208,6 @@
     Zn001:Wall004,           !- Building Surface Name
     Zn002:Wall004:Door001,   !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1226,7 +1223,6 @@
     Zn002:Wall004,           !- Building Surface Name
     Zn001:Wall004:Door001,   !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1242,7 +1238,6 @@
     Zn002:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     TestFrameAndDivider,     !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1251,8 +1246,10 @@
     12.19200,5.5,0.5,  !- X,Y,Z ==> Vertex 3 {m}
     12.19200,5.5,2.5;  !- X,Y,Z ==> Vertex 4 {m}
 
-  WindowProperty:ShadingControl,
-    WIN-CONTROL-GLARE,       !- Name
+  WindowShadingControl,
+    WIN-CONTROL-GLARE-West Zone,  !- Name
+    West Zone,               !- Zone Name
+    1,                       !- Shading Control Sequence Number
     SwitchableGlazing,       !- Shading Type
     ELECTRO-CON-DARK,        !- Construction with Shading Name
     ONIFHIGHGLARE,           !- Shading Control Type
@@ -1262,7 +1259,11 @@
     YES,                     !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    West Zone_DaylCtrl,      !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn001:Wall001:Win001;    !- Fenestration Surface 1 Name
 
   WindowProperty:FrameAndDivider,
     TestFrameAndDivider,     !- Name

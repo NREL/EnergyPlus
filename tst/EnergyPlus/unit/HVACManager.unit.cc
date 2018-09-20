@@ -127,3 +127,47 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalFanSys::MCPV.deallocate();
     DataHeatBalFanSys::ZoneAirHumRatAvg.deallocate();
 }
+
+TEST_F(EnergyPlusFixture, InfiltrationReportTest)
+{
+
+    int NumOfZones = 2;
+
+    DataHeatBalance::Zone.allocate(NumOfZones);
+    DataHeatBalFanSys::MAT.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(NumOfZones);
+    DataHeatBalance::ZnAirRpt.allocate(NumOfZones);
+    DataHeatBalFanSys::MCPI.allocate(NumOfZones);
+    DataHeatBalFanSys::MCPV.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
+
+    DataGlobals::NumOfZones = NumOfZones;
+    DataHVACGlobals::TimeStepSys = 1.0;
+    DataHeatBalFanSys::MCPI(1) = 1.0;
+    DataHeatBalFanSys::MCPI(2) = 1.5;
+    DataHeatBalFanSys::MCPV(1) = 2.0;
+    DataHeatBalFanSys::MCPV(2) = 2.5;
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataEnvironment::OutHumRat = 0.0005;
+    DataHeatBalFanSys::MAT(1) = 22.0;
+    DataHeatBalFanSys::MAT(2) = 25.0;
+    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
+    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
+    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    DataEnvironment::StdRhoAir = 1.20;
+    DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
+    DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
+
+    // Call HVACManager
+    ReportAirHeatBalance();
+
+    EXPECT_NEAR(2.9971591, DataHeatBalance::ZnAirRpt(1).InfilVolumeCurDensity, 0.0001);
+    EXPECT_NEAR(5.9943183, DataHeatBalance::ZnAirRpt(1).VentilVolumeCurDensity, 0.0001);
+    EXPECT_NEAR(2.9827908, DataHeatBalance::ZnAirRpt(1).InfilVolumeStdDensity, 0.0001);
+    EXPECT_NEAR(5.9655817, DataHeatBalance::ZnAirRpt(1).VentilVolumeStdDensity, 0.0001);
+    EXPECT_NEAR(4.5421638, DataHeatBalance::ZnAirRpt(2).InfilVolumeCurDensity, 0.0001);
+    EXPECT_NEAR(7.5702731, DataHeatBalance::ZnAirRpt(2).VentilVolumeCurDensity, 0.0001);
+    EXPECT_NEAR(4.4741862, DataHeatBalance::ZnAirRpt(2).InfilVolumeStdDensity, 0.0001);
+    EXPECT_NEAR(7.4569771, DataHeatBalance::ZnAirRpt(2).VentilVolumeStdDensity, 0.0001);
+
+}

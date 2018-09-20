@@ -2017,7 +2017,7 @@ namespace SizingManager {
                                 // store timing description of Last occurance of max
                                 int Month(0);
                                 int DayOfMonth(0);
-                                General::InvJulianDay(DayLoop, Month, DayOfMonth, 1);
+                                General::InvOrdinalDay(DayLoop, Month, DayOfMonth, 1);
                                 std::string MonthDayString;
                                 static gio::Fmt MnDyFmt("(I2.2,'/',I2.2)");
                                 gio::write(MonthDayString, MnDyFmt) << Month << DayOfMonth;
@@ -4879,7 +4879,7 @@ namespace SizingManager {
                 Real64 curHeatLoad = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatLoadSeq(TimeStepInDay);
                 if (curHeatLoad > 0.0) {
                     sumHeatLoad += curHeatLoad;
-                    wghtdHeatZoneTemp += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curCoolLoad;
+                    wghtdHeatZoneTemp += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curHeatLoad;
                     wghtdHeatHumRat += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepInDay) * curHeatLoad;
                 }
             }

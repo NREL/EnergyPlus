@@ -243,7 +243,6 @@ namespace MicroturbineElectricGenerator {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::GetCurveType;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using General::RoundSigDigits;
         using General::TrimSigDigits;
@@ -392,31 +391,29 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal type is BiQuadratic
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,   // Curve index
+                    {2},                            // Valid dimensions
+                    "GetMTGeneratorInput: ",         // Routine name
+                    cCurrentModuleObject,           // Object Type
+                    MTGenerator(GeneratorNum).Name,        // Object Name
+                    cAlphaFieldNames(2));           // Field Name
+
+                if (!ErrorsFound)
                 {
-                    auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum));
-
-                    if (SELECT_CASE_var == "BIQUADRATIC") {
-                        // Check electrical power output at reference combustion inlet temp and elevation
-                        ElectOutFTempElevOutput = CurveValue(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,
-                                                             MTGenerator(GeneratorNum).RefCombustAirInletTemp,
-                                                             MTGenerator(GeneratorNum).RefElevation);
-                        if (std::abs(ElectOutFTempElevOutput - 1.0) > 0.1) {
-                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(cAlphaFieldNames(2) + " = " + AlphArray(2));
-                            ShowContinueError("...Curve output at reference conditions should equal 1 (+-10%).");
-                            ShowContinueError("...Reference combustion air inlet temperature = " +
-                                              TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
-                            ShowContinueError(
-                                "...Reference elevation                        = " + TrimSigDigits(MTGenerator(GeneratorNum).RefElevation, 4) + " m");
-                            ShowContinueError("...Curve output                               = " + TrimSigDigits(ElectOutFTempElevOutput, 4));
-                        }
-
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError("... illegal " + cAlphaFieldNames(2) +
-                                          " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum));
-                        ShowContinueError("... Curve type must be BIQUADRATIC."); // TODO rename point (curves)
-                        ErrorsFound = true;
+                    // Check electrical power output at reference combustion inlet temp and elevation
+                    ElectOutFTempElevOutput = CurveValue(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,
+                                                         MTGenerator(GeneratorNum).RefCombustAirInletTemp,
+                                                         MTGenerator(GeneratorNum).RefElevation);
+                    if (std::abs(ElectOutFTempElevOutput - 1.0) > 0.1) {
+                        ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                        ShowContinueError(cAlphaFieldNames(2) + " = " + AlphArray(2));
+                        ShowContinueError("...Curve output at reference conditions should equal 1 (+-10%).");
+                        ShowContinueError("...Reference combustion air inlet temperature = " +
+                                          TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
+                        ShowContinueError(
+                            "...Reference elevation                        = " + TrimSigDigits(MTGenerator(GeneratorNum).RefElevation, 4) + " m");
+                        ShowContinueError("...Curve output                               = " + TrimSigDigits(ElectOutFTempElevOutput, 4));
                     }
                 }
             }
@@ -428,28 +425,26 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal types are Quadratic and Cubic
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    MTGenerator(GeneratorNum).ElecEffFTempCurveNum,   // Curve index
+                    {1},                            // Valid dimensions
+                    "GetMTGeneratorInput: ",         // Routine name
+                    cCurrentModuleObject,           // Object Type
+                    MTGenerator(GeneratorNum).Name,        // Object Name
+                    cAlphaFieldNames(3));           // Field Name
+
+                if (!ErrorsFound)
                 {
-                    auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).ElecEffFTempCurveNum));
-
-                    if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                        // Check electrical efficiency at reference combustion inlet temp
-                        ElecEfficFTempOutput =
-                            CurveValue(MTGenerator(GeneratorNum).ElecEffFTempCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp);
-                        if (std::abs(ElecEfficFTempOutput - 1.0) > 0.1) {
-                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(cAlphaFieldNames(3) + " = " + AlphArray(3));
-                            ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
-                            ShowContinueError("... Reference combustion air inlet temperature = " +
-                                              TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
-                            ShowContinueError("... Curve output                               = " + TrimSigDigits(ElecEfficFTempOutput, 4));
-                        }
-
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError("...illegal " + cAlphaFieldNames(3) +
-                                          " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).ElecEffFTempCurveNum));
-                        ShowContinueError("Curve type must be QUADRATIC or CUBIC."); // TODO rename point (curves)
-                        ErrorsFound = true;
+                    // Check electrical efficiency at reference combustion inlet temp
+                    ElecEfficFTempOutput =
+                        CurveValue(MTGenerator(GeneratorNum).ElecEffFTempCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp);
+                    if (std::abs(ElecEfficFTempOutput - 1.0) > 0.1) {
+                        ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                        ShowContinueError(cAlphaFieldNames(3) + " = " + AlphArray(3));
+                        ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
+                        ShowContinueError("... Reference combustion air inlet temperature = " +
+                                          TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
+                        ShowContinueError("... Curve output                               = " + TrimSigDigits(ElecEfficFTempOutput, 4));
                     }
                 }
             }
@@ -461,30 +456,28 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal types are Quadratic and Cubic
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    MTGenerator(GeneratorNum).ElecEffFPLRCurveNum,   // Curve index
+                    {1},                            // Valid dimensions
+                    "GetMTGeneratorInput: ",         // Routine name
+                    cCurrentModuleObject,           // Object Type
+                    MTGenerator(GeneratorNum).Name,        // Object Name
+                    cAlphaFieldNames(4));           // Field Name
+
+                if (!ErrorsFound)
                 {
-                    auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum));
-
-                    if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                        // Check electrical efficiency at PLR = 1
-                        ElecEfficFPLROutput = CurveValue(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, 1.0);
-                        if (std::abs(ElecEfficFPLROutput - 1.0) > 0.1) {
-                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError(cAlphaFieldNames(4) + " = " + AlphArray(4));
-                            ShowContinueError("... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
-                            ShowContinueError("... Curve output = " + TrimSigDigits(ElecEfficFPLROutput, 4));
-                        }
-
-                        GetCurveMinMaxValues(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, Var1Min, Var1Max);
-                        MTGenerator(GeneratorNum).MinPartLoadRat = Var1Min;
-                        MTGenerator(GeneratorNum).MaxPartLoadRat = Var1Max;
-
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError("...illegal " + cAlphaFieldNames(4) +
-                                          " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum));
-                        ShowContinueError("Curve type must be QUADRATIC or CUBIC."); // TODO rename point (curves)
-                        ErrorsFound = true;
+                    // Check electrical efficiency at PLR = 1
+                    ElecEfficFPLROutput = CurveValue(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, 1.0);
+                    if (std::abs(ElecEfficFPLROutput - 1.0) > 0.1) {
+                        ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                        ShowContinueError(cAlphaFieldNames(4) + " = " + AlphArray(4));
+                        ShowContinueError("... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
+                        ShowContinueError("... Curve output = " + TrimSigDigits(ElecEfficFPLROutput, 4));
                     }
+
+                    GetCurveMinMaxValues(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, Var1Min, Var1Max);
+                    MTGenerator(GeneratorNum).MinPartLoadRat = Var1Min;
+                    MTGenerator(GeneratorNum).MaxPartLoadRat = Var1Max;
                 }
             }
 
@@ -577,37 +570,30 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else if (MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum > 0) {
                 // Verify curve object, only legal type is Quadratic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum));
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum,   // Curve index
+                    {1},                            // Valid dimensions
+                    "GetMTGeneratorInput: ",         // Routine name
+                    cCurrentModuleObject,           // Object Type
+                    MTGenerator(GeneratorNum).Name,        // Object Name
+                    cAlphaFieldNames(6));           // Field Name
 
-                    if (SELECT_CASE_var == "QUADRATIC") {
-
-                        if (MTGenerator(GeneratorNum).FuelLowerHeatingValue > 0.0 && MTGenerator(GeneratorNum).RefElecEfficiencyLHV > 0.0) {
-
-                            RefFuelUseMdot = (MTGenerator(GeneratorNum).RefElecPowerOutput / MTGenerator(GeneratorNum).RefElecEfficiencyLHV) /
-                                             (MTGenerator(GeneratorNum).FuelLowerHeatingValue * 1000.0);
-                            AncillaryPowerOutput = CurveValue(MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, RefFuelUseMdot);
-                            if (std::abs(AncillaryPowerOutput - 1.0) > 0.1) {
-                                ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError(cAlphaFieldNames(6) + " = " + AlphArray(6));
-                                ShowContinueError("... Curve output at reference conditions should equal 1 (+-10%).");
-                                ShowContinueError("... Reference Electrical Power Output           = " +
-                                                  TrimSigDigits(MTGenerator(GeneratorNum).RefElecPowerOutput, 2) + " W");
-                                ShowContinueError("... Reference Electrical Efficiency (LHV basis) = " +
-                                                  TrimSigDigits(MTGenerator(GeneratorNum).RefElecEfficiencyLHV, 4));
-                                ShowContinueError("... Fuel Lower Heating Value                    = " +
-                                                  TrimSigDigits(MTGenerator(GeneratorNum).FuelLowerHeatingValue, 2) + " kJ/kg");
-                                ShowContinueError("... Calculated fuel flow                        = " + TrimSigDigits(RefFuelUseMdot, 4) + " kg/s");
-                                ShowContinueError("... Curve output                                = " + TrimSigDigits(AncillaryPowerOutput, 4));
-                            }
-                        }
-
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError("... illegal " + cAlphaFieldNames(6) +
-                                          " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum));
-                        ShowContinueError("... Curve type must be QUADRATIC.");
-                        ErrorsFound = true;
+                if (!ErrorsFound) {
+                    RefFuelUseMdot = (MTGenerator(GeneratorNum).RefElecPowerOutput / MTGenerator(GeneratorNum).RefElecEfficiencyLHV) /
+                                     (MTGenerator(GeneratorNum).FuelLowerHeatingValue * 1000.0);
+                    AncillaryPowerOutput = CurveValue(MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, RefFuelUseMdot);
+                    if (std::abs(AncillaryPowerOutput - 1.0) > 0.1) {
+                        ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                        ShowContinueError(cAlphaFieldNames(6) + " = " + AlphArray(6));
+                        ShowContinueError("... Curve output at reference conditions should equal 1 (+-10%).");
+                        ShowContinueError("... Reference Electrical Power Output           = " +
+                                          TrimSigDigits(MTGenerator(GeneratorNum).RefElecPowerOutput, 2) + " W");
+                        ShowContinueError("... Reference Electrical Efficiency (LHV basis) = " +
+                                          TrimSigDigits(MTGenerator(GeneratorNum).RefElecEfficiencyLHV, 4));
+                        ShowContinueError("... Fuel Lower Heating Value                    = " +
+                                          TrimSigDigits(MTGenerator(GeneratorNum).FuelLowerHeatingValue, 2) + " kJ/kg");
+                        ShowContinueError("... Calculated fuel flow                        = " + TrimSigDigits(RefFuelUseMdot, 4) + " kg/s");
+                        ShowContinueError("... Curve output                                = " + TrimSigDigits(AncillaryPowerOutput, 4));
                     }
                 }
             }
@@ -698,28 +684,22 @@ namespace MicroturbineElectricGenerator {
                     MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum = GetCurveIndex(AlphArray(10));
                     if (MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum != 0) {
                         // Verify curve object, only legal type is BiQuadratic
-                        {
-                            auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum));
-
-                            if (SELECT_CASE_var == "BIQUADRATIC") {
-                                //          NEED TO FIGURE OUT WHAT TO USE FOR Pnet............Shirey
-                                //    HeatRecFlowFTempPowCurveOutput = CurveValue(MTGenerator(GeneratorNum)%HeatRecFlowFTempPowCurveNum, Pnet)
-                                //    IF(ABS(HeatRecFlowFTempPowCurveOutput-1.0d0) .GT. 0.1d0)THEN !
-                                //      CALL ShowWarningError('GENERATOR:MICROTURBINE "'//TRIM(MTGenerator(GeneratorNum)%Name)//'"')
-                                //      CALL ShowContinueError('Heat Recovery Water Flow Rate Modifier Curve (function of temp and power) =
-                                //      '//TRIM(AlphArray(10))) CALL ShowContinueError('... Curve ouput at a reference conditions should equal 1
-                                //      (+-10%).') CALL ShowContinueError('... Curve output =
-                                //      '//TRIM(TrimSigDigits(HeatRecFlowFTempPowCurveOutput,4)))
-                                //    END IF
-
-                            } else {
-                                ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError("... illegal " + cAlphaFieldNames(10) +
-                                                  " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum));
-                                ShowContinueError("Curve type must be BIQUADRATIC.");
-                                ErrorsFound = true;
-                            }
-                        }
+                        ErrorsFound |= CurveManager::CheckCurveDims(
+                            MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum,   // Curve index
+                            {2},                            // Valid dimensions
+                            "GetMTGeneratorInput: ",         // Routine name
+                            cCurrentModuleObject,           // Object Type
+                            MTGenerator(GeneratorNum).Name,        // Object Name
+                            cAlphaFieldNames(10));           // Field Name
+                        //          NEED TO FIGURE OUT WHAT TO USE FOR Pnet............Shirey
+                        //    HeatRecFlowFTempPowCurveOutput = CurveValue(MTGenerator(GeneratorNum)%HeatRecFlowFTempPowCurveNum, Pnet)
+                        //    IF(ABS(HeatRecFlowFTempPowCurveOutput-1.0d0) .GT. 0.1d0)THEN !
+                        //      CALL ShowWarningError('GENERATOR:MICROTURBINE "'//TRIM(MTGenerator(GeneratorNum)%Name)//'"')
+                        //      CALL ShowContinueError('Heat Recovery Water Flow Rate Modifier Curve (function of temp and power) =
+                        //      '//TRIM(AlphArray(10))) CALL ShowContinueError('... Curve ouput at a reference conditions should equal 1
+                        //      (+-10%).') CALL ShowContinueError('... Curve output =
+                        //      '//TRIM(TrimSigDigits(HeatRecFlowFTempPowCurveOutput,4)))
+                        //    END IF
                     }
 
                 } // End of IF (MTGenerator(GeneratorNum)%InternalFlowControl) THEN
@@ -727,33 +707,29 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum = GetCurveIndex(AlphArray(11)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum != 0) {
                     // Verify curve object, only legal types are BiQuadratic and BiCubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum));
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,   // Curve index
+                        {2},                            // Valid dimensions
+                        "GetMTGeneratorInput: ",         // Routine name
+                        cCurrentModuleObject,           // Object Type
+                        MTGenerator(GeneratorNum).Name,        // Object Name
+                        cAlphaFieldNames(11));           // Field Name
 
-                        if ((SELECT_CASE_var == "BIQUADRATIC") || (SELECT_CASE_var == "BICUBIC")) {
+                    if (!ErrorsFound) {
+                        ThermalEffTempElevOutput = CurveValue(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,
+                                                              MTGenerator(GeneratorNum).RefCombustAirInletTemp,
+                                                              MTGenerator(GeneratorNum).RefElevation);
 
-                            ThermalEffTempElevOutput = CurveValue(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,
-                                                                  MTGenerator(GeneratorNum).RefCombustAirInletTemp,
-                                                                  MTGenerator(GeneratorNum).RefElevation);
-
-                            if (std::abs(ThermalEffTempElevOutput - 1.0) > 0.1) {
-                                ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError(cAlphaFieldNames(11) + " = " + AlphArray(11));
-                                ShowContinueError("... Curve output at reference conditions should equal 1 (+-10%).");
-                                ShowContinueError("... Reference combustion air inlet temperature      = " +
-                                                  TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
-                                ShowContinueError("... Reference elevation                             = " +
-                                                  TrimSigDigits(MTGenerator(GeneratorNum).RefElevation, 4) + " m");
-                                ShowContinueError("... Curve output                                    = " +
-                                                  TrimSigDigits(ThermalEffTempElevOutput, 4));
-                            }
-
-                        } else {
-                            ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError("... illegal " + cAlphaFieldNames(11) +
-                                              " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum));
-                            ShowContinueError("Curve type must be BIQUADRATIC or BICUBIC.");
-                            ErrorsFound = true;
+                        if (std::abs(ThermalEffTempElevOutput - 1.0) > 0.1) {
+                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(cAlphaFieldNames(11) + " = " + AlphArray(11));
+                            ShowContinueError("... Curve output at reference conditions should equal 1 (+-10%).");
+                            ShowContinueError("... Reference combustion air inlet temperature      = " +
+                                              TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
+                            ShowContinueError("... Reference elevation                             = " +
+                                              TrimSigDigits(MTGenerator(GeneratorNum).RefElevation, 4) + " m");
+                            ShowContinueError("... Curve output                                    = " +
+                                              TrimSigDigits(ThermalEffTempElevOutput, 4));
                         }
                     }
                 }
@@ -761,26 +737,22 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum = GetCurveIndex(AlphArray(12)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic or Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum));
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        "GetMTGeneratorInput: ",         // Routine name
+                        cCurrentModuleObject,           // Object Type
+                        MTGenerator(GeneratorNum).Name,        // Object Name
+                        cAlphaFieldNames(12));           // Field Name
 
-                        if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
+                    if (!ErrorsFound) {
+                        HeatRecRateFPLROutput = CurveValue(MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, 1.0);
 
-                            HeatRecRateFPLROutput = CurveValue(MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, 1.0);
-
-                            if (std::abs(HeatRecRateFPLROutput - 1.0) > 0.1) {
-                                ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError(cAlphaFieldNames(12) + " = " + AlphArray(12));
-                                ShowContinueError("... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
-                                ShowContinueError("... Curve output = " + TrimSigDigits(HeatRecRateFPLROutput, 4));
-                            }
-
-                        } else {
-                            ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError("... illegal " + cAlphaFieldNames(12) +
-                                              " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum));
-                            ShowContinueError("... Curve type must be QUADRATIC or CUBIC.");
-                            ErrorsFound = true;
+                        if (std::abs(HeatRecRateFPLROutput - 1.0) > 0.1) {
+                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(cAlphaFieldNames(12) + " = " + AlphArray(12));
+                            ShowContinueError("... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
+                            ShowContinueError("... Curve output = " + TrimSigDigits(HeatRecRateFPLROutput, 4));
                         }
                     }
                 }
@@ -788,29 +760,25 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum = GetCurveIndex(AlphArray(13)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum != 0) {
                     // Verify curve object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum));
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        "GetMTGeneratorInput: ",         // Routine name
+                        cCurrentModuleObject,           // Object Type
+                        MTGenerator(GeneratorNum).Name,        // Object Name
+                        cAlphaFieldNames(13));           // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
+                    if (!ErrorsFound) {
+                        HeatRecRateFTempOutput =
+                            CurveValue(MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum, MTGenerator(GeneratorNum).RefInletWaterTemp);
 
-                            HeatRecRateFTempOutput =
-                                CurveValue(MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum, MTGenerator(GeneratorNum).RefInletWaterTemp);
-
-                            if (std::abs(HeatRecRateFTempOutput - 1.0) > 0.1) {
-                                ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError(cAlphaFieldNames(13) + " = " + AlphArray(13));
-                                ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
-                                ShowContinueError("... Reference inlet water temperature temperature      = " +
-                                                  TrimSigDigits(MTGenerator(GeneratorNum).RefInletWaterTemp, 4) + " C");
-                                ShowContinueError("... Curve output = " + TrimSigDigits(HeatRecRateFTempOutput, 4));
-                            }
-
-                        } else {
-                            ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError("... illegal " + cAlphaFieldNames(13) +
-                                              " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum));
-                            ShowContinueError("... Curve type must be QUADRATIC.");
-                            ErrorsFound = true;
+                        if (std::abs(HeatRecRateFTempOutput - 1.0) > 0.1) {
+                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(cAlphaFieldNames(13) + " = " + AlphArray(13));
+                            ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
+                            ShowContinueError("... Reference inlet water temperature temperature      = " +
+                                              TrimSigDigits(MTGenerator(GeneratorNum).RefInletWaterTemp, 4) + " C");
+                            ShowContinueError("... Curve output = " + TrimSigDigits(HeatRecRateFTempOutput, 4));
                         }
                     }
                 }
@@ -818,29 +786,25 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum = GetCurveIndex(AlphArray(14));
                 if (MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum != 0) {
                     // Verify curve object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum));
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        "GetMTGeneratorInput: ",         // Routine name
+                        cCurrentModuleObject,           // Object Type
+                        MTGenerator(GeneratorNum).Name,        // Object Name
+                        cAlphaFieldNames(14));           // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
+                    if (!ErrorsFound) {
+                        HeatRecRateFFlowOutput =
+                            CurveValue(MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum, MTGenerator(GeneratorNum).RefHeatRecVolFlowRate);
 
-                            HeatRecRateFFlowOutput =
-                                CurveValue(MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum, MTGenerator(GeneratorNum).RefHeatRecVolFlowRate);
-
-                            if (std::abs(HeatRecRateFFlowOutput - 1.0) > 0.1) {
-                                ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError(cAlphaFieldNames(14) + " = " + AlphArray(14));
-                                ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
-                                ShowContinueError("... Reference Heat Recovery Water Flow Rate      = " +
-                                                  TrimSigDigits(MTGenerator(GeneratorNum).RefHeatRecVolFlowRate, 4) + " m3/s");
-                                ShowContinueError("... Curve output = " + TrimSigDigits(HeatRecRateFFlowOutput, 4));
-                            }
-
-                        } else {
-                            ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError("... illegal " + cAlphaFieldNames(14) +
-                                              " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum));
-                            ShowContinueError("... Curve type must be QUADRATIC.");
-                            ErrorsFound = true;
+                        if (std::abs(HeatRecRateFFlowOutput - 1.0) > 0.1) {
+                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(cAlphaFieldNames(14) + " = " + AlphArray(14));
+                            ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
+                            ShowContinueError("... Reference Heat Recovery Water Flow Rate      = " +
+                                              TrimSigDigits(MTGenerator(GeneratorNum).RefHeatRecVolFlowRate, 4) + " m3/s");
+                            ShowContinueError("... Curve output = " + TrimSigDigits(HeatRecRateFFlowOutput, 4));
                         }
                     }
                 }
@@ -930,29 +894,25 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhFlowFTempCurveNum = GetCurveIndex(AlphArray(17));
                 if (MTGenerator(GeneratorNum).ExhFlowFTempCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic and Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).ExhFlowFTempCurveNum));
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        MTGenerator(GeneratorNum).ExhFlowFTempCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        "GetMTGeneratorInput: ",         // Routine name
+                        cCurrentModuleObject,           // Object Type
+                        MTGenerator(GeneratorNum).Name,        // Object Name
+                        cAlphaFieldNames(17));           // Field Name
 
-                        if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
+                    if (!ErrorsFound) {
+                        ExhFlowFTempOutput =
+                            CurveValue(MTGenerator(GeneratorNum).ExhFlowFTempCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp);
 
-                            ExhFlowFTempOutput =
-                                CurveValue(MTGenerator(GeneratorNum).ExhFlowFTempCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp);
-
-                            if (std::abs(ExhFlowFTempOutput - 1.0) > 0.1) {
-                                ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError(cAlphaFieldNames(17) + " = " + AlphArray(17));
-                                ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
-                                ShowContinueError("... Reference combustion air inlet temperature      = " +
-                                                  TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
-                                ShowContinueError("... Curve output = " + TrimSigDigits(ExhFlowFTempOutput, 4));
-                            }
-
-                        } else {
-                            ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError("... illegal " + cAlphaFieldNames(17) +
-                                              " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).ExhFlowFTempCurveNum));
-                            ShowContinueError("... Curve type must be QUADRATIC or CUBIC.");
-                            ErrorsFound = true;
+                        if (std::abs(ExhFlowFTempOutput - 1.0) > 0.1) {
+                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(cAlphaFieldNames(17) + " = " + AlphArray(17));
+                            ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
+                            ShowContinueError("... Reference combustion air inlet temperature      = " +
+                                              TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
+                            ShowContinueError("... Curve output = " + TrimSigDigits(ExhFlowFTempOutput, 4));
                         }
                     }
                 }
@@ -960,26 +920,22 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum = GetCurveIndex(AlphArray(18)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum != 0) {
                     // Verify curve object, legal types are Quadratic or Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum));
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        "GetMTGeneratorInput: ",         // Routine name
+                        cCurrentModuleObject,           // Object Type
+                        MTGenerator(GeneratorNum).Name,        // Object Name
+                        cAlphaFieldNames(18));           // Field Name
 
-                        if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
+                    if (!ErrorsFound) {
+                        ExhFlowFPLROutput = CurveValue(MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, 1.0);
 
-                            ExhFlowFPLROutput = CurveValue(MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, 1.0);
-
-                            if (std::abs(ExhFlowFPLROutput - 1.0) > 0.1) {
-                                ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError(cAlphaFieldNames(18) + " = " + AlphArray(18));
-                                ShowContinueError("... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
-                                ShowContinueError("... Curve output = " + TrimSigDigits(ExhFlowFPLROutput, 4));
-                            }
-
-                        } else {
-                            ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError("... illegal " + cAlphaFieldNames(18) +
-                                              " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum));
-                            ShowContinueError("... Curve type must be QUADRATIC or CUBIC.");
-                            ErrorsFound = true;
+                        if (std::abs(ExhFlowFPLROutput - 1.0) > 0.1) {
+                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(cAlphaFieldNames(18) + " = " + AlphArray(18));
+                            ShowContinueError("... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
+                            ShowContinueError("... Curve output = " + TrimSigDigits(ExhFlowFPLROutput, 4));
                         }
                     }
                 }
@@ -989,29 +945,25 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum = GetCurveIndex(AlphArray(19));
                 if (MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic and Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum));
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        "GetMTGeneratorInput: ",         // Routine name
+                        cCurrentModuleObject,           // Object Type
+                        MTGenerator(GeneratorNum).Name,        // Object Name
+                        cAlphaFieldNames(19));           // Field Name
 
-                        if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
+                    if (!ErrorsFound) {
+                        ExhAirTempFTempOutput =
+                            CurveValue(MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp);
 
-                            ExhAirTempFTempOutput =
-                                CurveValue(MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp);
-
-                            if (std::abs(ExhAirTempFTempOutput - 1.0) > 0.1) {
-                                ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError(cAlphaFieldNames(19) + " = " + AlphArray(19));
-                                ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
-                                ShowContinueError("... Reference combustion air inlet temperature      = " +
-                                                  TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
-                                ShowContinueError("... Curve output = " + TrimSigDigits(ExhAirTempFTempOutput, 4));
-                            }
-
-                        } else {
-                            ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError("... illegal " + cAlphaFieldNames(19) +
-                                              " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum));
-                            ShowContinueError("... Curve type must be QUADRATIC or CUBIC.");
-                            ErrorsFound = true;
+                        if (std::abs(ExhAirTempFTempOutput - 1.0) > 0.1) {
+                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(cAlphaFieldNames(19) + " = " + AlphArray(19));
+                            ShowContinueError("... Curve output at reference condition should equal 1 (+-10%).");
+                            ShowContinueError("... Reference combustion air inlet temperature      = " +
+                                              TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
+                            ShowContinueError("... Curve output = " + TrimSigDigits(ExhAirTempFTempOutput, 4));
                         }
                     }
                 }
@@ -1019,26 +971,22 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum = GetCurveIndex(AlphArray(20)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum != 0) {
                     // Verify curve object, legal types are Quadratic or Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum));
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        "GetMTGeneratorInput: ",         // Routine name
+                        cCurrentModuleObject,           // Object Type
+                        MTGenerator(GeneratorNum).Name,        // Object Name
+                        cAlphaFieldNames(20));           // Field Name
 
-                        if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
+                    if (!ErrorsFound) {
+                        ExhOutAirTempFPLROutput = CurveValue(MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, 1.0);
 
-                            ExhOutAirTempFPLROutput = CurveValue(MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, 1.0);
-
-                            if (std::abs(ExhOutAirTempFPLROutput - 1.0) > 0.1) {
-                                ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                                ShowContinueError(cAlphaFieldNames(20) + " = " + AlphArray(20));
-                                ShowContinueError("... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
-                                ShowContinueError("... Curve output = " + TrimSigDigits(ExhOutAirTempFPLROutput, 4));
-                            }
-
-                        } else {
-                            ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                            ShowContinueError("... illegal " + cAlphaFieldNames(20) +
-                                              " type for this object = " + GetCurveType(MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum));
-                            ShowContinueError("... Curve type must be QUADRATIC or CUBIC.");
-                            ErrorsFound = true;
+                        if (std::abs(ExhOutAirTempFPLROutput - 1.0) > 0.1) {
+                            ShowWarningError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                            ShowContinueError(cAlphaFieldNames(20) + " = " + AlphArray(20));
+                            ShowContinueError("... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
+                            ShowContinueError("... Curve output = " + TrimSigDigits(ExhOutAirTempFPLROutput, 4));
                         }
                     }
                 }

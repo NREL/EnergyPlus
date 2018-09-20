@@ -157,7 +157,7 @@ namespace HVACUnitarySystem {
 
     // Types
 
-    struct DesignSpecMSHPData
+    struct DesignSpecMSHPLegacyData
     {
         // Members
         std::string Name;                    // Name of the design specification MSHP
@@ -169,7 +169,7 @@ namespace HVACUnitarySystem {
         Real64 NoLoadAirFlowRateRatio;       // fraction of supply air flow rate multiplier
 
         // Default Constructor
-        DesignSpecMSHPData() : NumOfSpeedCooling(0), NumOfSpeedHeating(0), SingleModeFlag(false), NoLoadAirFlowRateRatio(1.0)
+        DesignSpecMSHPLegacyData() : NumOfSpeedCooling(0), NumOfSpeedHeating(0), SingleModeFlag(false), NoLoadAirFlowRateRatio(1.0)
         {
         }
     };
@@ -186,7 +186,6 @@ namespace HVACUnitarySystem {
         int ZoneSequenceCoolingNum;       // Index to cooling sequence/priority for this zone
         int ZoneSequenceHeatingNum;       // Index to heating sequence/priority for this zone
         int ZoneInletNode;                // Zone inlet node number in the controlled zone
-        Real64 ControlZoneMassFlowFrac;   // Fraction of flow to control zone
         bool Humidistat;                  // Set to True if dehumidification control mode is set to
         int CondenserNodeNum;             // index to condenser air inlet node
         int DehumidControlType_Num;       // Set to Dehumid Control None, CoolReheat or MultiMode
@@ -228,8 +227,6 @@ namespace HVACUnitarySystem {
         Real64 DesignHeatingCapacity;    // heating coil capacity (W)
         Real64 HeatingSizingRatio;       // ratio of heating coil to cooling coil size
         bool DXHeatingCoil;              // specifies if heating coil is DX
-        int HeatCoilInletNodeNum;        // Heating coil air inlet node number
-        int HeatCoilOutletNodeNum;       // Heating coil air outlet node number
         int HeatingCoilPLFCurveIndex;    // PLF curve index (not used yet?)
         int HeatingCoilAvailSchPtr;      // heating coil availability schedule index
         bool HeatCoilExists;             // True if a heating coil is specified in the unitary system
@@ -327,7 +324,7 @@ namespace HVACUnitarySystem {
         Array1D<Real64> MSHeatingSpeedRatio; // Fan speed ratio in heating mode
         Array1D<Real64> MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
         Real64 NoHeatCoolSpeedRatio;         // Fan speed ratio when no cooling or heating
-        int DesignSpecMSHPIndex;             // Index to design specification multispeed heat pump object
+        int DesignSpecMSHPLegacyIndex;             // Index to design specification multispeed heat pump object
         bool MultiSpeedCoolingCoil;          // TRUE when cooling coil multispeed
         bool MultiSpeedHeatingCoil;          // TRUE when heating coil multispeed
         bool VarSpeedCoolingCoil;            // TRUE when cooling coil variable speed
@@ -415,7 +412,7 @@ namespace HVACUnitarySystem {
         int MSpdCycLatPLRIter;            // used in MultiSpeed calculations
         int MSpdCycLatPLRIterIndex;       // used in MultiSpeed calculations
         int LatMaxIterIndex;              // used in PLR calculations for moisture load
-        int LatRegulaFalsIFailedIndex;    // used in PLR calculations for moisture load
+        int LatRegulaFalsiFailedIndex;    // used in PLR calculations for moisture load
         // EMS variables
         bool DesignFanVolFlowRateEMSOverrideOn;         // If true, then EMS is calling to override autosize fan flow
         bool MaxHeatAirVolFlowEMSOverrideOn;            // If true, then EMS is calling to override autosize fan flow
@@ -440,13 +437,10 @@ namespace HVACUnitarySystem {
         Array1D<int> iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
 
         // connect ZoneHVAC to DOAS
-        bool ATMixerExists;      // True if there is an ATMixer
         std::string ATMixerName; // name of air terminal mixer
         int ATMixerIndex;        // index to the air terminal mixer
-        int ATMixerType;         // 1 = inlet side mixer, 2 = supply side mixer
         int ATMixerPriNode;      // primary inlet air node number for the air terminal mixer
         int ATMixerSecNode;      // secondary air inlet node number for the air terminal mixer
-        int ATMixerOutNode;      // outlet air node number for the air terminal mixer
 
         // Fault model of coil SAT sensor
         bool FaultyCoilSATFlag;     // True if the coil has SAT sensor fault
@@ -458,7 +452,7 @@ namespace HVACUnitarySystem {
         std::string UnitType;            // type of unit
         int MaxIterIndex;                // used in PLR calculations for sensible load
         int NodeNumOfControlledZone;     // Node number of controlled zone
-        int RegulaFalsIFailedIndex;      // used in PLR calculations for sensible load
+        int RegulaFalsiFailedIndex;      // used in PLR calculations for sensible load
         Real64 FanPartLoadRatio;         // Unitary system fan part load ratio
         Real64 CoolCoilWaterFlowRatio;   // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
         Real64 HeatCoilWaterFlowRatio;   // holds ratio of max heat coil water flow rate, may be < 1 when FlowLock is true
@@ -488,18 +482,24 @@ namespace HVACUnitarySystem {
         int HeatCoilCompNum;             // Comp num of the heating coil in the plant loop
         int HeatCoilFluidInletNode;      // Heating coil fluid inlet node
         int HeatCoilFluidOutletNodeNum;  // Heating coil fluid outlet node number (from Plant Loop data)
+        int HeatCoilInletNodeNum;        // Heating coil air inlet node number
+        int HeatCoilOutletNodeNum;       // Heating coil air outlet node number
+        bool ATMixerExists;              // True if there is an ATMixer
+        int ATMixerType;                 // 1 = inlet side mixer, 2 = supply side mixer
+        int ATMixerOutNode;              // outlet air node number for the air terminal mixer
+        Real64 ControlZoneMassFlowFrac;  // Fraction of flow to control zone
 
         // Default Constructor
         UnitarySystemData()
             : UnitarySystemType_Num(0), HeatPump(false), SysAvailSchedPtr(0), CondenserType(0), AirLoopEquipment(true), ZoneSequenceCoolingNum(0),
-              ZoneSequenceHeatingNum(0), ZoneInletNode(0), ControlZoneMassFlowFrac(0.0), Humidistat(false), CondenserNodeNum(0),
+              ZoneSequenceHeatingNum(0), ZoneInletNode(0), Humidistat(false), CondenserNodeNum(0),
               DehumidControlType_Num(0), AirFlowControl(1), ControlType(0), validASHRAECoolCoil(false), validASHRAEHeatCoil(false),
               simASHRAEModel(false), CapacityControlType(0), RequestAutoSize(false), RunOnSensibleLoad(true), RunOnLatentLoad(false),
               RunOnLatentOnlyWithSensible(false), DehumidificationMode(0), FanOpMode(0), LastMode(0), AncillaryOnPower(0.0), AncillaryOffPower(0.0),
               CoolingCoilType_Num(0), CoolingCoilIndex(0), DesignCoolingCapacity(0.0), CoolingCoilAvailSchPtr(0), ActualDXCoilIndexForHXAssisted(0),
-              ISHundredPercentDOASDXCoil(false), CoolCoilExists(false), FrostControlStatus(0), CoolingCoilUpstream(true), CoolCompPartLoadRatio(0.0),
-              HeatingCoilType_Num(0), HeatingCoilIndex(0), DesignHeatingCapacity(0.0), HeatingSizingRatio(1.0), DXHeatingCoil(false),
-              HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), HeatingCoilPLFCurveIndex(0), HeatingCoilAvailSchPtr(0), HeatCoilExists(false),
+              ISHundredPercentDOASDXCoil(false), CoolCoilExists(false), FrostControlStatus(0), CoolingCoilUpstream(true),
+              CoolCompPartLoadRatio(0.0), HeatingCoilType_Num(0), HeatingCoilIndex(0), DesignHeatingCapacity(0.0), HeatingSizingRatio(1.0),
+              DXHeatingCoil(false), HeatingCoilPLFCurveIndex(0), HeatingCoilAvailSchPtr(0), HeatCoilExists(false),
               HeatCompPartLoadRatio(0.0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0), DesignSuppHeatingCapacity(0.0), SuppCoilFluidInletNode(0),
               SuppCoilFluidOutletNodeNum(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppCoilAvailSchPtr(0),
               MaxSuppCoilFluidFlow(AutoSize), MaxOATSuppHeat(21.0), SuppCoilExists(false), SuppCoilLoopNum(0), SuppCoilLoopSide(0),
@@ -514,15 +514,15 @@ namespace HVACUnitarySystem {
               DesiredOutletHumRat(1.0), CoolingPartLoadFrac(0.0), HeatingPartLoadFrac(0.0), SuppHeatPartLoadFrac(0.0), SupHeaterLoad(0.0),
               SenLoadLoss(0.0), LatLoadLoss(0.0), SensibleLoadMet(0.0), LatentLoadMet(0.0), InitHeatPump(true), WaterCyclingMode(0), HeatCoolMode(0),
               NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0), IdleVolumeAirRate(0), IdleMassFlowRate(0), CheckFanFlow(true),
-              NoHeatCoolSpeedRatio(1.0), DesignSpecMSHPIndex(0), MultiSpeedCoolingCoil(false), MultiSpeedHeatingCoil(false),
+              NoHeatCoolSpeedRatio(1.0), DesignSpecMSHPLegacyIndex(0), MultiSpeedCoolingCoil(false), MultiSpeedHeatingCoil(false),
               VarSpeedCoolingCoil(false), VarSpeedHeatingCoil(false), CoolingSpeedNum(0), HeatingSpeedNum(0), CoolingSpeedRatio(1.0),
               CoolingFanSpeedRatio(1.0), HeatingSpeedRatio(1.0), HeatingFanSpeedRatio(1.0), CoolingCycRatio(0.0), HeatingCycRatio(0.0),
               PartLoadFrac(0.0), CompPartLoadRatio(0.0), ElecPower(0.0), ElecPowerConsumption(0.0), TotCoolEnergyRate(0.0), SensCoolEnergyRate(0.0),
               LatCoolEnergyRate(0.0), TotHeatEnergyRate(0.0), SensHeatEnergyRate(0.0), LatHeatEnergyRate(0.0), TotalAuxElecPower(0.0),
-              HeatingAuxElecConsumption(0.0), CoolingAuxElecConsumption(0.0), HeatRecoveryRate(0.0), HeatRecoveryEnergy(0.0),
-              HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0), DehumidInducedHeatingDemandRate(0.0),
-              EMSSensibleZoneLoadValue(0.0), EMSMoistureZoneLoadValue(0.0), SpeedNum(0), SpeedRatio(0.0), CycRatio(0.0), TESOpMode(0),
-              HXAssistedSensPLRIter(0), HXAssistedSensPLRIterIndex(0), HXAssistedSensPLRFail(0), HXAssistedSensPLRFailIndex(0),
+              SensibleLoadPredicted(0.0), MoistureLoadPredicted(0.0), HeatingAuxElecConsumption(0.0), CoolingAuxElecConsumption(0.0), HeatRecoveryRate(0.0),
+              HeatRecoveryEnergy(0.0), HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0),
+              DehumidInducedHeatingDemandRate(0.0), EMSSensibleZoneLoadValue(0.0), EMSMoistureZoneLoadValue(0.0), SpeedNum(0), SpeedRatio(0.0), CycRatio(0.0),
+              TESOpMode(0), HXAssistedSensPLRIter(0), HXAssistedSensPLRIterIndex(0), HXAssistedSensPLRFail(0), HXAssistedSensPLRFailIndex(0),
               HXAssistedSensPLRFail2(0), HXAssistedSensPLRFailIndex2(0), HXAssistedLatPLRIter(0), HXAssistedLatPLRIterIndex(0),
               HXAssistedLatPLRFail(0), HXAssistedLatPLRFailIndex(0), HXAssistedCRLatPLRIter(0), HXAssistedCRLatPLRIterIndex(0),
               HXAssistedCRLatPLRFail(0), HXAssistedCRLatPLRFailIndex(0), HXAssistedCRLatPLRFail2(0), HXAssistedCRLatPLRFailIndex2(0), SensPLRIter(0),
@@ -531,22 +531,22 @@ namespace HVACUnitarySystem {
               SuppHeatCoilSensPLRIterIndex(0), SuppHeatCoilSensPLRFail(0), SuppHeatCoilSensPLRFailIndex(0), DXCoilSensPLRIter(0),
               DXCoilSensPLRIterIndex(0), DXCoilSensPLRFail(0), DXCoilSensPLRFailIndex(0), MSpdSensPLRIter(0), MSpdSensPLRIterIndex(0),
               MSpdCycSensPLRIter(0), MSpdCycSensPLRIterIndex(0), MSpdLatPLRIter(0), MSpdLatPLRIterIndex(0), MSpdCycLatPLRIter(0),
-              MSpdCycLatPLRIterIndex(0), LatMaxIterIndex(0), LatRegulaFalsIFailedIndex(0), DesignFanVolFlowRateEMSOverrideOn(false),
+              MSpdCycLatPLRIterIndex(0), LatMaxIterIndex(0), LatRegulaFalsiFailedIndex(0), DesignFanVolFlowRateEMSOverrideOn(false),
               MaxHeatAirVolFlowEMSOverrideOn(false), MaxCoolAirVolFlowEMSOverrideOn(false), MaxNoCoolHeatAirVolFlowEMSOverrideOn(false),
               DesignFanVolFlowRateEMSOverrideValue(0.0), MaxHeatAirVolFlowEMSOverrideValue(0.0), MaxCoolAirVolFlowEMSOverrideValue(0.0),
               MaxNoCoolHeatAirVolFlowEMSOverrideValue(0.0), EMSOverrideSensZoneLoadRequest(false), EMSOverrideMoistZoneLoadRequest(false),
               StageNum(0), Staged(false), CoolCountAvail(0), CoolIndexAvail(0), HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true), SingleMode(0),
-              iterationCounter(0), iterationMode(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
-              ATMixerOutNode(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
+              iterationCounter(0), ATMixerIndex(0), ATMixerPriNode(0), ATMixerSecNode(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
 
               // SZVAV variables
-              MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsIFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
+              MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsiFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
               HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
               MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(80.0), LowSpeedCoolFanRatio(0.0),
               LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(AutoSize), MaxHeatCoilFluidFlow(AutoSize), CoolCoilInletNodeNum(0),
               CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0),
               CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0),
-              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0)
+              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0),
+              ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0) 
         {
         }
     };
@@ -563,7 +563,7 @@ namespace HVACUnitarySystem {
     };
 
     // Object Data
-    extern Array1D<DesignSpecMSHPData> DesignSpecMSHP;
+    extern Array1D<DesignSpecMSHPLegacyData> DesignSpecMSHPLegacy;
     extern Array1D<UnitarySystemData> UnitarySystem;
     extern Array1D<UnitarySystemNumericFieldData> UnitarySystemNumericFields;
 
@@ -637,7 +637,7 @@ namespace HVACUnitarySystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlUnitarySystemtoSP(int const UnitarySysNum,                   // Index of AirloopHVAC:UnitarySystem object
+    void ControlUnitarySystemtoSP(int const UnitarySysNum,                   // Index of AirloopHVAC:UnitarySystem:Legacy object
                                   int const AirLoopNum,                      // Primary air loop number
                                   bool const FirstHVACIteration,             // True when first HVAC iteration
                                   int &CompOn,                               // compressor on/off control
@@ -645,7 +645,7 @@ namespace HVACUnitarySystem {
                                   Optional_bool HXUnitOn = _                 // Flag to control HX for HXAssisted Cooling Coil
     );
 
-    void ControlUnitarySystemtoLoad(int const UnitarySysNum,                   // Index of AirloopHVAC:UnitarySystem object
+    void ControlUnitarySystemtoLoad(int const UnitarySysNum,                   // Index of AirloopHVAC:UnitarySystem:Legacy object
                                     int const AirLoopNum,                      // Primary air loop number
                                     bool const FirstHVACIteration,             // True when first HVAC iteration
                                     int &CompOn,                               // Determines if compressor is on or off
@@ -653,7 +653,7 @@ namespace HVACUnitarySystem {
                                     Optional_bool HXUnitOn = _                 // Flag to control HX for HXAssisted Cooling Coil
     );
 
-    void ControlUnitarySystemOutput(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void ControlUnitarySystemOutput(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                                     int const AirLoopNum,          // Index to air loop
                                     bool const FirstHVACIteration, // True when first HVAC iteration
                                     Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
@@ -666,7 +666,7 @@ namespace HVACUnitarySystem {
                                               Array1<Real64> const &Par   // Function parameters
     );
 
-    void SetSpeedVariables(int const UnitarySysNum,   // Index of AirloopHVAC:UnitarySystem object
+    void SetSpeedVariables(int const UnitarySysNum,   // Index of AirloopHVAC:UnitarySystem:Legacy object
                            bool const SensibleLoad,   // True when meeting a sensible load (not a moisture load)
                            Real64 const PartLoadRatio // operating PLR
     );
@@ -675,7 +675,7 @@ namespace HVACUnitarySystem {
                                          Array1<Real64> const &Par   // Function parameters
     );
 
-    void CalcUnitarySystemToLoad(int const UnitarySysNum,           // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitarySystemToLoad(int const UnitarySysNum,           // Index of AirloopHVAC:UnitarySystem:Legacy object
                                  int const AirLoopNum,              // index to air loop
                                  bool const FirstHVACIteration,     // True when first HVAC iteration
                                  Real64 const CoolPLR,              // operating cooling part-load ratio []
@@ -689,12 +689,12 @@ namespace HVACUnitarySystem {
                                  Optional_int_const CompOn = _      // Determines if compressor is on or off
     );
 
-    void calculateCapacity(int const UnitarySysNum, // index of AirloopHVAC:UnitarySystem object
-                           Real64 &SensOutput,      // sensible output of AirloopHVAC:UnitarySystem
-                           Real64 &LatOutput        // latent output of AirloopHVAC:UnitarySystem
+    void calculateCapacity(int const UnitarySysNum, // index of AirloopHVAC:UnitarySystem:Legacy object
+                           Real64 &SensOutput,      // sensible output of AirloopHVAC:UnitarySystem:Legacy
+                           Real64 &LatOutput        // latent output of AirloopHVAC:UnitarySystem:Legacy
     );
 
-    void CalcUnitaryCoolingSystem(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitaryCoolingSystem(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                                   int const AirLoopNum,          // index to air loop
                                   bool const FirstHVACIteration, // True when first HVAC iteration
                                   Real64 const PartLoadRatio,    // coil operating part-load ratio
@@ -704,7 +704,7 @@ namespace HVACUnitarySystem {
                                   bool const HXUnitOn           // Flag to control HX for HXAssisted Cooling Coil
     );
 
-    void CalcUnitaryHeatingSystem(int const UnitarySysNum,                // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitaryHeatingSystem(int const UnitarySysNum,                // Index of AirloopHVAC:UnitarySystem:Legacy object
                                   int const AirLoopNum,                   // index to air loop
                                   bool const FirstHVACIteration,          // True when first HVAC iteration
                                   Real64 const PartLoadRatio,             // coil operating part-load ratio
@@ -713,13 +713,13 @@ namespace HVACUnitarySystem {
                                   Optional<Real64 const> HeatCoilLoad = _ // adjusted heating coil load if outlet temp exceeds max (W)
     );
 
-    void CalcUnitarySuppHeatingSystem(int const UnitarySysNum,                // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitarySuppHeatingSystem(int const UnitarySysNum,                // Index of AirloopHVAC:UnitarySystem:Legacy object
                                       bool const FirstHVACIteration,          // True when first HVAC iteration
                                       Real64 const PartLoadRatio,             // coil operating part-load ratio
                                       Optional<Real64 const> SuppCoilLoad = _ // adjusted supp coil load when outlet temp exceeds max (W)
     );
 
-    void CalcUnitarySuppSystemToSP(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem object
+    void CalcUnitarySuppSystemToSP(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem:Legacy object
                                    bool const FirstHVACIteration // True when first HVAC iteration
     );
 
@@ -741,7 +741,7 @@ namespace HVACUnitarySystem {
                                bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void SimMultiSpeedCoils(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem object
+    void SimMultiSpeedCoils(int const UnitarySysNum,       // Index of AirloopHVAC:UnitarySystem:Legacy object
                             int const AirLoopNum,          // Index to air loop
                             bool const FirstHVACIteration, // True when first HVAC iteration
                             int &CompOn,                   // compressor on/off control
@@ -751,7 +751,7 @@ namespace HVACUnitarySystem {
                             int const CoilType,
                             Optional_int_const SpeedNumber = _);
 
-    void CalcPassiveSystem(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem object
+    void CalcPassiveSystem(int const UnitarySysNum,      // Index of AirloopHVAC:UnitarySystem:Legacy object
                            int const AirLoopNum,         // Index to air loop
                            bool const FirstHVACIteration // True when first HVAC iteration
     );
@@ -874,9 +874,9 @@ namespace HVACUnitarySystem {
 
     void CheckUnitarySysCoilInOASysExists(std::string const &UnitarySysName);
 
-    void GetUnitarySystemOAHeatCoolCoil(std::string const &UnitarySystemName, // Name of Unitary System object
-                                        Optional_bool OACoolingCoil = _,      // Cooling coil in OA stream
-                                        Optional_bool OAHeatingCoil = _       // Heating coil in OA stream
+    void GetUnitarySystemHeatCoolCoil(std::string const &UnitarySystemName, // Name of Unitary System object
+                                      bool &CoolingCoil,                    // Cooling coil in OA stream
+                                      bool &HeatingCoil                     // Heating coil in OA stream
     );
 
     int GetUnitarySystemDXCoolingCoilIndex(std::string const &UnitarySystemName); // Name of Unitary System object

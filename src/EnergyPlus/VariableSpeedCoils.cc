@@ -69,7 +69,6 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HVACFan.hh>
-#include <HVACUnitarySystem.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -80,6 +79,7 @@
 #include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <UnitarySystem.hh>
 #include <VariableSpeedCoils.hh>
 #include <WaterManager.hh>
 
@@ -438,7 +438,6 @@ namespace VariableSpeedCoils {
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using CurveManager::SetCurveOutputMinMaxValues;
         using General::TrimSigDigits;
         using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -629,24 +628,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                                {2},                                    // Valid dimensions
+                                                                RoutineName,                            // Routine name
+                                                                CurrentModuleObject,                    // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));          // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletWetBulbTemp, RatedInletWaterTemp);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletWetBulbTemp, RatedInletWaterTemp);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -664,33 +658,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                                {1},                                       // Valid dimensions
+                                                                RoutineName,                               // Routine name
+                                                                CurrentModuleObject,                       // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));             // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -708,33 +688,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
+                                                                {1},                                         // Valid dimensions
+                                                                RoutineName,                                 // Routine name
+                                                                CurrentModuleObject,                         // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,                // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));               // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -752,24 +718,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                                {2},                                   // Valid dimensions
+                                                                RoutineName,                           // Routine name
+                                                                CurrentModuleObject,                   // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));         // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletWetBulbTemp, RatedInletWaterTemp);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(1)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletWetBulbTemp, RatedInletWaterTemp);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -787,33 +748,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                                {1},                                      // Valid dimensions
+                                                                RoutineName,                              // Routine name
+                                                                CurrentModuleObject,                      // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));            // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -831,33 +778,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
+                                                                {1},                                        // Valid dimensions
+                                                                RoutineName,                                // Routine name
+                                                                CurrentModuleObject,                        // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,               // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));              // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -876,24 +809,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSWasteHeat(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                                {2},                                    // Valid dimensions
+                                                                RoutineName,                            // Routine name
+                                                                CurrentModuleObject,                    // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));          // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSWasteHeat(I), RatedInletWaterTemp, RatedInletAirTemp);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSWasteHeat(I)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSWasteHeat(I), RatedInletWaterTemp, RatedInletAirTemp);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1198,24 +1126,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                                {2},                                    // Valid dimensions
+                                                                RoutineName,                            // Routine name
+                                                                CurrentModuleObject,                    // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));          // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletWetBulbTemp, RatedAmbAirTemp);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletWetBulbTemp, RatedAmbAirTemp);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1233,33 +1156,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                                {1},                                       // Valid dimensions
+                                                                RoutineName,                               // Routine name
+                                                                CurrentModuleObject,                       // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));             // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1277,24 +1186,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                                {2},                                   // Valid dimensions
+                                                                RoutineName,                           // Routine name
+                                                                CurrentModuleObject,                   // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));         // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletWetBulbTemp, RatedAmbAirTemp);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(1)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletWetBulbTemp, RatedAmbAirTemp);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1312,33 +1216,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                                {1},                                      // Valid dimensions
+                                                                RoutineName,                              // Routine name
+                                                                CurrentModuleObject,                      // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));            // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1512,24 +1402,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                                {2},                                    // Valid dimensions
+                                                                RoutineName,                            // Routine name
+                                                                CurrentModuleObject,                    // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));          // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletAirTempHeat, RatedInletWaterTempHeat);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletAirTempHeat, RatedInletWaterTempHeat);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1547,33 +1432,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                                {1},                                       // Valid dimensions
+                                                                RoutineName,                               // Routine name
+                                                                CurrentModuleObject,                       // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));             // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1591,33 +1462,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
+                                                                {1},                                         // Valid dimensions
+                                                                RoutineName,                                 // Routine name
+                                                                CurrentModuleObject,                         // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,                // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));               // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1635,24 +1492,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                                {2},                                   // Valid dimensions
+                                                                RoutineName,                           // Routine name
+                                                                CurrentModuleObject,                   // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));         // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletAirTempHeat, RatedInletWaterTempHeat);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(1)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletAirTempHeat, RatedInletWaterTempHeat);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1670,33 +1522,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                                {1},                                      // Valid dimensions
+                                                                RoutineName,                              // Routine name
+                                                                CurrentModuleObject,                      // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));            // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1714,33 +1552,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
+                                                                {1},                                        // Valid dimensions
+                                                                RoutineName,                                // Routine name
+                                                                CurrentModuleObject,                        // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,               // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));              // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1759,24 +1583,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSWasteHeat(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                                                                {2},                                    // Valid dimensions
+                                                                RoutineName,                            // Routine name
+                                                                CurrentModuleObject,                    // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));          // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSWasteHeat(I), RatedInletAirTempHeat, RatedInletWaterTempHeat);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSWasteHeat(I)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSWasteHeat(I), RatedInletAirTempHeat, RatedInletWaterTempHeat);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -1922,19 +1741,12 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).DefrostEIRFT));
-
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(5) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).DefrostEIRFT));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                                                                {2},                                  // Valid dimensions
+                                                                RoutineName,                          // Routine name
+                                                                CurrentModuleObject,                  // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,         // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));        // Field Name
                 }
             }
 
@@ -2016,24 +1828,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                                {2},                                    // Valid dimensions
+                                                                RoutineName,                            // Routine name
+                                                                CurrentModuleObject,                    // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));          // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletAirTempHeat, RatedAmbAirTempHeat);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletAirTempHeat, RatedAmbAirTempHeat);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -2051,33 +1858,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                                {1},                                       // Valid dimensions
+                                                                RoutineName,                               // Routine name
+                                                                CurrentModuleObject,                       // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));             // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -2095,24 +1888,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                                {2},                                   // Valid dimensions
+                                                                RoutineName,                           // Routine name
+                                                                CurrentModuleObject,                   // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));         // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletAirTempHeat, RatedAmbAirTempHeat);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(1)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletAirTempHeat, RatedAmbAirTempHeat);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -2130,33 +1918,19 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                                {1},                                      // Valid dimensions
+                                                                RoutineName,                              // Routine name
+                                                                CurrentModuleObject,                      // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));            // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -2442,25 +2216,21 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                                                                {2},                                    // Valid dimensions
+                                                                RoutineName,                            // Routine name
+                                                                CurrentModuleObject,                    // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,           // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));          // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), WHInletAirTemp, WHInletWaterTemp);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), WHInletAirTemp, WHInletWaterTemp);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
+                                              " output is not equal to 1.0 "
+                                              "(+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -2478,35 +2248,21 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), // Curve index
+                                                                {1},                                       // Valid dimensions
+                                                                RoutineName,                               // Routine name
+                                                                CurrentModuleObject,                       // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,              // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));             // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
+                                              " output is not equal to 1.0 "
+                                              "(+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -2524,35 +2280,21 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), // Curve index
+                                                                {1},                                         // Valid dimensions
+                                                                RoutineName,                                 // Routine name
+                                                                CurrentModuleObject,                         // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,                // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));               // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
+                                              " output is not equal to 1.0 "
+                                              "(+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -2570,25 +2312,21 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                                                                {2},                                   // Valid dimensions
+                                                                RoutineName,                           // Routine name
+                                                                CurrentModuleObject,                   // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,          // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));         // Field Name
 
-                        if (SELECT_CASE_var == "BIQUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), WHInletAirTemp, WHInletWaterTemp);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(1)));
-                            ShowContinueError("Curve type must be BiQuadratic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), WHInletAirTemp, WHInletWaterTemp);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
+                                              " output is not equal to 1.0 "
+                                              "(+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -2606,35 +2344,21 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), // Curve index
+                                                                {1},                                      // Valid dimensions
+                                                                RoutineName,                              // Routine name
+                                                                CurrentModuleObject,                      // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,             // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));            // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
+                                              " output is not equal to 1.0 "
+                                              "(+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -2652,35 +2376,21 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I)));
+                    ErrorsFound |= CurveManager::CheckCurveDims(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), // Curve index
+                                                                {1},                                        // Valid dimensions
+                                                                RoutineName,                                // Routine name
+                                                                CurrentModuleObject,                        // Object Type
+                                                                VarSpeedCoil(DXCoilNum).Name,               // Object Name
+                                                                cAlphaFields(AlfaFieldIncre));              // Field Name
 
-                        if (SELECT_CASE_var == "QUADRATIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-                            CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
-                            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
-                                ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
-                                                  " output is not equal to 1.0 "
-                                                  "(+ or - 10%) at rated conditions.");
-                                ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
-                            }
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                            ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) +
-                                              " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I)));
-                            ShowContinueError("Curve type must be Quadratic or Cubic.");
-                            ErrorsFound = true;
+                    if (!ErrorsFound) {
+                        CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
+                        if (CurveVal > 1.10 || CurveVal < 0.90) {
+                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
+                                              " output is not equal to 1.0 "
+                                              "(+ or - 10%) at rated conditions.");
+                            ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
                     }
                 }
@@ -4099,7 +3809,6 @@ namespace VariableSpeedCoils {
         using CurveManager::CurveValue;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using HVACUnitarySystem::DesignSpecMSHP;
 
         // Locals
         Real64 QLoadTotal; // placeholder for calculating SHR
@@ -4352,17 +4061,27 @@ namespace VariableSpeedCoils {
                     OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
                     rhoair = PsyRhoAirFnPbTdbW(OutBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                    MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
 
+                    // design fan heat will be added to coil load
+                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, VolFlowRate);
+                    // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
+                    Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                    if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                        MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                    } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                        SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                    }
+                    MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     TotCapTempModFac =
                         CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
                     if (MixEnth > SupEnth) {
-                        CoolCapAtPeak = rhoair * VolFlowRate * (MixEnth - SupEnth);
+                        CoolCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                     } else {
-                        CoolCapAtPeak = rhoair * VolFlowRate * (48000.0 - SupEnth);
+                        CoolCapAtPeak = (rhoair * VolFlowRate * (48000.0 - SupEnth)) + FanCoolLoad;
                     }
                     CoolCapAtPeak = max(0.0, CoolCapAtPeak);
                     if (TotCapTempModFac > 0.0) {
@@ -4411,17 +4130,29 @@ namespace VariableSpeedCoils {
                     }
                     rhoair = PsyRhoAirFnPbTdbW(OutBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                    MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
 
+                    // design fan heat will be added to coil load
+                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, VolFlowRate);
+                    // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
+                    Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+
+                    if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                        MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                    } else {
+                        SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                    }
+
+                    MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     TotCapTempModFac =
                         CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
                     if (MixEnth > SupEnth) {
-                        CoolCapAtPeak = rhoair * VolFlowRate * (MixEnth - SupEnth);
+                        CoolCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                     } else {
-                        CoolCapAtPeak = rhoair * VolFlowRate * (48000.0 - SupEnth);
+                        CoolCapAtPeak = (rhoair * VolFlowRate * (48000.0 - SupEnth)) + FanCoolLoad;
                     }
                     CoolCapAtPeak = max(0.0, CoolCapAtPeak);
                     if (TotCapTempModFac > 0.0) {
@@ -4677,47 +4408,55 @@ namespace VariableSpeedCoils {
             rhoA = PsyRhoAirFnPbTdbW(OutBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
             // HPWH, the mass flow rate will be updated by a revised entering air density
 
-            if (VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > 0 && allocated(HVACUnitarySystem::DesignSpecMSHP)) {
+            if (VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > -1 && UnitarySystems::designSpecMSHP.size() > 0) {
                 if (VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
-                    if (HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).NumOfSpeedCooling !=
+                    if (UnitarySystems::designSpecMSHP[VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].numOfSpeedCooling !=
                         VarSpeedCoil(DXCoilNum).NumOfSpeeds) {
                         ShowFatalError("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil(DXCoilNum).Name +
                                        " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object.");
+                    } else {
+                        for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
+                            VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
+                                VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
+                                UnitarySystems::designSpecMSHP[VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].coolingVolFlowRatio[Mode - 1];
+                            VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
+                                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
+                            VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
+                            // EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
+                            VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) =
+                                VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedEvapCondVolFlowPerRatedTotCap(Mode);
+                        }
                     }
-                } else {
-                    if (HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).NumOfSpeedHeating !=
+                } else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "HEATING") {
+                    if (UnitarySystems::designSpecMSHP[VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].numOfSpeedHeating !=
                         VarSpeedCoil(DXCoilNum).NumOfSpeeds) {
                         ShowFatalError("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil(DXCoilNum).Name +
                                        " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object.");
+                    } else {
+                        for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
+                            VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
+                                VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
+                                UnitarySystems::designSpecMSHP[VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].heatingVolFlowRatio[Mode - 1];
+                            VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
+                                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
+                            VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
+                            // EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
+                            VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) =
+                                VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedEvapCondVolFlowPerRatedTotCap(Mode);
+                        }
                     }
                 }
-            }
-
-            for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
-
-                if (VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > 0 && VarSpeedCoil(DXCoilNum).CoolHeatType != "WATERHEATING") {
-                    if (VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
-                        VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
-                            VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
-                            HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).CoolingVolFlowRatio(Mode);
-                    } else {
-                        VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
-                            VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
-                            HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).HeatingVolFlowRatio(Mode);
-                    }
-                    VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
-                        VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
-                } else {
+            } else {
+                for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
                     VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
                         VarSpeedCoil(DXCoilNum).MSRatedTotCap(UpperSpeed) * VarSpeedCoil(DXCoilNum).MSRatedPercentTotCap(Mode);
                     VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
                         VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
+                    VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
+                    // EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
+                    VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) =
+                        VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedEvapCondVolFlowPerRatedTotCap(Mode);
                 }
-
-                VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
-                // EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
-                VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) =
-                    VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedEvapCondVolFlowPerRatedTotCap(Mode);
             }
         }
 
@@ -7505,26 +7244,27 @@ namespace VariableSpeedCoils {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
 
-        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing &&
-            VarSpeedCoil(DXCoilNum).reportCoilFinalSizes) {
-            if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ||
-                VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed) { // cooling coil
-                coilSelectionReportObj->setCoilFinalSizes(VarSpeedCoil(DXCoilNum).Name,
-                                                          VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
-                                                          VarSpeedCoil(DXCoilNum).RatedCapCoolTotal,
-                                                          VarSpeedCoil(DXCoilNum).RatedCapCoolSens,
-                                                          VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
-                                                          VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
-            } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit ||
-                       VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed) { // heating coil
-                coilSelectionReportObj->setCoilFinalSizes(VarSpeedCoil(DXCoilNum).Name,
-                                                          VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
-                                                          VarSpeedCoil(DXCoilNum).RatedCapHeat,
-                                                          VarSpeedCoil(DXCoilNum).RatedCapHeat,
-                                                          VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
-                                                          VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
+        if (VarSpeedCoil(DXCoilNum).reportCoilFinalSizes) {
+            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+                if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ||
+                    VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed) { // cooling coil
+                    coilSelectionReportObj->setCoilFinalSizes(VarSpeedCoil(DXCoilNum).Name,
+                                                              VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
+                                                              VarSpeedCoil(DXCoilNum).RatedCapCoolTotal,
+                                                              VarSpeedCoil(DXCoilNum).RatedCapCoolSens,
+                                                              VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
+                                                              VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
+                } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit ||
+                           VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed) { // heating coil
+                    coilSelectionReportObj->setCoilFinalSizes(VarSpeedCoil(DXCoilNum).Name,
+                                                              VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
+                                                              VarSpeedCoil(DXCoilNum).RatedCapHeat,
+                                                              VarSpeedCoil(DXCoilNum).RatedCapHeat,
+                                                              VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
+                                                              VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
+                }
+                VarSpeedCoil(DXCoilNum).reportCoilFinalSizes = false;
             }
-            VarSpeedCoil(DXCoilNum).reportCoilFinalSizes = false;
         }
     }
 
