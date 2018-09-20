@@ -1,33 +1,30 @@
-/* Copyright (c) 2012-2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+/* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef GROUND_HPP_
 #define GROUND_HPP_
 
-#include "Mesher.hpp"
-#include "Domain.hpp"
+#include "Algorithms.hpp"
 #include "BoundaryConditions.hpp"
+#include "Domain.hpp"
 #include "Foundation.hpp"
 #include "GroundOutput.hpp"
-#include "Algorithms.hpp"
+#include "Mesher.hpp"
 #include "libkiva_export.h"
 
 #include <cmath>
-#include <vector>
-#include <string>
-#include <numeric>
 #include <memory>
+#include <numeric>
+#include <string>
+#include <vector>
 
-#include <Eigen/SparseCore>
 #include <Eigen/IterativeLinearSolvers>
-
+#include <Eigen/SparseCore>
 
 namespace Kiva {
 
-class LIBKIVA_EXPORT Ground
-{
+class LIBKIVA_EXPORT Ground {
 public:
-
   // Constructor
   Ground(Foundation &foundation);
   Ground(Foundation &foundation, GroundOutput::OutputMap &outputMap);
@@ -39,36 +36,29 @@ public:
   Foundation &foundation;
   GroundOutput groundOutput;
 
-  size_t nX, nY, nZ;
+  size_t nX, nY, nZ, num_cells;
 
-  std::vector<std::vector<std::vector<double>>> TNew; // solution, n+1
-  std::vector<std::vector<std::vector<double>>> TOld; // solution, n
+  std::vector<double> TNew; // solution, n+1
+  std::vector<double> TOld; // solution, n
 
   void buildDomain();
 
   void calculateBoundaryLayer();
   void setNewBoundaryGeometry();
-  void calculate(BoundaryConditions& boundaryConidtions, double ts=0.0);
-
-  std::vector<double> calculateHeatFlux(const size_t &i, const size_t &j, const size_t &k);
-
+  void calculate(BoundaryConditions &boundaryConidtions, double ts = 0.0);
 
   void calculateSurfaceAverages();
   double getSurfaceAverageValue(std::pair<Surface::SurfaceType, GroundOutput::OutputType> output);
 
-
 private:
-
-  double timestep;  // in seconds
+  double timestep; // in seconds
 
   BoundaryConditions bcs;
   // Data structures
 
   // ADE
-  std::vector<std::vector<std::vector<double>>> U; // ADE upper sweep, n+1
-  std::vector<std::vector<std::vector<double>>> UOld; // ADE upper sweep, n
-  std::vector<std::vector<std::vector<double>>> V; // ADE lower sweep, n+1
-  std::vector<std::vector<std::vector<double>>> VOld; // ADE lower sweep, n
+  std::vector<double> U; // ADE upper sweep, n+1
+  std::vector<double> V; // ADE lower sweep, n+1
 
   // ADI
   std::vector<double> a1; // lower diagonal
@@ -82,10 +72,10 @@ private:
   std::vector<Eigen::Triplet<double>> tripletList;
   Eigen::VectorXd b, x;
 
-  std::shared_ptr<Eigen::BiCGSTAB<Eigen::SparseMatrix<double>, Eigen::IncompleteLUT<double>>> pSolver;
+  std::shared_ptr<Eigen::BiCGSTAB<Eigen::SparseMatrix<double>, Eigen::IncompleteLUT<double>>>
+      pSolver;
 
 private:
-
   // Calculators (Called from main calculator)
   void calculateADE();
 
@@ -102,31 +92,25 @@ private:
   // Misc. Functions
   void setAmatValue(const int i, const int j, const double val);
   void setbValue(const int i, const double val);
+  void setValuesADI(const std::size_t &index, const double &A, const double (&Alt)[2],
+                    const double &bVal);
   void solveLinearSystem();
   void clearAmat();
   double getxValue(const int i);
-
-  double getConvectionCoeff(double Tsurf,
-                double Tamb,
-                double Vair,
-                double roughness,
-                bool isExterior,
-                double tilt);
-
+  std::vector<double> getXvalues();
 
   double getSurfaceArea(Surface::SurfaceType surfaceType);
 
-  void setSolarBoundaryConditions();
-  void setInteriorRadiationBoundaryConditions();
+  void setBoundaryConditions();
 
-  std::vector<std::pair<double,double>> boundaryLayer;
+  std::vector<std::pair<double, double>> boundaryLayer;
 
   double getBoundaryValue(double dist);
 
   double getBoundaryDistance(double val);
-
+  void link_cells_to_temp();
 };
 
-}
+} // namespace Kiva
 
 #endif /* GROUND_HPP_ */

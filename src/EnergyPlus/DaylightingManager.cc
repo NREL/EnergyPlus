@@ -161,6 +161,18 @@ namespace DaylightingManager {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
+    bool CalcDayltghCoefficients_firstTime(true);
+    bool refFirstTime(true);
+    bool DayltgInteriorIllum_firstTime(true); // true first time routine is called
+    bool FirstTimeDaylFacCalc(true);
+    bool VeryFirstTime(true);
+    bool mapFirstTime(true);
+    bool CheckTDDs_firstTime(true);
+    bool DayltgExtHorizIllum_firstTime(true); // flag for first time thru to initialize
+    bool DayltgInteriorMapIllum_FirstTimeFlag(true);
+    bool ReportIllumMap_firstTime(true);
+    bool SQFirstTime(true);
+
 
     // Surface count crossover for using octree algorithm
     // The octree gives lower computational complexity for much higher performance
@@ -234,6 +246,25 @@ namespace DaylightingManager {
     {
         // this will need a lot more, but it is a start
         ZoneDaylight.deallocate();
+        CalcDayltghCoefficients_firstTime = true;
+        CheckTDDZone.deallocate();
+        TDDTransVisBeam.deallocate();
+        TDDFluxInc.deallocate();
+        TDDFluxTrans.deallocate();
+        RefErrIndex.deallocate();
+        refFirstTime = true;
+        ComplexWind.deallocate();
+        IllumMap.deallocate();
+        IllumMapCalc.deallocate();
+        DayltgInteriorIllum_firstTime = true;
+        FirstTimeDaylFacCalc = true;
+        VeryFirstTime = true;
+        mapFirstTime = true;
+        CheckTDDs_firstTime = true;
+        DayltgExtHorizIllum_firstTime = true;
+        DayltgInteriorMapIllum_FirstTimeFlag = true;
+        ReportIllumMap_firstTime = true;
+        SQFirstTime = true;
     }
 
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
@@ -521,8 +552,6 @@ namespace DaylightingManager {
         int IHR;     // Hour of day counter
         int IWin;    // Window counter
         int loop;    // DO loop indices
-        static bool firstTime(true);
-        static bool FirstTimeDaylFacCalc(true);
         Real64 DaylFac1; // sky daylight factor at ref pt 1
         Real64 DaylFac2; // sky daylight factor at ref pt 2
 
@@ -548,11 +577,11 @@ namespace DaylightingManager {
             "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')");
 
         // FLOW:
-        if (firstTime) {
+        if (CalcDayltghCoefficients_firstTime) {
             GetDaylightingParametersInput();
             CheckTDDsAndLightShelvesInDaylitZones();
             AssociateWindowShadingControlWithDaylighting();
-            firstTime = false;
+            CalcDayltghCoefficients_firstTime = false;
             if (allocated(CheckTDDZone)) CheckTDDZone.deallocate();
         } // End of check if firstTime
 
@@ -908,7 +937,6 @@ namespace DaylightingManager {
         int IWin;    // Window counter
         int PipeNum; // TDD pipe object number
         int loopwin; // loop index for exterior windows associated with a daylit zone
-        static bool VeryFirstTime(true);
         int TZoneNum;
         bool ErrorsFound;
         int MapNum;
@@ -1052,7 +1080,6 @@ namespace DaylightingManager {
         Real64 DAXY;               // Area of window element
         Real64 SkyObstructionMult; // Ratio of obstructed to unobstructed sky diffuse at a ground point
         int ExtWinType;            // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
-        static bool refFirstTime(true);
         int BRef;
         int ILB;
         bool hitIntObs;        // True iff interior obstruction hit
@@ -1461,7 +1488,6 @@ namespace DaylightingManager {
         //		Array2D< Real64 > MapWindowSolidAngAtRefPt; //Inactive Only allocated and assigning to: Also only 1 value used at a time
         //		Array2D< Real64 > MapWindowSolidAngAtRefPtWtd; // Only 1 value used at a time: Replaced by below
         Real64 MapWindowSolidAngAtRefPtWtd;
-        static bool mapFirstTime(true);
         static bool MySunIsUpFlag(false);
         int WinEl; // window elements counter
 
@@ -5564,11 +5590,10 @@ namespace DaylightingManager {
         int ShelfNum; // light shelf object number
         int SurfNum;  // daylight device surface number
         bool ErrorsFound;
-        static bool firstTime(true);
 
-        if (firstTime) {
+        if (CheckTDDs_firstTime) {
             CheckTDDZone.dimension(NumOfZones, true);
-            firstTime = false;
+            CheckTDDs_firstTime = false;
         }
 
         ErrorsFound = false;
@@ -5963,7 +5988,6 @@ namespace DaylightingManager {
         static Array1D<Real64> TH(NTH);     // Azimuth of sky element (radians)
         int ISky;                           // Sky type index
         static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
-        static bool firstTime(true);        // flag for first time thru to initialize
 
         // FLOW:
         // Integrate to obtain illuminance from sky.
@@ -5971,7 +5995,7 @@ namespace DaylightingManager {
         // is L(TH,PH)*SIN(PH)*COS(PH)*DTH*DPH, where L(TH,PH) is the luminance
         // of the patch in cd/m2.
         //  Init
-        if (firstTime) {
+        if (DayltgExtHorizIllum_firstTime) {
             for (IPH = 1; IPH <= NPH; ++IPH) {
                 PH(IPH) = (IPH - 0.5) * DPH;
                 SPHCPH(IPH) = std::sin(PH(IPH)) * std::cos(PH(IPH)); // DA = COS(PH)*DTH*DPH
@@ -5979,7 +6003,7 @@ namespace DaylightingManager {
             for (ITH = 1; ITH <= NTH; ++ITH) {
                 TH(ITH) = (ITH - 0.5) * DTH;
             }
-            firstTime = false;
+            DayltgExtHorizIllum_firstTime = false;
         }
 
         HISK = 0.0;
@@ -6393,7 +6417,6 @@ namespace DaylightingManager {
         static Array3D<Real64> tmpIllumFromWinAtRefPt;
         static Array3D<Real64> tmpBackLumFromWinAtRefPt;
         static Array3D<Real64> tmpSourceLumFromWinAtRefPt;
-        static bool firstTime(true); // true first time routine is called
 
         static bool blnCycle(false);
 
@@ -6401,12 +6424,12 @@ namespace DaylightingManager {
 
         // Three arrays to save original clear and dark (fully switched) states'
         //  zone/window daylighting properties.
-        if (firstTime) {
+        if (DayltgInteriorIllum_firstTime) {
             int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(ZoneDaylight, &ZoneDaylightCalc::NumOfDayltgExtWins)));
             tmpIllumFromWinAtRefPt.allocate(d1, 2, 2);
             tmpBackLumFromWinAtRefPt.allocate(d1, 2, 2);
             tmpSourceLumFromWinAtRefPt.allocate(d1, 2, 2);
-            firstTime = false;
+            DayltgInteriorIllum_firstTime = false;
         }
         tmpIllumFromWinAtRefPt = 0.0;
         tmpBackLumFromWinAtRefPt = 0.0;
@@ -9542,7 +9565,6 @@ namespace DaylightingManager {
         Real64 GTOT2;
         static Array1D<Real64> BACLUM;
         static Array1D<Real64> GLRNDX;
-        static bool FirstTimeFlag(true);
         int ILB;
 
         int IConst;
@@ -9556,11 +9578,11 @@ namespace DaylightingManager {
         int MapNum;
         int ILM;
 
-        if (FirstTimeFlag) {
+        if (DayltgInteriorMapIllum_FirstTimeFlag) {
             daylight_illum.allocate(MaxMapRefPoints);
             BACLUM.allocate(MaxMapRefPoints);
             GLRNDX.allocate(MaxMapRefPoints);
-            FirstTimeFlag = false;
+            DayltgInteriorMapIllum_FirstTimeFlag = false;
         }
 
         if (WarmupFlag) return;
@@ -9981,7 +10003,6 @@ namespace DaylightingManager {
         //  REAL(r64)           :: NumOut
         int IllumOut;
 
-        static bool firstTime(true);
         static Array1D_bool FirstTimeMaps;
         static Array1D_bool EnvrnPrint;
         static Array1D_string SavedMnDy;
@@ -9997,13 +10018,12 @@ namespace DaylightingManager {
         int SQMonth;
         int SQDayOfMonth;
         int IllumIndex;
-        static bool SQFirstTime(true);
         //		static bool CommaDelimited( true ); //Unused Set but never used
         // BSLLC Finish
 
         // FLOW:
-        if (firstTime) {
-            firstTime = false;
+        if (ReportIllumMap_firstTime) {
+            ReportIllumMap_firstTime = false;
             FirstTimeMaps.dimension(TotIllumMaps, true);
             EnvrnPrint.dimension(TotIllumMaps, true);
             RefPts.allocate(NumOfZones, MaxRefPoints);

@@ -45,19 +45,87 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::MixedAir Unit Tests
+// EnergyPlus::UnitHeater Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-namespace EnergyPlus {
+using namespace EnergyPlus;
+using namespace ObjexxFCL;
+
+TEST_F(EnergyPlusFixture, RecurringWarningTest)
+{
+
+    //void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
+    //    int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
+    //    Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
+    //    Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
+    //    Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
+    //    std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
+    //    std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
+    //    std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
+    //)
+    
+    std::string myMessage1 = "Test message 1";
+    // proper call to ShowRecurringWarningErrorAtEnd to set up new recurring warning
+    int ErrIndex1 = 0;
+    ShowRecurringWarningErrorAtEnd(myMessage1, ErrIndex1);
+    EXPECT_EQ(ErrIndex1, 1);
+    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 1u);
+    EXPECT_EQ(" ** Warning ** " + myMessage1, DataErrorTracking::RecurringErrors(1).Message);
+    EXPECT_EQ(1, DataErrorTracking::RecurringErrors(1).Count);
+
+    std::string myMessage2 = "Test message 2";
+    // improper call to ShowRecurringWarningErrorAtEnd to set up new recurring warning
+    int ErrIndex2 = 6;
+    ShowRecurringWarningErrorAtEnd(myMessage2, ErrIndex2);
+    EXPECT_EQ(ErrIndex2, 2); // ShowRecurringWarningErrorAtEnd handles improper index and returns correct value
+    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 2u);
+    EXPECT_EQ(" ** Warning ** " + myMessage2, DataErrorTracking::RecurringErrors(2).Message);
+    EXPECT_EQ(1, DataErrorTracking::RecurringErrors(2).Count);
+
+    ErrIndex2 = 6;
+    ShowRecurringWarningErrorAtEnd(myMessage2, ErrIndex2);
+    EXPECT_EQ(ErrIndex2, 2); // ShowRecurringWarningErrorAtEnd handles improper index and returns correct value
+    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 2u);
+    EXPECT_EQ(" ** Warning ** " + myMessage2, DataErrorTracking::RecurringErrors(2).Message);
+    EXPECT_EQ(2, DataErrorTracking::RecurringErrors(2).Count);
+
+    std::string myMessage3 = "Test message 3";
+    ShowRecurringContinueErrorAtEnd(myMessage3, ErrIndex1);
+    // index gets updated with correct value
+    EXPECT_EQ(ErrIndex1, 3);
+    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 3u);
+    EXPECT_EQ(" **   ~~~   ** " + myMessage3, DataErrorTracking::RecurringErrors(3).Message);
+    EXPECT_EQ(1, DataErrorTracking::RecurringErrors(3).Count);
+
+    std::string myMessage4 = "Test message 4";
+    ShowRecurringSevereErrorAtEnd(myMessage4, ErrIndex1);
+    // index gets updated with correct value
+    EXPECT_EQ(ErrIndex1, 4);
+    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 4u);
+    EXPECT_EQ(" ** Severe  ** " + myMessage4, DataErrorTracking::RecurringErrors(4).Message);
+    EXPECT_EQ(1, DataErrorTracking::RecurringErrors(4).Count);
+
+    // same message for different show message type (changed severe to warning) should be valid
+    ShowRecurringWarningErrorAtEnd(myMessage4, ErrIndex1);
+    // index gets updated with correct value
+    EXPECT_EQ(ErrIndex1, 5);
+    EXPECT_EQ(" ** Warning ** " + myMessage4, DataErrorTracking::RecurringErrors(5).Message);
+}
+
 
 TEST_F(EnergyPlusFixture, DisplayMessageTest)
 {
