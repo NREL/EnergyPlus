@@ -118,15 +118,12 @@ namespace ZoneDehumidifier {
         int AirInletNodeNum;               // Inlet air node number
         int AirOutletNodeNum;              // Outlet air node number
         int WaterRemovalCurveIndex;        // Index for water removal curve
-        int WaterRemovalCurveType;         // Water removal curve type. 2 = biquadratic
         int WaterRemovalCurveErrorCount;   // Count number of times water removal curve returns a negative value
         int WaterRemovalCurveErrorIndex;   // Index for negative value water removal factor recurring messages
         int EnergyFactorCurveIndex;        // Index for energy factor curve
-        int EnergyFactorCurveType;         // Energy factor curve type. 2 = biquadratic
         int EnergyFactorCurveErrorCount;   // Count number of times energy factor curve returns negative value
         int EnergyFactorCurveErrorIndex;   // Index for negative value energy factor recurring messages
         int PartLoadCurveIndex;            // Index for part load curve
-        int PartLoadCurveType;             // Part load curve type. 1 = quadratic, cubic = 3
         int LowPLFErrorCount;              // Count number of times PLF < 0.7
         int LowPLFErrorIndex;              // Index for PLF < 0.7 recurring warning messages
         int HighPLFErrorCount;             // Count number of times PLF > 1.0
@@ -158,9 +155,9 @@ namespace ZoneDehumidifier {
         ZoneDehumidifierData()
             : UnitType_Num(0), SchedPtr(0), RatedWaterRemoval(0.0), RatedEnergyFactor(0.0), RatedAirVolFlow(0.0), RatedAirMassFlow(0.0),
               MinInletAirTemp(0.0), MaxInletAirTemp(0.0), InletAirMassFlow(0.0), OutletAirEnthalpy(0.0), OutletAirHumRat(0.0),
-              OffCycleParasiticLoad(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterRemovalCurveIndex(0), WaterRemovalCurveType(0),
-              WaterRemovalCurveErrorCount(0), WaterRemovalCurveErrorIndex(0), EnergyFactorCurveIndex(0), EnergyFactorCurveType(0),
-              EnergyFactorCurveErrorCount(0), EnergyFactorCurveErrorIndex(0), PartLoadCurveIndex(0), PartLoadCurveType(0), LowPLFErrorCount(0),
+              OffCycleParasiticLoad(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterRemovalCurveIndex(0),
+              WaterRemovalCurveErrorCount(0), WaterRemovalCurveErrorIndex(0), EnergyFactorCurveIndex(0),
+              EnergyFactorCurveErrorCount(0), EnergyFactorCurveErrorIndex(0), PartLoadCurveIndex(0), LowPLFErrorCount(0),
               LowPLFErrorIndex(0), HighPLFErrorCount(0), HighPLFErrorIndex(0), HighRTFErrorCount(0), HighRTFErrorIndex(0), PLFPLRErrorCount(0),
               PLFPLRErrorIndex(0), CondensateCollectMode(CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0),
               SensHeatingRate(0.0), SensHeatingEnergy(0.0), WaterRemovalRate(0.0), WaterRemoved(0.0), ElecPower(0.0), ElecConsumption(0.0),

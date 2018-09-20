@@ -399,7 +399,7 @@ namespace ConvectionCoefficients {
                 }
 
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    HConvIn(SurfNum) = SurfaceGeometry::kivaManager.getConv(SurfNum);
+                    HConvIn(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].h;
                     Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
                     continue;
                 }
@@ -1151,7 +1151,6 @@ namespace ConvectionCoefficients {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DataErrorTracking::TotalSevereErrors;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
@@ -1424,19 +1423,13 @@ namespace ConvectionCoefficients {
                                     cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                     ErrorsFound = true;
                 } else { // check type
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(HcInsideUserCurve(Loop).HcFnTempDiffCurveNum));
-
-                        if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC") ||
-                            (SELECT_CASE_var == "EXPONENT") || (SELECT_CASE_var == "QUARTIC")) {
-                            // okay do nothing, have the right type of curve (single independent variable)
-                        } else {
-                            ShowSevereError(CurrentModuleObject + " \"" + cAlphaArgs(1) + "\"");
-                            ShowContinueError("...illegal " + cAlphaFieldNames(3) +
-                                              " type for this object = " + GetCurveType(GetCurveIndex(cAlphaArgs(3))));
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        HcInsideUserCurve(Loop).HcFnTempDiffCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        HcInsideUserCurve(Loop).Name,   // Object Name
+                        cAlphaFieldNames(3));               // Field Name
                 }
             } else {
                 HcInsideUserCurve(Loop).HcFnTempDiffCurveNum = 0;
@@ -1449,19 +1442,13 @@ namespace ConvectionCoefficients {
                                     cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                     ErrorsFound = true;
                 } else { // check type
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum));
-
-                        if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC") ||
-                            (SELECT_CASE_var == "EXPONENT") || (SELECT_CASE_var == "QUARTIC")) {
-                            // okay do nothing, have the right type of curve (single independent variable)
-                        } else {
-                            ShowSevereError(CurrentModuleObject + " \"" + cAlphaArgs(1) + "\"");
-                            ShowContinueError("...illegal " + cAlphaFieldNames(4) +
-                                              " type for this object = " + GetCurveType(GetCurveIndex(cAlphaArgs(4))));
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        HcInsideUserCurve(Loop).Name,   // Object Name
+                        cAlphaFieldNames(4));               // Field Name
                 }
             } else {
                 HcInsideUserCurve(Loop).HcFnTempDiffDivHeightCurveNum = 0;
@@ -1474,19 +1461,13 @@ namespace ConvectionCoefficients {
                                     cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                     ErrorsFound = true;
                 } else { // check type
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(HcInsideUserCurve(Loop).HcFnACHCurveNum));
-
-                        if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC") ||
-                            (SELECT_CASE_var == "EXPONENT") || (SELECT_CASE_var == "QUARTIC")) {
-                            // okay do nothing, have the right type of curve (single independent variable)
-                        } else {
-                            ShowSevereError(CurrentModuleObject + " \"" + cAlphaArgs(1) + "\"");
-                            ShowContinueError("...illegal " + cAlphaFieldNames(5) +
-                                              " type for this object = " + GetCurveType(GetCurveIndex(cAlphaArgs(5))));
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        HcInsideUserCurve(Loop).HcFnACHCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        HcInsideUserCurve(Loop).Name,   // Object Name
+                        cAlphaFieldNames(5));               // Field Name
                 }
             } else {
                 HcInsideUserCurve(Loop).HcFnACHCurveNum = 0;
@@ -1499,19 +1480,13 @@ namespace ConvectionCoefficients {
                                     cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                     ErrorsFound = true;
                 } else { // check type
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum));
-
-                        if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC") ||
-                            (SELECT_CASE_var == "EXPONENT") || (SELECT_CASE_var == "QUARTIC")) {
-                            // okay do nothing, have the right type of curve (single independent variable)
-                        } else {
-                            ShowSevereError(CurrentModuleObject + " \"" + cAlphaArgs(1) + "\"");
-                            ShowContinueError("...illegal " + cAlphaFieldNames(6) +
-                                              " type for this object = " + GetCurveType(GetCurveIndex(cAlphaArgs(6))));
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        HcInsideUserCurve(Loop).Name,   // Object Name
+                        cAlphaFieldNames(6));               // Field Name
                 }
             } else {
                 HcInsideUserCurve(Loop).HcFnACHDivPerimLengthCurveNum = 0;
@@ -1562,19 +1537,13 @@ namespace ConvectionCoefficients {
                                     cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                     ErrorsFound = true;
                 } else { // check type
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum));
-
-                        if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC") ||
-                            (SELECT_CASE_var == "EXPONENT") || (SELECT_CASE_var == "QUARTIC")) {
-                            // okay do nothing, have the right type of curve (single independent variable)
-                        } else {
-                            ShowSevereError(CurrentModuleObject + " \"" + cAlphaArgs(1) + "\"");
-                            ShowContinueError("...illegal " + cAlphaFieldNames(3) +
-                                              " type for this object = " + GetCurveType(GetCurveIndex(cAlphaArgs(3))));
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        HcOutsideUserCurve(Loop).Name,   // Object Name
+                        cAlphaFieldNames(3));               // Field Name
                 }
             } else {
                 HcOutsideUserCurve(Loop).HfFnWindSpeedCurveNum = 0;
@@ -1588,19 +1557,13 @@ namespace ConvectionCoefficients {
                                     cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                     ErrorsFound = true;
                 } else { // check type
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum));
-
-                        if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC") ||
-                            (SELECT_CASE_var == "EXPONENT") || (SELECT_CASE_var == "QUARTIC")) {
-                            // okay do nothing, have the right type of curve (single independent variable)
-                        } else {
-                            ShowSevereError(CurrentModuleObject + " \"" + cAlphaArgs(1) + "\"");
-                            ShowContinueError("...illegal " + cAlphaFieldNames(4) +
-                                              " type for this object = " + GetCurveType(GetCurveIndex(cAlphaArgs(4))));
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        HcOutsideUserCurve(Loop).Name,   // Object Name
+                        cAlphaFieldNames(4));               // Field Name
                 }
             } else {
                 HcOutsideUserCurve(Loop).HnFnTempDiffCurveNum = 0;
@@ -1614,19 +1577,13 @@ namespace ConvectionCoefficients {
                                     cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                     ErrorsFound = true;
                 } else { // check type
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum));
-
-                        if ((SELECT_CASE_var == "LINEAR") || (SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC") ||
-                            (SELECT_CASE_var == "EXPONENT") || (SELECT_CASE_var == "QUARTIC")) {
-                            // okay do nothing, have the right type of curve (single independent variable)
-                        } else {
-                            ShowSevereError(CurrentModuleObject + " \"" + cAlphaArgs(1) + "\"");
-                            ShowContinueError("...illegal " + cAlphaFieldNames(5) +
-                                              " type for this object = " + GetCurveType(GetCurveIndex(cAlphaArgs(5))));
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum,   // Curve index
+                        {1},                            // Valid dimensions
+                        RoutineName,                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        HcOutsideUserCurve(Loop).Name,   // Object Name
+                        cAlphaFieldNames(5));               // Field Name
                 }
             } else {
                 HcOutsideUserCurve(Loop).HnFnTempDiffDivHeightCurveNum = 0;
@@ -4263,7 +4220,7 @@ namespace ConvectionCoefficients {
                 } else if (((DeltaTemp < 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
                            ((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt < 0.0))) { // Enhanced Convection
 
-                    HcIn(SurfNum) = 9.482 * std::pow(std::abs(DeltaTemp), OneThird) / (7.283 - std::abs(Surface(SurfNum).CosTilt));
+                    HcIn(SurfNum) = 9.482 * std::pow(std::abs(DeltaTemp), OneThird) / (7.238 - std::abs(Surface(SurfNum).CosTilt));
 
                 } else if (((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
                            ((DeltaTemp < 0.0) && (Surface(SurfNum).CosTilt < 0.0))) { // Reduced Convection
@@ -4290,7 +4247,7 @@ namespace ConvectionCoefficients {
                 } else if (((DeltaTemp < 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
                            ((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt < 0.0))) { // Enhanced Convection
 
-                    HcIn(SurfNum) = 9.482 * std::pow(std::abs(DeltaTemp), 1.0 / 3.0) / (7.283 - std::abs(Surface(SurfNum).CosTilt));
+                    HcIn(SurfNum) = 9.482 * std::pow(std::abs(DeltaTemp), 1.0 / 3.0) / (7.238 - std::abs(Surface(SurfNum).CosTilt));
                     HcIn(SurfNum) = std::pow(std::pow(HcIn(SurfNum), 3.2) + std::pow(Hf, 3.2), 1.0 / 3.2);
 
                 } else if (((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
@@ -8057,7 +8014,7 @@ namespace ConvectionCoefficients {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
-        Hn = 9.482 * std::pow(std::abs(DeltaTemp), OneThird) / (7.283 - std::abs(CosineTilt));
+        Hn = 9.482 * std::pow(std::abs(DeltaTemp), OneThird) / (7.238 - std::abs(CosineTilt));
 
         return Hn;
     }

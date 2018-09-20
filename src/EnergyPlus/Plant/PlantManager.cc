@@ -1240,7 +1240,7 @@ namespace PlantManager {
                             this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                             this_comp.CurOpSchemeType = DemandOpSchemeType;
                         } else if (UtilityRoutines::SameString(this_comp_type, "AirLoopHVAC:UnitarySystem")) {
-                            this_comp.TypeOf_Num = TypeOf_UnitarySystemRecovery;
+                            this_comp.TypeOf_Num = TypeOf_UnitarySysRecovery;
                             this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                             this_comp.CurOpSchemeType = DemandOpSchemeType;
                         } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Heating:WaterToAirHeatPump:EquationFit")) {
@@ -4154,7 +4154,7 @@ namespace PlantManager {
                                 this_component.FlowCtrl = ControlType_Active;
                                 this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                 this_component.HowLoadServed = HowMet_PassiveCap;
-                            } else if (SELECT_CASE_var == TypeOf_UnitarySystemRecovery) {
+                            } else if (SELECT_CASE_var == TypeOf_UnitarySysRecovery) {
                                 this_component.FlowCtrl = ControlType_Active;
                                 this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                 this_component.HowLoadServed = HowMet_PassiveCap;

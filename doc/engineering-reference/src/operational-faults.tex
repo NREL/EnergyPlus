@@ -63,15 +63,15 @@ T_{s,f} = T_{s,ff}  - \Delta T
 RH_{s,f} = RH_{s,ff}  - \Delta RH
 \end{equation}
 
-Where,
+where:
 
-\(T_{s,f}\) thermostat value in the faulty case, C
+\(T_{s,f}\) is the thermostat value in the faulty case, \(^{\circ}\)C
 
-\(T_{s,ff}\) thermostat value in the fault-free case (design value), C
+\(T_{s,ff}\) is the thermostat value in the fault-free case (design value), \(^{\circ}\)C
 
-\(RH_{s,f}\) humidistat value in the faulty case,
+\(RH_{s,f}\) is the humidistat value in the faulty case
 
-\(RH_{s,ff}\) humidistat value in the fault-free case (design value),
+\(RH_{s,ff}\) is the humidistat value in the fault-free case (design value)
 
 \(\Delta T / \Delta RH\) difference between the thermostat/humidistat readings and the actual zone air conditions. Positive values mean that the readings is higher than the actual air conditions.
 
@@ -81,11 +81,11 @@ For the humidistat that is independent of the thermostat, \(\Delta RH\) can be d
 \Delta RH = RH_{s,ff} - f(T_{real}, W_{s,f})
 \end{equation}
 
-Where,
+where:
 
-\(T_{real}\) real-time temperature of the indoor air (real value), C
+\(T_{real}\) is the real-time temperature of the indoor air (real value), \(^{\circ}\)C
 
-\(W_{s,f}\) humidistat ratio corresponding to \(T_{real} - \Delta T and RH_{s,ff, kgWater/kgDryAir}\)
+\(W_{s,f}\) is the humidistat ratio corresponding to \(T_{real} - \Delta T and RH_{s,ff, kgWater/kgDryAir}\).
 
 Note that the thermostat/humidistat settings are related with two major processes within EnergyPlus: one is the design load calculations and HVAC system sizing, and the other is the HVAC system operations. Only the latter is affected by the thermostat/humidistat offset fault, while the former is not. Therefore, the size of the corresponding HVAC equipment in the faulty cases is the same as that in the fault-free cases.
 
@@ -105,15 +105,15 @@ The coil fouling fault is described in the object FaultModel:Fouling:Coil. The f
 UA_{fouled} = [UA_{air} - 1  +  R_{foul}  + UA_{water} - 1]-1
 \end{equation}
 
-Where,
+where:
 
-\(U_{Aair}\) heat transfer coefficient of the coil on the air side, W/K
+\(U_{Aair}\) is the heat transfer coefficient of the coil on the air side, W/K
 
-\(UA_{fouled}\) overall heat transfer coefficient of the fouled coil, W/K
+\(UA_{fouled}\) is the overall heat transfer coefficient of the fouled coil, W/K
 
-\(UA_{water}\) heat transfer coefficient of the coil on the water side, W/K
+\(UA_{water}\) is the heat transfer coefficient of the coil on the water side, W/K
 
-\(R_{foul}\) fouling factor, K/W
+\(R_{foul}\) is the fouling factor, K/W.
 
 \(R_{foul}\) is determined by:
 
@@ -121,15 +121,15 @@ Where,
 R_{foul} = r_{air}/A_{air} + r_{water} / A_{water}
 \end{equation}
 
-Where,
+where:
 
-\(r_{air}\) Air side fouling factor, m2-K/W
+\(r_{air}\) is the air side fouling factor, m\(^{2}\)-K/W
 
-\(r_{water}\) Water side fouling factor, m2-K/W
+\(r_{water}\) is the water side fouling factor, m\(^{2}\)-K/W
 
-\(A_{air}\) Air side coil surface area, m2
+\(A_{air}\) is the air side coil surface area, m\(^{2}\)
 
-\(A_{water}\) Water side coil surface area, m2
+\(A_{water}\) is the water side coil surface area, m\(^{2}\).
 
 The pressure drop associated with the fouling is ignored in the current implementation.
 
@@ -155,7 +155,7 @@ In this case, the fan operation state changes from point A (intersection of the 
 \caption{Effect of dirty air filter on variable speed fan operation – flow rate maintained \protect \label{fig:effect-of-dirty-air-filter-on-variable-speed}}
 \end{figure}
 
-The required airflow rate m can be maintained while the fan pressure rise \(\Delta P\) is increased to \(\Delta P_{df}\) . This leads to higher fan power \(\dot Q_{tot,df}\) and higher power entering the air \(\dot Q_{toair,df}\) , and thus changes the specific enthalpies of the fan outlet air stream (\(h_{out,df}\) ).
+The required airflow rate m can be maintained while the fan pressure rise \(\Delta P\) is increased to \(\Delta P_{df}\) . This leads to higher fan power \(\dot Q_{tot,df}\) and higher power entering the air \(\dot Q_{toair,df}\) , and thus changes the specific enthalpies of the fan outlet air stream (\(h_{out,df}\)).
 
 \begin{equation}
 f_{flow,df} = m / m_{design,df}
@@ -181,29 +181,29 @@ f_{pl,df} = c_{1} + c_{2}*f_{flow,df} + c_{3}*f_{flow,df}^2 + c_{4}*f_{flow,df}^
 h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m
 \end{equation}
 
-Where,
+where:
 
-\(e_{tot}\) is the motor efficiency;
+\(e_{tot}\) is the motor efficiency
 
-\(f_{flow}\) is the flow fraction or part-load ratio;
+\(f_{flow}\) is the flow fraction or part-load ratio
 
-\(f_{pl}\) is the part load factor;
+\(f_{pl}\) is the part load factor
 
-\(m\) is the air mass flow in kg/s;
+\(m\) is the air mass flow in kg/s
 
-\(h_{in}\) is the inlet air stream specific enthalpies in J/kg;
+\(h_{in}\) is the inlet air stream specific enthalpies in J/kg
 
-\(h_{out}\) is the outlet air stream specific enthalpies in J/kg;
+\(h_{out}\) is the outlet air stream specific enthalpies in J/kg
 
-\(\dot{Q}_{tot}\) is the fan power in watts;
+\(\dot{Q}_{tot}\) is the fan power in watts
 
-\(\dot{Q}_{toair}\) is the power entering the air in watts;
+\(\dot{Q}_{toair}\) is the power entering the air in watts
 
-\(\dot{Q}_{shaft}\) is the fan shaft power in watts;
+\(\dot{Q}_{shaft}\) is the fan shaft power in watts
 
-\(\Delta P\) is the fan pressure increase in Pascal;
+\(\Delta P\) is the fan pressure increase in Pascal
 
-\(_{design}\) is for the parameters in the design condition;
+\(_{design}\) is for the parameters in the design condition
 
 \(_{df}\) is for the parameters in the dirty filter case.
 
@@ -217,7 +217,7 @@ In this case, the fan operation state changes from point A (intersection of the 
 \caption{Effect of dirty air filter on variable speed fan operation – flow rate reduced \protect \label{fig:effect-of-dirty-air-filter-on-variable-speed-001}}
 \end{figure}
 
-The airflow rate m is reduced to \(m_{df}\) while the fan design pressure rise \(\Delta P\) is increased to \(\Delta P_{df}\). Similarly to case (a), the fan power (\(\dot Q_{tot}\) ), the power entering the air (\(\dot Q_{toair}\) ), and the specific enthalpies of the fan outlet air stream (\(h_{out}\) ) are all affected. Different from case (a), however, the fan power (\(\dot Q_{tot}\) ) may either increase or decrease, depending on the degree of the airflow rate decrease and pressure rise increase. Also note that \(f_{flow,df}\) is always 1 in this case, since the fan runs at its maximum speed.
+The airflow rate m is reduced to \(m_{df}\) while the fan design pressure rise \(\Delta P\) is increased to \(\Delta P_{df}\). Similarly to case (a), the fan power (\(\dot Q_{tot}\)), the power entering the air (\(\dot Q_{toair}\)), and the specific enthalpies of the fan outlet air stream (\(h_{out}\)) are all affected. Different from case (a), however, the fan power (\(\dot Q_{tot}\)) may either increase or decrease, depending on the degree of the airflow rate decrease and pressure rise increase. Also note that \(f_{flow,df}\) is always 1 in this case, since the fan runs at its maximum speed.
 
 \begin{equation}
 f_{flow,df} = 1
@@ -243,29 +243,29 @@ f_{pl,df} = c_{1} + c_{2}*f_{flow,df} + c_{3}*f_{flow,df}^2 + c_{4}*f_{flow,df}^
 h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m_{design,df}
 \end{equation}
 
-Where,
+where:
 
-\(e_{tot}\) is the motor efficiency;
+\(e_{tot}\) is the motor efficiency
 
-\(f_{flow}\) is the flow fraction or part-load ratio;
+\(f_{flow}\) is the flow fraction or part-load ratio
 
-\(f_{pl}\) is the part load factor;
+\(f_{pl}\) is the part load factor
 
-\(m\) is the air mass flow in kg/s;
+\(m\) is the air mass flow in kg/s
 
-\(h_{in}\) is the inlet air stream specific enthalpies in J/kg;
+\(h_{in}\) is the inlet air stream specific enthalpies in J/kg
 
-\(h_{out}\) is the outlet air stream specific enthalpies in J/kg;
+\(h_{out}\) is the outlet air stream specific enthalpies in J/kg
 
-\(\dot{Q}_{tot}\) is the fan power in watts;
+\(\dot{Q}_{tot}\) is the fan power in Watts
 
-\(\dot{Q}_{toair}\) is the power entering the air in watts;
+\(\dot{Q}_{toair}\) is the power entering the air in Watts
 
-\(\dot{Q}_{shaft}\) is the fan shaft power in watts;
+\(\dot{Q}_{shaft}\) is the fan shaft power in Watts
 
-\(\Delta P\) is the fan pressure increase in Pascal;
+\(\Delta P\) is the fan pressure increase in Pascal
 
-\(_{design}\) is for the parameters in the design condition;
+\(_{design}\) is for the parameters in the design condition
 
 \(_{df}\) is for the parameters in the dirty filter case.
 
@@ -279,7 +279,7 @@ In this case, the fan operation state changes from point A (intersection of the 
 \caption{Effect of dirty air filter on constant speed fan operation \protect \label{fig:effect-of-dirty-air-filter-on-constant-speed}}
 \end{figure}
 
-Similarly to case (b), the airflow rate m is reduced to \(m_{df}\) while the fan pressure rise \(\Delta P\) is increased to \(\Delta P_{df}\) . This results in the variations of the fan power (\(\dot Q_{tot}\) ), the power entering the air (\(\dot Q_{toair}\) ), and the specific enthalpies of the fan outlet air stream (\(h_{out}\) ).
+Similarly to case (b), the airflow rate m is reduced to \(m_{df}\) while the fan pressure rise \(\Delta P\) is increased to \(\Delta P_{df}\) . This results in the variations of the fan power (\(\dot Q_{tot}\)), the power entering the air (\(\dot Q_{toair}\)), and the specific enthalpies of the fan outlet air stream (\(h_{out}\)).
 
 \begin{equation}
 \dot{Q}_{tot,df} = m_{design,df} \times \Delta P_{df} / (e_{tot} \times \rho_{air} )
@@ -297,25 +297,25 @@ Similarly to case (b), the airflow rate m is reduced to \(m_{df}\) while the fan
 h_{out,df} = h_{in} + \dot{Q}_{toair,df} / m_{design,df}
 \end{equation}
 
-Where,
+where:
 
-\(e_{tot}\) is the motor efficiency;
+\(e_{tot}\) is the motor efficiency
 
-\(m\) is the air mass flow in kg/s;
+\(m\) is the air mass flow in kg/s
 
-\(h_{in}\) is the inlet air stream specific enthalpies in J/kg;
+\(h_{in}\) is the inlet air stream specific enthalpies in J/kg
 
-\(h_{out}\) is the outlet air stream specific enthalpies in J/kg;
+\(h_{out}\) is the outlet air stream specific enthalpies in J/kg
 
-\(\dot{Q}_{tot}\) is the fan power in watts;
+\(\dot{Q}_{tot}\) is the fan power in Watts
 
-\(\dot{Q}_{toair}\) is the power entering the air in watts;
+\(\dot{Q}_{toair}\) is the power entering the air in Watts
 
-\(\dot{Q}_{shaft}\) is the fan shaft power in watts;
+\(\dot{Q}_{shaft}\) is the fan shaft power in Watts
 
-\(\Delta P\) is the fan pressure increase in Pascal;
+\(\Delta P\) is the fan pressure increase in Pascal
 
-\(_{design}\) is for the parameters in the design condition;
+\(_{design}\) is for the parameters in the design condition
 
 \(_{df}\) is for the parameters in the dirty filter case.
 
@@ -362,7 +362,7 @@ These chillers can have different flow modes:
   \emph{NotModulated} for either variable or constant pumping with flow controlled by the external plant system.
 \end{itemize}
 
-\textbf{(a) constant flow chillers}
+\textbf{(a) Constant Flow Chillers}
 
 For the chillers with \emph{ConstantFlow} and \emph{NotModulated}, local control is provided by resetting the leaving water temperature. The actual evaporator outlet water temperature value at faulty operations can be obtained via:
 
@@ -370,13 +370,13 @@ For the chillers with \emph{ConstantFlow} and \emph{NotModulated}, local control
 T_{evap-o,f} = T_{evap-o,ff} - \Delta T
 \end{equation}
 
-Where, 
+where:
 
-\(T_{evap-o,f}\) evaporator outlet temperature in the faulty case (actual value)
+\(T_{evap-o,f}\) is the evaporator outlet temperature in the faulty case (actual value)
 
-\(T_{evap-o,ff}\) evaporator outlet temperature in the fault-free case (reading value)
+\(T_{evap-o,ff}\) is the evaporator outlet temperature in the fault-free case (reading value)
 
-\(\Delta T\) difference between the temperature reading and the actual temperature
+\(\Delta T\) is the difference between the temperature reading and the actual temperature.
 
 Then the evaporator capacity can be calculated with:
 
@@ -384,17 +384,17 @@ Then the evaporator capacity can be calculated with:
 Q_{evap,f} = m_{evap} \times C_p \times (T_{evap-i} - T_{evap-o,f} )
 \end{equation}
 
-Where, 
+where:
 
-\(m_{evap}\) evaporator water flow rate (design value, actual value)
+\(m_{evap}\) is the evaporator water flow rate (design value, actual value)
 
-\(Q_{evap,f}\) actual evaporator capacity in the faulty case
+\(Q_{evap,f}\) is the actual evaporator capacity in the faulty case
 
-\(T_{evap-o,f}\) evaporator outlet temperature value in the faulty case (actual value)
+\(T_{evap-o,f}\) is the evaporator outlet temperature value in the faulty case (actual value)
 
-\(T_{evap-i}\) evaporator inlet temperature value \newline
+\(T_{evap-i}\) is the evaporator inlet temperature value. \newline
 
-\textbf{(b) variable flow chillers}
+\textbf{(b) Variable Flow Chillers}
 
 For the variable flow chillers with internal water flow rate controls to target a leaving temperature setpoint (type \emph{LeavingSetpointModulated}), the actual evaporator outlet water temperature value at faulty operations can be obtained via:
 
@@ -402,13 +402,13 @@ For the variable flow chillers with internal water flow rate controls to target 
 T_{evap-o,f} = T_{evap-o,ff} - \Delta T
 \end{equation}
 
-Where, 
+where:
 
-\(T_{evap-o,f}\) evaporator outlet temperature in the faulty case (actual value)
+\(T_{evap-o,f}\) is the evaporator outlet temperature in the faulty case (actual value)
 
-\(T_{evap-o,ff}\) evaporator outlet temperature in the fault-free case (reading, design value)
+\(T_{evap-o,ff}\) is the evaporator outlet temperature in the fault-free case (reading, design value)
 
-\(\Delta T\) difference between the temperature reading and the actual temperature
+\(\Delta T\) is the difference between the temperature reading and the actual temperature.
 
 The water flow rate at faulty operations can be obtained via:
 
@@ -416,19 +416,19 @@ The water flow rate at faulty operations can be obtained via:
 m_{evap,f} = Q_{evap,ff} / ( C_p \times (T_{evap-i} - T_{evap-o,ff} ) )
 \end{equation}
 
-Where, 
+where:
 
-\(m_{evap,f}\) evaporator water flow rate in the faulty case (actual value)
+\(m_{evap,f}\) is the evaporator water flow rate in the faulty case (actual value)
 
-\(Q_{evap,ff}\) evaporator capacity in the fault-free case (required value)
+\(Q_{evap,ff}\) is the evaporator capacity in the fault-free case (required value)
 
-\(Q_{evap,f}\) actual evaporator capacity in the faulty case (actual value)
+\(Q_{evap,f}\) is the actual evaporator capacity in the faulty case (actual value)
 
-\(T_{evap-o,ff}\) evaporator outlet temperature in the fault-free case (reading, design value)
+\(T_{evap-o,ff}\) is the evaporator outlet temperature in the fault-free case (reading, design value)
 
-\(T_{evap-i}\) evaporator inlet temperature value 
+\(T_{evap-i}\) is the evaporator inlet temperature value 
 
-\(\Delta T\) difference between the temperature reading and the actual temperature
+\(\Delta T\) is the difference between the temperature reading and the actual temperature.
 
 Then the evaporator capacity can be calculated with:
 
@@ -436,15 +436,15 @@ Then the evaporator capacity can be calculated with:
 Q_{evap,f} = m_{evap,f} \times C_p \times (T_{evap-i} - T_{evap-o,f} )
 \end{equation}
 
-Where, 
+where:
 
-\(m_{evap,f}\) evaporator water flow rate in the faulty case (actual value)
+\(m_{evap,f}\) is the evaporator water flow rate in the faulty case (actual value)
 
-\(Q_{evap,f}\) actual evaporator capacity in the faulty case (actual value)
+\(Q_{evap,f}\) is the actual evaporator capacity in the faulty case (actual value)
 
-\(T_{evap-o,f}\) evaporator outlet temperature value in the faulty case (actual value)
+\(T_{evap-o,f}\) is the evaporator outlet temperature value in the faulty case (actual value)
 
-\(T_{evap-i}\) evaporator inlet temperature value 
+\(T_{evap-i}\) is the evaporator inlet temperature value 
 
 Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations. If the faulty sensor leads to a supply water temperature level that goes beyond the limits defined in the chiller object, the predefined bound values will be used as the actual supply water temperature \(T_{evap-o,f}\).
 
@@ -479,13 +479,13 @@ The effect of an offset in a condenser supply water temperature sensor whose sol
 T_{tower-o,f} = T_{tower-o,ff} - \Delta T
 \end{equation}
 
-Where,
+where:
 
-\(T_{tower-o,f}\) tower outlet temperature in the faulty case (actual value)
+\(T_{tower-o,f}\) is the tower outlet temperature in the faulty case (actual value)
 
-\(T_{tower-o,ff}\) tower outlet temperature in the fault-free case (reading value)
+\(T_{tower-o,ff}\) is the tower outlet temperature in the fault-free case (reading value)
 
-\(\Delta T\) difference between the temperature reading and the actual temperature
+\(\Delta T\) is the difference between the temperature reading and the actual temperature.
 
 Note that the fault affects the tower in both the free convection cooling mode when fan is off and normal cooling mode when fan is on. Also note that if the faulty sensor temperature goes beyond the sensor bounds (e.g., min/max condenser loop temperature defined in object \emph{CondenserLoop}, or the min/max setpoint values defined in object \emph{SetpointManager:FollowOutdoorAirTemperature}), the predefined bound values will be used as the actual temperature.
 
@@ -516,13 +516,13 @@ The fault model allows the user to describe the fouling using UA reduction facto
 UA_{tower,f} = UA_{tower,ff} \times F_{UA}
 \end{equation}
 
-Where,
+where:
 
-\(UA_{tower,f}\) U-factor times area values in the faulty case
+\(UA_{tower,f}\) is the U-factor times area values in the faulty case
 
-\(UA_{tower,ff}\) U-factor times area values in the fault-free case
+\(UA_{tower,ff}\) is the U-factor times area values in the fault-free case
 
-\(F_{UA}\) Factor describing the tower UA reduction due to fouling
+\(F_{UA}\) is the factor describing the tower UA reduction due to fouling.
 
 
 \subsection{Coil Supply Air Temperature Sensor Offset}\label{coil-supply-air-temperature-sensor-offset}
@@ -559,13 +559,13 @@ The effect of an offset in a coil supply air temperature sensor whose sole use i
 T_{coil-o,f} = T_{coil-o,ff} - \Delta T
 \end{equation}
 
-Where,
+where:
 
-\(T_{coil-o,f}\) coil outlet temperature in the faulty case (actual value)
+\(T_{coil-o,f}\) is the coil outlet temperature in the faulty case (actual value)
 
-\(T_{coil-o,ff}\) coil outlet temperature in the fault-free case (reading value)
+\(T_{coil-o,ff}\) is the coil outlet temperature in the fault-free case (reading value)
 
-\(\Delta T\) difference between the temperature reading and the actual temperature
+\(\Delta T\) is the difference between the temperature reading and the actual temperature.
 
 Note that \emph{Coil:Heating:Water}, \emph{Coil:Cooling:Water}, and \emph{Coil:Cooling:Water:Detailedgeometry} are controlled via \emph{Controller:WaterCoil}, while the other coil types are controlled with an internal \emph{Temperature Setpoint Node}. For the water coils, users need to specify a \emph{Controller:WaterCoil} object that corresponds to the faulty water coil.
 
@@ -590,17 +590,17 @@ Q_{boiler,f} = Q_{boiler,ff} \times F_{boiler}
 Eff_{boiler,f} = Eff_{boiler,ff} \times F_{boiler}
 \end{equation}
 
-Where,
+where:
 
-\(Q_{boiler,f}\) Nominal boiler capacity in the faulty case
+\(Q_{boiler,f}\) is the nominal boiler capacity in the faulty case
 
-\(Q_{boiler,ff}\) Nominal boiler capacity in the fault-free case
+\(Q_{boiler,ff}\) is the nominal boiler capacity in the fault-free case
 
-\(Eff_{boiler,f}\) Nominal boiler thermal efficiency in the faulty case
+\(Eff_{boiler,f}\) is the nominal boiler thermal efficiency in the faulty case
 
-\(Eff_{boiler,ff}\) Nominal boiler thermal efficiency in the fault-free case
+\(Eff_{boiler,ff}\) is the nominal boiler thermal efficiency in the fault-free case
 
-\(F_{boiler}\) Factor describing the boiler capacity and efficiency reduction due to fouling
+\(F_{boiler}\) is the factor describing the boiler capacity and efficiency reduction due to fouling.
 
 Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations.
 
@@ -643,17 +643,17 @@ Q_{chiller,f} = Q_{chiller,ff} \times F_{chiller}
 COP_{chiller,f} = COP_{chiller,ff} \times F_{chiller}
 \end{equation}
 
-Where,
+where:
 
-\(Q_{chiller,f}\) Reference chiller capacity in the faulty case
+\(Q_{chiller,f}\) is the reference chiller capacity in the faulty case
 
-\(Q_{chiller,ff}\) Reference chiller capacity in the fault-free case
+\(Q_{chiller,ff}\) is the reference chiller capacity in the fault-free case
 
-\(COP_{chiller,f}\) Reference chiller COP in the faulty case
+\(COP_{chiller,f}\) is the reference chiller COP in the faulty case
 
-\(COP_{chiller,ff}\) Reference chiller COP in the fault-free case
+\(COP_{chiller,ff}\) is the reference chiller COP in the fault-free case
 
-\(F_{chiller}\) Factor describing the chiller capacity and efficiency reduction due to fouling
+\(F_{chiller}\) is the factor describing the chiller capacity and efficiency reduction due to fouling.
 
 Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations.
 
@@ -674,11 +674,12 @@ The model allows the user to describe the fault using a dynamic fouling factor. 
 Eff_{EvapCooler,f} = Eff_{EvapCooler,ff} \times F_{EvapCooler}
 \end{equation}
 
-Where,
-\(Eff_{EvapCooler,f}\) Indirect stage efficiency in the faulty case
+where:
 
-\(Eff_{EvapCooler,ff}\) Indirect stage efficiency in the fault-free case
+\(Eff_{EvapCooler,f}\) is the indirect stage efficiency in the faulty case
 
-\(F_{EvapCooler}\) Factor describing the evaporative cooler efficiency reduction due to fouling
+\(Eff_{EvapCooler,ff}\) is the indirect stage efficiency in the fault-free case
+
+\(F_{EvapCooler}\) is the factor describing the evaporative cooler efficiency reduction due to fouling.
 
 Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations.

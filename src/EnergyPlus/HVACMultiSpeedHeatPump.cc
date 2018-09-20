@@ -58,6 +58,7 @@
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <DataAirflowNetwork.hh>
 #include <DataBranchNodeConnections.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
@@ -541,7 +542,6 @@ namespace HVACMultiSpeedHeatPump {
 
         using BranchNodeConnections::SetUpCompSets;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DXCoils::GetDXCoilIndex;
         auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
@@ -716,6 +716,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
+                                    MSHeatPump(MSHPNum).AirLoopNumber = AirLoopNumber;
                                     break;
                                 }
                                 MSHeatPump(MSHPNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
@@ -2633,6 +2634,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using namespace DataSizing;
+        using DataAirSystems::PrimaryAirSystem;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::TrimSigDigits;
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -2642,6 +2644,21 @@ namespace HVACMultiSpeedHeatPump {
         int NumOfSpeedCooling; // Number of speeds for cooling
         int NumOfSpeedHeating; // Number of speeds for heating
         int i;                 // Index to speed
+
+        if (CurSysNum > 0 && CurOASysNum == 0) {
+            if (MSHeatPump(MSHeatPumpNum).FanType == DataHVACGlobals::FanType_SystemModelObject) {
+                PrimaryAirSystem(CurSysNum).supFanVecIndex = MSHeatPump(MSHeatPumpNum).FanNum;
+                PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+            } else {
+                PrimaryAirSystem(CurSysNum).SupFanNum = MSHeatPump(MSHeatPumpNum).FanNum;
+                PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            }
+            if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
+                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            } else if (MSHeatPump(MSHeatPumpNum).FanPlaceType == DrawThru) {
+                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            }
+        }
 
         // FLOW
         NumOfSpeedCooling = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
@@ -3707,11 +3724,10 @@ namespace HVACMultiSpeedHeatPump {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataAirLoop::LoopCompCycRatio;
-        using DataAirLoop::LoopFanOperationMode;
-        using DataAirLoop::LoopOnOffFanPartLoadRatio;
-        using DataAirLoop::LoopSystemOffMassFlowrate;
-        using DataAirLoop::LoopSystemOnMassFlowrate;
+        using DataAirflowNetwork::AirflowNetworkControlMultiADS;
+        using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
+        using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataAirLoop::AirLoopAFNInfo;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3721,11 +3737,13 @@ namespace HVACMultiSpeedHeatPump {
             MSHPHeatRecovery(MSHeatPumpNum);
         }
 
-        LoopSystemOnMassFlowrate = CompOnMassFlow;
-        LoopSystemOffMassFlowrate = CompOffMassFlow;
-        LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
-        LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
-        LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
+        if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate = CompOnMassFlow;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate = CompOffMassFlow;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
+            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
+        }
     }
 
     //******************************************************************************
@@ -3786,6 +3804,15 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPumpReport(MSHeatPumpNum).AuxElecCoolConsumption +=
                 MSHeatPump(MSHeatPumpNum).AuxOffCyclePower * (1.0 - SaveCompressorPLR) * ReportingConstant;
         }
+
+        if (MSHeatPump(MSHeatPumpNum).FirstPass) {
+            if (!SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, MSHeatPump(MSHeatPumpNum).FirstPass);
+            }
+        }
+
+        // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
+        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
     }
 
     void MSHPHeatRecovery(int const MSHeatPumpNum) // Number of the current electric MSHP being simulated

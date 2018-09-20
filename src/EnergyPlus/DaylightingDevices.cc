@@ -548,7 +548,7 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (Surface(SurfNum).WindowShadingControlPtr > 0) {
+                    if (Surface(SurfNum).HasShadeControl) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
                                         " must not have a shading control.");
                         ErrorsFound = true;
@@ -623,7 +623,7 @@ namespace DaylightingDevices {
                         }
                     }
 
-                    if (Surface(SurfNum).WindowShadingControlPtr > 0) {
+                    if (Surface(SurfNum).HasShadeControl) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
                                         " must not have a shading control.");
                         ErrorsFound = true;
@@ -804,7 +804,7 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (Surface(SurfNum).WindowShadingControlPtr > 0) {
+                    if (Surface(SurfNum).HasShadeControl) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
                                         " must not have a shading control.");
                         ErrorsFound = true;

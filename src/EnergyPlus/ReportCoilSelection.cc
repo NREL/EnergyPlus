@@ -1304,17 +1304,15 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             // should be picked up by CoolingWaterDesAirInletHumRatSizing and CoolingWaterDesWaterInletTempSizing
             // c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneTempAtCoolPeak;
             // c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneHumRatAtCoolPeak;
-        } else if (DataSizing::ZoneEqFanCoil) {
-            // should be picked up by CoolingWaterDesAirInletHumRatSizing and CoolingWaterDesWaterInletTempSizing
-            // if ( DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolMassFlow > 0.0 ) {
-            //	c->oaPeakVolFrac = min( (DataEnvironment::StdRhoAir * c->oaPeakVolFlow)/DataSizing::FinalZoneSizing( curZoneEqNum
-            //).DesCoolMassFlow, 1.0 ); } else { 	c->oaPeakVolFrac = 0.0;
-            //}
-            // c->coilDesEntTemp = c->oaPeakVolFrac * DataSizing::FinalZoneSizing( curZoneEqNum ).OutTempAtCoolPeak + ( 1.0 - c->oaPeakVolFrac ) *
-            // DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneTempAtCoolPeak;  c->coilDesEntHumRat =  c->oaPeakVolFrac * DataSizing::FinalZoneSizing(
-            // curZoneEqNum ).OutHumRatAtCoolPeak + ( 1.0 - c->oaPeakVolFrac ) * DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneHumRatAtCoolPeak;
-        } else if (DataSizing::ZoneEqDXCoil) {
-            if (DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
+        } else if (DataSizing::ZoneEqDXCoil || DataSizing::ZoneEqFanCoil || DataSizing::ZoneEqUnitarySys) {
+            if (DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerVolFlow > 0.0) {
+                if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
+                    c->coilDesEntTemp = DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb;
+                }
+                if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
+                    c->coilDesEntHumRat = DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat;
+                }
+            } else if (DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
                     c->coilDesEntTemp = DataSizing::FinalZoneSizing(curZoneEqNum).DesCoolCoilInTemp;
                 }
@@ -1323,7 +1321,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                 }
             } else {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    c->coilDesEntTemp = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneRetTempAtCoolPeak;
+                    c->coilDesEntTemp = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneTempAtCoolPeak;
                 }
                 if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
                     c->coilDesEntHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneHumRatAtCoolPeak;
@@ -1533,16 +1531,23 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                         (DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).ZoneHumRatAtHeatPeak * (1.0 - MinPriFlowFrac));
                 }
             }
-        } else if (DataSizing::ZoneEqFanCoil) {
-            if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                Real64 desOAFlowFrac = DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatOAFlowFrac;
-                c->coilDesEntTemp = desOAFlowFrac * DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak +
-                                    (1.0 - desOAFlowFrac) * DataSizing::FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak;
-                c->coilDesEntHumRat = desOAFlowFrac * DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak +
-                                      (1.0 - desOAFlowFrac) * DataSizing::FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak;
-            }
-        } else if (DataSizing::ZoneEqDXCoil) {
-            if (DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
+            //} else if (DataSizing::ZoneEqFanCoil) {
+            //    if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
+            //        Real64 desOAFlowFrac = DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatOAFlowFrac;
+            //        c->coilDesEntTemp = desOAFlowFrac * DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak +
+            //                            (1.0 - desOAFlowFrac) * DataSizing::FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak;
+            //        c->coilDesEntHumRat = desOAFlowFrac * DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak +
+            //                              (1.0 - desOAFlowFrac) * DataSizing::FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak;
+            //    }
+        } else if (DataSizing::ZoneEqDXCoil || DataSizing::ZoneEqFanCoil || DataSizing::ZoneEqUnitarySys) {
+            if (DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerVolFlow > 0.0) {
+                if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
+                    c->coilDesEntTemp = DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb;
+                }
+                if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
+                    c->coilDesEntHumRat = DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat;
+                }
+            } else if (DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
                     c->coilDesEntTemp = DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatCoilInTemp;
                 }
@@ -1551,7 +1556,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 }
             } else {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    c->coilDesEntTemp = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneRetTempAtHeatPeak;
+                    c->coilDesEntTemp = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak;
                 }
                 if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
                     c->coilDesEntHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak;

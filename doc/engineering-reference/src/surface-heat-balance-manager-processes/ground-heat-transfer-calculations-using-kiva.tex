@@ -54,7 +54,9 @@ The general method is to define the width of the floor (the distance
 from the symmetry plane to the wall interior),\(w\) in the
 two-dimensional context as:
 
-\[ A/P_{exp} \]
+\begin{equation}
+A/P_{exp}
+\end{equation}
 
 where \(A\) is the area of the foundation footprint, and \(P_{exp}\) is
 the exposed perimeter of the foundation (See
@@ -189,7 +191,7 @@ slab.
 \begin{figure}
 \centering
 \includegraphics{media/kiva-walkout-walls.png}
-\caption{Figure 20: Walkout basement Kiva instances (one for each wall
+\caption{Walkout basement Kiva instances (one for each wall
 height)\label{fig:wo-w}}
 \end{figure}
 
@@ -233,16 +235,22 @@ be weighted according to the fraction of the total exposed perimeter,
 \(P_{exp,tot}\), represented by each segment of different height. The
 total heat flux through the walkout basement floor is:
 
-\[\dot{q} = \sum^{N_{segs}}_i{\frac{P_{exp,i}}{P_{exp,tot}}}\cdot h_i \left(T_\infty - T_{floor,i} \right)\]
+\begin{equation}
+\dot{q} = \sum^{N_{segs}}_i{\frac{P_{exp,i}}{P_{exp,tot}}}\cdot h_i \left(T_\infty - T_{floor,i} \right)
+\end{equation}
 
 The weighted average convective coefficient for the walkout basement
 floor surface is:
 
-\[\bar{h} = \sum^{N_{wall,segs}}_i{\frac{P_{exp,i}}{P_{exp,tot}}}\cdot h_i\]
+\begin{equation}
+\bar{h} = \sum^{N_{wall,segs}}_i{\frac{P_{exp,i}}{P_{exp,tot}}}\cdot h_i
+\end{equation}
 
 The weighted average temperature for the floor surface is:
 
-\[ \bar{T}_{floor} = T_\infty - \dot{q}/\bar{h} \]
+\begin{equation}
+\bar{T}_{floor} = T_\infty - \dot{q}/\bar{h}
+\end{equation}
 
 \textbf{Multiple Floor Surfaces:} If a floor has multiple constructions
 (e.g., carpeted and bare) each surface must reference a separate

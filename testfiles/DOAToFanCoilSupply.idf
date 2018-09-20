@@ -214,8 +214,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -227,8 +229,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -1454,7 +1458,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1470,7 +1473,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1486,7 +1488,6 @@
     RIGHT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1502,7 +1503,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1518,7 +1518,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1534,7 +1533,6 @@
     LEFT-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1910,7 +1908,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    13.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   Sizing:Zone,
     SPACE2-1,                !- Zone or ZoneList Name
@@ -1935,7 +1937,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    13.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   Sizing:Zone,
     SPACE3-1,                !- Zone or ZoneList Name
@@ -1960,7 +1966,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    13.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   Sizing:Zone,
     SPACE4-1,                !- Zone or ZoneList Name
@@ -1985,7 +1995,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    13.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   Sizing:Zone,
     SPACE5-1,                !- Zone or ZoneList Name
