@@ -519,17 +519,6 @@ namespace CommandLineInterface {
         // Check if specified files exist
         {
             IOFlags flags;
-            gio::inquire(inputIddFileName, flags);
-            FileExists = flags.exists();
-        }
-        if (!FileExists) {
-            DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + ".");
-            DisplayString(errorFollowUp);
-            exit(EXIT_FAILURE);
-        }
-
-        {
-            IOFlags flags;
             gio::inquire(inputFileName, flags);
             FileExists = flags.exists();
         }
@@ -603,6 +592,18 @@ namespace CommandLineInterface {
             }
             std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
             bool inputFileNamedIn = (getAbsolutePath(inputFileName) == getAbsolutePath("in.idf"));
+
+            // check if IDD actually exists since ExpandObjects still requires it
+            {
+                IOFlags flags;
+                gio::inquire(inputIddFileName, flags);
+                FileExists = flags.exists();
+            }
+            if (!FileExists) {
+                DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + ".");
+                DisplayString(errorFollowUp);
+                exit(EXIT_FAILURE);
+            }
 
             bool iddFileNamedEnergy = (getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
 

@@ -123,6 +123,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     int const nCapfT = 1;
     pCurve = &PerfCurve(nCapfT);
     pCurve->CurveType = Cubic;
+    pCurve->NumDims = 1;
     pCurve->Name = "PTHPHeatingCAPFT";
     pCurve->Coeff1 = 0.876825;
     pCurve->Coeff2 = -0.002955;
@@ -132,11 +133,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->Var1Max = 25;
 
     Coil.CCapFTemp(1) = nCapfT;
-    Coil.TotCapTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nCapfFF = 2;
     pCurve = &PerfCurve(nCapfFF);
     pCurve->CurveType = Quadratic;
+    pCurve->NumDims = 1;
     pCurve->Name = "HPHeatCapfFF";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -150,6 +151,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     int const nEIRfT = 3;
     pCurve = &PerfCurve(nEIRfT);
     pCurve->CurveType = Cubic;
+    pCurve->NumDims = 1;
     pCurve->Name = "PTHPHeatingEIRFT";
     pCurve->Coeff1 = 0.704658;
     pCurve->Coeff2 = 0.008767;
@@ -158,11 +160,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->Var1Min = -5;
     pCurve->Var1Max = 25;
     Coil.EIRFTemp(1) = nEIRfT;
-    Coil.EIRTempModFacCurveType(1) = pCurve->CurveType;
 
     int const nEIRfFF = 4;
     pCurve = &PerfCurve(nEIRfFF);
     pCurve->CurveType = Quadratic;
+    pCurve->NumDims = 1;
     pCurve->Name = "HPHeatEIRfFF";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -176,6 +178,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     int const nPLFfPLR = 5;
     pCurve = &PerfCurve(nPLFfPLR);
     pCurve->CurveType = Quadratic;
+    pCurve->NumDims = 1;
     pCurve->Name = "HPHeatPLFfPLR";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -189,9 +192,9 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
         PerfomanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == Cubic) {
-            rCurve.ObjectType = CurveType_Cubic;
+            rCurve.ObjectType = "Curve:Cubic";
         } else if (rCurve.CurveType == Quadratic) {
-            rCurve.ObjectType = CurveType_Quadratic;
+            rCurve.ObjectType = "Curve:Quadratic";
         }
         rCurve.InterpolationType = EvaluateCurveToLimits;
     }

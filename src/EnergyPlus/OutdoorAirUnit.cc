@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <BranchNodeConnections.hh>
 #include <DXCoils.hh>
+#include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -76,7 +77,6 @@
 #include <HVACDXSystem.hh>
 #include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <HVACUnitarySystem.hh>
 #include <HeatRecovery.hh>
 #include <HeatingCoils.hh>
 #include <InputProcessing/InputProcessor.hh>
@@ -88,7 +88,9 @@
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <SimAirServingZones.hh>
 #include <SteamCoils.hh>
+#include <UnitarySystem.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
 
@@ -129,6 +131,7 @@ namespace OutdoorAirUnit {
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
+    using DataSizing::ZoneEqOutdoorAirUnit;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
     using namespace FluidProperties;
@@ -149,7 +152,7 @@ namespace OutdoorAirUnit {
     int const HeatXchngr(10);
     int const Desiccant(11);
     int const DXHeatPumpSystem(12);
-    int const UnitarySystem(13);
+    int const UnitarySystemModel(13);
 
     //  Control Types
     int const Neutral(1);       // Controls system using zone mean air temperature
@@ -273,6 +276,8 @@ namespace OutdoorAirUnit {
             }
         }
 
+        ZoneEqOutdoorAirUnit = true;
+
         if (ZoneSizingCalc || SysSizingCalc) return;
 
         InitOutdoorAirUnit(OAUnitNum, ZoneNum, FirstHVACIteration);
@@ -282,6 +287,8 @@ namespace OutdoorAirUnit {
         // CALL UpdateOutdoorAirUnit(OAUnitNum, FirstHVACIteration)
 
         ReportOutdoorAirUnit(OAUnitNum);
+
+        ZoneEqOutdoorAirUnit = false;
     }
 
     void GetOutdoorAirUnitInputs()
@@ -313,12 +320,13 @@ namespace OutdoorAirUnit {
         auto &GetWaterCoilMaxFlowRate(WaterCoils::GetCoilMaxWaterFlowRate);
         using DataGlobals::ScheduleAlwaysOn;
         using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
         using FluidProperties::FindRefrigerant;
         using ScheduleManager::GetScheduleIndex;
         using SteamCoils::GetCoilAirInletNode;
         using SteamCoils::GetCoilAirOutletNode;
+        using SteamCoils::GetCoilMaxSteamFlowRate;
         using SteamCoils::GetCoilSteamInletNode;
+        using SteamCoils::GetCoilSteamOutletNode;
         using SteamCoils::GetSteamCoilIndex;
         using WaterCoils::CheckWaterCoilSchedule;
         using namespace DataLoopNode;
@@ -347,7 +355,6 @@ namespace OutdoorAirUnit {
         using Fans::GetFanIndex;
         using Fans::GetFanType;
         using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
-        using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetOutdoorAirUnitInputs: "); // include trailing blank space
@@ -515,8 +522,8 @@ namespace OutdoorAirUnit {
                     OutAirUnit(OAUnitNum).ExtFanType = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(OutAirUnit(OAUnitNum).ExtFanName)); // call constructor
                     OutAirUnit(OAUnitNum).ExtFan_Index = HVACFan::getFanObjectVectorIndex(OutAirUnit(OAUnitNum).ExtFanName);
-                    OutAirUnit(OAUnitNum).EFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->designAirVolFlowRate;
-                    OutAirUnit(OAUnitNum).ExtFanAvailSchedPtr = HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->availSchedIndex;
+                    OutAirUnit(OAUnitNum).EFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->designAirVolFlowRate;
+                    OutAirUnit(OAUnitNum).ExtFanAvailSchedPtr = HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->availSchedIndex;
                 } else {
                     GetFanType(
                         OutAirUnit(OAUnitNum).ExtFanName, OutAirUnit(OAUnitNum).ExtFanType, errFlag, CurrentModuleObject, OutAirUnit(OAUnitNum).Name);
@@ -742,7 +749,13 @@ namespace OutdoorAirUnit {
                                     GetCoilSteamInletNode(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex,
                                                           OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                                           ErrorsFound);
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilWaterOutletNode =
+                                    GetCoilSteamOutletNode(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType,
+                                                           OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
+                                                           ErrorsFound);
 
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).MaxVolWaterFlow =
+                                    GetCoilMaxSteamFlowRate(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex, ErrorsFound);
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).MinVolWaterFlow = 0.0;
                                 // below: no extra error needed if steam properties not in input
                                 // file because getting the steam coil will have done that.
@@ -840,8 +853,12 @@ namespace OutdoorAirUnit {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = DXHeatPumpSystem;
 
                             } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
-                                OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystem;
-                                CheckUnitarySysCoilInOASysExists(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName);
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystemModel;
+                                UnitarySystems::UnitarySys thisSys;
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(
+                                    DataHVACGlobals::UnitarySys_AnyCoilType, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, false, OAUnitNum);
+                                UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
+                                                                                             OAUnitNum);
 
                                 // Heat recovery
                             } else if (SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE") {
@@ -1098,8 +1115,8 @@ namespace OutdoorAirUnit {
         using PlantUtilities::ScanPlantLoopsForObject;
         using ScheduleManager::GetCurrentScheduleValue;
         auto &GetWaterCoilMaxFlowRate(WaterCoils::GetCoilMaxWaterFlowRate);
-        using DataSizing::AutoSize;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+        using SteamCoils::GetCoilMaxSteamFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
 
         // Locals
@@ -1279,11 +1296,13 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
                     }
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum == TypeOf_CoilSteamAirHeating) {
-                        // DSU deal with steam mass flow rate , currenlty just like hot water  DSU?
-                        rho = GetDensityGlycol(PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
-                                               60.0,
-                                               PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
-                                               RoutineName);
+                        OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow =
+                            GetCoilMaxSteamFlowRate(OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentIndex, errFlag);
+                        Real64 rho = GetSatDensityRefrig(PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
+                                                         DataGlobals::SteamInitConvTemp,
+                                                         1.0,
+                                                         PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
+                                                         RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MinVolWaterFlow;
                         InitComponentNodes(OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
@@ -1455,6 +1474,17 @@ namespace OutdoorAirUnit {
         ExtAirVolFlowUser = 0.0;
         MaxVolWaterFlowDes = 0.0;
         MaxVolWaterFlowUser = 0.0;
+        if (OutAirUnit(OAUnitNum).SFanType == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = OutAirUnit(OAUnitNum).SFan_Index;
+        if (OutAirUnit(OAUnitNum).FanPlace == BlowThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        } else if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+        }
 
         if (OutAirUnit(OAUnitNum).OutAirVolFlow == AutoSize) {
             IsAutoSize = true;
@@ -1551,6 +1581,7 @@ namespace OutdoorAirUnit {
         ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
         ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
         ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
+        ZoneEqSizing(CurZoneEqNum).OAVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
 
         if (OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize) {
             if (OutAirUnit(OAUnitNum).SFanType != DataHVACGlobals::FanType_SystemModelObject) {
@@ -2079,7 +2110,6 @@ namespace OutdoorAirUnit {
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterCoils::SimulateWaterCoilComponents;
         //		using SteamCoils::SimulateSteamCoilComponents;
-        using HVACUnitarySystem::SimUnitarySystem;
         //  Use TranspiredCollector, Only:SimTranspiredCollector
         //  Use EvaporativeCoolers, Only:SimEvapCooler
         //  USE PhotovoltaicThermalCollectors, ONLY:SimPVTcollectors, CalledFromOutsideAirSystem
@@ -2376,7 +2406,8 @@ namespace OutdoorAirUnit {
                     SimDXHeatPumpSystem(EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
                 }
 
-            } else if (SELECT_CASE_var == UnitarySystem) { // 'AirLoopHVAC:UnitarySystem'
+                // RAR need new AirLoopHVAC:UnitarySystem object here
+            } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
                 if (Sim) {
                     // This may have to be done in the unitary system object since there can be both cooling and heating
                     if (((OpMode == NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Temperature)) && (OpMode == HeatingMode)) {
@@ -2386,7 +2417,10 @@ namespace OutdoorAirUnit {
                     } else {
                         Dxsystemouttemp = CompAirOutTemp - FanEffect;
                     }
-                    SimUnitarySystem(EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp);
+                    OutAirUnit(OAUnitNum)
+                        .OAEquip(SimCompNum)
+                        .compPointer->simulate(
+                            EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp, false);
                 }
 
             } else {
@@ -2614,6 +2648,12 @@ namespace OutdoorAirUnit {
         OutAirUnit(OAUnitNum).TotCoolingEnergy = OutAirUnit(OAUnitNum).TotCoolingRate * TimeStepSys * SecInHour;
         OutAirUnit(OAUnitNum).AirMassFlow = OutAirUnit(OAUnitNum).OutAirMassFlow;
         OutAirUnit(OAUnitNum).ElecFanEnergy = OutAirUnit(OAUnitNum).ElecFanRate * TimeStepSys * SecInHour;
+
+        if (OutAirUnit(OAUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, OutAirUnit(OAUnitNum).FirstPass);
+            }
+        }
     }
 
     int GetOutdoorAirUnitOutAirNode(int const OAUnitNum)

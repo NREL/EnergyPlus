@@ -17,7 +17,7 @@ In response to the need for green roof design tools a computational model of the
   heat conduction (and storage) in the soil layer
 \end{itemize}
 
-The ability to track moisture-dependent thermal properties is not implemented yet due to stability issues in the CTF scheme, but is under development for use with the finite difference solution scheme made available in EnergyPlus starting in version 2.
+The ability to track moisture-dependent thermal properties is not implemented yet due to stability issues in the Conduction Transfer Function (CTF) scheme. Finite difference solution scheme currently is not supported in EnergyPlus Green Roof (EcoRoof) Model.
 
 As implemented in EnergyPlus the green roof module allows the user to specify ``ecoroof'' as the outer layer of a rooftop construction using a ``Material:RoofVegetation'' object. The user can then specify various aspects of the green roof construction including growing media depth, thermal properties, plant canopy density, plant height, stomatal conductance (ability to transpire moisture), and soil moisture conditions (including irrigation).
 
@@ -46,7 +46,7 @@ As with a traditional roof, the energy balance of an green roof is dominated by 
 
 The energy budget analysis follows the Fast All Season Soil Strength (FASST) model developed by Frankenstein and Koenig for the US Army Corps of Engineers. FASST was developed, in part, to determine the ability of soils to support manned and unmanned vehicles and personnel movement. In order to accomplish this, however, FASST tracks the energy and moisture balance (including ice and snow) within a vegetated soil. It is a one-dimensional model that draws heavily from other plant canopy models including BATS (Dickinson et al.) and SiB (Sellers et al.). We have implemented FASST here with only a few modifications to adapt it for use with a relatively thin soil layer. The sign convention used assumes all heat fluxes are positive when energy is absorbed into the layer.
 
-In the following discussion this energy budget is divided into a budget for the foliage layer (F\(_{f}\)) and a budget for the ground surface (F\(_{g-}\)). The various parameterizations for latent and sensible heat flux are described in some detail and then the equation set is reduced to the simultaneous solution of two equations involving the temperatures of the foliage and ground surface.
+In the following discussion this energy budget is divided into a budget for the foliage layer (F\(_{f}\)) and a budget for the ground surface (F\(_{g}\)). The various parameterizations for latent and sensible heat flux are described in some detail and then the equation set is reduced to the simultaneous solution of two equations involving the temperatures of the foliage and ground surface.
 
 \subsubsection{Energy budget in the foliage layer}\label{energy-budget-in-the-foliage-layer}
 
@@ -130,7 +130,7 @@ Here, r\(_{s,min}\) is the minimum stomatal resistance. The actual stomatal resi
        0                                                                 & \text{when} \; \theta_r > \overline \theta \\
        \frac{ \overline \theta   - \theta_r }{ \theta_{max} - \theta_r } & \text{when} \; \theta_r \leq \overline \theta \leq \theta_{max}
      \end{array} \right. \\
-   \frac{1}{f_3} = \exp \left[ - {g_d}({e_{f,sat}} - {e_a} \right]
+   \frac{1}{f_3} = \exp \left[ - {g_d}({e_{f,sat}} - {e_a}) \right]
 \end{array}
 \end{equation}
 
@@ -153,13 +153,13 @@ This surface wetness factor is simply a ratio of the aerodynamic resistance to t
 The latent heat flux is then given by:
 
 \begin{equation}
-{L_f} = {l_f} * LAI{\rho_{af}}{C_f}{W_{af}}{r^``}\left( {{q_{af}} - {q_{f,sat}}} \right)
+{L_f} = {l_f} * LAI{\rho_{af}}{C_f}{W_{af}}{r''}\left( {{q_{af}} - {q_{f,sat}}} \right)
 \end{equation}
 
 Here \emph{l\(_{f}\)} , is the latent heat of vaporization (J/kg), q\(_{f,sat}\) is the saturation mixing ratio at the leaf surface temperature, and q\(_{af}\) is the mixing ratio of the air within the canopy. As developed in Frankenstein and Koenig the mixing ratio within the canopy can be determined from:
 
 \begin{equation}
-{q_{af}} = \left[ {\frac{{\left( {1 - {\sigma_f}} \right){q_a} + {\sigma_f}\left( {0.3{q_a} + 0.6{q_{f,sat}}{r^``} + 0.1{q_{f,sat}}{M_g}} \right)}}{{1 - {\sigma_f}\left[ {0.6\left( {1 - {r^``}} \right) + 0.1\left( {1 - {M_g}} \right)} \right]}}} \right]
+{q_{af}} = \left[ {\frac{{\left( {1 - {\sigma_f}} \right){q_a} + {\sigma_f}\left( {0.3{q_a} + 0.6{q_{f,sat}}{r''} + 0.1{q_{f,sat}}{M_g}} \right)}}{{1 - {\sigma_f}\left[ {0.6\left( {1 - {r''}} \right) + 0.1\left( {1 - {M_g}} \right)} \right]}}} \right]
 \end{equation}
 
 where the factor \emph{M\(_{g}\)} ~(ranging from 0 to 1) is the ratio of volumetric moisture content to the porosity of the soil (Koenig). The latent heat of vaporization (\emph{l\(_{f}\)}) is the amount of energy required to convert a unit mass of water to vapor. It is measured in units of J/kg and is inversely proportional to the temperature. From Henderson-Sellers it is estimated as:
@@ -323,7 +323,7 @@ This final set of equations is then solved simultaneously to obtain T\emph{\(_{g
 
 \subsection{Green Roof Nomenclature}\label{green-roof-nomenclature}
 
-C\(_{1}\), C\(_{2}\), C\(_{3}\)~~~ = ~~~~~~~~~ coefficients in linearized temperature equations
+C\(_{1}\), C\(_{2}\), C\(_{3}\)~~~~~~ = ~~~~~~~~~ coefficients in linearized temperature equations
 
 \emph{C\(_{e}\)\(^{g}\)~~~~~~~~~~~~~ = ~~~~~~~~~} latent heat flux bulk transfer coefficient at ground layer
 
@@ -333,7 +333,7 @@ C\(_{h}\)\(^{g}\)~~~~~~~~~~~~~ = ~~~~~~~~~ sensible heat flux bulk transfer coef
 
 C\(_{hn}\)\(^{f}\) ~~~~~~~~~~~ = ~~~~~~~~~ near-neutral transfer coefficient at foliage layer
 
-C\(_{hn}\)\(^{g}\) = ~~~~~~~~~ near-neutral transfer coefficient at ground layer
+C\(_{hn}\)\(^{g}\) ~~~~~~~~~~~ = ~~~~~~~~~ near-neutral transfer coefficient at ground layer
 
 C\(_{p,a}\)~~~~~~~~~~~~ = ~~~~~~~~~ specific heat of air at constant pressure (1005.6 J/kg k)
 
@@ -345,27 +345,27 @@ f\(_{2}\)~~~~~~~~~~~~~~~ = ~~~~~~~~~ multiplying factor for moisture effect on s
 
 f\(_{3}\)~~~~~~~~~~~~~~~ = ~~~~~~~~~ additional multiplying factor for stomatal resistance
 
-F\(_{f}\)~~~~~~~~~~~~~~~ = ~~~~~~~~~ net heat flux to foliage layer (W/m\(^{2}\))
+F\(_{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ net heat flux to foliage layer (W/m\(^{2}\))
 
 F\(_{g}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ net heat flux to ground surface (W/m\(^{2}\))
 
 g\(_{d}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ plant specific characteristic related to stomatal resistance
 
-H \emph{\(_{f}\)} ~~~~~~~~~~~~~ = ~~~~~~~~~ foliage sensible heat flux (W/m\(^{2}\))
+H\(_{f}\) ~~~~~~~~~~~~~ = ~~~~~~~~~ foliage sensible heat flux (W/m\(^{2}\))
 
 H\(_{g}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ ground sensible heat flux (W/m\(^{2}\))
 
-\(I_s^ \downarrow\) ~~~~~~~~~~~ = ~~~~~~~~~ total incoming short wave radiation (W/m\(^{2}\))
+\(I_s^ \downarrow\) ~~~~~~~~~~~~ = ~~~~~~~~~ total incoming short wave radiation (W/m\(^{2}\))
 
-\(I_{i\gamma }^ \downarrow\) ~~~~~~~~~~~~ = ~~~~~~~~~ total incoming longwave radiation (W/m\(^{2}\))
+\(I_{i\gamma }^ \downarrow\) ~~~~~~~~~~~~~ = ~~~~~~~~~ total incoming longwave radiation (W/m\(^{2}\))
 
 K\(_{v}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ von Karmen constant (0.4)
 
-l\(_{f}\)~~~~~~~~~~~~~~~~ = ~~~~~~~~~ latent heat of vaporization at foliage temperature (J/kg)
+l\(_{f}\)~~~~~~~~~~~~~~~ = ~~~~~~~~~ latent heat of vaporization at foliage temperature (J/kg)
 
 l\(_{g}\)~~~~~~~~~~~~~~~ = ~~~~~~~~~ latent heat of vaporization at ground temperature (J/kg)
 
-L\emph{\(_{f}\)}~ ~~~~~~~~~~~~~ = ~~~~~~~~~ foliage latent heat flux (W/m\(^{2}\))
+L\emph{\(_{f}\)}~ ~~~~~~~~~~~~ = ~~~~~~~~~ foliage latent heat flux (W/m\(^{2}\))
 
 L\(_{g}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ ground latent heat flux (W/m\(^{2}\))
 
@@ -393,17 +393,17 @@ R\(_{ib}\)~~~~~~~~~~~~~ = ~~~~~~~~~ bulk Richardson number
 
 R\(_{v}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ gas constant for water vapor (461.53 J/kgK)
 
-\emph{T\(_{a}\)} = ~~~~~~~~~ the air temperature at the instrument height (Kelvin)
+\emph{T\(_{a}\)} ~~~~~~~~~~~ = ~~~~~~~~~ the air temperature at the instrument height (Kelvin)
 
-T\(_{af}\) ~ ~~~~~~~~~ = ~~~~~~~~~ air temperature with in the canopy (Kelvin)
+T\(_{af}\) ~~~~~~~~~~~ = ~~~~~~~~~ air temperature with in the canopy (Kelvin)
 
-T\emph{\(_{f}\)}~~ ~~~~~~~~~~~ = ~~~~~~~~~ leaf temperature (Kelvin)
+T\emph{\(_{f}\)}~~~~~~~~~~~~~~ = ~~~~~~~~~ leaf temperature (Kelvin)
 
 T\(_{g}\) ~~~~~~~~~~~~~~ = ~~~~~~~~~ ground surface temperature (Kelvin)
 
 W~~~~~~~~~~~~~~ = ~~~~~~~~~ wind speed above canopy (m/s)
 
-W\(_{af}\)~ ~~~~~~~~~~~ = ~~~~~~~~~ wind speed with in the canopy (m/s)
+W\(_{af}\)~~~~~~~~~~~~ = ~~~~~~~~~ wind speed with in the canopy (m/s)
 
 z~~~~~~~~~~~~~~~~ = ~~~~~~~~~ height or depth (m)
 
@@ -411,11 +411,11 @@ Z\(_{a}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ instrument height (m)
 
 Z\(_{d}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ displacement height (m)
 
-Z\(_{o}\)\(^{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ foliage roughness length scale (m)
+Z\(_{o}\)\(^{f}\)~~~~~~~~~~~~~ = ~~~~~~~~~ foliage roughness length scale (m)
 
 \subsubsection{Greek letters}\label{greek-letters-000}
 
-\(\alpha\)\(_{f}\)~~~ ~~~~~~~~~~~ = ~~~~~~~~~ albedo (short wave reflectivity) of the canopy
+~~~\(\alpha\)\(_{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ albedo (short wave reflectivity) of the canopy
 
 \(\alpha\)\(_{g}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ albedo (short wave reflectivity) of ground surface
 
@@ -431,9 +431,9 @@ Z\(_{o}\)\(^{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ foliage roughness length scale (m)
 
 \(\rho\)\(_{f}\)~ ~~~~~~~~~~~~~ = ~~~~~~~~ density of air at foliage temperature (kg/m\(^{3}\))
 
-\(\rho\)\(_{f}\)~ ~~~~~~~~~~~~ = ~~~~~~~~ density of air at foliage temperature (kg/m\(^{3}\))
+\(\rho\)\(_{af}\)~ ~~~~~~~~~~~~ = ~~~~~~~~ density of air at foliage temperature (kg/m\(^{3}\))
 
-\(\rho\)\(_{g}\)~~~~~~~~~~~~~ = ~~~~~~~~ density of air at ground surface temperature (kg/m\(^{3}\))
+\(\rho\)\(_{ag}\)~~~~~~~~~~~~~ = ~~~~~~~~ density of air at ground surface temperature (kg/m\(^{3}\))
 
 \(\sigma\) ~ ~~~~~~~~~~~ = ~~~~~~~~~ the Stefan-Boltzmann constant (5.699*10\(^{8}\) W/m\(^{2}\) $^{\circ}$K\(^{4}\))
 

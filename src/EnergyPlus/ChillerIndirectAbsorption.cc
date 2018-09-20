@@ -313,7 +313,6 @@ namespace ChillerIndirectAbsorption {
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataSizing::AutoSize;
         using FluidProperties::FindRefrigerant;
@@ -399,31 +398,25 @@ namespace ChillerIndirectAbsorption {
             IndirectAbsorber(AbsorberNum).GeneratorInputCurvePtr = GetCurveIndex(cAlphaArgs(7));
             if (IndirectAbsorber(AbsorberNum).GeneratorInputCurvePtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(IndirectAbsorber(AbsorberNum).GeneratorInputCurvePtr));
-                    if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + IndirectAbsorber(AbsorberNum).Name + "\"");
-                        ShowContinueError("...illegal Generator Heat Input function of part-load ratio curve type for this object.");
-                        ShowContinueError("...Curve type = " + GetCurveType(IndirectAbsorber(AbsorberNum).GeneratorInputCurvePtr));
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    IndirectAbsorber(AbsorberNum).GeneratorInputCurvePtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    cCurrentModuleObject,            // Object Type
+                    IndirectAbsorber(AbsorberNum).Name,  // Object Name
+                    cAlphaFieldNames(7));               // Field Name
             }
 
             IndirectAbsorber(AbsorberNum).PumpPowerCurvePtr = GetCurveIndex(cAlphaArgs(8));
             if (IndirectAbsorber(AbsorberNum).PumpPowerCurvePtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(IndirectAbsorber(AbsorberNum).PumpPowerCurvePtr));
-                    if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + IndirectAbsorber(AbsorberNum).Name + "\"");
-                        ShowContinueError("...illegal Pump Electric Input function of part-load ratio curve type for this object.");
-                        ShowContinueError("...Curve type = " + GetCurveType(IndirectAbsorber(AbsorberNum).PumpPowerCurvePtr));
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    IndirectAbsorber(AbsorberNum).PumpPowerCurvePtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    cCurrentModuleObject,            // Object Type
+                    IndirectAbsorber(AbsorberNum).Name,  // Object Name
+                    cAlphaFieldNames(8));               // Field Name
             }
 
             if (NumAlphas > 15) {
@@ -524,79 +517,61 @@ namespace ChillerIndirectAbsorption {
             IndirectAbsorber(AbsorberNum).CapFCondenserTempPtr = GetCurveIndex(cAlphaArgs(11));
             if (IndirectAbsorber(AbsorberNum).CapFCondenserTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(IndirectAbsorber(AbsorberNum).CapFCondenserTempPtr));
-                    if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + IndirectAbsorber(AbsorberNum).Name + "\"");
-                        ShowContinueError("...illegal Capacity Correction function of condenser temperature curve type for this object.");
-                        ShowContinueError("...Curve type = " + GetCurveType(IndirectAbsorber(AbsorberNum).CapFCondenserTempPtr));
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    IndirectAbsorber(AbsorberNum).CapFCondenserTempPtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    cCurrentModuleObject,            // Object Type
+                    IndirectAbsorber(AbsorberNum).Name,  // Object Name
+                    cAlphaFieldNames(11));               // Field Name
             }
 
             IndirectAbsorber(AbsorberNum).CapFEvaporatorTempPtr = GetCurveIndex(cAlphaArgs(12));
             if (IndirectAbsorber(AbsorberNum).CapFEvaporatorTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(IndirectAbsorber(AbsorberNum).CapFEvaporatorTempPtr));
-                    if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + IndirectAbsorber(AbsorberNum).Name + "\"");
-                        ShowContinueError("...illegal Capacity Correction function of evaporator temperature curve type for this object.");
-                        ShowContinueError("...Curve type = " + GetCurveType(IndirectAbsorber(AbsorberNum).CapFCondenserTempPtr));
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    IndirectAbsorber(AbsorberNum).CapFEvaporatorTempPtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    cCurrentModuleObject,            // Object Type
+                    IndirectAbsorber(AbsorberNum).Name,  // Object Name
+                    cAlphaFieldNames(12));               // Field Name
             }
 
             IndirectAbsorber(AbsorberNum).CapFGeneratorTempPtr = GetCurveIndex(cAlphaArgs(13));
             if (IndirectAbsorber(AbsorberNum).CapFGeneratorTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(IndirectAbsorber(AbsorberNum).CapFGeneratorTempPtr));
-                    if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                    } else {
-                        if (IndirectAbsorber(AbsorberNum).GenHeatSourceType == NodeType_Water) {
-                            ShowSevereError(cCurrentModuleObject + " \"" + IndirectAbsorber(AbsorberNum).Name + "\"");
-                            ShowContinueError("...illegal Capacity Correction function of generator temperature curve type for this object.");
-                            ShowContinueError("...Curve type = " + GetCurveType(IndirectAbsorber(AbsorberNum).CapFGeneratorTempPtr));
-                            ErrorsFound = true;
-                        }
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    IndirectAbsorber(AbsorberNum).CapFGeneratorTempPtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    cCurrentModuleObject,            // Object Type
+                    IndirectAbsorber(AbsorberNum).Name,  // Object Name
+                    cAlphaFieldNames(13));               // Field Name
             }
 
             IndirectAbsorber(AbsorberNum).HeatInputFCondTempPtr = GetCurveIndex(cAlphaArgs(14));
             if (IndirectAbsorber(AbsorberNum).HeatInputFCondTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(IndirectAbsorber(AbsorberNum).HeatInputFCondTempPtr));
-                    if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + IndirectAbsorber(AbsorberNum).Name + "\"");
-                        ShowContinueError("...illegal Generator Heat Input Correction function of condenser temperature curve type for this object.");
-                        ShowContinueError("...Curve type = " + GetCurveType(IndirectAbsorber(AbsorberNum).HeatInputFCondTempPtr));
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    IndirectAbsorber(AbsorberNum).HeatInputFCondTempPtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    cCurrentModuleObject,            // Object Type
+                    IndirectAbsorber(AbsorberNum).Name,  // Object Name
+                    cAlphaFieldNames(14));               // Field Name
             }
 
             IndirectAbsorber(AbsorberNum).HeatInputFEvapTempPtr = GetCurveIndex(cAlphaArgs(15));
             if (IndirectAbsorber(AbsorberNum).HeatInputFEvapTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                {
-                    auto const SELECT_CASE_var(GetCurveType(IndirectAbsorber(AbsorberNum).HeatInputFEvapTempPtr));
-                    if ((SELECT_CASE_var == "QUADRATIC") || (SELECT_CASE_var == "CUBIC")) {
-                    } else {
-                        ShowSevereError(cCurrentModuleObject + " \"" + IndirectAbsorber(AbsorberNum).Name + "\"");
-                        ShowContinueError(
-                            "...illegal Generator Heat Input Correction function of evaporator temperature curve type for this object.");
-                        ShowContinueError("...Curve type = " + GetCurveType(IndirectAbsorber(AbsorberNum).HeatInputFEvapTempPtr));
-                        ErrorsFound = true;
-                    }
-                }
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    IndirectAbsorber(AbsorberNum).HeatInputFEvapTempPtr,   // Curve index
+                    {1},                            // Valid dimensions
+                    RoutineName,                    // Routine name
+                    cCurrentModuleObject,            // Object Type
+                    IndirectAbsorber(AbsorberNum).Name,  // Object Name
+                    cAlphaFieldNames(15));               // Field Name
             }
 
             // Get remaining data

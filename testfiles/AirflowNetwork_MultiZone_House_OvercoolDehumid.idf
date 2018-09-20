@@ -151,8 +151,10 @@
     ,                        !- Name
     8,                       !- Begin Month
     16,                      !- Begin Day of Month
+    ,                        !- Begin Year
     8,                       !- End Month
     19,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -960,7 +962,6 @@
     Living:North,            !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -976,7 +977,6 @@
     Living:East,             !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -992,7 +992,6 @@
     Living:South,            !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1008,7 +1007,6 @@
     Living:West,             !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices

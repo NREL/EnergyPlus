@@ -2,7 +2,10 @@
 
 \subsection{Overview}
 
-Nomenclature\\
+The hybrid modeling combines forward and inverse physics-based modeling taking advantage of measured zone air temperature data to perform targeted calibration on specific inputs. The hybrid modeling approach aims to enhance the current energy retrofit practices not only offering more user-friendly energy modeling environments but also providing more accurate estimates of energy savings at the same time. The hybrid model avoids input parameters that are hard to measure and replace them to easily measurable data, which integrates physics-based and data-driven modeling methods. Parameters such as interior thermal mass and air infiltration rates are required in physics-based models, and they have significant impacts as they are driving factors for the dynamic performance of buildings. An accurate estimate of interior thermal mass has been a difficult problem because the building usually has various amounts of furniture and changeable partitions. The air infiltration rate changes in time and dynamically interacts with indoor and outdoor climatic conditions. However the accurate estimation of the data is almost impossible to collect without a fan pressurized test, which can not be easily done by typical energy modelers (Gowri et al. 2009). The hybrid model introduces an approach that represents the interior thermal mass in EnergyPlus, one with traditional interior mass object and the other with capacitance multiplier approach. Also the approach presents fundamentals of the infiltration modeling in energy simulation and provides mathematical derivation of the hybrid model. 
+
+\begin{table}
+\caption{Nomenclature for the Hybrid Model}
 \begin{tabular}{ll}
 $Q_{int}$ & Internal heat gain\\
 $h_s$ & Convective heat transfer coefficient\\
@@ -21,8 +24,7 @@ $C_z$ & Heat capacity of zone air and internal thermal mass\\
 $C_p$ & Zone air specific heat\\
 $C_T$ & Heat capacity multiplier\\
 \end{tabular}
-
-The hybrid modeling combines forward and inverse physics-based modeling taking advantage of measured zone air temperature data to perform targeted calibration on specific inputs. The hybrid modeling approach aims to enhance the current energy retrofit practices not only offering more user-friendly energy modeling environments but also providing more accurate estimates of energy savings at the same time. The hybrid model avoids input parameters that are hard to measure and replace them to easily measurable data, which integrates physics-based and data-driven modeling methods. Parameters such as interior thermal mass and air infiltration rates are required in physics-based models, and they have significant impacts as they are driving factors for the dynamic performance of buildings. An accurate estimate of interior thermal mass has been a difficult problem because the building usually has various amounts of furniture and changeable partitions. The air infiltration rate changes in time and dynamically interacts with indoor and outdoor climatic conditions. However the accurate estimation of the data is almost impossible to collect without a fan pressurized test, which can not be easily done by typical energy modelers (Gowri et al. 2009). The hybrid model introduces an approach that represents the interior thermal mass in EnergyPlus, one with traditional interior mass object and the other with capacitance multiplier approach. Also the approach presents fundamentals of the infiltration modeling in energy simulation and provides mathematical derivation of the hybrid model. 
+\end{table}
 
 \subsection{Hybrid modeling approaches}\label{hybrid-modeling-approaches}
 
@@ -56,7 +58,7 @@ C_z \frac {dT_z} {dt} = \Sigma Q_i +\Sigma[h_i A_i (T_{si} - T_z)] + \Sigma [\do
 C_z = V \rho_{air} C_p C_T
 \end{equation}
 
-The sum of zone loads and the provided air system energy equals the change in energy stored in the zone. Typically the zone capacitance, $C_z$ includes the zone air only when formulating energy balances for the zone air. The internal thermal mass, including furniture, books, and changeable partitions, is assumed to be in thermal equilibrium with the zone air, thus it is added in the zone heat capacitance, $C_z$.  The infiltration airflow rate, $q_inf$ changes for different conditions depending on outdoor temperature, wind speed, and HVAC system operations. The energy provided from systems to the zone is represented as $Q_{sys}$.
+The sum of zone loads and the provided air system energy equals the change in energy stored in the zone. Typically the zone capacitance, $C_z$ includes the zone air only when formulating energy balances for the zone air. The internal thermal mass, including furniture, books, and changeable partitions, is assumed to be in thermal equilibrium with the zone air, thus it is added in the zone heat capacitance, $C_z$.  The infiltration airflow rate, $\dot{m}_{inf}$ changes for different conditions depending on outdoor temperature, wind speed, and HVAC system operations. The energy provided from systems to the zone is represented as $Q_{sys}$.
 
 EnergyPlus provides heat balance solution algorithms of 3rd order backward difference and analytical solution to solve the zone air energy balance equation. The 3rd order finite difference approximation provides stability without requiring a prohibitively small time step, the method still has truncation errors and requires a fixed time step length for the previous three simulation time steps. Therefore, different time step lengths for the previous three simulation time steps may make the temperature coefficients invalid. The analytical solution algorithm is an integration approach that provides a possible way to obtain solutions without truncation errors and independent of time step length and only requires the zone air temperature for one previous time step. The hybrid modeling approach uses the analytical solution for internal thermal mass inverse calculation and the 3rd order backward difference for infiltration inverse calculation. 
 
@@ -85,7 +87,7 @@ The use of the internal mass multiplier, the zone temperature capacitance multip
 
 \subsubsection{Inverse algorithm for zone capacitance multiplier}\label{Inverse-algorithm-for-zone-capacitance-multiplier}
 
-The interior thermal mass including furniture, books, and changeable partitions, is assumed to be in thermal equilibrium with the zone air, thus it is added in the zone heat capacitance, $C_z$.  The interior thermal mass is assumed to be in equilibrium with the zone air. The interior mass in the current EnergyPlus model uses a capacitance multiplier, $C_T$ indicating the capacitance as part of the air in the volume of the specified zone. The default value is given as 1.0 corresponding to the total capacitance for the zone's volume of air at current zone conditions. The hybrid model to derive internal thermal mass uses the capacitance multiplier that indicates the capacitance added to the zone air. The added internal thermal mass capacitance will be represented in the multiplier, which the value would be greater than 1.0. The formulation starts with the heat balance on the zone air. The following equation calculates the time-series zone air temperature, $T_z$ reformulating the above equation using the analytical solution method.
+The interior thermal mass including furniture, books, and changeable partitions, is assumed to be in thermal equilibrium with the zone air, thus it is added in the zone heat capacitance, $C_z$.  The interior thermal mass is assumed to be in equilibrium with the zone air. The interior mass in the current EnergyPlus model uses a capacitance multiplier, $C_T$ indicating the capacitance as part of the air in the volume of the specified zone. The default value is given as 1.0 corresponding to the total capacitance for the zone's volume of air at current zone conditions. The hybrid model to derive internal thermal mass uses the capacitance multiplier that indicates the capacitance added to the zone air. The added internal thermal mass capacitance will be represented in the multiplier, which the value would be greater than 1.0. The formulation starts with the heat balance on the zone air. The following equation calculates the time-series zone air temperature, $T_z$, reformulating the above equation using the analytical solution method.
 
 \begin{equation}
 \begin{aligned}
@@ -119,10 +121,7 @@ Infiltration is an uncontrolled outside air into a building depending on the air
 The infiltration modeling is relatively simplified in the energy simulation because of the lack of knowledge about the sizes and distribution of cracks in the building envelope, the permeability of the envelope, the air flow to the building, and the pressure distribution in and around the building. EnergyPlus allows a simple approach to model the infiltration for users. This requires to define a design flow rate and coefficients for temperature and wind velocity using the ZoneInfiltration:DesignFlowRate object. EnergyPlus calculates airflow rates by adjusting for the indoor-outdoor temperature differences and the outdoor wind speed using the following equation.
 
 \begin{equation}
-\begin{aligned}
-\text{Infiltration} = \text{Infiltration}_\text{design} F_\text{schedule} \left[A+B|T_z -T_o|&+C (\text{WindSpeed})\\
-&+D(\text{WindSpeed}^2 )\right]
-\end{aligned}
+\text{Infiltration} = \text{Infiltration}_\text{design} F_\text{schedule} \left[A+B|T_z -T_o|+C (\text{WindSpeed})+D(\text{WindSpeed}^2 )\right]
 \end{equation}
 Where $A$ is the constant term coefficient, $B$ is the temperature term coefficient, $C$ is the velocity term coefficient, $D$ is the velocity squared coefficient, and $F_\text{schedule}$ is a user-defined schedule value between 0 and 1.
 

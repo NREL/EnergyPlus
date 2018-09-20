@@ -280,7 +280,6 @@ namespace HVACStandAloneERV {
         auto &GetHXSupplyInletNode(HeatRecovery::GetSupplyInletNode);
         auto &GetHXSecondaryInletNode(HeatRecovery::GetSecondaryInletNode);
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveType;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using namespace DataIPShortCuts;
 
@@ -889,19 +888,13 @@ namespace HVACStandAloneERV {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Quadratic and Cubic
-                    {
-                        auto const SELECT_CASE_var(GetCurveType(GetCurveIndex(Alphas(2))));
-
-                        if (SELECT_CASE_var == "QUADRATIC") {
-
-                        } else if (SELECT_CASE_var == "CUBIC") {
-
-                        } else {
-                            ShowSevereError(CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                            ShowContinueError("...illegal " + cAlphaFields(2) + " type for this object = " + GetCurveType(GetCurveIndex(Alphas(2))));
-                            ErrorsFound = true;
-                        }
-                    }
+                    ErrorsFound |= CurveManager::CheckCurveDims(
+                        thisOAController.EnthalpyCurvePtr,   // Curve index
+                        {1},                            // Valid dimensions
+                        "GetStandAloneERV: ",                    // Routine name
+                        CurrentModuleObject,            // Object Type
+                        thisOAController.Name,        // Object Name
+                        cAlphaFields(2));               // Field Name
                 }
             }
 
@@ -1695,6 +1688,11 @@ namespace HVACStandAloneERV {
                 }
             }
         }
+        // Reset zone equipment sizing data
+        ZoneEqSizing(CurZoneEqNum).AirVolFlow = 0.0;
+        ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0;
+        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = false;
+        ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
     }
 
     void CalcStandAloneERV(int const StandAloneERVNum,    // Unit index in ERV data structure

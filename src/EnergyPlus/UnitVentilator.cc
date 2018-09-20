@@ -1712,6 +1712,14 @@ namespace UnitVentilator {
         ZoneHeatingOnlyFan = false;
         DoWaterCoilSizing = false;
         CoilNum = 0;
+        if (UnitVent(UnitVentNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = UnitVent(UnitVentNum).Fan_Index;
+        // unit ventilator is always blow thru
+        DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
         if (UnitVent(UnitVentNum).CoilOption == BothOption) {
             ZoneCoolingOnlyFan = true;
@@ -1724,8 +1732,19 @@ namespace UnitVentilator {
         }
 
         if (CurZoneEqNum > 0) {
-
             if (UnitVent(UnitVentNum).HVACSizingIndex > 0) {
+
+                // initialize OA flow for sizing other inputs (e.g., inlet temp, capacity, etc.)
+                if (UnitVent(UnitVentNum).OutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = UnitVent(UnitVentNum).OutAirVolFlow;
+                }
+                if (UnitVent(UnitVentNum).ATMixerExists) {      // set up ATMixer conditions for scalable capacity sizing
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                    SingleDuct::setATMixerSizingProperties(UnitVent(UnitVentNum).ATMixerIndex, UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
+                }
+
                 zoneHVACIndex = UnitVent(UnitVentNum).HVACSizingIndex;
                 // N1 , \field Maximum Supply Air Flow Rate
                 FieldNum = 1;
@@ -1996,6 +2015,12 @@ namespace UnitVentilator {
                         }
                     }
                 }
+            }
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = UnitVent(UnitVentNum).OutAirVolFlow;
+
+            if (UnitVent(UnitVentNum).ATMixerExists) {      // set up ATMixer conditions for use in component sizing
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                SingleDuct::setATMixerSizingProperties(UnitVent(UnitVentNum).ATMixerIndex, UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
             }
         }
 
@@ -3700,6 +3725,12 @@ namespace UnitVentilator {
         UnitVent(UnitVentNum).SensCoolEnergy = UnitVent(UnitVentNum).SensCoolPower * TimeStepSys * SecInHour;
         UnitVent(UnitVentNum).TotCoolEnergy = UnitVent(UnitVentNum).TotCoolPower * TimeStepSys * SecInHour;
         UnitVent(UnitVentNum).ElecEnergy = UnitVent(UnitVentNum).ElecPower * TimeStepSys * SecInHour;
+
+        if (UnitVent(UnitVentNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, UnitVent(UnitVentNum).FirstPass);
+            }
+        }
     }
 
     int GetUnitVentilatorOutAirNode(int const UnitVentNum)
