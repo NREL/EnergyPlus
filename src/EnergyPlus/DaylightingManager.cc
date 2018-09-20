@@ -6894,15 +6894,16 @@ namespace DaylightingManager {
         }
 
         Array3D<Real64> WDAYIL(
-            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point (second index)
+            2, NREFPT, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point (second index)
         //   for shade open/closed (first index), the number of shade deployment groups (third index)
         Array3D<Real64> WBACLU(
-            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point (second index)
+            2, NREFPT, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point (second index)
         //   for shade open/closed (first index), the number of shade deployment groups (third index)
         Array2D<Real64> RDAYIL(
-            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point after closing shade
+            NREFPT, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point after closing shade
         Array2D<Real64> RBACLU(
-            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point after closing shade
+            NREFPT,
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point after closing shade
 
         if (GlareFlag) {
             // Glare is too high at a ref pt.  Loop through windows.
@@ -6986,27 +6987,38 @@ namespace DaylightingManager {
                         DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                     }
 
-                    blnCycle = false;
-                    if (NREFPT == 1 && GLRNEW(1) > GLRNDX(1)) {
-                        // One ref pt;  go to next window if glare has increased.
-                        blnCycle = true;
-                    } else if (NREFPT > 1) {
-                        // Two ref pts.  There are three cases depending on glare values.
-                        if (GLRNDX(1) > ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) > ZoneDaylight(ZoneNum).MaxGlareallowed) {
-                            // (1) Initial glare too high at both ref pts.  Deploy shading on
-                            //     this window if this decreases glare at both ref pts.
-                            if (GLRNEW(1) > GLRNDX(1) || GLRNEW(2) > GLRNDX(2)) blnCycle = true;
-                        } else if (GLRNDX(1) > ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed) {
-                            // (2) Initial glare too high only at first ref pt.  Deploy shading
-                            //     on this window if glare at first ref pt decreases and
-                            //     glare at second ref pt stays below max.
-                            if (GLRNEW(1) > GLRNDX(1) || GLRNEW(2) > ZoneDaylight(ZoneNum).MaxGlareallowed) blnCycle = true;
-                        } else {
-                            // (3) Initial glare too high at second ref pt.  Deploy shading if glare
-                            //     at second ref pt decreases and glare at first ref pt stays below max.
-                            if (GLRNEW(2) > GLRNDX(2) || GLRNEW(1) > ZoneDaylight(ZoneNum).MaxGlareallowed) blnCycle = true;
-                        }
+                    // Check if the shading did not improve the glare conditions
+                    //
+                    // blnCycle when true resets the specific window to its non-shaded condition. A later comment says
+                    //      Shading this window has not improved the glare situation.
+                    //      Reset shading flag to no shading condition, go to next window.
+                    //
+                    // If the original glare was too high at all reference points and the new glare is lower at all reference points it is good, don't
+                    // reset it. For each reference point, if the original glare was too high but ok at other reference points and the glare gets
+                    // lower at the reference and stays ok at the other reference points it is good, don't reset it.
+                    //
+                    // The old comments when there were only two reference points were:
+                    //     One ref pt;  go to next window if glare has increased.
+                    //     Two ref pts.  There are three cases depending on glare values.
+                    //         (1) Initial glare too high at both ref pts.  Deploy shading on
+                    //             this window if this decreases glare at both ref pts.
+                    //         (2) Initial glare too high only at first ref pt.  Deploy shading
+                    //             on this window if glare at first ref pt decreases and
+                    //             glare at second ref pt stays below max.
+                    //         (3) Initial glare too high at second ref pt.  Deploy shading if glare
+                    //             at second ref pt decreases and glare at first ref pt stays below max.
+                    //
+                    // The approach taken is just to count the number of reference points that fulfill the individual requirements and see if it covers
+                    // all the reference points.
+                    int numRefPtOldAboveMaxNewBelowOld = 0;
+                    int numRefPtOldBelowMaxNewBelowMax = 0;
+                    for (IL = 1; IL <= NREFPT; ++IL) {
+                        if (GLRNDX(IL) > ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(IL) <= GLRNDX(IL)) ++numRefPtOldAboveMaxNewBelowOld;
+                        if (GLRNDX(IL) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(IL) <= ZoneDaylight(ZoneNum).MaxGlareallowed)
+                            ++numRefPtOldBelowMaxNewBelowMax;
                     }
+                    blnCycle = true;
+                    if ((numRefPtOldAboveMaxNewBelowOld + numRefPtOldBelowMaxNewBelowMax) == NREFPT) blnCycle = false;
                 }
 
                 // restore the count to the value prior to the last loop through the group of exterior windows
