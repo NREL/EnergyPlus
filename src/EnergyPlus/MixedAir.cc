@@ -84,7 +84,6 @@
 #include <HVACDXSystem.hh>
 #include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <HVACUnitarySystem.hh>
 #include <HeatRecovery.hh>
 #include <HeatingCoils.hh>
 #include <Humidifiers.hh>
@@ -203,9 +202,9 @@ namespace MixedAir {
     int const Fan_ComponentModel(18); // cpw22Aug2010 (new)
     int const DXHeatPumpSystem(19);
     int const Coil_UserDefined(20);
-    int const UnitarySystem(21);
-    int const Humidifier(22);
-    int const Fan_System_Object(23);
+    int const Humidifier(21);
+    int const Fan_System_Object(22);
+    int const UnitarySystemModel(23);
 
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -596,9 +595,6 @@ namespace MixedAir {
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
-        using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
-        using HVACUnitarySystem::SimUnitarySystem;
         using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
@@ -742,14 +738,19 @@ namespace MixedAir {
                     SimDXCoolingSystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
                 }
                 OACoolingCoil = true;
-            } else if (SELECT_CASE_var == UnitarySystem) { // AirLoopHVAC:UnitarySystem
+            } else if (SELECT_CASE_var == UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
                 if (Sim) {
-                    SimUnitarySystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
+                    bool HeatingActive = false;
+                    bool CoolingActive = false;
+                    Real64 OAUCoilOutTemp = 0.0;
+                    bool ZoneEquipFlag = false;
+                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(
+                        CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, CompIndex, OAUCoilOutTemp, ZoneEquipFlag);
                 }
-                if (AirLoopInputsFilled) GetUnitarySystemOAHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil);
+                if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil, 0);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
                     if (AirLoopInputsFilled) {
-                        CheckUnitarySysCoilInOASysExists(CompName);
+                        UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(CompName, 0);
                         MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
                     }
                 }
@@ -1089,6 +1090,7 @@ namespace MixedAir {
                     OutsideAirSys(OASysNum).ComponentType.allocate(NumInList);
                     OutsideAirSys(OASysNum).ComponentType_Num.dimension(NumInList, 0);
                     OutsideAirSys(OASysNum).ComponentIndex.dimension(NumInList, 0);
+                    OutsideAirSys(OASysNum).compPointer.resize(NumInList + 1, nullptr);
                     for (InListNum = 1; InListNum <= NumInList; ++InListNum) {
                         OutsideAirSys(OASysNum).ComponentName(InListNum) = AlphArray(InListNum * 2 + 1);
                         OutsideAirSys(OASysNum).ComponentType(InListNum) = AlphArray(InListNum * 2);
@@ -1196,7 +1198,11 @@ namespace MixedAir {
                     } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = DXHeatPumpSystem;
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
-                        OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystem;
+                        OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystemModel;
+                        OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
+                        UnitarySystems::UnitarySys thisSys;
+                        OutsideAirSys(OASysNum).compPointer[CompNum] =
+                            thisSys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
                     } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Coil_UserDefined;
                         // Heat recovery
@@ -2359,13 +2365,12 @@ namespace MixedAir {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    OAController(OutAirNum).EnthalpyCurvePtr,   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    OAController(OutAirNum).Name,   // Object Name
-                    cAlphaFields(8));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(OAController(OutAirNum).EnthalpyCurvePtr, // Curve index
+                                                            {1},                                      // Valid dimensions
+                                                            RoutineName,                              // Routine name
+                                                            CurrentModuleObject,                      // Object Type
+                                                            OAController(OutAirNum).Name,             // Object Name
+                                                            cAlphaFields(8));                         // Field Name
             }
         }
 
@@ -4667,7 +4672,9 @@ namespace MixedAir {
                     AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass = true;
                     this->HeatRecoveryBypassStatus = 1;
                 } else if (this->HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum) {
-                    if (OASignal > OutAirMinFrac) {
+                    Real64 OAMassFlowMin = OutAirMinFrac * AirLoopFlow(AirLoopNum).DesSupply;
+                    Real64 OAMassFlowActual = OASignal * this->MixMassFlow;
+                    if (OAMassFlowActual > OAMassFlowMin) {
                         AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass = true;
                         this->HeatRecoveryBypassStatus = 1;
                     }

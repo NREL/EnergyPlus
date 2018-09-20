@@ -409,6 +409,8 @@ namespace FaultsManager {
 
     void clear_state();
 
+    void SetFaultyCoilSATSensor(std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
+
 } // namespace FaultsManager
 
 } // namespace EnergyPlus
