@@ -8781,7 +8781,11 @@ namespace SolarShading {
                 //  Calculate average Equation of Time, Declination Angle for this period
 
                 if (!WarmupFlag) {
-                    DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDyYr);
+                    if (KindOfSim == ksRunPeriodWeather) {
+                        DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDyYr);
+                    } else {
+                        DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDy);
+                    }
                     DisplayPerfSimulationFlag = true;
                 }
 
