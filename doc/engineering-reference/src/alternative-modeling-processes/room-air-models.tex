@@ -117,7 +117,7 @@ The values for \({Z_i}\) are constrained to be between 0.01 and 0.99 because the
 
 The user-defined profile is treated as a look up table or piecewise linear model.~ The values for \(\Delta {T_{ai}}\) are determined by searching the \({\rm Z}\) values in the user-defined profile and performing linear interpolation on the associated \(\Delta {T_a}\) values.
 
-The patterns defined by the object `RoomAir:TemperaturePattern:ConstantGradient' apply a constant temperature gradient in the vertical direction.~ The model assumes that \({T_{MAT}}\) occurs at the mid-plane so that \({{\rm Z}_{{T_{MAT}}}} = 0.5\) (by definition).~ The surface \({Z_i}\) values are compared to \({Z_{{T_{MAT}}}}\) and then scaled with zone ceiling height to obtain values for the change in height (in units of meters), \(\Delta z\).~ The user defined gradient, \(grad\), (units of \(^{\circ\)C/m) is then used to determine \(\Delta {T_{ai}}\) values using:
+The patterns defined by the object `RoomAir:TemperaturePattern:ConstantGradient' apply a constant temperature gradient in the vertical direction.~ The model assumes that \({T_{MAT}}\) occurs at the mid-plane so that \({{\rm Z}_{{T_{MAT}}}} = 0.5\) (by definition).~ The surface \({Z_i}\) values are compared to \({Z_{{T_{MAT}}}}\) and then scaled with zone ceiling height to obtain values for the change in height (in units of meters), \(\Delta z\).~ The user defined gradient, \(grad\), (units of \(^{\circ}\)C/m) is then used to determine \(\Delta {T_{ai}}\) values using:
 
 \begin{equation}
 \Delta {T_{ai}} = \Delta z * grad
@@ -1085,7 +1085,7 @@ MC{P_{zone}} = MC{P_i} + MC{P_{vent}} + MC{P_{mix}}
 \end{equation}
 
 \begin{equation}
-MC{P_{sys}} = \sum\limits_{inlets} {{{\dot m}_i}} {C_{p,i}}
+MCP_{sys} = \sum\limits_{inlets} {\dot m_i C_{p,i}}
 \end{equation}
 
 \begin{equation}
