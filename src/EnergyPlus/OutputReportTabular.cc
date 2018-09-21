@@ -12965,9 +12965,11 @@ namespace OutputReportTabular {
 
             if (isCooling) {
                 // Time of Peak Load
-                compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                         General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                         coilSelectionReportObj->getTimeText(timeOfMax);
+                if (desDaySelected <= WeatherManager::DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                }
 
                 // Outside  Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax);
@@ -13014,9 +13016,11 @@ namespace OutputReportTabular {
 
             } else {
                 // Time of Peak Load
-                compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                         General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                         coilSelectionReportObj->getTimeText(timeOfMax);
+                if (desDaySelected <= WeatherManager::DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                }
 
                 // Outside  Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax);
