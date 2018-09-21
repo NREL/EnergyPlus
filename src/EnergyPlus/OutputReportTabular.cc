@@ -12969,6 +12969,8 @@ namespace OutputReportTabular {
                     compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
                                              General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
+                } else {
+                    compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
                 }
 
                 // Outside  Dry Bulb Temperature
@@ -13020,6 +13022,8 @@ namespace OutputReportTabular {
                     compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
                                              General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
+                } else {
+                    compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
                 }
 
                 // Outside  Dry Bulb Temperature
