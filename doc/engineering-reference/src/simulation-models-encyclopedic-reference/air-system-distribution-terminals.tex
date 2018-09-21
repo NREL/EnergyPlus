@@ -1087,11 +1087,11 @@ This dual duct air terminal may also be used to provide a minimum outdoor air qu
 The simulation begins by determining the air mass flow rate required to satisfy the heating/cooling demand using either the heating duct or cooling duct.
 
 \begin{equation}
-C_{p,zone} = PsyCpAirFnWTdb\left( {\omega_{zone}},{T_{zone}}} \right)
+C_{p,zone} = PsyCpAirFnWTdb\left( {\omega_{zone}},{T_{zone}} \right)
 \end{equation}
 
 \begin{equation}
-C_{p,inlet} = PsyCpAirFnWTdb\left( {\omega_{inlet}},{T_{inlet}}} \right)
+C_{p,inlet} = PsyCpAirFnWTdb\left( {\omega_{inlet}},{T_{inlet}} \right)
 \end{equation}
 
 \begin{equation}
@@ -1134,7 +1134,7 @@ The outdoor air input requirements, if entered, are then used to adjust the term
 
 where:
 
-\(\dot m_{OA}}\) is the zone outdoor air flow rate, kg/s
+\(\dot m_{OA}\) is the zone outdoor air flow rate, kg/s
 
 \(OAFrac\) is the fraction of outdoor air entering the air loop outside air system.
 
