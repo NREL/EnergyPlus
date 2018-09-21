@@ -45,54 +45,63 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef OutAirNodeManager_hh_INCLUDED
-#define OutAirNodeManager_hh_INCLUDED
+// EnergyPlus::RoomAirModelUserTempPattern Unit Tests
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
-namespace EnergyPlus {
+//#include <EnergyPlus/UtilityRoutines.hh>
 
-namespace OutAirNodeManager {
+using namespace EnergyPlus;
+using namespace EnergyPlus::OutAirNodeManager;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
+TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
+{
+    NumOutsideAirNodes = 3;
+    OutsideAirNodeList.allocate(3);
+    DataLoopNode::Node.allocate(3);
+    ScheduleManager::Schedule.allocate(2);
 
-    // Type declarations in OutAirNodeManager module
+    DataEnvironment::OutDryBulbTemp = 25.0;
+    DataEnvironment::OutWetBulbTemp = 15.0;
+    DataEnvironment::WindSpeed = 2.0;
+    DataEnvironment::WindDir = 0.0;
+    DataEnvironment::OutBaroPress = 101325;
+    DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
 
-    // MODULE VARIABLE DECLARATIONS:
+    ScheduleManager::Schedule(1).CurrentValue = 24.0;
+    OutsideAirNodeList(1) = 1;
+    OutsideAirNodeList(2) = 2;
+    OutsideAirNodeList(3) = 3;
+    // Scheduled value
+    DataLoopNode::Node(1).IsLocalNode = true;
+    DataLoopNode::Node(1).OutAirDryBulbSchedNum = 1;
+    DataLoopNode::Node(1).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
+    DataLoopNode::Node(1).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
+    // EMS override value
+    DataLoopNode::Node(2).IsLocalNode = true;
+    DataLoopNode::Node(2).EMSOverrideOutAirDryBulb = true;
+    DataLoopNode::Node(2).EMSOverrideOutAirWetBulb = true;
+    DataLoopNode::Node(2).EMSValueForOutAirDryBulb = 26.0;
+    DataLoopNode::Node(2).EMSValueForOutAirWetBulb = 16.0;
+    DataLoopNode::Node(2).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
+    DataLoopNode::Node(2).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
+    // No changes
+    DataLoopNode::Node(3).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
+    DataLoopNode::Node(3).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
 
-    extern Array1D_int OutsideAirNodeList; // List of all outside air inlet nodes
-    extern int NumOutsideAirNodes;         // Number of single outside air nodes
-    extern bool GetOutAirNodesInputFlag;   // Flag set to make sure you get input once
+    InitOutAirNodes();
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE OutAirNodeManager
+    EXPECT_NEAR(14.62572687, DataLoopNode::Node(1).OutAirWetBulb, 0.0001);
+    EXPECT_NEAR(0.007253013, DataLoopNode::Node(2).HumRat, 0.000001);
+    EXPECT_NEAR(0.006543816, DataLoopNode::Node(3).HumRat, 0.000001);
 
-    // Functions
-
-    // Clears the global data in OutAirNodeManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
-    void SetOutAirNodes();
-
-    void GetOutAirNodesInput();
-
-    void InitOutAirNodes();
-
-    bool CheckOutAirNodeNumber(int const NodeNumber); // Number of node to check to see if in Outside Air list
-
-    void CheckAndAddAirNodeNumber(int const NodeNumber, // Number of node to check to see if in Outside Air list
-                                  bool &Okay            // True if found, false if not
-    );
-    void SetOANodeValues(int const NodeNum, // Number of node to check to see if in Outside Air list
-                         bool InitCall            // True if Init calls, false if CheckAndAddAirNodeNumber calls
-    );
-} // namespace OutAirNodeManager
-
-} // namespace EnergyPlus
-
-#endif
+}
