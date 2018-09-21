@@ -328,6 +328,7 @@ namespace ZoneTempPredictorCorrector {
         AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.deallocate();
         AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.deallocate();
         AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.deallocate();
+        NumOnOffCtrZone = 0;
     }
 
     void ManageZoneAirUpdates(int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
@@ -2766,6 +2767,8 @@ namespace ZoneTempPredictorCorrector {
             AdapComfortCoolingSetPoint.dimension(NumOfZones, 0.0);
             ZoneThermostatSetPointHi.dimension(NumOfZones, 0.0);
             ZoneThermostatSetPointLo.dimension(NumOfZones, 0.0);
+            ZoneThermostatSetPointHiAver.dimension(NumOfZones, 0.0);
+            ZoneThermostatSetPointLoAver.dimension(NumOfZones, 0.0);
 
             LoadCorrectionFactor.dimension(NumOfZones, 0.0); // PH 3/3/04
             TempControlType.dimension(NumOfZones, 0);
