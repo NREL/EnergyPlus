@@ -2886,7 +2886,11 @@ namespace WeatherManager {
                                              LiquidPrecip);
                 } else if (ReadStatus < 0) {
                     if (NumRewinds > 0) {
-                        ShowSevereError("Multiple rewinds on EPW while searching for first day");
+                        std::string date = std::to_string(Environment(Environ).StartMonth) + '/' + std::to_string(Environment(Environ).StartDay);
+                        if (Environment(Environ).MatchYear) {
+                            date += '/' + std::to_string(Environment(Environ).StartYear);
+                        }
+                        ShowSevereError("Multiple rewinds on EPW while searching for first day " + date);
                     } else {
                         gio::rewind(WeatherFileUnitNumber);
                         ++NumRewinds;
@@ -2934,8 +2938,8 @@ namespace WeatherManager {
                     }
                 }
                 if (ReadStatus != 0) {
-                    BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + BlankString +
-                                RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
+                    BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + ' ' + RoundSigDigits(WHour) +
+                                ':' + RoundSigDigits(WMinute);
                     gio::write(ErrOut, fmtLD) << ReadStatus;
                     strip(ErrOut);
                     ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
