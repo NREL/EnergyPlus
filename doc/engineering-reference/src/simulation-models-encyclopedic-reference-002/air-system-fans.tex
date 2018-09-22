@@ -331,7 +331,7 @@ The last term also accounts in part for leakage from the supply system when damp
 
 In principle, especially for research applications of Energy Plus, the four individual fan pressure rise coefficients can be determined using duct design calculation tools for the entire system (e.g., Right-CommDuct, UNI-DUCT, Ductsize, Varitrane Duct Designer, T-Duct). In practice, however, especially for existing buildings, the necessary details may not be known sufficiently. In that case, one can make active measurements at different combinations of fan flows, outside air fractions, damper positions (if they are variable), and duct static pressures and then use non-linear system identification techniques to fit the data and determine the coefficients. If passive measurements can be made over a sufficiently long time so that a wide range of outside air settings, damper positions, and fan flows is obtained, one could instead regress the data to find all of the parameters in the equation. Unfortunately, there are no standardized test procedures available to draw upon, even though some standards appear to be related (e.g., ASHRAE 1999, 2008). Consequently, field test protocols need to be developed to determine the parameters for the new duct system model. These protocols then need to be integrated into standardized data collection and analysis tools such as Pacific Gas and Electric's ``Universal Translator'' tool. The California Energy Commission is funding such a project; data, procedures, and tools from this project will support the EnergyPlus implementation of the fan and duct system models described here.
 
-\emph{SPR Model}: The model for duct-static-pressure reset (SPR) is based on a simple diagnostic procedure and a linear correlation between duct static pressure and supply fan airflow (Federspiel 2004, 2005). The diagnostic method involves measuring the static pressure at the duct static pressure sensor and the velocity pressure at the fan inlet (represents the fan flow) at multiple points over the fan's operating range, while the VAV box dampers attempt to control flow in response to a constant thermostat setpoint. The goal of the test is to define the lowest duct static pressure where all VAV boxes are still in control (dampers modulating). In the model, the correlation between \emph{P\(_{sm}\)} and \emph{Q\(_{fan}\)} is as follows for \({Q_{fan,min}} \leq {Q_{fan}} \leq {Q_{fan,max}\)}:
+\emph{SPR Model}: The model for duct-static-pressure reset (SPR) is based on a simple diagnostic procedure and a linear correlation between duct static pressure and supply fan airflow (Federspiel 2004, 2005). The diagnostic method involves measuring the static pressure at the duct static pressure sensor and the velocity pressure at the fan inlet (represents the fan flow) at multiple points over the fan's operating range, while the VAV box dampers attempt to control flow in response to a constant thermostat setpoint. The goal of the test is to define the lowest duct static pressure where all VAV boxes are still in control (dampers modulating). In the model, the correlation between \emph{P\(_{sm}\)} and \emph{Q\(_{fan}\)} is as follows for \({Q_{fan,min}} \leq {Q_{fan}} \leq {Q_{fan,max}}\):
 
 \begin{equation}
 {P_{sm}} = {P_{sm,min }} + \left( {{P_{sm,max }} - {P_{sm,min }}} \right)*\frac{{\left( {{Q_{fan}} - {Q_{fan,min }}} \right)}}{{\left( {{Q_{fan,max }} - {Q_{fan,min }}} \right)}} = {C_1} + {C_2}*{Q_{fan}}
@@ -357,7 +357,7 @@ Eu = \frac{{\left( {\Delta {P_{fan}} * D_{fan}^4} \right)}}{{\left( {\rho * Q_{f
 \label{eq:Eu535}
 \end{equation}
 
-where \(\Delta {P_{fan}\)} is the fan static pressure rise (Pa), \({D_{fan}}\) is the fan wheel outer diameter (m), \(\rho\) is the air density at the fan inlet (kg/m\(^{3}\)), and \({Q_{fan}\) is the fan flow at standard conditions (m\(^{3}\)/s). \emph{Eu} is nominally the ratio of pressure forces across the fan to inertial forces at the fan wheel exit.
+where \(\Delta {P_{fan}}\) is the fan static pressure rise (Pa), \({D_{fan}}\) is the fan wheel outer diameter (m), \(\rho\) is the air density at the fan inlet (kg/m\(^{3}\)), and \({Q_{fan}}\) is the fan flow at standard conditions (m\(^{3}\)/s). \emph{Eu} is nominally the ratio of pressure forces across the fan to inertial forces at the fan wheel exit.
 
 By plotting the normalized fan static efficiency (\emph{static efficiency / maximum static efficiency}) versus the logarithm base 10 of the normalized Euler number (\emph{Eu} \emph{/} \emph{Eu} \emph{at maximum static efficiency}), the dimensionless performance of various fan sizes is very similar (as one might expect from the ``fan laws''), but so also is the dimensionless performance of different \emph{types} of fans (e.g., single-inlet plenum fans, double-inlet housed centrifugal fans, mixed flow fans, vane axial fans, fans with backward or forward curved blades). An example of this correlation for the ``normal operation'' (non-stall) and stall regions of eight fans is shown in Figure~\ref{fig:normalized-efficiency-curves-for-eight-fans}.
 
@@ -367,7 +367,7 @@ By plotting the normalized fan static efficiency (\emph{static efficiency / maxi
 \caption{Normalized Efficiency Curves for Eight Fans in Dimensionless Space *(BC = backward curved, FC = forward curved; SI = single inlet, DI = double inlet)* \protect \label{fig:normalized-efficiency-curves-for-eight-fans}}
 \end{figure}
 
-This model uses a continuous function to represent the normalized fan efficiency (\(\eta_{fan}\)}) variation. The normalized exponential-conditioned skew-normal functional relationship is:
+This model uses a continuous function to represent the normalized fan efficiency (\(\eta_{fan}\)) variation. The normalized exponential-conditioned skew-normal functional relationship is:
 
 \begin{equation}
 \frac{{{\eta_{fan}}({x_{fan}})}}{{{\eta_{fan,\max }}}} = \frac{{{e^{( - 0.5*Z_1^2)}}[1 + \frac{{{Z_2}}}{{\left| {{Z_2}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_2}} \right|}}{{\sqrt 2 }}} \right)}}{{{e^{( - 0.5*Z_3^2)}}[1 + \frac{{{Z_3}}}{{\left| {{Z_3}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_3}} \right|}}{{\sqrt 2 }}} \right)}}
@@ -392,7 +392,7 @@ Z_{2} = ((e^{(c_{fan}*{x_{fan}})}*d_{fan}*x_{fan}) - a_{fan}) / b_{fan}
 Z_{3} = -a_{fan} / b_{fan}
 \end{equation}
 
-For conceptual design when only rough estimates are needed, a generic curve (also shown in Figure~\ref{fig:normalized-efficiency-curves-for-eight-fans}) can be used and then one only needs to know the maximum efficiency (\(\eta_{fan,max}\)}) and \emph{Eu} at that maximum (\(Eu_{max}\)) to entirely model the fan efficiency and hence fan power. The dimensionless coefficients for the generic normalized fan efficiency curve are as follows:
+For conceptual design when only rough estimates are needed, a generic curve (also shown in Figure~\ref{fig:normalized-efficiency-curves-for-eight-fans}) can be used and then one only needs to know the maximum efficiency (\(\eta_{fan,max}\)) and \emph{Eu} at that maximum (\(Eu_{max}\)) to entirely model the fan efficiency and hence fan power. The dimensionless coefficients for the generic normalized fan efficiency curve are as follows:
 
 \begin{equation}
 {a_{fan}} = -2.732094
@@ -443,7 +443,7 @@ Stall & -2.354091 & 2.117493 & 0 & 2.753264 \tabularnewline
 
 In this case, the average and RMS differences between the efficiency values based on extracted data and fitted specific curve (R\(^{2}\) is 0.999) are, respectively, about -0.1\% and 0.3\%; maximum differences are about ±0.7\%. Field tests are especially needed to determine the coefficients for installed fans because fans are susceptible to ``system effects'' (e.g., inlet obstructions) that are not included in the manufacturer test data (AMCA 1990a).
 
-To determine fan efficiency and fan shaft power at a particular time step, first calculate the fan pressure rise (\(\Delta P_{fan}\)) using the time step fan flow (\emph{Q\(_{fan}\)}) and Equation~\ref{eq:DeltaPfantot531} (and also using Equation~\ref{eq:Psm533} if there is SPR). Next, calculate \emph{Eu} using Equation~\ref{eq:Eu535} and then \emph{x\(_{fan}\)} (log\(_{10}\) normalized \emph{Eu}), which is based on \emph{Eu} and the specified \emph{Eu\(_{max}\)} (\emph{Eu} at maximum efficiency) for the fan. The corresponding normalized efficiency (\(\eta_{fan}({x_{fan})/eta_{fan,max}\)) is obtained using Equation~\ref{eq:etafanoveretafanmax}. The fan efficiency (\(\eta_{fan}({x_{fan}})\)) therefore is:
+To determine fan efficiency and fan shaft power at a particular time step, first calculate the fan pressure rise (\(\Delta P_{fan}\)) using the time step fan flow (\emph{Q\(_{fan}\)}) and Equation~\ref{eq:DeltaPfantot531} (and also using Equation~\ref{eq:Psm533} if there is SPR). Next, calculate \emph{Eu} using Equation~\ref{eq:Eu535} and then \emph{x\(_{fan}\)} (log\(_{10}\) normalized \emph{Eu}), which is based on \emph{Eu} and the specified \emph{Eu\(_{max}\)} (\emph{Eu} at maximum efficiency) for the fan. The corresponding normalized efficiency (\(\eta_{fan}(x_{fan})/eta_{fan,max}\)) is obtained using Equation~\ref{eq:etafanoveretafanmax}. The fan efficiency (\(\eta_{fan}(x_{fan})\)) therefore is:
 
 \begin{equation}
 {\eta_{fan}}\left( {{x_{fan}}} \right) = {\eta_{fan,max }}\left[ {\frac{{{\eta_{fan}}\left( {{x_{fan}}} \right)}}{{{\eta_{fan,max }}}}} \right]
@@ -523,7 +523,7 @@ Stall & 0.000608 & 0.586366 & 0.021775 & -0.063218 & 0.072827 \tabularnewline
 \bottomrule
 \end{longtable}
 
-For any operating point of flow (\emph{Q\(_{fan}\)}) and fan pressure rise (\(\Delta {P_{fan}\)), one can calculate the corresponding Euler number (\emph{Eu}) for the given fan, and then determine the corresponding normalized dimensionless flow (\(\varphi {x_{fan}} / \varphi_{max}\)) from the sigmoidal dimensionless flow function (Equation ). With \(\varphi {x_{fan}} / \varphi_{max}\) determined and knowing \(\varphi_{max}\) for the fan, the dimensionless flow is:
+For any operating point of flow (\emph{Q\(_{fan}\)}) and fan pressure rise (\(\Delta {P_{fan}}\)), one can calculate the corresponding Euler number (\emph{Eu}) for the given fan, and then determine the corresponding normalized dimensionless flow (\(\varphi {x_{fan}} / \varphi_{max}\)) from the sigmoidal dimensionless flow function (Equation ). With \(\varphi {x_{fan}} / \varphi_{max}\) determined and knowing \(\varphi_{max}\) for the fan, the dimensionless flow is:
 
 \begin{equation}
 \varphi \left( {{x_{fan}}} \right) = {\varphi_{\max }}\left[ {\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}}} \right]
@@ -541,7 +541,7 @@ Fan shaft torque (N∙m), which the belt drive must supply to the fan shaft, is 
 {\tau_{fan}} = \frac{{{H_{fan}}}}{{{\omega_{fan}}}} 
 \end{equation}
 
-The fraction of full-load driven torque for the belt (\(\tau_{fan) / \tau_{belt,max}\)), which is typically called ``belt load'', is thus \emph{τ\(_{fan}\)} divided by the belt torque capacity (\(\tau_{belt,max}\)). For a particular belt type and cross-section, belt torque capacity can be determined from manufacturer's information such as a shaft speed versus power chart.
+The fraction of full-load driven torque for the belt (\(\tau_{fan} / \tau_{belt,max}\)), which is typically called ``belt load'', is thus \emph{\(\tau_{fan}\)} divided by the belt torque capacity (\(\tau_{belt,max}\)). For a particular belt type and cross-section, belt torque capacity can be determined from manufacturer's information such as a shaft speed versus power chart.
 
 Ignoring belt slip, motor shaft speed (\(\omega_{motor}\), rad/s) can then be determined using the fan speed (\(\omega_{fan}\)) and the motor/fan pulley diameter ratio (\emph{D\(_{pulley,motor}\) / D\(_{pulley,fan}\)}), which is typically called the ``drive'' ratio:
 
