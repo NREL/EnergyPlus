@@ -126,232 +126,212 @@ namespace AirflowNetworkSolver {
                 int &ITER           // number of iterations
     );
 
-    void FILJAC(int const NNZE, // number of nonzero entries in the "AU" array.
-                int const LFLAG // if = 1, use laminar relationship (initialization).
+    void FILJAC(int const NNZE,  // number of nonzero entries in the "AU" array.
+                bool const LFLAG // if = 1, use laminar relationship (initialization).
     );
 
-    void AFEPLR(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEPLR(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFESCR(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFESCR(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFEDWC(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEDWC(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFESOP(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFESOP(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFECFR(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFECFR(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFEFAN(int const JA,       // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEFAN(int const JA,       // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
     // The above subroutine is not used. Leave it for the time being and revise later.
 
-    void AFECPF(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFECPF(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
     // Leave it for the time being and revise later. Or drop this component ???????????
 
-    void AFEDMP(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEDMP(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFESEL(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFESEL(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFEELR(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEELR(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFECPD(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 &PDROP,      // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFECPD(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 &PDROP,      // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFECOI(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFECOI(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFETMU(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFETMU(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFEEXF(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEEXF(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFEHEX(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEHEX(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFEHOP(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEHOP(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFEOAF(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEOAF(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void AFEREL(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEREL(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void GenericCrack(Real64 &coef,       // Flow coefficient
-                      Real64 const expn,  // Flow exponent
-                      int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const n,        // Node 1 number
-                      int const M,        // Node 2 number
-                      Array1A<Real64> F,  // Airflow through the component [kg/s]
-                      Array1A<Real64> DF, // Partial derivative:  DF/DP
-                      int &NF             // Number of flows, either 1 or 2
+    int GenericCrack(Real64 &coef,       // Flow coefficient
+                     Real64 const expn,  // Flow exponent
+                     bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+                     Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+                     int const n,        // Node 1 number
+                     int const M,        // Node 2 number
+                     Array1A<Real64> F,  // Airflow through the component [kg/s]
+                     Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
-    void GenericDuct(Real64 const Length,   // Duct length
-                     Real64 const Diameter, // Duct diameter
-                     int const LFLAG,       // Initialization flag.If = 1, use laminar relationship
-                     Real64 const PDROP,    // Total pressure drop across a component (P1 - P2) [Pa]
-                     int const n,           // Node 1 number
-                     int const M,           // Node 2 number
-                     Array1A<Real64> F,     // Airflow through the component [kg/s]
-                     Array1A<Real64> DF,    // Partial derivative:  DF/DP
-                     int &NF                // Number of flows, either 1 or 2
+    int GenericDuct(Real64 const Length,   // Duct length
+                    Real64 const Diameter, // Duct diameter
+                    bool const LFLAG,      // Initialization flag.If = 1, use laminar relationship
+                    Real64 const PDROP,    // Total pressure drop across a component (P1 - P2) [Pa]
+                    int const n,           // Node 1 number
+                    int const M,           // Node 2 number
+                    Array1A<Real64> F,     // Airflow through the component [kg/s]
+                    Array1A<Real64> DF     // Partial derivative:  DF/DP
     );
 
     void FACSKY(Array1A<Real64> AU,   // the upper triangle of [A] before and after factoring
@@ -391,15 +371,14 @@ namespace AirflowNetworkSolver {
                 int const UOUT           // Output file unit
     );
 
-    void AFEDOP(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const IL,       // Linkage number
-                int const n,        // Node 1 number
-                int const M,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEDOP(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const IL,       // Linkage number
+               int const n,        // Node 1 number
+               int const M,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     );
 
     void PresProfile(int const il,                 // Linkage number

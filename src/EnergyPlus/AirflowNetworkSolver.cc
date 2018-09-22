@@ -685,7 +685,7 @@ namespace AirflowNetworkSolver {
         int n;
         int NNZE;
         int NSYM;
-        int LFLAG;
+        bool LFLAG;
         int CONVG;
         int ACCEL;
         Array1D<Real64> PCF(NetworkNumOfNodes);
@@ -716,7 +716,7 @@ namespace AirflowNetworkSolver {
         if (AirflowNetworkSimu.InitFlag != 1) {
             // Initialize node/zone pressure values by assuming only linear relationship between
             // airflows and pressure drops.
-            LFLAG = 1;
+            LFLAG = true;
             FILJAC(NNZE, LFLAG);
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
                 if (AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = SUMF(n);
@@ -740,7 +740,7 @@ namespace AirflowNetworkSolver {
         // Solve nonlinear airflow network equations by modified Newton's method.
 
         while (ITER < AirflowNetworkSimu.MaxIteration) {
-            LFLAG = 0;
+            LFLAG = false;
             ++ITER;
             if (LIST >= 2) gio::write(Unit21, fmtLD) << "Begin iteration " << ITER;
             // Set up the Jacobian matrix.
@@ -832,8 +832,8 @@ namespace AirflowNetworkSolver {
         }
     }
 
-    void FILJAC(int const NNZE, // number of nonzero entries in the "AU" array.
-                int const LFLAG // if = 1, use laminar relationship (initialization).
+    void FILJAC(int const NNZE,  // number of nonzero entries in the "AU" array.
+                bool const LFLAG // if = 1, use laminar relationship (initialization).
     )
     {
 
@@ -929,43 +929,43 @@ namespace AirflowNetworkSolver {
             {
                 auto const SELECT_CASE_var(AirflowNetworkCompData(j).CompTypeNum);
                 if (SELECT_CASE_var == CompTypeNum_PLR) { // Distribution system crack component
-                    AFEPLR(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEPLR(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_DWC) { // Distribution system duct component
-                    AFEDWC(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEDWC(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_CVF) { // Distribution system constant volume fan component
-                    AFECFR(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFECFR(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_FAN) { // Distribution system detailed fan component
-                    AFEFAN(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEFAN(j, LFLAG, DP, i, n, m, F, DF);
                     //           Case (CompTypeNum_CPF) ! not currently used in EnergyPlus code -- left for compatibility with AirNet
                     //              CALL AFECPF(J,LFLAG,DP,I,N,M,F,DF,NF)
                 } else if (SELECT_CASE_var == CompTypeNum_DMP) { // Distribution system damper component
-                    AFEDMP(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEDMP(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_ELR) { // Distribution system effective leakage ratio component
-                    AFEELR(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEELR(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_CPD) { // Distribution system constant pressure drop component
-                    AFECPD(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFECPD(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_DOP) { // Detailed opening
-                    AFEDOP(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEDOP(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_SOP) { // Simple opening
-                    AFESOP(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFESOP(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_SCR) { // Surface crack component
-                    AFESCR(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFESCR(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_SEL) { // Surface effective leakage ratio component
-                    AFESEL(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFESEL(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_COI) { // Distribution system coil component
-                    AFECOI(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFECOI(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_TMU) { // Distribution system terminal unit component
-                    AFETMU(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFETMU(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_EXF) { // Exhaust fan component
-                    AFEEXF(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEEXF(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_HEX) { // Distribution system heat exchanger component
-                    AFEHEX(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEHEX(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_HOP) { // Horizontal opening
-                    AFEHOP(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEHOP(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_OAF) { // OA supply fan
-                    AFEOAF(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEOAF(j, LFLAG, DP, i, n, m, F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_REL) { // Relief fan
-                    AFEREL(j, LFLAG, DP, i, n, m, F, DF, NF);
+                    NF = AFEREL(j, LFLAG, DP, i, n, m, F, DF);
                 } else {
                     continue;
                 }
@@ -1084,15 +1084,14 @@ namespace AirflowNetworkSolver {
 #endif
     }
 
-    void AFEPLR(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEPLR(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -1159,8 +1158,7 @@ namespace AirflowNetworkSolver {
             coef /= SQRTDZ(m);
         }
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 Ctl = std::pow(RhozNorm / RHOZ(n), expn - 1.0) * std::pow(VisczNorm / VISCZ(n), 2.0 * expn - 1.0);
@@ -1204,17 +1202,17 @@ namespace AirflowNetworkSolver {
                 DF[0] = FT * expn / PDROP;
             }
         }
+        return 1;
     }
 
-    void AFESCR(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFESCR(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -1292,8 +1290,7 @@ namespace AirflowNetworkSolver {
             coef = MultizoneSurfaceCrackData(CompNum).FlowCoef / SQRTDZ(m) * Corr;
         }
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 RhoCor = (TZ(n) + KelvinConv) / (Tave + KelvinConv);
@@ -1344,17 +1341,17 @@ namespace AirflowNetworkSolver {
                 DF[0] = FT * expn / PDROP;
             }
         }
+        return 1;
     }
 
-    void AFEDWC(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEDWC(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -1428,8 +1425,7 @@ namespace AirflowNetworkSolver {
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 DF[0] = (2.0 * RHOZ(n) * DisSysCompDuctData(CompNum).A * DisSysCompDuctData(CompNum).D) /
@@ -1524,17 +1520,17 @@ namespace AirflowNetworkSolver {
                 DF[0] = 0.5 * FT / PDROP;
             }
         }
+        return 1;
     }
 
-    void AFESOP(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFESOP(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -1601,6 +1597,8 @@ namespace AirflowNetworkSolver {
         Real64 Height;
         Real64 OpenFactor;
 
+        int NF(1);
+
         // Formats
         static gio::Fmt Format_900("(A5,9X,4E16.7)");
         static gio::Fmt Format_903("(A5,3I3,4E16.7)");
@@ -1634,18 +1632,16 @@ namespace AirflowNetworkSolver {
             if (MultizoneSurfaceData(i).Multiplier > 1.0) Width *= MultizoneSurfaceData(i).Multiplier;
         }
 
-        NF = 1;
         DRHO = RHOZ(n) - RHOZ(m);
         GDRHO = 9.8 * DRHO;
         if (LIST >= 4) gio::write(Unit21, Format_903) << " DOR:" << i << n << m << PDROP << std::abs(DRHO) << MinRhoDiff;
         if (OpenFactor == 0.0) {
-            GenericCrack(FlowCoef, FlowExpo, LFLAG, PDROP, n, m, F, DF, NF);
-            return;
+            return GenericCrack(FlowCoef, FlowExpo, LFLAG, PDROP, n, m, F, DF);
         }
-        if (std::abs(DRHO) < MinRhoDiff || LFLAG == 1) {
+        if (std::abs(DRHO) < MinRhoDiff || LFLAG) {
             DPMID = PDROP - 0.5 * Height * GDRHO;
             // Initialization or identical temps: treat as one-way flow.
-            GenericCrack(FlowCoef, FlowExpo, LFLAG, DPMID, n, m, F, DF, NF);
+            NF = GenericCrack(FlowCoef, FlowExpo, LFLAG, DPMID, n, m, F, DF);
             if (LIST >= 4) gio::write(Unit21, Format_900) << " Drs:" << DPMID << F[0] << DF[0];
         } else {
             // Possible two-way flow:
@@ -1698,17 +1694,17 @@ namespace AirflowNetworkSolver {
                 if (LIST >= 4) gio::write(Unit21, Format_900) << " Dr4:" << C << F[1] << DF[1];
             }
         }
+        return NF;
     }
 
-    void AFECFR(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFECFR(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -1762,15 +1758,17 @@ namespace AirflowNetworkSolver {
         int Node1;
         int Node2;
 
+        int NF(1);
+
         // FLOW:
         CompNum = AirflowNetworkCompData(j).TypeNum;
         int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
-        NF = 1;
         if (DisSysCompCVFData(CompNum).FanTypeNum == FanType_SimpleOnOff) {
             if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate == 0.0) {
-                GenericDuct(0.1, 0.001, LFLAG, PDROP, n, m, F, DF, NF);
-            } else if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
+                NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, n, m, F, DF);
+            } else if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                       AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
                 F[0] = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             } else {
                 F[0] = Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate * DisSysCompCVFData(CompNum).Ctrl;
@@ -1783,7 +1781,7 @@ namespace AirflowNetworkSolver {
             if (Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate > 0.0) {
                 F[0] = DisSysCompCVFData(CompNum).FlowRate * DisSysCompCVFData(CompNum).Ctrl;
             } else if (NumPrimaryAirSys > 1 && Node(DisSysCompCVFData(CompNum).InletNode).MassFlowRate <= 0.0) {
-                GenericDuct(0.1, 0.001, LFLAG, PDROP, n, m, F, DF, NF);
+                NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, n, m, F, DF);
             }
 
             if (MultiSpeedHPIndicator == 2) {
@@ -1818,17 +1816,17 @@ namespace AirflowNetworkSolver {
             }
         }
         DF[0] = 0.0;
+        return NF;
     }
 
-    void AFEFAN(int const JA,       // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEFAN(int const JA,       // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -1896,11 +1894,9 @@ namespace AirflowNetworkSolver {
         FlowCoef = DisSysCompDetFanData(CompNum).FlowCoef;
         FlowExpo = DisSysCompDetFanData(CompNum).FlowExpo;
 
-        NF = 1;
         if (AFECTL(i) <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            GenericCrack(FlowCoef, FlowExpo, LFLAG, PDROP, n, m, F, DF, NF);
-            return;
+            return GenericCrack(FlowCoef, FlowExpo, LFLAG, PDROP, n, m, F, DF);
         }
         // Pressure rise at reference fan speed.
         if (AFECTL(i) >= DisSysCompDetFanData(CompNum).TranRat) {
@@ -1909,7 +1905,7 @@ namespace AirflowNetworkSolver {
             PRISE = -PDROP * (DisSysCompDetFanData(CompNum).RhoAir / RHOZ(n)) / (DisSysCompDetFanData(CompNum).TranRat * AFECTL(i));
         }
         if (LIST >= 4) gio::write(Unit21, Format_901) << " fan:" << i << PDROP << PRISE << AFECTL(i) << DisSysCompDetFanData(CompNum).TranRat;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear approximation.
             F[0] = -DisSysCompDetFanData(CompNum).Qfree * AFECTL(i) * (1.0 - PRISE / DisSysCompDetFanData(CompNum).Pshut);
             DPDF = -DisSysCompDetFanData(CompNum).Pshut / DisSysCompDetFanData(CompNum).Qfree;
@@ -1983,12 +1979,13 @@ namespace AirflowNetworkSolver {
         } else {
             DF[0] = -1.0 / DPDF;
         }
+        return 1;
     }
 
     // The above subroutine is not used. Leave it for the time being and revise later.
 
     void AFECPF(int const EP_UNUSED(j), // Component number
-                int const LFLAG,        // Initialization flag.If = 1, use laminar relationship
+                bool const LFLAG,       // Initialization flag.If = 1, use laminar relationship
                 Real64 const PDROP,     // Total pressure drop across a component (P1 - P2) [Pa]
                 int const i,            // Linkage number
                 int const EP_UNUSED(n), // Node 1 number
@@ -2040,7 +2037,7 @@ namespace AirflowNetworkSolver {
 
         // FLOW:
         NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             F[0] = AFECTL(i);
             DF[0] = F[0];
         } else {
@@ -2051,15 +2048,14 @@ namespace AirflowNetworkSolver {
 
     // Leave it for the time being and revise later. Or drop this component ???????????
 
-    void AFEDMP(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEDMP(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2110,7 +2106,6 @@ namespace AirflowNetworkSolver {
         // Get component number
         CompNum = AirflowNetworkCompData(j).TypeNum;
 
-        NF = 1;
         C = AFECTL(i);
         if (C < DisSysCompDamperData(CompNum).FlowMin) C = DisSysCompDamperData(CompNum).FlowMin;
         if (C > DisSysCompDamperData(CompNum).FlowMax) C = DisSysCompDamperData(CompNum).FlowMax;
@@ -2119,7 +2114,7 @@ namespace AirflowNetworkSolver {
         if (LIST >= 4)
             gio::write(Unit21, Format_901) << " Dmp:" << i << AFECTL(i) << DisSysCompDamperData(CompNum).FlowMin
                                            << DisSysCompDamperData(CompNum).FlowMax << C;
-        if (LFLAG == 1 || std::abs(PDROP) <= DisSysCompDamperData(CompNum).LTP) {
+        if (LFLAG || std::abs(PDROP) <= DisSysCompDamperData(CompNum).LTP) {
             //                              Laminar flow.
             if (PDROP >= 0.0) {
                 DF[0] = C * DisSysCompDamperData(CompNum).LamFlow * RHOZ(n) / VISCZ(n);
@@ -2136,17 +2131,17 @@ namespace AirflowNetworkSolver {
             }
             DF[0] = F[0] * DisSysCompDamperData(CompNum).FlowExpo / PDROP;
         }
+        return 1;
     }
 
-    void AFESEL(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFESEL(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2204,8 +2199,7 @@ namespace AirflowNetworkSolver {
         FlowCoef = MultizoneSurfaceELAData(CompNum).ELA * MultizoneSurfaceELAData(CompNum).DischCoeff * sqrt_2 *
                    std::pow(MultizoneSurfaceELAData(CompNum).RefDeltaP, 0.5 - FlowExpo);
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 DF[0] = FlowCoef * RHOZ(n) / VISCZ(n);
@@ -2248,17 +2242,17 @@ namespace AirflowNetworkSolver {
                 DF[0] = FT * FlowExpo / PDROP;
             }
         }
+        return 1;
     }
 
-    void AFEELR(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEELR(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2314,8 +2308,7 @@ namespace AirflowNetworkSolver {
         FlowCoef = DisSysCompELRData(CompNum).ELR * DisSysCompELRData(CompNum).FlowRate / RHOZ(n) *
                    std::pow(DisSysCompELRData(CompNum).RefPres, -DisSysCompELRData(CompNum).FlowExpo);
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 DF[0] = FlowCoef * RHOZ(n) / VISCZ(n);
@@ -2358,17 +2351,17 @@ namespace AirflowNetworkSolver {
                 DF[0] = FT * DisSysCompELRData(CompNum).FlowExpo / PDROP;
             }
         }
+        return 1;
     }
 
-    void AFECPD(int const j,                // Component number
-                int const EP_UNUSED(LFLAG), // Initialization flag.If = 1, use laminar relationship
-                Real64 &PDROP,              // Total pressure drop across a component (P1 - P2) [Pa]
-                int const EP_UNUSED(i),     // Linkage number
-                int const n,                // Node 1 number
-                int const m,                // Node 2 number
-                Array1A<Real64> F,          // Airflow through the component [kg/s]
-                Array1A<Real64> DF,         // Partial derivative:  DF/DP
-                int &NF                     // Number of flows, either 1 or 2
+    int AFECPD(int const j,                 // Component number
+               bool const EP_UNUSED(LFLAG), // Initialization flag.If = 1, use laminar relationship
+               Real64 &PDROP,               // Total pressure drop across a component (P1 - P2) [Pa]
+               int const EP_UNUSED(i),      // Linkage number
+               int const n,                 // Node 1 number
+               int const m,                 // Node 2 number
+               Array1A<Real64> F,           // Airflow through the component [kg/s]
+               Array1A<Real64> DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -2419,7 +2412,6 @@ namespace AirflowNetworkSolver {
         // DP = Pressure difference across the element [Pa]
         CompNum = AirflowNetworkCompData(j).TypeNum;
 
-        NF = 1;
         if (PDROP == 0.0) {
             F[0] = std::sqrt(2.0 * RHOZ(n)) * DisSysCompCPDData(CompNum).A * std::sqrt(DisSysCompCPDData(CompNum).DP);
             DF[0] = 0.5 * F[0] / DisSysCompCPDData(CompNum).DP;
@@ -2435,17 +2427,17 @@ namespace AirflowNetworkSolver {
             Co = F[0] / DisSysCompCPDData(CompNum).DP;
             DF[0] = 10.e10;
         }
+        return 1;
     }
 
-    void AFECOI(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFECOI(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2522,8 +2514,7 @@ namespace AirflowNetworkSolver {
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 DF[0] = (2.0 * RHOZ(n) * area * DisSysCompCoilData(CompNum).D) / (VISCZ(n) * InitLamCoef * ld);
@@ -2612,17 +2603,17 @@ namespace AirflowNetworkSolver {
                 DF[0] = 0.5 * FT / PDROP;
             }
         }
+        return 1;
     }
 
-    void AFETMU(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFETMU(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2699,8 +2690,7 @@ namespace AirflowNetworkSolver {
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 DF[0] = (2.0 * RHOZ(n) * area * DisSysCompTermUnitData(CompNum).D) / (VISCZ(n) * InitLamCoef * ld);
@@ -2797,17 +2787,17 @@ namespace AirflowNetworkSolver {
             }
             DF[0] = 0.0;
         }
+        return 1;
     }
 
-    void AFEEXF(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEEXF(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -2870,14 +2860,13 @@ namespace AirflowNetworkSolver {
         InletNode = MultizoneCompExhaustFanData(CompNum).InletNode;
         if (Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
-            NF = 1;
             if (PressureSetFlag == PressureCtrlExhaust) {
                 F[0] = ExhaustFanMassFlowRate;
             } else {
                 F[0] = Node(InletNode).MassFlowRate;
             }
             DF[0] = 0.0;
-            return;
+            return 1;
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
@@ -2896,8 +2885,7 @@ namespace AirflowNetworkSolver {
                 coef = MultizoneCompExhaustFanData(CompNum).FlowCoef / SQRTDZ(m) * Corr;
             }
 
-            NF = 1;
-            if (LFLAG == 1) {
+            if (LFLAG) {
                 // Initialization by linear relation.
                 if (PDROP >= 0.0) {
                     RhoCor = (TZ(n) + KelvinConv) / (Tave + KelvinConv);
@@ -2949,17 +2937,17 @@ namespace AirflowNetworkSolver {
                 }
             }
         }
+        return 1;
     }
 
-    void AFEHEX(int const j,            // Component number
-                int const LFLAG,        // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP,     // Total pressure drop across a component (P1 - P2) [Pa]
-                int const EP_UNUSED(i), // Linkage number
-                int const n,            // Node 1 number
-                int const m,            // Node 2 number
-                Array1A<Real64> F,      // Airflow through the component [kg/s]
-                Array1A<Real64> DF,     // Partial derivative:  DF/DP
-                int &NF                 // Number of flows, either 1 or 2
+    int AFEHEX(int const j,            // Component number
+               bool const LFLAG,       // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP,     // Total pressure drop across a component (P1 - P2) [Pa]
+               int const EP_UNUSED(i), // Linkage number
+               int const n,            // Node 1 number
+               int const m,            // Node 2 number
+               Array1A<Real64> F,      // Airflow through the component [kg/s]
+               Array1A<Real64> DF      // Partial derivative:  DF/DP
     )
     {
 
@@ -3033,8 +3021,7 @@ namespace AirflowNetworkSolver {
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 DF[0] = (2.0 * RHOZ(n) * area * DisSysCompHXData(CompNum).D) / (VISCZ(n) * InitLamCoef * ld);
@@ -3116,17 +3103,17 @@ namespace AirflowNetworkSolver {
                 DF[0] = 0.5 * FT / PDROP;
             }
         }
+        return 1;
     }
 
-    void AFEHOP(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEHOP(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -3203,10 +3190,8 @@ namespace AirflowNetworkSolver {
         DH = 4.0 * (Width * Height) / 2.0 / (Width + Height) * Fact;
 
         // Check which zone is higher
-        NF = 1;
         if (Fact == 0.0) {
-            GenericCrack(coef, expn, LFLAG, PDROP, n, m, F, DF, NF);
-            return;
+            return GenericCrack(coef, expn, LFLAG, PDROP, n, m, F, DF);
         }
 
         fma12 = 0.0;
@@ -3266,18 +3251,19 @@ namespace AirflowNetworkSolver {
             F[1] = BuoFlow;
         }
         DF[1] = 0.0;
+
+        return 1;
     }
 
-    void AFEOAF(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                                    //		int const EP_UNUSED( i ), // Linkage number
-                int const i,        // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEOAF(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+                                   //		int const EP_UNUSED( i ), // Linkage number
+               int const i,        // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -3329,13 +3315,12 @@ namespace AirflowNetworkSolver {
         InletNode = DisSysCompOutdoorAirData(CompNum).InletNode;
         if (Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
-            NF = 1;
             F[0] = Node(InletNode).MassFlowRate;
             DF[0] = 0.0;
             if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                 F[0] = F[0] / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
-            return;
+            return 1;
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
@@ -3354,8 +3339,7 @@ namespace AirflowNetworkSolver {
                 coef = DisSysCompOutdoorAirData(CompNum).FlowCoef / SQRTDZ(m) * Corr;
             }
 
-            NF = 1;
-            if (LFLAG == 1) {
+            if (LFLAG) {
                 // Initialization by linear relation.
                 if (PDROP >= 0.0) {
                     RhoCor = (TZ(n) + KelvinConv) / (Tave + KelvinConv);
@@ -3406,18 +3390,18 @@ namespace AirflowNetworkSolver {
                 }
             }
         }
+        return 1;
     }
 
-    void AFEREL(int const j,        // Component number
-                int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                int const i,        // Linkage number
-                                    //		int const EP_UNUSED( i ), // Linkage number
-                int const n,        // Node 1 number
-                int const m,        // Node 2 number
-                Array1A<Real64> F,  // Airflow through the component [kg/s]
-                Array1A<Real64> DF, // Partial derivative:  DF/DP
-                int &NF             // Number of flows, either 1 or 2
+    int AFEREL(int const j,        // Component number
+               bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,        // Linkage number
+                                   //		int const EP_UNUSED( i ), // Linkage number
+               int const n,        // Node 1 number
+               int const m,        // Node 2 number
+               Array1A<Real64> F,  // Airflow through the component [kg/s]
+               Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -3468,7 +3452,6 @@ namespace AirflowNetworkSolver {
         OutletNode = DisSysCompReliefAirData(CompNum).OutletNode;
         if (Node(OutletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
-            NF = 1;
             DF[0] = 0.0;
             if (PressureSetFlag == PressureCtrlRelief) {
                 F[0] = ReliefMassFlowRate;
@@ -3478,7 +3461,7 @@ namespace AirflowNetworkSolver {
                     F[0] = F[0] / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
                 }
             }
-            return;
+            return 1;
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
@@ -3496,8 +3479,7 @@ namespace AirflowNetworkSolver {
                 coef = DisSysCompReliefAirData(CompNum).FlowCoef / SQRTDZ(m) * Corr;
             }
 
-            NF = 1;
-            if (LFLAG == 1) {
+            if (LFLAG) {
                 // Initialization by linear relation.
                 if (PDROP >= 0.0) {
                     RhoCor = (TZ(n) + KelvinConv) / (Tave + KelvinConv);
@@ -3548,17 +3530,17 @@ namespace AirflowNetworkSolver {
                 }
             }
         }
+        return 1;
     }
 
-    void GenericCrack(Real64 &coef,       // Flow coefficient
-                      Real64 const expn,  // Flow exponent
-                      int const LFLAG,    // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const n,        // Node 1 number
-                      int const m,        // Node 2 number
-                      Array1A<Real64> F,  // Airflow through the component [kg/s]
-                      Array1A<Real64> DF, // Partial derivative:  DF/DP
-                      int &NF             // Number of flows, either 1 or 2
+    int GenericCrack(Real64 &coef,       // Flow coefficient
+                     Real64 const expn,  // Flow exponent
+                     bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+                     Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+                     int const n,        // Node 1 number
+                     int const m,        // Node 2 number
+                     Array1A<Real64> F,  // Airflow through the component [kg/s]
+                     Array1A<Real64> DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -3624,8 +3606,7 @@ namespace AirflowNetworkSolver {
             coef /= SQRTDZ(m);
         }
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 RhoCor = (TZ(n) + KelvinConv) / (Tave + KelvinConv);
@@ -3676,17 +3657,17 @@ namespace AirflowNetworkSolver {
                 DF[0] = FT * expn / PDROP;
             }
         }
+        return 1;
     }
 
-    void GenericDuct(Real64 const Length,   // Duct length
-                     Real64 const Diameter, // Duct diameter
-                     int const LFLAG,       // Initialization flag.If = 1, use laminar relationship
-                     Real64 const PDROP,    // Total pressure drop across a component (P1 - P2) [Pa]
-                     int const n,           // Node 1 number
-                     int const m,           // Node 2 number
-                     Array1A<Real64> F,     // Airflow through the component [kg/s]
-                     Array1A<Real64> DF,    // Partial derivative:  DF/DP
-                     int &NF                // Number of flows, either 1 or 2
+    int GenericDuct(Real64 const Length,   // Duct length
+                    Real64 const Diameter, // Duct diameter
+                    bool const LFLAG,      // Initialization flag.If = 1, use laminar relationship
+                    Real64 const PDROP,    // Total pressure drop across a component (P1 - P2) [Pa]
+                    int const n,           // Node 1 number
+                    int const m,           // Node 2 number
+                    Array1A<Real64> F,     // Airflow through the component [kg/s]
+                    Array1A<Real64> DF     // Partial derivative:  DF/DP
     )
     {
 
@@ -3738,8 +3719,7 @@ namespace AirflowNetworkSolver {
         Real64 g = 1.14 - 0.868589 * std::log(ed);
         Real64 AA1 = g;
 
-        NF = 1;
-        if (LFLAG == 1) {
+        if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 DF[0] = (2.0 * RHOZ(n) * area * Diameter) / (VISCZ(n) * InitLamCoef * ld);
@@ -3821,6 +3801,7 @@ namespace AirflowNetworkSolver {
                 DF[0] = 0.5 * FT / PDROP;
             }
         }
+        return 1;
     }
 
     void FACSKY(Array1A<Real64> AU,   // the upper triangle of [A] before and after factoring
@@ -4267,15 +4248,14 @@ namespace AirflowNetworkSolver {
         gio::write(UOUT);
     }
 
-    void AFEDOP(int const j,                // Component number
-                int const EP_UNUSED(LFLAG), // Initialization flag.If = 1, use laminar relationship
-                Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                int const IL,               // Linkage number
-                int const EP_UNUSED(n),     // Node 1 number
-                int const EP_UNUSED(M),     // Node 2 number
-                Array1A<Real64> F,          // Airflow through the component [kg/s]
-                Array1A<Real64> DF,         // Partial derivative:  DF/DP
-                int &NF                     // Number of flows, either 1 or 2
+    int AFEDOP(int const j,                 // Component number
+               bool const EP_UNUSED(LFLAG), // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP,          // Total pressure drop across a component (P1 - P2) [Pa]
+               int const IL,                // Linkage number
+               int const EP_UNUSED(n),      // Node 1 number
+               int const EP_UNUSED(m),      // Node 2 number
+               Array1A<Real64> F,           // Airflow through the component [kg/s]
+               Array1A<Real64> DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -4572,7 +4552,7 @@ namespace AirflowNetworkSolver {
             }
         }
         // Initialization:
-        NF = 1;
+        int NF(1);
         Interval = ActLh / NrInt;
         fma12 = 0.0;
         fma21 = 0.0;
@@ -4791,6 +4771,7 @@ namespace AirflowNetworkSolver {
             F[1] = fma21;
         }
         DF[1] = 0.0;
+        return NF;
     }
 
     void PresProfile(int const il,                 // Linkage number
