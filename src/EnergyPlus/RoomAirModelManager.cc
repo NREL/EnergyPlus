@@ -2195,8 +2195,8 @@ namespace RoomAirModelManager {
                             ++SurfNum;
                             // Check if airflow network Surface is an interzone surface:
                         } else {
-                            NodeNum1 = MultizoneSurfaceData(Loop2).NodeNums(1);
-                            NodeNum2 = MultizoneSurfaceData(Loop2).NodeNums(2);
+                            NodeNum1 = MultizoneSurfaceData(Loop2).NodeNums[0];
+                            NodeNum2 = MultizoneSurfaceData(Loop2).NodeNums[1];
                             if ((AirflowNetworkNodeData(NodeNum2).EPlusZoneNum == Loop && AirflowNetworkNodeData(NodeNum1).EPlusZoneNum > 0) ||
                                 (AirflowNetworkNodeData(NodeNum2).EPlusZoneNum > 0 && AirflowNetworkNodeData(NodeNum1).EPlusZoneNum == Loop)) {
                                 AirflowNetworkSurfaceUCSDCV(SurfNum, Loop) = Loop2;

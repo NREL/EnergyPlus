@@ -98,8 +98,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     DF.allocate(2);
 
     AirflowNetworkLinkageData.allocate(i);
-    AirflowNetworkLinkageData(i).NodeHeights(1) = 4.0;
-    AirflowNetworkLinkageData(i).NodeHeights(2) = 2.0;
+    AirflowNetworkLinkageData(i).NodeHeights[0] = 4.0;
+    AirflowNetworkLinkageData(i).NodeHeights[1] = 2.0;
 
     AFEHOP(1, 1, 0.05, 1, 1, 2, F, DF, NF);
     EXPECT_NEAR(3.47863, F(1), 0.00001);

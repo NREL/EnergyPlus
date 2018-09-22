@@ -303,6 +303,7 @@ namespace DataAirflowNetwork {
         Real64 Factor;                // Crack Actual Value or Window Open Factor for Ventilation
         int SurfNum;                  // Surface number
         Array1D_int NodeNums;         // Positive: Zone numbers; 0: External
+        //std::array<int, 2> NodeNums;  // Positive: Zone numbers; 0: External
         Real64 OpenFactor;            // Surface factor
         Real64 OpenFactorLast;        // Surface factor at previous time step
         bool EMSOpenFactorActuated;   // True if EMS actuation is on
@@ -564,10 +565,13 @@ namespace DataAirflowNetwork {
         // Members
         std::string Name;            // Provide a unique linkage name
         Array1D_string NodeNames;    // Names of nodes (limited to 2)
+        //std::array<std::string, 2> NodeNames;    // Names of nodes (limited to 2)
         Array1D<Real64> NodeHeights; // Node heights
+        //std::array<Real64, 2> NodeHeights; // Node heights
         std::string CompName;        // Name of element
         int CompNum;                 // Element Number
         Array1D_int NodeNums;        // Node numbers
+        //std::array<int, 2> NodeNums; // Node numbers
         int LinkNum;                 // Linkage number
 
         // Default Constructor
