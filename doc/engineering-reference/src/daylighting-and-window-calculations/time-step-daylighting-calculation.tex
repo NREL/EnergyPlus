@@ -8,13 +8,13 @@ A daylighting calculation is performed each time step that the sun is up for eac
 \begin{longtable}[c]{p{1.0in}p{2.0in}p{1.0in}p{2.0in}}
 \caption{Variables in Time-Step Calculations \label{table:variables-in-time-step-calculations}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & C++ variable \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Variables in Time-Step Calculations} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & C++ variable \tabularnewline
 \midrule
 \endhead
 
@@ -44,7 +44,7 @@ i\(_{L}\) & Reference point index & - & IL \tabularnewline
 i\(_{S}\) & Window shade index & - & IS \tabularnewline
 I\(_{tot}\) & Total daylight illuminance at reference point & lux & DaylIllum \tabularnewline
 B\(_{tot}\), B & Total window background luminance & cd/m\(^{2}\) & BLUM \tabularnewline
-I\(_{set}\) & Illuminance setpoint & lux & ZoneDaylight\%IllumSetPoint \tabularnewline
+I\(_{set}\) & Illuminance setpoint & lux & ZoneDaylight(ZoneNum).IllumSetPoint \tabularnewline
 f\(_{L}\) & Fractional electric lighting output & - & FL \tabularnewline
 f\(_{p}\) & Fractional electric lighting input power & - & FP \tabularnewline
 N\(_{L}\) & Number of steps in a stepped control system & - & LightControlSteps \tabularnewline

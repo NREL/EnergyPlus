@@ -3522,7 +3522,7 @@ WindowMaterial:Gap:EquivalentLayer,
 
 \subsection{Material:RoofVegetation}\label{materialroofvegetation}
 
-This definition must be used in order to simulate the green roof (ecoroof) model. The material becomes the outside layer in a green roof construction (see example below). In the initial release of the green roof model, only one material may be used as a green roof layer though, of course, several constructions using that material may be used. In addition, the model has only been tested with the ConductionTransferFunction solution algorithm -- a warning will be issued for other solution algorithm choices. This model was developed for low-sloped exterior surfaces (roofs). It is not recommended for high-sloped exterior surfaces (e.g., walls).
+This definition must be used in order to simulate the green roof (ecoroof) model. The material becomes the outside layer in a green roof construction (see example below). In the initial release of the green roof model, only one material may be used as a green roof layer though, of course, several constructions using that material may be used. In addition, the model works only with the ConductionTransferFunction heat balance solution algorithm. This model was developed for low-sloped exterior surfaces (roofs). It is not recommended for high-sloped exterior surfaces (e.g., walls).
 
 \subsubsection{Inputs}\label{inputs-32-000}
 
@@ -3600,13 +3600,13 @@ The field allows for user input of the initial moisture content of the soil laye
 
 \paragraph{Field: Moisture Diffusion Calculation Method}\label{field-moisture-diffusion-calculation-method}
 
-The field allows for two models to be selected: \textbf{Simple} or \textbf{Advanced}.
+The field allows for two models to be selected: \textbf{Simple} or \textbf{Advanced}. EnergyPlus Currently supports only the \textbf{Simple} \textit{Moisture Diffusion Calculation Method}.
 
 \textbf{Simple} is the original Ecoroof model - based on a constant diffusion of moisture through the soil.~ This model starts with the soil in two layers.~ Every time the soil properties update is called, it will look at the two soils moisture layers and asses which layer has more moisture in it. It then takes moisture from the higher moisture layer and redistributes it to the lower moisture layer at a constant rate.
 
-\textbf{Advanced} is the later Ecoroof model. If you use it, you will need to increase your number of timesteps in hour for the simulation with a recommended value of 20. This moisture transport model is based on a project which looked at the way moisture transports through soil.~ It uses a finite difference method to divide the soil into layers (nodes). It redistributes the soil moisture according the model described in:
+\textbf{Advanced} is the later Ecoroof model. The model requires higher number of timesteps in hour for the simulation with a recommended value of 20. This moisture transport model is based on a project which looked at the way moisture transports through soil.~ It uses a finite difference method to divide the soil into layers (nodes). It redistributes the soil moisture according the model described in:
 
-Marcel G Schaap and Martinus Th. van Genuchten, 2006, `A modified Maulem-van Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near Saturation', Vadose Zone Journal 5 (1), p 27-34.
+Marcel G Schaap and Martinus Th. van Genuchten, 2006, `A modified Maulem-van Genuchten Formulation for Improved Description of the Hydraulic Conductivity Near Saturation', Vadose Zone Journal 5 (1), p 27-34. However, currently \textbf{Advanced} \textit{Moisture Diffusion Calculation Method} is not supported in EnergyPlus.
 
 An IDF example:
 
@@ -3628,10 +3628,10 @@ Material:RoofVegetation,
       0.95,                    !- Thermal Absorptance
       0.8,                     !- Solar Absorptance
       0.7,                     !- Visible Absorptance
-     0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
+      0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
       0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer
       0.2,                     !- Initial Volumetric Moisture Content of the Soil Layer
-      Advanced;                !- Moisture Diffusion Calculation Method
+      Simple;                  !- Moisture Diffusion Calculation Method
 
 
     Material:RoofVegetation,
@@ -3650,10 +3650,10 @@ Material:RoofVegetation,
       0.95,                    !- Thermal Absorptance
       0.8,                     !- Solar Absorptance
       0.7,                     !- Visible Absorptance
-     0.4,          !- Saturation Volumetric Moisture Content of the Soil Layer
-      0.01,         !- Residual Volumetric Moisture Content of the Soil Layer
-      0.2,          !- Initial Volumetric Moisture Content of the Soil Layer
-      Advanced;                !- Moisture Diffusion Calculation Method
+      0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer
+      0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer
+      0.2,                     !- Initial Volumetric Moisture Content of the Soil Layer
+      Simple;                 !- Moisture Diffusion Calculation Method
 \end{lstlisting}
 
 And construction using the ecoroof material:

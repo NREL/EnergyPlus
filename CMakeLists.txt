@@ -179,10 +179,11 @@ IF( NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
 ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
+if( BUILD_TESTING )
+  ADD_SUBDIRECTORY(third_party/gtest)
+endif()
 
 # Kiva
-option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging only)" OFF )
-mark_as_advanced(FORCE BUILD_GROUND_PLOT)
 INCLUDE(third_party/cmake/kiva.cmake)
 
 execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
@@ -207,9 +208,7 @@ ADD_SUBDIRECTORY(src/EnergyPlus)
 # Include scripts for enabling the testing of 179D compliance
 include(cmake/179DReporting.cmake)
 
-
 if( BUILD_TESTING )
-  ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
 

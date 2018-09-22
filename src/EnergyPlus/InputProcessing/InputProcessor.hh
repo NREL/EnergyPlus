@@ -241,7 +241,9 @@ private:
     std::unique_ptr<Validation> validation;
     std::unique_ptr<DataStorage> data;
     json schema;
+    public:
     json epJSON;
+    private:
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
     UnorderedObjectCacheMap objectCacheMap;
     UnorderedUnusedObjectMap unusedInputs;
