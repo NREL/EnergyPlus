@@ -422,7 +422,7 @@ The iteration process then begins to determine the heat exchanger effectiveness 
 The ratio of average volumetric flow rate through the heat exchanger core to heat exchanger's nominal volumetric flow rate (\emph{HX\(_{flowratio}\)}) is then determined and used to calculate the operating effectiveness of the heat exchanger using Equations~\ref{eq:varepsilonoperatingsensible} and~\ref{eq:varepsilonoperatinglatent}. Since the supply airflow rate through the heat exchanger core is purposely reduced to control frost formation, average volumetric airflow rates below 50\% of nominal are allowed and no warning message is issued. Supply air outlet temperature (leaving the heat exchanger core), sensible heat transfer, and exhaust air outlet temperature are then calculated using the revised heat exchanger effectiveness.
 
 \begin{equation}
-{T_{SupAirOut}} = {T_{SupAirIn}} + {\varepsilon_{operating,sensible}}\left( {\frac{{\dot{m}  c_{p,min}}}{{\dot{m} c_{p,sup}}} \right)({T_{ExhAirIn}} - {T_{SupAirIn}})
+{T_{SupAirOut}} = {T_{SupAirIn}} + {\varepsilon_{operating,sensible}}\left( {\frac{{\dot{m}  c_{p,min}}}{{\dot{m} c_{p,sup}}}} \right)({T_{ExhAirIn}} - {T_{SupAirIn}})
 \end{equation}
 
 \begin{equation}
@@ -560,7 +560,7 @@ After the specified performance data type model calculates the process/regenerat
 \end{equation}
 
 \begin{equation}
-{\dot{Q}_{Latent}} = {\dot{Q}__{Total}} - {\dot{Q}_{Sensible}}
+{\dot{Q}_{Latent}} = {\dot{Q}_{Total}} - {\dot{Q}_{Sensible}}
 \end{equation}
 
 where:

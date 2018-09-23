@@ -26,21 +26,21 @@ The model is formulated from the heat balances on the fluid and wall nodes.
 {M_{w,i}}{C_{P,w}}\frac{{d{T_{w,i}}}}{{dt}} = {h_f}{A_i}\left( {{T_{f,i}} - {T_{w,i}}} \right) - {h_e}{A_i}\left( {{T_{w,i}} - {T_e}} \right)
 \end{equation}
 
-Where, subscript \emph{w}, \emph{f} and \emph{e} denote the values for pipe wall, fluid and environment respectively. The current node is represented by a subscript of \emph{i}, while the previous node is represented by \emph{i-1}.
+where subscripts \emph{w}, \emph{f} and \emph{e} denote the values for pipe wall, fluid and environment, respectively. The current node is represented by a subscript of \emph{i}, while the previous node is represented by \emph{i-1}.  In the previous two equations, the terms are defined by:
 
-\(M\) ~ = Mass
+\(M\) is the mass
 
-\({C_p}\) ~ = Specific Heat
+\({C_p}\) is the specific heat
 
-\(\dot m\) ~ = Mass flow rate of fluid in pipe
+\(\dot m\) is the mass flow rate of fluid in pipe
 
-\(T\) ~ = Temperature
+\(T\) is the Temperature
 
-\(A\) ~ = ~ Heat Transfer Area
+\(A\) is the heat transfer area
 
-\(h\) ~ = Film convective resistance
+\(h\) is the film convective resistance
 
-\(t\) ~~ = time
+\(t\) is time.
 
 The exterior film convective resistance is calculated based on either wind speed, room air velocity, or a scheduled value based on the type of pipe heat transfer object. However, when the velocity gets too low, natural convection must be modeled. This is handled within the program by having a lower limit on the Nusselt number. For natural convection from a horizontal cylinder, a constant Nusselt number is assumed based on information from Spang (referenced below). This Nusselt number is 0.36. The Nusselt number used in calculating the exterior convection coefficient (Incropera and Dewitt 1996) is the maximum of the Nusselt number from the forced convection coefficient correlation and this natural convection Nusselt number (0.36).
 
@@ -52,19 +52,20 @@ Approximating the derivatives using backward differencing enables these equation
 \frac{{{M_{f,i}}{C_{P,f}}}}{{\Delta t}}\left( {T_{f,i}^n - T_{f,i}^{n - 1}} \right) = \dot m{C_{P,f}}\left( {T_{f,i - 1}^n - T_{f,i}^n} \right) - {h_f}{A_i}\left( {T_{f,i}^n - T_{w,i}^n} \right)
 \end{equation}
 
-Rearranging gives,
+Rearranging gives:
 
 \begin{equation}
 T_{f,i}^n\left[ {{M_{f,i}}{C_{P,f}} + \dot m{C_{P,f}}\Delta t + {h_f}{A_i}\Delta t} \right] = \dot m{C_{P,f}}\Delta tT_{f,i - 1}^n + {h_f}{A_i}\Delta tT_{w,i}^n + {M_{f,i}}{C_{P,f}}T_{f,i}^{n - 1}
 \end{equation}
 
-or,
+or:
 
 \begin{equation}
 {a_1}T_{f,i}^n = {a_2}T_{f,i - 1}^n + {a_3}T_{w,i}^n + {a_4}T_{f,i}^{n - 1}
+\label{eq:PipeEquation614}
 \end{equation}
 
-where,
+where:
 
 \begin{equation}
   \begin{array}{rl}
@@ -75,25 +76,26 @@ where,
   \end{array}
 \end{equation}
 
-Similarly, taking backwards differences for the conduit wall at time step n, the heat balance becomes,
+Similarly, taking backwards differences for the conduit wall at time step n, the heat balance becomes:
 
 \begin{equation}
 \frac{{{M_{w,i}}{C_{P,w}}}}{{\Delta t}}\left( {T_{w,i}^n - T_{w,i}^{n - 1}} \right) = {h_f}{A_i}\left( {T_{f,i}^n - T_{w,i}^n} \right) - {h_e}{A_i}\left( {T_{w,i}^n - T_e^n} \right)
 \end{equation}
 
-Rearranging gives,
+Rearranging gives:
 
 \begin{equation}
 T_{w,i}^n\left[ {{M_{w,i}}{C_{P,w}} + {h_f}{A_i}\Delta t + {h_e}{A_i}\Delta t} \right] = {h_f}{A_i}\Delta tT_{f,i}^n + {h_e}{A_i}\Delta tT_e^n + {M_{w,i}}{C_{P,w}}T_{w,i}^{n - 1}
 \end{equation}
 
-or,
+or:
 
 \begin{equation}
 {b_1}T_{w,i}^n = {b_2}T_{f,i}^n + {b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}
+\label{eq:PipeEquation617}
 \end{equation}
 
-where,
+where:
 
 \begin{equation}
   \begin{array}{rl}
@@ -104,7 +106,7 @@ where,
   \end{array}
 \end{equation}
 
-Substituting into gives an equation for the current fluid temperature:
+Substituting Equation~\ref{eq:PipeEquation617} into Equation~\ref{eq:PipeEquation614} gives an equation for the current fluid temperature:
 
 \begin{equation}
 {a_1}T_{f,i}^n = {a_2}T_{f,i - 1}^n + {a_3}\left( {{b_2}T_{f,i}^n + {b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}} \right)/{b_1} + {a_4}T_{f,i}^{n - 1}
@@ -112,9 +114,10 @@ Substituting into gives an equation for the current fluid temperature:
 
 \begin{equation}
 T_{f,i}^n = \frac{1}{{\left( {{a_1} - {a_3}{b_2}/{b_1}} \right)}}\left[ {{a_2}T_{f,i - 1}^n + {a_3}\left( {{b_3}T_{e,i}^n + {b_4}T_{w,i}^{n - 1}} \right)/{b_1} + {a_4}T_{f,i}^{n - 1}} \right]
+\label{eq:PipeTfitothen}
 \end{equation}
 
-The conduit is simulated by solving Eq. followed by Eq. for each of the twenty cells in the model and incrementing the time step. The fluid temperature of the last node is taken to be the pipe outlet temperature.
+The conduit is simulated by solving Equation~\ref{eq:PipeTfitothen} followed by Equation~\ref{eq:PipeEquation614} for each of the twenty cells in the model and incrementing the time step. The fluid temperature of the last node is taken to be the pipe outlet temperature.
 
 \subsubsection{References}\label{references-036}
 
@@ -230,16 +233,20 @@ The mesh is developed by using a few simple parameters.~ There are two distinct 
 \begin{itemize}
 \item
   X, Y, Z mesh
+\begin{itemize}
 \item
   Mesh Layout
 \item
   Cell density
+\end{itemize}
 \item
   Radial mesh
+\begin{itemize}
 \item
   Radial mesh thickness
 \item
   Cell count
+\end{itemize}
 \end{itemize}
 
 The Cartesian mesh uses a cell density parameter to define the number of cells to use in the simulation.~ Instead of requiring a detailed specification of all cell regions in the domain, this one parameter is used to specify a mesh density and is applied to all domain regions.~ The cell density parameter represents the number of cells within any two domain partitions.~ A domain partition is a basement wall or a pipe placed in the domain.~ Once these partitions are all laid out and validated, the regions between them are populated with the number of cells specified in the cell density parameter.~ Although this may lead to a variation of cell size within the domain, it is assumed that this will help focus computational intensity in the domain. ~Of course, the number of cells (cell density parameter) can be different for each of the X, Y, and Z directions to allow for further fine tuning of the domain.
