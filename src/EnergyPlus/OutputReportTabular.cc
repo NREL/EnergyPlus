@@ -2439,6 +2439,13 @@ namespace OutputReportTabular {
         return isCompLoadRepReq;
     }
 
+    bool hasSizingPeriodsDays()
+    {
+        int sizePerDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay");
+        int sizePerWeathFileDays = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
+        return ((sizePerDesDays + sizePerWeathFileDays) > 0);
+    }
+
     void InitializePredefinedMonthlyTitles()
     {
         // SUBROUTINE INFORMATION:
@@ -12958,9 +12965,13 @@ namespace OutputReportTabular {
 
             if (isCooling) {
                 // Time of Peak Load
-                compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                         General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                         coilSelectionReportObj->getTimeText(timeOfMax);
+                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                } else {
+                    compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
+                }
 
                 // Outside  Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax);
@@ -13007,9 +13018,13 @@ namespace OutputReportTabular {
 
             } else {
                 // Time of Peak Load
-                compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                         General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                         coilSelectionReportObj->getTimeText(timeOfMax);
+                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                } else {
+                    compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
+                }
 
                 // Outside  Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax);
