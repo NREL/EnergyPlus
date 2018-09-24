@@ -188,17 +188,18 @@ namespace DaylightingManager {
     int const octreeCrossover(100); // Octree surface count crossover
 
     // MODULE VARIABLE DECLARATIONS:
-    int TotWindowsWithDayl(0);                    // Total number of exterior windows in all daylit zones
-    int OutputFileDFS(0);                         // Unit number for daylight factors
-    Array1D<Real64> DaylIllum(MaxRefPoints, 0.0); // Daylight illuminance at reference points (lux)
-    Real64 PHSUN(0.0);                            // Solar altitude (radians)
-    Real64 SPHSUN(0.0);                           // Sine of solar altitude
-    Real64 CPHSUN(0.0);                           // Cosine of solar altitude
-    Real64 THSUN(0.0);                            // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
-    Array1D<Real64> PHSUNHR(24, 0.0);             // Hourly values of PHSUN
-    Array1D<Real64> SPHSUNHR(24, 0.0);            // Hourly values of the sine of PHSUN
-    Array1D<Real64> CPHSUNHR(24, 0.0);            // Hourly values of the cosine of PHSUN
-    Array1D<Real64> THSUNHR(24, 0.0);             // Hourly values of THSUN
+    int TotWindowsWithDayl(0);         // Total number of exterior windows in all daylit zones
+    int OutputFileDFS(0);              // Unit number for daylight factors
+    Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
+    int maxNumRefPtInAnyZone;          // The most number of reference points that any single zone has
+    Real64 PHSUN(0.0);                 // Solar altitude (radians)
+    Real64 SPHSUN(0.0);                // Sine of solar altitude
+    Real64 CPHSUN(0.0);                // Cosine of solar altitude
+    Real64 THSUN(0.0);                 // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
+    Array1D<Real64> PHSUNHR(24, 0.0);  // Hourly values of PHSUN
+    Array1D<Real64> SPHSUNHR(24, 0.0); // Hourly values of the sine of PHSUN
+    Array1D<Real64> CPHSUNHR(24, 0.0); // Hourly values of the cosine of PHSUN
+    Array1D<Real64> THSUNHR(24, 0.0);  // Hourly values of THSUN
 
     // In the following I,J,K arrays:
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
@@ -1124,25 +1125,25 @@ namespace DaylightingManager {
             ZoneDaylight(ZoneNum).DaylBackFacSun = 0.0;
             ZoneDaylight(ZoneNum).DaylBackFacSunDisk = 0.0;
         } else {
-
+            int numRefPts = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
             ZoneDaylight(ZoneNum).DaylIllFacSky(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylSourceFacSky(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylBackFacSky(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylIllFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylIllFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
             ZoneDaylight(ZoneNum).DaylIllFacSunDisk(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylSourceFacSun(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylBackFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylBackFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
             ZoneDaylight(ZoneNum).DaylBackFacSunDisk(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
         }
 
         NRF = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
@@ -4497,24 +4498,29 @@ namespace DaylightingManager {
             DayltgSetupAdjZoneListsAndPointers();
         }
 
+        maxNumRefPtInAnyZone = 0;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
             ZoneNum = Surface(SurfNum).Zone;
+            int numRefPoints = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
+            if (numRefPoints > maxNumRefPtInAnyZone) {
+                maxNumRefPtInAnyZone = numRefPoints;
+            }
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
                 if (!SurfaceWindow(SurfNum).SurfDayLightInit) {
-                    SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
-                    SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                    SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numRefPoints);
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                    SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numRefPoints);
                     SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                    SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numRefPoints);
                     SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                    SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
                     SurfaceWindow(SurfNum).SurfDayLightInit = true;
                 }
@@ -4524,19 +4530,19 @@ namespace DaylightingManager {
                     ZoneNumAdj = Surface(SurfNumAdj).Zone;
                     if (ZoneDaylight(ZoneNumAdj).TotalDaylRefPoints > 0) {
                         if (!SurfaceWindow(SurfNum).SurfDayLightInit) {
-                            SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
-                            SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                            SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numRefPoints);
                             SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                            SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numRefPoints);
                             SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                            SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numRefPoints);
                             SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                            SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
                             SurfaceWindow(SurfNum).SurfDayLightInit = true;
                         }
@@ -5910,7 +5916,7 @@ namespace DaylightingManager {
         // Calculate background luminance including effect of inter-reflected illuminance from light
         // entering zone through its interior windows
 
-        RefPoints = min(2, ZoneDaylight(ZoneNum).TotalDaylRefPoints);
+        RefPoints = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
         for (IL = 1; IL <= RefPoints; ++IL) {
             BacLum = ZoneDaylight(ZoneNum).BacLum(IL) + ZoneDaylight(ZoneNum).InterReflIllFrIntWins * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi;
             BacLum = max(ZoneDaylight(ZoneNum).IllumSetPoint(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, BacLum);
@@ -6367,7 +6373,7 @@ namespace DaylightingManager {
         int ISky;   // Sky type index
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
-        static Vector2<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
+        Array1D<Real64> SetPnt;              // Illuminance setpoint at reference points (lux)
         static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
@@ -6377,8 +6383,8 @@ namespace DaylightingManager {
         static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
-        static Vector2<Real64> GLRNDX; // Glare index at reference point
-        static Vector2<Real64> GLRNEW; // New glare index at reference point
+        Array1D<Real64> GLRNDX;        // Glare index at reference point
+        Array1D<Real64> GLRNEW;        // New glare index at reference point
         int IL;                        // Reference point index
         int IWin;                      // Window index
         int IS;                        // IS=1 for unshaded window, =2 for shaded window
@@ -6424,13 +6430,15 @@ namespace DaylightingManager {
 
         if (ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) return;
 
+        NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
+
         // Three arrays to save original clear and dark (fully switched) states'
         //  zone/window daylighting properties.
         if (DayltgInteriorIllum_firstTime) {
             int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(ZoneDaylight, &ZoneDaylightCalc::NumOfDayltgExtWins)));
-            tmpIllumFromWinAtRefPt.allocate(d1, 2, 2);
-            tmpBackLumFromWinAtRefPt.allocate(d1, 2, 2);
-            tmpSourceLumFromWinAtRefPt.allocate(d1, 2, 2);
+            tmpIllumFromWinAtRefPt.allocate(d1, 2, NREFPT);
+            tmpBackLumFromWinAtRefPt.allocate(d1, 2, NREFPT);
+            tmpSourceLumFromWinAtRefPt.allocate(d1, 2, NREFPT);
             DayltgInteriorIllum_firstTime = false;
         }
         tmpIllumFromWinAtRefPt = 0.0;
@@ -6438,9 +6446,10 @@ namespace DaylightingManager {
         tmpSourceLumFromWinAtRefPt = 0.0;
 
         // FLOW:
-        // Limit the number of control reference points to 2
-        NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
-        if (NREFPT > 2) NREFPT = 2;
+        SetPnt.allocate(NREFPT);
+        DaylIllum.allocate(maxNumRefPtInAnyZone);
+        GLRNDX.allocate(NREFPT);
+        GLRNEW.allocate(NREFPT);
 
         // Initialize reference point illuminance and window background luminance
         for (IL = 1; IL <= NREFPT; ++IL) {
@@ -6917,15 +6926,16 @@ namespace DaylightingManager {
         }
 
         Array3D<Real64> WDAYIL(
-            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point (second index)
+            2, NREFPT, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point (second index)
         //   for shade open/closed (first index), the number of shade deployment groups (third index)
         Array3D<Real64> WBACLU(
-            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point (second index)
+            2, NREFPT, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point (second index)
         //   for shade open/closed (first index), the number of shade deployment groups (third index)
         Array2D<Real64> RDAYIL(
-            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point after closing shade
+            NREFPT, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point after closing shade
         Array2D<Real64> RBACLU(
-            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point after closing shade
+            NREFPT,
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point after closing shade
 
         if (GlareFlag) {
             // Glare is too high at a ref pt.  Loop through windows.
@@ -7016,27 +7026,38 @@ namespace DaylightingManager {
                         DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                     }
 
-                    blnCycle = false;
-                    if (NREFPT == 1 && GLRNEW(1) > GLRNDX(1)) {
-                        // One ref pt;  go to next window if glare has increased.
-                        blnCycle = true;
-                    } else if (NREFPT > 1) {
-                        // Two ref pts.  There are three cases depending on glare values.
-                        if (GLRNDX(1) > ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) > ZoneDaylight(ZoneNum).MaxGlareallowed) {
-                            // (1) Initial glare too high at both ref pts.  Deploy shading on
-                            //     this window if this decreases glare at both ref pts.
-                            if (GLRNEW(1) > GLRNDX(1) || GLRNEW(2) > GLRNDX(2)) blnCycle = true;
-                        } else if (GLRNDX(1) > ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed) {
-                            // (2) Initial glare too high only at first ref pt.  Deploy shading
-                            //     on this window if glare at first ref pt decreases and
-                            //     glare at second ref pt stays below max.
-                            if (GLRNEW(1) > GLRNDX(1) || GLRNEW(2) > ZoneDaylight(ZoneNum).MaxGlareallowed) blnCycle = true;
-                        } else {
-                            // (3) Initial glare too high at second ref pt.  Deploy shading if glare
-                            //     at second ref pt decreases and glare at first ref pt stays below max.
-                            if (GLRNEW(2) > GLRNDX(2) || GLRNEW(1) > ZoneDaylight(ZoneNum).MaxGlareallowed) blnCycle = true;
-                        }
+                    // Check if the shading did not improve the glare conditions
+                    //
+                    // blnCycle when true resets the specific window to its non-shaded condition. A later comment says
+                    //      Shading this window has not improved the glare situation.
+                    //      Reset shading flag to no shading condition, go to next window.
+                    //
+                    // If the original glare was too high at all reference points and the new glare is lower at all reference points it is good, don't
+                    // reset it. For each reference point, if the original glare was too high but ok at other reference points and the glare gets
+                    // lower at the reference and stays ok at the other reference points it is good, don't reset it.
+                    //
+                    // The old comments when there were only two reference points were:
+                    //     One ref pt;  go to next window if glare has increased.
+                    //     Two ref pts.  There are three cases depending on glare values.
+                    //         (1) Initial glare too high at both ref pts.  Deploy shading on
+                    //             this window if this decreases glare at both ref pts.
+                    //         (2) Initial glare too high only at first ref pt.  Deploy shading
+                    //             on this window if glare at first ref pt decreases and
+                    //             glare at second ref pt stays below max.
+                    //         (3) Initial glare too high at second ref pt.  Deploy shading if glare
+                    //             at second ref pt decreases and glare at first ref pt stays below max.
+                    //
+                    // The approach taken is just to count the number of reference points that fulfill the individual requirements and see if it covers
+                    // all the reference points.
+                    int numRefPtOldAboveMaxNewBelowOld = 0;
+                    int numRefPtOldBelowMaxNewBelowMax = 0;
+                    for (IL = 1; IL <= NREFPT; ++IL) {
+                        if (GLRNDX(IL) > ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(IL) <= GLRNDX(IL)) ++numRefPtOldAboveMaxNewBelowOld;
+                        if (GLRNDX(IL) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(IL) <= ZoneDaylight(ZoneNum).MaxGlareallowed)
+                            ++numRefPtOldBelowMaxNewBelowMax;
                     }
+                    blnCycle = true;
+                    if ((numRefPtOldAboveMaxNewBelowOld + numRefPtOldBelowMaxNewBelowMax) == NREFPT) blnCycle = false;
                 }
 
                 // restore the count to the value prior to the last loop through the group of exterior windows
@@ -7394,7 +7415,7 @@ namespace DaylightingManager {
         Real64 TotReduction; // Electric lighting power reduction factor for a zone
         //  due to daylighting
         int NREFPT;   // Number of daylighting reference points in a zone
-        Real64 ZFTOT; // Fraction of zone's floor area that has daylighting controls
+        Real64 ZFTOT = 0.; // Fraction of zone's floor area that has daylighting controls
         int IL;       // Reference point index
         int LSYSTP;   // Lighting control type: 1=continuous dimming, 2=stepped,
         //  3=continuous dimming then off
@@ -7423,16 +7444,14 @@ namespace DaylightingManager {
         //  ENDIF
 
         if (ScheduledAvailable) {
-            // Limit the number of control reference points to 2
             NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
-            if (NREFPT > 2) NREFPT = 2;
-
-            // Total fraction of zone that is daylit
-            ZFTOT = ZoneDaylight(ZoneNum).FracZoneDaylit(1);
-            if (NREFPT > 1) ZFTOT += ZoneDaylight(ZoneNum).FracZoneDaylit(2);
 
             // Loop over reference points
             for (IL = 1; IL <= NREFPT; ++IL) {
+
+                // Total fraction of zone that is daylit
+                ZFTOT += ZoneDaylight(ZoneNum).FracZoneDaylit(IL);
+                
                 DaylIllum(IL) = ZoneDaylight(ZoneNum).DaylIllumAtRefPt(IL);
                 if (DaylIllum(IL) >= ZoneDaylight(ZoneNum).IllumSetPoint(IL)) {
                     FL = 0.0;
@@ -10704,7 +10723,7 @@ namespace DaylightingManager {
 
                 ZoneDaylight(ZoneNum).NumOfDayltgExtWins = ZoneExtWin(ZoneNum);
                 WinSize = ZoneExtWin(ZoneNum);
-                RefSize = 2;
+                RefSize = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
                 ZoneDaylight(ZoneNum).DaylIllFacSky.allocate(24, MaxSlatAngs + 1, 4, RefSize, WinSize);
                 ZoneDaylight(ZoneNum).DaylSourceFacSky.allocate(24, MaxSlatAngs + 1, 4, RefSize, WinSize);
                 ZoneDaylight(ZoneNum).DaylBackFacSky.allocate(24, MaxSlatAngs + 1, 4, RefSize, WinSize);
