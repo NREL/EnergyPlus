@@ -1461,7 +1461,11 @@ void InputProcessor::preScanReportingVariables()
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
-                addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
+                try {
+                    addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
+                } catch (...) {
+                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                }
             }
         }
     }
@@ -1477,7 +1481,11 @@ void InputProcessor::preScanReportingVariables()
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
-                addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
+                try {
+                    addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
+                } catch (...) {
+                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                }
             }
         }
     }
