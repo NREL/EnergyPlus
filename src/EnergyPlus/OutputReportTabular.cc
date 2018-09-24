@@ -12965,7 +12965,7 @@ namespace OutputReportTabular {
 
             if (isCooling) {
                 // Time of Peak Load
-                if (desDaySelected <= WeatherManager::DesDayInput.size()) {
+                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
                     compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
                                              General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
@@ -13018,7 +13018,7 @@ namespace OutputReportTabular {
 
             } else {
                 // Time of Peak Load
-                if (desDaySelected <= WeatherManager::DesDayInput.size()) {
+                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
                     compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
                                              General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
