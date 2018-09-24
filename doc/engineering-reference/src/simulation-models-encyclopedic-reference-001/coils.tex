@@ -2567,10 +2567,7 @@ For the Coil:Cooling:DX:TwoSpeed object in EnergyPlus, these standard ratings ar
 The standard rating cooling capacity is calculated as follows:
 
 \begin{equation}
-\begin{array}{l}
-\dot{Q}_{StandardRating} & = \dot{Q}_{Total,Rated} \left( TotCapTempModFac_{Rated} \right) \left( TotCapFlowModFac_{Rated} \right) \\
-& - (FanHeatCorrection)
-\end{array}
+\dot{Q}_{StandardRating} = \dot{Q}_{Total,Rated} TotCapTempModFac_{Rated} TotCapFlowModFac_{Rated} - FanHeatCorrection
 \end{equation}
 
 where:
@@ -2610,10 +2607,7 @@ Energy Efficiency Ratio (EER) is another standard rating (AHRI 2007), and it is 
 \end{equation}
 
 \begin{equation}
-  \begin{array}{l}
-    Power_{Total,Rated} =& \left( {\dot Q}_{Total,Rated} (TotCapTempModFac_{Rated})(TotCapFlowModFac_{Rated}) \right)\, \cdot EIR_{Rated} \\
-    & + (FanPowerCorrection)
-  \end{array}
+    Power_{Total,Rated} = \dot{Q}_{Total,Rated} TotCapTempModFac_{Rated} TotCapFlowModFac_{Rated} EIR_{Rated} + FanPowerCorrection
 \end{equation}
 
 \begin{equation}
@@ -3148,7 +3142,7 @@ The following procedure provides the detailed description of the exception.
 The total delivered heating capacity for Stage 1 operating at the cycling ratio needed to meet the requested heating load is:
 
 \begin{equation}
-  Q_{coil,cycling} = {\dpt{m}_{Speed~1}} \left( CycRatio \right) (h_{inlet} - h_{outlet,full})
+  Q_{coil,cycling} = {\dot{m}_{Speed~1}} \left( CycRatio \right) (h_{inlet} - h_{outlet,full})
 \end{equation}
 
 where:
@@ -3236,7 +3230,7 @@ where:
 \end{itemize}
 
 \begin{equation}
-  \begin{array}{l}
+  \begin{array}{rl}
     Q_{coil,SpeedRatio} =& \left( SpeedRatio \right){\dot{m}_{Speed~n}}(h_{inlet} - h_{outlet,full~Speed~n}) \\
                          &+ (1 - SpeedRatio) {\dot{m}_{Speed~n-1}}(h_{inlet} - h_{outlet,full~Speed~n-1})
   \end{array}
@@ -3246,9 +3240,9 @@ where:
 
 \({{Q_{coil,SpeedRatio}}}\) is the delivered sensible heating capacity at a given Stage ratio between two consecutive Stages (W)
 
-\({\dot{m}_{Speed~n}\) is the air mass flow rate through heating coil at Stage n as set by the parent object (kg/s)
+\(\dot{m}_{Speed~n}\) is the air mass flow rate through heating coil at Stage n as set by the parent object (kg/s)
 
-\({\dot{m}_{Speed~n-1}\) is the air mass flow rate through heating coil at Stage 1 as set by the parent object (kg/s).
+\(\dot{m}_{Speed~n-1}\) is the air mass flow rate through heating coil at Stage 1 as set by the parent object (kg/s).
 
 \begin{itemize}
   \item Average outlet air enthalpy
@@ -3778,7 +3772,7 @@ For a single speed heat pump with a fixed speed indoor fan installed, a constant
   \left\{ 
     \begin{array}{l}
       {\dot{Q}_h}(8.33) \cdot (1.8) \cdot \left( {\frac{{18.33 - {T_{OD}}}}{{60.0}}} \right), {~for~Regions~I,~II,~III,~IV,~and~VI} \\
-      {\dot{Q}\limits^ \cdot_h}(8.33),{~for~Region~V}
+      {\dot{Q}_h}(8.33),{~for~Region~V}
     \end{array}
   \right\}
 \end{equation}
@@ -3788,7 +3782,7 @@ For a single speed heat pump with a fixed speed indoor fan installed, a constant
   \left\{ 
     \begin{array}{l}
       {2 \cdot \dot{Q}_h}(8.33) \cdot (1.8) \cdot \left( {\frac{{18.33 - {T_{OD}}}}{{60.0}}} \right), {~for~Regions~I,~II,~III,~IV,~and~VI} \\
-      {2.2 \cdot \dot{Q}\limits^ \cdot_h}(8.33),{~for~Region~V}
+      {2.2 \cdot \dot{Q}_h}(8.33),{~for~Region~V}
     \end{array}
   \right\}
 \end{equation}
@@ -3894,7 +3888,7 @@ H3 Test (Required, Steady) & 21.11 & 15.56 & -8.33 & -9.44 & Heating Full-load \
 \bottomrule
 \multicolumn{6}{p{6in}}{\raggedright Notes: 1) Heating air volume arte are defined in section 3.1.4.4 of ANSI/AHRI 210/240-2008  2) Maintain the airflow nozzles static pressure difference ro velocity pressure during the ON periodat the same pressure difference or velocity pressure as measured during the H1 Test.} \tabularnewline
 \multicolumn{6}{p{6in}}{Source: Table 9, Page 74, ANSI/AHRI Standard 210/240-2008}
-\end{longtable}}
+\end{longtable}
 
 % table 60
 \begin{longtable}[c]{p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
@@ -3935,7 +3929,7 @@ H3 Test (Required, Steady) & 21.11 & 15.56 & -8.33 & -9.44 & Heating Full-load \
 \bottomrule
 \multicolumn{8}{l}{* Pacific Coast Region} \tabularnewline
 \multicolumn{8}{l}{Source: Table 17, Page 99, ANSI/AHRI Standard 210/240-2008}
-\end{longtable}}
+\end{longtable}
 
 % table 61
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
@@ -4484,22 +4478,20 @@ X(T\(_{j}\)) is the heating mode load factor for temperature bin j (-)
 Test & \multicolumn{2}{l}{Air Entering Indoor} & \multicolumn{2}{l}{Air Entering Outdoor} & Compressor & Heating Air \tabularnewline
 Description & \multicolumn{2}{l}{Unit Temperature} & \multicolumn{2}{l}{Unit Temperature} & Speed & Volume Flow Rate \tabularnewline
 \midrule
-& Dry Bulb \(^{\circ}\)C (\(^{\circ}\)F) & Wet Bulb \(^{\circ}\)C (\(^{\circ}\)F) & Dry Bulb \(^{\circ}\)C (\(^{\circ}\)F) & Wet Bulb \(^{\circ}\)C (\(^{\circ}\)F) \tabularnewline
-\midrule
-\endfirsthead
+& Dry Bulb \(^{\circ}\)C (\(^{\circ}\)F) & Wet Bulb \(^{\circ}\)C (\(^{\circ}\)F) & Dry Bulb \(^{\circ}\)C (\(^{\circ}\)F) & Wet Bulb \(^{\circ}\)C \(^{\circ}\)F) \tabularnewline
 
-H01 Test (required,steady) & 21.1 (70) & 15.6 (60) (max) & 16.7 (62) & 18.3 (56.5) & Low & Heating Minimum (1) \tabularnewline
-H12 Test (required,steady) & 21.1 (70) & 15.6 (60) (max) & 8.33 (47) & 6.11 (43) & High & Heating Full-Load (2) \tabularnewline
-H1C2 Test (required, cyclic) & 21.1 (70) & 15.6 (60) (max) & 8.33 (47) & 6.11 (43) & High &  \tabularnewline
-H11 Test (required,steady) & 21.1 (70) & 15.6 (60) (max) & 8.33 (47) & 6.11 (43) & Low & Heating Minimum (1) \tabularnewline
-H1C1 Test (required, cyclic) & 21.1 (70) & 15.6 (60) (max) & 8.33 (47) & 6.11 (43) & Low &  \tabularnewline
-H22 Test (required) & 21.1 (70) & 15.6 (60) (max) & 1.67 (35) & 0.56 (33) & High & Heating Full-Load \tabularnewline
-H21 Test (required) & 21.1 (70) & 15.6 (60) (max) & 1.67 (35) & 0.56 (33) & Low & Heating Minimum \tabularnewline
-H32 Test (required,steady) & 21.1 (70) & 15.6 (60) (max) & -8.33 (17) & -9.44 (15) & High & Heating Full-Load \tabularnewline
-H31 Test (required,steady) & 21.1 (70) & 15.6 (60) (max) & -8.33 (17) & -9.44 (15) & Low & Heating Minimum \tabularnewline
+H01 Test  (required,steady)  & 21.1 (70) & 15.6 (60) (max) & 16.7 (62)  & 18.3 (56.5) & Low  & Heating Minimum (1)   \tabularnewline
+H12 Test  (required,steady)  & 21.1 (70) & 15.6 (60) (max) & 8.33 (47)  & 6.11 (43)   & High & Heating Full-Load (2) \tabularnewline
+H1C2 Test (required, cyclic) & 21.1 (70) & 15.6 (60) (max) & 8.33 (47)  & 6.11 (43)   & High &                       \tabularnewline
+H11 Test  (required,steady)  & 21.1 (70) & 15.6 (60) (max) & 8.33 (47)  & 6.11 (43)   & Low  & Heating Minimum (1)   \tabularnewline
+H1C1 Test (required, cyclic) & 21.1 (70) & 15.6 (60) (max) & 8.33 (47)  & 6.11 (43)   & Low  &                       \tabularnewline
+H22 Test  (required)         & 21.1 (70) & 15.6 (60) (max) & 1.67 (35)  & 0.56 (33)   & High & Heating Full-Load     \tabularnewline
+H21 Test  (required)         & 21.1 (70) & 15.6 (60) (max) & 1.67 (35)  & 0.56 (33)   & Low  & Heating Minimum       \tabularnewline
+H32 Test  (required,steady)  & 21.1 (70) & 15.6 (60) (max) & -8.33 (17) & -9.44 (15)  & High & Heating Full-Load     \tabularnewline
+H31 Test  (required,steady)  & 21.1 (70) & 15.6 (60) (max) & -8.33 (17) & -9.44 (15)  & Low  & Heating Minimum       \tabularnewline
 \midrule
 \multicolumn{7}{l}{Source: Table 11, ANSI/AHRI Standard 210/240-2008}
-\bottomrule
+
 \end{longtable}
 
 \subsubsection{References}\label{references-6-000}
@@ -5903,7 +5895,7 @@ where:
 With the SHR for the coil at the current operating conditions, the properties of the air leaving the cooling coil are calculated using the following equations:
 
 \begin{equation}
-{h_{out}} = {h_{in}} - \left( {\left( {{{\dot{Q}_{total}} \times PLR}} \right) / \dot{m} \right)
+h_{out} = h_{in} - \left( \left( \dot{Q}_{total} \times PLR \right) / \dot{m} \right)
 \end{equation}
 
 \begin{equation}
@@ -6001,22 +5993,22 @@ The variable refrigerant flow (VRF) terminal unit operates based on user-specifi
 The average supply air and outdoor air mass flow rates through the heat pump for the HVAC simulation time step are calculated based on the cycling ratio of the DX cooling coil or heating coil (whichever coil is operating) as follows:
 
 \begin{equation}
-\dot{m}_{SA,avg} = \dot{m}_{SA,coil~on}} \left( {CyclingRatio} \right) + \dot{m}_{SA,coil~off}} \left( {1 - CyclingRatio} \right)
+\dot{m}_{SA,avg} = \dot{m}_{SA,coil~on} \left( {CyclingRatio} \right) + \dot{m}_{SA,coil~off} \left( {1 - CyclingRatio} \right)
 \end{equation}
 
 \begin{equation}
-\dot{m}_{OA,avg} = \dot{m}_{OA,coil~on}} \left( {CyclingRatio} \right) + \dot{m}_{OA,coil~off}} \left( {1 - CyclingRatio} \right)
+\dot{m}_{OA,avg} = \dot{m}_{OA,coil~on} \left( {CyclingRatio} \right) + \dot{m}_{OA,coil~off} \left( {1 - CyclingRatio} \right)
 \end{equation}
 
 where:
 
 \(\dot{m}_{SA,avg}\) is the average supply air mass flow rate during the time step (kg/s)
 
-\(\dot{m}_{SA,coil~on}}\) is the supply air mass flow rate when the coil is ON (kg/s)
+\(\dot{m}_{SA,coil~on}\) is the supply air mass flow rate when the coil is ON (kg/s)
 
 \emph{CyclingRatio} is the cycling ratio of the coil (heating or cooling)
 
-\(\dot{m}_{SA,coil~off}}\) is the supply air mass flow rate when the coil is OFF (kg/s)
+\(\dot{m}_{SA,coil~off}\) is the supply air mass flow rate when the coil is OFF (kg/s)
 
 \(\dot{m}_{OA,avg}\) is the average outside air mass flow rate during the time step (kg/s)
 
@@ -6367,7 +6359,7 @@ ff_{a,x-1} = ff_{a,x} = actual~air~mass~flow~rate/DesignAirFlowRateSpeedRatio
 \end{equation}
 
 \begin{equation}
-ff_{w,x-1}} = ff_{w,x} = actual~water~mass~flow~rate/DesignWaterFlowRateSpeedRatio
+ff_{w,x-1} = ff_{w,x} = actual~water~mass~flow~rate/DesignWaterFlowRateSpeedRatio
 \end{equation}
 
 The total heating capacities and EIRs at Speed x-1 and Speed x are given by:

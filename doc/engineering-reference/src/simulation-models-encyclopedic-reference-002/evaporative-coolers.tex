@@ -480,7 +480,7 @@ Case & Criteria & Secondary Air Flow \tabularnewline
 
 Off & \(T_{db,in,sec}<T_{db,out,setpoint}\) or (\(T_{db,in,sec}>T_{db,dryMaxLimit}\) and \(T_{wb,in,sec}>T_{wb,evapMaxLimit}\)) & None, no cooling needed or limit exceeded and is off \tabularnewline
 Dry Op Modulated & \(T_{db,in,sec}<T_{wb,evapMinLimit}\); \(T_{db,in,sec}<T_{db,dryMaxLimit}\) \(T_{db,out,sys,dry,min}<T_{db,out,setpoint}\) & Solve for secondary flow rate during dry operation that meets setpoint \tabularnewline
-Dry Op Max & \(T_{db,in,sec}>T_{db,evapMinLimit\); \(T_{db,in,sec}<T_{db,dryMaxLimit}\) \(T_{db,out,setpoint}<T_{db,out,sys,dry,min}\) & Run at full speed in dry mode \tabularnewline
+Dry Op Max & \(T_{db,in,sec}>T_{db,evapMinLimit}\); \(T_{db,in,sec}<T_{db,dryMaxLimit}\) \(T_{db,out,setpoint}<T_{db,out,sys,dry,min}\) & Run at full speed in dry mode \tabularnewline
 Dry or Wet Op Modulated & \(T_{db,in,sec}>T_{evapMinLimit}\); \(T_{db,in,sec}<T_{db,dryMaxLimit}\) \(T_{wb,in,sec}<T_{wb,evapMaxLimit}\) \(T_{db,out,setpoint}<T_{db,out,sys,dry,min}\); \(T_{db,out,sys,wet,min}<T_{db,out,setpoint}\) & Solve for secondary flow rate during both dry operation and wet operation that meets setpoint, choose lowest power among 2 \tabularnewline
 Wet Op Modulated & \(T_{db,in,sec}>T_{db,evapMinLimit}\); \(T_{wb,in,sec}<T_{wb,evapMaxLimit}\) \(T_{db,out.sys,wet,min}<T_{db,out,setpoint}\) \(T_{db,out,setpoint}<T_{db,out,sys,dry,min}\) & Solve for secondary flow rate during wet operation that meets setpoint \tabularnewline
 Wet Op Max & \(T_{db,in,sec}>T_{db,evapMinLimit}\); \(T_{wb,in,sec}<T_{wb,evapMaxLimit}\) \(T_{db,out,setpoint}<T_{db,out,sys,dry,min}\) & Run at full speed in wet mode \tabularnewline

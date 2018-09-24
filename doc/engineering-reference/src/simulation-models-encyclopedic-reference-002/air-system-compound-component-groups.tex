@@ -292,7 +292,7 @@ In this case, the reported cycling ratio is 1 and speed number is equal to n.
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system's operating supply air mass flow rate is determined by the cycling ratio (PartLoadRatio) for Speed 1. The supply air mass flow rate is multiplied by the cycling ratio to determine the average air mass flow rate for the system simulation time step. The air conditions at nodes downstream of the cooling coils represent the full-load (steady-state) values when the coil is operating.
 
 \begin{equation}
-{{\dot{m}_{UnitarySystem}} = \left( {CyclingRatio} \right){{\dot{m}_{Speed1}}
+\dot{m}_{UnitarySystem} = \left( {CyclingRatio} \right)\dot{m}_{Speed1}
 \end{equation}
 
 If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the unitary system cooling coil is ON at Speed 1 and the user-specified air flow rate when the unitary system cooling coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
@@ -321,11 +321,11 @@ When the unitary system operates at higher speeds to meet the required cooling l
 
 where:
 
-\({{\dot{m}_{UnitarySystem}}\) is the average air mass flow rate through the unitary system for the time step (kg/s)
+\(\dot{m}_{UnitarySystem}\) is the average air mass flow rate through the unitary system for the time step (kg/s)
 
-\({\dot m_{Speedn}}\) is the air mass flow rate through unitary system when cooling coil is ON at Speed n (kg/s)
+\(\dot m_{Speedn}\) is the air mass flow rate through unitary system when cooling coil is ON at Speed n (kg/s)
 
-\({\dot m_{Speedn - 1}}\) is the air mass flow rate through unitary system when cooling coil is ON at Speed n-1 (kg/s).
+\(\dot m_{Speedn - 1}\) is the air mass flow rate through unitary system when cooling coil is ON at Speed n-1 (kg/s).
 
 For this case of higher speed operation, the air conditions at nodes downstream of the cooling coils are determined by the delivered cooling capacity and supply air mass flow rates between two consecutive speeds.
 
@@ -407,14 +407,14 @@ If the unitary system's~ heating coil output at full load is insufficient to mee
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system's operating supply air mass flow rate is multiplied by PartLoadRatio to determine the average air mass flow rate for the system simulation time step. The air conditions at nodes downstream of the heating coils represent the full-load (steady-state) values when the coils are operating. If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the unitary system heating coil is ON and the user-specified air flow rate when the unitary system heating coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
 \begin{equation}
-{{\dot{m}_{UnitarySystem}} = PartLoadRatio\left( {{{\dot{m}_{HeatCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\dot{m}_{CoilOFF}}} \right)
+\dot{m}_{UnitarySystem} = PartLoadRatio\left( \dot{m}_{HeatCoilON} \right) + \left( 1 - PartLoadRatio \right)\left( \dot{m}_{CoilOFF} \right)
 \end{equation}
 
 where:
 
-\({\dot m_{HeatCoilON}}\) is the air mass flow rate through unitary system when the heating coil is ON (kg/s)
+\(\dot m_{HeatCoilON}\) is the air mass flow rate through unitary system when the heating coil is ON (kg/s)
 
-\({\dot m_{CoilOFF}}\) is the air mass flow rate through unitary system when no heating or cooling is needed (kg/s).
+\(\dot m_{CoilOFF}\) is the air mass flow rate through unitary system when no heating or cooling is needed (kg/s).
 
 In this case, the air conditions at nodes downstream of the heating coils are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coils are operating and inlet air conditions when the coils are OFF).
 
@@ -515,19 +515,19 @@ Tolerance = 0.001 \ge \frac{{\left( {UnitarySystemHeatingLoad - UnitarySystemOut
 where \emph{UnitarySystemOutput\(_{cycling}\)} is the unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W).
 
 \begin{equation}
-UnitarySystemOutpu{t_{cycling}} = {{\dot{m}_{UnitarySystem}}{\left( {{h_{out}} - {h_{Control~Zone}}} \right)_{HRmin}} - {\Delta_{cycling}}
+UnitarySystemOutput_{cycling} = \dot{m}_{UnitarySystem} \left( h_{out} - h_{Control~Zone} \right)_{HRmin} - \Delta_{cycling}
 \end{equation}
 
 where
 
-\({{\dot{m}_{UnitarySystem}}\) is the average air mass flow rate defined in the next section (kg/s)
+\(\dot{m}_{UnitarySystem}\) is the average air mass flow rate defined in the next section (kg/s)
 
 \(h_{out}\) is the enthalpy of air exiting the unitary system at part load conditions (J/kg)
 
 \(\Delta_{cycling}\) is the average sensible load difference between the system output node and the zone inlet node.
 
 \begin{equation}
-{\Delta_{cycling}} = \frac{\dot{m}_{Zone~Inlet}}{frac}\left( {{h_{Zone~Inlet}} - {h_{Control~Zone}}} \right) + \left( {\mdot{m}_{UnitarySystem}} - \frac{\dot{m}_{Zone~Inlet}}{frac} \right) \left( {{h_{Out}} - {h_{Control~Zone}}} \right)
+\Delta_{cycling} = \frac{\dot{m}_{ZoneInlet}}{frac} \left( h_{ZoneInlet} - h_{ControlZone} \right) + \left( \dot{m}_{UnitarySystem} - \frac{\dot{m}_{ZoneInlet}}{frac} \right) \left( h_{Out} - h_{ControlZone} \right)
 \end{equation}
 
 where \({\dot m_{Zone~Inlet}}\) is the air mass flow rate in the supply inlet node in the controlled zone (kg/s).
