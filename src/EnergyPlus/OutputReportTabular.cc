@@ -1985,7 +1985,10 @@ namespace OutputReportTabular {
             // loop through the fields looking for matching report titles
             for (iReport = 1; iReport <= NumAlphas; ++iReport) {
                 nameFound = false;
-                if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
+                if (AlphArray(iReport).empty()) {
+                    ShowWarningError("Blank report name in Oputput:Table:SummaryReports; ignoring and continuing");
+                    continue;
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
                     nameFound = true;
