@@ -252,6 +252,7 @@ namespace DataSizing {
     bool TermUnitIU(false);                         // TRUE if an unpowered induction terminal unit
     bool ZoneEqFanCoil(false);                      // TRUE if a 4 pipe fan coil unit is being simulated
     bool ZoneEqOutdoorAirUnit(false);               // TRUE if an OutdoorAirUnit is being simulated
+    bool ZoneEqPTUnit(false);                       // TRUE if a 4 pipe fan coil unit is being simulated
     bool ZoneEqUnitHeater(false);                   // TRUE if a unit heater is being simulated
     bool ZoneEqUnitVent(false);                     // TRUE if a unit ventilator unit is being simulated
     bool ZoneEqVentedSlab(false);                   // TRUE if a ventilated slab is being simulated
@@ -444,6 +445,22 @@ namespace DataSizing {
         DataScalableCapSizingON = false;
         DataSysScalableFlowSizingON = false;
         DataSysScalableCapSizingON = false;
+        SysSizingRunDone = false;
+        TermUnitSingDuct = false;
+        TermUnitPIU = false;
+        TermUnitIU = false;
+        ZoneEqFanCoil = false;
+        ZoneEqPTUnit = false;
+        ZoneEqUnitHeater = false;
+        ZoneEqUnitVent = false;
+        ZoneEqVentedSlab = false;
+        ZoneEqDXCoil = false;
+        ZoneCoolingOnlyFan = false;
+        ZoneHeatingOnlyFan = false;
+        ZoneSizingRunDone = false;
+        DataErrorsFound = false;
+        AutoVsHardSizingThreshold = 0.1;
+        AutoVsHardSizingDeltaTempThreshold = 1.5;
         DataDesInletWaterTemp = 0.0;
         DataDesInletAirHumRat = 0.0;
         DataDesInletAirTemp = 0.0;

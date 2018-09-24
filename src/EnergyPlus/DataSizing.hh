@@ -236,6 +236,7 @@ namespace DataSizing {
     extern bool TermUnitIU;                           // TRUE if an unpowered induction terminal unit
     extern bool ZoneEqFanCoil;                        // TRUE if a 4 pipe fan coil unit is being simulated
     extern bool ZoneEqOutdoorAirUnit;                 // TRUE if an OutdoorAirUnit is being simulated
+    extern bool ZoneEqPTUnit;                         // TRUE if a PTHP unit is being simulated
     extern bool ZoneEqUnitHeater;                     // TRUE if a unit heater is being simulated
     extern bool ZoneEqUnitVent;                       // TRUE if a unit ventilator is being simulated
     extern bool ZoneEqVentedSlab;                     // TRUE if a ventilated slab is being simulated
@@ -658,29 +659,29 @@ namespace DataSizing {
     struct ZoneEqSizingData // data saved from zone eq component sizing and passed to subcomponents
     {
         // Members
-        Real64 AirVolFlow;            // design air vol flow rate for zone equipment unit [m3/s]
-        Real64 MaxHWVolFlow;          // design Hot Water vol flow for zone equipment unit [m3/s]
-        Real64 MaxCWVolFlow;          // design Cold Water vol flow for zone equipment unit [m3/s]
-        Real64 OAVolFlow;             // design outside air flow for zone equipment unit [m3/s]
+        Real64 AirVolFlow;           // design air vol flow rate for zone equipment unit [m3/s]
+        Real64 MaxHWVolFlow;         // design Hot Water vol flow for zone equipment unit [m3/s]
+        Real64 MaxCWVolFlow;         // design Cold Water vol flow for zone equipment unit [m3/s]
+        Real64 OAVolFlow;            // design outside air flow for zone equipment unit [m3/s]
         Real64 ATMixerVolFlow;        // design ventilation air flow rate from air terminal mixer (central DOAS) [m3/s]
         Real64 ATMixerCoolPriDryBulb; // design ventilation drybulb temperature from air terminal mixer during cooling (central DOAS) [C]
         Real64 ATMixerCoolPriHumRat;  // design ventilation humidity ratio from air terminal mixer during cooling (central DOAS) [kgH20/kgDryAir]
         Real64 ATMixerHeatPriDryBulb; // design ventilation drybulb temperature from air terminal mixer during heating (central DOAS) [C]
         Real64 ATMixerHeatPriHumRat;  // design ventilation humidity ratio from air terminal mixer during heating (central DOAS) [kgH20/kgDryAir]
-        Real64 DesCoolingLoad;        // design cooling load used for zone equipment [W]
-        Real64 DesHeatingLoad;        // design heating load used for zone equipment [W]
-        Real64 CoolingAirVolFlow;     // design cooling air vol flow rate for equipment[m3/s]
-        Real64 HeatingAirVolFlow;     // design heating air vol flow rate for equipment[m3/s]
-        Real64 SystemAirVolFlow;      // design heating air vol flow rate for equipment[m3/s]
+        Real64 DesCoolingLoad;       // design cooling load used for zone equipment [W]
+        Real64 DesHeatingLoad;       // design heating load used for zone equipment [W]
+        Real64 CoolingAirVolFlow;    // design cooling air vol flow rate for equipment[m3/s]
+        Real64 HeatingAirVolFlow;    // design heating air vol flow rate for equipment[m3/s]
+        Real64 SystemAirVolFlow;     // design heating air vol flow rate for equipment[m3/s]
         bool AirFlow;                 // TRUE if AirloopHVAC system air flow rate is calculated
         bool CoolingAirFlow;          // TRUE if AirloopHVAC system cooling air flow rate is calculated
         bool HeatingAirFlow;          // TRUE if AirloopHVAC system heating air flow rate is calculated
         bool SystemAirFlow;           // TRUE if AirloopHVAC system heating air flow rate is calculated
-        bool Capacity;                // TRUE if AirloopHVAC system capacity is calculated
-        bool CoolingCapacity;         // TRUE if AirloopHVAC system cooling capacity is calculated
-        bool HeatingCapacity;         // TRUE if AirloopHVAC system heating capacity is calculated
-        bool SystemCapacity;          // TRUE if AirloopHVAC system heating capacity is calculated
-        bool DesignSizeFromParent;    // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
+        bool Capacity;               // TRUE if AirloopHVAC system capacity is calculated
+        bool CoolingCapacity;        // TRUE if AirloopHVAC system cooling capacity is calculated
+        bool HeatingCapacity;        // TRUE if AirloopHVAC system heating capacity is calculated
+        bool SystemCapacity;         // TRUE if AirloopHVAC system heating capacity is calculated
+        bool DesignSizeFromParent;   // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
         Array1D_int SizingMethod;    // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and
                                      // FractionOfAutosizedHeatingAirflow)
         Array1D_int CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea,

@@ -218,6 +218,7 @@ namespace PackagedTerminalHeatPump {
         MyOneTimeFlag = true;
         PTUnitUniqueNames.clear();
         PTUnit.deallocate();
+        GetPTUnitInputFlag = true;
     }
 
     void SimPackagedTerminalUnit(std::string const &CompName,   // name of the packaged terminal heat pump
@@ -310,6 +311,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         ZoneEqDXCoil = true;
+        ZoneEqPTUnit = true;
 
         // Initialize the packaged terminal heat pump
         InitPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
@@ -320,6 +322,7 @@ namespace PackagedTerminalHeatPump {
         ReportPTUnit(PTUnitNum);
 
         ZoneEqDXCoil = false;
+        ZoneEqPTUnit = false;
     }
 
     void SimPTUnit(int const PTUnitNum,           // number of the current Packaged Terminal Heat Pump being simulated
@@ -4859,6 +4862,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (CurZoneEqNum > 0) {
+
             if (PTUnit(PTUnitNum).HVACSizingIndex > 0) {
                 // initialize OA flow for sizing other inputs (e.g., capacity)
                 if (PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
