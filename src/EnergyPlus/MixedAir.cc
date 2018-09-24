@@ -3714,7 +3714,11 @@ namespace MixedAir {
             auto &curAirLoopFlow(AirLoopFlow(AirLoopNum));
 
             curAirLoopFlow.OAMinFrac = OutAirMinFrac;
-            curAirLoopFlow.MinOutAir = OutAirMinFrac * this->MixMassFlow;
+            if (this->FixedMin) {
+                curAirLoopFlow.MinOutAir = min(OutAirMinFrac * curAirLoopFlow.DesSupply, this->MixMassFlow);
+            } else {
+                curAirLoopFlow.MinOutAir = OutAirMinFrac * this->MixMassFlow;
+            }
             if (this->MixMassFlow > 0.0) {
                 curAirLoopFlow.OAFrac = this->OAMassFlow / this->MixMassFlow;
             } else {
@@ -4568,10 +4572,18 @@ namespace MixedAir {
                     // simulate OA System if equipment exists other than the mixer (e.g., heating/cooling coil, HX, ect.)
 
                     // 1 - check min OA flow result
-                    Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, OutAirMinFrac * Node(this->MixNode).MassFlowRate);
-                    Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
-                    // save actual OA flow frac for use as min value for RegulaFalsi call
-                    minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / this->MixMassFlow);
+                    if (this->FixedMin) {
+                        Node(this->OANode).MassFlowRate =
+                            min(max(this->ExhMassFlow, OutAirMinFrac * AirLoopFlow(AirLoopNum).DesSupply), Node(this->MixNode).MassFlowRate);
+                        Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
+                        // save actual OA flow frac for use as min value for RegulaFalsi call
+                        minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / this->MixMassFlow);
+                    } else {
+                        Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, OutAirMinFrac * Node(this->MixNode).MassFlowRate);
+                        Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
+                        // save actual OA flow frac for use as min value for RegulaFalsi call
+                        minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / this->MixMassFlow);
+                    }
                     SimOASysComponents(AirLoopControlInfo(AirLoopNum).OASysNum, FirstHVACIteration, AirLoopNum);
                     lowFlowResiduum = Node(this->MixNode).TempSetPoint - Node(this->MixNode).Temp;
 
