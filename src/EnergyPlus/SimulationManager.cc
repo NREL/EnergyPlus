@@ -238,9 +238,9 @@ namespace SimulationManager {
         using DataEnvironment::CurrentOverallSimDay;
         using DataEnvironment::EndMonthFlag;
         using DataEnvironment::EnvironmentName;
+        using DataEnvironment::TotalOverallSimDays;
         using DataEnvironment::TotDesDays;
         using DataEnvironment::TotRunDesPersDays;
-        using DataEnvironment::TotalOverallSimDays;
         using DataHVACGlobals::TimeStepSys;
 
         using BranchInputManager::InvalidBranchDefinitions;
@@ -253,12 +253,12 @@ namespace SimulationManager {
         using DataErrorTracking::AskForConnectionsReport;
         using DataErrorTracking::ExitDuringSimulations;
         using DemandManager::InitDemandManagers;
-        using EMSManager::CheckIfAnyEMS;
-        using EMSManager::ManageEMS;
         using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
         using EconomicLifeCycleCost::GetInputForLifeCycleCost;
         using EconomicTariff::ComputeTariff; // added for computing annual utility costs
         using EconomicTariff::WriteTabularTariffReports;
+        using EMSManager::CheckIfAnyEMS;
+        using EMSManager::ManageEMS;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
         using General::TrimSigDigits;
         using HVACControllers::DumpAirLoopStatistics;
@@ -282,8 +282,8 @@ namespace SimulationManager {
         using namespace DataTimings;
         using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
-        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using OutputProcessor::isFinalYear;
+        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
         using PlantPipingSystemsManager::CheckIfAnySlabs;
         using PlantPipingSystemsManager::SimulateGroundDomains;
@@ -532,11 +532,19 @@ namespace SimulationManager {
                     cWarmupDay = TrimSigDigits(NumOfWarmupDays);
                     DisplayString("Warming up {" + cWarmupDay + '}');
                 } else if (DayOfSim == 1) {
-                    DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    if (KindOfSim == ksRunPeriodWeather) {
+                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    } else {
+                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                    }
                     gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
-                    DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    if (KindOfSim == ksRunPeriodWeather) {
+                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    } else {
+                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                    }
                     DisplayPerfSimulationFlag = false;
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
@@ -698,9 +706,9 @@ namespace SimulationManager {
         using DataEnvironment::IgnoreBeamRadiation;
         using DataEnvironment::IgnoreDiffuseRadiation;
         using DataEnvironment::IgnoreSolarRadiation;
-        using DataHVACGlobals::LimitNumSysSteps;
         using DataHVACGlobals::deviationFromSetPtThresholdClg;
         using DataHVACGlobals::deviationFromSetPtThresholdHtg;
+        using DataHVACGlobals::LimitNumSysSteps;
         using General::RoundSigDigits;
         using namespace DataIPShortCuts;
 
@@ -1517,8 +1525,8 @@ namespace SimulationManager {
         using OutputProcessor::NumTotalIVariable;
         using OutputProcessor::NumTotalRVariable;
         using OutputProcessor::NumVarMeterArrays;
-        using OutputReportTabular::MonthlyFieldSetInputCount;
         using OutputReportTabular::maxUniqueKeyCount;
+        using OutputReportTabular::MonthlyFieldSetInputCount;
         using SolarShading::MAXHCArrayBounds;
         using SolarShading::maxNumberOfFigures;
         using namespace DataRuntimeLanguage;
@@ -2813,15 +2821,15 @@ void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use si
     using DemandManager::DemandManagerHBIterations;
     using DemandManager::DemandManagerHVACIterations;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
-    using HVACManager::SimHVAC;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
+    using HVACManager::SimHVAC;
     using RefrigeratedCase::ManageRefrigeratedCaseRacks;
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
     // using HVACManager::CalcAirFlowSimple;
     using DataContaminantBalance::Contaminant;
-    using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using DataHeatBalance::ZoneAirMassFlow;
+    using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
     using namespace ZoneEquipmentManager;
     // using ZoneEquipmentManager::CalcAirFlowSimple;

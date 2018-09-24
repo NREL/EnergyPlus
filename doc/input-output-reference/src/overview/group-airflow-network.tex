@@ -2725,24 +2725,24 @@ When modulation is in effect the value of the multiplier is between 0.0 and 1.0.
 
 % table 25
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Value of opening factor multiplier for different venting conditions. \label{table:value-of-opening-factor-multiplier-for}} \tabularnewline
+\caption{Value of opening factor multiplier for different venting conditions} \label{table:value-of-opening-factor-multiplier-for} \tabularnewline
 \toprule
 Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Value of opening factor multiplier for different venting conditions.} \tabularnewline
+\caption{Value of opening factor multiplier for different venting conditions} \tabularnewline
 \toprule
 Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
 \midrule
 \endhead
 
-Yes & Temperature & Yes & 0.0 to 1.0 \tabularnewline
-No & -1.0 \tabularnewline
-Enthalpy & Yes & 0.0 to 1.0 \tabularnewline
-No & -1.0 \tabularnewline
-Constant & Yes & 1.0 \tabularnewline
-NoVent & No & -1.0 \tabularnewline
+   & & Yes & 0.0 to 1.0 \tabularnewline \cmidrule{3-4}
+   & \raisebox{1.5ex}{Temperature} & No & -1.0 \tabularnewline \cmidrule{2-4}
+   & & Yes & 0.0 to 1.0 \tabularnewline \cmidrule{3-4}
+  Yes & \raisebox{1.5ex}{Enthalpy} & No & -1.0 \tabularnewline \cmidrule{2-4}
+   & Constant & Yes & 1.0 \tabularnewline \cmidrule{2-4}
+   & NoVent & No & -1.0 \tabularnewline
 \bottomrule
 \end{longtable}
 

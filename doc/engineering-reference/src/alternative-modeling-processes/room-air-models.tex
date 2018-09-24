@@ -38,51 +38,52 @@ The inside face temperature calculation is modified by rewriting the zone air te
 {T_{{s_{i,j}}}} = \frac{{{T_{s{o_{i,j}}}}{Y_{i,o}} + \sum\limits_{k = 1}^{nz} {{T_{s{o_{i,j - k}}}}} {Y_{i,k}} - \sum\limits_{k = 1}^{nz} {{T_{{s_{i,j - k}}}}} {Z_{i,k}} + \sum\limits_{k = 1}^{nq} {{\Phi_{i,k}}{{q''}_{k{i_{i,j - k}}}} + {T_{{a_{i,j}}}}{h_{{c_{i,j}}}} + {{q''}_{LWS}} + {{q''}_{LWX}} + {{q''}_{SW}} + {{q''}_{sol}}} }}{{{Z_{i,o}} + {h_{{c_{i,j}}}}}}
 \end{equation}}
 
-where, ~~~~~~~ \emph{T\(_{s}\)} ~~~~~~~ is the inside face temperature
+where:
 
-\emph{i}~~~~~~~~~~ subscript indicates individual surfaces
+\emph{T\(_{s}\)} is the inside face temperature
 
-~~~~~ \emph{j}~~~~~~~~~~ subscript indicates current time step
+\emph{i} is the subscript indicates individual surfaces
 
-~~~~~ \emph{k}~~~~~~~~~ subscript indicates time history steps
+\emph{j} is the subscript indicates current time step
 
-~~~~~ \emph{T\(_{so}\)} ~~~~~~ is the outside face temperature
+\emph{k} is the subscript indicates time history steps
 
-~~~~~ \emph{Y\(_{i}\) ~~~~~~~} are the cross CTF coefficients
+\emph{T\(_{so}\)} is the outside face temperature
 
-~~~~~ \emph{Z\(_{i}\)} are the inside CTF coefficients
+\emph{Y\(_{i}\)} are the cross CTF coefficients
 
-~~~~~ \(\varphi_{i}\) ~~~~~~~ are the flux CTF coefficients
+\emph{Z\(_{i}\)} are the inside CTF coefficients
 
-~~~~~ \({q''_{ki}}\) ~~~~~~ is the conduction heat flux through the surface
+\(\varphi_{i}\) are the flux CTF coefficients
 
-~~~~~ \({h_{{c_i}}}\) ~~~~~~ is the surface convection heat transfer coefficient
+\({q''_{ki}}\) is the conduction heat flux through the surface
 
-~~~~~ \emph{T\(_{a}\)}~~~~~~~~ is the near-surface air temperature
+\({h_{{c_i}}}\) is the surface convection heat transfer coefficient
 
-~~~~~ \({q''_{LWS}}\) ~~~ is the longwave radiation heat flux from equipment in zone
+\emph{T\(_{a}\)} is the near-surface air temperature
 
-~~~~~ \({q''_{LWX}}\) ~~~ is the net long wavelength radiation flux exchange between zone surfaces
+\({q''_{LWS}}\) is the longwave radiation heat flux from equipment in zone
 
-~~~~~ \({q''_{SW}}\) ~~~~ is the net short wavelength radiation flux to surface from lights
+\({q''_{LWX}}\) is the net long wavelength radiation flux exchange between zone surfaces
 
-~~~~~ \({q''_{sol}}\) ~~~~~ is the absorbed direct and diffuse solar (short wavelength) radiation
+\({q''_{SW}}\) is the net short wavelength radiation flux to surface from lights
+
+\({q''_{sol}}\) is the absorbed direct and diffuse solar (short wavelength) radiation.
 
 \subsection{User Defined RoomAir Temperatures}\label{user-defined-roomair-temperatures}
 
 The input object RoomAir:TemperaturePattern:UserDefined provides a capabity for users to define the sort of air temperature pattern he or she expects in the zone. With these models, the pattern is generally set beforehand and does not respond to conditions that evolve during the simulation.~ (Exception: the pattern available through the RoomAir:TemperaturePattern:TwoGradient object will switch between two different pre-defined vertical gradients depending on the current value of certain temperatures or thermal loads. )
 
-The user-defined patterns obtain the mean air temperature, \({T_{MAT}}\) , from the heat balance domain and then produce modified values for:
+The user-defined patterns obtain the mean air temperature, \({T_{MAT}}\), from the heat balance domain and then produce modified values for:
 
-~~~~~ \({T_{ai}}\) ~~~~~~ the adjacent air temperature which is then used in the calculation of inside face surface temperature during the heat balance calculations,
+\begin{itemize}
+\item \({T_{ai}}\) is the adjacent air temperature which is then used in the calculation of inside face surface temperature during the heat balance calculations.
+\item \({T_{leaving}}\) is the temperature of air leaving the zone and entering the air system returns.
+\item \({T_{exhaust}}\) is the temperature of air leaving the zone and entering the exhaust.
+\item \({T_{stat}}\) is the temperature of air ``sensed'' at the thermostat (not currently used in air system control because air system flows use load-based control).
+\end{itemize}
 
-~~~~~ \({T_{leaving}}\) ~ the temperature of air leaving the zone and entering the air system returns
-
-~~~~~ \({T_{exhaust}}\) ~ the temperature of air leaving the zone and entering the exhaust.
-
-~~~~~ \({T_{stat}}\) ~~~~ the temperature of air ``sensed'' at the thermostat (not currently used in air system control because air system flows use load-based control).
-
-The user defined room air models used indirect coupling so that the patterns provide values for, or ways to calculate, how specific temperatures differ from \({T_{MAT}}\) .~ The various \(\Delta T\) ~values determined from the model are applied to \({T_{MAT}}\) ~as follows:
+The user defined room air models used indirect coupling so that the patterns provide values for, or ways to calculate, how specific temperatures differ from \({T_{MAT}}\).~ The various \(\Delta T\) values determined from the model are applied to \({T_{MAT}}\) as follows:
 
 \begin{equation}
 {T_{ai}} = \Delta {T_{ai}} + {T_{MAT}}
@@ -102,9 +103,9 @@ The user defined room air models used indirect coupling so that the patterns pro
 {T_{stat}} = \Delta {T_{stat}} + {T_{MAT}}
 \end{equation}
 
-The patterns defined by the object `RoomAir:TemperaturePattern:SurfaceMapping' are fairly straightforward.~ The user directly inputs values for \(\Delta {T_{ai}}\) ~for each surface.~ The pattern ``maps'' specific surfaces, identified by name, to \(\Delta {T_{ai}}\) ~values.~ This provides completely general control (but in practice may be cumbersome to use).~ The other patterns focus on temperature changes in the vertical direction.~ Surfaces do not need to be identified, but all the surfaces with the same height will be assigned the same \(\Delta {T_{ai}}\) ~values.
+The patterns defined by the object `RoomAir:TemperaturePattern:SurfaceMapping' are fairly straightforward.~ The user directly inputs values for \(\Delta {T_{ai}}\) for each surface.~ The pattern ``maps'' specific surfaces, identified by name, to \(\Delta {T_{ai}}\) values.~ This provides completely general control (but in practice may be cumbersome to use).~ The other patterns focus on temperature changes in the vertical direction.~ Surfaces do not need to be identified, but all the surfaces with the same height will be assigned the same \(\Delta {T_{ai}}\) values.
 
-The patterns defined by the object `RoomAir:TemperaturePattern:NondimensonalHeight' apply a temperature profile based on a non-dimensionalized height, \({\rm Z}\) .~ The height of each surface is defined to be the z-coordinate of the surface's centroid relative to the average z-coordinate of the floor surfaces.~ The zone ceiling height is used as the length scale to non-dimensionalize each surface's height so that,
+The patterns defined by the object `RoomAir:TemperaturePattern:NondimensonalHeight' apply a temperature profile based on a non-dimensionalized height, \({\rm Z}\).~ The height of each surface is defined to be the z-coordinate of the surface's centroid relative to the average z-coordinate of the floor surfaces.~ The zone ceiling height is used as the length scale to non-dimensionalize each surface's height so that,
 
 \begin{equation}
 {{\rm Z}_i} = ({z_{i,centroid}} - {z_{floorAvg}})/Ceiling\;Height
@@ -112,17 +113,17 @@ The patterns defined by the object `RoomAir:TemperaturePattern:NondimensonalHeig
 
 (where ``\emph{i's''} represents each surface in the zone that is affected by the model)
 
-The values for \({Z_i}\) ~are constrained to be between 0.01 and 0.99 because the value is meant to describe the air layer near the surface (say approximate 0.1 m from the surface) rather than the surface itself.
+The values for \({Z_i}\) are constrained to be between 0.01 and 0.99 because the value is meant to describe the air layer near the surface (say approximate 0.1 m from the surface) rather than the surface itself.
 
-The user-defined profile is treated as a look up table or piecewise linear model.~ The values for \(\Delta {T_{ai}}\) ~are determined by searching the \({\rm Z}\) ~values in the user-defined profile and performing linear interpolation on the associated \(\Delta {T_a}\) ~values.
+The user-defined profile is treated as a look up table or piecewise linear model.~ The values for \(\Delta {T_{ai}}\) are determined by searching the \({\rm Z}\) values in the user-defined profile and performing linear interpolation on the associated \(\Delta {T_a}\) values.
 
-The patterns defined by the object `RoomAir:TemperaturePattern:ConstantGradient' apply a constant temperature gradient in the vertical direction.~ The model assumes that \({T_{MAT}}\) ~occurs at the mid-plane so that \({{\rm Z}_{{T_{MAT}}}} = 0.5\) ~(by definition).~ The surface \({Z_i}\) ~values are compared to \({Z_{{T_{MAT}}}}\) and then scaled with zone ceiling height to obtain values for the change in height (in units of meters), \(\Delta z\) .~ The user defined gradient, \(grad\) , (units of ºC/m) is then used to determine \(\Delta {T_{ai}}\) ~values using
+The patterns defined by the object `RoomAir:TemperaturePattern:ConstantGradient' apply a constant temperature gradient in the vertical direction.~ The model assumes that \({T_{MAT}}\) occurs at the mid-plane so that \({{\rm Z}_{{T_{MAT}}}} = 0.5\) (by definition).~ The surface \({Z_i}\) values are compared to \({Z_{{T_{MAT}}}}\) and then scaled with zone ceiling height to obtain values for the change in height (in units of meters), \(\Delta z\).~ The user defined gradient, \(grad\), (units of \(^{\circ}\)C/m) is then used to determine \(\Delta {T_{ai}}\) values using:
 
 \begin{equation}
 \Delta {T_{ai}} = \Delta z * grad
 \end{equation}
 
-The patterns defined by the object `RoomAir:TemperaturePattern:TwoGradient' are very similar to the constant gradient pattern above but the value of \(grad\) ~used at any given time is selected by interpolating between two user-defined values for \(grad\) .~ Five options are available, three based on temperatures and two based on thermal loads -- see the Input Output Reference.~ The user provides upper and lower bounding values.~ If the current value of the ``sensing'' variable lies between the upper and lower bounds, then \(grad\) ~is determined using linear interpolation.~ If the designated value is above the upper bound then the upper value for \(grad\) ~is used (no extrapolation).~ Similarly, if the designated value is below the lower bound, then the lower value for \(grad\) ~is used.~ Note that ``upper'' and ``lower'' indicate the temperature and heat rate bounds and that the values for \(grad\) ~do not have to follow in the same way; the \(grad\) ~value for the lower bound could be higher than the \(grad\) ~value for the upper bound (providing a something of a reverse control scheme).~ Rather than directly using \(\Delta T\) ~values from the user, the temperatures for the return air, exhaust and thermostat are determined based on user-entered heights (in units of meters from the floor) and applying the current value for \(grad\) .
+The patterns defined by the object `RoomAir:TemperaturePattern:TwoGradient' are very similar to the constant gradient pattern above but the value of \(grad\) used at any given time is selected by interpolating between two user-defined values for \(grad\).~ Five options are available, three based on temperatures and two based on thermal loads -- see the Input Output Reference.~ The user provides upper and lower bounding values.~ If the current value of the ``sensing'' variable lies between the upper and lower bounds, then \(grad\) is determined using linear interpolation.~ If the designated value is above the upper bound then the upper value for \(grad\) is used (no extrapolation).~ Similarly, if the designated value is below the lower bound, then the lower value for \(grad\) is used.~ Note that ``upper'' and ``lower'' indicate the temperature and heat rate bounds and that the values for \(grad\) do not have to follow in the same way; the \(grad\) value for the lower bound could be higher than the \(grad\) value for the upper bound (providing a something of a reverse control scheme).~ Rather than directly using \(\Delta T\) values from the user, the temperatures for the return air, exhaust and thermostat are determined based on user-entered heights (in units of meters from the floor) and applying the current value for \(grad\).
 
 \subsection{One-Node Displacement Ventilation RoomAir Model}\label{one-node-displacement-ventilation-roomair-model}
 
@@ -132,9 +133,9 @@ The input object RoomAirSettings:OneNodeDisplacementVentilation provides a simpl
 \rho \,{c_p}\dot V({T_{AirFloor}} - {T_{Supply}}) = {h_{cFloor}}{A_{Floor}}({T_{Floor}} - {T_{AirFloor}}) + {Q_{ConvSourceFloor}} + {Q_{InfilFloor}}
 \end{equation}
 
-where
+where:
 
-\emph{ρ} is the air density
+\emph{\(\rho\)} is the air density
 
 \emph{c\(_{p}\)} is the air specific heat at constant pressure
 
@@ -148,9 +149,9 @@ where
 
 \emph{T\(_{floor}\)} is the surface temperature of the floor
 
-\emph{Q\(_{convSourceFloor}\)~} is the convection from internal sources near the floor (\textless{} 0.2 m)
+\emph{Q\(_{convSourceFloor}\)} is the convection from internal sources near the floor (\textless{} 0.2 m)
 
-\emph{Q\(_{InfilFloor}\)}~ is the heat gain (or loss) from infiltration or ventilation near the floor
+\emph{Q\(_{InfilFloor}\)} is the heat gain (or loss) from infiltration or ventilation near the floor.
 
 ``Floor splits'' are the fraction of total convective or infiltration loads that are dispersed so as to add heat to the air located near the floor.~ The user prescribes values for floor splits as input.~ No guidance is known to be available to use in recommending floor splits, but the user could for example account for equipment known to be near the floor, such as tower computer cases, or supplementary ventilation designed to enter along the floor.~ The equation above can be solved directly for \emph{T\(_{AirFloor}\)} and is used in the form of the equation below,
 
@@ -164,7 +165,7 @@ The upper air node temperature is obtained by solving the overall air heat balan
 {T_{Leaving}} = \frac{{ - {{\dot Q}_{sys}}}}{{p{c_p}\dot V}} + {T_{Supply}}
 \end{equation}
 
-where \({\dot Q_{sys}}\) ~is the air system heat load with negative values indicating a positive cooling load.~ Values for \({\dot Q_{sys}}\) ~are computed by the load calculation routines and passed to the air model.~ The vertical temperature gradient or slope, \emph{dT/dz}, is obtained from,
+where \({\dot Q_{sys}}\) is the air system heat load with negative values indicating a positive cooling load.~ Values for \({\dot Q_{sys}}\) are computed by the load calculation routines and passed to the air model.~ The vertical temperature gradient or slope, \emph{dT/dz}, is obtained from,
 
 \begin{equation}
 \frac{{dT}}{{dz}} = \frac{{{T_{Leaving}} - {T_{AirFloor}}}}{{{H_{return}}}}
@@ -184,7 +185,7 @@ The constant slope allows obtaining temperatures at any vertical location using,
 {T_{{a_i}}} = {T_{leaving}} - \frac{{dT}}{{dz}}({z_{leaving}} - {z_i})
 \end{equation}
 
-So for example the temperatures near the ceiling can easily be determined. Accounting for the location of the thermostat inside the zone (e.g.~1.1 m) is accomplished by returning the temperature for the appropriate height to the appropriate air node used for control. If the walls are subdivided in the vertical direction as shown in the figure above, then the air model can provide individual values for each surface based on the height and slope.~ However, no additional heat balances are necessarily made (in the air domain) at these points as all the surface convection is passed to the model in the totaled value for \({\dot Q_{sys}}\) .
+So for example the temperatures near the ceiling can easily be determined. Accounting for the location of the thermostat inside the zone (e.g.~1.1 m) is accomplished by returning the temperature for the appropriate height to the appropriate air node used for control. If the walls are subdivided in the vertical direction as shown in the figure above, then the air model can provide individual values for each surface based on the height and slope.~ However, no additional heat balances are necessarily made (in the air domain) at these points as all the surface convection is passed to the model in the totaled value for \({\dot Q_{sys}}\).
 
 \subsection{Three-Node Displacement Ventilation RoomAir Model}\label{three-node-displacement-ventilation-roomair-model}
 
@@ -196,7 +197,7 @@ The UCSD Displacement Ventilation Model is one of the non-uniform zone models pr
 
 \subsubsection{Displacement Ventilation}\label{displacement-ventilation}
 
-A DV system is a complete contrast to a conventional forced air system. In a conventional system conditioned air is delivered at ceiling level and the intent is to create a fully mixed space with uniform conditions. In a DV system conditioned air is delivered at floor level and low velocity in order to minimize mixing and to establish a vertical temperature gradient. The incoming air ``displaces'' the air above it which, in turn,~ is exhausted through ceiling level vents. In DV a noticeable interface occurs between the occupied zone of the room and a mixed hot layer near the ceiling of the room(Dominique \& Guitton, 1997). Maintaining the lower boundary of this warm layer above the occupied zone is one of the many unique challenges of displacement ventilation design. Often DV systems use 100\% outside air. The vertical displacement air movement means that convective heat gains introduced near the ceiling will be removed without affecting the occupied region of the room. Also a fraction of the heat gains that occur in the occupied zones rise as plumes into the upper part of the space, thereby reducing the cooling load. Similarly the fresh air will be used more effectively than with a fully mixed system: the fresh air won't be ``wasted'' in the upper, unoccupied region of the room. Finally, the vertical temperature gradient means that the average room temperature can be higher for a DV conditioned room than with a conventionally conditioned room: the occupants feel the lower temperature in the lower region of the room and are unaffected by the higher temperature near the ceiling. However, whenever the outside air temperature is above ≈19°C this advantage is mostly lost: the internal loads must be removed from the space independently of the airflow pattern (during the warmer hours buildings tend to be almost closed to the outside, operating in closed loop). The inflow temperature advantage is then only useful for the minimum outside air that must always be provided (in most cases this remaining advantage is negligible).
+A DV system is a complete contrast to a conventional forced air system. In a conventional system conditioned air is delivered at ceiling level and the intent is to create a fully mixed space with uniform conditions. In a DV system conditioned air is delivered at floor level and low velocity in order to minimize mixing and to establish a vertical temperature gradient. The incoming air ``displaces'' the air above it which, in turn,~ is exhausted through ceiling level vents. In DV a noticeable interface occurs between the occupied zone of the room and a mixed hot layer near the ceiling of the room(Dominique \& Guitton, 1997). Maintaining the lower boundary of this warm layer above the occupied zone is one of the many unique challenges of displacement ventilation design. Often DV systems use 100\% outside air. The vertical displacement air movement means that convective heat gains introduced near the ceiling will be removed without affecting the occupied region of the room. Also a fraction of the heat gains that occur in the occupied zones rise as plumes into the upper part of the space, thereby reducing the cooling load. Similarly the fresh air will be used more effectively than with a fully mixed system: the fresh air won't be ``wasted'' in the upper, unoccupied region of the room. Finally, the vertical temperature gradient means that the average room temperature can be higher for a DV conditioned room than with a conventionally conditioned room: the occupants feel the lower temperature in the lower region of the room and are unaffected by the higher temperature near the ceiling. However, whenever the outside air temperature is above \(\approx\)19\(^{\circ}\)C this advantage is mostly lost: the internal loads must be removed from the space independently of the airflow pattern (during the warmer hours buildings tend to be almost closed to the outside, operating in closed loop). The inflow temperature advantage is then only useful for the minimum outside air that must always be provided (in most cases this remaining advantage is negligible).
 
 DV systems have limitations. In order to avoid chilling the occupants the supply air temperature used for DV is considerably higher than that used in conventional forced-air systems. This can lead to problems in removing both sensible and latent loads. Exterior spaces may have conditions that are not conducive to establishing a vertical temperature gradient. DV systems seem to be best suited to interior spaces with only moderate loads.
 
@@ -216,7 +217,7 @@ The simplest form of the plume equation based models is the case of a single plu
 \dot V = C\cdot {B^{1/3}}{z^{5/3}}
 \end{equation}
 
-where
+where:
 
 \(\dot V\) = plume volume flux {[}m3/s{]}
 
@@ -230,7 +231,7 @@ C = \frac{6}{5}\alpha {(\frac{9}{{10}}\alpha )^{1/3}}{\pi ^{2/3}}
 
 \(\alpha\) = plume entrainment constant; a value of~ 0.127 is used, suitable for top-hat profiles for density and velocity across the plumes.
 
-For an ideal gas
+For an ideal gas:
 
 \begin{equation}
 \Delta \rho /\rho  = \Delta {\rm T}/{\rm T}
@@ -260,7 +261,7 @@ Since the plume volume flow rate increases with height with exponent 5/3, for an
 h = {F^{3/5}}/({C^{3/5}}{B^{1/5}})
 \end{equation}
 
-Substituting in and introducing air properties at 20 C gives:
+Substituting in and introducing air properties at 20\(^{\circ}\)C gives:
 
 \begin{equation}
 h = 24.55\cdot {F^{3/5}}/{\dot Q^{1/5}}
@@ -272,9 +273,10 @@ Of course, it would be rare for a real world case to consist of a single point-s
 
 As the complexity of the physical systems modeled increases some limitations must be imposed. In particular, the biggest challenge remains the interaction between wall driven boundary layers (positively and negatively buoyant) and displacement flows. For this reason, the model that is developed below is not applicable when:
 
-1.~~~~Downward moving buoyancy driven airflow rate is of the same order of magnitude as plume driven flow (these airflow currents are typically generated on lateral surfaces or in the ceiling whenever these surfaces are much cooler than the room air).
-
-2.~~~~Upward moving wall or floor generated buoyancy flux in the lower layer is of the same order of magnitude as plume driven flow.
+\begin{enumerate}
+\item Downward moving buoyancy driven airflow rate is of the same order of magnitude as plume driven flow (these airflow currents are typically generated on lateral surfaces or in the ceiling whenever these surfaces are much cooler than the room air).
+\item Upward moving wall or floor generated buoyancy flux in the lower layer is of the same order of magnitude as plume driven flow.
+\end{enumerate}
 
 Although these limitations are significant it is important to note that even in the presence of dominant convection from the floor surface, a buoyancy, two layer flow can be established whenever the plume buoyancy flux is more than 1/7 of the horizontal flux (Hunt \emph{et al.} 2002). A two layer structure can also originate when the only heat source is a heated portion of the room floor, as long as the heated area does not exceed 15\% of the room floor (Holford \emph{et al.} 2002).
 
@@ -294,13 +296,13 @@ resulting in a mixed layer height of:
 
 The model predicts three temperatures that characterize the three main levels in the stratification of the room:
 
-1.~~~~a floor level temperature T\(_{floor}\)~to account for the heat transfer from the floor into the supply air
+\begin{enumerate}
+\item A floor level temperature T\(_{floor}\) to account for the heat transfer from the floor into the supply air.
+\item An occupied subzone temperature T\(_{oc}\) representing the temperature of the occupied region.
+\item An upper level temperature T\(_{mx}\) representing the temperature of the upper, mixed region and the outflow temperature.
+\end{enumerate}
 
-2.~~~~an occupied subzone temperature T\(_{oc}\)~representing the temperature of the occupied region;
-
-3.~~~~an upper level temperature T\(_{mx}\) representing the temperature of the upper, mixed region and the outflow temperature.
-
-We assume that the model for multiple, equal strength plumes (equations and will be adequate for our calculations. The supply air flow rate \(\dot V\) ~is obtained by summing all the air flows entering the zone: supply air, infiltration, ventilation, and inter-zone flow. The heat gain \(\dot Q\) ~is estimated by summing all the convective internal gains located in the occupied subzone -- task lights, people, equipment -- and dividing this power equally among the n plumes. With these assumptions we can describe the implementation.
+We assume that the model for multiple, equal strength plumes (equations and will be adequate for our calculations. The supply air flow rate \(\dot V\) is obtained by summing all the air flows entering the zone: supply air, infiltration, ventilation, and inter-zone flow. The heat gain \(\dot Q\) is estimated by summing all the convective internal gains located in the occupied subzone -- task lights, people, equipment -- and dividing this power equally among the n plumes. With these assumptions we can describe the implementation.
 
 The UCSD DV model is controlled by the subroutine \emph{ManageUCSDDVModel} which is called from the \emph{RoomAirModelManager}. The \emph{RoomAirModelManager} selects which zone model will be used for each zone.
 
@@ -344,7 +346,7 @@ MCP{T_{sys}} = \sum\limits_{inlets} {{{\dot m}_i}} {C_{p,i}}{T_i}
 MCP{T_{tot}} = MCP{T_{zone}} + MCP{T_{sys}}
 \end{equation}
 
-The number of plumes per occupant \({N_{plumesperpers}}\) ~is a user input. The total number of plumes in the zone is:
+The number of plumes per occupant \({N_{plumesperpers}}\) is a user input. The total number of plumes in the zone is:
 
 \begin{equation}
 {N_{plumes}} = {N_{occ}} \cdot {N_{plumesperperson}}
@@ -364,25 +366,26 @@ We now make an initial estimate of the height fraction \emph{Fr\(_{hb}\)} (heigh
 
 \begin{equation}
 F{r_{hb}} = \left( {{{24.55} \mathord{\left/ {\vphantom {{24.55} {{H_{ceil}}}}} \right. } {{H_{ceil}}}}} \right){\left( {\frac{{0.000833 \cdot MC{P_{tot}}}}{{{N_{plumes}} \cdot \dot Q_{perplume}^{1/3}}}} \right)^{3/5}}
+\label{eq:RoomAirHeightBoundaryLayer}
 \end{equation}
 
-where 0.000833~ = \(1/({\rho_{air}} \cdot {c_{p,air}})\) converts \(MC{P_{tot}}\) ~to a volumetric flow rate. Next we iterate over the following 3 steps.
+where 0.000833~ = \(1/({\rho_{air}} \cdot {c_{p,air}})\) converts \(MC{P_{tot}}\) to a volumetric flow rate. Next we iterate over the following 3 steps.
 
 \subsubsection{Iterative procedure}\label{iterative-procedure}
 
-1.~~~~Call subroutine \emph{HcUCSDDV} to calculate a convective heat transfer coefficient for each surface in the zone, an effective air temperature for each surface, and HA\(_{mx}\), HAT\(_{mx}\), HA\(_{oc}\), HAT\(_{oc}\), HA\(_{fl}\), and HAT\(_{fl}\). Here HA is \(\sum\limits_{surfaces} {{h_{c,i}}} \cdot {A_i}\) ~for a region and HAT is \(\sum\limits_{surfaces} {{h_{c,i}}} \cdot {A_i} \cdot {T_i}\) ~for a region. The sum is over all the surfaces bounding the region; \({h_{c,i}}\) ~is the convective heat transfer coefficient for surface i, \({A_i}\) ~is the area of surface i,~ and \({T_i}\) ~is the surface temperature of surface i.
-
-2.~~~~Recalculate \(F{r_{hb}}\) ~using the equation .
-
-3.~~~~Calculate the three subzone temperatures: \emph{T\(_{floor,}\) T\(_{oc}\)} and \emph{T\(_{mx}\)}.
+\begin{enumerate}
+\item Call subroutine \emph{HcUCSDDV} to calculate a convective heat transfer coefficient for each surface in the zone, an effective air temperature for each surface, and HA\(_{mx}\), HAT\(_{mx}\), HA\(_{oc}\), HAT\(_{oc}\), HA\(_{fl}\), and HAT\(_{fl}\). Here HA is \(\sum\limits_{surfaces} {{h_{c,i}}} \cdot {A_i}\) ~for a region and HAT is \(\sum\limits_{surfaces} {{h_{c,i}}} \cdot {A_i} \cdot {T_i}\) ~for a region. The sum is over all the surfaces bounding the region; \({h_{c,i}}\) ~is the convective heat transfer coefficient for surface i, \({A_i}\) ~is the area of surface i,~ and \({T_i}\) ~is the surface temperature of surface i.
+\item Recalculate \(F{r_{hb}}\) using the Equation~\ref{eq:RoomAirHeightBoundaryLayer}.
+\item Calculate the three subzone temperatures: \emph{T\(_{fl,}\) T\(_{oc}\)} and \emph{T\(_{mx}\)}.
+\end{enumerate}
 
 The h\(_{c}\)'s calculated in step 1 depend on the subzone temperatures and the boundary layer height. In turn the subzone temperatures depend on the HA and HAT's calculated in step 1. Hence the need for iteration
 
-Next we describe each steps 1 and 3 in more detail.
+Next we describe Steps 1 and 3 in more detail.
 
 \subsubsection{Step 1}\label{step-1}
 
-Subroutine \emph{HcUCSDDV} is quite straightforward. It loops through all the surfaces in each zone and decides whether the surface is located in the upper, mixed subzone or the lower, occupied subzone, or if the surface is in both subzones. If entirely in one subzone the subzone temperature is stored in the surface effective temperature variable \emph{TempEffBulkAir(SurfNum)} and h\(_{c}\) for the surface is calculated by a call to subroutine \emph{CalcDetailedHcInForDVModel}. This routine uses the ``detailed'' natural convection coefficient calculation that depends on surface tilt and \(\Delta {T^{1/3}}\) . This calculation is appropriate for situations with low air velocity.
+Subroutine \emph{HcUCSDDV} is quite straightforward. It loops through all the surfaces in each zone and decides whether the surface is located in the upper, mixed subzone or the lower, occupied subzone, or if the surface is in both subzones. If entirely in one subzone the subzone temperature is stored in the surface effective temperature variable \emph{TempEffBulkAir(SurfNum)} and h\(_{c}\) for the surface is calculated by a call to subroutine \emph{CalcDetailedHcInForDVModel}. This routine uses the ``detailed'' natural convection coefficient calculation that depends on surface tilt and \(\Delta {T^{1/3}}\). This calculation is appropriate for situations with low air velocity.
 
 For surfaces that bound 2 subzones, the subroutine calculates h\(_{c}\) for each subzone and then averages them, weighting by the amount of surface in each subzone.
 
@@ -390,11 +393,11 @@ During the surface loop, once the h\(_{c}\)~for a surface is calculated, the app
 
 \subsubsection{Step 3}\label{step-3}
 
-The calculation of~ subzone temperatures follows the method used in the \textbf{\emph{ZoneTempPredictorCorrector}} module and described in the section \textbf{Basis for the System and Zone Integration}. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.
+The calculation of subzone temperatures follows the method used in the \textbf{\emph{ZoneTempPredictorCorrector}} module and described in the section \textbf{Basis for the System and Zone Integration}. Namely a third order finite difference expansion of the temperature time derivative is used in updating the subzone temperatures. Otherwise the subzone temperatures are obtained straightforwardly by solving an energy balance equation for each subzone.
 
 {\scriptsize
 \begin{equation}
-T_{fl} = (C_{air,fl} \cdot (3 \cdot T_{ - 1,fl} - (3/2) \cdot T_{ - 2,fl} + (1/3) \cdot T_{ - 3,fl}) + HAT_{fl} + MCPT_{tot} + 0.6 \cdot T_{oc} \cdot MCPT_{tot})  / ((11/6) \cdot C_{air,fl} + HA_{fl} + 1.6 \cdot MCP_{tot})
+T_{fl} = (C_{air,fl} \cdot (3 \cdot T_{ - 1,fl} - (3/2) \cdot T_{ - 2,fl} + (1/3) \cdot T_{ - 3,fl}) + HAT_{fl} + MCPT_{tot} + 0.6 \cdot T_{oc} \cdot MCP_{tot})  / ((11/6) \cdot C_{air,fl} + HA_{fl} + 1.6 \cdot MCP_{tot})
 \end{equation}}
 
 {\scriptsize
@@ -413,7 +416,7 @@ T_{fl} = (C_{air,fl} \cdot (3 \cdot T_{ - 1,fl} - (3/2) \cdot T_{ - 2,fl} + (1/3
   \end{array}
 \end{equation}}
 
-Here \({C_{air,fl}}\) , \({C_{air,oc}}\) , and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
+Here \({C_{air,fl}}\), \({C_{air,oc}}\), and \({C_{air,mx}}\) are the heat capacities of the air volume in each subzone.~ \({C_{air,mx}}\) is calculated by:
 
 \begin{equation}
 {R_{air,mx}} = {V_{mx}} \cdot (\Delta {z_{mx}}/{z_{ceil}}) \cdot {\rho_{air,mx}} \cdot {c_{p,air,mx}} \cdot Mu{l_{cap}}/(\Delta {t_z} \cdot 3600)
@@ -429,17 +432,17 @@ The other subzone air heat capacities are calculated in the same manner.
 
 The above iterative procedure assumed that displacement ventilation was taking place: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.
 
-If \({T_{mx}} < {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} < {H_{fl,top}} + \Delta {z_{occ,\min }}\) ~then the following mixed calculation will replace the displacement ventilation calculation.
+If \({T_{mx}} < {T_{oc}}\) or \(MC{P_{tot}} \le 0\) or \({H_{fr}} \cdot {H_{ceil}} < {H_{fl,top}} + \Delta {z_{occ,\min }}\) then the following mixed calculation will replace the displacement ventilation calculation.
 
-\textbf{Note:} ~\(\Delta {z_{occ,\min }}\) ~is the minimum thickness of occupied subzone. It is set to 0.2 meters. \({H_{fl,top}}\) is the height of the top of the floor subzone. It is defined to be 0.2 meters; that is, the floor subzone is always 0.2 meters thick and \({T_{fl}}\) ~is the temperature at 0.1 meter above the floor surface.
+\textbf{Note:} ~\(\Delta {z_{occ,\min }}\) is the minimum thickness of occupied subzone. It is set to 0.2 meters. \({H_{fl,top}}\) is the height of the top of the floor subzone. It is defined to be 0.2 meters; that is, the floor subzone is always 0.2 meters thick and \({T_{fl}}\) ~is the temperature at 0.1 meter above the floor surface.
 
 The mixed calculation iteratively calculates surface convection coefficients and room temperature just like the displacement ventilation calculation described above. In the mixed case however, only one zone temperature \emph{T\(_{avg}\)} is calculated. The 3 subzone temperatures are then set equal to \emph{T\(_{avg}\)}.
 
-First, \emph{Fr\(_{hb}\)}~ is set equal to zero.
+First, \emph{Fr\(_{hb}\)} is set equal to zero.
 
 Then the code iterates over these steps.
 
-1.~~~~Calculate \emph{T\(_{avg}\)} using
+1.~Calculate \emph{T\(_{avg}\)} using:
 
 {\scriptsize
 \begin{equation}
@@ -461,13 +464,13 @@ T_{avg} = (C_{air,z} \cdot (3 \cdot T_{ - 1,z} - (3/2) \cdot T_{ - 2,z} + (1/3) 
 {T_{fl}} = {T_{avg}}
 \end{equation}
 
-2.~~~~Call \emph{HcUCSDDV} to calculate the \emph{h\(_{c}\)}'s.
+2.~Call \emph{HcUCSDDV} to calculate the \emph{h\(_{c}\)}'s.
 
-3.~~~~Repeat step 1
+3.~Repeat step 1
 
 \subsubsection{Final calculations}\label{final-calculations}
 
-The displacement ventilation calculation finishes by calculating some report variables. Using equation , setting the boundary height to 1.5 meters and solving for the flow, we calculate a minimum flow fraction:
+The displacement ventilation calculation finishes by calculating some report variables. Using Equation~\ref{eq:RoomAirHeightBoundaryLayer}, setting the boundary height to 1.5 meters and solving for the flow, we calculate a minimum flow fraction:
 
 \begin{equation}
 {\dot V_{\min }} = {(1.5/{\rm{24}}{\rm{.55)}}^{{\rm{5/3}}}} \cdot {N_{plumes}} \cdot \dot Q_{perplume}^{1/3}
@@ -495,7 +498,7 @@ We define heights:
 {H_{flavg}} = {H_{fltop}}/2
 \end{equation}
 
-Using the user defined comfort height we calculate the comfort~ temperature.
+Using the user defined comfort height we calculate the comfort temperature.
 
 If mixing:
 
@@ -505,25 +508,25 @@ If mixing:
 
 If displacement ventilation:
 
-If \emph{H\(_{comf}\)} \textless{} \emph{H\(_{flavg}\)}
+If \emph{H\(_{comf}\)} \textless{} \emph{H\(_{flavg}\)}:
 
 \begin{equation}
 {T_{comf}} = {T_{fl}}
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{flavg}}\) ~and \({H_{comf}} < {H_{ocavg}}\)
+Else if \({H_{comf}} \ge {H_{flavg}}\) ~and \({H_{comf}} < {H_{ocavg}}\):
 
 \begin{equation}
 {T_{comf}} = ({T_{fl}}({H_{ocavg}} - {H_{comf}}) + {T_{mx}}({H_{comf}} - {H_{flavg}})/({H_{ocavg}} - {H_{flavg}})
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} < {H_{mxavg}}\)
+Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} < {H_{mxavg}}\):
 
 \begin{equation}
 {T_{comf}} = ({T_{oc}}({H_{mxavg}} - {H_{comf}}) + {T_{mx}}({H_{comf}} - {H_{ocavg}})/({H_{mxavg}} - {H_{ocavg}})
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} < {H_{ceil}}\)
+Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} < {H_{ceil}}\):
 
 \begin{equation}
 {T_{comf}} = {T_{mx}}
@@ -539,25 +542,25 @@ If mixing:
 
 If displacement ventilation:
 
-If \emph{H\(_{stat}\)} \textless{} \emph{H\(_{flavg}\)}
+If \emph{H\(_{stat}\)} \textless{} \emph{H\(_{flavg}\)}:
 
 \begin{equation}
 {T_{stat}} = {T_{fl}}
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{flavg}}\) ~and \({H_{stat}} < {H_{ocavg}}\)
+Else if \({H_{stat}} \ge {H_{flavg}}\) ~and \({H_{stat}} < {H_{ocavg}}\):
 
 \begin{equation}
 {T_{stat}} = ({T_{fl}}({H_{ocavg}} - {H_{stat}}) + {T_{mx}}({H_{stat}} - {H_{flavg}})/({H_{ocavg}} - {H_{flavg}})
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} < {H_{mxavg}}\)
+Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} < {H_{mxavg}}\):
 
 \begin{equation}
 {T_{stat}} = ({T_{oc}}({H_{mxavg}} - {H_{stat}}) + {T_{mx}}({H_{stat}} - {H_{ocavg}})/({H_{mxavg}} - {H_{ocavg}})
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\)
+Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\):
 
 \begin{equation}
 {T_{stat}} = {T_{mx}}
@@ -565,7 +568,7 @@ Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\)
 
 The average temperature gradient is:
 
-If \({H_{mxavg}} - {H_{flavg}} > 0.1\)
+If \({H_{mxavg}} - {H_{flavg}} > 0.1\):
 
 \begin{equation}
 Grad{T_{avg}} = ({T_{mx}} - {T_{fl}})/({H_{mxavg}} - {H_{flavg}})
@@ -575,7 +578,7 @@ else \(Grad{T_{avg}} =  - 9.999\)
 
 The maximum temperature gradient is:
 
-If~ \({H_{ocavg}} - {H_{flavg}} > 0.1\)
+If~ \({H_{ocavg}} - {H_{flavg}} > 0.1\):
 
 \begin{equation}
 Grad{T_{\max ,1}} = ({T_{oc}} - {T_{fl}})/({H_{ocavg}} - {H_{flavg}})
@@ -583,7 +586,7 @@ Grad{T_{\max ,1}} = ({T_{oc}} - {T_{fl}})/({H_{ocavg}} - {H_{flavg}})
 
 else \(Grad{T_{\max ,1}} = - 9.999\)
 
-If~ \({H_{mxavg}} - {H_{ocavg}} > 0.1\)
+If~ \({H_{mxavg}} - {H_{ocavg}} > 0.1\):
 
 \begin{equation}
 Grad{T_{\max ,2}} = ({T_{mx}} - {T_{oc}})/({H_{mxavg}} - {H_{ocavg}})
@@ -623,7 +626,7 @@ Finally, the zone node temperature is set to \emph{T\(_{mx}\)}.
 
 The input object RoomAirSettings:UnderFloorAirDistributionInterior provides a simple model for heat transfer and nonuniform vertical temperature profile for interior zones of a UFAD system. These zones are expected to be dominated by internal loads, a portion of which (such as occupants and workstations) will act to generate plumes. The plumes act to potentially create room air stratification, depending on the type \& number of diffusers, the amount and type of load, and the system flowrate. In order to better model this situation the fully-mixed room air approximation that is currently used in most whole building analysis tools is extended to a two node approach, with the purpose of obtaining a first order precision model for vertical temperature profiles for the interior zones of UFAD systems. The use of 2 nodes allows for greatly improved prediction of thermal comfort and overall building energy performance for the increasingly popular UFAD systems.
 
-TheUCSD UFAD Interior Zone Model is one of the non-uniform zone models provided through the Room Air Manager in EnergyPlus. The intent is to provide a selection of useful non-uniform zone air models to enable the evaluation of air-conditioning techniques that use stratified or partially stratified room air. Such techniques include displacement ventilation (DV) and underfloor air distribution (UFAD) systems. The methodology can also include natural displacement ventilation and also wind-driven cross-ventilation (CV).
+The UCSD UFAD Interior Zone Model is one of the non-uniform zone models provided through the Room Air Manager in EnergyPlus. The intent is to provide a selection of useful non-uniform zone air models to enable the evaluation of air-conditioning techniques that use stratified or partially stratified room air. Such techniques include displacement ventilation (DV) and underfloor air distribution (UFAD) systems. The methodology can also include natural displacement ventilation and also wind-driven cross-ventilation (CV).
 
 \subsubsection{Underfloor air distribution systems}\label{underfloor-air-distribution-systems}
 
@@ -637,22 +640,24 @@ The UCSD UFAD interior zone model is similar to the UCSD DV model. The most obvi
 
 The UFAD interior zone model is based upon non-dimensional analysis of the system and using the non-dimensional description to make a comparison between full-scale UCB test chamber data \& small-scale UCSD salt tank measurements.
 
-In order to do the non-dimensional comparisons, we need to define two dimensionless parameters. One is \(\Gamma\) , and the other is \(\phi\) . Lin \& Linden (Lin \& Linden, 2005) showed that in a UFAD system, the buoyancy flux of the heat source \((B)\) and the momentum flux of the cooling jets \((M)\) are the controlling parameters on the stratification. Since \([B] = {L^4}{T^{ - 3}}\) and\([M] = {L^4}{T^{ - 2}}\) , we can have a length scale as \({M^{3/4}}/{B^{1/2}}\) .
+In order to do the non-dimensional comparisons, we need to define two dimensionless parameters. One is \(\Gamma\), and the other is \(\phi\). Lin \& Linden (Lin \& Linden, 2005) showed that in a UFAD system, the buoyancy flux of the heat source \((B)\) and the momentum flux of the cooling jets \((M)\) are the controlling parameters on the stratification. Since \([B] = {L^4}{T^{ - 3}}\) and\([M] = {L^4}{T^{ - 2}}\) , we can have a length scale as \({M^{3/4}}/{B^{1/2}}\) .
 
-\emph{Definition of} \emph{Gfor the single-plume single-diffuser basic model}
+\emph{Definition of \(\Gamma\) for the single-plume single-diffuser basic model}
 
-We observed, in our small-scale experiments, that the total room height does not affect the interface position, or the height of the occupied zone. In other words, \emph{H} might not be the critical length scale for the stratification. Therefore, we started to use \(\sqrt A\) ~as the reference length. Then \(\Gamma\) is defined as
+We observed, in our small-scale experiments, that the total room height does not affect the interface position, or the height of the occupied zone. In other words, \emph{H} might not be the critical length scale for the stratification. Therefore, we started to use \(\sqrt A\) ~as the reference length. Then \(\Gamma\) is defined as:
 
 \begin{equation}
 \Gamma  = \frac{{{M^{3/4}}}}{{{B^{1/2}}{A^{1/2}}}} = \frac{{{{({Q^2}/A)}^{3/4}}}}{{{B^{1/2}}{A^{1/2}}}} = \frac{{{Q^{3/2}}}}{{{A^{5/4}}{B^{1/2}}}}
+\label{eq:GammaSinglePlumeSingleDiffuser}
 \end{equation}
 
 \emph{Definition for multi-diffuser and multi-source cases}
 
-We only considered single-diffuser, single-source cases in above analysis. Suppose there are \emph{n} equal diffusers and \emph{m} equal heat sources in a UFAD room. We shall divide the number of diffusers up into a number of separate heat sources so that each subsection with \emph{n' = n/m} diffusers per heat source will have the same stratification as other subsections. Further, the air flow and the heat load into the subsection \emph{Q'} and \emph{B'} will be\(Q' = Q/m\) \(B' = B/m\) respectively, where \emph{Q'} and \emph{B'} are the total air flow and the total heat load for the entire UFAD space. Then the momentum flux each diffuser per heat source carries is\({M_d} = {(\frac{1}{{n'}}Q')^2}/A\) . will be modified as
+We only considered single-diffuser, single-source cases in above analysis. Suppose there are \emph{n} equal diffusers and \emph{m} equal heat sources in a UFAD room. We shall divide the number of diffusers up into a number of separate heat sources so that each subsection with \emph{n' = n/m} diffusers per heat source will have the same stratification as other subsections. Further, the air flow and the heat load into the subsection \emph{Q'} and \emph{B'} will be \(Q' = Q/m\) \(B' = B/m\) respectively, where \emph{Q'} and \emph{B'} are the total air flow and the total heat load for the entire UFAD space. Then the momentum flux each diffuser per heat source carries is \({M_d} = {(\frac{1}{{n'}}Q')^2}/A\). Equation~\ref{eq:GammaSinglePlumeSingleDiffuser} will be modified as:
 
 \begin{equation}
 \Gamma  = \frac{{{{(n'{M_d})}^{3/4}}}}{{B{'^{1/2}}\sqrt {n'A} }} = \frac{{Q{'^{3/2}}}}{{{{(n'A)}^{5/4}}B{'^{1/2}}}} = \frac{{{Q^{3/2}}}}{{m{{(n'A)}^{5/4}}{B^{1/2}}}}
+\label{eq:GammaMultiDiffuserMultiSource}
 \end{equation}
 
 \emph{Full-scale cases}
@@ -661,53 +666,56 @@ Because \emph{B} is the buoyancy flux of the heat sources and \emph{M} is the mo
 
 \begin{equation}
 \Gamma  = \frac{{{{(Q\cos \theta )}^{3/2}}}}{{m{{(n'A)}^{5/4}}{{(0.0281W)}^{1/2}}}}
+\label{eq:GammaFullScaleCases}
 \end{equation}
 
-where, \emph{Q} is the net flow rate coming out from all diffusers (m\(^{3}\)/s); \emph{W} is the total net heat load (kW); \emph{A} is the effective area of each diffuser (m\(^{2}\)); \emph{n'} is the number of diffusers per heat source; \emph{q} is the angle between the diffuser slots and the vertical direction and \emph{m} is the number of heat sources
+where \emph{Q} is the net flow rate coming out from all diffusers (m\(^{3}\)/s); \emph{W} is the total net heat load (kW); \emph{A} is the effective area of each diffuser (m\(^{2}\)); \emph{n'} is the number of diffusers per heat source; \emph{q\(\theta\)} is the angle between the diffuser slots and the vertical direction and \emph{m} is the number of heat sources.
 
-\emph{Definition of} \emph{F}
+\emph{Definition of \(\phi\)}
 
-In our theoretical model, two-layer stratification forms at steady state, provided that each diffuser carries the same momentum flux, and each heat source has the same heat load. We could define a dimensionless parameter \emph{F}, which indicates the strength of stratification.
+In our theoretical model, two-layer stratification forms at steady state, provided that each diffuser carries the same momentum flux, and each heat source has the same heat load. We could define a dimensionless parameter \emph{\(\phi\)}, which indicates the strength of stratification.
 
 \emph{Small-scale cases}
 
-In our salt-water tank experiments, fluid density \emph{r} is measured. Define that
+In our salt-water tank experiments, fluid density \emph{r} is measured. Define that:
 
 \begin{equation}
 \phi  = \frac{{{\rho_u} - {\rho_l}}}{{{\rho_u} - {\rho_o}}}
+\label{eq:PhiSmallScaleCases}
 \end{equation}
 
-where, \emph{r\(_{u}\)} and \emph{r\(_{l}\)} are the fluid density of the upper layer and lower layer, separately; and \emph{r\(_{o}\)} is the source density at the diffusers.
+where \emph{\(\rho_{u}\)} and \emph{\(\rho_{l}\)} are the fluid density of the upper layer and lower layer, separately; and \emph{\(\rho_{o}\)} is the source density at the diffusers.
 
-Therefore, \emph{r\(_{l}\)} = \emph{r\(_{o}\)} gives \emph{f} = \emph{1}, which means the largest stratification (displacement ventilation case); \emph{r\(_{l}\)} = \emph{r\(_{u}\)} leads to \emph{f} = \emph{0}, in which case there is no stratification (mixed ventilation case).
+Therefore, \emph{\(\rho_{l}\)} = \emph{\(\rho_{o}\)} gives \emph{\(\phi\)} = \emph{1}, which means the largest stratification (displacement ventilation case); \emph{\(\rho_{l}\)} = \emph{\(\rho_{u}\)} leads to \emph{\(\phi\)} = \emph{0}, in which case there is no stratification (mixed ventilation case).
 
 \emph{Full-scale cases}
 
-Similarly, we can define \emph{f} for full-scale cases by using temperature.
+Similarly, we can define \emph{\(\phi\)} for full-scale cases by using temperature.
 
 \begin{equation}
 \phi  = \frac{{{T_r} - {T_{oz}}}}{{{T_r} - {T_s}}}
+\label{eq:PhiFullScaleCases}
 \end{equation}
 
-where \emph{T\(_{r}\)}, \emph{T\(_{oz}\)}, and \emph{T\(_{s}\)} are the return air temperature, the occupied zone temperature and the supply temperature, respectively (K). Again \emph{f = 1} occurs in displacement ventilation; while \emph{f = 0} happens in mixed ventilation.
+where \emph{T\(_{r}\)}, \emph{T\(_{oz}\)}, and \emph{T\(_{s}\)} are the return air temperature, the occupied zone temperature and the supply temperature, respectively (K). Again \emph{\(\phi\) = 1} occurs in displacement ventilation; while \emph{\(\phi\) = 0} happens in mixed ventilation.
 
 \emph{Comparisons between full-scale UCB data and small-scale UCSD data}
 
 \begin{figure}[hbtp] % fig 133
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2469.png}
-\caption{Data comparisons in the non-dimensional (a) regular G-fplot \protect \label{fig:data-comparisons-in-the-non-dimensional-a}}
+\caption{Data comparisons in the non-dimensional (a) regular \(\Gamma\)-\(\phi\) plot \protect \label{fig:data-comparisons-in-the-non-dimensional-a}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 134
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2470.png}
-\caption{(b) log-log G-fplot.\} \protect \label{fig:b-log-log-g-fplot.}}
+\caption{(b) log-log \(\Gamma\)-\(\phi\) plot.\} \protect \label{fig:b-log-log-g-fplot.}}
 \end{figure}
 
-The figures (Figure~\ref{fig:data-comparisons-in-the-non-dimensional-a}. Data comparisons in the non-dimensional (a) regular G-fplot and Figure~\ref{fig:b-log-log-g-fplot.}. (b) log-log G-fplot.\} show the comparisons between UCB's data and the UCSD salt tank data in the \emph{G-f} plot. As seen in the figures, the full-scale and small-scale data are on the same trend curve. This provides the evidence that the salt-tank experiments have included most characteristics of a UFAD system. Note that big \emph{G} (\textgreater{}20) of UCB's experiments all have large DDR (from \emph{1.19} to \emph{2.18}). The largest DDR (\emph{2.18}) even gives a negative\(({T_r} - {T_{oz}})/({T_r} - {T_s})\) , which is NOT shown in the figures.)
+The figures (Figure~\ref{fig:data-comparisons-in-the-non-dimensional-a}. Data comparisons in the non-dimensional (a) regular \(\Gamma\)-\(\phi\) plot and Figure~\ref{fig:b-log-log-g-fplot.}. (b) log-log \(\Gamma\)-\(\phi\) plot.\} show the comparisons between UCB's data and the UCSD salt tank data in the \emph{\(\Gamma\)-\(\phi\)} plot. As seen in the figures, the full-scale and small-scale data are on the same trend curve. This provides the evidence that the salt-tank experiments have included most characteristics of a UFAD system. Note that big \emph{\(\Gamma\)} (\textgreater{}20) of UCB's experiments all have large DDR (from \emph{1.19} to \emph{2.18}). The largest DDR (\emph{2.18}) even gives a negative \(({T_r} - {T_{oz}})/({T_r} - {T_s})\), which is NOT shown in the figures.)
 
-We could work out the occupied zone temperature by using the least-square fitting line suggested in Figure~\ref{fig:energyplus-program-schematic}(b). Hence the interface height is needed to determine a entire two-layer stratification. Figure~\ref{fig:non-dimensional-interface-height-of-small} shows the dimensionless interface height\((h/\sqrt {n'A} )\) of the UCSD small-scale experiments plotted against \emph{G}. Note that for the experiments with elevated heat source, the interface heights have been modified by\(h' = h - \frac{1}{2}{h_s}\) ~where \emph{h\(_{s}\)} is the vertical position of the elevated heat source. All data then are located along a line in Figure~\ref{fig:non-dimensional-interface-height-of-small}. Since the salt-tank experiments are concluded to represent important characteristics of a full-scale UFAD room, this figure provides some guidelines for estimate the interface position in a real UFAD room.
+We could work out the occupied zone temperature by using the least-square fitting line suggested in Figure~\ref{fig:b-log-log-g-fplot.}. Hence the interface height is needed to determine a entire two-layer stratification. Figure~\ref{fig:non-dimensional-interface-height-of-small} shows the dimensionless interface height\((h/\sqrt {n'A} )\) of the UCSD small-scale experiments plotted against \emph{\(\Gamma\)}. Note that for the experiments with elevated heat source, the interface heights have been modified by\(h' = h - \frac{1}{2}{h_s}\) ~where \emph{h\(_{s}\)} is the vertical position of the elevated heat source. All data then are located along a line in Figure~\ref{fig:non-dimensional-interface-height-of-small}. Since the salt-tank experiments are concluded to represent important characteristics of a full-scale UFAD room, this figure provides some guidelines for estimate the interface position in a real UFAD room.
 
 \begin{figure}[hbtp] % fig 135
 \centering
@@ -715,9 +723,9 @@ We could work out the occupied zone temperature by using the least-square fittin
 \caption{Non-dimensional interface height of small-scale experiments. \protect \label{fig:non-dimensional-interface-height-of-small}}
 \end{figure}
 
-\emph{Formulas for EnergyPlus based on the dimensionless parameter} \emph{G}
+\emph{Formulas for EnergyPlus based on the dimensionless parameter \(\Gamma\)}
 
-If we have input including the supply temperature \emph{T\(_{s}\)} (K); the number of diffusers \emph{n}; the number of heat sources \emph{m}; the vertical position of the heat sources \emph{h\(_{s}\)} (m); the heat load \emph{W} (kW); the effective area of a diffuser \emph{A} (m\(^{2}\)); and the total supply air flow rate \emph{Q} (m\(^{3}\)/s) then the output will be
+If we have input including the supply temperature \emph{T\(_{s}\)} (K); the number of diffusers \emph{n}; the number of heat sources \emph{m}; the vertical position of the heat sources \emph{h\(_{s}\)} (m); the heat load \emph{W} (kW); the effective area of a diffuser \emph{A} (m\(^{2}\)); and the total supply air flow rate \emph{Q} (m\(^{3}\)/s) then the output will be;
 
 \begin{equation}
 {T_r} = \frac{{0.0281W}}{{Qg}}{T_s} + {T_s}
@@ -729,19 +737,21 @@ If we have input including the supply temperature \emph{T\(_{s}\)} (K); the numb
 
 \begin{equation}
 h = \sqrt {\frac{n}{m}A} (7.43ln(\Gamma ) - 1.35) + \frac{1}{2}{h_s}
+\label{eq:InterfaceHeightEquation}
 \end{equation}
 
-where \emph{T\(_{r}\)} is the return temperature (K); \emph{T\(_{oz}\)} is the occupied subzone temperature (K); \emph{h} is the interface height (m); and \emph{G} is defined above.
+where \emph{T\(_{r}\)} is the return temperature (K); \emph{T\(_{oz}\)} is the occupied subzone temperature (K); \emph{h} is the interface height (m); and \emph{\(\Gamma\)} is defined above.
 
 \subsubsection{Implementation}\label{implementation-1}
 
 The implementation closely follows the procedure described in the displacement ventilation zone model. The model predicts two temperatures that characterize the two main levels in the stratification of the room:
 
-1.~~~~an occupied subzone temperature T\(_{oc}\)~representing the temperature of the occupied region;
+\begin{enumerate}
+\item An occupied subzone temperature T\(_{oc}\)~representing the temperature of the occupied region;
+\item An upper level temperature T\(_{mx}\) representing the temperature of the upper, mixed region and the outflow temperature.
+\end{enumerate}
 
-2.~~~~an upper level temperature T\(_{mx}\) representing the temperature of the upper, mixed region and the outflow temperature.
-
-We will use to calculate the interface height and do a heat balance calculation on each subzone. \emph{G} is given by . The supply air flow rate \(\dot V\) ~is obtained by summing all the air flows entering the zone: supply air, infiltration, ventilation, and inter-zone flow. The heat gain \(\dot Q\) ~is estimated by summing all the convective internal gains located in the occupied subzone -- task lights, people, equipment -- and dividing this power equally among the n plumes. With these assumptions we can describe the implementation.
+We will use Equation~\ref{eq:InterfaceHeightEquation} to calculate the interface height and do a heat balance calculation on each subzone. \emph{\(\Gamma\)} is given by Equation~\ref{eq:GammaFullScaleCases}. The supply air flow rate \(\dot V\) is obtained by summing all the air flows entering the zone: supply air, infiltration, ventilation, and inter-zone flow. The heat gain \(\dot Q\) is estimated by summing all the convective internal gains located in the occupied subzone -- task lights, people, equipment -- and dividing this power equally among the n plumes. With these assumptions we can describe the implementation.
 
 The UCSD UFI model is controlled by the subroutine \emph{ManageUCSDUFModels} which is called from the \emph{RoomAirModelManager}. The \emph{RoomAirModelManager} selects which zone model will be used for each zone.
 
@@ -814,7 +824,7 @@ The number of diffusers per plumes is also a user input. To obtain the number of
 {N_{diffusers}} = {N_{plumes}}\cdot {N_{diffusersperplume}}
 \end{equation}
 
-The area \emph{A\(_{diff}\)} is also a user input. For swirl diffusers and for displacement diffusers this area is used as input. For the variable area diffusers, though, we calculate the area. We assume 400 ft/min velocity at the diffuser and a design flow rate per diffuser is 150 cfm (.0708 m\(^{3}\)/s). The design area of the diffuser is 150 ft\(^{3}\)/min /~ 400 ft/min = .575 ft\(^{2}\) = .035 m\(^{2}\). Then the variable area each time step is
+The area \emph{A\(_{diff}\)} is also a user input. For swirl diffusers and for displacement diffusers this area is used as input. For the variable area diffusers, though, we calculate the area. We assume 400 ft/min velocity at the diffuser and a design flow rate per diffuser is 150 cfm (.0708 m\(^{3}\)/s). The design area of the diffuser is 150 ft\(^{3}\)/min / 400 ft/min = .575 ft\(^{2}\) = .035 m\(^{2}\). Then the variable area each time step is
 
 \begin{equation}
 {A_{diff}} = {\dot m_{systot}}/(.0708\cdot {N_{diffusers}})
@@ -830,19 +840,20 @@ We now calculate the height fraction \emph{Fr\(_{hb}\)} (height of boundary laye
 F{r_{hb}} = \frac{{{{({N_{diffusersperplume}}\cdot {A_{diff}})}^{1/2}}(7.43\ln (\Gamma ) - 1.35 + 0.5{H_s})}}{{{H_{ceil}}}}
 \end{equation}
 
-where \emph{q\(_{throw}\)} is a user input: the angle between the diffuser slots and vertical; and \emph{H\(_{s}\)} is the source height above the floor (m).
+where \emph{\(\theta_{throw}\)} is a user input: the angle between the diffuser slots and vertical; and \emph{H\(_{s}\)} is the source height above the floor (m).
 
 Next we iterate over the following 2 steps.
 
 \subsubsection{Iterative procedure}\label{iterative-procedure-1}
 
-1.~~~~Call subroutine \emph{HcUCSDUF} to calculate a convective heat transfer coefficient for each surface in the zone, an effective air temperature for each surface, and HA\(_{mx}\), HAT\(_{mx}\), HA\(_{oc}\), HAT\(_{oc}\). Here HA is \(\sum\limits_{surfaces} {{h_{c,i}} \cdot {A_i}}\) ~for a region and HAT is \(\sum\limits_{surfaces} {{h_{c,i}} \cdot {A_i}} \cdot {T_i}\) ~for a region. The sum is over all the surfaces bounding the region; \({{h_{c,i}}}\) ~is the convective heat transfer coefficient for surface i, \({A_i}\) ~is the area of surface i,~ and \({T_i}\) ~is the surface temperature of surface i.
+\begin{enumerate}
+\item Call subroutine \emph{HcUCSDUF} to calculate a convective heat transfer coefficient for each surface in the zone, an effective air temperature for each surface, and HA\(_{mx}\), HAT\(_{mx}\), HA\(_{oc}\), HAT\(_{oc}\). Here HA is \(\sum\limits_{surfaces} {{h_{c,i}} \cdot {A_i}}\) for a region and HAT is \(\sum\limits_{surfaces} {{h_{c,i}} \cdot {A_i}} \cdot {T_i}\) for a region. The sum is over all the surfaces bounding the region; \({{h_{c,i}}}\) is the convective heat transfer coefficient for surface i, \({A_i}\) is the area of surface i, and \({T_i}\) is the surface temperature of surface i.
+\item Calculate the two subzone temperatures: \emph{T\(_{oc}\)} and \emph{T\(_{mx}\)}.
+\end{enumerate}
 
-2.~~~~Calculate the two subzone temperatures: \emph{T\(_{oc}\)} and \emph{T\(_{mx}\)}.
+The h\(_{c}\)'s calculated in step 1 depend on the subzone temperatures. In turn the subzone temperatures depend on the HA and HAT's calculated in step 1. Hence the need for iteration.
 
-The h\(_{c}\)'s calculated in step 1 depend on the subzone temperatures. In turn the subzone temperatures depend on the HA and HAT's calculated in step 1. Hence the need for iteration
-
-Next we describe each steps 1 and 2 in more detail.
+Next we describe Steps 1 and 2 in more detail.
 
 \subsubsection{Step 1}\label{step-1-1}
 
@@ -863,7 +874,7 @@ The calculation of~ subzone temperatures follows the method used in the \textbf{
   \end{array}
 \end{equation}
 
-Here \({C_{air,oc}}\) ~and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
+Here \({C_{air,oc}}\) and \({C_{air,mx}}\) are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) is calculated by:
 
 \begin{equation}
 {R_{air,mx}} = {V_{mx}} \cdot \left( {\Delta {z_{mx}}/{z_{ceil}}} \right) \cdot {\rho_{air,mx}} \cdot {c_{p,air,mx}} \cdot Mu{l_{cap}}/\left( {\Delta {t_z} \cdot 3600} \right)
@@ -881,9 +892,9 @@ The other subzone air heat capacities are calculated in the same manner.
 
 The above iterative procedure assumed that the UFAD nonuniform zone model was appropriate: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.
 
-If \({T_{mx}} < {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} < \Delta {z_{occ,\min }}\) ~then the following mixed calculation will replace the UFAD interior zone calculation.
+If \({T_{mx}} < {T_{oc}}\) or \(MC{P_{tot}} \le 0\) or \({H_{fr}} \cdot {H_{ceil}} < \Delta {z_{occ,\min }}\), then the following mixed calculation will replace the UFAD interior zone calculation.
 
-\textbf{Note:} ~\(\Delta {z_{occ,min}}\) ~is the minimum thickness of occupied subzone. It is set to 0.2 meters.
+\textbf{Note:} \(\Delta {z_{occ,min}}\) is the minimum thickness of occupied subzone. It is set to 0.2 meters.
 
 The mixed calculation iteratively calculates surface convection coefficients and room temperature just like the displacement ventilation calculation described above. In the mixed case however, only one zone temperature \emph{T\(_{avg}\)} is calculated. The 3 subzone temperatures are then set equal to \emph{T\(_{avg}\)}.
 
@@ -891,12 +902,12 @@ First, \emph{Fr\(_{hb}\)}~ is set equal to zero.
 
 Then the code iterates over these steps.
 
-Calculate \emph{T\(_{avg}\)} using
+Calculate \emph{T\(_{avg}\)} using:
 
 \begin{equation}
   \begin{array}{rl}
     T_{avg} &= ({C_{air,z}} \cdot (3 \cdot {T_{ - 1,z}} - (3/2) \cdot {T_{ - 2,z}} + (1/3) \cdot {T_{ - 3,z}}) \\
-            &+ {{\dot Q}_{tot,conv}} + HA{T_{oc}} + HA{T_{mx}}MCP{T_{tot}})/((11/6) \cdot {C_{air,z}} + H{A_{oc}} + H{A_{mx}} + MC{P_{tot}})
+            &+ {{\dot Q}_{tot,conv}} + HA{T_{oc}} + HA{T_{mx}} + MCP{T_{tot}})/((11/6) \cdot {C_{air,z}} + H{A_{oc}} + H{A_{mx}} + MC{P_{tot}})
   \end{array}
 \end{equation}
 
@@ -930,7 +941,7 @@ We define heights:
 {H_{ocavg}} = {H_{trans}}/2
 \end{equation}
 
-Using the user defined comfort height we calculate the comfort~ temperature.
+Using the user defined comfort height we calculate the comfort temperature.
 
 If mixing:
 
@@ -940,19 +951,19 @@ If mixing:
 
 If UFAD:
 
-If~ \({H_{comf}} < {H_{ocavg}}\)
+If \({H_{comf}} < {H_{ocavg}}\):
 
 \begin{equation}
 {T_{comf}} = {T_{occ}}
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} < {H_{mxavg}}\)
+Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} < {H_{mxavg}}\):
 
 \begin{equation}
 {T_{comf}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{comf}}} \right) + {T_{mx}}\left( {{H_{comf}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} < {H_{ceil}}\)
+Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} < {H_{ceil}}\):
 
 \begin{equation}
 {T_{comf}} < {T_{mx}}
@@ -968,19 +979,19 @@ If mixing:
 
 If UFAD:
 
-If\({H_{stat}} < {H_{ocavg}}\)
+If\({H_{stat}} < {H_{ocavg}}\):
 
 \begin{equation}
 {T_{stat}} = {T_{occ}}
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} < {H_{mxavg}}\)
+Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} < {H_{mxavg}}\):
 
 \begin{equation}
 {T_{stat}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{stat}}} \right) + {T_{mx}}\left( {{H_{stat}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\)
+Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\):
 
 \begin{equation}
 {T_{stat}} = {T_{mx}}
@@ -988,17 +999,17 @@ Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\)
 
 The average temperature gradient is:
 
-If \({H_{mxavg}} - {H_{occavg}} > 0.1\)
+If \({H_{mxavg}} - {H_{occavg}} > 0.1\):
 
 \begin{equation}
 Grad{T_{avg}} = ({T_{mx}} - {T_{occ}})/({H_{mxavg}} - {H_{occavg}})
 \end{equation}
 
-else \(Grad{T_{avg}} = 0.0\)
+else \(Grad{T_{avg}} = 0.0\).
 
 Finally, the zone node temperature is set to \emph{T\(_{mx}\)}.
 
-Other variables that are reported out are \(\Gamma\) and \(\phi\) .
+Other variables that are reported out are \(\Gamma\) and \(\phi\).
 
 \begin{equation}
 \phi  = ({T_{mx}} - {T_{occ}})/({T_{mx}} - {T_{sup}})
@@ -1024,7 +1035,7 @@ The UCSD UFAD exterior zone model is similar to the UCSD interior zone model. Th
 
 \subsubsection{Model Description}\label{model-description-2-001}
 
-As in the interior zone case, we define 2 dimensionless parameters: \(\Gamma\) and \(\phi\) . The definitions of the 2 parameters are the same as in the previous section (equations , , , , and ). As in the previous case, the experimental data can be plotted versus \(\Gamma\) and lines fitted to the data give the following formulas for occupied subzone temperature and interface height.
+As in the interior zone case, we define 2 dimensionless parameters: \(\Gamma\) and \(\phi\). The definitions of the 2 parameters are the same as in the previous section (Equations~\ref{eq:GammaSinglePlumeSingleDiffuser},~\ref{eq:GammaMultiDiffuserMultiSource},~\ref{eq:GammaFullScaleCases},~\ref{eq:PhiSmallScaleCases}, and~\ref{eq:PhiFullScaleCases}). As in the previous case, the experimental data can be plotted versus \(\Gamma\) and lines fitted to the data give the following formulas for occupied subzone temperature and interface height.
 
 \begin{equation}
 {T_{oz}} = {T_r} - 1.4{\Gamma ^{ - 0.6}}({T_r} - {T_s})
@@ -1032,19 +1043,21 @@ As in the interior zone case, we define 2 dimensionless parameters: \(\Gamma\) a
 
 \begin{equation}
 h = \sqrt {\frac{n}{m}A} (11.03ln(\Gamma ) - 10.73) + \frac{1}{2}{h_s}
+\label{eq:InterfaceHeightUFAD}
 \end{equation}
 
-where \emph{T\(_{oz}\)} is the occupied subzone temperature (K); \emph{T\(_{r}\)}~is the return temperature (K); \emph{G}~is the dimensionless height parameter defined above; \emph{T\(_{s}\)} is the supply temperature (K); \emph{h} is the interface height (m); \emph{n} is the number of diffusers; \emph{m} is the number of heat sources; \emph{A} is the effective area of a diffuser (m\(^{2}\)); and \emph{h\(_{s}\)} is the vertical position of the heat sources (m). The formula for \emph{T\(_{r}\)} is the same as in the previous section.
+where \emph{T\(_{oz}\)} is the occupied subzone temperature (K); \emph{T\(_{r}\)}~is the return temperature (K); \emph{\(\Gamma\)}~is the dimensionless height parameter defined above; \emph{T\(_{s}\)} is the supply temperature (K); \emph{h} is the interface height (m); \emph{n} is the number of diffusers; \emph{m} is the number of heat sources; \emph{A} is the effective area of a diffuser (m\(^{2}\)); and \emph{h\(_{s}\)} is the vertical position of the heat sources (m). The formula for \emph{T\(_{r}\)} is the same as in the previous section.
 
 \subsubsection{Implementation}\label{implementation-2}
 
 The implementation closely follows the procedure described in the UFAD interior zone model. The model predicts two temperatures that characterize the two main levels in the stratification of the room:
 
-1.~~~~an occupied subzone temperature T\(_{oc}\)~representing the temperature of the occupied region;
+\begin{enumerate}
+\item An occupied subzone temperature T\(_{oc}\)~representing the temperature of the occupied region;
+\item An upper level temperature T\(_{mx}\) representing the temperature of the upper, mixed region and the outflow temperature.
+\end{enumerate}
 
-2.~~~~an upper level temperature T\(_{mx}\) representing the temperature of the upper, mixed region and the outflow temperature.
-
-We will use to calculate the interface height and do a heat balance calculation on each subzone. \emph{G} is given by . The supply air flow rate \(\dot V\) ~is obtained by summing all the air flows entering the zone: supply air, infiltration, ventilation, and inter-zone flow. The heat gain \(\dot Q\) ~is estimated by summing all the convective internal gains located in the occupied subzone -- task lights, people, equipment -- and adding to this the convective gain coming from the window surface. With these assumptions we can describe the implementation.
+We will use Equation~\ref{eq:InterfaceHeightUFAD} to calculate the interface height and do a heat balance calculation on each subzone. \emph{\(\Gamma\)} is given by Equation~\ref{eq:GammaFullScaleCases}. The supply air flow rate \(\dot V\) is obtained by summing all the air flows entering the zone: supply air, infiltration, ventilation, and inter-zone flow. The heat gain \(\dot Q\) is estimated by summing all the convective internal gains located in the occupied subzone -- task lights, people, equipment -- and adding to this the convective gain coming from the window surface. With these assumptions we can describe the implementation.
 
 The UCSD UFE model is controlled by the subroutine \emph{ManageUCSDUFModels} which is called from the \emph{RoomAirModelManager}. The \emph{RoomAirModelManager} selects which zone model will be used for each zone.
 
@@ -1072,7 +1085,7 @@ MC{P_{zone}} = MC{P_i} + MC{P_{vent}} + MC{P_{mix}}
 \end{equation}
 
 \begin{equation}
-MC{P_{sys}} = \sum\limits_{inlets} {{{\dot m}_i}} {C_{p,i}}
+MCP_{sys} = \sum\limits_{inlets} {\dot m_i C_{p,i}}
 \end{equation}
 
 \begin{equation}
@@ -1095,9 +1108,9 @@ MCP{T_{sys}} = \sum\limits_{inlets} {{{\dot m}_i}} {C_{p,i}}{T_i}
 MCP{T_{tot}} = MCP{T_{zone}} + MCP{T_{sys}}
 \end{equation}
 
-For exterior zone model, we assume one plume: \({N_{plumes}} = 1\) . The number of diffusers in the zone \({N_{diffusers}}\) is a user input.
+For exterior zone model, we assume one plume: \({N_{plumes}} = 1\). The number of diffusers in the zone \({N_{diffusers}}\) is a user input.
 
-The area \emph{A\(_{diff}\)} is also a user input. For swirl diffusers, linear bar grilles, and displacement diffusers this area is used as input. For the variable area diffusers, though, we calculate the area. We assume 400 ft/min velocity at the diffuser and a design flow rate per diffuser is 150 cfm (.0708 m\(^{3}\)/s). The design area of the diffuser is 150 ft\(^{3}\)/min /~ 400 ft/min = .575 ft\(^{2}\) = .035 m\(^{2}\). Then the variable area each time step is
+The area \emph{A\(_{diff}\)} is also a user input. For swirl diffusers, linear bar grilles, and displacement diffusers this area is used as input. For the variable area diffusers, though, we calculate the area. We assume 400 ft/min velocity at the diffuser and a design flow rate per diffuser is 150 cfm (.0708 m\(^{3}\)/s). The design area of the diffuser is 150 ft\(^{3}\)/min / 400 ft/min = .575 ft\(^{2}\) = .035 m\(^{2}\). Then the variable area each time step is:
 
 \begin{equation}
 {A_{diff}} = {\dot m_{systot}}/(.0708\cdot {N_{diffusers}})
@@ -1109,7 +1122,7 @@ We now make an initial estimate of the convective gain from the windows.
 {\dot Q_{win,conv}} = \sum\limits_{i = 1,{n_{win}}} {{h_{c,i}}} {A_{win,i}}{T_{winsurf,i}} - {h_{c,i}}{A_{win,i}}{T_{mat}}
 \end{equation}
 
-Then
+Then:
 
 \begin{equation}
 {\dot Q_{plumes}} = {\dot Q_{ocz}} + {\dot Q_{win,conv}}
@@ -1125,23 +1138,25 @@ We now calculate the height fraction \emph{Fr\(_{hb}\)} (height of boundary laye
 F{r_{hb}} = \frac{{{{({N_{diffusers}}\cdot {A_{diff}})}^{1/2}}(11.03ln(\Gamma ) - 10.73 + 0.5{H_s})}}{{{H_{ceil}}}}
 \end{equation}
 
-where \emph{q\(_{throw}\)} is a user input: the angle between the diffuser slots and vertical; and \emph{H\(_{s}\)} is the source height above the floor (m).
+where \emph{\(\theta_{throw}\)} is a user input: the angle between the diffuser slots and vertical; and \emph{H\(_{s}\)} is the source height above the floor (m).
 
 Next we iterate over the following 2 steps.
 
 \subsubsection{Iterative procedure}\label{iterative-procedure-2}
 
-1.~~~~Call subroutine \emph{HcUCSDUF} to calculate a convective heat transfer coefficient for each surface in the zone, an effective air temperature for each surface, and HA\(_{mx}\), HAT\(_{mx}\), HA\(_{oc}\), HAT\(_{oc}\), HA\(_{mx,win}\),HAT\(_{mx,win}\),HA\(_{oc,win}\),and HAT\(_{oc,win}\). Here HA is \(\sum\limits_{surfaces} {{h_{c,i}} \cdot {A_i}}\) ~for a region and HAT is \(\sum\limits_{surfaces} {{h_{c,i}} \cdot {A_i}} \cdot {T_i}\) ~for a region. The sum is over all the surfaces bounding the region; \({h_{c,i}}\) ~is the convective heat transfer coefficient for surface i, \({A_i}\) ~is the area of surface i,~ and \({T_i}\) ~is the surface temperature of surface i. Variables with the \emph{win} subscript are summed over window surfaces only. Then the convective gain from the window is recalculated:
+\begin{enumerate}
+\item Call subroutine \emph{HcUCSDUF} to calculate a convective heat transfer coefficient for each surface in the zone, an effective air temperature for each surface, and HA\(_{mx}\), HAT\(_{mx}\), HA\(_{oc}\), HAT\(_{oc}\), HA\(_{mx,win}\), HAT\(_{mx,win}\), HA\(_{oc,win}\),and HAT\(_{oc,win}\). Here HA is \(\sum\limits_{surfaces} {{h_{c,i}} \cdot {A_i}}\) for a region and HAT is \(\sum\limits_{surfaces} {{h_{c,i}} \cdot {A_i}} \cdot {T_i}\) for a region. The sum is over all the surfaces bounding the region; \({h_{c,i}}\) is the convective heat transfer coefficient for surface i, \({A_i}\) is the area of surface i, and \({T_i}\) is the surface temperature of surface i. Variables with the \emph{win} subscript are summed over window surfaces only. Then the convective gain from the window is recalculated using Equation~\ref{eq:QdotwinconvUSCDUFAD} and the power in the plume is recalculated: \({\dot Q_{plumes}} = {\dot Q_{ocz}} + {\dot Q_{win,conv}}\) .
+\item Calculate the two subzone temperatures: \emph{T\(_{oc}\)} and \emph{T\(_{mx}\)}.
+\end{enumerate}
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \({\dot Q_{win,conv}} = HA{T_{mx,win}} + HA{T_{oc,win}} - H{A_{mx,win}}{T_{mx}} - H{A_{oc,win}}{T_{oc}}\)
+\begin{equation}
+{\dot Q_{win,conv}} = HA{T_{mx,win}} + HA{T_{oc,win}} - H{A_{mx,win}}{T_{mx}} - H{A_{oc,win}}{T_{oc}}
+\label{eq:QdotwinconvUSCDUFAD}
+\end{equation}
 
-and the power in the plume is recalculated: \({\dot Q_{plumes}} = {\dot Q_{ocz}} + {\dot Q_{win,conv}}\) .
+The h\(_{c}\)'s calculated in step 1 depend on the subzone temperatures. In turn the subzone temperatures depend on the HA and HAT's calculated in step 1. Hence the need for iteration.
 
-2.~~~~Calculate the two subzone temperatures: \emph{T\(_{oc}\)} and \emph{T\(_{mx}\)}.
-
-The h\(_{c}\)'s calculated in step 1 depend on the subzone temperatures. In turn the subzone temperatures depend on the HA and HAT's calculated in step 1. Hence the need for iteration
-
-Next we describe each steps 1 and 3 in more detail.
+Next we describe Steps 1 and 3 in more detail.
 
 \subsubsection{Step 1}\label{step-1-2}
 
@@ -1162,7 +1177,7 @@ The calculation of~ subzone temperatures follows the method used in the \textbf{
   \end{array}
 \end{equation}
 
-Here \({C_{air,oc}}\) ~and \({C_{air,mx}}\) ~are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) ~is calculated by
+Here \({C_{air,oc}}\) and \({C_{air,mx}}\) are the heat capacities of the air volume in each subzone. \({C_{air,mx}}\) is calculated by:
 
 \begin{equation}
 {R_{air,mx}} = {V_{mx}} \cdot \left( {\Delta {z_{mx}}/{z_{ceil}}} \right) \cdot {\rho_{air,mx}} \cdot {c_{p,air,mx}} \cdot Mu{l_{cap}}/\left( {\Delta {t_z} \cdot 3600} \right)
@@ -1180,17 +1195,17 @@ The other subzone air heat capacities are calculated in the same manner.
 
 The above iterative procedure assumed that the UFAD zone model was applicable: i.e., conditions were favorable temperature stratification in the zone. Now that this calculation is complete and the subzone temperatures and depths calculated, we check to see if this assumption was justified. If not, zone conditions must be recalculated assuming a well-mixed zone.
 
-If \({T_{mx}} < {T_{oc}}\) ~or \(MC{P_{tot}} \le 0\) ~or \({H_{fr}} \cdot {H_{ceil}} < \Delta {z_{occ,\min }}\) ~then the following mixed calculation will replace the UFAD exterior zone calculation.
+If \({T_{mx}} < {T_{oc}}\) or \(MC{P_{tot}} \le 0\) or \({H_{fr}} \cdot {H_{ceil}} < \Delta {z_{occ,\min }}\), then the following mixed calculation will replace the UFAD exterior zone calculation.
 
-\textbf{Note:} ~\({\Delta_{occ,min}}\) ~is the minimum thickness of occupied subzone. It is set to 0.2 meters.
+\textbf{Note:} \(\Delta {z_{occ,min}}\) is the minimum thickness of occupied subzone. It is set to 0.2 meters.
 
 The mixed calculation iteratively calculates surface convection coefficients and room temperature just like the displacement ventilation calculation described above. In the mixed case however, only one zone temperature \emph{T\(_{avg}\)} is calculated. The 2 subzone temperatures are then set equal to \emph{T\(_{avg}\)}.
 
-First, \emph{Fr\(_{hb}\)}~ is set equal to zero.
+First, \emph{Fr\(_{hb}\)} is set equal to zero.
 
 Then the code iterates over these steps.
 
-Calculate \emph{T\(_{avg}\)} using
+Calculate \emph{T\(_{avg}\)} using:
 
 \begin{equation}
   \begin{array}{rl}
@@ -1209,7 +1224,7 @@ Calculate \emph{T\(_{avg}\)} using
 
 Call \emph{HcUCSDUF} to calculate the \emph{h\(_{c}\)}'s.
 
-Repeat step 1
+Repeat step 1.
 
 \subsubsection{Final calculations}\label{final-calculations-2}
 
@@ -1229,7 +1244,7 @@ We define heights:
 {H_{ocavg}} = {H_{trans}}/2
 \end{equation}
 
-Using the user defined comfort height we calculate the comfort~ temperature.
+Using the user defined comfort height we calculate the comfort temperature.
 
 If mixing:
 
@@ -1239,25 +1254,25 @@ If mixing:
 
 If UFAD:
 
-If~ \({H_{comf}} < {H_{ocavg}}\)
+If~ \({H_{comf}} < {H_{ocavg}}\):
 
 \begin{equation}
 {T_{comf}} = {T_{occ}}
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} < {H_{mxavg}}\)
+Else if \({H_{comf}} \ge {H_{ocavg}}\) ~and \({H_{comf}} < {H_{mxavg}}\):
 
 \begin{equation}
 {T_{comf}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{comf}}} \right) + {T_{mx}}\left( {{H_{comf}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)
 \end{equation}
 
-Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} < {H_{ceil}}\)
+Else if \({H_{comf}} \ge {H_{mxavg}}\) ~and \({H_{comf}} < {H_{ceil}}\):
 
 \begin{equation}
 {T_{comf}} < {T_{mx}}
 \end{equation}
 
-Using the user defined thermostat height we calculate the temperature at the thermostat.
+Using the user defined thermostat height, we calculate the temperature at the thermostat.
 
 If mixing:
 
@@ -1267,19 +1282,19 @@ If mixing:
 
 If UFAD:
 
-If\({H_{stat}} < {H_{ocavg}}\)
+If\({H_{stat}} < {H_{ocavg}}\):
 
 \begin{equation}
 {T_{stat}} = {T_{occ}}
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} < {H_{mcavg}}\)
+Else if \({H_{stat}} \ge {H_{ocavg}}\) ~and \({H_{stat}} < {H_{mcavg}}\):
 
 \begin{equation}
 {T_{stat}} = \left( {{T_{oc}}\left( {{H_{mxavg}} - {H_{stat}}} \right) + {T_{mx}}\left( {{H_{stat}} - {H_{ocavg}}} \right)} \right)/\left( {{H_{mxavg}} - {H_{ocavg}}} \right)
 \end{equation}
 
-Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\)
+Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\):
 
 \begin{equation}
 {T_{stat}} = {T_{mx}}
@@ -1287,17 +1302,17 @@ Else if \({H_{stat}} \ge {H_{mxavg}}\) ~and \({H_{stat}} < {H_{ceil}}\)
 
 The average temperature gradient is:
 
-If \({H_{mxavg}} - {H_{occavg}} > 0.1\)
+If \({H_{mxavg}} - {H_{occavg}} > 0.1\):
 
 \begin{equation}
 Grad{T_{avg}} = ({T_{mx}} - {T_{occ}})/({H_{mxavg}} - {H_{occavg}})
 \end{equation}
 
-else \(Grad{T_{avg}} = 0.0\)
+else \(Grad{T_{avg}} = 0.0\).
 
 Finally, the zone node temperature is set to \emph{T\(_{mx}\)}.
 
-Other variables that are reported out are \(\Gamma\) and \(\phi\) .
+Other variables that are reported out are \(\Gamma\) and \(\phi\).
 
 \begin{equation}
 \phi  = ({T_{mx}} - {T_{occ}})/({T_{mx}} - {T_{sup}})
@@ -1331,7 +1346,7 @@ The updated CV model proposed in this document was developed using inlet areas \
 
 0.5\%~\textless{}~\emph{A}\(_{in}\)/\emph{A}\(_{RM}\)~\textless{}~5\%
 
-whereas the existing model used
+whereas the existing model used:
 
 3.2\%~\textless{}~\emph{A}\(_{in}\)/\emph{A}\(_{RM}\)~\textless{}~21\%
 
@@ -1343,11 +1358,11 @@ The room lengths for which these models are expected to be applied range between
 \caption{Development of an axisymmetric jet from airflow through a window. \protect \label{fig:development-of-an-axisymmetric-jet-from}}
 \end{figure}
 
-Air flows into the room through an inflow window in the form of an approximately axisymmetric jet, with characteristic diameter \emph{L} = \emph{A}\(_{in}\)\(^{1/2}\), that is confined by the room surfaces (see Figure~\ref{fig:top-view-of-a-cross-ventilated-room.-the-air}). The initial portion of the jet (up to six diameters) is called the potential core and is characterized by shear layer development along the perimeter of the jet. After this phase the jet transitions into a self similar profile whose centerline velocity decays as 1/\emph{x}`, where \emph{x}' = \emph{x}/\emph{D} (Awbi, 2003).
+Air flows into the room through an inflow window in the form of an approximately axisymmetric jet, with characteristic diameter \emph{L} = \emph{A}\(_{in}\)\(^{1/2}\), that is confined by the room surfaces (see Figure~\ref{fig:top-view-of-a-cross-ventilated-room.-the-air}). The initial portion of the jet (up to six diameters) is called the potential core and is characterized by shear layer development along the perimeter of the jet. After this phase the jet transitions into a self similar profile whose centerline velocity decays as 1/\emph{x}', where \emph{x}' = \emph{x}/\emph{D} (Awbi, 2003).
 
 For the relevant room length range the geometries used in the two models result in:
 
-~~~~~ New model:~~~~~~ 6~\textless{}~x'~\textless{}~60
+~~~~~ New model:~~~~~~~~~~~~~~~~~ 6~\textless{}~x'~\textless{}~60
 
 ~~~~~ Existing model: ~~~~~~~~~~~ 2~\textless{}~x'~\textless{}~18
 
@@ -1407,7 +1422,7 @@ or
 
 where the constant \emph{C}\(_{1}\) will be obtained from the results of a set of CFD simulations shown in the next section.
 
-In addition to the jet velocity the characteristic recirculation flow velocity \({U_R}\) ~is also an interesting parameter that, according to the self-similar flow profile hypothesis shown in Figure~\ref{fig:top-view-of-one-half-of-a-cross-ventilated}, should scale with a similar expression to the one shown above for the jet (although with a different correlation constant, \emph{C}\(_{2}\)). The modeling hypothesis can also be tested by evaluating its capability to predict the maximum recirculation flow rate, which can be predicted by multiplying the average velocity by the room cross-section area:
+In addition to the jet velocity the characteristic recirculation flow velocity \({U_R}\) is also an interesting parameter that, according to the self-similar flow profile hypothesis shown in Figure~\ref{fig:top-view-of-one-half-of-a-cross-ventilated}, should scale with a similar expression to the one shown above for the jet (although with a different correlation constant, \emph{C}\(_{2}\)). The modeling hypothesis can also be tested by evaluating its capability to predict the maximum recirculation flow rate, which can be predicted by multiplying the average velocity by the room cross-section area:
 
 \begin{equation}
 {Q_R} = {C_3}\frac{{{Q_{in}}}}{{{C_{RM}}}}\left( {{V_{J,m}}/{U_{in}}} \right)
@@ -1425,9 +1440,10 @@ where \emph{a} is \emph{C}\(_{1}\), \emph{C}\(_{2}\) or \emph{C}\(_{3}\), X is a
 
 In addition to the velocity and airflow rate predictions described above it is also essential to predict the temperature variations in the two zones of the flow. In most cases these variations will be positive due to the internal sensible heat gains. However`, as a result of room surface heat transfer, in some cases the variations may be negative. Analysis of the CFD simulations that are presented in the next section revealed that approximately all the exhaust air comes from the jet regions. For this reason, the heat gains affect the two regions differently:
 
-·~~~~~~~~Heat gains in the jet region only affect this region (no temperature increase in the recirculation regions)
-
-·~~~~~~~~Heat gains in the recirculations affect both jet and recirculation regions (because they must be exhausted by the jets).
+\begin{itemize}
+\item Heat gains in the jet region only affect this region (no temperature increase in the recirculation regions).
+\item Heat gains in the recirculations affect both jet and recirculation regions (because they must be exhausted by the jets).
+\end{itemize}
 
 In order to predict the temperature increase, heat gains were inserted into the recirculation regions for different room geometries in the set of simulations presented in the next section. The volume containing the heat gains extended over the whole depth of the room, from floor to ceiling, and in the lateral direction from halfway between the window edge and the wall all the way to the wall. Applying energy conservation principles to predict the temperature increase in the jet and recirculation region as a function of the sensible heat gains in each region (the sum of internal gains and internal surface heat transfer) we can obtain the average value of temperature increase in each region:
 
@@ -1439,11 +1455,11 @@ In order to predict the temperature increase, heat gains were inserted into the 
 \Delta {T_R} = {C_{T,R}}\frac{{q'{'_{RM}}}}{{\rho {c_p}{Q_{in}}}}
 \end{equation}
 
-where q''\(_{RM}\) is the total internal heat gain for the room, r and \emph{c}\(_{p}\) are the density and specific heat capacity of air, respectively, and \emph{C}\(_{T,J}\), \emph{C}\(_{T,R}\) are constants.
+where q''\(_{RM}\) is the total internal heat gain for the room, \(\rho\) and \emph{c}\(_{p}\) are the density and specific heat capacity of air, respectively, and \emph{C}\(_{T,J}\), \emph{C}\(_{T,R}\) are constants.
 
 \subsubsection{Results}\label{results}
 
-Table~\ref{table:test-cases-used-to-develop-correlations} lists the cases used to develop the updated CV model, which predicts the output variables defined in Table~\ref{table:definitions-of-output-variables} (see also Figure~\ref{fig:jet-and-recirculation-regions-in-typical}). Figure 140, Figure 141, and Figure 142 show plots of the data derived from the CFD simulations of these test cases, and the lines giving the best fit to the data. Table~\ref{table:correlation-formulae-in-the-form-y-ax-+-b} summarizes the correlation formulae and constants. Finally, Table~\ref{table:accuracy-of-correlation-formulae-in} provides estimates for the error of the correlation in each test case.
+Table~\ref{table:test-cases-used-to-develop-correlations} lists the cases used to develop the updated CV model, which predicts the output variables defined in Table~\ref{table:definitions-of-output-variables} (see also Figure~\ref{fig:jet-and-recirculation-regions-in-typical}). Figures~\ref{fig:jet-veolicty-correlation},~\ref{fig:recirculation-region-velocity}, and~\ref{fig:recirculation-region-flow-rate} show plots of the data derived from the CFD simulations of these test cases, and the lines giving the best fit to the data. Table~\ref{table:correlation-formulae-in-the-form-y-ax-+-b} summarizes the correlation formulae and constants. Finally, Table~\ref{table:accuracy-of-correlation-formulae-in} provides estimates for the error of the correlation in each test case.
 
 \begin{figure}[hbtp] % fig 139
 \centering
@@ -1456,16 +1472,19 @@ Table~\ref{table:test-cases-used-to-develop-correlations} lists the cases used t
 \caption{Test cases used to develop correlations \label{table:test-cases-used-to-develop-correlations}} \tabularnewline
 \toprule 
 Case & Opening area & Room width & Room depth & Room height \tabularnewline
+  & A (m\(^2\)) & W (m) & D (m) & H (m) \tabularnewline
+
 \midrule
 \endfirsthead
 
 \caption[]{Test cases used to develop correlations} \tabularnewline
 \toprule 
 Case & Opening area & Room width & Room depth & Room height \tabularnewline
+  & A (m\(^2\)) & W (m) & D (m) & H (m) \tabularnewline
+
 \midrule
 \endhead
 
-A in (m 2 ) & W (m) & D (m) & H (m) \tabularnewline
 1 & 0.25 & 6 & 9 & 2.3 \tabularnewline
 2 & 0.25 & 11 & 9 & 2.3 \tabularnewline
 3 & 0.5 & 9 & 4.5 & 2.3 \tabularnewline
@@ -1480,7 +1499,7 @@ A in (m 2 ) & W (m) & D (m) & H (m) \tabularnewline
 12 & 1 & 9 & 9 & 2.3 \tabularnewline
 13 & 1 & 9 & 13.5 & 2.3 \tabularnewline
 14 & 1 & 9 & 18 & 2.3 \tabularnewline
-RANGE (max:min ratio) \tabularnewline
+   & RANGE (max:min ratio) \tabularnewline
  & 4 & 2.25 & 4 & 1 \tabularnewline
 \bottomrule
 \end{longtable}
@@ -1499,8 +1518,8 @@ Output variable & Symbol & Units & Definition \tabularnewline
 \midrule
 \endhead
 Jet velocity & U\(_J\) & m/s & Volume-averaged jet region velocity. The averaging volume is bounded at each x along the room depth by the line in the y-z plane where the jet velocity drops to 50\% of its maximum centerline value. \tabularnewline
-Recirculation zone velocity & U\(_R\) & m/s & Area-averaged velocity in the y-z plane with maximum flow. The averaging area is the recirculation part of the room cross-section. Typically the plane of maximum flow occurs at x~\textbackslash\~{}~2D/3 (D/3 before the outlet). \tabularnewline
-Recirculation zone flow rate & Q\(_R\) & m  /s & Total flow rate for the recirculation regions in the plane of maximum flow (see above). \tabularnewline
+Recirculation zone velocity & U\(_R\) & m/s & Area-averaged velocity in the y-z plane with maximum flow. The averaging area is the recirculation part of the room cross-section. Typically the plane of maximum flow occurs at x~\(\sim\)~2D/3 (D/3 before the outlet). \tabularnewline
+Recirculation zone flow rate & Q\(_R\) & m\(^3\)/s & Total flow rate for the recirculation regions in the plane of maximum flow (see above). \tabularnewline
 Jet temperature rise & $\Delta$T\(_J\) & °C & Volume-averaged temperature variations in the jet region, over the same volume used to define the jet velocity average. \tabularnewline
 Recirculation zone temperature rise & $\Delta$T\(_R\) & °C & Volume-average temperature variations in the recirculation region. The average is calculated over the cuboidal volume placed in each recirculation containing the volumetric sensible heat gains (see main text). \tabularnewline
 \bottomrule
@@ -1543,7 +1562,7 @@ Cases & Errors (\%) \tabularnewline
 \midrule
 \endhead
 
-ID & A (m2) & W (m) & D (m) & H (m) & Jet Velocity & Recirculation Velocity & Recirculation Flow Rate & Jet Temperature Rise & Recirculation Temperature Rise \tabularnewline
+ID & A (m2) & W (m) & D (m) & H (m) & Jet Velocity & Recirc- ulation Velocity & Recirc- ulation Flow Rate & Jet Temperature Rise & Recirc- ulation Temperature Rise \tabularnewline
 1 & 0.25 & 6 & 9 & 2.3 & 16 & 45 & 60 & 1 & 10 \tabularnewline
 2 & 0.25 & 11 & 9 & 2.3 & 5 & 43 & 32 & 5 & 7 \tabularnewline
 3 & 0.5 & 9 & 4.5 & 2.3 & 2 & 18 & 27 & 15 & 2 \tabularnewline
@@ -1564,23 +1583,17 @@ Average & 8 & 17 & 19 & 9 & 6 \tabularnewline
 
 In each case the error is the percentage difference between the given correlation prediction and the test case result obtained from CFD, i.e.~100*\textbar{}(correlation prediction -- CFD)/CFD\textbar{}.
 
-\(\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)\) \({U_J}/{U_{in}}\) 
-
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2652.png}
 \caption{Jet velocity correlation. \protect \label{fig:jet-veolicty-correlation}}
 \end{figure}
 
-\(\sqrt {{A_{in}}/{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)\) \({U_R}/{U_{in}}\) 
-
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2655.png}
 \caption{Recirculation region velocity correlation. \protect \label{fig:recirculation-region-velocity}}
 \end{figure}
-
-\(\sqrt {{A_{in}}{A_{RM}}} \left( {{V_{J,m}}/{U_{in}}} \right)\) \({Q_R}/{U_{in}}\) 
 
 \begin{figure}[hbtp]
 \centering
@@ -1595,16 +1608,16 @@ When the incoming wind is not normal to the façade the jet enters the room at a
 \begin{figure}[hbtp] % fig 143
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2659.png}
-\caption{Schematic of jet resulting from wind at angle φ to façade. \protect \label{fig:schematic-of-jet-resulting-from-wind-at-angle}}
+\caption{Schematic of jet resulting from wind at angle \(\phi\) to façade. \protect \label{fig:schematic-of-jet-resulting-from-wind-at-angle}}
 \end{figure}
 
 This oblique geometry has two main effects on the flow and consequent correlation predictions:
 
-The inflow area is reduced, creating a larger inflow velocity for the same flow rate.
-
-The room flow path length is increased, from \emph{D} to \emph{D}*, resulting in a larger apparent depth.
-
-The first effect increases indoor velocities while the second effect decreases the velocities.
+\begin{itemize}
+\item The inflow area is reduced, creating a larger inflow velocity for the same flow rate.
+\item The room flow path length is increased, from \emph{D} to \emph{D}*, resulting in a larger apparent depth.
+\item The first effect increases indoor velocities while the second effect decreases the velocities.
+\end{itemize}
 
 \subsubsection{Multiple apertures}\label{multiple-apertures}
 
@@ -1626,11 +1639,11 @@ CFD simulations for rooms with more than one inflow aperture show that the model
 
 In most cross ventilation flows with recirculations the mixing between recirculation and inflow jet is only partial. Figure~\ref{fig:top-view-of-the-flow-structure-in-case-r.} shows a schematic representation of the heat transfer process (showing a top view of one half of a symmetrical room). The flow is divided into three distinct streams with connected temperature variations:
 
-The main jet (labeled J in the figure).
-
-The part of the recirculation flow that exchanges heat with the jet (label R).
-
-The wall boundary layer part of the recirculation flow (label W).
+\begin{itemize}
+\item The main jet (labeled J in the figure).
+\item The part of the recirculation flow that exchanges heat with the jet (label R).
+\item The wall boundary layer part of the recirculation flow (label W).
+\end{itemize}
 
 \begin{figure}[hbtp] % fig 146
 \centering
@@ -1644,7 +1657,17 @@ The light gray arrows show flow direction. The dark gray arrows show heat transf
 
 It is possible to use a formulation with a heat transfer area, a convection heat transfer coefficient and an average shear layer temperature difference to model the heat exchange between jet and recirculation flows:
 
-\({Q_{y = 0}} = {A_{SL}}\,{h_{SL}}\,\Delta {T_{SL}}\) , \({A_{SL}} = L\,\,P\,,\,\,{h_{SL}} = \frac{{\rho \,{C_P}\,F}}{{{C_D}\,\,{A_{IN}}\,\,4\,\sigma \,\sqrt \pi }}\)
+\begin{equation}
+{Q_{y = 0}} = {A_{SL}}{h_{SL}}\Delta {T_{SL}}
+\end{equation}
+
+\begin{equation}
+{A_{SL}} = L P
+\end{equation}
+
+\begin{equation}
+{h_{SL}} = \frac{{\rho \,{C_P}\,F}}{{{C_D}\,\,{A_{IN}}\,\,4\,\sigma \,\sqrt \pi }}
+\end{equation}
 
 Locally, the heat transfer process is driven by the variable, local, temperature difference:
 
@@ -1660,8 +1683,9 @@ An accurate representation of system behavior must consider both the local heat 
   \begin{array}{rl}
     \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} & = \frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
-    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_R\left(x\right) - T_J \left(x\right)\right) 
   \end{array}
+  \label{eq:DiffEqForTWrTRxTJx}
 \end{equation}
 
 The relevant boundary conditions are:
@@ -1670,7 +1694,7 @@ The relevant boundary conditions are:
 {T_W}({L_{}}) = {T_R}(0)\,,\,{T_W}(0) = {T_R}(L)\,,\,\,{T_J}(0) = {T_{IN}}
 \end{equation}
 
-The first equation in models heat transfer in the wall layer. The second models the temperature variation of the portion of the recirculation flow that is in contact with the jet, it differs from the third equation only in a sign (the temperature variation in \emph{T\(_{R}\)} is symmetric to the variation in \emph{T\(_{J}\)}) and the flow rate (\emph{F.R} for the recirculation and \emph{F} for the main jet). The temperature in the recirculation region is given by:
+The first equation in Equation~\ref{eq:DiffEqForTWrTRxTJx} models heat transfer in the wall layer. The second models the temperature variation of the portion of the recirculation flow that is in contact with the jet, it differs from the third equation only in a sign (the temperature variation in \emph{T\(_{R}\)} is symmetric to the variation in \emph{T\(_{J}\)}) and the flow rate (\emph{F\(\cdot\)R} for the recirculation and \emph{F} for the main jet). The temperature in the recirculation region is given by:
 
 \begin{equation}
 {T_W}(r) = {T_S} - ({T_S} - {T_{IN}})\,\frac{{{e^{\frac{{{h_S}\,{A_S}}}{{\rho \,{C_P}\,R\,F}}\frac{r}{{{L_{}}}}}}\,({e^{ - \frac{{{A_{SL}}\,{h_{SL}}\,(1 + R)}}{{\rho \,{C_P}\,R\,F}}}} - 1)}}{{{e^{ - \frac{{{A_{SL}}\,{h_{SL}}\,(1 + R)}}{{\rho \,{C_P}\,R\,F}}}} - {e^{\frac{{{h_S}\,{A_S}}}{{\rho \,{C_P}\,R\,F}}}}\,(1 + R) + R}}
@@ -1688,6 +1712,7 @@ For gains occurring in the jet region (between the inlet and the room outlet) a 
 
 \begin{equation}
 {T_{ING}} = {T_{IN}} + \frac{{{G_J}}}{{\rho {C_P}F}}
+\label{eq:AlteredInflowTempEquation}
 \end{equation}
 
 Gains occurring in the jet region, close to the outlet can be ignored in a first order accuracy model.
@@ -1704,11 +1729,12 @@ In the case of a flow in a room with adiabatic surfaces and heat gains in the re
   \begin{array}{rl}
     \rho C_p F R \left(T_R\left(0\right) - T_R\left(L\right)\right) & = G_R \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
-    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right)
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_R\left(x\right) - T_J \left(x\right)\right)
   \end{array}
+  \label{eq:TRoTRLdTRxdTJxSystem}
 \end{equation}
 
-This system of equations differs from system F16 in several ways. Because there is no wall heat transfer there is no need to split the recirculation flow in two parts (\emph{R} and \emph{W}). The temperature increase in the recirculation flow is simply defined by the internal gains (first equation in ). The second and third equations in model shear layer heat transfer are similar in the two cases ( and ).
+This system of equations differs from the system shown in Equation~\ref{eq:DiffEqForTWrTRxTJx} in several ways. Because there is no wall heat transfer there is no need to split the recirculation flow in two parts (\emph{R} and \emph{W}). The temperature increase in the recirculation flow is simply defined by the internal gains (first equation in Equation~\ref{eq:TRoTRLdTRxdTJxSystem}). The second and third equations in Equation~\ref{eq:TRoTRLdTRxdTJxSystem} model shear layer heat transfer and are similar in the two cases (Equation~\ref{eq:DiffEqForTWrTRxTJx} and Equation~\ref{eq:TRoTRLdTRxdTJxSystem}).
 
 The recirculation flow temperature at \emph{x} = 0 is given by:
 
@@ -1716,7 +1742,7 @@ The recirculation flow temperature at \emph{x} = 0 is given by:
 {T_R}(0) = {T_{IN}} + \left( {\frac{1}{{{e^{\frac{{{A_{SL}}{h_{SL}}\,(1 + R)}}{{\rho \,{C_P}F\,R}}}} - 1}} + 1} \right)\frac{{{G_R}(1 + R)}}{{\rho \,{C_P}F\,R}}
 \end{equation}
 
-The temperature in the recirculation is inversely proportional to the recirculation flow ratio (\emph{R}) and the shear layer area (measured by the product: \emph{A\(_{SL}\) h\(_{SL}\)}). As both of these parameters increase this expression becomes similar to . The recirculation flow temperature at \emph{x = L} is given by:
+The temperature in the recirculation is inversely proportional to the recirculation flow ratio (\emph{R}) and the shear layer area (measured by the product: \emph{A\(_{SL}\) h\(_{SL}\)}). As both of these parameters increase this expression becomes similar to Equation~\ref{eq:AlteredInflowTempEquation}. The recirculation flow temperature at \emph{x = L} is given by:
 
 \begin{equation}
 {T_R}(L) = {T_R}(0) + \Delta {T_R}
@@ -1736,7 +1762,7 @@ In this case, the following system of equations must be solved:
 \begin{array}{rl}
     \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} & = -\frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) - \frac{G_R}{L_R} \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
-    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} & = \frac{A_{SL} h_{SL}}{L} \left(T_R\left(x\right) - T_J \left(x\right)\right) 
   \end{array}
 \end{equation}
 
@@ -1793,7 +1819,7 @@ Z & m & Vertical coordinate \tabularnewline
 $\Delta$T\(_{J}\) & °C & Average jet temperature variation \tabularnewline
 $\Delta$T\(_{R}\) & °C & Average recirculation region temperature variation \tabularnewline
 r & kg/m\(^3\) & Density of air \tabularnewline
-$\varphi$ & ° & Wind direction relative to façade normal \tabularnewline
+$\phi$ & ° & Wind direction relative to façade normal \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -1824,9 +1850,9 @@ where:
 
 F\(_{i}\) = Fraction of zone air volume for the ith node, defined in the Fraction of Zone Air Volume field of the RoomAir:Node:Airflownetwork
 
-C\(_{z,i}\) = Volumetric heat capacity for the ith node: ρ\(_{air,i}\)V C\(_{p}\)C\(_{T}\)
+C\(_{z,i}\) = Volumetric heat capacity for the ith node: \(\rho_{air,i}\)V C\(_{p}\)C\(_{T}\)
 
-ρ\(_{air,i}\) = Dry air density at the ith zone node
+\(\rho_{air,i}\) = Dry air density at the ith zone node
 
 C\(_{p}\) = zone dry air specific heat
 
@@ -1846,13 +1872,13 @@ F\(_{gain,j}\) = Fraction of internal gain from jth internal gain object defined
 
 N\(_{i,sur}\) = The number of adjacent surface with convective heat transfer for the ith node, defined in the RoomAir:Node:Airflownetwork:AdjacentSurfaceList object
 
-h\(_{j}\) = Heat transfer coefficient between the jth adjacent surface and ith node
+h\(_{i,j}\) = Heat transfer coefficient between the jth adjacent surface and ith node
 
 A\(_{j}\) = Area of the jth adjacent surface
 
 T\(_{s,j}\) = Inside temperature at the jth adjacent surface
 
-\({\sum\limits_{j = 1}^{N_{i,sur}} h_{j} A_j \left( T_{s,j} - T_{z,i}\right)}\) = The total amount of convective gains from adjacent surfaces attached to the ith node
+\({\sum\limits_{j = 1}^{N_{i,sur}} h_{i,j} A_j \left( T_{s,j} - T_{z,i}\right)}\) = The total amount of convective gains from adjacent surfaces attached to the ith node
 
 N\(_{i,AFN}\) = The number of RoomAir:Node:Airflownetwork objects connected to the ith node. The links are defined in AirflowNetwork:IntraZone:Linkage objects.
 
@@ -1885,9 +1911,9 @@ where:
 
 Fi = Fraction of zone air volume for the ith node, defined in the Fraction of Zone Air Volume of the RoomAir:Node:Airflownetwork
 
-M\(_{z,i}\) = Mass for the ith node: ρ\(_{air,i}\)V\(_{Cp}\)C\(_{T}\)
+M\(_{z,i}\) = Mass for the ith node: \(\rho_{air,i}\)V\(_{Cp}\)C\(_{T}\)
 
-ρ\(_{air,i}\) = Dry air density at the ith zone RoomAir node
+\(\rho_{air,i}\) = Dry air density at the ith zone RoomAir node
 
 V = Zone air volume
 

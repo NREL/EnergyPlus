@@ -199,6 +199,9 @@ namespace FuelCellElectricGenerator {
 
     void InitFuelCellGenerators(int const FCnum); // index to specific fuel cell generator
 
+    void getFuelCellGeneratorHeatRecoveryInfo(std::string const &GeneratorName, // user specified name of Generator
+                                              std::string &heatRecoveryCompName);
+
     // End FuelCell Generator Module Utility Subroutines
     // *****************************************************************************
 

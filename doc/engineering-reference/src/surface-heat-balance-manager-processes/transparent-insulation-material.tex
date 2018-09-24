@@ -129,28 +129,20 @@ $\alpha$\(_{WALL}\) = Absorptance of Wall.
 
 $\rho$\(_{WALL}\) = Reflectance of Wall surface
 
-Following is the old FORTRAN Code (converted to C++ code in the current version of EnergyPlus) used in the HeatBalanceSurfaceManager module, to determine the short wave radiation absorbed on outside of movable insulation and the short wave radiation absorbed on outside of opaque surface of the wall.
+Following is the C++ code in the current version of EnergyPlus used in the HeatBalanceSurfaceManager module, to determine the short wave radiation absorbed on outside of movable insulation and the short wave radiation absorbed on outside of opaque surface of the wall.
 
 \begin{lstlisting}
-IF (Surface(SurfNum)\%MaterialMovInsulExt.GT.0)                                           &
-
-    CALL EvalOutsideMovableInsulation(SurfNum,HMovInsul,RoughIndexMovInsul,AbsExt)
-
-    IF (HMovInsul \textgreater{} 0) THEN    ! Movable outside insulation in place
-
-      QRadSWOutMvIns(SurfNum) = QRadSWOutAbs(SurfNum)*AbsExt                              &
-
-                       /Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar
-
-!   For Transparent Insulation
-
-      QRadSWOutAbs(SurfNum) = Material(Surface(SurfNum)\%MaterialMovInsulExt)\%Trans      &
-
-             *QRadSWOutMvIns(SurfNum)*                                                    &
-
-                 (  (Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar/AbsExt)   &
-
-                        +(1-Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar)~ )
+// Calculate absorbed solar on outside if movable exterior insulation in place
+HMovInsul = 0.0;
+if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+if (HMovInsul > 0) { // Movable outside insulation in place
+    QRadSWOutMvIns(SurfNum) = QRadSWOutAbs(SurfNum) * AbsExt / Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
+    QRadSWOutAbs(SurfNum) = Material(Surface(SurfNum).MaterialMovInsulExt).Trans * QRadSWOutMvIns(SurfNum) *
+                            ((Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar / AbsExt) +
+                            (1 - Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar));
+    SWOutAbsTotalReport(SurfNum) = QRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
+    SWOutAbsEnergyReport(SurfNum) = SWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
+}
 \end{lstlisting}
 
 \subsection{Sample Test Run Cases: -- Comparison}\label{sample-test-run-cases-comparison}

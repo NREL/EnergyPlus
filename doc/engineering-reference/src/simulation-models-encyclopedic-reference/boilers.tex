@@ -18,7 +18,7 @@ TheoreticalFuelUse = \frac{{BoilerLoad}}{{NominalThermalEfficiency}}
 FuelUsed = \frac{{TheoreticalFuelUse}}{{BoilerEfficiencyCurveOuput}}
 \end{equation}
 
--or-
+or
 
 \begin{equation}
 FuelUsed = \frac{{BoilerLoad}}{{\left( {NominalThermalEfficiency} \right)\left( {BoilerEfficiencyCurveOutput} \right)}}
@@ -34,20 +34,20 @@ When a boiler efficiency performance curve is used, any valid curve object with 
 \item
   \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right)\) ~(Linear)
 \item
-  \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2}\) (Quadratic)
+  \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2}\) ~(Quadratic)
 \item
-  \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + C4{(PLR)^3}\) (Cubic)
+  \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + C4{(PLR)^3}\) ~(Cubic)
 \end{itemize}
 
 \subsubsection{Dual independent variables:}\label{dual-independent-variables}
 
 \begin{itemize}
 \item
-  \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + \left( {C4 + C5\left( {PLR} \right) + C6{{\left( {PLR} \right)}^2}} \right)\left( {Twater} \right)\) (QuadraticLinear)
+  \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + \left( {C4 + C5\left( {PLR} \right) + C6{{\left( {PLR} \right)}^2}} \right)\left( {Twater} \right)\) ~(QuadraticLinear)
 \item
   \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + C4\left( {Twater} \right) + C5{(Twater)^2} + C6(PLR)(Twater)\) ~(Biquadratic)
 \item
-  \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + C4\left( {Twater} \right) + C5{(Twater)^2} + C6\left( {PLR} \right)\left( {Twater} \right) + C7{(PLR)^3} + C8{(Twater)^3} + C9{\left( {PLR} \right)^2}\left( {Twater} \right) + C10\left( {PLR} \right){(Twater)^2}\) (Bicubic)
+  \(BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + C4\left( {Twater} \right) + C5{(Twater)^2} + C6\left( {PLR} \right)\left( {Twater} \right) + C7{(PLR)^3} + C8{(Twater)^3} + C9{\left( {PLR} \right)^2}\left( {Twater} \right) + C10\left( {PLR} \right){(Twater)^2}\) ~(Bicubic)
 \end{itemize}
 
 When a boiler efficiency curve is used, a constant efficiency boiler may be specified by setting C1 = 1 and all other coefficients to 0. A boiler with an efficiency proportional to part-load ratio or which has a non-linear relationship of efficiency with part-load ratio will typically set the coefficients of a linear, quadratic, or cubic curve to non-zero values. Using other curve types allows a more accurate simulation when boiler efficiency varies as a function of part-load ratio and as the boiler outlet water temperature changes over time due to loading or as changes occur in the water temperature setpoint.
@@ -60,9 +60,9 @@ The parasitic electric power is calculated based on the user-defined parasitic e
 
 where:
 
-\({P_{parasitic}}\) = parasitic electric power (W), average for the simulation time step
+\({P_{parasitic}}\) is the parasitic electric power (W), average for the simulation time step
 
-\({P_{load}}\) ~~~ = parasitic electric load specified by the user (W)
+\({P_{load}}\) is the parasitic electric load specified by the user (W).
 
 \subsection{Steam Boiler}\label{steam-boiler}
 
@@ -110,7 +110,7 @@ The operation part load ratio is calculated with the following equation.~ This i
 {O_{PLR}} = \frac{{{Q_B}}}{{{Q_{B,N}}}}
 \end{equation}
 
-The actual fuel consumption by the boiler is calculated as using the following equation, where C1, C2, and C3 are the Part Load Ratio coefficients.
+The actual fuel consumption by the boiler is calculated as using the following equation, where C1, C2, and C3 are the Part Load Ratio coefficients:
 
 \begin{equation}
 {F_{}} = \frac{{{F_t}}}{{{C_1}\,\, + \,\,{C_2}\,\, \times \,\,{O_{PLR}}\,\, + \,\,{C_3} \times \,{O_{PLR}}^2\,}}
@@ -124,9 +124,7 @@ The control algorithm for a steam boiler is an important issue.~ The user may wa
 
 At start of simulation an initial value of steam mass flow rate is calculated.~ This is required to start the flow of steam around the loop.
 
-\begin{equation}
-If\,\,\,\,(FirstTimeThrough)\,\,\,THEN
-\end{equation}
+IF (FirstTimeThrough) THEN
 
 Calculate the boiler supply steam mass flow rate at start of simulation.
 
@@ -134,47 +132,39 @@ Calculate the boiler supply steam mass flow rate at start of simulation.
 \,{\dot m_s}\,\, = \,\,\frac{{{Q_B}}}{{{h_{fg\,\,\, + }}\,\,{c_{p,w}}\,\, \times \Delta {T_{loop}}\,\,}}
 \end{equation}
 
-\(ELSE\) ~~ ! Not first time through
+ELSE ~~ ! Not first time through
 
-Steam boiler calculations rely heavily on the variable \(\dot m\) \(_{b}\), boiler mass flow rate.~ This variable \(\dot m\) \(_{b}\) is the assigned equal to mass flow at boiler inlet node for preliminary calculations.
+Steam boiler calculations rely heavily on the variable \(\dot m\)\(_{b}\), boiler mass flow rate.~ This variable \(\dot m_{b}\) is the assigned equal to mass flow at boiler inlet node for preliminary calculations.
 
 \begin{equation}
-\,{\dot m_b}\,\,\, = \,\,\,\mathop {\,{{\dot m}_{Inlet_Node}}}\limits^{}
+\,{\dot m_b}\,\,\, = \,\,\,\mathop {\,{{\dot m}_{InletNode}}}\limits^{}
 \end{equation}
 
 Calculating the boiler delta temperature difference between the inlet and outlet nodes.~ This calculation is used to determine various boiler control situation.
 
 \begin{equation}
-\Delta {T_{in_out}}\,\, = \,\,{T_{SP}}\,\, - \,\,{T_{in}}
+\Delta {T_{inout}}\,\, = \,\,{T_{SP}}\,\, - \,\,{T_{in}}
 \end{equation}
 
 In case the temperature difference calculated with the previous equation equation~ is zero then the boiler just needs to supply latent heat to steam, else the boiler performs its normal load calculations by providing both sensible and latent heat to the inlet stream.
 
-\begin{equation}
-If\,\,(\Delta {T_{in_out}}\,\, < \,\,\,\,0\,\,\,)\,\,\,THEN
-\end{equation}
+~~~~IF (\(\Delta {T_{inout}}\) < 0) THEN
 
 \begin{equation}
 {Q_B}\,\, = \,\,\,{\dot m_b}\,\,\, \times \,\,{h_{fg}}
 \end{equation}
 
-\begin{equation}
-ELSE
-\end{equation}
+~~~~ELSE
 
 \begin{equation}
-{Q_B}\,\, = \,\,\,{\dot m_b}\,\,\, \times \,\,(\,\,\,{h_{fg}} + \,\,{c_{p,w}} \times \Delta {T_{in_out}}\,\,)
+{Q_B}\,\, = \,\,\,{\dot m_b}\,\,\, \times \,\,(\,\,\,{h_{fg}} + \,\,{c_{p,w}} \times \Delta {T_{inout}}\,\,)
 \end{equation}
 
-\begin{equation}
-End\,\,If
-\end{equation}
+~~~~ENDIF
 
 Sometimes the boiler load Q\(_{B}\) is greater than the demand side requested load at the current time step, which may occur because the boiler inlet conditions is from previous time step.~ There is sudden fall in request of steam mass flow from the demand side.~ The boiler now recalculates its new mass flow and adjusts to these new conditions.
 
-\begin{equation}
-If\,\,({Q_B}\,\, > \,\,{Q_{HeatingDemand}}\,\,\,)\,\,\,THEN
-\end{equation}
+~~~~IF (\({Q_B}\) > \({Q_{HeatingDemand}}\)) THEN
 
 Boiler load is set equal to the new boiler heating demand and steam mass flow rate is recalculated.
 
@@ -186,37 +176,29 @@ Boiler load is set equal to the new boiler heating demand and steam mass flow ra
 \,{\dot m_s}\,\,\, = \,\,\frac{{{Q_B}}}{{{h_{fg\,\,\, + }}\,\,{c_{p,w}}\,\, \times \Delta {T_{loop}}\,\,}}
 \end{equation}
 
-\begin{equation}
-End\,\,If
-\end{equation}
+~~~~ENDIF
 
 In case the requested load exceeds the boiler nominal capacity, which is its maximum heating capacity.~ In this case the requested steam mass flow is not met and the zone is not heated adequately.~ This happens if the boiler is undersized.~ The steam mass flow rate is recalculated at nominal capacity.
 
-\begin{equation}
-If\,\,({Q_B}\,\, > \,\,{Q_{No\min al_Capacity}}\,\,\,)\,\,\,THEN
-\end{equation}
+~~~~IF (\({Q_B}\) > \({Q_{NominalCapacity}}\)) THEN
 
 Boiler load is set equal to boiler nominal capacity and steam mass flow rate recalculated.
 
 \begin{equation}
-{Q_B}\,\, = \,\,{Q_{No\min al_Capacity}}
+{Q_B}\,\, = \,\,{Q_{NominalCapacity}}
 \end{equation}
 
 \begin{equation}
 \,{\dot m_s}\,\,\, = \,\,\frac{{{Q_B}}}{{{h_{fg\,\,\, + }}\,\,{c_{p,w}}\,\, \times \Delta {T_{loop}}\,\,}}
 \end{equation}
 
-\begin{equation}
-End\,\,If
-\end{equation}
+~~~~ENDIF
 
-\begin{equation}
-End\,\,If
-\end{equation}
+ENDIF
 
 End If statement for the boiler load control algorithm.~ This algorithm determines all possible control conditions that might while simulating a system in EnergyPlus.
 
-*********************PSEUDO CODE SECTION STARTS***********************
+*********************PSEUDO CODE SECTION ENDS***********************
 
 If the boiler operating pressure exceeds the maximum allowable boiler pressure, the simulation trips and outputs a warning regarding the same.~ This notifies the user about potential system pressure sizing problems.
 
@@ -234,68 +216,64 @@ It is assumed that the steam boiler operates to maintain a desired temperature, 
 \begin{longtable}[c]{p{1.0in}p{4.0in}}
 \caption{Steam Loop Nomenclature \label{table:steam-loop-nomenclature}} \tabularnewline
 \toprule 
-\({Q_{B}}\) & Boiler Heat Transfer. W. \tabularnewline
-\midrule
 \endfirsthead
 
 \caption[]{Steam Loop Nomenclature} \tabularnewline
 \toprule 
-\({Q_{B}}\) & Boiler Heat Transfer. W. \tabularnewline
-\midrule
 \endhead
 
-\({Q_{B,N}}\) & Boiler Nominal Capacity.~ W. \tabularnewline
-\({O_{PLR}}\) & Boiler Operating Part Load Ratio.~ \tabularnewline
-\(\Delta\)T\(_{sc}\) & Degree of subcooling in coil.~ \tabularnewline
-\(\Delta\)T\(_{in_out}\) & Temperature difference across the steam boiler.~ ºC. \tabularnewline
-\(\rho\)\(_{w}\) & Density of condensate entering the pump.~ Kg/m\(^3\).~ \tabularnewline
-\(Q_{Des}\) & Design Load on the steam coil.~ W. \tabularnewline
-\(h_{f,n}\) & Enthalpy of fluid at point n on the Ts diagram.~ J/kg. \tabularnewline
-\(P_{Frac}\) & Fraction of Pump Full Load Power.~ W. \tabularnewline
-\(F_{m,f}\) & Fractional Motor Power Lost to Fluid.~ W. \tabularnewline
-\(Q_{a,l}\) & Heating load on the Air Loop Steam Coil.~ W. \tabularnewline
-\(Q_{z,c}\) & Heating load on the Zone Steam Coil.~ W. \tabularnewline
-\(h_{fg,T_loop}\) & Latent heat of steam at Loop operating Temperature.~ J/kg. \tabularnewline
-\(h_{fg}\) & Latent Heat of Steam.~ J/kg. \tabularnewline
-\(Q_{L,H}\) & Latent Heat Part of the Heating Coil Load.~ W. \tabularnewline
-\(\Delta\)Q\(_{loss}\) & Loop losses in steam coil.~ W. \tabularnewline
-\(\Delta\)T\(_{loop}\) & Loop Temperature Difference. \tabularnewline
-\(\dot m_{a}\) & Mass flow rate for steam coil Kg/s. \tabularnewline
-\(\dot m_{in}\) & Mass flow rate of steam entering the steam coil .Kg/s. \tabularnewline
-\(\dot m_{a,l}\) & Mass flow rate of steam for Air loop steam coil Kg/s \tabularnewline
-\(\dot m_{z,c}\) & Mass flow rate of steam for zone steam coil Kg/s. \tabularnewline
-\(\dot m_{s}\) & Mass flow rate of steam.~ Kg/s. \tabularnewline
-\(\dot m_{loop}\) & Mass flow rate of steam for the steam loop.~ Kg/s. \tabularnewline
-\(\dot m\) & Mass of condensate entering the pump.~ Kg/s. \tabularnewline
-\(\dot m_{a,max}\) & Maximum allowed mass flow rate of air.~ Kg/s \tabularnewline
-\(\dot m_{S,max}\) & Maximum Mass flow rate of steam Kg/s \tabularnewline
-\(\dot m_{B,Supply}\) & Maximum steam mass flow rate supplied by boiler.~ Kg/s. \tabularnewline
-\(\dot V_{w,max}\) & Maximum Volume flow rate of condensate in pump.~ m\(^3\)/s. \tabularnewline
-\(\dot V_{w,loop}\) & Maximum Volume flow rate of condensate in steam loop.~ m\(^3\)/s. \tabularnewline
-\(T_{a,in,min}\) & Minimum inlet air temperature possible.~ ºC. \tabularnewline
-\(P_{n}\) & Nominal Power Capacity for condensate pump.~ W. \tabularnewline
-\(P_{nom}\) & Nominal power of the pump.~ W. \tabularnewline
-\(H_{n}\) & Nominal Pump Head.~ M. \tabularnewline
-\(\dot V_{nom}\) & Nominal volume flow rate through the condensate pump.~ m\(^3\)/s. \tabularnewline
-PLR & Part Load Ratio for condensate pump. \tabularnewline
-\(\eta\)\(_{p}\) & Pump efficiency. \tabularnewline
-\(\eta\)\(_{m}\) & Pump Motor Efficiency. \tabularnewline
-P & Pump Power.~ W. \tabularnewline
-\(Q_{S,H}\) & Sensible Heat Part of the Heating Coil Load.~ W. \tabularnewline
-\(T_{sp}\) & Setpoint Temperature of the zone.~ ºC. \tabularnewline
-\(T_{a,out,SP}\) & Setpoint air outlet temperature for the steam coil.~ ºC. \tabularnewline
-\(P_{S}\) & Shaft power of the pump.~ W. \tabularnewline
-\(c_{p,a}\) & Specific Heat Capacity for Air.~ J/Kg K. \tabularnewline
-\(c_{p,w}\) & Specific Heat Capacity for Water.~ J/Kg K. \tabularnewline
-\(\eta\)\(_{B}\) & Steam Boiler Efficiency. \tabularnewline
-\(T_{a,in}\) & Temperature of air entering the coil.~ ºC. \tabularnewline
-\(T_{a}\) & Temperature of air entering the steam coil.~ ºC. \tabularnewline
-\(T_{a,out}\) & Temperature of air leaving the coil.~ ºC. \tabularnewline
-\(T_{s,in}\) & Temperature of steam entering the coil.~ ºC. \tabularnewline
-\(F_{in}\) & Theoretical Fuel Consumption by the Steam Boiler.~ W. \tabularnewline
-\(\dot m_{coils,R}\) & Total Mass flow rate requested by all the steam coils.~ Kg/s. \tabularnewline
-\(\dot V\) & Volume of condensate entering the pump.~ m\(^3\)/s. \tabularnewline
-\(T_{w,out}\) & Water outlet temperature from pump.~ ºC. \tabularnewline
+\({Q_{B}}\) & Boiler Heat Transfer, W \tabularnewline
+\({Q_{B,N}}\) & Boiler Nominal Capacity, W \tabularnewline
+\({O_{PLR}}\) & Boiler Operating Part Load Ratio \tabularnewline
+\(\Delta\)T\(_{sc}\) & Degree of subcooling in coil \tabularnewline
+\(\Delta\)T\(_{inout}\) & Temperature difference across the steam boiler, \(^{\circ}\)C \tabularnewline
+\(\rho\)\(_{w}\) & Density of condensate entering the pump, kg/m\(^3\) \tabularnewline
+\(Q_{Des}\) & Design Load on the steam coil, W \tabularnewline
+\(h_{f,n}\) & Enthalpy of fluid at point n on the Ts diagram, J/kg \tabularnewline
+\(P_{Frac}\) & Fraction of Pump Full Load Power, W \tabularnewline
+\(F_{m,f}\) & Fractional Motor Power Lost to Fluid, W \tabularnewline
+\(Q_{a,l}\) & Heating load on the Air Loop Steam Coil, W \tabularnewline
+\(Q_{z,c}\) & Heating load on the Zone Steam Coil, W \tabularnewline
+\(h_{fg}\) & Latent Heat of Steam, J/kg \tabularnewline
+\(Q_{L,H}\) & Latent Heat Part of the Heating Coil Load, W \tabularnewline
+\(\Delta\)Q\(_{loss}\) & Loop losses in steam coil, W \tabularnewline
+\(\Delta\)T\(_{loop}\) & Loop Temperature Difference, \(^{\circ}\)C \tabularnewline
+\(\dot m_{a}\) & Mass flow rate for steam coil, kg/s \tabularnewline
+\(\dot m_{in}\) & Mass flow rate of steam entering the steam coil, kg/s \tabularnewline
+\(\dot m_{a,l}\) & Mass flow rate of steam for Air loop steam coil, kg/s \tabularnewline
+\(\dot m_{z,c}\) & Mass flow rate of steam for zone steam coil, kg/s \tabularnewline
+\(\dot m_{s}\) & Mass flow rate of steam, kg/s \tabularnewline
+\(\dot m_{loop}\) & Mass flow rate of steam for the steam loop, kg/s \tabularnewline
+\(\dot m\) & Mass of condensate entering the pump, kg/s \tabularnewline
+\(\dot m_{a,max}\) & Maximum allowed mass flow rate of air, kg/s \tabularnewline
+\(\dot m_{S,max}\) & Maximum Mass flow rate of steam, kg/s \tabularnewline
+\(\dot m_{B,Supply}\) & Maximum steam mass flow rate supplied by boiler, kg/s \tabularnewline
+\(\dot V_{w,max}\) & Maximum Volume flow rate of condensate in pump, m\(^3\)/s \tabularnewline
+\(\dot V_{w,loop}\) & Maximum Volume flow rate of condensate in steam loop, m\(^3\)/s \tabularnewline
+\(T_{a,in,min}\) & Minimum inlet air temperature possible, \(^{\circ}\)C \tabularnewline
+\(P_{n}\) & Nominal Power Capacity for condensate pump, W \tabularnewline
+\(P_{nom}\) & Nominal power of the pump, W \tabularnewline
+\(H_{n}\) & Nominal Pump Head, m \tabularnewline
+\(\dot V_{nom}\) & Nominal volume flow rate through the condensate pump, m\(^3\)/s \tabularnewline
+PLR & Part Load Ratio for condensate pump \tabularnewline
+\(\eta\)\(_{p}\) & Pump efficiency \tabularnewline
+\(\eta\)\(_{m}\) & Pump Motor Efficiency \tabularnewline
+P & Pump Power, W \tabularnewline
+\(Q_{S,H}\) & Sensible Heat Part of the Heating Coil Load, W \tabularnewline
+\(T_{sp}\) & Setpoint Temperature of the zone, \(^{\circ}\)C \tabularnewline
+\(T_{a,out,SP}\) & Setpoint air outlet temperature for the steam coil, \(^{\circ}\)C \tabularnewline
+\(P_{S}\) & Shaft power of the pump, W \tabularnewline
+\(c_{p,a}\) & Specific Heat Capacity for Air, J/kg-K \tabularnewline
+\(c_{p,w}\) & Specific Heat Capacity for Water, J/kg-K. \tabularnewline
+\(\eta\)\(_{B}\) & Steam Boiler Efficiency \tabularnewline
+\(T_{a,in}\) & Temperature of air entering the coil, \(^{\circ}\)C \tabularnewline
+\(T_{a}\) & Temperature of air entering the steam coil, \(^{\circ}\)C \tabularnewline
+\(T_{a,out}\) & Temperature of air leaving the coil, \(^{\circ}\)C \tabularnewline
+\(T_{s,in}\) & Temperature of steam entering the coil, \(^{\circ}\)C \tabularnewline
+\(F_{in}\) & Theoretical Fuel Consumption by the Steam Boiler, W \tabularnewline
+\(\dot m_{coils,R}\) & Total Mass flow rate requested by all the steam coils, kg/s \tabularnewline
+\(\dot V\) & Volume of condensate entering the pump, m\(^3\)/s \tabularnewline
+\(T_{w,out}\) & Water outlet temperature from pump, \(^{\circ}\)C \tabularnewline
 \bottomrule
 \end{longtable}
 

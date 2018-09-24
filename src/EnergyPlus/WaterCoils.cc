@@ -995,7 +995,6 @@ namespace WaterCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataSizing::AutoSize;
         using DataSizing::CurSysNum;
         using General::Iterate;
         using General::RoundSigDigits;

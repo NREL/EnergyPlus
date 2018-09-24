@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -79,7 +80,7 @@ namespace OutdoorAirUnit {
     extern int const HeatXchngr;
     extern int const Desiccant;
     extern int const DXHeatPumpSystem;
-    extern int const UnitarySystem;
+    extern int const UnirarySystemModel;
 
     //  Control Types
     extern int const Neutral;       // Controls system using zone mean air temperature
@@ -124,6 +125,7 @@ namespace OutdoorAirUnit {
         std::string ComponentType;
         int ComponentType_Num; // Parameterized Component Types this module can address
         int ComponentIndex;    // Which one in list -- updated by routines called from here
+        UnitarySystems::UnitarySys *compPointer;
         int CoilAirInletNode;
         int CoilAirOutletNode;
         int CoilWaterInletNode;

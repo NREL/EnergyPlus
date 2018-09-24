@@ -131,8 +131,8 @@ namespace DataZoneEquipment {
     int const BBElectric_Num(27);
     int const RefrigerationAirChillerSet_Num(28);
     int const UserDefinedZoneHVACForcedAir_Num(29);
-    int const ZoneUnitarySystem_Num(30); // AirloopHVAC:UnitarySystem configured as zone equipment
-    int const CoolingPanel_Num(31);
+    int const CoolingPanel_Num(30);
+    int const ZoneUnitarySys_Num(31);
     int const TotalNumZoneEquipType(31);
     // **NOTE**... if you add another zone equipment object, then increment
     // TotalNumZoneEquipType above to match the total number of zone equipment types
@@ -560,6 +560,7 @@ namespace DataZoneEquipment {
                 ZoneEquipList(ControlledZoneNum).NumOfEquipTypes = maxEquipCount;
                 ZoneEquipList(ControlledZoneNum).EquipType.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
                 ZoneEquipList(ControlledZoneNum).EquipType_Num.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
+                ZoneEquipList(ControlledZoneNum).compPointer.resize(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes + 1);
                 ZoneEquipList(ControlledZoneNum).EquipName.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
                 ZoneEquipList(ControlledZoneNum).EquipIndex.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
                 ZoneEquipList(ControlledZoneNum).EquipData.allocate(ZoneEquipList(ControlledZoneNum).NumOfEquipTypes);
@@ -639,7 +640,10 @@ namespace DataZoneEquipment {
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = PkgTermACAirToAir_Num;
 
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") { // Unitary System
-                            ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySystem_Num;
+                            ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
+                            UnitarySystems::UnitarySys thisSys;
+                            ZoneEquipList(ControlledZoneNum).compPointer[ZoneEquipTypeNum] = thisSys.factory(
+                                DataHVACGlobals::UnitarySys_AnyCoilType, ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum), true, 0);
 
                         } else if (SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX") { // Zone dehumidifier
                             ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneDXDehumidifier_Num;
