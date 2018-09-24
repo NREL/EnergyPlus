@@ -89,7 +89,7 @@ The sum of the individual zone total cooling requirements is used to calculate t
 
 \subsubsection{Cooling Capacity Ratio Modifier Function of Low Temperature}\label{cooling-capacity-ratio-modifier-function-of-low-temperature}
 
-The heat pump's cooling capacity correction factor (function of temperature) is determined by averaging the zone cooling coil inlet air wet-bulb temperature for all operating cooling coils. A load-weighted average inlet air wet-bulb temperature is used in the calculations. The weighted average cooling coil inlet air wet-bulb temperature and the outdoor condenser entering air dry-bulb temperature are then used to calculate the temperature correction factor in cooling mode for the heat pump condenser. The actual zone air wet-bulb temperature is used to calculate the operating capacity of the individual zone cooling coils.
+The heat pump's cooling capacity correction factor (function of temperature) is determined by averaging the zone cooling coil inlet air wet-bulb temperature for all operating cooling coils. A load-weighted average inlet air wet-bulb temperature is used in the calculations. The weighted average cooling coil inlet air wet-bulb temperature and the outdoor condenser entering air dry-bulb temperature are then used to calculate the temperature correction factor in cooling mode for the heat pump condenser. If the \textit{Condenser Type} is WaterCooled, then the cooling capacity curve will be function of weighted average cooling coil inlet air wet-bulb temperature and outdoor condenser entering water temperature. The actual zone air wet-bulb temperature is used to calculate the operating capacity of the individual zone cooling coils.
 
 \begin{equation}
 {\mathop Q\limits^ \bullet_{zone,\,total}} = \sum\limits_1^i {{{\mathop Q\limits^ \bullet  }_{zone(i)}}}
@@ -133,11 +133,11 @@ where
 
 \(a - f\) ~ = equation coefficients for Cooling Capacity Ratio Modifier
 
-\({T_c}\) ~~~ = temperature of the air entering an air-cooled or evaporatively-cooled condenser (°C)
+\({T_c}\) ~~~ = temperature of the air entering an air-cooled or evaporatively-cooled condenser (°C) or temperature of the water entering a water-cooled condenser unit (°C)
 
 \subsubsection{Using multiple curves to define Cooling Capacity Ratio Modifier}\label{using-multiple-curves-to-define-cooling-capacity-ratio-modifier}
 
-The cooling capacity ratio modifier determines the change in total (sensible + latent) capacity with respect to the heat pump rated cooling capacity. This modifier corrects for off-design performance and provides the operating total (sensible + latent) cooling capacity for the heat pump condenser. The performance data for VRF AC systems may be specified using a single curve object, however, if the performance data does not reflect a smooth change in performance as outdoor conditions vary, the overall performance of the system may be described using two cooling capacity ratio modifier curves (i.e., a separate curve at low and high outdoor temperatures) and a boundary curve (i.e., the curve defining the separation at specific outdoor temperatures).
+The cooling capacity ratio modifier determines the change in total (sensible + latent) capacity with respect to the heat pump rated cooling capacity. This modifier corrects for off-design performance and provides the operating total (sensible + latent) cooling capacity for the heat pump condenser. The performance data for VRF AC systems may be specified using a single curve object, however, if the performance data does not reflect a smooth change in performance as outdoor conditions vary, the overall performance of the system may be described using two cooling capacity ratio modifier curves (i.e., a separate curve at low and high outdoor temperatures) and a boundary curve (i.e., the curve defining the separation at specific outdoor temperatures). If the \textit{Condenser Type} is WaterCooled, the cooling capacity and EIR modifier curves may be represented using the low temperature curve input field only. 
 
 \subsubsection{Application of Dual Performance Curves}\label{application-of-dual-performance-curves}
 
@@ -412,7 +412,7 @@ The electrical power consumed by the heat pump condenser is then calculated base
 
 \subsubsection{Cooling Energy Input Ratio Modifier Function of Low Temperature}\label{cooling-energy-input-ratio-modifier-function-of-low-temperature}
 
-As described previously (Ref. Application of Dual Performance Curves), the cooling energy input ratio modifier curve can either be applied as a single curve object as shown below, or applied using dual performance curve objects. The equation form used for a single or dual performance curve application is shown here.
+As described previously (Ref. Application of Dual Performance Curves), the cooling energy input ratio modifier curve can either be applied as a single curve object as shown below, or applied using dual performance curve objects. If the \textit{Condenser Type} is WaterCooled, then the cooling energy input ratio modifier curve will be function of weighted average indoor air wet-bulb temperature and outdoor condenser entering water temperature. The equation form used for a single or dual performance curve application is shown here.
 
 \begin{equation}
   EIRFT_{cooling} = a + b \left( T_{wb,avg} \right) + c \left( T_{wb,avg} \right)^2 + d \left( T_c \right) + e \left( T_c \right)^2 + f \left( T_{wb,avg} \right) \left( T_c \right)

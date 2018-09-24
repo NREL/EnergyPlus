@@ -188,6 +188,7 @@ namespace WaterToAirHeatPumpSimple {
     void clear_state()
     {
         MyOneTimeFlag = true;
+        GetCoilsInputFlag = true;
         SimpleWatertoAirHP.deallocate();
     }
 

@@ -22,29 +22,31 @@ The ice storage module is a passive component and will accept any flow rate plac
 
 When charging is requested, the following limits are calculated to determine the actual charging rate:
 
-1)~~~~If the entering water temperature is greater than --1C, the charging rate is zero.
+\begin{enumerate}
+\item If the entering water temperature is greater than -1\(^{\circ}\)C, the charging rate is zero.
+\item If the entering water temperature is greater than or equal to the outlet setpoint temperature, the charging rate is zero.
+\item If the current fraction of ice stored is 1.0, the tank is fully charge, and the charging rate is zero.
+\item If the requested charging rate times the current system timestep is more than the remaining uncharged storage capacity, the charging rate is limited to that required to completely fill the tank.
+\item The maximum charging rate which the chilled water flow can provide is determined by the entering water temperature and flow rate and an outlet temperature which is the minimum of -1\(^{\circ}\)C or the outlet setpoint temperature.
+\item The maximum charging rate which the tank can accept is calculated by the following equations developed in the prior work (Henze and Krarti 2002):
+\end{enumerate}
 
-2)~~~~If the entering water temperature is greater than or equal to the outlet setpoint temperature, the charging rate is zero.
-
-3)~~~~If the current fraction of ice stored is 1.0, the tank is fully charge, and the charging rate is zero.
-
-4)~~~~If the requested charging rate times the current system timestep is more than the remaining uncharged storage capacity, the charging rate is limited to that required to completely fill the tank.
-
-5)~~~~The maximum charging rate which the chilled water flow can provide is determined by the entering water temperature and flow rate and an outlet temperature which is the minimum of --1C or the outlet setpoint temperature.
-
-6)~~~~The maximum charging rate which the tank can accept is calculated by the following equations developed in the prior work (Henze and Krarti 2002):
-
-\emph{UAIceCh} = ( 1.3879 - 7.6333*\emph{y} + 26.3423*\emph{y}\(^{2}\) - 47.6084*\emph{y}\(^{3}\) + 41.8498*\emph{y}\(^{4}\) - 14.2948*\emph{y}\(^{5}\) ) * \emph{ITSNomCap} / \emph{TimeInterval} / 10.0
+\begin{equation}
+\begin{split}
+{UAIceCh} = (& 1.3879 - 7.6333*{y} + 26.3423*{y^2} - 47.6084*{y^3} + 41.8498*{y^4} \\
+&- 14.2948*{y^5} ) * {ITSNomCap} / {TimeInterval} / 10.0
+\end{split}
+\end{equation}
 
 where:
 
-\emph{UAIceCh} ~ = UA rate for charging
+\emph{UAIceCh} is the UA value for charging
 
-\emph{y}~~~~~~~~~~~~~~~ = Current ice fraction stored
+\emph{y} is the current ice fraction stored
 
-\emph{ITSNomCap}~~~~~~~~~ = Nominal storage capacity {[}GJ{]}
+\emph{ITSNomCap} is the nominal storage capacity (GJ)
 
-TimeInterval = 3600 {[}s{]}
+TimeInterval is 3600 (s).
 
 The smallest charging rate determined by the above rules is selected and the corresponding leaving water temperature is calculated.
 
@@ -52,35 +54,42 @@ The smallest charging rate determined by the above rules is selected and the cor
 
 When discharging is requested, the following limits are calculated to determine the actual charging rate:
 
-1)~~~~If the entering water temperature is less than 1C, the discharge rate is zero.
-
-2)~~~~If the entering water temperature is less than or equal to the outlet setpoint temperature, the discharge rate is zero.
-
-3)~~~~If the current fraction of ice stored is 0.0, the tank is fully discharged, and the discharge rate is zero.
-
-4)~~~~If the requested discharge rate times the current system timestep is more than the remaining charged storage capacity, the discharge rate is limited to that required to completely deplete the ice in the tank.
-
-5)~~~~The maximum discharge rate which the chilled water flow can accept is determined by the entering water temperature and flow rate and an outlet temperature which is the maximum of 1C or the outlet setpoint temperature.
-
-6)~~~~The maximum discharge rate which the tank can deliver is calculated by the following equations developed in the prior work (Henze and Krarti 2002):
+\begin{enumerate}
+\item If the entering water temperature is less than 1\(^{\circ}\)C, the discharge rate is zero.
+\item If the entering water temperature is less than or equal to the outlet setpoint temperature, the discharge rate is zero.
+\item If the current fraction of ice stored is 0.0, the tank is fully discharged, and the discharge rate is zero.
+\item If the requested discharge rate times the current system timestep is more than the remaining charged storage capacity, the discharge rate is limited to that required to completely deplete the ice in the tank.
+\item The maximum discharge rate which the chilled water flow can accept is determined by the entering water temperature and flow rate and an outlet temperature which is the maximum of 1\(^{\circ}\)C or the outlet setpoint temperature.
+\item The maximum discharge rate which the tank can deliver is calculated by the following equations developed in the prior work (Henze and Krarti 2002):
+\end{enumerate}
 
 For ice-on-coil internal melt:
 
-\emph{UAIceDisCh} = ( 1.3879 - 7.6333*\emph{y} + 26.3423*\emph{y}\(^{2}\) - 47.6084*\emph{y}\(^{3}\) + 41.8498*\emph{y}\(^{4}\) - 14.2948*\emph{y}\(^{5}\) ) * \emph{ITSNomCap} / \emph{TimeInterval} / 10.0
+\begin{equation}
+\begin{split}
+{UAIceDisCh} = (& 1.3879 - 7.6333*{y} + 26.3423*{y^2} - 47.6084*{y^3} + 41.8498*{y^4} \\
+&- 14.2948*{y^5} ) * {ITSNomCap} / {TimeInterval} / 10.0
+\end{split}
+\end{equation}
 
 For ice-on-coil external melt:
 
-\emph{UAIceDisCh} = ( 1.1756 - 5.3689*\emph{y} + 17.3602*\emph{y}\(^{2}\) - 30.1077*\emph{y}\(^{3}\) + 25.6387*\emph{y}\(^{4}\) - 8.5102*\emph{y}\(^{5}\) ) * \emph{ITSNomCap} / \emph{TimeInterval} / 10.0
+\begin{equation}
+\begin{split}
+{UAIceDisCh} = (& 1.1756 - 5.3689*{y} + 17.3602*{y^2} - 30.1077*{y^3} + 25.6387*{y^4} \\
+&- 8.5102*{y^5} ) * {ITSNomCap} / {TimeInterval} / 10.0
+\end{split}
+\end{equation}
 
 where:
 
-UAIceDisCh~~~~~~~~~~~ = UA rate for discharging
+UAIceDisCh is the UA value for discharging
 
-\emph{y}~~~~~~~~~~~~~~~ = 1 - Current ice fraction stored
+\emph{y} = 1 - current ice fraction stored
 
-\emph{ITSNomCap}~~~~~~~~~ = Nominal storage capacity {[}GJ{]}
+\emph{ITSNomCap} is the nominal storage capacity (GJ)
 
-TimeInterval = 3600 {[}s{]}
+TimeInterval is 3600 (s).
 
 The smallest discharge rate determined by the above rules is selected and the corresponding leaving water temperature is calculated.
 
@@ -120,21 +129,21 @@ where:
 \Delta {T_{lm}} \equiv \frac{{{T_{brine,in}} - {T_{brine,out}}}}{{\ln \left( {\frac{{{T_{brine,in}} - {T_{brine,freeze}}}}{{{T_{brine,out}} - {T_{brine,freeze}}}}} \right)}}
 \end{equation}
 
-q is the instantaneous heat transfer rate,
+q is the instantaneous heat transfer rate
 
-Qstor is the total latent storage capacity,
+Q\(_{stor}\) is the total latent storage capacity
 
-Dt is a time step used in the curve fit (usually one hour),
+Dt is a time step used in the curve fit (usually one hour)
 
-DT\(_{nominal}\) is a nominal temperature difference (18°F = 10°C),
+DT\(_{nominal}\) is a nominal temperature difference (18\(^{\circ}\)F = 10\(^{\circ}\)C)
 
-T\(_{brine,in}\) is the tank brine inlet temperature,
+T\(_{brine,in}\) is the tank brine inlet temperature
 
-T\(_{brine,out}\) is the tank brine outlet temperature,
+T\(_{brine,out}\) is the tank brine outlet temperature
 
-T\(_{freeze}\) is the freezing temperature of water or the latent energy storage material,
+T\(_{freeze}\) is the freezing temperature of water or the latent energy storage material
 
-P\(_{c}\) is the fraction charged, and
+P\(_{c}\) is the fraction charged
 
 P\(_{d}\) is the fraction discharged.
 

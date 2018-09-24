@@ -16,7 +16,7 @@ The need for iteration can be reintroduced by the need for system control. If sy
 
 \subsection{Component Models}\label{component-models}
 
-EnergyPlus component models are algorithmic with fixed inputs and outputs. They are embodied as Fortran90 subroutines within software modules. For each component several choices of inputs and outputs are possible. There is no one choice that will be most usable and efficient for all system configurations and control schemes. For reasons of consistency and comprehensibility the requirement was imposed that all EnergyPlus models be forward models. That is, the component inputs correspond to the inlet conditions and the outputs to the outlet conditions.~ If another choice of inputs and outputs is needed it is obtained by numerical inversion of the forward model.
+EnergyPlus component models are algorithmic with fixed inputs and outputs. They are embodied as C++ functions within software modules. For each component several choices of inputs and outputs are possible. There is no one choice that will be most usable and efficient for all system configurations and control schemes. For reasons of consistency and comprehensibility the requirement was imposed that all EnergyPlus models be forward models. That is, the component inputs correspond to the inlet conditions and the outputs to the outlet conditions.~ If another choice of inputs and outputs is needed it is obtained by numerical inversion of the forward model.
 
 \subsection{Iteration Scheme}\label{iteration-scheme}
 

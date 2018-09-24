@@ -137,7 +137,7 @@
     12,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
@@ -150,7 +150,7 @@
 !    1,                       !- Begin Day of Month
 !   7,                      !- End Month
 !   15,                      !- End Day of Month
-!     UseWeatherFile,          !- Day of Week for Start Day
+!     ,                        !- Day of Week for Start Day
 !     Yes,                     !- Use Weather File Holidays and Special Days
 !     Yes,                     !- Use Weather File Daylight Saving Period
 !     No,                      !- Apply Weekend Holiday Rule

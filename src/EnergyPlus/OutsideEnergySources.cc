@@ -608,7 +608,6 @@ namespace OutsideEnergySources {
         using DataPlant::PlantFinalSizesOkayToReport;
         using DataPlant::PlantFirstSizesOkayToFinalize;
         using DataPlant::PlantFirstSizesOkayToReport;
-        using DataSizing::AutoSize;
         using DataSizing::AutoVsHardSizingThreshold;
         using DataSizing::PlantSizData;
         using FluidProperties::GetDensityGlycol;
