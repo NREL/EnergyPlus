@@ -227,7 +227,8 @@ DryRespHeatLoss = 0.0014*ActLevel*(34.- AirTemp)
 \end{equation}
 
 \begin{equation}
-Q_{r}=3.96*f\left(l\right)*{[}(0.01*T_{a}))^{4}-(0.01*T_{a})^{4}{]}
+{Q_{r}}=3.96*f\left(_{l}\right)*{[}(0.01*T\left(_{a}\right))\left(^{4}\right)-(0.01*T\left(_{a}\right))\left(^{4}\right){]}
+\label{eq:FangerQr}
 \end{equation}
 
 In the EnergyPlus source code, Q\(_{dry}\), Q\(_{c}\) and Q\(_{r}\) are calculated using the following equations, respectively:
@@ -429,7 +430,7 @@ ShivResponse = 19.4*SkinThermSigCold*CoreThermSigCold
 
 The latest version of the Pierce model (Fountain and Huizenga 1997) discusses the concepts of SET* and ET*. The Pierce model converts the actual environment into a ``standard environment'' at a Standard Effective Temperature, SET*. SET* is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity for subjects wearing clothing that would be standard for the given activity in the real environment. Furthermore, in this standard environment, the same physiological strain, i.e.~the same skin temperature, skin wettedness and heat loss to the environment, would exist as in the real environment. The Pierce model also converts the actual environment into a environment at an Effective Temperature, ET*, that is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity and uniform temperature (T\(_a\) = MRT) where the subjects would experience the same physiological strain as in the real environment.
 
-In the latest version of the model, it is suggested that the classical Fanged PMV be modified by using ET* or SET* instead of the operative temperature. This gives a new index PMV* which is proposed for dry or humid environments. It is also suggested that PMV* is very responsive to the changes in vapor permeation efficiency of the occupants clothing.
+In the latest version of the model, it is suggested that the classical Fanger PMV be modified by using ET* or SET* instead of the operative temperature. This gives a new index PMV* which is proposed for dry or humid environments. It is also suggested that PMV* is very responsive to the changes in vapor permeation efficiency of the occupants clothing.
 
 \begin{equation}
 M = {M_{act}} + {M_{shiv}}
@@ -463,6 +464,7 @@ DryRespHeatLoss = 0.0014*ActLevel*(34.- AirTemp)
 
 \begin{equation}
 {Q_r} = {h_r} \times {f_{cl}}({T_{cl}} - {T_r})
+\label{eq:PierceQr}
 \end{equation}
 
 Q\(_{dry}\) or DryHeatLoss is calculated in the EnergyPlus code using the following equation:
@@ -731,6 +733,7 @@ where Q\(_{res}\) and Q\(_{dry}\) are calculated using:
 
 \begin{equation}
 {Q_{dry}} = {Q_c} + {Q_r} = {h_{}}{f_{cl}}{F_{cl}}({T_{sk}} - {T_o})
+\label{eq:KSU2NodeQdry}
 \end{equation}
 
 The calculation of Q\(_{res}\) (RespHeatLoss) and Q\(_{dry}\) (DryHeatLoss) in the source code are accomplished through the following equations:

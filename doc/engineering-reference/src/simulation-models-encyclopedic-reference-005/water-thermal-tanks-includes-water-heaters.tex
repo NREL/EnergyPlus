@@ -633,7 +633,7 @@ where:
 
 \({\dot m_{source}}\) is the mass flow rate for the source side plant connections
 
-\(T_{source}\)} is the inlet fluid temperature of the source side plant connections.
+\(T_{source}\) is the inlet fluid temperature of the source side plant connections.
 
 \(q_{flow,n}\) is defined as:
 
@@ -832,7 +832,7 @@ H = {\left( {\frac{{4~V~A{R^2}}}{\pi }} \right)^{1/3}}
 When the water thermal tank is connected to a plant loop, it is convient to autosize the design volume flow rates through the plant connections.~ When the water thermal tank is connected to the supply side of plant loop and flow rates are autosized, the flow rate is the sum of the flow requests of all the various components on the demand side of that plant loop.~ When the water thermal tank is connected on the demand side of a plant loop (e.g.~as for indirect water heating with a boiler) and flow rates are autosized, the design flow rates are calculated with the following equation:
 
 \begin{equation}
-\dot V =  - \left( {\frac{V}{{{t_{Recover}} * 3600 * \varepsilon }}} \right) * Ln\left[ {\frac{{\left( {{T_{PlantDesign}} - {T_{Setpoint}}}}} \right)}}{{\left( {{T_{PlantDesign}} - {T_{start}}} \right)}}} \right]
+\dot V =  - \left( \frac{V}{t_{Recover} * 3600 * \varepsilon } \right) * Ln\left( \frac{T_{PlantDesign} - T_{Setpoint}}{T_{PlantDesign} - T_{start}}  \right)
 \end{equation}
 
 where:
