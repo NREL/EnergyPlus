@@ -102,16 +102,16 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     AirflowNetworkLinkageData(i).NodeHeights[1] = 2.0;
 
     NF = AFEHOP(1, 1, 0.05, 1, 1, 2, F, DF);
-    EXPECT_NEAR(3.47863, F(1), 0.00001);
-    EXPECT_NEAR(34.7863, DF(1), 0.0001);
-    EXPECT_NEAR(2.96657, F(2), 0.00001);
-    EXPECT_EQ(0.0, DF(2));
+    EXPECT_NEAR(3.47863, F[0], 0.00001);
+    EXPECT_NEAR(34.7863, DF[0], 0.0001);
+    EXPECT_NEAR(2.96657, F[1], 0.00001);
+    EXPECT_EQ(0.0, DF[1]);
 
     NF = AFEHOP(1, 1, -0.05, 1, 1, 2, F, DF);
-    EXPECT_NEAR(-3.42065, F(1), 0.00001);
-    EXPECT_NEAR(34.20649, DF(1), 0.0001);
-    EXPECT_NEAR(2.96657, F(2), 0.00001);
-    EXPECT_EQ(0.0, DF(2));
+    EXPECT_NEAR(-3.42065, F[0], 0.00001);
+    EXPECT_NEAR(34.20649, DF[0], 0.0001);
+    EXPECT_NEAR(2.96657, F[1], 0.00001);
+    EXPECT_EQ(0.0, DF[1]);
 
     AirflowNetworkLinkageData.deallocate();
     DF.deallocate();
