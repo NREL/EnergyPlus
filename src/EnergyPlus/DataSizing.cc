@@ -712,6 +712,7 @@ namespace DataSizing {
             ZoneEqSizing(curZoneEqNum).CoolingAirVolFlow = 0.0;
             ZoneEqSizing(curZoneEqNum).HeatingAirVolFlow = 0.0;
             ZoneEqSizing(curZoneEqNum).SystemAirVolFlow = 0.0;
+            ZoneEqSizing(curZoneEqNum).DesignSizeFromParent = false;
         }
 
         if (curSysNum > 0) {
