@@ -421,9 +421,9 @@ namespace ReportSizingManager {
         Real64 const RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
         std::string DDNameFanPeak;
-        DDNameFanPeak = " test my Design Day";
+        DDNameFanPeak = "";  // " test my Design Day";
         std::string dateTimeFanPeak;
-        dateTimeFanPeak = " test 1/2 00:00:00 ";
+        dateTimeFanPeak = "";  // " test 1/2 00:00:00 ";
         Real64 DXFlowPerCapMinRatio(1.0);
         Real64 DXFlowPerCapMaxRatio(1.0);
 
