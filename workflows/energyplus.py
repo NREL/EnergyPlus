@@ -196,11 +196,11 @@ class EPlusRunManager(object):
 
                     # run the ConvertESOMTR program to create IP versions of the timestep based output files
                     if platform.system() == 'Windows':
-                        convertESOMTR_binary = os.path.join(energyplus_root_folder, 'PostProcess\\convertESOMTRpgm\\convertESOMTR.exe')
+                        convertESOMTR_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'convertESOMTRpgm', 'convertESOMTR.exe')
                     else:
-                        convertESOMTR_binary = os.path.join(energyplus_root_folder, 'PostProcess\\convertESOMTRpgm\\convertESOMTR')
+                        convertESOMTR_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'convertESOMTRpgm', 'convertESOMTR')
                     if os.path.exists(convertESOMTR_binary):
-                        converttxt_orig_path = os.path.join(energyplus_root_folder, 'PostProcess\\convertESOMTRpgm\\convert.txt')
+                        converttxt_orig_path = os.path.join(energyplus_root_folder, 'PostProcess', 'convertESOMTRpgm', 'convert.txt')
                         converttxt_run_path = os.path.join(run_directory, 'convert.txt')
                         shutil.copy(converttxt_orig_path, converttxt_run_path)
 
@@ -229,9 +229,9 @@ class EPlusRunManager(object):
 
                     # run ReadVarsESO to convert the timestep based output files to CSV files
                     if platform.system() == 'Windows':
-                        readvarseso_binary = os.path.join(energyplus_root_folder, 'PostProcess\\ReadVarsESO.exe')
+                        readvarseso_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'ReadVarsESO.exe')
                     else:
-                        readvarseso_binary = os.path.join(energyplus_root_folder, 'PostProcess\\ReadVarsESO')
+                        readvarseso_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'ReadVarsESO')
                     if os.path.exists(readvarseso_binary):
 
                         command_line_args = [readvarseso_binary]
@@ -316,9 +316,9 @@ class EPlusRunManager(object):
 
                 # run HVAC-Diagram
                 if platform.system() == 'Windows':
-                    hvac_diagram_binary = os.path.join(energyplus_root_folder, 'PostProcess\\HVAC-Diagram.exe')
+                    hvac_diagram_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'HVAC-Diagram.exe')
                 else:
-                    hvac_diagram_binary = os.path.join(energyplus_root_folder, 'PostProcess\\HVAC-Diagram')
+                    hvac_diagram_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'HVAC-Diagram')
                 if os.path.exists(hvac_diagram_binary):
                     bnd_path = os.path.join(run_directory, file_name_no_ext + '.bnd')
                     eplusout_bnd_path = os.path.join(run_directory, 'eplusout.bnd')
