@@ -1417,7 +1417,6 @@ namespace HVACStandAloneERV {
         int PeopleSchPtr;                  // Pointer to people schedule
         Real64 MaxPeopleSch;               // maximum people schedule value
         Real64 FloorArea;                  // Floor area of zone (m2)
-        bool ErrorsFound;                  // Used for warning messages
         bool IsAutoSize;                   // Indicator to autosize
         Real64 SupplyAirVolFlowDes;        // Autosized supply air flow for reporting
         Real64 SupplyAirVolFlowUser;       // Hardsized supply air flow for reporting
