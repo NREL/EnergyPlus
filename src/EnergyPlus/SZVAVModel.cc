@@ -85,18 +85,6 @@ namespace SZVAVModel {
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
 
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE General
-    // PUBLIC  SaveCompDesWaterFlow
-    // PUBLIC  ErfFunction
-
     // Functions
 
     void calcSZVAVModel(PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
@@ -287,7 +275,7 @@ namespace SZVAVModel {
                     maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilLoopNum, coilLoopSide, coilBranchNum, coilCompNum);
             Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
-            if (HeatingLoad) { // Function HVACUnitarySystem::CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
+            if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                 // set the water flow ratio so water coil gets proper flow
                 SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
             }
@@ -414,7 +402,7 @@ namespace SZVAVModel {
                         maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilLoopNum, coilLoopSide, coilBranchNum, coilCompNum);
                 Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
-                if (HeatingLoad) { // Function HVACUnitarySystem::CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
+                if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                     // set the water flow ratio so water coil gets proper flow
                     SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                 }
@@ -705,7 +693,7 @@ namespace SZVAVModel {
                     maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilLoopNum, coilLoopSide, coilBranchNum, coilCompNum);
             Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
-            if (HeatingLoad) { // Function HVACUnitarySystem::CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
+            if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                 // set the water flow ratio so water coil gets proper flow
                 SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
             }
@@ -825,7 +813,7 @@ namespace SZVAVModel {
                         maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilLoopNum, coilLoopSide, coilBranchNum, coilCompNum);
                 Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
-                if (HeatingLoad) { // Function HVACUnitarySystem::CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
+                if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                     // set the water flow ratio so water coil gets proper flow
                     SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                 }
@@ -937,11 +925,6 @@ namespace SZVAVModel {
                         int const &CompressorONFlag)
     {
 
-        // Using/Aliasing
-        // using HVACUnitarySystem::CalcUnitarySystemToLoad;
-        // using HVACUnitarySystem::CalcUnitarySystemWaterFlowResidual;
-        // using PlantUtilities::SetComponentFlowRate;
-        // using Psychrometrics::PsyHFnTdbW;
         UnitarySystems::UnitarySys &thisSys = UnitarySystems::unitarySys[SysIndex];
 
         int const MaxIter(100);    // maximum number of iterations
