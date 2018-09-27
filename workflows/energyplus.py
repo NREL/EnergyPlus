@@ -400,6 +400,9 @@ class EnergyPlusWorkflowSI(BaseEPLaunchWorkflow1):
     def description(self):
         return "Run EnergyPlus with SI unit system"
 
+    def uses_weather(self):
+        return True
+
     def get_file_types(self):
         return ["*.idf", "*.imf", "*.epJSON"]
 
@@ -433,6 +436,9 @@ class EnergyPlusWorkflowIP(BaseEPLaunchWorkflow1):
 
     def description(self):
         return "Run EnergyPlus with IP unit system"
+
+    def uses_weather(self):
+        return True
 
     def get_file_types(self):
         return ["*.idf", "*.imf", "*.epJSON"]
