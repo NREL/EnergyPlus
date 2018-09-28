@@ -351,12 +351,12 @@ namespace AirflowNetworkSolver {
                 int const NSYM            // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void FILSKY(Array1A<Real64> const X, // element array (row-wise sequence)
-                Array1A_int const LM,    // location matrix
-                Array1A_int const IK,    // pointer to the top of column/row "K"
-                Array1A<Real64> AU,      // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,      // the main diagonal of [A] before and after factoring
-                int const FLAG           // mode of operation
+    void FILSKY(Array1A<Real64> const X,     // element array (row-wise sequence)
+                std::array<int, 2> const LM, // location matrix
+                Array1A_int const IK,        // pointer to the top of column/row "K"
+                Array1A<Real64> AU,          // the upper triangle of [A] before and after factoring
+                Array1A<Real64> AD,          // the main diagonal of [A] before and after factoring
+                int const FLAG               // mode of operation
     );
 
     void DUMPVD(std::string const &S,    // Description

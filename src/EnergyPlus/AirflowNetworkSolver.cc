@@ -4055,12 +4055,12 @@ namespace AirflowNetworkSolver {
         }
     }
 
-    void FILSKY(Array1A<Real64> const X, // element array (row-wise sequence)
-                Array1A_int const LM,    // location matrix
-                Array1A_int const IK,    // pointer to the top of column/row "K"
-                Array1A<Real64> AU,      // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,      // the main diagonal of [A] before and after factoring
-                int const FLAG           // mode of operation
+    void FILSKY(Array1A<Real64> const X,     // element array (row-wise sequence)
+                std::array<int, 2> const LM, // location matrix
+                Array1A_int const IK,        // pointer to the top of column/row "K"
+                Array1A<Real64> AU,          // the upper triangle of [A] before and after factoring
+                Array1A<Real64> AD,          // the main diagonal of [A] before and after factoring
+                int const FLAG               // mode of operation
     )
     {
 
@@ -4086,7 +4086,6 @@ namespace AirflowNetworkSolver {
 
         // Argument array dimensioning
         X.dim(4);
-        LM.dim(2);
         IK.dim(NetworkNumOfNodes + 1);
         AU.dim(IK(NetworkNumOfNodes + 1));
         AD.dim(NetworkNumOfNodes);
@@ -4113,8 +4112,8 @@ namespace AirflowNetworkSolver {
         // FLOW:
         // K = row number, L = column number.
         if (FLAG > 1) {
-            k = LM(1);
-            L = LM(2);
+            k = LM[0];
+            L = LM[1];
             if (FLAG == 4) {
                 AD(k) += X(1);
                 if (k < L) {

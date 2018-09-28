@@ -597,14 +597,14 @@ namespace RoomAirModelAirflowNetwork {
         if (NodeNum > 0) {
             for (linkNum = 1; linkNum <= ThisRAFNNode.NumOfAirflowLinks; ++linkNum) {
                 Link = ThisRAFNNode.Link(linkNum).AirflowNetworkLinkSimuID;
-                if (AirflowNetworkLinkageData(Link).NodeNums(1) == NodeNum) { // incoming flow
-                    NodeIn = AirflowNetworkLinkageData(Link).NodeNums(2);
+                if (AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
+                    NodeIn = AirflowNetworkLinkageData(Link).NodeNums[1];
                     ThisRAFNNode.Link(linkNum).TempIn = AirflowNetworkNodeSimu(NodeIn).TZ;
                     ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetworkNodeSimu(NodeIn).WZ;
                     ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetworkLinkSimu(Link).FLOW2;
                 }
-                if (AirflowNetworkLinkageData(Link).NodeNums(2) == NodeNum) { // outgoing flow
-                    NodeIn = AirflowNetworkLinkageData(Link).NodeNums(1);
+                if (AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
+                    NodeIn = AirflowNetworkLinkageData(Link).NodeNums[0];
                     ThisRAFNNode.Link(linkNum).TempIn = AirflowNetworkNodeSimu(NodeIn).TZ;
                     ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetworkNodeSimu(NodeIn).WZ;
                     ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetworkLinkSimu(Link).FLOW;

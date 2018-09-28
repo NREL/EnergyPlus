@@ -302,8 +302,7 @@ namespace DataAirflowNetwork {
         std::string ExternalNodeName; // Name of external node, but not used at WPC="INPUT"
         Real64 Factor;                // Crack Actual Value or Window Open Factor for Ventilation
         int SurfNum;                  // Surface number
-        Array1D_int NodeNums;         // Positive: Zone numbers; 0: External
-        //std::array<int, 2> NodeNums;  // Positive: Zone numbers; 0: External
+        std::array<int, 2> NodeNums;  // Positive: Zone numbers; 0: External
         Real64 OpenFactor;            // Surface factor
         Real64 OpenFactorLast;        // Surface factor at previous time step
         bool EMSOpenFactorActuated;   // True if EMS actuation is on
@@ -352,7 +351,7 @@ namespace DataAirflowNetwork {
 
         // Default Constructor
         MultizoneSurfaceProp()
-            : Factor(0.0), SurfNum(0), NodeNums(2, 0), OpenFactor(0.0), OpenFactorLast(0.0), EMSOpenFactorActuated(false), EMSOpenFactor(0.0),
+            : Factor(0.0), SurfNum(0), NodeNums({0, 0}), OpenFactor(0.0), OpenFactorLast(0.0), EMSOpenFactorActuated(false), EMSOpenFactor(0.0),
               Height(0.0), Width(0.0), CHeight(0.0), VentControl("ZONELEVEL"), ModulateFactor(0.0), LowValueTemp(0.0), UpValueTemp(100.0),
               LowValueEnth(0.0), UpValueEnth(300000.0), VentSchNum(0), VentSurfCtrNum(0), VentingSchNum(0), ZonePtr(0), IndVentControl(false),
               ExtLargeOpeningErrCount(0), ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0), Multiplier(1.0),
@@ -563,19 +562,16 @@ namespace DataAirflowNetwork {
     struct AirflowNetworkLinkage // AirflowNetwork linkage data base class
     {
         // Members
-        std::string Name;            // Provide a unique linkage name
-        Array1D_string NodeNames;    // Names of nodes (limited to 2)
-        //std::array<std::string, 2> NodeNames;    // Names of nodes (limited to 2)
-        Array1D<Real64> NodeHeights; // Node heights
-        //std::array<Real64, 2> NodeHeights; // Node heights
-        std::string CompName;        // Name of element
-        int CompNum;                 // Element Number
-        Array1D_int NodeNums;        // Node numbers
-        //std::array<int, 2> NodeNums; // Node numbers
-        int LinkNum;                 // Linkage number
+        std::string Name;                     // Provide a unique linkage name
+        std::array<std::string, 2> NodeNames; // Names of nodes (limited to 2)
+        std::array<Real64, 2> NodeHeights;    // Node heights
+        std::string CompName;                 // Name of element
+        int CompNum;                          // Element Number
+        std::array<int, 2> NodeNums;          // Node numbers
+        int LinkNum;                          // Linkage number
 
         // Default Constructor
-        AirflowNetworkLinkage() : NodeNames(2), NodeHeights(2, 0.0), CompNum(0), NodeNums(2, 0), LinkNum(0)
+        AirflowNetworkLinkage() : NodeHeights({0.0, 0.0}), CompNum(0), NodeNums({0, 0}), LinkNum(0)
         {
         }
     };

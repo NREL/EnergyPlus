@@ -794,8 +794,8 @@ namespace CrossVentMgr {
         } else {
             // adiabatic surface
             if (MultizoneSurfaceData(MaxSurf).SurfNum == Surface(MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond) {
-                NodeNum1 = AirflowNetworkLinkageData(MaxSurf).NodeNums(1);
-                NodeNum2 = AirflowNetworkLinkageData(MaxSurf).NodeNums(2);
+                NodeNum1 = AirflowNetworkLinkageData(MaxSurf).NodeNums[0];
+                NodeNum2 = AirflowNetworkLinkageData(MaxSurf).NodeNums[1];
                 if (Surface(MultizoneSurfaceData(MaxSurf).SurfNum).Zone == ZoneNum) {
                     if (AirflowNetworkNodeData(NodeNum1).EPlusZoneNum <= 0) {
                         Tin(ZoneNum) = Surface(MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
