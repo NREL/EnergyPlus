@@ -894,8 +894,8 @@ namespace AirflowNetworkSolver {
 #endif
         Array1D<Real64> X(4);
         Real64 DP;
-        Array1D<Real64> F(2);
-        Array1D<Real64> DF(2);
+        std::array<Real64, 2> F{{0.0, 0.0}};
+        std::array<Real64, 2> DF{{0.0, 0.0}};
 
         // Formats
         static gio::Fmt Format_901("(A5,3I3,4E16.7)");
@@ -1090,8 +1090,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -1113,10 +1113,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1211,8 +1207,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -1234,10 +1230,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1350,8 +1342,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -1375,10 +1367,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1529,8 +1517,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -1554,10 +1542,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1703,8 +1687,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -1732,10 +1716,6 @@ namespace AirflowNetworkSolver {
         using DataHVACGlobals::FanType_SimpleVAV;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataLoopNode::Node;
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1825,8 +1805,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -1849,10 +1829,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1990,8 +1966,8 @@ namespace AirflowNetworkSolver {
                 int const i,            // Linkage number
                 int const EP_UNUSED(n), // Node 1 number
                 int const EP_UNUSED(m), // Node 2 number
-                Array1A<Real64> F,      // Airflow through the component [kg/s]
-                Array1A<Real64> DF,     // Partial derivative:  DF/DP
+                std::array<Real64, 2> &F,      // Airflow through the component [kg/s]
+                std::array<Real64, 2> &DF,     // Partial derivative:  DF/DP
                 int &NF                 // Number of flows, either 1 or 2
     )
     {
@@ -2015,10 +1991,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2054,8 +2026,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2078,10 +2050,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2140,8 +2108,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2164,10 +2132,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2251,8 +2215,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2275,10 +2239,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2360,8 +2320,8 @@ namespace AirflowNetworkSolver {
                int const EP_UNUSED(i),      // Linkage number
                int const n,                 // Node 1 number
                int const m,                 // Node 2 number
-               Array1A<Real64> F,           // Airflow through the component [kg/s]
-               Array1A<Real64> DF           // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -2384,10 +2344,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2436,8 +2392,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2460,10 +2416,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2612,8 +2564,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -2636,10 +2588,6 @@ namespace AirflowNetworkSolver {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2796,8 +2744,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -2819,10 +2767,6 @@ namespace AirflowNetworkSolver {
         // Using/Aliasing
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2946,8 +2890,8 @@ namespace AirflowNetworkSolver {
                int const EP_UNUSED(i), // Linkage number
                int const n,            // Node 1 number
                int const m,            // Node 2 number
-               Array1A<Real64> F,      // Airflow through the component [kg/s]
-               Array1A<Real64> DF      // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,      // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF      // Partial derivative:  DF/DP
     )
     {
 
@@ -2970,10 +2914,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3112,8 +3052,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -3136,10 +3076,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         using DataGlobals::Pi;
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3262,8 +3198,8 @@ namespace AirflowNetworkSolver {
                int const i,        // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -3275,10 +3211,6 @@ namespace AirflowNetworkSolver {
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3400,8 +3332,8 @@ namespace AirflowNetworkSolver {
                                    //		int const EP_UNUSED( i ), // Linkage number
                int const n,        // Node 1 number
                int const m,        // Node 2 number
-               Array1A<Real64> F,  // Airflow through the component [kg/s]
-               Array1A<Real64> DF  // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -3412,10 +3344,6 @@ namespace AirflowNetworkSolver {
         using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3539,8 +3467,8 @@ namespace AirflowNetworkSolver {
                      Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
                      int const n,        // Node 1 number
                      int const m,        // Node 2 number
-                     Array1A<Real64> F,  // Airflow through the component [kg/s]
-                     Array1A<Real64> DF  // Partial derivative:  DF/DP
+                     std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
+                     std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
     )
     {
 
@@ -3563,10 +3491,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         // na
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3666,16 +3590,12 @@ namespace AirflowNetworkSolver {
                     Real64 const PDROP,    // Total pressure drop across a component (P1 - P2) [Pa]
                     int const n,           // Node 1 number
                     int const m,           // Node 2 number
-                    Array1A<Real64> F,     // Airflow through the component [kg/s]
-                    Array1A<Real64> DF     // Partial derivative:  DF/DP
+                    std::array<Real64, 2> &F,     // Airflow through the component [kg/s]
+                    std::array<Real64, 2> &DF     // Partial derivative:  DF/DP
     )
     {
 
         // This subroutine solve air flow as a duct if fan has zero flow rate
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4253,8 +4173,8 @@ namespace AirflowNetworkSolver {
                int const IL,                // Linkage number
                int const EP_UNUSED(n),      // Node 1 number
                int const EP_UNUSED(m),      // Node 2 number
-               Array1A<Real64> F,           // Airflow through the component [kg/s]
-               Array1A<Real64> DF           // Partial derivative:  DF/DP
+               std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -4302,10 +4222,6 @@ namespace AirflowNetworkSolver {
 
         // USE STATEMENTS:
         using DataGlobals::PiOvr2;
-
-        // Argument array dimensioning
-        F.dim(2);
-        DF.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

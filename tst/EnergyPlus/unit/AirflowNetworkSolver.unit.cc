@@ -71,8 +71,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     int n;
     int m;
     int NF;
-    Array1D<Real64> F;
-    Array1D<Real64> DF;
+    std::array<Real64, 2> F{{0.0, 0.0}};
+    std::array<Real64, 2> DF{{0.0, 0.0}};
 
     n = 1;
     m = 2;
@@ -94,9 +94,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     MultizoneCompHorOpeningData(1).Slope = 90.0;
     MultizoneCompHorOpeningData(1).DischCoeff = 0.2;
 
-    F.allocate(2);
-    DF.allocate(2);
-
     AirflowNetworkLinkageData.allocate(i);
     AirflowNetworkLinkageData(i).NodeHeights[0] = 4.0;
     AirflowNetworkLinkageData(i).NodeHeights[1] = 2.0;
@@ -114,8 +111,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     EXPECT_EQ(0.0, DF[1]);
 
     AirflowNetworkLinkageData.deallocate();
-    DF.deallocate();
-    F.deallocate();
+
     RHOZ.deallocate();
     MultizoneCompHorOpeningData.deallocate();
     MultizoneSurfaceData.deallocate();
