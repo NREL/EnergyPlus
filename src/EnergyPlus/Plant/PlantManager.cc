@@ -1086,7 +1086,11 @@ namespace PlantManager {
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:ExhaustGasToWaterHeatExchanger")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "WaterHeater:HeatPump:PumpedCondenser")) {
                             this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
                             this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
@@ -1161,23 +1165,43 @@ namespace PlantManager {
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroTurbine")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:InternalCombustionEngine")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_ICEngine;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:CombustionTurbine")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_CTurbine;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroCHP")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_MicroCHP;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:StackCooler")) {
                             this_comp.TypeOf_Num = TypeOf_Generator_FCStackCooler;
                             this_comp.GeneralEquipType = GenEquipTypes_Generator;
-                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
                         } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:SingleSpeed")) {
                             this_comp.TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
                             this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;

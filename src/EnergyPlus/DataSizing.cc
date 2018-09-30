@@ -362,6 +362,8 @@ namespace DataSizing {
     Array1D<Real64> PzSumBySys;      // sum of design people for system, Pz_sum
     Array1D<Real64> PsBySys;         // sum of peak concurrent people by system, Ps
     Array1D<Real64> DBySys;          // Population Diversity by system
+    Array1D<Real64> SumRpxPzBySys;   // Sum of per person OA times number of people by system, No D yet
+    Array1D<Real64> SumRaxAzBySys;   // sum of per area OA time zone area by system, does not get altered by D
     Array1D<std::string> PeakPsOccurrenceDateTimeStringBySys;    // string describing when Ps peak occurs
     Array1D<std::string> PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
     Array1D<Real64> VouBySys;                                    // uncorrected system outdoor air requirement, for std 62.1 VRP
@@ -549,6 +551,8 @@ namespace DataSizing {
         PzSumBySys.deallocate();
         PsBySys.deallocate();
         DBySys.deallocate();
+        SumRpxPzBySys.deallocate();
+        SumRaxAzBySys.deallocate();
         PeakPsOccurrenceDateTimeStringBySys.deallocate();
         PeakPsOccurrenceEnvironmentStringBySys.deallocate();
         VouBySys.deallocate();
@@ -708,6 +712,7 @@ namespace DataSizing {
             ZoneEqSizing(curZoneEqNum).CoolingAirVolFlow = 0.0;
             ZoneEqSizing(curZoneEqNum).HeatingAirVolFlow = 0.0;
             ZoneEqSizing(curZoneEqNum).SystemAirVolFlow = 0.0;
+            ZoneEqSizing(curZoneEqNum).DesignSizeFromParent = false;
         }
 
         if (curSysNum > 0) {

@@ -45,7 +45,7 @@
     1,                       !- End Month
     2,                       !- End Day of Month
     ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
+    ,                        !- Day of Week for Start Day
     yes,                     !- Use Weather File Holidays and Special Days
     yes,                     !- Use Weather File Daylight Saving Period
     no,                      !- Apply Weekend Holiday Rule
