@@ -2429,6 +2429,13 @@ namespace RefrigeratedCase {
                             ShowContinueError("...invalid curve " + cAlphaFieldNames(AlphaNum) + "=\"" + Alphas(AlphaNum) + "\".");
                             ErrorsFound = true;
                         }
+                        ErrorsFound |= CurveManager::CheckCurveDims(
+                            WarehouseCoil(CoilID).SHRCorrectionCurvePtr,   // Curve index
+                            {3},                            // Valid dimensions
+                            RoutineName,                    // Routine name
+                            CurrentModuleObject,            // Object Type
+                            WarehouseCoil(CoilID).Name,     // Object Name
+                            cAlphaFieldNames(AlphaNum));    // Field Name
                         //        IF(WarehouseCoil(CoilID)%SHRCorrectionCurvePtr == 0) THEN
                         //          CALL ShowSevereError(RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(WarehouseCoil(CoilID)%Name)//&
                         //                           '", not found  '//TRIM(cAlphaFieldNames(AlphaNum)))
