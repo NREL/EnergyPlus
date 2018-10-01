@@ -9,8 +9,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): 1/1 through 12/31, CHICAGO_IL_USA TMY2-94846
 !
@@ -96,7 +96,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
 !----------------------------------------------------------------
 
@@ -230,8 +230,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -276,7 +278,7 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -306,7 +308,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -968,7 +970,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -984,7 +985,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1179,7 +1179,6 @@
     RIGHT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1354,7 +1353,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1370,7 +1368,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1545,7 +1542,6 @@
     LEFT-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -3114,7 +3110,6 @@
     0.8,                     !- Nominal Thermal Efficiency
     LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable
     BoilerEfficiency,        !- Normalized Boiler Efficiency Curve Name
-    81.,                     !- Design Water Outlet Temperature {C}
     autosize,                !- Design Water Flow Rate {m3/s}
     0.0,                     !- Minimum Part Load Ratio
     1.2,                     !- Maximum Part Load Ratio

@@ -12,8 +12,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3Â°C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5Â°C MCWB=  23.0Â°C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Building,                !- Name
@@ -2135,8 +2135,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -2148,8 +2150,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -2985,7 +2989,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -3001,7 +3004,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -3017,7 +3019,6 @@
     RIGHT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -3033,7 +3034,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -3049,7 +3049,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -3065,7 +3064,6 @@
     LEFT-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices

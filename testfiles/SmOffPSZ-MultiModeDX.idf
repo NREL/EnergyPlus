@@ -14,8 +14,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/1-7, Spring 4/1-7, Summer 7/1-7, CHICAGO_IL_USA TMY2-94846
 !
@@ -58,7 +58,7 @@
 !             the same as in SmOffPSZ.
 !
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Small Office,            !- Name
@@ -89,8 +89,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -102,8 +104,10 @@
     ,                        !- Name
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     4,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -115,8 +119,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -131,7 +137,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -161,7 +167,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -975,7 +981,6 @@
     EWall,                   !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -991,7 +996,6 @@
     SWall,                   !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1007,7 +1011,6 @@
     WWall,                   !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1023,7 +1026,6 @@
     zE-W-5,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1039,7 +1041,6 @@
     NWall,                   !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1055,7 +1056,6 @@
     zE-W-8,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1071,7 +1071,6 @@
     zE-W-11,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1087,7 +1086,6 @@
     zE-W-13,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1103,7 +1101,6 @@
     zE-W-15,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1119,7 +1116,6 @@
     zE-W-17,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1135,7 +1131,6 @@
     zE-W-19,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
@@ -1151,7 +1146,6 @@
     zE-W-21,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices

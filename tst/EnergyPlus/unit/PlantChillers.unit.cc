@@ -51,86 +51,83 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/PlantChillers.hh>
 #include <DataPlant.hh>
 #include <DataSizing.hh>
+#include <EnergyPlus/PlantChillers.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 
-TEST_F( EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest )
+TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 {
-	// unit test for autosizing heat recovery in Chiller:CombustionTurbine
-	PlantChillers::GTChiller.allocate( 1 );
+    // unit test for autosizing heat recovery in Chiller:CombustionTurbine
+    PlantChillers::GTChiller.allocate(1);
 
-	PlantChillers::GTChiller( 1 ).Base.SizFac = 1.0;
-	PlantChillers::GTChiller( 1 ).DesignHeatRecVolFlowRateWasAutoSized = true;
-	PlantChillers::GTChiller( 1 ).HeatRecCapacityFraction = 0.5;
-	PlantChillers::GTChiller( 1 ).HeatRecActive = true;
-	PlantChillers::GTChiller( 1 ).Base.CondenserType = PlantChillers::WaterCooled;
-	PlantChillers::GTChiller( 1 ).Base.CWLoopNum = 1;
-	PlantChillers::GTChiller( 1 ).Base.CDLoopNum = 2;
-	PlantChillers::GTChiller( 1 ).Base.EvapVolFlowRate = 1.0;
-	PlantChillers::GTChiller( 1 ).Base.CondVolFlowRate = 1.0;
-	PlantChillers::GTChiller( 1 ).Base.NomCap = 10000;
-	PlantChillers::GTChiller( 1 ).Base.COP = 3.0;
-	PlantChillers::GTChiller( 1 ).engineCapacityScalar = 1.0;
+    PlantChillers::GTChiller(1).Base.SizFac = 1.0;
+    PlantChillers::GTChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
+    PlantChillers::GTChiller(1).HeatRecCapacityFraction = 0.5;
+    PlantChillers::GTChiller(1).HeatRecActive = true;
+    PlantChillers::GTChiller(1).Base.CondenserType = PlantChillers::WaterCooled;
+    PlantChillers::GTChiller(1).Base.CWLoopNum = 1;
+    PlantChillers::GTChiller(1).Base.CDLoopNum = 2;
+    PlantChillers::GTChiller(1).Base.EvapVolFlowRate = 1.0;
+    PlantChillers::GTChiller(1).Base.CondVolFlowRate = 1.0;
+    PlantChillers::GTChiller(1).Base.NomCap = 10000;
+    PlantChillers::GTChiller(1).Base.COP = 3.0;
+    PlantChillers::GTChiller(1).engineCapacityScalar = 1.0;
 
-	DataPlant::PlantLoop.allocate( 2 );
-	DataSizing::PlantSizData.allocate( 1 );
-	DataPlant::PlantLoop( 1 ).PlantSizNum = 1;
-	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
-	DataPlant::PlantLoop( 1 ).FluidName = "WATER";
-	DataSizing::PlantSizData( 1 ).DesVolFlowRate = 1.0;
-	DataSizing::PlantSizData( 1 ).DeltaT = 5.0;
-	DataPlant::PlantFirstSizesOkayToFinalize = true;
+    DataPlant::PlantLoop.allocate(2);
+    DataSizing::PlantSizData.allocate(1);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
+    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
 
-	//now call sizing routine
-	PlantChillers::SizeGTChiller( 1 );
-	// see if heat recovery flow rate is as expected
-	EXPECT_NEAR( PlantChillers::GTChiller( 1 ).DesignHeatRecVolFlowRate, 0.5, 0.00001 );
+    // now call sizing routine
+    PlantChillers::SizeGTChiller(1);
+    // see if heat recovery flow rate is as expected
+    EXPECT_NEAR(PlantChillers::GTChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
-	PlantChillers::GTChiller.deallocate();
-	DataSizing::PlantSizData.deallocate();
-	DataPlant::PlantLoop.deallocate();
-
+    PlantChillers::GTChiller.deallocate();
+    DataSizing::PlantSizData.deallocate();
+    DataPlant::PlantLoop.deallocate();
 }
 
-TEST_F( EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest )
+TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
 {
-	// unit test for autosizing heat recovery in Chiller:EngineDriven
-	PlantChillers::EngineDrivenChiller.allocate( 1 );
+    // unit test for autosizing heat recovery in Chiller:EngineDriven
+    PlantChillers::EngineDrivenChiller.allocate(1);
 
-	PlantChillers::EngineDrivenChiller( 1 ).Base.SizFac = 1.0;
-	PlantChillers::EngineDrivenChiller( 1 ).DesignHeatRecVolFlowRateWasAutoSized = true;
-	PlantChillers::EngineDrivenChiller( 1 ).HeatRecCapacityFraction = 0.5;
-	PlantChillers::EngineDrivenChiller( 1 ).HeatRecActive = true;
-	PlantChillers::EngineDrivenChiller( 1 ).Base.CondenserType = PlantChillers::WaterCooled;
-	PlantChillers::EngineDrivenChiller( 1 ).Base.CWLoopNum = 1;
-	PlantChillers::EngineDrivenChiller( 1 ).Base.CDLoopNum = 2;
-	PlantChillers::EngineDrivenChiller( 1 ).Base.EvapVolFlowRate = 1.0;
-	PlantChillers::EngineDrivenChiller( 1 ).Base.CondVolFlowRate = 1.0;
-	PlantChillers::EngineDrivenChiller( 1 ).Base.NomCap = 10000;
-	PlantChillers::EngineDrivenChiller( 1 ).Base.COP = 3.0;
-		
-	DataPlant::PlantLoop.allocate( 2 );
-	DataSizing::PlantSizData.allocate( 1 );
-	DataPlant::PlantLoop( 1 ).PlantSizNum = 1;
-	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
-	DataPlant::PlantLoop( 1 ).FluidName = "WATER";
-	DataSizing::PlantSizData( 1 ).DesVolFlowRate = 1.0;
-	DataSizing::PlantSizData( 1 ).DeltaT = 5.0;
-	DataPlant::PlantFirstSizesOkayToFinalize = true;
+    PlantChillers::EngineDrivenChiller(1).Base.SizFac = 1.0;
+    PlantChillers::EngineDrivenChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
+    PlantChillers::EngineDrivenChiller(1).HeatRecCapacityFraction = 0.5;
+    PlantChillers::EngineDrivenChiller(1).HeatRecActive = true;
+    PlantChillers::EngineDrivenChiller(1).Base.CondenserType = PlantChillers::WaterCooled;
+    PlantChillers::EngineDrivenChiller(1).Base.CWLoopNum = 1;
+    PlantChillers::EngineDrivenChiller(1).Base.CDLoopNum = 2;
+    PlantChillers::EngineDrivenChiller(1).Base.EvapVolFlowRate = 1.0;
+    PlantChillers::EngineDrivenChiller(1).Base.CondVolFlowRate = 1.0;
+    PlantChillers::EngineDrivenChiller(1).Base.NomCap = 10000;
+    PlantChillers::EngineDrivenChiller(1).Base.COP = 3.0;
 
-	//now call sizing routine
-	PlantChillers::SizeEngineDrivenChiller( 1 );
-	// see if heat recovery flow rate is as expected
-	EXPECT_NEAR( PlantChillers::EngineDrivenChiller( 1 ).DesignHeatRecVolFlowRate, 0.5, 0.00001 );
+    DataPlant::PlantLoop.allocate(2);
+    DataSizing::PlantSizData.allocate(1);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
+    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
 
-	PlantChillers::EngineDrivenChiller.deallocate();
-	DataSizing::PlantSizData.deallocate();
-	DataPlant::PlantLoop.deallocate();
+    // now call sizing routine
+    PlantChillers::SizeEngineDrivenChiller(1);
+    // see if heat recovery flow rate is as expected
+    EXPECT_NEAR(PlantChillers::EngineDrivenChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
+    PlantChillers::EngineDrivenChiller.deallocate();
+    DataSizing::PlantSizData.deallocate();
+    DataPlant::PlantLoop.deallocate();
 }
-

@@ -58,64 +58,52 @@ namespace EnergyPlus {
 
 namespace ZoneAirLoopEquipmentManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
+    // na
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE ZoneAirLoopEquipmentManager
+    // SUBROUTINE SPECIFICATIONS FOR MODULE ZoneAirLoopEquipmentManager
 
-	// Functions
-	void
-	clear_state();
+    // Functions
+    void clear_state();
 
-	void
-	ManageZoneAirLoopEquipment(
-		std::string const & ZoneAirLoopEquipName,
-		bool const FirstHVACIteration,
-		Real64 & SysOutputProvided,
-		Real64 & NonAirSysOutput,
-		Real64 & LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
-		int const ActualZoneNum,
-		int & ControlledZoneNum,
-		int & CompIndex
-	);
+    void ManageZoneAirLoopEquipment(std::string const &ZoneAirLoopEquipName,
+                                    bool const FirstHVACIteration,
+                                    Real64 &SysOutputProvided,
+                                    Real64 &NonAirSysOutput,
+                                    Real64 &LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
+                                    int const ActualZoneNum,
+                                    int &ControlledZoneNum,
+                                    int &CompIndex);
 
-	void
-	GetZoneAirLoopEquipment();
+    void GetZoneAirLoopEquipment();
 
-	void
-	InitZoneAirLoopEquipment(
-		int const AirDistUnitNum,
-		int const ControlledZoneNum,
-		int const ActualZoneNum
-	);
+    void InitZoneAirLoopEquipment(int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
 
-	void
-	SimZoneAirLoopEquipment(
-		int const AirDistUnitNum,
-		Real64 & SysOutputProvided,
-		Real64 & NonAirSysOutput,
-		Real64 & LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative
-		bool const FirstHVACIteration,
-		int const ControlledZoneNum,
-		int const ActualZoneNum
-	);
+    void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum);
 
-	void
-	UpdateZoneAirLoopEquipment();
+    void SimZoneAirLoopEquipment(int const AirDistUnitNum,
+                                 Real64 &SysOutputProvided,
+                                 Real64 &NonAirSysOutput,
+                                 Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative
+                                 bool const FirstHVACIteration,
+                                 int const ControlledZoneNum,
+                                 int const ActualZoneNum);
 
-	// void
-	// ReportZoneAirLoopEquipment(
-	// 	int const AirDistUnitNum
-	// );
+    void UpdateZoneAirLoopEquipment();
 
-} // ZoneAirLoopEquipmentManager
+    // void
+    // ReportZoneAirLoopEquipment(
+    // 	int const AirDistUnitNum
+    // );
 
-} // EnergyPlus
+} // namespace ZoneAirLoopEquipmentManager
+
+} // namespace EnergyPlus
 
 #endif

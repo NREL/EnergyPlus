@@ -11,9 +11,10 @@ if(NOT PROFILE_USE)
 endif()
 
 SET( SRC
-  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.hpp"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.hpp"
-  Timer.h
+  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
@@ -276,8 +277,6 @@ SET( SRC
   HVACStandAloneERV.hh
   HVACUnitaryBypassVAV.cc
   HVACUnitaryBypassVAV.hh
-  HVACUnitarySystem.cc
-  HVACUnitarySystem.hh
   HVACVariableRefrigerantFlow.cc
   HVACVariableRefrigerantFlow.hh
   HWBaseboardRadiator.cc
@@ -402,6 +401,27 @@ SET( SRC
   PipeHeatTransfer.hh
   Pipes.cc
   Pipes.hh
+  Plant/CallingOrder.hh
+  Plant/Enums.hh
+  Plant/EquipAndOperations.hh
+  Plant/LoopSidePumpInformation.hh
+  Plant/PlantAvailManager.hh
+  Plant/PlantConvergencePoint.hh
+  Plant/LoopSideReportVars.hh
+  Plant/MeterData.hh
+  Plant/ReportBranchData.hh
+  Plant/ReportCompData.hh
+  Plant/ReportLoopData.hh
+  Plant/ReportVars.hh
+  Plant/Branch.hh
+  Plant/Component.hh
+  Plant/ConnectedLoopData.hh
+  Plant/Connection.hh
+  Plant/Loop.hh
+  Plant/LoopSide.hh
+  Plant/MixerData.hh
+  Plant/SplitterData.hh
+  Plant/Subcomponents.hh
   PlantCentralGSHP.cc
   PlantCentralGSHP.hh
   PlantChillers.cc
@@ -415,13 +435,13 @@ SET( SRC
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
-  PlantLocation.hh
+  Plant/PlantLocation.hh
   PlantLoopEquip.cc
   PlantLoopEquip.hh
-  PlantLoopSolver.cc
-  PlantLoopSolver.hh
-  PlantManager.cc
-  PlantManager.hh
+  Plant/PlantLoopSolver.cc
+  Plant/PlantLoopSolver.hh
+  Plant/PlantManager.cc
+  Plant/PlantManager.hh
   PlantPipingSystemsManager.cc
   PlantPipingSystemsManager.hh
   PlantPressureSystem.cc
@@ -543,6 +563,8 @@ SET( SRC
   TranspiredCollector.hh
   UFADManager.cc
   UFADManager.hh
+  UnitarySystem.cc
+  UnitarySystem.hh
   UnitHeater.cc
   UnitHeater.hh
   UnitVentilator.cc
@@ -581,6 +603,14 @@ SET( SRC
   WindowEquivalentLayer.hh
   WindowManager.cc
   WindowManager.hh
+  WindowManagerExteriorData.cc
+  WindowManagerExteriorData.hh
+  WindowManagerExteriorThermal.cc
+  WindowManagerExteriorThermal.hh
+  WindowManagerExteriorOptical.cc
+  WindowManagerExteriorOptical.hh
+  WindowModel.cc
+  WindowModel.hh
   ZoneAirLoopEquipmentManager.cc
   ZoneAirLoopEquipmentManager.hh
   ZoneContaminantPredictorCorrector.cc
@@ -594,6 +624,8 @@ SET( SRC
   ZoneTempPredictorCorrector.cc
   ZoneTempPredictorCorrector.hh
 )
+
+CREATE_SRC_GROUPS( "${SRC}" )
 
 if (UNIX)
   ADD_DEFINITIONS("-fPIC")
@@ -613,7 +645,7 @@ add_custom_target( GenerateEmbeddedEpJSONSchema
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva )
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva Windows-CalcEngine)
 add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)

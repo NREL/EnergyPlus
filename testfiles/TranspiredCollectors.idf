@@ -30,7 +30,7 @@
 !        ZN15_Shop_1 is a floating zone
 !
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,4;
 
@@ -45,8 +45,10 @@
     ,                        !- Name
     2,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     2,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
@@ -58,8 +60,10 @@
     ,                        !- Name
     2,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     2,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
@@ -102,7 +106,7 @@
 
 ! DENVER_STAPLETON_CO_USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
 ! Coldest Month=December
-! DENVER_STAPLETON_CO_USA Annual Heating 99.6%, MaxDB=-20°C
+! DENVER_STAPLETON_CO_USA Annual Heating 99.6%, MaxDB=-20Â°C
 
   SizingPeriod:DesignDay,
     DENVER_STAPLETON Ann Htg 99.6% Condns DB,  !- Name
@@ -134,7 +138,7 @@
 
 ! DENVER_STAPLETON Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
 ! Hottest Month=July
-! DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1°C MWB=15.8°C
+! DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1Â°C MWB=15.8Â°C
 
   SizingPeriod:DesignDay,
     DENVER_STAPLETON Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -2483,7 +2487,6 @@
     ZN3_N_Space_1:ExtWall:North,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -2499,7 +2502,6 @@
     ZN4_W_Space_1:ExtWall:West,  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.500,                   !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices

@@ -16,8 +16,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6°C
-!                          Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
+! Design Days:             Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6Â°C
+!                          Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6Â°C MWB=23Â°C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7.
 !
@@ -104,9 +104,9 @@
 !                                 purposes only. The coefficients in these objects are the same as the default
 !                                 for Tower Model Types "YorkCalc" and "CoolTools CrossFlow", respectively.
 ! Setpoint:                  SetpointManager:CondenserEnteringReset:Ideal
-!                                 The “ideal” chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint
+!                                 The Â°idealÂ° chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint
 !                                 at a given timestep. This requires resimulating HVAC systems at each timestep until finding
-!                                 an “optimal” condenser water entering setpoint (OptSetpoint) which gives the minimum total chiller,
+!                                 an Â°optimalÂ° condenser water entering setpoint (OptSetpoint) which gives the minimum total chiller,
 !                                 cooling tower, chilled water pump and condenser water pump power consumption.
 !                                 The OptSetpoint falls between realistic minimum and maximum boundaries, which are set by the user.
 !                                 The minimum boundary is determined based on the minimum lift (user input)
@@ -124,7 +124,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     Building,                !- Name
@@ -193,8 +193,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -206,8 +208,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -231,7 +235,7 @@
     -6.00,                   !- Time Zone {hr}
     205.00;                  !- Elevation {m}
 
- ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6°C
+ ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6Â°C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
@@ -261,7 +265,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6Â°C MWB=23Â°C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -908,7 +912,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -924,7 +927,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1119,7 +1121,6 @@
     RIGHT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1294,7 +1295,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1310,7 +1310,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1485,7 +1484,6 @@
     LEFT-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -3082,7 +3080,6 @@
     0.8,                     !- Nominal Thermal Efficiency
     LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable
     BoilerEfficiency,        !- Normalized Boiler Efficiency Curve Name
-    81.,                     !- Design Water Outlet Temperature {C}
     autosize,                !- Design Water Flow Rate {m3/s}
     0.0,                     !- Minimum Part Load Ratio
     1.2,                     !- Maximum Part Load Ratio

@@ -15,8 +15,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6캜
-!                          Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6캜 MWB=23캜
+! Design Days:             Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6째C
+!                          Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6째C MWB=23째C
 !
 ! Run Period (Weather File): 1/1 - 12/31.
 !
@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,4;
 
@@ -142,8 +142,10 @@
     WinterSeasonDay,         !- Name
     1,                       !- Begin Month
     12,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -155,8 +157,10 @@
     SpringSeasonDay,         !- Name
     4,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     4,                       !- End Month
     16,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -168,8 +172,10 @@
     SummerSeasonDay,         !- Name
     7,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     16,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -181,8 +187,10 @@
     AutumnSeasonDay,         !- Name
     10,                      !- Begin Month
     12,                      !- Begin Day of Month
+    ,                        !- Begin Year
     10,                      !- End Month
     16,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -197,7 +205,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -227,7 +235,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -1719,7 +1727,7 @@
     99.0,                    !- Maximum Supply Air Temperature {C}
     East Zone,               !- Control Zone Name
     East Zone Air Node,      !- Zone Node Name
-    West Zone Inlets,        !- Zone Inlet Node Name
+    East Zone Inlets,        !- Zone Inlet Node Name
     East Sys Setpoint nodes; !- Setpoint Node or NodeList Name
 
   NodeList,
@@ -2751,7 +2759,7 @@
   ElectricEquipment:ITE:AirCooled,
     WestDataCenter_Equip,    !- Name
     West Zone,               !- Zone Name
-    FlowFromSystem,
+    FlowFromSystem,          !- Air Flow Calculation Method
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
     ,                        !- Number of Units
@@ -2892,7 +2900,7 @@
   ElectricEquipment:ITE:AirCooled,
     EastDataCenter_Equip,    !- Name
     East Zone,               !- Zone Name
-    FlowControlWithApproachTemperatures, !- Air Flow Caclulation Method
+    FlowControlWithApproachTemperatures,  !- Air Flow Calculation Method
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
     ,                        !- Number of Units
@@ -2918,10 +2926,10 @@
     ITE-CPU,                 !- CPU End-Use Subcategory
     ITE-Fans,                !- Fan End-Use Subcategory
     ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
-    2,                       !- field Supply Approach Temperature
-    ,                        !- field Supply Approach Temperature Schedule
-    0,                      !- field Return Approach Temperature 
-    ;                        !- field Return Approach Temperature Schedule
+    2,                       !- Supply Temperature Difference {deltaC}
+    ,                        !- Supply Temperature Difference Schedule
+    0,                       !- Return Temperature Difference {deltaC}
+    ;                        !- Return Temperature Difference Schedule
 
   Schedule:Compact,
     LIGHTS-1,                !- Name

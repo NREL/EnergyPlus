@@ -1,0 +1,37 @@
+set(CPACK_GENERATOR ZIP)
+
+set(CPACK_PACKAGE_VENDOR "Big Ladder Software LLC")
+
+set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+
+if ( "${CMAKE_BUILD_TYPE}" STREQUAL "" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Release" )
+  set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${KIVA_PACKAGE_CONFIG}")
+else()
+  set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${KIVA_PACKAGE_CONFIG}-${CMAKE_BUILD_TYPE}")
+endif()
+
+# Normal release files LICENSE, Change log, and README
+install(FILES "${kiva_SOURCE_DIR}/LICENSE" DESTINATION "./")
+set(CPACK_RESOURCE_FILE_LICENSE "${kiva_SOURCE_DIR}/LICENSE")
+
+install(FILES "${kiva_SOURCE_DIR}/ChangeLog.md" DESTINATION "./")
+
+set(CPACK_RESOURCE_FILE_README "${kiva_SOURCE_DIR}/README.md")
+install(FILES "${kiva_SOURCE_DIR}/README.md" DESTINATION "./")
+
+# Examples and WeatherData
+install(DIRECTORY "${kiva_SOURCE_DIR}/examples" DESTINATION "./")
+
+install(DIRECTORY "${kiva_SOURCE_DIR}/weather" DESTINATION "./")
+
+if(UNIX)
+  install(PROGRAMS "${kiva_SOURCE_DIR}/bin/run-kiva.sh" DESTINATION "./")
+else()
+  install(FILES "${kiva_SOURCE_DIR}/bin/run-kiva.bat" DESTINATION "./")
+endif()
+
+# Libraries
+include(CPack)
+
+set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+include(InstallRequiredSystemLibraries)

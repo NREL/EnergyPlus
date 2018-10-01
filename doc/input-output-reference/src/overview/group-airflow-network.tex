@@ -2,7 +2,7 @@
 
 \subsection{Overview}\label{overview}
 
-The Airflow Network model provides the ability to simulate multizone airflows driven by wind and also by a forced air distribution system. The model can also simulate the heat and moisture gains or losses from the air distribution system itself (e.g., ductwork). When modeling an air distribution system, the current version of the Airflow Network model is restricted to a single forced air system (i.e., AirLoopHVAC object) with a constant volume supply air fan (Fan:ConstantVolume or Fan:OnOff). The capabilities of the model are to:
+The Airflow Network model provides the ability to simulate multizone airflows driven by wind and also by forced air distribution systems. The model can also simulate the heat and moisture gains or losses from the air distribution system itself (e.g., ductwork). When modeling air distribution systems, the current version of the Airflow Network model is allowed to simulate multiple forced air systems (i.e., AirLoopHVAC object) with a constant volume supply air fan (Fan:ConstantVolume or Fan:OnOff) and a VAV supply air fan (Fan:VariableVolume). The capabilities of the model are to:
 
 \begin{itemize}
 \item
@@ -29,6 +29,8 @@ The Airflow Network model provides the ability to simulate multizone airflows dr
   Allow zone exhaust fans to be included as part of the airflow network
 \item
   For airflow networks with a forced air distribution system, calculate zone sensible and latent loads for two different supply air fan operation modes as required: cycling fan, cycling compressor (CyclingFanAndCompressor) and continuous fan, cycling compressor (ContinuousFanWithCyclingCompressor)
+\item
+  When multiple forced air systems (AirloopHVAC) are present in the idf, all systems must be used in the Airflow Network model.
 \end{itemize}
 
 \subsection{Summary of Objects}\label{summary-of-objects}
@@ -85,6 +87,10 @@ The Airflow Network input objects are:
 
 \textbf{AirflowNetwork:Distribution:Component:TerminalUnit}
 
+\textbf{AirflowNetwork:Distribution:Component:OutdoorAirFlow}
+
+\textbf{AirflowNetwork:Distribution:Component:ReliefAirFlow}
+
 \textbf{AirflowNetwork:Distribution:Linkage}
 
 \textbf{~}
@@ -101,7 +107,7 @@ The Airflow Network input objects are:
 \item
   \textbf{AirflowNetwork:Distribution:Node} represents air distribution system nodes for the AirflowNetwork model. A set of an AirLoopHVAC and ZoneHVAC:EquipmentList nodes is a subset of the AirflowNetwork:Distribution:Nodes.
 \item
-  \textbf{AirflowNetwork:Distribution:Component} objects consist of \textbf{Leak, LeakageRatio, Duct, ConstantPressureDrop, Fan, Coil,} and \textbf{TerminalUnit.} The components provide a relationship between pressure and airflow. The \textbf{Leak} and \textbf{Leakage} components can be used to simulate supply and/or return leaks in an air distribution system\textbf{.} The \textbf{Duct} and \textbf{ConstantPressureDrop components} can be used to deliver forced air into conditioned spaces. The components \textbf{Fan, Coil, and TerminalUnit} reference normal EnergyPlus objects. The Airflow Network model gets information from these objects to perform an airflow network simulation.
+  \textbf{AirflowNetwork:Distribution:Component} objects consist of \textbf{Leak, LeakageRatio, Duct, ConstantPressureDrop, Fan, Coil, TerminalUnit, OutdoorAirFlow} and \textbf{ReliefAirFlow.} The components provide a relationship between pressure and airflow. The \textbf{Leak} and \textbf{Leakage} components can be used to simulate supply and/or return leaks in an air distribution system\textbf{.} The \textbf{Duct} and \textbf{ConstantPressureDrop components} can be used to deliver forced air into conditioned spaces. The components \textbf{Fan, Coil, and TerminalUnit} reference normal EnergyPlus objects. \textbf{OutdoorAirFlow, and ReliefAirFlow} specify the outdoor air flow rate set by the Controller:OutdoorAir object in the model. The Airflow Network model gets information from these objects to perform an airflow network simulation.
 \item
   \textbf{AirflowNetwork:Distribution:Linkage} object represents a connection between two node objects and an AirflowNetwork component. The node objects can be an AirflowNetwork:Distribution:Node, AirflowNetwork:MultiZone:ExternalNode or AirflowNetwork:MultiZone:Zone.
 \end{itemize}
@@ -140,15 +146,23 @@ Figure~\ref{fig:plan-view-of-a-simple-air-flow-network} shows a possible air flo
 \item
   AirflowNetwork3zVentAutoWPC.idf
 \item
+  AirflowNetworkOccupantVentilationControl.idf
+\item
+  AirflowNetwork\_Attic\_Duct.idf
+\item
   AirflowNetwork\_Simple\_House.idf
 \item
   AirflowNetwork\_Simple\_SmallOffice.idf
+\item
+  AirflowNetwork\_MultiAirLoops.idf
 \item
   AirflowNetwork\_MultiZone\_House.idf
 \item
   AirflowNetwork\_MultiZone\_House\_OvercoolDehumid.idf
 \item
   AirflowNetwork\_MultiZone\_House\_TwoSpeed.idf
+\item
+  AirflowNetwork\_MultiZone\_LocalNode.idf
 \item
   AirflowNetwork\_MultiZone\_SmallOffice.idf
 \item
@@ -160,13 +174,23 @@ Figure~\ref{fig:plan-view-of-a-simple-air-flow-network} shows a possible air flo
 \item
   AirflowNetwork\_MultiZone\_SmallOffice\_VAV.idf
 \item
-  AirflowNetwor\_MultiZone\_HorizontalOpening.idf
+  AirflowNetwork\_MultiZone\_HorizontalOpening.idf
+\item
+  AirflowNetwor\_PressureControl.idf
 \item
   CrossVent\_1Zone\_AirflowNetwork.idf
 \item
+  CrossVent\_1Zone\_AirflowNetwork\_with2CrossflowJets.idf
+\item
   DisplacementVent\_Nat\_AirflowNetwork.idf
 \item
+  DisplacementVent\_Nat\_AirflowNetwork\_AdaptiveComfort.idf
+\item
+  EMSAirflowNetworkOpeningControlByHumidity.idf
+\item
   HybridVentilationControl.idf
+\item
+  RoomAirflowNetwork.idf
 \end{itemize}
 
 \subsection{What the Airflow Network Model Can and Cannot Do}\label{what-the-airflow-network-model-can-and-cannot-do}
@@ -195,11 +219,10 @@ Here is a list of some of the things that the Airflow Network calculation can an
 
 \subsubsection{Cannot Do or Restricted}\label{cannot-do-or-restricted}
 \begin{enumerate}
-\item The model is restricted to using a constant volume fan (Fan:ConstantVolume and Fan:OnOff) and cannot model variable volume fan equipment.
+\item The model is restricted to using a constant volume or variable volume fan (Fan:ConstantVolume, Fan:OnOff, and Fan:VariableVolume).
 \item Air circulation and/or air temperature stratification within a thermal zone. For example, you should not try to divide a high space, such as an atrium, into subzones separated by artificial horizontal surfaces that have cracks or openings with the expectation that AirflowNetwork will give you a realistic temperature in each subzone and/or a realistic air flow between subzones.
 \item The model is restricted to eleven types of coils that can be in the air distribution system (Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel, Coil:Heating:Electric,~ Coil:Heating:DX:SingleSpeed, Coil:Cooling:Water, Coil:Heating:Water, Coil:Cooling:Water:DetailedGeometry, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Coil:Cooling:DX:MultiSpeed, Coil:Heating:DX:MultiSpeed, and Coil:Heating:Desuperheater).
-\item The model is restricted to a single type of air distribution equipment terminal units (AirTerminal:SingleDuct:ConstantVolume:Reheat).
-\item Pollutant transport cannot currently be modeled.
+\item The model is restricted to two types of air distribution equipment terminal units (AirTerminal:SingleDuct:ConstantVolume:Reheat and AirTerminal:SingleDuct:VAV:Reheat).
 \item Supply and return leaks are not allowed in an AirLoopHVAC. They can only be modeled in the Zone Equipment portion of the air loop (i.e., return leaks may be modeled between the zone return node and the zone mixer inlet or the zone mixer outlet and the zone equipment loop outlet; and supply leaks may be modeled between the zone equipment loop inlet and the AirLoopHVAC:ZoneSplitter inlet node or the AirLoopHVAC:ZoneSplitter outlet node and the zone supply node).
 \item An air distribution system must be located inside the building (i.e., the ducts must pass through zones within the building).
 \item Zone exhaust fans must be defined in ZoneHVAC:EquipmentConnections objects.
@@ -2237,6 +2260,10 @@ The AirflowNetwork:Distribution:Component:OutdoorAirFlow object is used to allow
 
 This is the name for this instance of the AirflowNetwork:Distribution:Component:OutdoorAirFlow object.
 
+\paragraph{Field: Outdoor Air Mixer Name}\label{field-name-outdoor-air-mixer}
+
+The name identifying an AirflowNetwork OutdoorAirFlow defined in an air loop as an OutdoorAir:Mixer object. This name must be the same name as the associated OutdoorAir:Mixer object. 
+
 \paragraph{Field: Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions}\label{field-air-mass-flow-coefficient-when-no-outdoor-air-flow-at-reference-conditions}
 
 The value of the air mass flow coefficient, \({C_Q}\), in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
@@ -2255,6 +2282,7 @@ IDF examples are provided below:
 
 AirflowNetwork:MultiZone:Component:OutdoorAirFlow,
   OAFlow,                  !- Name
+  OA Mixer 1,              !- Outdoor Air Mixer Name
   0.01,                    !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}
   0.667;                   !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}
 
@@ -2288,6 +2316,10 @@ The AirflowNetwork:Distribution:Component:ReliefAirFlow object is used to allow 
 
 This is the name for this instance of the AirflowNetwork:Distribution:Component:ReliefAirFlow object.
 
+\paragraph{Field: Outdoor Air Mixer Name}\label{field-name-outdoor-air-mixer}
+
+The name identifying an AirflowNetwork OutdoorAirFlow defined in an air loop as an OutdoorAir:Mixer object. This name must be the same name as the associated OutdoorAir:Mixer object. 
+
 \paragraph{Field: Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions}\label{field-air-mass-flow-coefficient-when-no-outdoor-air-flow-at-reference-conditions-2016-06-16}
 
 The value of the air mass flow coefficient, \({C_Q}\), in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
@@ -2314,6 +2346,7 @@ AirflowNetwork:ZoneControl:PressureController,
 
 AirflowNetwork:MultiZone:Component:ReliefAirFlow,
   ReliefFlow,                     !- Name
+  OA Mixer 1,              !- Outdoor Air Mixer Name
   0.01,                           !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}
   0.667;                          !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}
 
@@ -2692,24 +2725,24 @@ When modulation is in effect the value of the multiplier is between 0.0 and 1.0.
 
 % table 25
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\caption{Value of opening factor multiplier for different venting conditions. \label{table:value-of-opening-factor-multiplier-for}} \tabularnewline
+\caption{Value of opening factor multiplier for different venting conditions} \label{table:value-of-opening-factor-multiplier-for} \tabularnewline
 \toprule
 Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Value of opening factor multiplier for different venting conditions.} \tabularnewline
+\caption{Value of opening factor multiplier for different venting conditions} \tabularnewline
 \toprule
 Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
 \midrule
 \endhead
 
-Yes & Temperature & Yes & 0.0 to 1.0 \tabularnewline
-No & -1.0 \tabularnewline
-Enthalpy & Yes & 0.0 to 1.0 \tabularnewline
-No & -1.0 \tabularnewline
-Constant & Yes & 1.0 \tabularnewline
-NoVent & No & -1.0 \tabularnewline
+   & & Yes & 0.0 to 1.0 \tabularnewline \cmidrule{3-4}
+   & \raisebox{1.5ex}{Temperature} & No & -1.0 \tabularnewline \cmidrule{2-4}
+   & & Yes & 0.0 to 1.0 \tabularnewline \cmidrule{3-4}
+  Yes & \raisebox{1.5ex}{Enthalpy} & No & -1.0 \tabularnewline \cmidrule{2-4}
+   & Constant & Yes & 1.0 \tabularnewline \cmidrule{2-4}
+   & NoVent & No & -1.0 \tabularnewline
 \bottomrule
 \end{longtable}
 

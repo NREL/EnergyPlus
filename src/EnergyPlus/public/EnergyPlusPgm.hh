@@ -53,18 +53,16 @@
 // C++ Headers
 #include <string>
 
-	// Functions
+// Functions
 
-	void
-	CreateCurrentDateTimeString( std::string & CurrentDateTimeString );
+void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
 
-	void ENERGYPLUSLIB_API
-	EnergyPlusPgm( std::string const & filepath = std::string() );
+void ENERGYPLUSLIB_API EnergyPlusPgm(std::string const &filepath = std::string());
 
-	void ENERGYPLUSLIB_API
-	StoreProgressCallback( void ( *f )( int const ) );
+int ENERGYPLUSLIB_API RunEnergyPlus(std::string const & filepath = std::string());
 
-	void ENERGYPLUSLIB_API
-	StoreMessageCallback( void ( *f )( std::string const & ) );
+void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
+
+void ENERGYPLUSLIB_API StoreMessageCallback(void (*f)(std::string const &));
 
 #endif

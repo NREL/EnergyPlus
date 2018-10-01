@@ -11,8 +11,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): none
 !
@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,6;
 
@@ -145,7 +145,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
- ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+ ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -175,7 +175,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.0;                     !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+ ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -500,8 +500,10 @@
     WinAirGap,               !- Layer 2
     SPECTRAL GLASS INNER PANE;  !- Layer 3
 
-  WindowProperty:ShadingControl,
-    WIN-CONTROL-GLARE,       !- Name
+  WindowShadingControl,
+    WIN-CONTROL-GLARE-West Zone,  !- Name
+    West Zone,               !- Zone Name
+    1,                       !- Shading Control Sequence Number
     SwitchableGlazing,       !- Shading Type
     ELECTRO-CON-DARK,        !- Construction with Shading Name
     OnIfHighGlare,           !- Shading Control Type
@@ -511,7 +513,11 @@
     YES,                     !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    West Zone_DaylCtrl,      !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn001:Wall001:Win001;    !- Fenestration Surface 1 Name
 
   WindowProperty:FrameAndDivider,
     TestFrameAndDivider,     !- Name
@@ -895,7 +901,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    WIN-CONTROL-GLARE,       !- Shading Control Name
     TestFrameAndDivider,     !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices

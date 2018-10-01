@@ -54,7 +54,7 @@
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
 !  Version,
-!    8.8;                    !- Version Identifier
+!    9.0;                    !- Version Identifier
 
   AirLoopHVAC:UnitaryHeatPump:AirToAir,
     RooftopPackagedHeatpumpExample,  !- Name
@@ -155,7 +155,7 @@
     1.25,                    !- Maximum Value of x
     0.9275,                  !- Minimum Curve Output
     1.0198,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -170,7 +170,7 @@
     1.25,                    !- Maximum Value of x
     0.9806,                  !- Minimum Curve Output
     1.0782,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -264,7 +264,7 @@
     1.25,                    !- Maximum Value of x
     0.9518,                  !- Minimum Curve Output
     1.0388,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -279,7 +279,7 @@
     1.25,                    !- Maximum Value of x
     0.9992,                  !- Minimum Curve Output
     1.0107,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -374,7 +374,7 @@
     1.25,                    !- Maximum Value of x
     0.888,                   !- Minimum Curve Output
     1.0371,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -389,7 +389,7 @@
     1.25,                    !- Maximum Value of x
     0.9643,                  !- Minimum Curve Output
     1.1138,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -483,7 +483,7 @@
     1.25,                    !- Maximum Value of x
     0.9049,                  !- Minimum Curve Output
     1,                       !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -498,7 +498,7 @@
     1.25,                    !- Maximum Value of x
     0.9649,                  !- Minimum Curve Output
     1.1634,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -592,7 +592,7 @@
     1.25,                    !- Maximum Value of x
     0.9507,                  !- Minimum Curve Output
     1.0302,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -607,7 +607,7 @@
     1.25,                    !- Maximum Value of x
     0.983,                   !- Minimum Curve Output
     1.0328,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -701,7 +701,7 @@
     1.25,                    !- Maximum Value of x
     0.9902,                  !- Minimum Curve Output
     1.0079,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -716,7 +716,7 @@
     1.25,                    !- Maximum Value of x
     0.9576,                  !- Minimum Curve Output
     1.0769,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -810,7 +810,7 @@
     1.25,                    !- Maximum Value of x
     0.9598,                  !- Minimum Curve Output
     1.0201,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -825,7 +825,7 @@
     1.25,                    !- Maximum Value of x
     0.986,                   !- Minimum Curve Output
     1.0297,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -919,7 +919,7 @@
     1.25,                    !- Maximum Value of x
     0.9777,                  !- Minimum Curve Output
     1.0251,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -934,7 +934,7 @@
     1.25,                    !- Maximum Value of x
     0.9849,                  !- Minimum Curve Output
     1.0293,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -1028,7 +1028,7 @@
     1.125,                   !- Maximum Value of x
     0.9841,                  !- Minimum Curve Output
     1.0117,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1043,7 +1043,7 @@
     1.125,                   !- Maximum Value of x
     0.9929,                  !- Minimum Curve Output
     1.0087,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -1137,7 +1137,7 @@
     1.125,                   !- Maximum Value of x
     0.9907,                  !- Minimum Curve Output
     1.0028,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1152,7 +1152,7 @@
     1.125,                   !- Maximum Value of x
     0.9892,                  !- Minimum Curve Output
     1.0297,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -1276,7 +1276,7 @@
     1.2,                     !- Maximum Value of x
     0.9507,                  !- Minimum Curve Output
     1.062,                   !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,            !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1291,7 +1291,7 @@
     1.2,                     !- Maximum Value of x
     0.9507,                  !- Minimum Curve Output
     1.0458,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,            !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Cooling Capacity Function of Temperature Curve
@@ -1348,7 +1348,7 @@
     1.2,                     !- Maximum Value of x
     0.95,                    !- Minimum Curve Output
     1.0621,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1363,7 +1363,7 @@
     1.2,                     !- Maximum Value of x
     0.9513,                  !- Minimum Curve Output
     1.045,                   !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -1447,7 +1447,7 @@
     1.2,                     !- Maximum Value of x
     0.9865,                  !- Minimum Curve Output
     1.0315,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1462,7 +1462,7 @@
     1.2,                     !- Maximum Value of x
     0.9233,                  !- Minimum Curve Output
     1.1033,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -1586,7 +1586,7 @@
     1.2,                     !- Maximum Value of x
     0.9694,                  !- Minimum Curve Output
     1.0216,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1601,7 +1601,7 @@
     1.2,                     !- Maximum Value of x
     0.9846,                  !- Minimum Curve Output
     1.0246,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Cooling Capacity Function of Temperature Curve
@@ -1658,7 +1658,7 @@
     1.2,                     !- Maximum Value of x
     0.9695,                  !- Minimum Curve Output
     1.0218,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1673,7 +1673,7 @@
     1.2,                     !- Maximum Value of x
     0.9847,                  !- Minimum Curve Output
     1.0235,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -1757,7 +1757,7 @@
     1.2,                     !- Maximum Value of x
     0.9792,                  !- Minimum Curve Output
     1.0213,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1772,7 +1772,7 @@
     1.2,                     !- Maximum Value of x
     0.9451,                  !- Minimum Curve Output
     1.0786,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -1867,7 +1867,7 @@
     1.2,                     !- Maximum Value of x
     0.9659,                  !- Minimum Curve Output
     1.0233,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1882,7 +1882,7 @@
     1.2,                     !- Maximum Value of x
     0.9836,                  !- Minimum Curve Output
     1.0263,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -1966,7 +1966,7 @@
     1.2,                     !- Maximum Value of x
     0.9857,                  !- Minimum Curve Output
     1.016,                   !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1981,7 +1981,7 @@
     1.2,                     !- Maximum Value of x
     0.9416,                  !- Minimum Curve Output
     1.0843,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -2105,7 +2105,7 @@
     1.2,                     !- Maximum Value of x
     0.9698,                  !- Minimum Curve Output
     1.0207,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -2120,7 +2120,7 @@
     1.2,                     !- Maximum Value of x
     0.9834,                  !- Minimum Curve Output
     1.0273,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Cooling Capacity Function of Temperature Curve
@@ -2177,7 +2177,7 @@
     1.2,                     !- Maximum Value of x
     0.9694,                  !- Minimum Curve Output
     1.021,                   !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -2192,7 +2192,7 @@
     1.2,                     !- Maximum Value of x
     0.9835,                  !- Minimum Curve Output
     1.0274,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -2276,7 +2276,7 @@
     1.2,                     !- Maximum Value of x
     0.9865,                  !- Minimum Curve Output
     1.0316,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -2291,7 +2291,7 @@
     1.2,                     !- Maximum Value of x
     0.9251,                  !- Minimum Curve Output
     1.0997,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -2386,7 +2386,7 @@
     1.2,                     !- Maximum Value of x
     0.9447,                  !- Minimum Curve Output
     1.065,                   !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -2401,7 +2401,7 @@
     1.2,                     !- Maximum Value of x
     0.951,                   !- Minimum Curve Output
     1.0495,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -2485,7 +2485,7 @@
     1.2,                     !- Maximum Value of x
     0.9653,                  !- Minimum Curve Output
     1.0162,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -2500,7 +2500,7 @@
     1.2,                     !- Maximum Value of x
     0.943,                   !- Minimum Curve Output
     1.1045,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -2624,7 +2624,7 @@
     1.2,                     !- Maximum Value of x
     0.949,                   !- Minimum Curve Output
     1.0559,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -2639,7 +2639,7 @@
     1.2,                     !- Maximum Value of x
     0.9564,                  !- Minimum Curve Output
     1.0454,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Cooling Capacity Function of Temperature Curve
@@ -2696,7 +2696,7 @@
     1.2,                     !- Maximum Value of x
     0.9484,                  !- Minimum Curve Output
     1.0556,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -2711,7 +2711,7 @@
     1.2,                     !- Maximum Value of x
     0.9574,                  !- Minimum Curve Output
     1.0465,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -2795,7 +2795,7 @@
     1.2,                     !- Maximum Value of x
     0.9704,                  !- Minimum Curve Output
     1.0289,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -2810,7 +2810,7 @@
     1.2,                     !- Maximum Value of x
     0.9279,                  !- Minimum Curve Output
     1.1028,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -2934,7 +2934,7 @@
     1.2,                     !- Maximum Value of x
     0.9443,                  !- Minimum Curve Output
     1.0549,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -2949,7 +2949,7 @@
     1.2,                     !- Maximum Value of x
     0.9586,                  !- Minimum Curve Output
     1.0471,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Cooling Capacity Function of Temperature Curve
@@ -3006,7 +3006,7 @@
     1.2,                     !- Maximum Value of x
     0.9462,                  !- Minimum Curve Output
     1.0547,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -3021,7 +3021,7 @@
     1.2,                     !- Maximum Value of x
     0.9601,                  !- Minimum Curve Output
     1.0447,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve
@@ -3105,7 +3105,7 @@
     1.2,                     !- Maximum Value of x
     0.9741,                  !- Minimum Curve Output
     1.0255,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -3120,7 +3120,7 @@
     1.2,                     !- Maximum Value of x
     0.9371,                  !- Minimum Curve Output
     1.0909,                  !- Maximum Curve Output
-    Flow Fraction,           !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Part Load Fraction Function of Part Load Ratio Curve

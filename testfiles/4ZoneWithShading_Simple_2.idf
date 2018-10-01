@@ -9,8 +9,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6캜
-!                          Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6캜 MWB=23캜
+! Design Days:             Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6째C
+!                          Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6째C MWB=23째C
 !
 ! Run Period (Weather File): N/A
 !
@@ -81,7 +81,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Timestep,4;
 
@@ -117,10 +117,10 @@
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Chicago Ohare Intl Ap IL USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.4m/s, 5%=8.6m/s
- ! Chicago Ohare Intl Ap IL USA Extreme Annual Temperatures, Max Drybulb=-23.7캜 Min Drybulb=35.9캜
+ ! Chicago Ohare Intl Ap IL USA Extreme Annual Temperatures, Max Drybulb=-23.7째C Min Drybulb=35.9째C
  ! Chicago Ohare Intl Ap IL USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
  ! Coldest Month=January
- ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6캜
+ ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6째C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
@@ -150,7 +150,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6캜 MWB=23캜
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6째C MWB=23째C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -184,9 +184,11 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
@@ -517,7 +519,6 @@
     Zn001:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn001:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Starting X Coordinate {m}
@@ -529,7 +530,6 @@
     Zn001:Wall001:Door001,   !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn001:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     14,                      !- Starting X Coordinate {m}
@@ -655,7 +655,6 @@
     Zn002:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Starting X Coordinate {m}
@@ -676,7 +675,6 @@
     Zn002:Wall001:Win002,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     10,                      !- Starting X Coordinate {m}
@@ -760,7 +758,6 @@
     Zn003:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn003:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     8,                       !- Starting X Coordinate {m}
@@ -879,7 +876,6 @@
     Zn004:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn004:Wall001,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     8,                       !- Starting X Coordinate {m}

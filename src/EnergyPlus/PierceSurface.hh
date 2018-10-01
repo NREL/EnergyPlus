@@ -69,8 +69,8 @@
 //   Don't make changes here without validating the performance impact
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
+#include <EnergyPlus.hh>
 #include <Platform.hh>
 
 // ObjexxFCL Headers
@@ -85,367 +85,351 @@
 
 namespace EnergyPlus {
 
-inline
-void
-PierceSurface_Triangular(
-	DataSurfaces::Surface2D const & s2d, // 2D surface
-	Vector2< Real64 > const & h2d, // 2D hit point
-	bool & hit // Ray intersects surface?
+inline void PierceSurface_Triangular(DataSurfaces::Surface2D const &s2d, // 2D surface
+                                     Vector2<Real64> const &h2d,         // 2D hit point
+                                     bool &hit                           // Ray intersects surface?
 )
 {
-	// Purpose: Check if a 2D hit point is in a triangular 2D surface
-	//
-	// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-	//
-	// History:
-	//  Jan 2016: Initial release
-	//
-	// Notes:
-	//  Pulled this case out into separate function to facilitate inlining
+    // Purpose: Check if a 2D hit point is in a triangular 2D surface
+    //
+    // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+    //
+    // History:
+    //  Jan 2016: Initial release
+    //
+    // Notes:
+    //  Pulled this case out into separate function to facilitate inlining
 
-	using DataSurfaces::Surface2D;
-	Surface2D::Vertices const & vs( s2d.vertices ); // 2D surface vertices
-	Surface2D::Vectors const & es( s2d.edges ); // 2D surface edge vectors
-	if ( es[ 0 ].cross( h2d - vs[ 0 ] ) < 0.0 ) return;
-	if ( es[ 1 ].cross( h2d - vs[ 1 ] ) < 0.0 ) return;
-	if ( es[ 2 ].cross( h2d - vs[ 2 ] ) < 0.0 ) return;
-	hit = true;
+    using DataSurfaces::Surface2D;
+    Surface2D::Vertices const &vs(s2d.vertices); // 2D surface vertices
+    Surface2D::Vectors const &es(s2d.edges);     // 2D surface edge vectors
+    if (es[0].cross(h2d - vs[0]) < 0.0) return;
+    if (es[1].cross(h2d - vs[1]) < 0.0) return;
+    if (es[2].cross(h2d - vs[2]) < 0.0) return;
+    hit = true;
 }
 
-inline
-void
-PierceSurface_Convex(
-	DataSurfaces::Surface2D const & s2d, // 2D surface
-	Vector2< Real64 > const & h2d, // 2D hit point
-	bool & hit // Ray intersects surface?
+inline void PierceSurface_Convex(DataSurfaces::Surface2D const &s2d, // 2D surface
+                                 Vector2<Real64> const &h2d,         // 2D hit point
+                                 bool &hit                           // Ray intersects surface?
 )
 {
-	// Purpose: Check if a 2D hit point is in a convex 2D surface
-	//
-	// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-	//
-	// History:
-	//  Jan 2016: Initial release
-	//
-	// Notes:
-	//  Pulled this rare case out into separate function to facilitate inlining
-	//  This is O( n ) complexity so it is isn't used for many-vertex surfaces
+    // Purpose: Check if a 2D hit point is in a convex 2D surface
+    //
+    // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+    //
+    // History:
+    //  Jan 2016: Initial release
+    //
+    // Notes:
+    //  Pulled this rare case out into separate function to facilitate inlining
+    //  This is O( n ) complexity so it is isn't used for many-vertex surfaces
 
-	using DataSurfaces::Surface2D;
-	Surface2D::Vertices const & vs( s2d.vertices ); // 2D surface vertices
-	Surface2D::Vectors const & es( s2d.edges ); // 2D surface edge vectors
-	Surface2D::Vertices::size_type const n( vs.size() );
-	assert( n >= 3u );
-	switch ( n ) {
-	case 8:
-		if ( es[ 7 ].cross( h2d - vs[ 7 ] ) < 0.0 ) {
-			return;
-		}
-		// fallthrough
-	case 7:
-		if ( es[ 6 ].cross( h2d - vs[ 6 ] ) < 0.0 ) {
-			return;
-		}
-		// fallthrough
-	case 6:
-		if ( es[ 5 ].cross( h2d - vs[ 5 ] ) < 0.0 ) {
-			return;
-		}
-		// fallthrough
-	case 5:
-		if ( es[ 4 ].cross( h2d - vs[ 4 ] ) < 0.0 ) {
-			return;
-		}
-		// fallthrough
-	case 4:
-		if ( es[ 3 ].cross( h2d - vs[ 3 ] ) < 0.0 ) {
-			return;
-		}
-		// fallthrough
-	case 3:
-		if ( es[ 2 ].cross( h2d - vs[ 2 ] ) < 0.0 ) {
-			return;
-		}
-		if ( es[ 1 ].cross( h2d - vs[ 1 ] ) < 0.0 ) {
-			return;
-		}
-		if ( es[ 0 ].cross( h2d - vs[ 0 ] ) < 0.0 ) {
-			return;
-		}
-		hit = true;
-		return;
-	default:
-		for ( Surface2D::Vertices::size_type i = 0; i < n; ++i ) {
-			if ( es[ i ].cross( h2d - vs[ i ] ) < 0.0 ) return;
-		}
-		hit = true;
-		return;
-	}
+    using DataSurfaces::Surface2D;
+    Surface2D::Vertices const &vs(s2d.vertices); // 2D surface vertices
+    Surface2D::Vectors const &es(s2d.edges);     // 2D surface edge vectors
+    Surface2D::Vertices::size_type const n(vs.size());
+    assert(n >= 3u);
+    switch (n) {
+    case 8:
+        if (es[7].cross(h2d - vs[7]) < 0.0) {
+            return;
+        }
+        // fallthrough
+    case 7:
+        if (es[6].cross(h2d - vs[6]) < 0.0) {
+            return;
+        }
+        // fallthrough
+    case 6:
+        if (es[5].cross(h2d - vs[5]) < 0.0) {
+            return;
+        }
+        // fallthrough
+    case 5:
+        if (es[4].cross(h2d - vs[4]) < 0.0) {
+            return;
+        }
+        // fallthrough
+    case 4:
+        if (es[3].cross(h2d - vs[3]) < 0.0) {
+            return;
+        }
+        // fallthrough
+    case 3:
+        if (es[2].cross(h2d - vs[2]) < 0.0) {
+            return;
+        }
+        if (es[1].cross(h2d - vs[1]) < 0.0) {
+            return;
+        }
+        if (es[0].cross(h2d - vs[0]) < 0.0) {
+            return;
+        }
+        hit = true;
+        return;
+    default:
+        for (Surface2D::Vertices::size_type i = 0; i < n; ++i) {
+            if (es[i].cross(h2d - vs[i]) < 0.0) return;
+        }
+        hit = true;
+        return;
+    }
 }
 
-inline
-void
-PierceSurface_Nonconvex(
-	DataSurfaces::Surface2D const & s2d, // 2D surface
-	Vector2< Real64 > const & h2d, // 2D hit point
-	bool & hit // Ray intersects surface?
+inline void PierceSurface_Nonconvex(DataSurfaces::Surface2D const &s2d, // 2D surface
+                                    Vector2<Real64> const &h2d,         // 2D hit point
+                                    bool &hit                           // Ray intersects surface?
 )
 {
-	// Purpose: Check if a 2D hit point is in a 2D possibly nonconvex surface
-	//
-	// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-	//
-	// History:
-	//  Jan 2016: Initial release
-	//
-	// Notes:
-	//  Pulled this rare case out into separate function to facilitate inlining
-	//  This works for nonconvex "simple" (no edge crossings) polygons
-	//  This is also a fast O( log n ) algorithm for many-vertex convex surfaces
+    // Purpose: Check if a 2D hit point is in a 2D possibly nonconvex surface
+    //
+    // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+    //
+    // History:
+    //  Jan 2016: Initial release
+    //
+    // Notes:
+    //  Pulled this rare case out into separate function to facilitate inlining
+    //  This works for nonconvex "simple" (no edge crossings) polygons
+    //  This is also a fast O( log n ) algorithm for many-vertex convex surfaces
 
-	using DataSurfaces::Surface2D;
-	using size_type = Surface2D::Vertices::size_type;
-	using Slab = DataSurfaces::Surface2DSlab;
-	using Vertex2D = Vector2< Real64 >;
-	assert( s2d.vertices.size() >= 3u );
-	Surface2D::Slabs const & slabs( s2d.slabs ); // 2D surface y slice slabs
-	Surface2D::SlabYs const & slabYs( s2d.slabYs ); // 2D surface slab y coordinates
-	assert( slabYs.size() > 0u );
-	Real64 const yHit( h2d.y ); // Hit point y coordinate
+    using DataSurfaces::Surface2D;
+    using size_type = Surface2D::Vertices::size_type;
+    using Slab = DataSurfaces::Surface2DSlab;
+    using Vertex2D = Vector2<Real64>;
+    assert(s2d.vertices.size() >= 3u);
+    Surface2D::Slabs const &slabs(s2d.slabs);    // 2D surface y slice slabs
+    Surface2D::SlabYs const &slabYs(s2d.slabYs); // 2D surface slab y coordinates
+    assert(slabYs.size() > 0u);
+    Real64 const yHit(h2d.y); // Hit point y coordinate
 
-	// Find slab with y range containing hit point
-	auto const iHit( std::lower_bound( slabYs.begin(), slabYs.end(), yHit ) );
-	assert( ( yHit >= slabYs.front() ) && ( yHit <= slabYs.back() ) ); // Passed bounding box check so hit point in slabs y range
-	assert( iHit != slabYs.end() ); // Hit point can't be above all slabs: passed bounding box check
-	size_type const iSlab( std::min( static_cast< size_type >( iHit - 1 - slabYs.begin() ), slabs.size() ) ); // Hit slab index
-	Slab const & slab( slabs[ iSlab ] );
+    // Find slab with y range containing hit point
+    auto const iHit(std::lower_bound(slabYs.begin(), slabYs.end(), yHit));
+    assert((yHit >= slabYs.front()) && (yHit <= slabYs.back())); // Passed bounding box check so hit point in slabs y range
+    assert(iHit != slabYs.end());                                // Hit point can't be above all slabs: passed bounding box check
+    size_type const iSlab(std::min(static_cast<size_type>(iHit - 1 - slabYs.begin()), slabs.size())); // Hit slab index
+    Slab const &slab(slabs[iSlab]);
 
-	// Check hit point within slab bounding box x range
-	Real64 const xHit( h2d.x ); // Hit point x coordinate
-	if ( ( xHit < slab.xl ) || ( xHit > slab.xu ) ) return; // Hit point outside slab bounding box
+    // Check hit point within slab bounding box x range
+    Real64 const xHit(h2d.x);                         // Hit point x coordinate
+    if ((xHit < slab.xl) || (xHit > slab.xu)) return; // Hit point outside slab bounding box
 
-	// Find edge pair surrounding hit point
-	Slab::Edges const & slabEdges( slab.edges );
-	Slab::EdgesXY const & slabEdgesXY( slab.edgesXY );
-	size_type const nEdges( slabEdges.size() );
-	assert( nEdges >= 2u );
-	if ( nEdges == 2 ) { // 2 edges
-		Slab::Edge const se0( slabEdges[ 0 ] );
-		Slab::EdgeXY const eXY0( slabEdgesXY[ 0 ] );
-		Vertex2D v0( s2d.vertices[ se0 ] );
-		Surface2D::Edge e0( s2d.edges[ se0 ] );
-		Real64 const x0( v0.x + ( yHit - v0.y ) * eXY0 );
-		if ( xHit < x0 ) return; // Hit point x is left of left edge
-		Slab::Edge const se1( slabEdges[ 1 ] );
-		Slab::EdgeXY const eXY1( slabEdgesXY[ 1 ] );
-		Vertex2D v1( s2d.vertices[ se1 ] );
-		Surface2D::Edge e1( s2d.edges[ se1 ] );
-		Real64 const x1( v1.x + ( yHit - v1.y ) * eXY1 );
-		if ( x1 < xHit ) return; // Hit point is right of right edge
-	} else { // 4+ edges: Binary search for edges surrounding hit point
-		assert( nEdges >= 4u );
-		assert( nEdges % 2 == 0u );
-		size_type l( 0u ), u( nEdges - 1 );
-		Slab::Edge const il( slabEdges[ l ] );
-		Slab::EdgeXY const eXYl( slabEdgesXY[ l ] );
-		Vertex2D const & vl( s2d.vertices[ il ] );
-		Surface2D::Edge const el( s2d.edges[ il ] );
-		Real64 const xl( vl.x + ( yHit - vl.y ) * eXYl );
-		if ( xHit < xl ) return; // Hit point x is left of leftmost edge
-		Slab::Edge const iu( slabEdges[ u ] );
-		Slab::EdgeXY const eXYu( slabEdgesXY[ u ] );
-		Vertex2D const & vu( s2d.vertices[ iu ] );
-		Surface2D::Edge const eu( s2d.edges[ iu ] );
-		Real64 const xu( vu.x + ( yHit - vu.y ) * eXYu );
-		if ( xu < xHit ) return; // Hit point is right of rightmost edge
-		while ( u - l > 1u ) {
-			size_type const m( ( l + u ) / 2 );
-			Slab::Edge const im( slabEdges[ m ] );
-			Slab::EdgeXY const eXYm( slabEdgesXY[ m ] );
-			Vertex2D const & vm( s2d.vertices[ im ] );
-			Surface2D::Edge const em( s2d.edges[ im ] );
-			Real64 xm( vm.x + ( yHit - vm.y ) * eXYm );
-			if ( xHit <= xm ) {
-				u = m;
-			} else {
-				l = m;
-			}
-		}
-		assert( u - l == 1u );
-		if ( u % 2 == 0u ) return; // Outside of nonconvex surface polygon
-	}
-	hit = true;
+    // Find edge pair surrounding hit point
+    Slab::Edges const &slabEdges(slab.edges);
+    Slab::EdgesXY const &slabEdgesXY(slab.edgesXY);
+    size_type const nEdges(slabEdges.size());
+    assert(nEdges >= 2u);
+    if (nEdges == 2) { // 2 edges
+        Slab::Edge const se0(slabEdges[0]);
+        Slab::EdgeXY const eXY0(slabEdgesXY[0]);
+        Vertex2D v0(s2d.vertices[se0]);
+        Surface2D::Edge e0(s2d.edges[se0]);
+        Real64 const x0(v0.x + (yHit - v0.y) * eXY0);
+        if (xHit < x0) return; // Hit point x is left of left edge
+        Slab::Edge const se1(slabEdges[1]);
+        Slab::EdgeXY const eXY1(slabEdgesXY[1]);
+        Vertex2D v1(s2d.vertices[se1]);
+        Surface2D::Edge e1(s2d.edges[se1]);
+        Real64 const x1(v1.x + (yHit - v1.y) * eXY1);
+        if (x1 < xHit) return; // Hit point is right of right edge
+    } else {                   // 4+ edges: Binary search for edges surrounding hit point
+        assert(nEdges >= 4u);
+        assert(nEdges % 2 == 0u);
+        size_type l(0u), u(nEdges - 1);
+        Slab::Edge const il(slabEdges[l]);
+        Slab::EdgeXY const eXYl(slabEdgesXY[l]);
+        Vertex2D const &vl(s2d.vertices[il]);
+        Surface2D::Edge const el(s2d.edges[il]);
+        Real64 const xl(vl.x + (yHit - vl.y) * eXYl);
+        if (xHit < xl) return; // Hit point x is left of leftmost edge
+        Slab::Edge const iu(slabEdges[u]);
+        Slab::EdgeXY const eXYu(slabEdgesXY[u]);
+        Vertex2D const &vu(s2d.vertices[iu]);
+        Surface2D::Edge const eu(s2d.edges[iu]);
+        Real64 const xu(vu.x + (yHit - vu.y) * eXYu);
+        if (xu < xHit) return; // Hit point is right of rightmost edge
+        while (u - l > 1u) {
+            size_type const m((l + u) / 2);
+            Slab::Edge const im(slabEdges[m]);
+            Slab::EdgeXY const eXYm(slabEdgesXY[m]);
+            Vertex2D const &vm(s2d.vertices[im]);
+            Surface2D::Edge const em(s2d.edges[im]);
+            Real64 xm(vm.x + (yHit - vm.y) * eXYm);
+            if (xHit <= xm) {
+                u = m;
+            } else {
+                l = m;
+            }
+        }
+        assert(u - l == 1u);
+        if (u % 2 == 0u) return; // Outside of nonconvex surface polygon
+    }
+    hit = true;
 }
 
 ALWAYS_INLINE
-void
-PierceSurface_polygon(
-	DataSurfaces::SurfaceData const & surface, // Surface
-	Vector3< Real64 > const & hitPt, // Ray-plane intersection point
-	bool & hit // Ray intersects surface?
+void PierceSurface_polygon(DataSurfaces::SurfaceData const &surface, // Surface
+                           Vector3<Real64> const &hitPt,             // Ray-plane intersection point
+                           bool &hit                                 // Ray intersects surface?
 )
 {
-	// Purpose: Check if hit point on surface plane is in surface polygon
-	//
-	// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-	//
-	// History:
-	//  Jan 2016: Initial release
+    // Purpose: Check if hit point on surface plane is in surface polygon
+    //
+    // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+    //
+    // History:
+    //  Jan 2016: Initial release
 
-	using DataSurfaces::Surface2D;
-	using DataSurfaces::nVerticesBig;
-	using Vertex2D = Vector2< Real64 >;
-	Surface2D const & s2d( surface.surface2d );
-	int const axis( s2d.axis );
-	Vertex2D const h2d( axis == 0 ? hitPt.y : hitPt.x, axis == 2 ? hitPt.y : hitPt.z ); // Hit point in 2D surface's plane
-	if ( ( h2d.x < s2d.vl.x ) || ( s2d.vu.x < h2d.x ) || ( h2d.y < s2d.vl.y ) || ( s2d.vu.y < h2d.y ) ) return; // Misses 2D surface bounding box
-	ShapeCat const shapeCat( surface.shapeCat );
-	if ( shapeCat == ShapeCat::Rectangular ) { // Rectangular is most common: Special case algorithm is faster but assumes these are really rectangular
-		Vertex2D const v0h( h2d - s2d.vertices[ 0 ] );
-		Real64 const he1( v0h.dot( s2d.edges[ 0 ] ) );
-		if ( ( he1 < 0.0 ) || ( he1 > s2d.s1 ) ) return;
-		Real64 const he3( -v0h.dot( s2d.edges[ 3 ] ) );
-		if ( ( he3 < 0.0 ) || ( he3 > s2d.s3 ) ) return;
-		hit = true;
-	} else if ( shapeCat == ShapeCat::Triangular ) { // Cross products all nonnegative <=> Hit point in triangle
-		PierceSurface_Triangular( s2d, h2d, hit );
-	} else if ( ( shapeCat == ShapeCat::Nonconvex ) || ( s2d.vertices.size() >= nVerticesBig ) ) { // O( log n ) algorithm for nonconvex and many-vertex convex surfaces
-		PierceSurface_Nonconvex( s2d, h2d, hit );
-	} else if ( shapeCat == ShapeCat::Convex ) { // O( n ) algorithm for convex surface without too many vertices
-		PierceSurface_Convex( s2d, h2d, hit );
-	}
+    using DataSurfaces::nVerticesBig;
+    using DataSurfaces::Surface2D;
+    using Vertex2D = Vector2<Real64>;
+    Surface2D const &s2d(surface.surface2d);
+    int const axis(s2d.axis);
+    Vertex2D const h2d(axis == 0 ? hitPt.y : hitPt.x, axis == 2 ? hitPt.y : hitPt.z);                 // Hit point in 2D surface's plane
+    if ((h2d.x < s2d.vl.x) || (s2d.vu.x < h2d.x) || (h2d.y < s2d.vl.y) || (s2d.vu.y < h2d.y)) return; // Misses 2D surface bounding box
+    ShapeCat const shapeCat(surface.shapeCat);
+    if (shapeCat == ShapeCat::Rectangular) { // Rectangular is most common: Special case algorithm is faster but assumes these are really rectangular
+        Vertex2D const v0h(h2d - s2d.vertices[0]);
+        Real64 const he1(v0h.dot(s2d.edges[0]));
+        if ((he1 < 0.0) || (he1 > s2d.s1)) return;
+        Real64 const he3(-v0h.dot(s2d.edges[3]));
+        if ((he3 < 0.0) || (he3 > s2d.s3)) return;
+        hit = true;
+    } else if (shapeCat == ShapeCat::Triangular) { // Cross products all nonnegative <=> Hit point in triangle
+        PierceSurface_Triangular(s2d, h2d, hit);
+    } else if ((shapeCat == ShapeCat::Nonconvex) ||
+               (s2d.vertices.size() >= nVerticesBig)) { // O( log n ) algorithm for nonconvex and many-vertex convex surfaces
+        PierceSurface_Nonconvex(s2d, h2d, hit);
+    } else if (shapeCat == ShapeCat::Convex) { // O( n ) algorithm for convex surface without too many vertices
+        PierceSurface_Convex(s2d, h2d, hit);
+    }
 }
 
 ALWAYS_INLINE
-void
-PierceSurface(
-	DataSurfaces::SurfaceData const & surface, // Surface
-	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction vector
-	Vector3< Real64 > & hitPt, // Ray-plane intersection point
-	bool & hit // Ray intersects surface?
+void PierceSurface(DataSurfaces::SurfaceData const &surface, // Surface
+                   Vector3<Real64> const &rayOri,            // Ray origin point
+                   Vector3<Real64> const &rayDir,            // Ray direction vector
+                   Vector3<Real64> &hitPt,                   // Ray-plane intersection point
+                   bool &hit                                 // Ray intersects surface?
 )
 {
-	// Purpose: Check if a ray hits a surface and return the point of intersection
-	//  with the surface's plane if they intersect.
-	//  Convex and concave surfaces with 3 or more vertices are supported.
-	//
-	// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-	//
-	// History:
-	//  Jan 2016: Initial release
+    // Purpose: Check if a ray hits a surface and return the point of intersection
+    //  with the surface's plane if they intersect.
+    //  Convex and concave surfaces with 3 or more vertices are supported.
+    //
+    // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+    //
+    // History:
+    //  Jan 2016: Initial release
 
-	// Find ray intersection with surface plane
-	hit = false;
-	DataSurfaces::SurfaceData::Plane const & plane( surface.plane );
-	Real64 const den( ( plane.x * rayDir.x ) + ( plane.y * rayDir.y ) + ( plane.z * rayDir.z ) );
-	if ( den == 0.0 ) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
-		return;
-	} else { // Ray's line intersects plane
-		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) );
-		if ( num * den <= 0.0 ) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
-			return;
-		} else { // Ray points toward surface: Compute hit point
-			Real64 const t( num / den ); // Ray parameter at plane intersection: hitPt = rayOri + t * rayDir
-			hitPt.x = rayOri.x + ( t * rayDir.x ); // Compute by coordinate to avoid Vertex temporaries
-			hitPt.y = rayOri.y + ( t * rayDir.y );
-			hitPt.z = rayOri.z + ( t * rayDir.z );
-		}
-	}
+    // Find ray intersection with surface plane
+    hit = false;
+    DataSurfaces::SurfaceData::Plane const &plane(surface.plane);
+    Real64 const den((plane.x * rayDir.x) + (plane.y * rayDir.y) + (plane.z * rayDir.z));
+    if (den == 0.0) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
+        return;
+    } else { // Ray's line intersects plane
+        Real64 const num(-((plane.x * rayOri.x) + (plane.y * rayOri.y) + (plane.z * rayOri.z) + plane.w));
+        if (num * den <=
+            0.0) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
+            return;
+        } else {                                 // Ray points toward surface: Compute hit point
+            Real64 const t(num / den);           // Ray parameter at plane intersection: hitPt = rayOri + t * rayDir
+            hitPt.x = rayOri.x + (t * rayDir.x); // Compute by coordinate to avoid Vertex temporaries
+            hitPt.y = rayOri.y + (t * rayDir.y);
+            hitPt.z = rayOri.z + (t * rayDir.z);
+        }
+    }
 
-	// Check if hit point is in surface polygon
-	PierceSurface_polygon( surface, hitPt, hit );
+    // Check if hit point is in surface polygon
+    PierceSurface_polygon(surface, hitPt, hit);
 }
 
 ALWAYS_INLINE
-void
-PierceSurface(
-	int const iSurf, // Surface index
-	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction vector
-	Vector3< Real64 > & hitPt, // Ray-plane intersection point
-	bool & hit // Ray intersects surface?
+void PierceSurface(int const iSurf,               // Surface index
+                   Vector3<Real64> const &rayOri, // Ray origin point
+                   Vector3<Real64> const &rayDir, // Ray direction vector
+                   Vector3<Real64> &hitPt,        // Ray-plane intersection point
+                   bool &hit                      // Ray intersects surface?
 )
 {
-	// Purpose: Overload taking surface index instead of surface
-	//
-	// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-	//
-	// History:
-	//  Jan 2016: Initial release
+    // Purpose: Overload taking surface index instead of surface
+    //
+    // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+    //
+    // History:
+    //  Jan 2016: Initial release
 
-	PierceSurface( DataSurfaces::Surface( iSurf ), rayOri, rayDir, hitPt, hit );
+    PierceSurface(DataSurfaces::Surface(iSurf), rayOri, rayDir, hitPt, hit);
 }
 
 ALWAYS_INLINE
-void
-PierceSurface(
-	DataSurfaces::SurfaceData const & surface, // Surface
-	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction unit vector
-	Real64 const dMax, // Max distance from rayOri to hit point
-	Vector3< Real64 > & hitPt, // Ray-plane intersection point
-	bool & hit // Ray intersects surface?
+void PierceSurface(DataSurfaces::SurfaceData const &surface, // Surface
+                   Vector3<Real64> const &rayOri,            // Ray origin point
+                   Vector3<Real64> const &rayDir,            // Ray direction unit vector
+                   Real64 const dMax,                        // Max distance from rayOri to hit point
+                   Vector3<Real64> &hitPt,                   // Ray-plane intersection point
+                   bool &hit                                 // Ray intersects surface?
 )
 {
-	// Purpose: Check if a ray hits a surface and return the point of intersection
-	//  with the surface's plane if they intersect.
-	//  Convex and concave surfaces with 3 or more vertices are supported.
-	//  This overload limits the ray-surface distance for a hit.
-	//
-	// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-	//
-	// History:
-	//  Jan 2016: Initial release
+    // Purpose: Check if a ray hits a surface and return the point of intersection
+    //  with the surface's plane if they intersect.
+    //  Convex and concave surfaces with 3 or more vertices are supported.
+    //  This overload limits the ray-surface distance for a hit.
+    //
+    // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+    //
+    // History:
+    //  Jan 2016: Initial release
 
-	// Input checks
-	assert( std::abs( rayDir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real64 >::epsilon() ); // Check unit vector
-	assert( dMax >= 0.0 ); // Distance must be nonnegative
+    // Input checks
+    assert(std::abs(rayDir.mag_squared() - 1.0) < 4 * std::numeric_limits<Real64>::epsilon()); // Check unit vector
+    assert(dMax >= 0.0);                                                                       // Distance must be nonnegative
 
-	// Find ray intersection with surface plane
-	hit = false;
-	DataSurfaces::SurfaceData::Plane const & plane( surface.plane );
-	Real64 const den( ( plane.x * rayDir.x ) + ( plane.y * rayDir.y ) + ( plane.z * rayDir.z ) );
-	if ( den == 0.0 ) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
-		return;
-	} else { // Ray's line intersects plane
-		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) );
-		if ( num * den <= 0.0 ) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
-			return;
-		} else { // Ray points toward surface: Compute hit point
-			Real64 const t( num / den ); // Ray parameter at plane intersection: hitPt = rayOri + t * rayDir
-			if ( t > dMax ) return; // Hit point exceeds distance from rayOri limit
-			hitPt.x = rayOri.x + ( t * rayDir.x ); // Compute by coordinate to avoid Vertex temporaries
-			hitPt.y = rayOri.y + ( t * rayDir.y );
-			hitPt.z = rayOri.z + ( t * rayDir.z );
-		}
-	}
+    // Find ray intersection with surface plane
+    hit = false;
+    DataSurfaces::SurfaceData::Plane const &plane(surface.plane);
+    Real64 const den((plane.x * rayDir.x) + (plane.y * rayDir.y) + (plane.z * rayDir.z));
+    if (den == 0.0) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
+        return;
+    } else { // Ray's line intersects plane
+        Real64 const num(-((plane.x * rayOri.x) + (plane.y * rayOri.y) + (plane.z * rayOri.z) + plane.w));
+        if (num * den <=
+            0.0) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
+            return;
+        } else {                                 // Ray points toward surface: Compute hit point
+            Real64 const t(num / den);           // Ray parameter at plane intersection: hitPt = rayOri + t * rayDir
+            if (t > dMax) return;                // Hit point exceeds distance from rayOri limit
+            hitPt.x = rayOri.x + (t * rayDir.x); // Compute by coordinate to avoid Vertex temporaries
+            hitPt.y = rayOri.y + (t * rayDir.y);
+            hitPt.z = rayOri.z + (t * rayDir.z);
+        }
+    }
 
-	// Check if hit point is in surface polygon
-	PierceSurface_polygon( surface, hitPt, hit );
+    // Check if hit point is in surface polygon
+    PierceSurface_polygon(surface, hitPt, hit);
 }
 
 ALWAYS_INLINE
-void
-PierceSurface(
-	int const iSurf, // Surface index
-	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction unit vector
-	Real64 const dMax, // Max distance from rayOri to hit point
-	Vector3< Real64 > & hitPt, // Ray-plane intersection point
-	bool & hit // Ray intersects surface?
+void PierceSurface(int const iSurf,               // Surface index
+                   Vector3<Real64> const &rayOri, // Ray origin point
+                   Vector3<Real64> const &rayDir, // Ray direction unit vector
+                   Real64 const dMax,             // Max distance from rayOri to hit point
+                   Vector3<Real64> &hitPt,        // Ray-plane intersection point
+                   bool &hit                      // Ray intersects surface?
 )
 {
-	// Purpose: Overload taking surface index instead of surface
-	//
-	// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-	//
-	// History:
-	//  Jan 2016: Initial release
+    // Purpose: Overload taking surface index instead of surface
+    //
+    // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+    //
+    // History:
+    //  Jan 2016: Initial release
 
-	PierceSurface( DataSurfaces::Surface( iSurf ), rayOri, rayDir, dMax, hitPt, hit );
+    PierceSurface(DataSurfaces::Surface(iSurf), rayOri, rayDir, dMax, hitPt, hit);
 }
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -3661,7 +3661,7 @@ Up to 6 curves are required depending on the defrost strategy selected.
 \item
   The part load fraction correlation (function of part load ratio) is a quadratic or cubic curve with the independent variable being part load ratio (sensible heating load / steady-state heating capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the effective EIR for a given simulation timestep. The part load fraction correlation accounts for efficiency losses due to compressor cycling.
 \item
-  The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: outdoor air dry-bulb temperature and the heating coil entering air wet-bulb temperature. The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
+  The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: the heating coil entering air wet-bulb temperature (variable x) and the outdoor air dry-bulb temperature (variable y). The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
 \end{enumerate}
 
 The curves are simply specified by name. Curve inputs are described in the curve manager section of this document (ref. Performance Curves).
@@ -3742,7 +3742,7 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
 \paragraph{Field: Defrost Energy Input Ratio Function of Temperature Curve Name}\label{field-defrost-energy-input-ratio-function-of-temperature-curve-name}
 
-This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the outdoor air dry-bulb temperature and the wet-bulb temperature of the air entering the indoor coil. The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse-cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
+This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the wet-bulb temperature of the air entering the indoor coil (variable x) and the outdoor air dry-bulb temperature (variable y). The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse-cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
 
@@ -3910,7 +3910,7 @@ The coil operates to meet the sensible capacity being requested. When this reque
 
 The next input defines the minimum outdoor dry-bulb temperature where the compressor will operate. The followed two inputs are related to crankcase heater operation: capacity and maximum outdoor dry-bulb temperature for crankcase heater operation. The next six inputs cover defrost operation: defrost EIR modifier curve, the maximum outdoor dry-bulb temperature for defrost operation, the type of defrost strategy (reverse-cycle or resistive), defrost control (timed or on-demand), the fractional defrost time period (timed defrost control only), and the resistive defrost heater capacity if a resistive defrost strategy is selected. The activation of defrost is dependent on outdoor conditions. The capacity reduction and energy use modification are independent of speed. The defrost EIR modifier is described below:
 
-The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: outdoor air dry-bulb temperature and the heating coil entering air wet-bulb temperature. The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
+The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: the heating coil entering air wet-bulb temperature (variable x) and the outdoor air dry-bulb temperature (variable y). The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
 
 The next input allows the user to choose whether to apply the part load fraction correlation to speeds greater than 1 or not. The following input is the type of fuel.
 
@@ -3966,7 +3966,7 @@ This numeric field defines the outdoor air dry-bulb temperature above which the 
 
 \paragraph{Field: Defrost Energy Input Ratio Function of Temperature Curve Name}\label{field-defrost-energy-input-ratio-function-of-temperature-curve-name-1}
 
-This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the outdoor air dry-bulb temperature and the wet-bulb temperature of the air entering the indoor coil. The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse-cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
+This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the wet-bulb temperature of the air entering the indoor coil (variable x) and the outdoor air dry-bulb temperature (variable y). The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse-cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Defrost Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-defrost-operation-1}
 
@@ -4310,7 +4310,7 @@ This alpha field defines the name of a quadratic or cubic performance curve (Ref
 
 \paragraph{Field: Defrost Energy Input Ratio Function of Temperature Curve Name}\label{field-defrost-energy-input-ratio-function-of-temperature-curve-name-2}
 
-This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the outdoor air dry-bulb temperature and the wet-bulb temperature of the air entering the indoor coil. The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity at the maximum speed level, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
+This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the wet-bulb temperature of the air entering the indoor coil (variable x) and the outdoor air dry-bulb temperature (variable y). The EIR is the inverse of the COP. The output of this curve is multiplied by the coil capacity at the maximum speed level, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. This curve is only required when a reverse cycle defrost strategy is selected. The curve is normalized to a value of 1.0 at the rating point conditions.
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-2}
 
@@ -4953,13 +4953,20 @@ CoilSystem:Cooling:DX,
   HVAC,Average,Coil System Frost Control Status
 \end{itemize}
 
-\textbf{\emph{Coil Type = Coil:Cooling:DX:TwoStageWithHumidityControlMode}}
+\textbf{\emph{Coil Type = Coil:Cooling:DX:TwoStageWithHumidityControlMode \& Coil:Cooling:DX:VariableSpeed}}
 
 \begin{itemize}
 \item
   HVAC,Average,Coil System Cycling Ratio
 \item
   HVAC,Average,Coil System Compressor Speed Ratio
+\end{itemize}
+
+\textbf{\emph{Coil:Cooling:DX:VariableSpeed}}
+
+\begin{itemize}
+\item
+  HVAC,Average,Coil System Compressor Speed Number
 \end{itemize}
 
 \textbf{\emph{Coil types = Coil:Cooling:DX:SingleSpeed \& CoilSystem:Cooling:DX:HeatExchangerAssisted}}
@@ -4972,15 +4979,19 @@ CoilSystem:Cooling:DX,
 
 \paragraph{Coil System Cycling Ratio}\label{coil-system-cycling-ratio}
 
-The system may operate for the entire system timestep, but to meet the load the compressor can cycle on and off. This reports the fraction of the system timestep that the compressor is operating. (1.0 is continuous, 0.0 is off).
+The system may operate for the entire system timestep, but to meet the load the compressor can cycle on and off. This reports the fraction of the system timestep that the compressor is operating. (1.0 is continuous, 0.0 is off). For Coil:Cooling:VariableSpeed this description is true when compressor speed = 1. At higher compressor speeds Coil System Cycling Ratio = 1.
 
 \paragraph{Coil System Compressor Speed Ratio}\label{coil-system-compressor-speed-ratio}
 
-This is the ratio of time in a system timestep that the compressor is at rated speed. The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep.
+This is the ratio of time in a system timestep that the compressor is at rated speed. The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. This report is a duplicate of the report in Coil:Cooling:DX:VaraibleSpeed named Cooling Coil Neighboring Speed Levels Ratio.
+
+\paragraph{Coil System Compressor Speed Number}\label{coil-system-compressor-speed-ratio}
+
+This is the stage number that the compressor is operating at in a system timestep. The compressor speed number (from 1 to number of speeds) is reported and averaged over the timestep. This report is a duplicate of the report in Coil:Cooling:DX:VaraibleSpeed named Cooling Coil Upper Speed Level.
 
 \paragraph{Coil System Part Load Ratio}\label{coil-system-part-load-ratio}
 
-The DX system can operate with a cycling compressor or a varying speed compressor, This variable reports the fraction of the Full Load that is met during the system timestep. This can differ from the cycling part load ratio or the compressor speed ratio. (1.0 is Full Load and 0.0 is no load)
+The DX system can operate with a cycling compressor or a varying speed compressor. This variable reports the fraction of the Full Load that is met during the system timestep. This can differ from the cycling part load ratio or the compressor speed ratio. (1.0 is Full Load and 0.0 is no load)
 
 \paragraph{Coil System Frost Control Status}\label{coil-system-frost-control-status}
 

@@ -14,8 +14,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.9;
+  Version,9.0;
 
   Building,
     PTAC with DOAS RH Control,  !- Name
@@ -162,8 +162,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -175,8 +177,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -200,7 +204,7 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -230,7 +234,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -851,7 +855,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -867,7 +870,6 @@
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1062,7 +1064,6 @@
     RIGHT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1237,7 +1238,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1253,7 +1253,6 @@
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1428,7 +1427,6 @@
     LEFT-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -1761,7 +1759,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTAC,
     SPACE2-1,                !- Zone Name
@@ -1802,7 +1801,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTAC,
     SPACE3-1,                !- Zone Name
@@ -1843,7 +1843,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTAC,
     SPACE4-1,                !- Zone Name
@@ -1884,7 +1885,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTAC,
     SPACE5-1,                !- Zone Name
@@ -1925,7 +1927,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:System:DedicatedOutdoorAir,
     DOAS,                    !- Name

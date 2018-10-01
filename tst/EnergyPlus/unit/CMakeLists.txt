@@ -25,6 +25,7 @@ set( test_src
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
+  ChillerAbsorption.unit.cc
   ChillerConstantCOP.unit.cc
   ChillerElectric.unit.cc
   ChillerElectricEIR.unit.cc
@@ -37,8 +38,10 @@ set( test_src
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
   DataEnvironment.unit.cc
+  DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
+  DataSizing.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DaylightingManager.unit.cc
@@ -63,6 +66,7 @@ set( test_src
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   FluidProperties.unit.cc
+  FuelCellElectricGenerator.unit.cc
   Furnaces.unit.cc
   General.unit.cc
   GeneralRoutines.unit.cc
@@ -88,7 +92,7 @@ set( test_src
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
-  HVACUnitarySystem.unit.cc
+  HVACUnitaryBypassVAV.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
   HybridModel.unit.cc
@@ -104,6 +108,7 @@ set( test_src
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
   OASystemHWPreheatCoil.unit.cc
+  OutAirNodeManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
@@ -113,18 +118,25 @@ set( test_src
   PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
+  Pipes.unit.cc
+  Plant/Branch.unit.cc
+  Plant/Subcomponent.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
+  PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc
+  ReportCoilSelection.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  RunPeriod.unit.cc
+  RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
@@ -147,10 +159,13 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
+  SZVAVModel.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
+  UnitarySystem.unit.cc
   UnitHeater.unit.cc
+  UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
@@ -161,11 +176,13 @@ set( test_src
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  WinCalcEngine.unit.cc
   WindowAC.unit.cc
   WindowEquivalentLayer.unit.cc
   WindowLayerEffectiveMultipliers.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
+  ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
