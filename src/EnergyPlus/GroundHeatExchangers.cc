@@ -2620,21 +2620,6 @@ namespace GroundHeatExchangers {
                                     "System",
                                     "Average",
                                     thisGLHE.name);
-<<<<<<< .mine
-                SetupOutputVariable("Ground Heat Exchanger Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    thisGLHE.QGLHE,
-                                    "System",
-                                    "Average",
-
-
-
-
-
-
-
-
-=======
                 SetupOutputVariable(
                     "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
                 SetupOutputVariable(
@@ -2648,40 +2633,6 @@ namespace GroundHeatExchangers {
                                     thisGLHE.aveFluidTemp,
                                     "System",
                                     "Average",
->>>>>>> .theirs
-                                    thisGLHE.name);
-<<<<<<< .mine
-                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.inletTemp,
-                                    "System",
-                                    "Average",
-=======
-                SetupOutputVariable("Ground Heat Exchanger Farfield Ground Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.tempGround,
-                                    "System",
-                                    "Average",
->>>>>>> .theirs
-                                    thisGLHE.name);
-<<<<<<< .mine
-                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.outletTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    thisGLHE.massFlowRate,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.aveFluidTemp,
-                                    "System",
-                                    "Average",
                                     thisGLHE.name);
                 SetupOutputVariable("Ground Heat Exchanger Farfield Ground Temperature",
                                     OutputProcessor::Unit::C,
@@ -2689,32 +2640,6 @@ namespace GroundHeatExchangers {
                                     "System",
                                     "Average",
                                     thisGLHE.name);
-=======
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> .theirs
             }
         }
 
@@ -2893,21 +2818,6 @@ namespace GroundHeatExchangers {
                                     "System",
                                     "Average",
                                     thisGLHE.name);
-<<<<<<< .mine
-                SetupOutputVariable("Ground Heat Exchanger Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    thisGLHE.QGLHE,
-                                    "System",
-                                    "Average",
-
-
-
-
-
-
-
-
-=======
                 SetupOutputVariable(
                     "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
                 SetupOutputVariable(
@@ -2921,59 +2831,7 @@ namespace GroundHeatExchangers {
                                     thisGLHE.aveFluidTemp,
                                     "System",
                                     "Average",
->>>>>>> .theirs
                                     thisGLHE.name);
-<<<<<<< .mine
-                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.inletTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.outletTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    thisGLHE.massFlowRate,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.aveFluidTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-=======
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> .theirs
             }
         }
     }
