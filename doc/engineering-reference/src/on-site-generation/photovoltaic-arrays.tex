@@ -4,7 +4,7 @@ The Photovoltaics module includes three different models referred to as ``Simple
 
 All of the photovoltaic models with the exception of the PVWatts model share the same models for predicting incident solar radiation that are also used for the solar thermal calculations and are described in the section Climate, Sky and Solar/Shading Calculations. The PVWatts generator uses the same solar calculations as the SAM software or PVWatts web API. 
 
-Note that some of the terminology used to discussed photovoltaics overlaps with terminology in software development and both may apply in these descriptions. The word \emph{module} may refer to a PV panel or to a fortran90 programming entity. \emph{Model} may refer to a manufacturers production model for a specific type of PV module or to a mathematical model used for engineering analysis. \emph{Array} may refer to a collection of PV modules wired together or to a mathematical variable with multiple elements.
+Note that some of the terminology used to discussed photovoltaics overlaps with terminology in software development and both may apply in these descriptions. The word \emph{module} may refer to a PV panel or to a C++ programming entity. \emph{Model} may refer to a manufacturers production model for a specific type of PV module or to a mathematical model used for engineering analysis. \emph{Array} may refer to a collection of PV modules wired together or to a mathematical variable with multiple elements.
 
 The PV modules are assumed to always run when the total incident solar is greater than 0.3 Watts. If the incident solar is less than 0.3, then the modules produce no power.
 
@@ -12,7 +12,7 @@ PV arrays are managed by an electric load center. The load center is a ``load'' 
 
 \subsection{Simple Model}\label{simple-model}
 
-The Generator:PV:Simple object describes about the simplest model for predicting photovoltaic energy production. In this model the user specifies the efficiency with which surfaces convert incident solar radiation to electricity. (In the other models this efficiency is determined as part of the model.)~ The full geometric model for solar radiation is used, including sky models, shading, and reflections, to determine the incident solar resource. The model accepts arbitrary conversion efficiencies and does not require actual production units be tested to obtain empirical performance coefficients. (The Energy+.idd sets the range of conversion efficiencies to be on {[}0..1{]}, but the user could alter the Energy+.idd to extend this range if desired.)
+The Generator:PV:Simple object describes about the simplest model for predicting photovoltaic energy production. In this model the user specifies the efficiency with which surfaces convert incident solar radiation to electricity. (In the other models this efficiency is determined as part of the model.)~ The full geometric model for solar radiation is used, including sky models, shading, and reflections, to determine the incident solar resource. The model accepts arbitrary conversion efficiencies and does not require actual production units be tested to obtain empirical performance coefficients. (The Energy+.idd sets the range of conversion efficiencies to be within {[}0..1{]}, but the user could alter the Energy+.idd to extend this range if desired.)
 
 \subsubsection{Mathematical Description}\label{mathematical-description}
 
@@ -20,22 +20,22 @@ The Generator:PV:Simple object describes about the simplest model for predicting
 \begin{longtable}[l]{p{1.2in}p{4.8in}}
 \caption{Nomenclature for Simple Photovoltaic model \label{table:nomenclature-for-simple-photovoltaic-model}} \tabularnewline
 \toprule 
-Mathematical variable & Description \tabularnewline
+Mathematical Variable & Description \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Nomenclature for Simple Photovoltaic model} \tabularnewline
 \toprule 
-Mathematical variable & Description \tabularnewline
+Mathematical Variable & Description \tabularnewline
 \midrule
 \endhead
 
-P & Electrical power produced by photovoltaics [W] \tabularnewline
-A\(_{surf}\) & Net area of surface~ [m\(^{2}\)] \tabularnewline
-f\(_{activ}\) & Fraction of surface area with active solar cells [] \tabularnewline
-G\(_{T}\) & Total solar radiation incident on PV array [W/m\(^{2}\)] \tabularnewline
-$\eta$\(_{cell}\) & Module conversion efficiency [] \tabularnewline
-$\eta$\(_{invert}\) & DC to AC conversion efficiency~ [] \tabularnewline
+P & Electrical power produced by photovoltaics (W) \tabularnewline
+A\(_{surf}\) & Net area of surface~ (m\(^{2}\)) \tabularnewline
+f\(_{activ}\) & Fraction of surface area with active solar cells \tabularnewline
+G\(_{T}\) & Total solar radiation incident on PV array (W/m\(^{2}\)) \tabularnewline
+$\eta$\(_{cell}\) & Module conversion efficiency \tabularnewline
+$\eta$\(_{invert}\) & DC to AC conversion efficiency \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -55,7 +55,7 @@ This model predicts the electrical performance of a photovoltaic (PV) array. Thi
 
 Mathematically speaking, the EnergyPlus PV module employs equations for an empirical equivalent circuit model to predict the current-voltage characteristics of a single module. This circuit consists of a DC current source, diode, and either one or two resistors. The strength of the current source is dependent on solar radiation and the IV characteristics of the diode are temperature-dependent. The results for a single module equivalent circuit are extrapolated to predict the performance of a multi-module array.
 
-The module employs a ``four-parameter'' equivalent circuit to model crystalline (both mono and poly) PV modules developed at the University of Wisconsin -- Madison {[}2{]}. The values of these parameters cannot normally be obtained directly from manufacturers' catalogs. However, the PV module will automatically calculate them from commonly available data. The PV module also includes an optional incidence angle modifier correlation to calculate how the reflectance of the PV module surface varies with the angle of incidence of solar radiation.
+The module employs a ``four-parameter'' equivalent circuit to model crystalline (both mono and poly) PV modules developed at the University of Wisconsin -- Madison. The values of these parameters cannot normally be obtained directly from manufacturers' catalogs. However, the PV module will automatically calculate them from commonly available data. The PV module also includes an optional incidence angle modifier correlation to calculate how the reflectance of the PV module surface varies with the angle of incidence of solar radiation.
 
 The module determines PV current as a function of load voltage. Other OUTPUTS include current and voltage at the maximum power point along the IV curve, open-circuit voltage, short circuit current as well as electrical load met and unmet.
 
@@ -73,13 +73,13 @@ Mathematical variable & Description \tabularnewline
 \midrule
 \endhead
 
-$\beta$ & Slope of PV array [degrees] \tabularnewline
+$\beta$ & Slope of PV array (degrees) \tabularnewline
 $\gamma$ & Empirical PV curve-fitting parameter \tabularnewline
-$\varepsilon$\(_{\gamma}\) & Semiconductor bandgap [eV] \tabularnewline
+$\varepsilon$\(_{\gamma}\) & Semiconductor bandgap (eV) \tabularnewline
 $\eta$\(_{c}\) & Module conversion efficiency \tabularnewline
-$\mu$\(_{I\alpha\gamma}\) & Temperature coefficient of short-circuit current [A/K] \tabularnewline
-$\mu$\(_{\zeta}\)\(_o\)\(_{\gamma}\) & Temperature coefficient of open-circuit voltage [V/K] \tabularnewline
-$\theta$ & Angle of incidence for solar radiation [degrees] \tabularnewline
+$\mu$\(_{isc}\) & Temperature coefficient of short-circuit current (A/K) \tabularnewline
+$\mu$\(_{voc}\) & Temperature coefficient of open-circuit voltage (V/K) \tabularnewline
+$\theta$ & Angle of incidence for solar radiation (degrees) \tabularnewline
 $\tau\alpha$ & Module transmittance-absorptance product \tabularnewline
 $\tau\alpha$\(_{normal}\) & Module transmittance-absorptance product at normal incidence \tabularnewline
 G\(_{T}\) & Total radiation incident on PV array \tabularnewline
@@ -98,24 +98,24 @@ I\(_{sc,ref}\) & Short-circuit current at reference conditions \tabularnewline
 I\(_{mp}\) & Current at maximum power point along IV curve \tabularnewline
 I\(_{mp,ref}\) & Current at maximum power point along IV curve, reference conditions \tabularnewline
 IAM & Dimensionless incidence angle modifier \tabularnewline
-K & Boltzmann constant [J/K] \tabularnewline
+K & Boltzmann constant (J/K) \tabularnewline
 NP & Number of modules in parallel in array \tabularnewline
 NS & Number of modules in series in array \tabularnewline
 N\(_{s}\) & Number of individual cells in module \tabularnewline
 P & PV output power \tabularnewline
 P\(_{max}\) & PV output power at maximum power point along IV curve \tabularnewline
 Q & Electron charge constant \tabularnewline
-R\(_{s}\) & Module series resistance [$\Omega$] \tabularnewline
-R\(_{sh}\) & Module shunt resistance [$\Omega$] \tabularnewline
-T\(_{c}\)­ & Module temperature [K] \tabularnewline
-T\(_{c,NOCT}\) & Module temperature at NOCT conditions [K] \tabularnewline
-T\(_{c,ref}\) & Module temperature at reference conditions [K] \tabularnewline
+R\(_{s}\) & Module series resistance ($\Omega$) \tabularnewline
+R\(_{sh}\) & Module shunt resistance ($\Omega$) \tabularnewline
+T\(_{c}\)­ & Module temperature (K) \tabularnewline
+T\(_{c,NOCT}\) & Module temperature at NOCT conditions (K) \tabularnewline
+T\(_{c,ref}\) & Module temperature at reference conditions (K) \tabularnewline
 U\(_{L}\) & Array thermal loss coefficient \tabularnewline
 V & Voltage \tabularnewline
 V\(_{mp}\) & Voltage at maximum power point along IV curve \tabularnewline
 V\(_{mp,ref}\) & Voltage at maximum power point along IV curve, reference conditions \tabularnewline
 V\(_{oc}\)­ & Open-circuit voltage \tabularnewline
-V\(_{oc,ref}\) & Open-circuit voltage at reference conditions [V] \tabularnewline
+V\(_{oc,ref}\) & Open-circuit voltage at reference conditions (V) \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -129,9 +129,9 @@ The four-parameter equivalent circuit model was developed largely by Townsend {[
 {\left( {\frac{{dI}}{{dV}}} \right)_{v = 0}} = 0
 \end{equation}
 
-This is a reasonable approximation for crystalline modules. The ``four parameters'' in the model are \emph{I\(_{L,ref}\)}, \emph{I\(_{o,ref,}\)} g, and \emph{R\(_{s}\).} These are empirical values that cannot be determined directly through physical measurement. The EnergyPlus model calculates these values from manufactures' catalog data as discussed in the following section on calculating these parameters
+This is a reasonable approximation for crystalline modules. The ``four parameters'' in the model are \(I_{L,ref}\), \(I_{o,ref}\), \(\gamma\), and \(R_{s}\). These are empirical values that cannot be determined directly through physical measurement. The EnergyPlus model calculates these values from manufactures' catalog data as discussed in the following section on calculating these parameters.
 
-The four-parameter equivalent circuit is shown in the following figure:
+The four-parameter equivalent circuit is shown in Figure~\ref{fig:equivalent-circuit-in-the-four-parameter}.
 
 \begin{figure}[hbtp] % fig 339
 \centering
@@ -143,33 +143,36 @@ The four-parameter equivalent circuit is shown in the following figure:
 
 \textbf{Determining Performance under Operating Conditions}
 
-The IV characteristics of a PV change with both insolation and temperature. The PV model employs these environmental conditions along with the four module constants \emph{I\(_{L,ref}\)}, \emph{I\(_{o,ref,}\)} g, and \emph{R\(_{s}\)} to generate an IV curve at each timestep.
+The IV characteristics of a PV change with both insolation and temperature. The PV model employs these environmental conditions along with the four module constants \(I_{L,ref}\), \(I_{o,ref}\), \(\gamma\), and \(R_{s}\) to generate an IV curve at each timestep.
 
-The current-voltage equation of circuit shown in the previous figure is as follows:
+The current-voltage equation of circuit shown in Figure~\ref{fig:equivalent-circuit-in-the-four-parameter} is as follows:
 
 \begin{equation}
 I = {I_L} - {I_o}\left[ {\exp \left( {\frac{q}{{\gamma k{T_c}}}\left( {V + I{R_s}} \right)} \right) - 1} \right]
+\label{eq:ElecLoadI869}
 \end{equation}
 
-\emph{R\(_{s}\)} and g are constants. The photocurrent \emph{I\(_{L}\)} depends linearly on incident radiation:
+where \(R_{s}\) and \(\gamma\) are constants. The photocurrent \(I_{L}\) depends linearly on incident radiation:
 
 \begin{equation}
 {I_L} = {I_{L,ref}}\frac{{{G_T}}}{{{G_{T,ref}}}}
+\label{eq:ElecLoadIL870}
 \end{equation}
 
-The reference insolation \emph{G\(_{ref}\)} ~is nearly always defined as 1000 W/m\(^{2}\). The diode reverse saturation current \emph{I\(_{o}\)} is a temperature dependent quantity:
+The reference insolation \(G_{ref}\) is nearly always defined as 1000 W/m\(^{2}\). The diode reverse saturation current \(I_{o}\) is a temperature dependent quantity:
 
 \begin{equation}
 \frac{{{I_o}}}{{{I_{o,ref}}}} = {\left( {\frac{{{T_c}}}{{{T_{c,ref}}}}} \right)^3}
+\label{eq:ElecLoadIoOverIoref871}
 \end{equation}
 
-Equation gives the current implicitly as a function of voltage. Once \emph{I\(_{o}\)} and \emph{I\(_{L}\)} are found from Eqs. 3 and 4, Newton's method is employed to calculate the PV current. In addition, an iterative search routine finds the current (\emph{I\(_{mp}\)}) ~and voltage (\emph{V\(_{mp}\)})~ at the point of maximum power along the IV curve.
+Equation~\ref{eq:ElecLoadI869} gives the current implicitly as a function of voltage. Once \(I_{o}\) and \(I_{L}\) are found from Equations~\ref{eq:ElecLoadIL870} and~\ref{eq:ElecLoadIoOverIoref871}, Newton's method is employed to calculate the PV current. In addition, an iterative search routine finds the current (\(I_{mp}\)) and voltage (\(V_{mp}\)) at the point of maximum power along the IV curve.
 
-\textbf{Calculating \emph{I\(_{L,ref}\)}, \emph{I\(_{o,ref,}\)}} \textbf{g, and \emph{R\(_{s}\)}}
+\textbf{Calculating \(I_{L,ref}\), \(I_{o,ref}\), \(\gamma\), and \(R_{s}\)}
 
-The Idf specification for the PV model include several values which must be read from manufacturers' PV module catalogs. The manufactures' values are used to determine the equivalent circuit characteristics \emph{I\(_{L,ref}\)}, \emph{I\(_{o,ref,}\)} g, and \emph{R\(_{s}\)}. These characteristics define an equivalent circuit that is employed to find the PV performance at each timestep, as described previously. This section describes the algebra and calculation algorithms used to solve for the four equivalent circuit characteristics.
+The Idf specification for the PV model include several values which must be read from manufacturers' PV module catalogs. The manufactures' values are used to determine the equivalent circuit characteristics \(I_{L,ref}\), \(I_{o,ref}\), \(\gamma\), and \(R_{s}\). These characteristics define an equivalent circuit that is employed to find the PV performance at each timestep, as described previously. This section describes the algebra and calculation algorithms used to solve for the four equivalent circuit characteristics.
 
-Three of these values, \emph{I\(_{L,ref}\)}, \emph{I\(_{o,ref,}\)} g, may be isolated algebraically. The first step is to substitute the current and voltage into Eq. at the open-circuit, short circuit, and maximum power conditions:
+Three of these values, \(I_{L,ref}\), \(I_{o,ref}\), and \(\gamma\) may be isolated algebraically. The first step is to substitute the current and voltage into Equation~\ref{eq:ElecLoadI869} at the open-circuit, short circuit, and maximum power conditions:
 
 \begin{equation}
 0 = {I_{L,ref}} - {I_{o,ref}}\left[ {\exp \left( {\frac{q}{{\gamma k{T_{c,ref}}}}{V_{oc,ref}}} \right) - 1} \right] - \frac{{{V_{oc,ref}}}}{{{R_{sh}}}}
@@ -183,39 +186,43 @@ Three of these values, \emph{I\(_{L,ref}\)}, \emph{I\(_{o,ref,}\)} g, may be iso
 {I_{mp,ref}} = {I_{L,ref}} - {I_{o,ref}}\left[ {\exp \left( {\frac{q}{{\gamma k{T_{c,ref}}}}\left( {{V_{mp,ref}} + {I_{mp,ref}}{R_s}} \right)} \right) - 1} \right] - \frac{{{V_{mp,ref}} + {I_{mp,ref}}{R_s}}}{{{R_{sh}}}}
 \end{equation}
 
-In each case the ``-1'' term is may be dropped to simplify the algebra. This approximation has little influence on the right side of the equations since because the magnitude of \emph{I\(_{o}\)} is very small, generally on the order of 10\(^{-6}\) A. Some rearrangement then yields the following three expressions which isolate \emph{I\(_{L,ref}\)}, \emph{I\(_{o,ref,}\)} g:
+In each case the ``-1'' term is/may be dropped to simplify the algebra. This approximation has little influence on the right side of the equations since because the magnitude of \emph{I\(_{o}\)} is very small, generally on the order of 10\(^{-6}\) A. Some rearrangement then yields the following three expressions which isolate \(I_{L,ref}\), \(I_{o,ref}\), and \(\gamma\):
 
 \begin{equation}
 {I_{L,ref}} \approx {I_{sc,ref}}
+\label{eq:ElecLoadILref875}
 \end{equation}
 
 \begin{equation}
 \gamma  = \frac{{q\left( {{V_{mp,ref}} - {V_{oc,ref}} + I_{mp,ref}^{}{R_s}} \right)}}{{k{T_{c,ref}}\ln \left( {1 - \frac{{{I_{mp,ref}}}}{{{I_{sc,ref}}}}} \right)}}
+\label{eq:ElecLoadGamma876}
 \end{equation}
 
 \begin{equation}
 {I_{o,ref}} = \frac{{{I_{sc,ref}}}}{{\exp \left( {\frac{{q{V_{oc,ref}}}}{{\gamma k{T_{c,ref}}}}} \right)}}
+\label{eq:ElecLoadIoref877}
 \end{equation}
 
 At this point an additional equation is needed in order to determine the last unknown parameter. Taking the analytical derivative of voltage with respect to temperature at the reference open-circuit condition derives the fourth equation. This analytical value is matched to the open-circuit temperature coefficient, a catalog specification:
 
 \begin{equation}
 \frac{{\partial {V_{oc}}}}{{\partial {T_c}}} = {\mu_{voc}} = \frac{{\gamma k}}{q}\left[ {\ln \left( {\frac{{{I_{sc,ref}}}}{{{I_{o,ref}}}}} \right) + \frac{{{T_c}\mu_{isc}^{}}}{{{I_{sc,ref}}}} - \left( {3 + \frac{{q\varepsilon }}{{Ak{T_{c,ref}}}}} \right)} \right]
+\label{eq:ElecLoaddVocdTc878}
 \end{equation}
 
-where
+where:
 
 \begin{equation}
 A = \frac{\gamma }{{{N_s}}}
 \end{equation}
 
-The ``TRNSYS PV model'' uses an iterative search routine in these four equations to calculate the equivalent circuit characteristics. The first step is to set upper and lower bounds for the series resistance parameter \emph{R\(_{s}\)}:~ physical constraints require the \emph{R\(_{s}\)} value to lie between 0 and the value such that g = \emph{N\(_{s}\)}. The initial guess for \emph{R\(_{s}\)} is midway between these bounds. g and \emph{I\(_{o,ref}\)} ~are found from Eq. and Eq. , while Eq. gives a trivial solution for \emph{I\(_{L,ref}\)}.~ The model then employs Eq. to compare the analytical and catalog values for m\(_{voc}\). When all other variables are held constant, the analytical value for m\(_{voc}\) increases monotonically with series resistance (Townsend 1989). If the analytical voltage coefficient is less than the catalog value, the lower bound for \emph{R\(_{s}\)} is reset to the present guess value. Likewise, the upper bound is set to the current value if the calculated m\(_{voc}\) is too large. After resetting the upper or lower bound for \emph{R\(_{s}\)}, a new guess value is found by averaging the bounds. This procedure repeats until \emph{R\(_{s}\)} and g converge. Note that for \emph{I\(_{L,ref}\)}, \emph{I\(_{o,ref,}\)} g, and \emph{R\(_{s}\)} are assumed to be constant and are calculated only on the first call in the simulation. Alternatively, the user may enter a known series resistance by entering a \textbf{positive} value in the IDF. In this case the iterative routine described above is skipped and Eqs. , , and find \emph{I\(_{L,ref}\)}, \emph{I\(_{o,ref,}\)} and g directly from the given value of \emph{R\(_{s}\)}.
+The ``TRNSYS PV model'' uses an iterative search routine in these four equations to calculate the equivalent circuit characteristics. The first step is to set upper and lower bounds for the series resistance parameter \emph{R\(_{s}\)}:~ physical constraints require the \(R_{s}\) value to lie between 0 and the value such that \(\gamma\) = \(N_{s}\). The initial guess for \(R_{s}\) is midway between these bounds. \(\gamma\) and \(I_{o,ref}\) are found from Equations~\ref{eq:ElecLoadGamma876} and~\ref{eq:ElecLoadIoref877}, while Equation~\ref{eq:ElecLoadILref875} gives a trivial solution for \(I_{L,ref}\).~ The model then employs Equation~\ref{eq:ElecLoaddVocdTc878} to compare the analytical and catalog values for \(m_{voc}\). When all other variables are held constant, the analytical value for \(m_{voc}\) increases monotonically with series resistance (Townsend 1989). If the analytical voltage coefficient is less than the catalog value, the lower bound for \(R_{s}\) is reset to the present guess value. Likewise, the upper bound is set to the current value if the calculated \(m_{voc}\) is too large. After resetting the upper or lower bound for \(R_{s}\), a new guess value is found by averaging the bounds. This procedure repeats until \(R_{s}\) and \(\gamma\) converge. Note that for \(I_{L,ref}\), \(I_{o,ref,}\), \(\gamma\), and \(R_{s}\) are assumed to be constant and are calculated only on the first call in the simulation. Alternatively, the user may enter a known series resistance by entering a \textbf{positive} value in the IDF. In this case the iterative routine described above is skipped and Equations~\ref{eq:ElecLoadILref875},~\ref{eq:ElecLoadGamma876}, and~\ref{eq:ElecLoadIoref877} find \(I_{L,ref}\), \(I_{o,ref,}\), and \(\gamma\) directly from the given value of \(R_{s}\).
 
 \paragraph{PV Section 2 : Module Operating Temperature}\label{pv-section-2-module-operating-temperature}
 
 The PV model uses one of five methods for determining cell temperature data. The cell temperature of a PV module is important because the hotter the temperature of the panel, the lower its electrical output. The cell temperature calculation method is chosen by the user in the EnergyPlus IDF file through a parameter choice in the IDD entry called Integration and Cell Temperature Mode.
 
-If the value of this parameter is ``\textbf{Decoupled NOCT Conditions}'' then the cell temperature of the PV is modeled using the method from the Duffie and Beckman (1991) for estimating cell temperature. This is based upon the standard NOCT (Nominal Operating Cell Temperature) measurements to compute the module temperature Tc at each timestep. The NOCT temperature (Tc,NOCT) is the operating temperature of the module with a wind speed of 1 m/s, no electrical load, and a certain specified insolation and ambient temperature {[}Beckman and Duffie, 1991{]}. The values for insolation GT,NOCT ~and ambient temperature \emph{T\(_{a,NOCT}\)} are usually 800 W/m\(^{2}\) and 20º C. \emph{h\(_{c}\)} is the convesion efficiency of the module, which varies with ambient conditions. ta is a user-defined constant.
+If the value of this parameter is ``\textbf{Decoupled NOCT Conditions}'' then the cell temperature of the PV is modeled using the method from the Duffie and Beckman (1991) for estimating cell temperature. This is based upon the standard NOCT (Nominal Operating Cell Temperature) measurements to compute the module temperature \(T_c\) at each timestep. The NOCT temperature (\(T_c\),NOCT) is the operating temperature of the module with a wind speed of 1 m/s, no electrical load, and a certain specified insolation and ambient temperature {[}Beckman and Duffie, 1991{]}. The values for insolation GT,NOCT ~and ambient temperature \(T_{a,NOCT}\) are usually 800 W/m\(^{2}\) and 20\(^{\circ}\)C. \(\eta_{c}\) is the convesion efficiency of the module, which varies with ambient conditions. \({\tau \alpha}\) is a user-defined constant.
 
 The equation is:
 
@@ -255,7 +262,7 @@ Ulleberg, Øystein. \emph{HYDROGEMS Component Library for TRNSYS 15 User Manual}
 
 The third model available in EnergyPlus for predicting the electricity generated by photovoltaics is referred to as the Sandia model. This model is based on work done at Sandia National Lab, Albuquerque, NM by David King -- with the help of many others. The model consists of a series of empirical relationships with coefficients that are derived from actual testing. Once the coefficients for a particular module are available, it is straightforward matter to use the model equations to calculate five select points on the current-voltage curve.
 
-The implementation in EnergyPlus is also based on work done by Greg Barker (2003) for the National Renewable Energy Lab who implemented the Sandia model in FORTRAN77 as a custom type (Type101) for the TRNSYS computer program.
+The C++ implementation in EnergyPlus is also based on work done by Greg Barker (2003) for the National Renewable Energy Lab who implemented the Sandia model in FORTRAN77 as a custom type (Type101) for the TRNSYS computer program.
 
 There are several climate and solar orientation inputs to the model that are managed elsewhere in EnergyPlus including: incident beam solar, incident diffuse solar, incidence angle of beam solar, solar zenith Angle, outdoor drybulb, wind speed, and elevation.
 
@@ -287,9 +294,9 @@ P\(_{mp}\) & Power at maximum-power point (W) \tabularnewline
 fd & Fraction of diffuse irradiance used by module \tabularnewline
 N\(_{s}\) & Number of cells in series in a module’s cell-string \tabularnewline
 N\(_{p}\) & Number of cell-strings in parallel in module \tabularnewline
-k & Boltzmann’s constant, 1.38066E-23 (J/k) \tabularnewline
+k & Boltzmann’s constant, 1.38066E-23 (J/K) \tabularnewline
 q & Elementary charge, 1.60218E-19 (coulomb) \tabularnewline
-T\(_{c}\) & Cell temperature inside module (°C) \tabularnewline
+T\(_{c}\) & Cell temperature inside module (\(^{\circ}\)C) \tabularnewline
 $\delta$(T\(_{c}\)) & ‘Thermal voltage’ per cell at temperature T\(_{c}\), approximately 1 volt for a typical 26-cell crystalline silicon module \tabularnewline
 E\(_{e}\) & ‘Effective’ solar irradiance \tabularnewline
 E\(_{b}\) & Beam solar irradiance \tabularnewline
@@ -305,30 +312,30 @@ f\(_{1}\)(AM\(_{a}\)) & Empirical polynomial function used to relate short-circu
 f\(_{2}\)(AOI) & Empirical polynomial function used to relate short-circuit current to the solar angle-of-incidence \tabularnewline
 a\(_{0}\), a\(_{1}\), a\(_{2}\), a\(_{3}\), a\(_{4}\) & Empirical coefficients for f\(_{1}\)(AM\(_{a}\)) polynomial \tabularnewline
 b\(_{0}\), b\(_{1}\), b\(_{2}\), b\(_{3}\), b\(_{4}\),b\(_{5}\),b\(_{6}\) & Empirical coefficients for f\(_{2}\)(AOI) polynomial \tabularnewline
-T\(_{o}\) & Reference cell temperature for rating, typically fixed at 25°C \tabularnewline
+T\(_{o}\) & Reference cell temperature for rating, typically fixed at 25\(^{\circ}\)C \tabularnewline
 I\(_{sco}\) & Short circuit current at reference conditions \tabularnewline
 I\(_{mpo}\) & Max power point current at reference conditions \tabularnewline
 V\(_{mpo}\) & Voltage at max power at reference conditions \tabularnewline
 V\(_{oco}\) & Open circuit voltage at reference conditions \tabularnewline
 I\(_{xo}\) & Current at V = 0.5 Voc and at reference conditions \tabularnewline
 I\(_{xxo}\) & Current at V = 0.5 (Vmp + Voc) and at reference conditions \tabularnewline
-$\alpha$\(_{Isc}\) & Normalized temperature coefficient for I\(_{sc}\) (1/°C) \tabularnewline
-$\alpha$\(_{Imp}\) & Normalized temperature coefficient for I\(_{mp}\) (1/°C) \tabularnewline
+$\alpha$\(_{Isc}\) & Normalized temperature coefficient for I\(_{sc}\) (1/\(^{\circ}\)C) \tabularnewline
+$\alpha$\(_{Imp}\) & Normalized temperature coefficient for I\(_{mp}\) (1/\(^{\circ}\)C) \tabularnewline
 $\beta$\(_{Voc}\)(E\(_{e}\)) & Temperature coefficient for module open-circuit-voltage as function of E\(_{e}\) \tabularnewline
 $\beta$\(_{Voco}\) & Temperature coefficient for module open-circuit-voltage at reference conditions \tabularnewline
-m\(_{\beta}\)\(_{Voco}\) & Coefficient for irradiance dependence of open-circuit-voltage-temperature coefficient, often zero (V/°C) \tabularnewline
+m\(_{\beta}\)\(_{Voco}\) & Coefficient for irradiance dependence of open-circuit-voltage-temperature coefficient, often zero (V/\(^{\circ}\)C) \tabularnewline
 $\beta$\(_{Vmp}\)(E\(_{e}\)) & Temperature coefficient for module maximum-power-voltage as a function of E \tabularnewline
 $\beta$\(_{Vmpo}\) & Temperature coefficient for module maximum-power-voltage at reference conditions \tabularnewline
-m\(_{\beta}\)\(_{Voco}\) & Cofficient for irradiance dependence of maximum-power-voltage-temperature coefficient, often zero (V/°C) \tabularnewline
-T\(_{m}\) & PV module temperature at back suface (°C) \tabularnewline
-T\(_{a}\) & Ambient outdoor drybulb temperature (°C) \tabularnewline
+m\(_{\beta}\)\(_{Voco}\) & Cofficient for irradiance dependence of maximum-power-voltage-temperature coefficient, often zero (V/\(^{\circ}\)C) \tabularnewline
+T\(_{m}\) & PV module temperature at back suface (\(^{\circ}\)C) \tabularnewline
+T\(_{a}\) & Ambient outdoor drybulb temperature (\(^{\circ}\)C) \tabularnewline
 E & Solar irradiance incident on module surface (W/m\(^{2}\)) \tabularnewline
 WS & Wind speed at standard 10-m height (m/s) \tabularnewline
 a & Empirical coefficient relating module temperature at low wind and high solar irradiance \tabularnewline
 b & Empirical coefficient relating module temperature decrease with increasing wind speed \tabularnewline
-T\(_{c}\) & Temperature of solar cell inside module (°C) \tabularnewline
+T\(_{c}\) & Temperature of solar cell inside module (\(^{\circ}\)C) \tabularnewline
 E\(_{o}\) & Reference solar irradiance (1000 W/m\(^{2}\)) \tabularnewline
-$\Delta$T & Temperature difference between T\(_{c}\) and T\(_{m}\) at E\(_{o}\) (°C), (This is d(Tc) in Sandia database) \tabularnewline
+$\Delta$T & Temperature difference between T\(_{c}\) and T\(_{m}\) at E\(_{o}\) (\(^{\circ}\)C), (This is d(Tc) in the Sandia database) \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -362,7 +369,7 @@ The current implementation in EnergyPlus focuses on determining performance at t
 {I_{xx}} = {I_{xxo}} \cdot \left\{ {{C_6} \cdot {E_e} + {C_7} \cdot E_e^2} \right\} \cdot \left\{ {1 + ({\alpha_{{\mathop{\rm Im}\nolimits} p}}) \cdot ({T_c} - {T_{o)}}} \right\}
 \end{equation}
 
-where,
+where:
 
 \begin{equation}
 {E_e} = {I_{sc}}/\left[ {{I_{sco}} \cdot \left\{ {1 + {\alpha_{Isc}} \cdot ({T_c} - {T_o})} \right\}} \right]

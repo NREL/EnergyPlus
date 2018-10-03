@@ -83,10 +83,10 @@ namespace DataSystemVariables {
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
-    using DataStringGlobals::CurrentWorkingFolder;
-    using DataStringGlobals::ProgramPath;
     using DataStringGlobals::altpathChar;
+    using DataStringGlobals::CurrentWorkingFolder;
     using DataStringGlobals::pathChar;
+    using DataStringGlobals::ProgramPath;
     using namespace FileSystem;
 
     // Data

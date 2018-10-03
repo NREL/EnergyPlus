@@ -41,6 +41,7 @@ set( test_src
   DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
+  DataSizing.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DaylightingManager.unit.cc
@@ -92,7 +93,6 @@ set( test_src
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   HVACUnitaryBypassVAV.unit.cc
-  HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
   HybridModel.unit.cc
@@ -108,6 +108,7 @@ set( test_src
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
   OASystemHWPreheatCoil.unit.cc
+  OutAirNodeManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
@@ -134,6 +135,7 @@ set( test_src
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  RunPeriod.unit.cc
   RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
@@ -157,10 +159,13 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
+  SZVAVModel.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
+  UnitarySystem.unit.cc
   UnitHeater.unit.cc
+  UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
@@ -171,6 +176,7 @@ set( test_src
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  WinCalcEngine.unit.cc
   WindowAC.unit.cc
   WindowEquivalentLayer.unit.cc
   WindowLayerEffectiveMultipliers.unit.cc

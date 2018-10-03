@@ -21,7 +21,7 @@ compilers:
     cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
 
   - name: cppcheck
-    compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*" --suppress="syntaxError:*" --suppress="*:*sqlite*" --suppress="invalidscanf:*DElight*" --suppress="uninitMemberVar:*DElight*" --suppress="invalidScanfArgType_int:*DElight*" --suppress="uninitMemberVar:*jsoncpp*" --suppress="*:*re2*" --suppress="*:*eigen*"
+    compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*" --suppress="syntaxError:*" --suppress="*:*sqlite*" --suppress="invalidscanf:*DElight*" --suppress="uninitMemberVar:*DElight*" --suppress="invalidScanfArgType_int:*DElight*" --suppress="uninitMemberVar:*jsoncpp*" --suppress="*:*re2*" --suppress="*:*eigen*" --suppress="constStatement:*kiva-ep*"
 
   - name: "gcc"
     version: "4.8"
@@ -54,15 +54,16 @@ compilers:
     skip_packaging: true
 
 #  - name: "gcc"
-#    build_tag: ValidationDocumentation
+#    build_tag: 179D_Reporting
 #    build_package_generator: "STGZ"
 #    version: "4.8"
 #    skip_packaging: true
 #    release_only: true
-#    s3_upload: ValidationReports-prefix/src/ValidationReports-build/Products
+#    s3_upload: 179D_Reports
 #    s3_upload_bucket: energyplus
 #    skip_regression: true
-#    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DBUILD_VALIDATION_REPORTS=ON -DBUILD_PYTHON_TESTS:BOOL=ON
+#    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA
+#-D179D_COMPLIANCE:BOOL=ON
 
   - name: custom_check
     commands:

@@ -347,53 +347,43 @@ namespace EconomicLifeCycleCost {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
-        //    MODIFIED       na
-        //    RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //    Read the input file for "LifeCycleCost:Parameters" object.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int jFld;
+        int jFld;   // loop counter
+        int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray(100);  // character string data
-        Array1D<Real64> NumArray(100);   // numeric data
+        Array1D_string AlphaArray;       // character string data
+        Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
         int NumObj;                      // count of objects
 
         CurrentModuleObject = "LifeCycleCost:Parameters";
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        NumArray.allocate(NumNums);
+        AlphaArray.allocate(NumAlphas);
         NumObj = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         if (NumObj == 0) {
             LCCparamPresent = false;
         } else if (NumObj == 1) {
             LCCparamPresent = true;
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          AlphaArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -607,51 +597,41 @@ namespace EconomicLifeCycleCost {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
-        //    MODIFIED       na
-        //    RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //    Read the input file for "LifeCycleCost:RecurringCosts" object.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int iInObj; // loop index variable for reading in objects
-        int jFld;
+        int jFld;   // loop counter
+        int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray(100);  // character string data
-        Array1D<Real64> NumArray(100);   // numeric data
+        Array1D_string AlphaArray;       // character string data
+        Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
 
         if (!LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:RecurringCosts";
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        NumArray.allocate(NumNums);
+        AlphaArray.allocate(NumAlphas);
         numRecurringCosts = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         RecurringCosts.allocate(numRecurringCosts);
         for (iInObj = 1; iInObj <= numRecurringCosts; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          AlphaArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -797,47 +777,28 @@ namespace EconomicLifeCycleCost {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
-        //    MODIFIED       na
-        //    RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //    Read the input file for "LifeCycleCost:NonrecurringCost" object.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int iInObj; // loop index variable for reading in objects
-        int jFld;
+        int jFld;   // loop counter
+        int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray(100);  // character string data
-        Array1D<Real64> NumArray(100);   // numeric data
+        Array1D_string AlphaArray;       // character string data
+        Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
         int numComponentCostLineItems;   // number of ComponentCost:LineItem objects
 
         if (!LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:NonrecurringCost";
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        NumArray.allocate(NumNums);
+        AlphaArray.allocate(NumAlphas);
         numNonrecurringCost = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         numComponentCostLineItems = inputProcessor->getNumObjectsFound("ComponentCost:LineItem");
         if (numComponentCostLineItems > 0) {                    // leave room for component cost total
@@ -846,8 +807,17 @@ namespace EconomicLifeCycleCost {
             NonrecurringCost.allocate(numNonrecurringCost);
         }
         for (iInObj = 1; iInObj <= numNonrecurringCost; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          AlphaArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -934,46 +904,28 @@ namespace EconomicLifeCycleCost {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
-        //    MODIFIED       na
-        //    RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //    Read the input file for "LifeCycleCost:UsePriceEscalation" object.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int iInObj; // loop index variable for reading in objects
-        int jYear;
-        int jFld;
+        int jFld;   // loop counter
+        int jYear;  // loop counter
+        int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray(100);  // character string data
-        Array1D<Real64> NumArray(100);   // numeric data
+        Array1D_string AlphaArray;       // character string data
+        Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
 
         if (!LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:UsePriceEscalation";
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        NumArray.allocate(NumNums);
+        AlphaArray.allocate(NumAlphas);
         numUsePriceEscalation = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         UsePriceEscalation.allocate(numUsePriceEscalation);
         for (iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj) {
@@ -981,8 +933,17 @@ namespace EconomicLifeCycleCost {
         }
         if (numUsePriceEscalation > 0) {
             for (iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj) {
-                inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              iInObj,
+                                              AlphaArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 // check to make sure none of the values are another life cycle cost object
                 for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                     if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -1077,48 +1038,29 @@ namespace EconomicLifeCycleCost {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2010
-        //    MODIFIED       na
-        //    RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //    Read the input file for "LifeCycleCost:UseAdjustment" object.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int iInObj; // loop index variable for reading in objects
-        int jFld;
-        int jYear;
+        int jFld;   // loop counter
+        int jYear;  // loop counter
+        int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray(100);  // character string data
-        Array1D<Real64> NumArray(100);   // numeric data
+        Array1D_string AlphaArray;       // character string data
+        Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
         int numFldsToUse;
 
         if (!LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:UseAdjustment";
+        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        NumArray.allocate(NumNums);
+        AlphaArray.allocate(NumAlphas);
         numUseAdjustment = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         UseAdjustment.allocate(numUseAdjustment);
         for (iInObj = 1; iInObj <= numUseAdjustment; ++iInObj) {
@@ -1126,8 +1068,17 @@ namespace EconomicLifeCycleCost {
         }
         if (numUseAdjustment > 0) {
             for (iInObj = 1; iInObj <= numUseAdjustment; ++iInObj) {
-                inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              iInObj,
+                                              AlphaArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 // check to make sure none of the values are another life cycle cost object
                 for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                     if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -2034,12 +1985,12 @@ namespace EconomicLifeCycleCost {
         // na
 
         // Using/Aliasing
+        using OutputReportTabular::displayLifeCycleCostReport;
         using OutputReportTabular::IntToStr;
         using OutputReportTabular::RealToStr;
         using OutputReportTabular::WriteReportHeaders;
         using OutputReportTabular::WriteSubtitle;
         using OutputReportTabular::WriteTable;
-        using OutputReportTabular::displayLifeCycleCostReport;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2157,8 +2108,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Life-Cycle Cost Parameters");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Life-Cycle Cost Parameters");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2191,8 +2142,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Use Price Escalation");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Use Price Escalation");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2224,8 +2175,8 @@ namespace EconomicLifeCycleCost {
                 WriteSubtitle("Use Adjustment");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                           "Use Adjustment");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();
@@ -2261,7 +2212,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2288,7 +2243,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Energy and Water Cost Cash Flows (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Energy and Water Cost Cash Flows (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2316,7 +2275,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Capital Cash Flow by Category (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Capital Cash Flow by Category (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2357,7 +2320,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Operating Cash Flow by Category (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Operating Cash Flow by Category (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2402,8 +2369,8 @@ namespace EconomicLifeCycleCost {
                 WriteSubtitle("DEBUG ONLY - Monthly Cash Flows");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                           "DEBUG ONLY - Monthly Cash Flows");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();
@@ -2431,8 +2398,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Monthly Total Cash Flow (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Monthly Total Cash Flow (Without Escalation)");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2515,7 +2482,11 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
                                                        "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
             }
             columnHead.deallocate();
@@ -2567,8 +2538,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Present Value by Category");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Present Value by Category");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2598,8 +2569,8 @@ namespace EconomicLifeCycleCost {
             WriteSubtitle("Present Value by Year");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                       "Present Value by Year");
+                sqlite->createSQLiteTabularDataRecords(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2636,8 +2607,8 @@ namespace EconomicLifeCycleCost {
                 WriteSubtitle("After Tax Estimate");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
-                                                           "After Tax Estimate");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();

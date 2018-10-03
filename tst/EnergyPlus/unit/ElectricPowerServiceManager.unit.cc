@@ -59,6 +59,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/General.hh>
@@ -213,8 +214,8 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
     Real64 Pw = 2.0;
     Real64 q0 = 60.2;
 
-    EXPECT_TRUE(facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj->determineCurrentForBatteryDischarge(I0, T0, Volt, Pw, q0, CurveNum1, k,
-                                                                                                                   c, qmax, E0c, InternalR));
+    EXPECT_TRUE(facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj->determineCurrentForBatteryDischarge(
+        I0, T0, Volt, Pw, q0, CurveNum1, k, c, qmax, E0c, InternalR));
 
     I0 = -222.7;
     T0 = -0.145;
@@ -222,8 +223,8 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
     Pw = 48000;
     q0 = 0;
 
-    EXPECT_FALSE(facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj->determineCurrentForBatteryDischarge(I0, T0, Volt, Pw, q0, CurveNum1,
-                                                                                                                    k, c, qmax, E0c, InternalR));
+    EXPECT_FALSE(facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj->determineCurrentForBatteryDischarge(
+        I0, T0, Volt, Pw, q0, CurveNum1, k, c, qmax, E0c, InternalR));
 }
 
 TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1)
@@ -441,7 +442,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
 
     createFacilityElectricPowerServiceObject();
@@ -554,7 +555,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
 
     // Case 4 DCBussInverterDCStorage    Inverter = 5000,
@@ -648,7 +649,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
 
     createFacilityElectricPowerServiceObject();
@@ -702,4 +703,107 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting)
     EXPECT_TRUE(SimElecCircuitsFlag);
     EXPECT_EQ(facilityElectricServiceObj->elecLoadCenterObjs[0]->numGenerators,
               0); // dummy generator has been added and report variables are available
+}
+TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Version,8.4;",
+
+        "  ElectricLoadCenter:Distribution,",
+        "    Test Load Center,        !- Name",
+        "    Generator List,          !- Generator List Name",
+        "    TrackElectrical,         !- Generator Operation Scheme Type",
+        "    10000.0,                 !- Demand Limit Scheme Purchased Electric Demand Limit {W}",
+        "    ,                        !- Track Schedule Name Scheme Schedule Name",
+        "    ,                        !- Track Meter Scheme Meter Name",
+        "    AlternatingCurrent,      !- Electrical Buss Type",
+        "    Test Inverter,           !- Inverter Object Name",
+        "    Test Storage Bank,       !- Electrical Storage Object Name",
+        "    Transformer;             !- Transformer Object Name",
+
+        "  ElectricLoadCenter:Inverter:Simple,",
+        "    Test Inverter,",
+        "    Always_ON,               !- availability schedule",
+        "    ,                        !- zone name",
+        "    ,                        !- radiative fraction",
+        "    1.0;                     !- Inverter efficiency",
+
+        "  ElectricLoadCenter:Storage:Simple,",
+        "    Test Storage Bank,",
+        "    Always_ON,               !- availability schedule",
+        "    ,                        !- zone name",
+        "    ,                        !- radiative fraction",
+        "    1.0,                     !- Nominal Energetic Efficiency for Charging",
+        "    1.0,                     !- Nominal Discharging Energetic efficiency",
+        "    1.0E9,                   !- Maximum storage capacity",
+        "    5000.0,                  !- Maximum Power for Discharging",
+        "    5000.0,                  !- Maximum Power for Charging",
+        "    1.0E9;                   !- initial stat of charge",
+
+        "  ElectricLoadCenter:Generators,",
+        "    Generator List,          !- Name",
+        "    Test Gen 1,              !- Generator 1 Name",
+        "    Generator:InternalCombustionEngine,  !- Generator 1 Object Type",
+        "    1000.0,                  !- Generator 1 Rated Electric Power Output {W}",
+        "    Always_ON,               !- Generator 1 Availability Schedule Name",
+        "    ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio",
+        "    Test Gen 2,              !- Generator 2 Name",
+        "    Generator:WindTurbine,   !- Generator 2 Object Type",
+        "    2000.0,                  !- Generator 2 Rated Electric Power Output {W}",
+        "    Always_ON,               !- Generator 2 Availability Schedule Name",
+        "    ;                        !- Generator 2 Rated Thermal to Electrical Power Ratio",
+
+        "  ElectricLoadCenter:Transformer,",
+        "    Transformer,             !- Name",
+        "    Always_ON,               !- Availability Schedule Name",
+        "    PowerOutToGrid,          !- Transformer Usage",
+        "    ,                        !- Zone Name",
+        "    ,                        !- Radiative Fraction",
+        "    ,                        !- Rated Capacity {VA}",
+        "    3,                       !- Phase",
+        "    Aluminum,                !- Conductor Material",
+        "    150,                     !- Full Load Temperature Rise {C}",
+        "    0.1,                     !- Fraction of Eddy Current Losses",
+        "    RatedLosses,             !- Performance Input Method",
+        "    300,                     !- Rated No Load Loss {W}",
+        "    2000,                    !- Rated Load Loss {W}",
+        "    ,                        !- Nameplate Efficiency",
+        "    ,                        !- Per Unit Load for Nameplate Efficiency",
+        "    ,                        !- Reference Temperature for Nameplate Efficiency {C}",
+        "    ,                        !- Per Unit Load for Maximum Efficiency",
+        "    ;                        !- Consider Transformer Loss for Utility Cost",
+
+        "  Schedule:Compact,",
+        "    Always_ON,               !- Name",
+        "    On/Off,                  !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1;          !- Field 3",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // get availability schedule to work
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    DataGlobals::HourOfDay = 1;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 21;
+    DataHVACGlobals::TimeStepSys = 1.0;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ScheduleInputProcessed = true;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues();
+
+    createFacilityElectricPowerServiceObject();
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj = std::unique_ptr<ElectricTransformer>(new ElectricTransformer("TRANSFORMER"));
+    Real64 expectedtransformerObjLossRate = facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj->getLossRateForOutputPower(2000.0);
+    // check the transformer loss rate for load and no load condition
+    EXPECT_EQ(expectedtransformerObjLossRate, 0.0);
 }

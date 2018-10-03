@@ -181,11 +181,18 @@ void ControlCompOutput(std::string const &CompName,           // the component N
     // Note - order in routine must match order below
     //  Plus -- order in ListOfComponents array must be in sorted order.
     int const NumComponents(11);
-    static Array1D_string const ListOfComponents(
-        NumComponents,
-        {"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER",
-         "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",
-         "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB"});
+    static Array1D_string const ListOfComponents(NumComponents,
+                                                 {"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
+                                                  "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
+                                                  "COIL:HEATING:WATER",
+                                                  "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",
+                                                  "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",
+                                                  "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",
+                                                  "ZONEHVAC:FOURPIPEFANCOIL",
+                                                  "ZONEHVAC:OUTDOORAIRUNIT",
+                                                  "ZONEHVAC:UNITHEATER",
+                                                  "ZONEHVAC:UNITVENTILATOR",
+                                                  "ZONEHVAC:VENTILATEDSLAB"});
 
     // DERIVED TYPE DEFINITIONS
     // Interval Half Type used for Controller
@@ -359,7 +366,11 @@ void ControlCompOutput(std::string const &CompName,           // the component N
                 }
                 // Set the Actuated node MassFlowRate with zero value
                 if (present(LoopNum)) { // this is a plant component
-                    SetActuatedBranchFlowRate(ZoneController.CalculatedSetPoint, ActuatedNode, LoopNum, LoopSide, BranchIndex,
+                    SetActuatedBranchFlowRate(ZoneController.CalculatedSetPoint,
+                                              ActuatedNode,
+                                              LoopNum,
+                                              LoopSide,
+                                              BranchIndex,
                                               false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
                 } else {                              // assume not a plant component
                     Node(ActuatedNode).MassFlowRate = ZoneController.CalculatedSetPoint;
@@ -464,7 +475,11 @@ void ControlCompOutput(std::string const &CompName,           // the component N
 
         // Set the Actuated node MassFlowRate with the new value
         if (present(LoopNum)) { // this is a plant component
-            SetActuatedBranchFlowRate(ZoneController.CalculatedSetPoint, ActuatedNode, LoopNum, LoopSide, BranchIndex,
+            SetActuatedBranchFlowRate(ZoneController.CalculatedSetPoint,
+                                      ActuatedNode,
+                                      LoopNum,
+                                      LoopSide,
+                                      BranchIndex,
                                       false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
         } else {                              // assume not a plant component, leave alone
             Node(ActuatedNode).MassFlowRate = ZoneController.CalculatedSetPoint;
@@ -622,11 +637,21 @@ void ControlCompOutput(std::string const &CompName,           // the component N
             ShowContinueError("... Error          = (Load met - Load requested) / MAXIMUM(Load requested, 100)");
             ShowContinueError("... Actuated Node Mass Flow Rate =" + RoundSigDigits(Node(ActuatedNode).MassFlowRate, 9) + " kg/s");
             ShowContinueErrorTimeStamp("");
-            ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName, CompErrIndex,
-                                           std::abs((LoadMet - QZnReq) * 100.0 / Denom), std::abs((LoadMet - QZnReq) * 100.0 / Denom), _, "%", "%");
+            ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
+                                           CompErrIndex,
+                                           std::abs((LoadMet - QZnReq) * 100.0 / Denom),
+                                           std::abs((LoadMet - QZnReq) * 100.0 / Denom),
+                                           _,
+                                           "%",
+                                           "%");
             //}
-            ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName, CompErrIndex,
-                                           std::abs((LoadMet - QZnReq) * 100.0 / Denom), std::abs((LoadMet - QZnReq) * 100.0 / Denom), _, "%", "%");
+            ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
+                                           CompErrIndex,
+                                           std::abs((LoadMet - QZnReq) * 100.0 / Denom),
+                                           std::abs((LoadMet - QZnReq) * 100.0 / Denom),
+                                           _,
+                                           "%",
+                                           "%");
             break; // It will not converge this time
         } else if (Iter > MaxIter * 2) {
             break;
@@ -746,8 +771,8 @@ void CheckThisAirSystemForSizing(int const AirLoopNum, bool &AirLoopWasSized)
 
     // Using/Aliasing
     using DataSizing::NumSysSizInput;
-    using DataSizing::SysSizInput;
     using DataSizing::SysSizingRunDone;
+    using DataSizing::SysSizInput;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1016,10 +1041,10 @@ void CalcPassiveExteriorBaffleGap(Array1S_int const SurfPtrARR, // Array of inde
     // USE DataLoopNode    , ONLY: Node
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
     using DataGlobals::BeginEnvrnFlag;
-    using DataHeatBalSurface::TH;
     using DataHeatBalance::Construct;
     using DataHeatBalance::Material;
     using DataHeatBalance::QRadSWOutIncident;
+    using DataHeatBalSurface::TH;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceData;
     using Psychrometrics::PsyCpAirFnWTdb;
@@ -1131,8 +1156,8 @@ void CalcPassiveExteriorBaffleGap(Array1S_int const SurfPtrARR, // Array of inde
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-        InitExteriorConvectionCoeff(SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf),
-                                    HAirARR(ThisSurf));
+        InitExteriorConvectionCoeff(
+            SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = Surface(SurfPtr).Construction;
         AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         TsoK = TH(1, 1, SurfPtr) + KelvinConv;
@@ -1169,7 +1194,8 @@ void CalcPassiveExteriorBaffleGap(Array1S_int const SurfPtrARR, // Array of inde
     }
     if (A == 0.0) { // should have been caught earlier
     }
-    auto Area(array_sub(Surface, &SurfaceData::Area,
+    auto Area(array_sub(Surface,
+                        &SurfaceData::Area,
                         SurfPtrARR)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
     // now figure area-weighted averages from underlying surfaces.
     //	Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below

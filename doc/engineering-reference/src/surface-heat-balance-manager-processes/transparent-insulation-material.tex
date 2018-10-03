@@ -50,11 +50,14 @@ Mathematical model to calculate amount of energy absorbed at the surface of move
 
 \begin{equation}
 QSM = {\alpha_{TIM}}\cdot Incident\;Solar
+\label{eq:QSMalphaIncSolar}
 \end{equation}
 
 The total solar gain on any exterior surface is a combination of the absorption of direct and diffuse solar radiation given by
 
-\textbf{\emph{\(Incident\;Solar = ({I_b}\cdot \cos \theta \cdot \frac{{{S_s}}}{S} + {I_s}\cdot {F_{ss}} + {I_g}\cdot {F_{sg}})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}}
+\begin{equation}
+IncidentSolar = ({I_b}\cdot \cos \theta \cdot \frac{{{S_s}}}{S} + {I_s}\cdot {F_{ss}} + {I_g}\cdot {F_{sg}})
+\end{equation}
 
 Where,
 
@@ -82,7 +85,7 @@ Now,
 {\alpha_{wall}} + {\rho_{wall}} = 1
 \end{equation}
 
-The model for TIM is simplified in that it assumes that absorption of solar radiation takes place at the inside and outside of the TIM only, not throughout the material.~ In addition, the model assumes that the solar radiation absorbed during the first pass through the TIM affects the outside surface of the TIM while the solar radiation reflected at the outer wall surface that gets absorbed during the back reflection will affect the inside TIM surface (which is also the outside surface of the wall).~ Thus, the heat absorbed at the outside of the TIM is as shown in Equation .
+The model for TIM is simplified in that it assumes that absorption of solar radiation takes place at the inside and outside of the TIM only, not throughout the material.~ In addition, the model assumes that the solar radiation absorbed during the first pass through the TIM affects the outside surface of the TIM while the solar radiation reflected at the outer wall surface that gets absorbed during the back reflection will affect the inside TIM surface (which is also the outside surface of the wall).~ Thus, the heat absorbed at the outside of the TIM is as shown in Equation~\ref{eq:QSMalphaIncSolar}.
 
 The heat absorbed at the inside of the TIM/outside of the wall includes two components.~ The first component is the amount of solar that is transmitted through the TIM and absorbed at the inside of the wall.~ This is characterized by the following equation:
 
@@ -126,28 +129,20 @@ $\alpha$\(_{WALL}\) = Absorptance of Wall.
 
 $\rho$\(_{WALL}\) = Reflectance of Wall surface
 
-Following is the FORTRAN Code used in the HeatBalanceSurfaceManager module, to determine the short wave radiation absorbed on outside of movable insulation and the short wave radiation absorbed on outside of opaque surface of the wall.
+Following is the C++ code in the current version of EnergyPlus used in the HeatBalanceSurfaceManager module, to determine the short wave radiation absorbed on outside of movable insulation and the short wave radiation absorbed on outside of opaque surface of the wall.
 
 \begin{lstlisting}
-IF (Surface(SurfNum)\%MaterialMovInsulExt.GT.0)                                           &
-
-    CALL EvalOutsideMovableInsulation(SurfNum,HMovInsul,RoughIndexMovInsul,AbsExt)
-
-    IF (HMovInsul \textgreater{} 0) THEN    ! Movable outside insulation in place
-
-      QRadSWOutMvIns(SurfNum) = QRadSWOutAbs(SurfNum)*AbsExt                              &
-
-                       /Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar
-
-!   For Transparent Insulation
-
-      QRadSWOutAbs(SurfNum) = Material(Surface(SurfNum)\%MaterialMovInsulExt)\%Trans      &
-
-             *QRadSWOutMvIns(SurfNum)*                                                    &
-
-                 (  (Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar/AbsExt)   &
-
-                        +(1-Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar)~ )
+// Calculate absorbed solar on outside if movable exterior insulation in place
+HMovInsul = 0.0;
+if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+if (HMovInsul > 0) { // Movable outside insulation in place
+    QRadSWOutMvIns(SurfNum) = QRadSWOutAbs(SurfNum) * AbsExt / Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
+    QRadSWOutAbs(SurfNum) = Material(Surface(SurfNum).MaterialMovInsulExt).Trans * QRadSWOutMvIns(SurfNum) *
+                            ((Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar / AbsExt) +
+                            (1 - Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar));
+    SWOutAbsTotalReport(SurfNum) = QRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
+    SWOutAbsEnergyReport(SurfNum) = SWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
+}
 \end{lstlisting}
 
 \subsection{Sample Test Run Cases: -- Comparison}\label{sample-test-run-cases-comparison}

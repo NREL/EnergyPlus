@@ -99,10 +99,10 @@ namespace ScheduleManager {
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
-    using DataEnvironment::DSTIndicator;
     using DataEnvironment::DayOfMonthTomorrow;
     using DataEnvironment::DayOfWeek;
     using DataEnvironment::DayOfWeekTomorrow;
+    using DataEnvironment::DSTIndicator;
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::HolidayIndexTomorrow;
     using DataEnvironment::MonthTomorrow;
@@ -118,14 +118,35 @@ namespace ScheduleManager {
     int const MaxDayTypes(12);
     static std::string const BlankString;
     Array1D_string const ValidDayTypes(MaxDayTypes,
-                                       {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay",
-                                        "WinterDesignDay", "CustomDay1", "CustomDay2"});
+                                       {"Sunday",
+                                        "Monday",
+                                        "Tuesday",
+                                        "Wednesday",
+                                        "Thursday",
+                                        "Friday",
+                                        "Saturday",
+                                        "Holiday",
+                                        "SummerDesignDay",
+                                        "WinterDesignDay",
+                                        "CustomDay1",
+                                        "CustomDay2"});
 
     int const NumScheduleTypeLimitUnitTypes(14);
     Array1D_string const ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes,
-                                                    {"Dimensionless", "Temperature", "DeltaTemperature", "PrecipitationRate", "Angle",
-                                                     "ConvectionCoefficient", "ActivityLevel", "Velocity", "Capacity", "Power", "Availability",
-                                                     "Percent", "Control", "Mode"});
+                                                    {"Dimensionless",
+                                                     "Temperature",
+                                                     "DeltaTemperature",
+                                                     "PrecipitationRate",
+                                                     "Angle",
+                                                     "ConvectionCoefficient",
+                                                     "ActivityLevel",
+                                                     "Velocity",
+                                                     "Capacity",
+                                                     "Power",
+                                                     "Availability",
+                                                     "Percent",
+                                                     "Control",
+                                                     "Mode"});
 
     int const ScheduleInput_year(1);
     int const ScheduleInput_compact(2);
@@ -214,7 +235,6 @@ namespace ScheduleManager {
         // Uses the standard get routines in the InputProcessor.
 
         // Using/Aliasing
-        using General::JulianDay;
         using General::ProcessDateString;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
@@ -225,8 +245,8 @@ namespace ScheduleManager {
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
         using DataSystemVariables::CheckForActualFileName;
-        using DataSystemVariables::TempFullFileName;
         using DataSystemVariables::iUnicode_end;
+        using DataSystemVariables::TempFullFileName;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -523,8 +543,8 @@ namespace ScheduleManager {
         NumCSVAllColumnsSchedules = 0;
 
         if (NumCommaFileShading != 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(
+                CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
             std::string ShadingSunlitFracFileName = Alphas(1);
             CheckForActualFileName(ShadingSunlitFracFileName, FileExists, TempFullFileName);
             if (!FileExists) {
@@ -712,8 +732,17 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "ScheduleTypeLimits";
         for (LoopIndex = 1; LoopIndex <= NumScheduleTypes; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
 
             ScheduleType(LoopIndex).Name = Alphas(1);
@@ -774,8 +803,17 @@ namespace ScheduleManager {
         Count = 0;
         CurrentModuleObject = "Schedule:Day:Hourly";
         for (LoopIndex = 1; LoopIndex <= NumHrDaySchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             DaySchedule(Count).Name = Alphas(1);
@@ -830,8 +868,17 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Day:Interval";
         for (LoopIndex = 1; LoopIndex <= NumIntDaySchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             DaySchedule(Count).Name = Alphas(1);
@@ -870,8 +917,16 @@ namespace ScheduleManager {
                                 Alphas(3) + "\"");
                 ErrorsFound = true;
             }
-            ProcessIntervalFields(Alphas({4, _}), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorsFound, Alphas(1),
-                                  CurrentModuleObject, DaySchedule(Count).IntervalInterpolated);
+            ProcessIntervalFields(Alphas({4, _}),
+                                  Numbers,
+                                  NumFields,
+                                  NumNumbers,
+                                  MinuteValue,
+                                  SetMinuteValue,
+                                  ErrorsFound,
+                                  Alphas(1),
+                                  CurrentModuleObject,
+                                  DaySchedule(Count).IntervalInterpolated);
             if (DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Average) {
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     SCount = 1;
@@ -921,8 +976,17 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Day:List";
         for (LoopIndex = 1; LoopIndex <= NumLstDaySchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             DaySchedule(Count).Name = Alphas(1);
@@ -1053,8 +1117,17 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Week:Daily";
         for (LoopIndex = 1; LoopIndex <= NumRegWeekSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             WeekSchedule(LoopIndex).Name = Alphas(1);
             // Rest of Alphas are processed into Pointers
@@ -1075,8 +1148,17 @@ namespace ScheduleManager {
         Count = NumRegWeekSchedules;
         CurrentModuleObject = "Schedule:Week:Compact";
         for (LoopIndex = 1; LoopIndex <= NumCptWeekSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             if (Count > 0) {
                 GlobalNames::VerifyUniqueInterObjectName(UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
@@ -1122,8 +1204,17 @@ namespace ScheduleManager {
 
         CurrentModuleObject = "Schedule:Year";
         for (LoopIndex = 1; LoopIndex <= NumRegSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             Schedule(LoopIndex).Name = Alphas(1);
             Schedule(LoopIndex).SchType = ScheduleInput_year;
@@ -1159,8 +1250,8 @@ namespace ScheduleManager {
                     EndMonth = int(Numbers(NumPointer + 3));
                     EndDay = int(Numbers(NumPointer + 4));
                     NumPointer += 4;
-                    StartPointer = JulianDay(StartMonth, StartDay, 1);
-                    EndPointer = JulianDay(EndMonth, EndDay, 1);
+                    StartPointer = General::OrdinalDay(StartMonth, StartDay, 1);
+                    EndPointer = General::OrdinalDay(EndMonth, EndDay, 1);
                     if (StartPointer <= EndPointer) {
                         for (Count = StartPointer; Count <= EndPointer; ++Count) {
                             ++DaysInYear(Count);
@@ -1197,7 +1288,11 @@ namespace ScheduleManager {
             }
 
             if (AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator("Schedule:Year", Schedule(LoopIndex).Name, "Schedule Value", "[ ]", Schedule(LoopIndex).EMSActuatedOn,
+                SetupEMSActuator("Schedule:Year",
+                                 Schedule(LoopIndex).Name,
+                                 "Schedule Value",
+                                 "[ ]",
+                                 Schedule(LoopIndex).EMSActuatedOn,
                                  Schedule(LoopIndex).EMSValue);
             }
         }
@@ -1227,8 +1322,17 @@ namespace ScheduleManager {
         AddDaySch = NumRegDaySchedules;
         CurrentModuleObject = "Schedule:Compact";
         for (LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
@@ -1285,7 +1389,7 @@ namespace ScheduleManager {
                     ErrorsFound = true;
                     goto Through_exit;
                 } else {
-                    EndPointer = JulianDay(EndMonth, EndDay, 1);
+                    EndPointer = General::OrdinalDay(EndMonth, EndDay, 1);
                     if (EndPointer == 366) {
                         if (FullYearSet) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name +
@@ -1407,8 +1511,15 @@ namespace ScheduleManager {
                     if (NumNumbers > 0) {
                         NumFields = NumNumbers;
                         ErrorHere = false;
-                        ProcessIntervalFields(Alphas({UntilFld, _}), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorHere,
-                                              DaySchedule(AddDaySch).Name, CurrentModuleObject + " DaySchedule Fields",
+                        ProcessIntervalFields(Alphas({UntilFld, _}),
+                                              Numbers,
+                                              NumFields,
+                                              NumNumbers,
+                                              MinuteValue,
+                                              SetMinuteValue,
+                                              ErrorHere,
+                                              DaySchedule(AddDaySch).Name,
+                                              CurrentModuleObject + " DaySchedule Fields",
                                               DaySchedule(AddDaySch).IntervalInterpolated);
                         // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
                         if (ErrorHere) {
@@ -1472,8 +1583,8 @@ namespace ScheduleManager {
             }
 
             if (AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator("Schedule:Compact", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn,
-                                 Schedule(SchNum).EMSValue);
+                SetupEMSActuator(
+                    "Schedule:Compact", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
         }
 
@@ -1531,8 +1642,17 @@ namespace ScheduleManager {
         }
         CurrentModuleObject = "Schedule:File";
         for (LoopIndex = 1; LoopIndex <= NumCommaFileSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
@@ -1861,8 +1981,8 @@ namespace ScheduleManager {
             }
 
             if (AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator("Schedule:File", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn,
-                                 Schedule(SchNum).EMSValue);
+                SetupEMSActuator(
+                    "Schedule:File", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
         }
         if (NumCommaFileSchedules > 0) {
@@ -1926,8 +2046,17 @@ namespace ScheduleManager {
         // Constant Schedules
         CurrentModuleObject = "Schedule:Constant";
         for (LoopIndex = 1; LoopIndex <= NumConstantSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
@@ -1964,16 +2093,25 @@ namespace ScheduleManager {
             DaySchedule(AddDaySch).TSValue = Numbers(1);
 
             if (AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator("Schedule:Constant", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn,
-                                 Schedule(SchNum).EMSValue);
+                SetupEMSActuator(
+                    "Schedule:Constant", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
         }
 
         CurrentModuleObject = "ExternalInterface:Schedule";
         for (LoopIndex = 1; LoopIndex <= NumExternalInterfaceSchedules; ++LoopIndex) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
@@ -2018,12 +2156,23 @@ namespace ScheduleManager {
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
         for (LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitImportSchedules; ++LoopIndex) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
 
             if (NumExternalInterfaceSchedules >= 1) {
                 GlobalNames::VerifyUniqueInterObjectName(
-                    UniqueScheduleNames, Alphas(1), CurrentModuleObject,
+                    UniqueScheduleNames,
+                    Alphas(1),
+                    CurrentModuleObject,
                     cAlphaFields(1) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This "
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport)",
                     ErrorsFound);
@@ -2073,12 +2222,23 @@ namespace ScheduleManager {
         // added for FMU Export
         CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
         for (LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitExportSchedules; ++LoopIndex) {
-            inputProcessor->getObjectItem(CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          LoopIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          Status,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
 
             if (NumExternalInterfaceSchedules >= 1) {
                 GlobalNames::VerifyUniqueInterObjectName(
-                    UniqueScheduleNames, Alphas(1), CurrentModuleObject,
+                    UniqueScheduleNames,
+                    Alphas(1),
+                    CurrentModuleObject,
                     cAlphaFields(1) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This "
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport)",
                     ErrorsFound);
@@ -2207,7 +2367,6 @@ namespace ScheduleManager {
 
         // Using/Aliasing
         using DataGlobals::OutputFileDebug;
-        using General::InvJulianDay;
         using General::RoundSigDigits;
 
         // Locals
@@ -2404,7 +2563,7 @@ namespace ScheduleManager {
                         TS = Schedule(Count).WeekSchedulePointer(NumF);
                         while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
-                                InvJulianDay(NumF, PMon, PDay, 1);
+                                General::InvOrdinalDay(NumF, PMon, PDay, 1);
                                 {
                                     IOFlags flags;
                                     flags.ADVANCE("No");
@@ -2415,7 +2574,7 @@ namespace ScheduleManager {
                             if (NumF > 366) break; // compound If might have a problem unless this included.
                         }
                         if (NumF <= 366) {
-                            InvJulianDay(NumF - 1, PMon, PDay, 1);
+                            General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
                             {
                                 IOFlags flags;
                                 flags.ADVANCE("No");
@@ -2438,7 +2597,7 @@ namespace ScheduleManager {
                         TS = Schedule(Count).WeekSchedulePointer(NumF);
                         while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
-                                InvJulianDay(NumF, PMon, PDay, 1);
+                                General::InvOrdinalDay(NumF, PMon, PDay, 1);
                                 gio::write(OutputFileDebug, fmtA) << "    Through: " + RoundSigDigits(PMon) + '/' + RoundSigDigits(PDay) + ',';
                                 iDayP = 0;
                                 for (DT = 2; DT <= 6; ++DT) {
@@ -2490,7 +2649,7 @@ namespace ScheduleManager {
                             if (NumF > 366) break; // compound If might have a problem unless this included.
                         }
                         if (NumF <= 366) {
-                            InvJulianDay(NumF - 1, PMon, PDay, 1);
+                            General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
                             gio::write(OutputFileDebug, fmtA) << "    Through: " + RoundSigDigits(PMon) + '/' + RoundSigDigits(PDay) + ',';
                             iDayP = 0;
                             for (DT = 2; DT <= 6; ++DT) {
@@ -2714,7 +2873,6 @@ namespace ScheduleManager {
 
         // Using/Aliasing
         using DataEnvironment::DayOfYear_Schedule;
-        using General::JulianDay;
 
         // Return value
         Real64 LookUpScheduleValue(0.0);
@@ -2783,7 +2941,7 @@ namespace ScheduleManager {
             }
             if (WhichHour > 24) {
                 while (WhichHour > 24) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(JulianDay(MonthTomorrow, DayOfMonthTomorrow, 1));
+                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(General::OrdinalDay(MonthTomorrow, DayOfMonthTomorrow, 1));
                     if (DayOfWeekTomorrow <= 7 && HolidayIndexTomorrow > 0) {
                         DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndexTomorrow);
                     } else {
@@ -4794,7 +4952,11 @@ namespace ScheduleManager {
         if (DoScheduleReportingSetup) { // CurrentModuleObject='Any Schedule'
             for (ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
                 // Set Up Reporting
-                SetupOutputVariable("Schedule Value", OutputProcessor::Unit::None, Schedule(ScheduleIndex).CurrentValue, "Zone", "Average",
+                SetupOutputVariable("Schedule Value",
+                                    OutputProcessor::Unit::None,
+                                    Schedule(ScheduleIndex).CurrentValue,
+                                    "Zone",
+                                    "Average",
                                     Schedule(ScheduleIndex).Name);
             }
             DoScheduleReportingSetup = false;

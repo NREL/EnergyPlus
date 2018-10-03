@@ -254,6 +254,8 @@ namespace ReportSizingManager {
         // int DataWaterLoopNum( 0 ); // index to plant water loop
         // int DataCoilNum( 0 ); // index to coil object
         // int DataFanOpMode( 0 ); // fan operating mode (ContFanCycCoil or CycFanCycCoil)
+        // int DataFanEnumType( -1 ); // Fan type used during sizing
+        // int DataFanIndex( -1 ); // Fan index used during sizing
         // bool DataCoilIsSuppHeater( false ); // TRUE if heating coil used as supplemental heater
         // bool DataIsDXCoil( false ); // TRUE if direct-expansion coil
         // bool DataAutosizable( true ); // TRUE if component is autosizable
@@ -337,9 +339,9 @@ namespace ReportSizingManager {
         using DataGlobals::DisplayExtraWarnings;
         using namespace DataSizing;
         using namespace DataHVACGlobals;
-        using DXCoils::ValidateADP;
         using DataPlant::PlantLoop;
         using DesiccantDehumidifiers::DesicDehum;
+        using DXCoils::ValidateADP;
         using Fans::FanDesDT;
         using Fans::FanDesHeatGain;
         using FluidProperties::GetDensityGlycol;
@@ -414,15 +416,14 @@ namespace ReportSizingManager {
         Real64 RetFanDT;                           // return air fan delta temperature [C]
         Real64 FanCoolLoad;                        // load due to fan operation added to cooling load [W]
         Array1D<Real64> Par(4);                    // array passed to RegulaFalsi
-        Real64 DesOAFlowFrac;                      // design outdoor air flow volume fraction
         std::string ScalableSM;                    // scalable sizing methods label for reporting
         Real64 const RatedInletAirTemp(26.6667);   // 26.6667C or 80F
         Real64 const RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
         std::string DDNameFanPeak;
-        DDNameFanPeak = " test my Design Day";
+        DDNameFanPeak = ""; // " test my Design Day";
         std::string dateTimeFanPeak;
-        dateTimeFanPeak = " test 1/2 00:00:00 ";
+        dateTimeFanPeak = ""; // " test 1/2 00:00:00 ";
         Real64 DXFlowPerCapMinRatio(1.0);
         Real64 DXFlowPerCapMaxRatio(1.0);
 
@@ -487,6 +488,7 @@ namespace ReportSizingManager {
             }
             bCheckForZero = false;
         } else if (CurZoneEqNum > 0) {
+
             if (!IsAutoSize && !SizingDesRunThisZone && !SizingDesValueFromParent) {
                 HardSizeNoDesRun = true;
                 AutosizeUser = SizingResult;
@@ -502,6 +504,17 @@ namespace ReportSizingManager {
                     }
                 }
             } else {
+
+                int tempZoneNum = CurZoneEqNum;
+                bool FinalZoneSizingNotAllocated = false;
+                if (!allocated(DataSizing::FinalZoneSizing)) {
+                    DataSizing::FinalZoneSizing.allocate(1);
+                    tempZoneNum = 1;
+                    FinalZoneSizingNotAllocated = true;
+                }
+                DataSizing::ZoneEqSizingData &zoneEqSizing = DataSizing::ZoneEqSizing(CurZoneEqNum);
+                DataSizing::ZoneSizingData &finalZoneSizing = DataSizing::FinalZoneSizing(tempZoneNum);
+
                 if (SizingType == SystemAirflowSizing) {
 
                     {
@@ -509,7 +522,8 @@ namespace ReportSizingManager {
                         if ((SELECT_CASE_var == SupplyAirFlowRate) || (SELECT_CASE_var == None)) {
 
                             if (ZoneEqSizing(CurZoneEqNum).SystemAirFlow) {
-                                AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).AirVolFlow, FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow,
+                                AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).AirVolFlow,
+                                                  FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow,
                                                   FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
                                 if (AutosizeDes == FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow) {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
@@ -821,7 +835,8 @@ namespace ReportSizingManager {
                                 }
                             } else {
                                 if (ZoneEqSizing(CurZoneEqNum).SystemAirFlow) {
-                                    AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).AirVolFlow, ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
+                                    AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).AirVolFlow,
+                                                      ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
                                                       ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
                                 } else if (ZoneCoolingOnlyFan) {
                                     AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
@@ -858,7 +873,8 @@ namespace ReportSizingManager {
                         auto const SELECT_CASE_var(ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingType));
                         if ((SELECT_CASE_var == SupplyAirFlowRate) || (SELECT_CASE_var == None) || (SELECT_CASE_var == FlowPerFloorArea)) {
                             if (ZoneEqSizing(CurZoneEqNum).SystemAirFlow) {
-                                AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).AirVolFlow, ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
+                                AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).AirVolFlow,
+                                                  ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
                                                   ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
                                 if (SizingType == CoolingAirflowSizing) {
                                     if (FinalZoneSizing(CurZoneEqNum).CoolDDNum > 0 &&
@@ -1177,7 +1193,8 @@ namespace ReportSizingManager {
                         auto const SELECT_CASE_var(ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingType));
                         if ((SELECT_CASE_var == SupplyAirFlowRate) || (SELECT_CASE_var == None) || (SELECT_CASE_var == FlowPerFloorArea)) {
                             if (ZoneEqSizing(CurZoneEqNum).SystemAirFlow) {
-                                AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).AirVolFlow, ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
+                                AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).AirVolFlow,
+                                                  ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow,
                                                   ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
                             } else {
                                 if (ZoneCoolingOnlyFan) {
@@ -1276,9 +1293,10 @@ namespace ReportSizingManager {
                     }
                 } else if (SizingType == CoolingWaterflowSizing) {
                     CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
-                    Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                    rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex,
-                                           CallingRoutine);
+                    Cp = GetSpecificHeatGlycol(
+                        PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                    rho = GetDensityGlycol(
+                        PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
                     if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
                         AutosizeDes = TermUnitSizing(CurTermUnitSizingNum).MaxCWVolFlow;
                     } else if (ZoneEqFanCoil || ZoneEqUnitVent || ZoneEqVentedSlab) {
@@ -1290,6 +1308,9 @@ namespace ReportSizingManager {
                         CoilInHumRat = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
                         DesCoilLoad = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow *
                                       (PsyHFnTdbW(CoilInTemp, CoilInHumRat) - PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
+                        DesVolFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow / StdRhoAir;
+                        // add fan heat to coil load
+                        DesCoilLoad += DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DesVolFlow);
                         if (DesCoilLoad >= SmallLoad) {
                             AutosizeDes = DesCoilLoad / (CoilDesWaterDeltaT * Cp * rho);
                         } else {
@@ -1300,17 +1321,25 @@ namespace ReportSizingManager {
                 } else if (SizingType == HeatingWaterflowSizing) {
                     if ((TermUnitSingDuct || TermUnitPIU || TermUnitIU) && (CurTermUnitSizingNum > 0)) {
                         AutosizeDes = TermUnitSizing(CurTermUnitSizingNum).MaxHWVolFlow;
-                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                   PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::HWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         DesCoilLoad = AutosizeDes * DataWaterCoilSizHeatDeltaT * Cp * rho;
                     } else if (ZoneEqFanCoil) {
                         AutosizeDes = ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow;
-                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                   PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::HWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         DesCoilLoad = AutosizeDes * DataWaterCoilSizHeatDeltaT * Cp * rho;
                     } else if (ZoneEqUnitHeater || ZoneEqVentedSlab) { // for unit ventilator the cp value is calculated at 5.05(InitConvTemp) for the
                                                                        // child and 60.0C for the unit ventilator //|| ZoneEqUnitVent
@@ -1323,21 +1352,20 @@ namespace ReportSizingManager {
                         } else {
                             DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
                         }
-                        if (DesMassFlow > 0.0) {
-                            OutAirFrac = min(StdRhoAir * ZoneEqSizing(CurZoneEqNum).OAVolFlow / DesMassFlow, 1.0);
-                        } else {
-                            OutAirFrac = 0.0;
-                        }
-                        CoilInTemp = (1.0 - OutAirFrac) * FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak +
-                                     OutAirFrac * FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak;
+                        CoilInTemp =
+                            setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         CoilOutTemp = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
                         CoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
                         DesCoilLoad = PsyCpAirFnWTdb(CoilOutHumRat, 0.5 * (CoilInTemp + CoilOutTemp)) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                         if (DesCoilLoad >= SmallLoad) {
-                            Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                       PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                            rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                                   PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                            Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                       DataGlobals::HWInitConvTemp,
+                                                       PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                       CallingRoutine);
+                            rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
                             AutosizeDes = DesCoilLoad / (DataWaterCoilSizHeatDeltaT * Cp * rho);
                         } else {
                             AutosizeDes = 0.0;
@@ -1347,8 +1375,13 @@ namespace ReportSizingManager {
                 } else if (SizingType == HeatingWaterDesAirInletTempSizing) {
                     if (TermUnitPIU && (CurTermUnitSizingNum > 0)) {
                         MinFlowFrac = TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac;
-                        AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
-                                      FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
+                        if (TermUnitSizing(CurTermUnitSizingNum).InducesPlenumAir) {
+                            AutosizeDes = (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac) +
+                                          (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneRetTempAtHeatPeak * (1.0 - MinFlowFrac));
+                        } else {
+                            AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
+                                          FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
+                        }
                     } else if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
                         AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                     } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
@@ -1361,13 +1394,8 @@ namespace ReportSizingManager {
                         } else {
                             DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
                         }
-                        if (DesMassFlow > 0.0) {
-                            OutAirFrac = min(StdRhoAir * ZoneEqSizing(CurZoneEqNum).OAVolFlow / DesMassFlow, 1.0);
-                        } else {
-                            OutAirFrac = 0.0;
-                        }
-                        AutosizeDes = OutAirFrac * FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak +
-                                      (1.0 - OutAirFrac) * FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak;
+                        AutosizeDes =
+                            setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                     }
                     bCheckForZero = false;
                 } else if (SizingType == HeatingWaterDesAirInletHumRatSizing) {
@@ -1387,29 +1415,30 @@ namespace ReportSizingManager {
                         } else {
                             DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
                         }
-                        if (DesMassFlow > 0.0) {
-                            OutAirFrac = min(StdRhoAir * ZoneEqSizing(CurZoneEqNum).OAVolFlow / DesMassFlow, 1.0);
-                        } else {
-                            OutAirFrac = 0.0;
-                        }
-                        AutosizeDes = OutAirFrac * FinalZoneSizing(CurZoneEqNum).OutHumRatAtHeatPeak +
-                                      (1.0 - OutAirFrac) * FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtHeatPeak;
+                        AutosizeDes =
+                            setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                     }
                     bCheckForZero = false;
                 } else if (SizingType == CoolingWaterDesAirInletTempSizing) {
                     if (TermUnitIU) {
                         AutosizeDes = FinalZoneSizing(CurZoneEqNum).ZoneTempAtCoolPeak;
                     } else if (ZoneEqFanCoil) {
-                        if (FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow > 0.0) {
-                            OutAirFrac = min(StdRhoAir * ZoneEqSizing(CurZoneEqNum).OAVolFlow / FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow, 1.0);
-                        } else {
-                            OutAirFrac = 0.0;
-                        }
-                        AutosizeDes = OutAirFrac * FinalZoneSizing(CurZoneEqNum).OutTempAtCoolPeak +
-                                      (1.0 - OutAirFrac) * FinalZoneSizing(CurZoneEqNum).ZoneTempAtCoolPeak;
+                        DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow;
+                        AutosizeDes =
+                            setCoolCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                     } else {
                         AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp;
                     }
+                    Real64 fanDeltaT = 0.0;
+                    if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                        // calculate fan heat to get fan air-side delta T
+                        FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                        if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
+                            CpAir = PsyCpAirFnWTdb(DataDesInletAirHumRat, AutosizeDes);
+                            fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
+                        }
+                    }
+                    AutosizeDes += fanDeltaT;
                     bCheckForZero = false;
                 } else if (SizingType == CoolingWaterDesWaterInletTempSizing) {
                     AutosizeDes = PlantSizData(DataPltSizCoolNum).ExitTemp;
@@ -1420,10 +1449,14 @@ namespace ReportSizingManager {
                     bCheckForZero = false;
                 } else if (SizingType == CoolingWaterDesAirOutletTempSizing) {
                     if (TermUnitIU) {
-                        Cp =
-                            GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::CWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::CWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         DesCoilLoad = DataWaterFlowUsedForSizing * DataWaterCoilSizCoolDeltaT * Cp * rho;
                         T1Out = DataDesInletAirTemp -
                                 DesCoilLoad / (StdRhoAir * PsyCpAirFnWTdb(DataDesInletAirHumRat, DataDesInletAirTemp) * DataAirFlowUsedForSizing);
@@ -1432,10 +1465,21 @@ namespace ReportSizingManager {
                     } else {
                         AutosizeDes = FinalZoneSizing(CurZoneEqNum).CoolDesTemp;
                     }
+                    Real64 fanDeltaT = 0.0;
+                    if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneDrawThru) {
+                        // calculate fan heat to get fan air-side delta T
+                        FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                        if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
+                            CpAir = PsyCpAirFnWTdb(DataDesInletAirHumRat, AutosizeDes);
+                            fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
+                            DataDesAccountForFanHeat = false; // used in CoolingCapacitySizing calculations to avoid double counting fan heat
+                        }
+                    }
+                    AutosizeDes -= fanDeltaT;
 
                     if (AutosizeDes < DataDesInletWaterTemp && DataWaterFlowUsedForSizing > 0.0) { // flow here is water vol flow rate
                         ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
-                                         "\", Cooling Coil has leaving air temperature > entering water temperature.");
+                                         "\", Cooling Coil has leaving air temperature < entering water temperature.");
                         ShowContinueError("    Tair,out  =  " + RoundSigDigits(AutosizeDes, 3));
                         ShowContinueError("    Twater,in = " + RoundSigDigits(DataDesInletWaterTemp, 3));
                         AutosizeDes = DataDesInletWaterTemp + 0.5;
@@ -1447,13 +1491,9 @@ namespace ReportSizingManager {
                     if (TermUnitIU) {
                         AutosizeDes = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak;
                     } else if (ZoneEqFanCoil) {
-                        if (FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow > 0.0) {
-                            OutAirFrac = min(StdRhoAir * ZoneEqSizing(CurZoneEqNum).OAVolFlow / FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow, 1.0);
-                        } else {
-                            OutAirFrac = 0.0;
-                        }
-                        AutosizeDes = OutAirFrac * FinalZoneSizing(CurZoneEqNum).OutHumRatAtCoolPeak +
-                                      (1.0 - OutAirFrac) * FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak;
+                        DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow;
+                        AutosizeDes =
+                            setCoolCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                     } else {
                         AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
                     }
@@ -1504,9 +1544,9 @@ namespace ReportSizingManager {
                         // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
                         // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
                         // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
-                        // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
-                        // of flow/capacity ratio vs SHR for several actual coils.
+                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
+                        // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
+                        // regression of flow/capacity ratio vs SHR for several actual coils.
                         RatedVolFlowPerRatedTotCap = DataFlowUsedForSizing / DataCapacityUsedForSizing;
                         if (DXCT == RegularDXCoil) {
                             if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
@@ -1527,8 +1567,14 @@ namespace ReportSizingManager {
                         }
 
                         // check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-                        AutosizeDes = ValidateADP(CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing,
-                                                  DataFlowUsedForSizing, AutosizeDes, CallingRoutine);
+                        AutosizeDes = ValidateADP(CompType,
+                                                  CompName,
+                                                  RatedInletAirTemp,
+                                                  RatedInletAirHumRat,
+                                                  DataCapacityUsedForSizing,
+                                                  DataFlowUsedForSizing,
+                                                  AutosizeDes,
+                                                  CallingRoutine);
 
                     } else {
                         AutosizeDes = 1.0;
@@ -1537,6 +1583,12 @@ namespace ReportSizingManager {
                     if (ZoneEqSizing(CurZoneEqNum).CoolingCapacity) { // Parent object calculated capacity
                         AutosizeDes = ZoneEqSizing(CurZoneEqNum).DesCoolingLoad;
                         DesVolFlow = DataFlowUsedForSizing;
+                        CoilInTemp = DataSizing::DataCoilSizingAirInTemp;
+                        CoilInHumRat = DataSizing::DataCoilSizingAirInHumRat;
+                        CoilOutTemp = DataSizing::DataCoilSizingAirOutTemp;
+                        CoilOutHumRat = DataSizing::DataCoilSizingAirOutHumRat;
+                        FanCoolLoad = DataSizing::DataCoilSizingFanCoolLoad;
+                        TotCapTempModFac = DataSizing::DataCoilSizingCapFT;
                     } else {
                         if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
                             UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
@@ -1553,24 +1605,37 @@ namespace ReportSizingManager {
                                 AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow *
                                               (PsyHFnTdbW(CoilInTemp, CoilInHumRat) - PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
                                 DesVolFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow / StdRhoAir;
+                                // add fan heat to coil load
+                                FanCoolLoad += DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DesVolFlow);
+                                AutosizeDes += FanCoolLoad;
                             }
                         } else {
                             DesVolFlow = DataFlowUsedForSizing;
                             if (DesVolFlow >= SmallAirVolFlow) {
+                                // each of these IFs now seem the same and can be condensed to just CoilInTemp = set() and CoilInHumRat = set()
                                 if (ZoneEqDXCoil) {
-                                    if (ZoneEqSizing(CurZoneEqNum).OAVolFlow > 0.0) {
+                                    // ATMixer has priority over Equipment OA vol flow
+                                    if (ZoneEqSizing(CurZoneEqNum).ATMixerVolFlow > 0.0) { // NEW ATMixer coil sizing method
+                                        DesMassFlow = DesVolFlow * StdRhoAir;
+                                        CoilInTemp = setCoolCoilInletTempForZoneEqSizing(
+                                            setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                                        CoilInHumRat = setCoolCoilInletHumRatForZoneEqSizing(
+                                            setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                                    } else if (ZoneEqSizing(CurZoneEqNum).OAVolFlow > 0.0) {
                                         CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp;
                                         CoilInHumRat = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
                                     } else {
-                                        CoilInTemp = FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak;
+                                        CoilInTemp = FinalZoneSizing(CurZoneEqNum)
+                                                         .ZoneRetTempAtCoolPeak; // Question whether zone equipment should use return temp for sizing
                                         CoilInHumRat = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak;
                                     }
                                 } else if (ZoneEqFanCoil) {
-                                    DesOAFlowFrac = FinalZoneSizing(CurZoneEqNum).DesCoolOAFlowFrac;
-                                    CoilInTemp = DesOAFlowFrac * FinalZoneSizing(CurZoneEqNum).OutTempAtCoolPeak +
-                                                 (1.0 - DesOAFlowFrac) * FinalZoneSizing(CurZoneEqNum).ZoneTempAtCoolPeak;
-                                    CoilInHumRat = DesOAFlowFrac * FinalZoneSizing(CurZoneEqNum).OutHumRatAtCoolPeak +
-                                                   (1.0 - DesOAFlowFrac) * FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak;
+                                    // use fan coil flow (i.e., set by parent) or flow used during sizing?
+                                    DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow;
+                                    CoilInTemp = setCoolCoilInletTempForZoneEqSizing(
+                                        setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                                    CoilInHumRat = setCoolCoilInletHumRatForZoneEqSizing(
+                                        setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                                 } else {
                                     CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp;
                                     CoilInHumRat = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
@@ -1586,15 +1651,7 @@ namespace ReportSizingManager {
                                 }
                                 rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine);
                                 CoilInEnth = PsyHFnTdbW(CoilInTemp, CoilInHumRat);
-                                CoilInWetBulb = PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine);
                                 CoilOutEnth = PsyHFnTdbW(CoilOutTemp, CoilOutHumRat);
-                                if (DataTotCapCurveIndex > 0) {
-                                    TotCapTempModFac = CurveValue(DataTotCapCurveIndex, CoilInWetBulb, OutTemp);
-                                } else if (DataTotCapCurveValue > 0) {
-                                    TotCapTempModFac = DataTotCapCurveValue;
-                                } else {
-                                    TotCapTempModFac = 1.0;
-                                }
                                 if (ZoneEqFanCoil) {
                                     PeakCoilLoad = max(0.0, (StdRhoAir * DesVolFlow * (CoilInEnth - CoilOutEnth)));
                                 } else if (ZoneEqUnitVent) {
@@ -1602,11 +1659,38 @@ namespace ReportSizingManager {
                                 } else {
                                     PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth)));
                                 }
+                                // add fan heat to coil load
+                                FanCoolLoad += DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DesVolFlow);
+                                PeakCoilLoad += FanCoolLoad;
+                                CpAir = PsyCpAirFnWTdb(CoilInHumRat, CoilInTemp);
+                                // adjust coil inlet/outlet temp with fan temperature rise
+                                if (DataDesAccountForFanHeat) {
+                                    if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                                        CoilInTemp += FanCoolLoad / (CpAir * StdRhoAir * DesVolFlow);
+                                    } else if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneDrawThru) {
+                                        CoilOutTemp -= FanCoolLoad / (CpAir * StdRhoAir * DesVolFlow);
+                                    }
+                                }
+                                CoilInWetBulb = PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine);
+                                if (DataTotCapCurveIndex > 0) {
+                                    TotCapTempModFac = CurveValue(DataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                } else if (DataTotCapCurveValue > 0) {
+                                    TotCapTempModFac = DataTotCapCurveValue;
+                                } else {
+                                    TotCapTempModFac = 1.0;
+                                }
                                 if (TotCapTempModFac > 0.0) {
                                     AutosizeDes = PeakCoilLoad / TotCapTempModFac;
                                 } else {
                                     AutosizeDes = PeakCoilLoad;
                                 }
+                                // save these conditions to use when ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true
+                                DataSizing::DataCoilSizingAirInTemp = CoilInTemp;
+                                DataSizing::DataCoilSizingAirInHumRat = CoilInHumRat;
+                                DataSizing::DataCoilSizingAirOutTemp = CoilOutTemp;
+                                DataSizing::DataCoilSizingAirOutHumRat = CoilOutHumRat;
+                                DataSizing::DataCoilSizingFanCoolLoad = FanCoolLoad;
+                                DataSizing::DataCoilSizingCapFT = TotCapTempModFac;
                             } else {
                                 AutosizeDes = 0.0;
                                 CoilOutTemp = -999.0;
@@ -1614,6 +1698,7 @@ namespace ReportSizingManager {
                         }
                     }
                     AutosizeDes = AutosizeDes * DataFracOfAutosizedCoolingCapacity;
+                    DataDesAccountForFanHeat = true; // reset for next water coil
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {
                         ShowWarningMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                         ShowContinueError("...Rated Total Cooling Capacity = " + TrimSigDigits(AutosizeDes, 2) + " [W]");
@@ -1666,15 +1751,30 @@ namespace ReportSizingManager {
                                              (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - MinPriFlowFrac));
                             }
                         } else if (ZoneEqFanCoil) {
-                            DesOAFlowFrac = FinalZoneSizing(CurZoneEqNum).DesHeatOAFlowFrac;
-                            CoilInTemp = DesOAFlowFrac * FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak +
-                                         (1.0 - DesOAFlowFrac) * FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak;
+                            // use fan coil flow (i.e., set by parent) or flow used during sizing?
+                            if (DesVolFlow > 0.0) {
+                                DesMassFlow = DesVolFlow * StdRhoAir;
+                            } else {
+                                DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
+                            }
+                            CoilInTemp = setHeatCoilInletTempForZoneEqSizing(
+                                setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                            CoilInHumRat = setHeatCoilInletHumRatForZoneEqSizing(
+                                setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         } else if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                         } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
                         } else {
-                            CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
+                            if (DesVolFlow > 0.0) {
+                                DesMassFlow = DesVolFlow * StdRhoAir;
+                            } else {
+                                DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
+                            }
+                            CoilInTemp = setHeatCoilInletTempForZoneEqSizing(
+                                setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                            CoilInHumRat = setHeatCoilInletHumRatForZoneEqSizing(
+                                setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         }
                         if ((TermUnitSingDuct || TermUnitPIU) && (CurTermUnitSizingNum > 0)) {
                             CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
@@ -1732,17 +1832,25 @@ namespace ReportSizingManager {
                 } else if (SizingType == WaterHeatingCapacitySizing) {
                     if ((TermUnitSingDuct || TermUnitPIU || TermUnitIU) && (CurTermUnitSizingNum > 0)) {
                         DesMassFlow = TermUnitSizing(CurTermUnitSizingNum).MaxHWVolFlow;
-                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                   PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::HWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         NominalCapacityDes = DesMassFlow * DataWaterCoilSizHeatDeltaT * Cp * rho;
                     } else if (ZoneEqFanCoil || ZoneEqUnitHeater) {
                         DesMassFlow = ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow;
-                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                   PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::HWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         NominalCapacityDes = DesMassFlow * DataWaterCoilSizHeatDeltaT * Cp * rho;
                         // if coil is part of a zonal unit, calc coil load to get hot water flow rate
                     } else {
@@ -1753,13 +1861,10 @@ namespace ReportSizingManager {
                         } else {
                             DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
                         }
-                        if (DesMassFlow > 0.0) {
-                            OutAirFrac = min(StdRhoAir * ZoneEqSizing(CurZoneEqNum).OAVolFlow / DesMassFlow, 1.0);
-                        } else {
-                            OutAirFrac = 0.0;
-                        }
-                        CoilInTemp = (1.0 - OutAirFrac) * FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak +
-                                     OutAirFrac * FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak;
+                        CoilInTemp =
+                            setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                        CoilInHumRat =
+                            setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         CoilOutTemp = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
                         CoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
                         NominalCapacityDes =
@@ -1784,26 +1889,38 @@ namespace ReportSizingManager {
                     if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
                         DesMassFlow =
                             StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow * TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult;
-                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                   PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::HWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         AutosizeDes = DataWaterFlowUsedForSizing * DataWaterCoilSizHeatDeltaT * Cp * rho;
                         coilSelectionReportObj->setCoilReheatMultiplier(CompName, CompType, 1.0);
                     } else if ((TermUnitPIU || TermUnitIU) && (CurTermUnitSizingNum > 0)) {
                         DesMassFlow =
                             StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow * TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult;
-                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                   PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::HWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         AutosizeDes =
                             DataWaterFlowUsedForSizing * DataWaterCoilSizHeatDeltaT * Cp * rho * TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult;
                     } else if (ZoneEqFanCoil || ZoneEqUnitHeater) {
-                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                   PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::HWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         AutosizeDes = DataWaterFlowUsedForSizing * DataWaterCoilSizHeatDeltaT * Cp * rho;
                         coilSelectionReportObj->setCoilReheatMultiplier(CompName, CompType, 1.0);
                     } else {
@@ -1814,15 +1931,10 @@ namespace ReportSizingManager {
                         } else {
                             DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
                         }
-                        if (DesMassFlow > 0.0) {
-                            OutAirFrac = min(StdRhoAir * ZoneEqSizing(CurZoneEqNum).OAVolFlow / DesMassFlow, 1.0);
-                        } else {
-                            OutAirFrac = 0.0;
-                        }
-                        CoilInTemp = (1.0 - OutAirFrac) * FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak +
-                                     OutAirFrac * FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak;
-                        CoilInHumRat = (1.0 - OutAirFrac) * FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtHeatPeak +
-                                       OutAirFrac * FinalZoneSizing(CurZoneEqNum).OutHumRatAtHeatPeak;
+                        CoilInTemp =
+                            setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                        CoilInHumRat =
+                            setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         CoilOutTemp = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
                         CoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
                         AutosizeDes = PsyCpAirFnWTdb(CoilOutHumRat, 0.5 * (CoilInTemp + CoilOutTemp)) * DesMassFlow * (CoilOutTemp - CoilInTemp);
@@ -1999,7 +2111,11 @@ namespace ReportSizingManager {
                 } else {
                     // should never happen
                 }
+
+                // get rid of temporary sizing array so next pass through will know there was no sizing data available
+                if (FinalZoneSizingNotAllocated) DataSizing::FinalZoneSizing.deallocate();
             }
+
         } else if (CurSysNum > 0) {
             if (!IsAutoSize && !SizingDesRunThisAirSys) {
                 HardSizeNoDesRun = true;
@@ -2252,10 +2368,14 @@ namespace ReportSizingManager {
                         CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
                     }
                     if (DataCapacityUsedForSizing >= SmallLoad) {
-                        Cp =
-                            GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, 5.0, PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::CWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::CWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         AutosizeDes = DataCapacityUsedForSizing / (CoilDesWaterDeltaT * Cp * rho);
                     } else {
                         AutosizeDes = 0.0;
@@ -2264,10 +2384,14 @@ namespace ReportSizingManager {
                     bCheckForZero = false;
                 } else if (SizingType == HeatingWaterflowSizing) {
                     if (DataCapacityUsedForSizing >= SmallLoad) {
-                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                   PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
-                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(DataWaterLoopNum).FluidIndex, CallingRoutine);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(DataWaterLoopNum).FluidIndex,
+                                                   CallingRoutine);
+                        rho = GetDensityGlycol(PlantLoop(DataWaterLoopNum).FluidName,
+                                               DataGlobals::HWInitConvTemp,
+                                               PlantLoop(DataWaterLoopNum).FluidIndex,
+                                               CallingRoutine);
                         AutosizeDes = DataCapacityUsedForSizing / (DataWaterCoilSizHeatDeltaT * Cp * rho);
                     } else {
                         AutosizeDes = 0.0;
@@ -2332,6 +2456,26 @@ namespace ReportSizingManager {
                             AutosizeDes =
                                 OutAirFrac * FinalSysSizing(CurSysNum).PrecoolTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetTempAtCoolPeak;
                         }
+                        Real64 fanDeltaT = 0.0;
+                        if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                            // water coils on main branch have no parent object to set DataFan* variables
+                            if (DataFanIndex == -1) {
+                                if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
+                                    DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                                    DataFanIndex = PrimaryAirSystem(CurSysNum).SupFanNum;
+                                } else if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
+                                    DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                                    DataFanIndex = PrimaryAirSystem(CurSysNum).supFanVecIndex;
+                                }
+                            }
+                            // calculate fan heat to get fan air-side delta T
+                            FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                            if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
+                                CpAir = PsyCpAirFnWTdb(DataDesInletAirHumRat, AutosizeDes);
+                                fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
+                            }
+                        }
+                        AutosizeDes += fanDeltaT;
                     }
                     bCheckForZero = false;
                 } else if (SizingType == CoolingWaterDesWaterInletTempSizing) {
@@ -2345,12 +2489,53 @@ namespace ReportSizingManager {
                         AutosizeDes = FinalSysSizing(CurSysNum).PrecoolTemp;
                     } else if (DataDesOutletAirTemp > 0.0) {
                         AutosizeDes = DataDesOutletAirTemp;
+                        Real64 fanDeltaT = 0.0;
+                        if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                            // water coils on main branch have no parent object to set DataFan* variables
+                            if (DataFanIndex == -1) {
+                                if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
+                                    DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                                    DataFanIndex = PrimaryAirSystem(CurSysNum).SupFanNum;
+                                } else if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
+                                    DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                                    DataFanIndex = PrimaryAirSystem(CurSysNum).supFanVecIndex;
+                                }
+                            }
+                            // calculate fan heat to get fan air-side delta T
+                            FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                            if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
+                                CpAir = PsyCpAirFnWTdb(DataDesInletAirHumRat, AutosizeDes);
+                                fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
+                                DataDesAccountForFanHeat = false; // used in CoolingCapacitySizing calculations to avoid double counting fan heat
+                            }
+                        }
+                        AutosizeDes -= fanDeltaT;
                     } else {
                         AutosizeDes = FinalSysSizing(CurSysNum).CoolSupTemp;
+                        Real64 fanDeltaT = 0.0;
+                        if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                            // water coils on main branch have no parent object to set DataFan* variables
+                            if (DataFanIndex == -1) {
+                                if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
+                                    DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                                    DataFanIndex = PrimaryAirSystem(CurSysNum).SupFanNum;
+                                } else if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
+                                    DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                                    DataFanIndex = PrimaryAirSystem(CurSysNum).supFanVecIndex;
+                                }
+                            }
+                            // calculate fan heat to get fan air-side delta T
+                            FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                            if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
+                                CpAir = PsyCpAirFnWTdb(DataDesInletAirHumRat, AutosizeDes);
+                                fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
+                            }
+                        }
+                        AutosizeDes -= fanDeltaT;
                     }
                     if (AutosizeDes < DataDesInletWaterTemp && DataWaterFlowUsedForSizing > 0.0) {
                         ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
-                                         "\", Cooling Coil has leaving air temperature > entering water temperature.");
+                                         "\", Cooling Coil has leaving air temperature < entering water temperature.");
                         ShowContinueError("    Tair,out  =  " + RoundSigDigits(AutosizeDes, 3));
                         ShowContinueError("    Twater,in = " + RoundSigDigits(DataDesInletWaterTemp, 3));
                         AutosizeDes = DataDesInletWaterTemp + 0.5;
@@ -2445,9 +2630,9 @@ namespace ReportSizingManager {
                         // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
                         // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
                         // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
-                        // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
-                        // of flow/capacity ratio vs SHR for several actual coils.
+                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
+                        // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
+                        // regression of flow/capacity ratio vs SHR for several actual coils.
                         RatedVolFlowPerRatedTotCap = DataFlowUsedForSizing / DataCapacityUsedForSizing;
                         if (DXCT == RegularDXCoil) {
                             if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
@@ -2468,8 +2653,14 @@ namespace ReportSizingManager {
                         }
 
                         // check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-                        AutosizeDes = ValidateADP(CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing,
-                                                  DataFlowUsedForSizing, AutosizeDes, CallingRoutine);
+                        AutosizeDes = ValidateADP(CompType,
+                                                  CompName,
+                                                  RatedInletAirTemp,
+                                                  RatedInletAirHumRat,
+                                                  DataCapacityUsedForSizing,
+                                                  DataFlowUsedForSizing,
+                                                  AutosizeDes,
+                                                  CallingRoutine);
 
                     } else {
                         ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName);
@@ -2485,6 +2676,12 @@ namespace ReportSizingManager {
                     } else if (AirLoopSysFlag) {
                         AutosizeDes = UnitarySysEqSizing(CurSysNum).DesCoolingLoad;
                         DesVolFlow = DataFlowUsedForSizing;
+                        CoilInTemp = DataSizing::DataCoilSizingAirInTemp;
+                        CoilInHumRat = DataSizing::DataCoilSizingAirInHumRat;
+                        CoilOutTemp = DataSizing::DataCoilSizingAirOutTemp;
+                        CoilOutHumRat = DataSizing::DataCoilSizingAirOutHumRat;
+                        FanCoolLoad = DataSizing::DataCoilSizingFanCoolLoad;
+                        TotCapTempModFac = DataSizing::DataCoilSizingCapFT;
                     } else {
                         CheckSysSizing(CompType, CompName);
                         DesVolFlow = DataFlowUsedForSizing;
@@ -2549,20 +2746,17 @@ namespace ReportSizingManager {
                             CoilInEnth = PsyHFnTdbW(CoilInTemp, CoilInHumRat);
                             CoilInWetBulb = PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine);
                             CoilOutEnth = PsyHFnTdbW(CoilOutTemp, CoilOutHumRat);
-                            if (DataTotCapCurveIndex > 0) {
-                                TotCapTempModFac = CurveValue(DataTotCapCurveIndex, CoilInWetBulb, OutTemp);
-                            } else {
-                                TotCapTempModFac = 1.0;
-                            }
                             SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
                             RetFanNum = PrimaryAirSystem(CurSysNum).RetFanNum;
                             switch (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum) {
                             case DataAirSystems::structArrayLegacyFanModels: {
                                 FanCoolLoad = FanDesHeatGain(PrimaryAirSystem(CurSysNum).SupFanNum, DesVolFlow);
                                 if (coilSelectionReportObj->isCompTypeCoil(CompType) && (SupFanNum > 0)) {
-                                    coilSelectionReportObj->setCoilSupplyFanInfo(
-                                        CompName, CompType, Fans::Fan(PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
-                                        DataAirSystems::structArrayLegacyFanModels, PrimaryAirSystem(CurSysNum).SupFanNum);
+                                    coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
+                                                                                 CompType,
+                                                                                 Fans::Fan(PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
+                                                                                 DataAirSystems::structArrayLegacyFanModels,
+                                                                                 PrimaryAirSystem(CurSysNum).SupFanNum);
                                 }
 
                                 break;
@@ -2570,9 +2764,11 @@ namespace ReportSizingManager {
                             case DataAirSystems::objectVectorOOFanSystemModel: {
                                 FanCoolLoad = HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->getFanDesignHeatGain(DesVolFlow);
                                 if (coilSelectionReportObj->isCompTypeCoil(CompType) && (PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0)) {
-                                    coilSelectionReportObj->setCoilSupplyFanInfo(
-                                        CompName, CompType, HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
-                                        DataAirSystems::objectVectorOOFanSystemModel, PrimaryAirSystem(CurSysNum).supFanVecIndex);
+                                    coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
+                                                                                 CompType,
+                                                                                 HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
+                                                                                 DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                 PrimaryAirSystem(CurSysNum).supFanVecIndex);
                                 }
                                 break;
                             }
@@ -2600,17 +2796,40 @@ namespace ReportSizingManager {
 
                             PrimaryAirSystem(CurSysNum).FanDesCoolLoad = FanCoolLoad;
                             PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth) + FanCoolLoad));
+                            CpAir = PsyCpAirFnWTdb(CoilInHumRat, CoilInTemp);
+                            // adjust coil inlet/outlet temp with fan temperature rise
+                            if (DataDesAccountForFanHeat) {
+                                if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                                    CoilInTemp += FanCoolLoad / (CpAir * StdRhoAir * DesVolFlow);
+                                    // include change in inlet condition in TotCapTempModFac
+                                    CoilInWetBulb = PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine);
+                                } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                                    CoilOutTemp -= FanCoolLoad / (CpAir * StdRhoAir * DesVolFlow);
+                                }
+                            }
+                            if (DataTotCapCurveIndex > 0) {
+                                TotCapTempModFac = CurveValue(DataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                            } else {
+                                TotCapTempModFac = 1.0;
+                            }
                             if (TotCapTempModFac > 0.0) {
                                 NominalCapacityDes = PeakCoilLoad / TotCapTempModFac;
                             } else {
                                 NominalCapacityDes = PeakCoilLoad;
                             }
+                            DataSizing::DataCoilSizingAirInTemp = CoilInTemp;
+                            DataSizing::DataCoilSizingAirInHumRat = CoilInHumRat;
+                            DataSizing::DataCoilSizingAirOutTemp = CoilOutTemp;
+                            DataSizing::DataCoilSizingAirOutHumRat = CoilOutHumRat;
+                            DataSizing::DataCoilSizingFanCoolLoad = FanCoolLoad;
+                            DataSizing::DataCoilSizingCapFT = TotCapTempModFac;
                         } else {
                             NominalCapacityDes = 0.0;
                         }
                         AutosizeDes =
                             NominalCapacityDes * DataFracOfAutosizedCoolingCapacity; // Fixed Moved up 1 line inside block per Richard Raustad
                     }                                                                // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
+                    DataDesAccountForFanHeat = true;                                 // reset for next water coil
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {
                         ShowWarningMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                         ShowContinueError("...Rated Total Cooling Capacity = " + TrimSigDigits(AutosizeDes, 2) + " [W]");
@@ -2767,7 +2986,9 @@ namespace ReportSizingManager {
                     switch (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum) {
                     case DataAirSystems::structArrayLegacyFanModels: {
                         if (coilSelectionReportObj->isCompTypeCoil(CompType) && (PrimaryAirSystem(CurSysNum).SupFanNum > 0)) {
-                            coilSelectionReportObj->setCoilSupplyFanInfo(CompName, CompType, Fans::Fan(PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
+                            coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
+                                                                         CompType,
+                                                                         Fans::Fan(PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
                                                                          DataAirSystems::structArrayLegacyFanModels,
                                                                          PrimaryAirSystem(CurSysNum).SupFanNum);
                         }
@@ -2775,9 +2996,11 @@ namespace ReportSizingManager {
                     }
                     case DataAirSystems::objectVectorOOFanSystemModel: {
                         if (coilSelectionReportObj->isCompTypeCoil(CompType) && (PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0)) {
-                            coilSelectionReportObj->setCoilSupplyFanInfo(
-                                CompName, CompType, HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
-                                DataAirSystems::objectVectorOOFanSystemModel, PrimaryAirSystem(CurSysNum).supFanVecIndex);
+                            coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
+                                                                         CompType,
+                                                                         HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
+                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                         PrimaryAirSystem(CurSysNum).supFanVecIndex);
                         }
                         break;
                     }
@@ -3023,8 +3246,8 @@ namespace ReportSizingManager {
                 } else if (SizingResult > 0.0) {
                     AutosizeUser = SizingResult;
                     if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
-                        ReportSizingOutput(CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString,
-                                           AutosizeUser);
+                        ReportSizingOutput(
+                            CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser);
                     } else {
                         ReportSizingOutput(CompType, CompName, "User-Specified " + SizingString, AutosizeUser);
                     }
@@ -3161,15 +3384,19 @@ namespace ReportSizingManager {
                 if (DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag) {
                     if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
                         SizingType == CoolingAirflowSizing && DataIsDXCoil) {
-                        ReportSizingOutput(CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString,
-                                           AutosizeUser);
+                        ReportSizingOutput(
+                            CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser);
                         SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
                         AutosizeUser *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
-                        ReportSizingOutput(CompType, CompName, "Design Size " + SizingString + " ( non-bypassed )", AutosizeDes,
-                                           "User-Specified " + SizingString + " ( non-bypassed )", AutosizeUser);
-                    } else {
-                        ReportSizingOutput(CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString,
+                        ReportSizingOutput(CompType,
+                                           CompName,
+                                           "Design Size " + SizingString + " ( non-bypassed )",
+                                           AutosizeDes,
+                                           "User-Specified " + SizingString + " ( non-bypassed )",
                                            AutosizeUser);
+                    } else {
+                        ReportSizingOutput(
+                            CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser);
                     }
                     if (DisplayExtraWarnings && PrintWarningFlag) {
                         if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
@@ -3203,8 +3430,12 @@ namespace ReportSizingManager {
             } else {
                 if (DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag &&
                     !(DataScalableSizingON || DataScalableCapSizingON)) {
-                    ReportSizingOutput(CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString,
-                                       AutosizeUser);
+                    if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
+                        ReportSizingOutput(
+                            CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser);
+                    } else {
+                        ReportSizingOutput(CompType, CompName, "User-Specified " + SizingString, AutosizeUser);
+                    }
                     if (DisplayExtraWarnings) {
                         if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
@@ -3314,8 +3545,17 @@ namespace ReportSizingManager {
         } else if (SizingType == HeatingWaterDesAirInletHumRatSizing) {
             coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, SizingResult);
         } else if (SizingType == HeatingWaterDesCoilLoadUsedForUASizing) {
-            coilSelectionReportObj->setCoilHeatingCapacity(CompName, CompType, SizingResult, IsAutoSize, CurSysNum, CurZoneEqNum, CurOASysNum,
-                                                           FanCoolLoad, TotCapTempModFac, DXFlowPerCapMinRatio, DXFlowPerCapMaxRatio);
+            coilSelectionReportObj->setCoilHeatingCapacity(CompName,
+                                                           CompType,
+                                                           SizingResult,
+                                                           IsAutoSize,
+                                                           CurSysNum,
+                                                           CurZoneEqNum,
+                                                           CurOASysNum,
+                                                           FanCoolLoad,
+                                                           TotCapTempModFac,
+                                                           DXFlowPerCapMinRatio,
+                                                           DXFlowPerCapMaxRatio);
         } else if (SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing) {
             coilSelectionReportObj->setCoilWaterFlowPltSizNum(CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum);
         } else if (SizingType == HeatingAirflowSizing) {
@@ -3348,18 +3588,44 @@ namespace ReportSizingManager {
 
         } else if (SizingType == CoolingCapacitySizing) {
             if (coilSelectionReportObj->isCompTypeCoil(CompType)) {
-                coilSelectionReportObj->setCoilCoolingCapacity(CompName, CompType, SizingResult, IsAutoSize, CurSysNum, CurZoneEqNum, CurOASysNum,
-                                                               FanCoolLoad, TotCapTempModFac, DXFlowPerCapMinRatio, DXFlowPerCapMaxRatio);
+                if (CoilInTemp > 0.0) { // set inlet air properties used during capacity sizing if available
+                    coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, CoilInTemp, CurSysNum, CurZoneEqNum);
+                    coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, CoilInHumRat);
+                }
+                if (CoilOutTemp > 0.0) { // set outlet air properties used during capacity sizing if available
+                    coilSelectionReportObj->setCoilLvgAirTemp(CompName, CompType, CoilOutTemp);
+                    coilSelectionReportObj->setCoilLvgAirHumRat(CompName, CompType, CoilOutHumRat);
+                }
+                coilSelectionReportObj->setCoilCoolingCapacity(CompName,
+                                                               CompType,
+                                                               SizingResult,
+                                                               IsAutoSize,
+                                                               CurSysNum,
+                                                               CurZoneEqNum,
+                                                               CurOASysNum,
+                                                               FanCoolLoad,
+                                                               TotCapTempModFac,
+                                                               DXFlowPerCapMinRatio,
+                                                               DXFlowPerCapMaxRatio);
             }
         } else if (SizingType == HeatingCapacitySizing) {
             if (coilSelectionReportObj->isCompTypeCoil(CompType)) {
-                coilSelectionReportObj->setCoilHeatingCapacity(CompName, CompType, SizingResult, IsAutoSize, CurSysNum, CurZoneEqNum, CurOASysNum,
-                                                               FanCoolLoad, TotCapTempModFac, DXFlowPerCapMinRatio, DXFlowPerCapMaxRatio);
+                coilSelectionReportObj->setCoilHeatingCapacity(CompName,
+                                                               CompType,
+                                                               SizingResult,
+                                                               IsAutoSize,
+                                                               CurSysNum,
+                                                               CurZoneEqNum,
+                                                               CurOASysNum,
+                                                               FanCoolLoad,
+                                                               TotCapTempModFac,
+                                                               DXFlowPerCapMinRatio,
+                                                               DXFlowPerCapMaxRatio);
             }
         } else if (SizingType == WaterHeatingCapacitySizing) {
             if (coilSelectionReportObj->isCompTypeCoil(CompType)) {
-                coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum,
-                                                                            DataWaterLoopNum);
+                coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(
+                    CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum);
             }
         } else if (SizingType == WaterHeatingCoilUASizing) {
             coilSelectionReportObj->setCoilUA(CompName, CompType, SizingResult, DataCapacityUsedForSizing, IsAutoSize, CurSysNum, CurZoneEqNum);
@@ -3480,6 +3746,88 @@ namespace ReportSizingManager {
                 DesFlow = TotFlow;
             }
         }
+    }
+
+    Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
+    {
+        Real64 outAirFrac = 0.0;
+        if (desMassFlow <= 0.0) return outAirFrac;
+
+        if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+            // set central DOAS AT mixer OA fraction
+            outAirFrac = min(DataEnvironment::StdRhoAir * zoneEqSizing.ATMixerVolFlow / desMassFlow, 1.0);
+        } else if (zoneEqSizing.OAVolFlow > 0.0) { // set zone equipment OA fraction
+            outAirFrac = min(DataEnvironment::StdRhoAir * zoneEqSizing.OAVolFlow / desMassFlow, 1.0);
+        }
+        return outAirFrac;
+    }
+
+    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing)
+    {
+        Real64 coilInTemp = 0.0;
+        if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+            // adjust for central DOAS AT mixer mixed inlet temp
+            coilInTemp = (1.0 - outAirFrac) * finalZoneSizing.ZoneRetTempAtHeatPeak + outAirFrac * zoneEqSizing.ATMixerHeatPriDryBulb;
+        } else if (zoneEqSizing.OAVolFlow > 0.0) {
+            // adjust for raw OA mixed inlet temp
+            coilInTemp = (1.0 - outAirFrac) * finalZoneSizing.ZoneTempAtHeatPeak + outAirFrac * finalZoneSizing.OutTempAtHeatPeak;
+        } else {
+            // use zone condition for sizing zone equipment
+            coilInTemp = finalZoneSizing.ZoneTempAtHeatPeak;
+        }
+        return coilInTemp;
+    }
+
+    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing)
+    {
+        Real64 coilInHumRat = 0.0;
+        if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+            // adjust for central DOAS AT mixer mixed inlet humrat
+            coilInHumRat = (1.0 - outAirFrac) * finalZoneSizing.ZoneHumRatAtHeatPeak + outAirFrac * zoneEqSizing.ATMixerHeatPriHumRat;
+        } else if (zoneEqSizing.OAVolFlow > 0.0) { // adjust for raw OA mixed inlet humrat
+            coilInHumRat = (1.0 - outAirFrac) * finalZoneSizing.ZoneHumRatAtHeatPeak + outAirFrac * finalZoneSizing.OutHumRatAtHeatPeak;
+        } else {
+            coilInHumRat = finalZoneSizing.ZoneHumRatAtHeatPeak;
+        }
+        return coilInHumRat;
+    }
+
+    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing)
+    {
+        Real64 coilInTemp = 0.0;
+        if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+            // adjust for central DOAS AT mixer mixed inlet temp
+            coilInTemp = (1.0 - outAirFrac) * finalZoneSizing.ZoneRetTempAtCoolPeak + outAirFrac * zoneEqSizing.ATMixerCoolPriDryBulb;
+        } else if (zoneEqSizing.OAVolFlow > 0.0) {
+            // adjust for raw OA mixed inlet temp
+            coilInTemp = (1.0 - outAirFrac) * finalZoneSizing.ZoneTempAtCoolPeak + outAirFrac * finalZoneSizing.OutTempAtCoolPeak;
+        } else {
+            // use zone condition for sizing zone equipment
+            coilInTemp = finalZoneSizing.ZoneTempAtCoolPeak;
+        }
+        return coilInTemp;
+    }
+
+    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing)
+    {
+        Real64 coilInHumRat = 0.0;
+        if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+            // adjust for central DOAS AT mixer mixed inlet humrat
+            coilInHumRat = (1.0 - outAirFrac) * finalZoneSizing.ZoneHumRatAtCoolPeak + outAirFrac * zoneEqSizing.ATMixerCoolPriHumRat;
+        } else if (zoneEqSizing.OAVolFlow > 0.0) { // adjust for raw OA mixed inlet humrat
+            coilInHumRat = (1.0 - outAirFrac) * finalZoneSizing.ZoneHumRatAtCoolPeak + outAirFrac * finalZoneSizing.OutHumRatAtCoolPeak;
+        } else {
+            coilInHumRat = finalZoneSizing.ZoneHumRatAtCoolPeak;
+        }
+        return coilInHumRat;
     }
 
 } // namespace ReportSizingManager

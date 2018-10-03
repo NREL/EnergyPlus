@@ -201,10 +201,16 @@ namespace HeatPumpWaterToWaterHEATING {
             CalcGshpModel(GSHPType, GSHPName, GSHPNum, MyLoad, FirstHVACIteration);
             UpdateGSHPRecords(GSHPNum);
         } else if (LoopNum == GSHP(GSHPNum).SourceLoopNum) { // condenser loop
-            UpdateChillerComponentCondenserSide(
-                GSHP(GSHPNum).SourceLoopNum, GSHP(GSHPNum).SourceLoopSideNum, TypeOf_HPWaterEFHeating, GSHP(GSHPNum).SourceSideInletNodeNum,
-                GSHP(GSHPNum).SourceSideOutletNodeNum, -GSHPReport(GSHPNum).QSource, GSHPReport(GSHPNum).SourceSideWaterInletTemp,
-                GSHPReport(GSHPNum).SourceSideWaterOutletTemp, GSHPReport(GSHPNum).SourceSidemdot, FirstHVACIteration);
+            UpdateChillerComponentCondenserSide(GSHP(GSHPNum).SourceLoopNum,
+                                                GSHP(GSHPNum).SourceLoopSideNum,
+                                                TypeOf_HPWaterEFHeating,
+                                                GSHP(GSHPNum).SourceSideInletNodeNum,
+                                                GSHP(GSHPNum).SourceSideOutletNodeNum,
+                                                -GSHPReport(GSHPNum).QSource,
+                                                GSHPReport(GSHPNum).SourceSideWaterInletTemp,
+                                                GSHPReport(GSHPNum).SourceSideWaterOutletTemp,
+                                                GSHPReport(GSHPNum).SourceSidemdot,
+                                                FirstHVACIteration);
         } else {
             ShowFatalError("SimHPWatertoWaterHEATING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + GSHPName);
         }
@@ -356,17 +362,17 @@ namespace HeatPumpWaterToWaterHEATING {
             //				ShowWarningError( ModuleCompName + ": Unit Cycle Time= 0.0 Heat Pump" + trim( AlphArray( 1 ) ) );
             //			}
 
-            GSHP(GSHPNum).SourceSideInletNodeNum = GetOnlySingleNode(AlphArray(2), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water,
-                                                                     NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            GSHP(GSHPNum).SourceSideInletNodeNum = GetOnlySingleNode(
+                AlphArray(2), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
-            GSHP(GSHPNum).SourceSideOutletNodeNum = GetOnlySingleNode(AlphArray(3), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water,
-                                                                      NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            GSHP(GSHPNum).SourceSideOutletNodeNum = GetOnlySingleNode(
+                AlphArray(3), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            GSHP(GSHPNum).LoadSideInletNodeNum = GetOnlySingleNode(AlphArray(4), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water,
-                                                                   NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+            GSHP(GSHPNum).LoadSideInletNodeNum = GetOnlySingleNode(
+                AlphArray(4), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
-            GSHP(GSHPNum).LoadSideOutletNodeNum = GetOnlySingleNode(AlphArray(5), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water,
-                                                                    NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+            GSHP(GSHPNum).LoadSideOutletNodeNum = GetOnlySingleNode(
+                AlphArray(5), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
             // Test node sets
             TestCompSet(ModuleCompNameUC, AlphArray(1), AlphArray(2), AlphArray(3), "Condenser Water Nodes");
@@ -387,45 +393,121 @@ namespace HeatPumpWaterToWaterHEATING {
 
         // CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
-            SetupOutputVariable("Water to Water Heat Pump Electric Power", OutputProcessor::Unit::W, GSHPReport(GSHPNum).Power, "System", "Average",
+            SetupOutputVariable("Water to Water Heat Pump Electric Power",
+                                OutputProcessor::Unit::W,
+                                GSHPReport(GSHPNum).Power,
+                                "System",
+                                "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Electric Energy", OutputProcessor::Unit::J, GSHPReport(GSHPNum).Energy, "System", "Sum",
-                                GSHP(GSHPNum).Name, _, "Electricity", "Heating", _, "Plant");
+            SetupOutputVariable("Water to Water Heat Pump Electric Energy",
+                                OutputProcessor::Unit::J,
+                                GSHPReport(GSHPNum).Energy,
+                                "System",
+                                "Sum",
+                                GSHP(GSHPNum).Name,
+                                _,
+                                "Electricity",
+                                "Heating",
+                                _,
+                                "Plant");
 
-            SetupOutputVariable("Water to Water Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, GSHPReport(GSHPNum).QLoad,
-                                "System", "Average", GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J, GSHPReport(GSHPNum).QLoadEnergy,
-                                "System", "Sum", GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Load Side Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                GSHPReport(GSHPNum).QLoad,
+                                "System",
+                                "Average",
+                                GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Load Side Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                GSHPReport(GSHPNum).QLoadEnergy,
+                                "System",
+                                "Sum",
+                                GSHP(GSHPNum).Name);
 
-            SetupOutputVariable("Water to Water Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W, GSHPReport(GSHPNum).QSource,
-                                "System", "Average", GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J,
-                                GSHPReport(GSHPNum).QSourceEnergy, "System", "Sum", GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Source Side Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                GSHPReport(GSHPNum).QSource,
+                                "System",
+                                "Average",
+                                GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Source Side Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                GSHPReport(GSHPNum).QSourceEnergy,
+                                "System",
+                                "Sum",
+                                GSHP(GSHPNum).Name);
 
-            SetupOutputVariable("Water to Water Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C,
-                                GSHPReport(GSHPNum).LoadSideWaterOutletTemp, "System", "Average", GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C,
-                                GSHPReport(GSHPNum).LoadSideWaterInletTemp, "System", "Average", GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C,
-                                GSHPReport(GSHPNum).SourceSideWaterOutletTemp, "System", "Average", GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C,
-                                GSHPReport(GSHPNum).SourceSideWaterInletTemp, "System", "Average", GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, GSHPReport(GSHPNum).LoadSidemdot,
-                                "System", "Average", GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                GSHPReport(GSHPNum).SourceSidemdot, "System", "Average", GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Load Side Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                GSHPReport(GSHPNum).LoadSideWaterOutletTemp,
+                                "System",
+                                "Average",
+                                GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Load Side Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                GSHPReport(GSHPNum).LoadSideWaterInletTemp,
+                                "System",
+                                "Average",
+                                GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Source Side Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                GSHPReport(GSHPNum).SourceSideWaterOutletTemp,
+                                "System",
+                                "Average",
+                                GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Source Side Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                GSHPReport(GSHPNum).SourceSideWaterInletTemp,
+                                "System",
+                                "Average",
+                                GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Load Side Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                GSHPReport(GSHPNum).LoadSidemdot,
+                                "System",
+                                "Average",
+                                GSHP(GSHPNum).Name);
+            SetupOutputVariable("Water to Water Heat Pump Source Side Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                GSHPReport(GSHPNum).SourceSidemdot,
+                                "System",
+                                "Average",
+                                GSHP(GSHPNum).Name);
 
             // scan for loop connection data
             errFlag = false;
-            ScanPlantLoopsForObject(GSHP(GSHPNum).Name, GSHP(GSHPNum).WWHPPlantTypeOfNum, GSHP(GSHPNum).SourceLoopNum,
-                                    GSHP(GSHPNum).SourceLoopSideNum, GSHP(GSHPNum).SourceBranchNum, GSHP(GSHPNum).SourceCompNum, _, _, _,
-                                    GSHP(GSHPNum).SourceSideInletNodeNum, _, errFlag);
-            ScanPlantLoopsForObject(GSHP(GSHPNum).Name, GSHP(GSHPNum).WWHPPlantTypeOfNum, GSHP(GSHPNum).LoadLoopNum, GSHP(GSHPNum).LoadLoopSideNum,
-                                    GSHP(GSHPNum).LoadBranchNum, GSHP(GSHPNum).LoadCompNum, _, _, _, GSHP(GSHPNum).LoadSideInletNodeNum, _, errFlag);
+            ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
+                                    GSHP(GSHPNum).WWHPPlantTypeOfNum,
+                                    GSHP(GSHPNum).SourceLoopNum,
+                                    GSHP(GSHPNum).SourceLoopSideNum,
+                                    GSHP(GSHPNum).SourceBranchNum,
+                                    GSHP(GSHPNum).SourceCompNum,
+                                    _,
+                                    _,
+                                    _,
+                                    GSHP(GSHPNum).SourceSideInletNodeNum,
+                                    _,
+                                    errFlag);
+            ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
+                                    GSHP(GSHPNum).WWHPPlantTypeOfNum,
+                                    GSHP(GSHPNum).LoadLoopNum,
+                                    GSHP(GSHPNum).LoadLoopSideNum,
+                                    GSHP(GSHPNum).LoadBranchNum,
+                                    GSHP(GSHPNum).LoadCompNum,
+                                    _,
+                                    _,
+                                    _,
+                                    GSHP(GSHPNum).LoadSideInletNodeNum,
+                                    _,
+                                    errFlag);
 
             if (!errFlag) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(GSHP(GSHPNum).LoadLoopNum, GSHP(GSHPNum).LoadLoopSideNum, GSHP(GSHPNum).SourceLoopNum,
-                                                              GSHP(GSHPNum).SourceLoopSideNum, GSHP(GSHPNum).WWHPPlantTypeOfNum, true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(GSHP(GSHPNum).LoadLoopNum,
+                                                              GSHP(GSHPNum).LoadLoopSideNum,
+                                                              GSHP(GSHPNum).SourceLoopNum,
+                                                              GSHP(GSHPNum).SourceLoopSideNum,
+                                                              GSHP(GSHPNum).WWHPPlantTypeOfNum,
+                                                              true);
             }
 
             if (errFlag) {
@@ -484,20 +566,35 @@ namespace HeatPumpWaterToWaterHEATING {
 
             MyEnvrnFlag(GSHPNum) = false;
 
-            rho = GetDensityGlycol(PlantLoop(GSHP(GSHPNum).LoadLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                   PlantLoop(GSHP(GSHPNum).LoadLoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(PlantLoop(GSHP(GSHPNum).LoadLoopNum).FluidName,
+                                   DataGlobals::CWInitConvTemp,
+                                   PlantLoop(GSHP(GSHPNum).LoadLoopNum).FluidIndex,
+                                   RoutineName);
             GSHP(GSHPNum).LoadSideDesignMassFlow = GSHP(GSHPNum).LoadSideVolFlowRate * rho;
 
-            InitComponentNodes(0.0, GSHP(GSHPNum).LoadSideDesignMassFlow, GSHP(GSHPNum).LoadSideInletNodeNum, GSHP(GSHPNum).LoadSideOutletNodeNum,
-                               GSHP(GSHPNum).LoadLoopNum, GSHP(GSHPNum).LoadLoopSideNum, GSHP(GSHPNum).LoadBranchNum, GSHP(GSHPNum).LoadCompNum);
+            InitComponentNodes(0.0,
+                               GSHP(GSHPNum).LoadSideDesignMassFlow,
+                               GSHP(GSHPNum).LoadSideInletNodeNum,
+                               GSHP(GSHPNum).LoadSideOutletNodeNum,
+                               GSHP(GSHPNum).LoadLoopNum,
+                               GSHP(GSHPNum).LoadLoopSideNum,
+                               GSHP(GSHPNum).LoadBranchNum,
+                               GSHP(GSHPNum).LoadCompNum);
 
-            rho = GetDensityGlycol(PlantLoop(GSHP(GSHPNum).SourceLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                   PlantLoop(GSHP(GSHPNum).SourceLoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(PlantLoop(GSHP(GSHPNum).SourceLoopNum).FluidName,
+                                   DataGlobals::CWInitConvTemp,
+                                   PlantLoop(GSHP(GSHPNum).SourceLoopNum).FluidIndex,
+                                   RoutineName);
             GSHP(GSHPNum).SourceSideDesignMassFlow = GSHP(GSHPNum).SourceSideVolFlowRate * rho;
 
-            InitComponentNodes(0.0, GSHP(GSHPNum).SourceSideDesignMassFlow, GSHP(GSHPNum).SourceSideInletNodeNum,
-                               GSHP(GSHPNum).SourceSideOutletNodeNum, GSHP(GSHPNum).SourceLoopNum, GSHP(GSHPNum).SourceLoopSideNum,
-                               GSHP(GSHPNum).SourceBranchNum, GSHP(GSHPNum).SourceCompNum);
+            InitComponentNodes(0.0,
+                               GSHP(GSHPNum).SourceSideDesignMassFlow,
+                               GSHP(GSHPNum).SourceSideInletNodeNum,
+                               GSHP(GSHPNum).SourceSideOutletNodeNum,
+                               GSHP(GSHPNum).SourceLoopNum,
+                               GSHP(GSHPNum).SourceLoopSideNum,
+                               GSHP(GSHPNum).SourceBranchNum,
+                               GSHP(GSHPNum).SourceCompNum);
 
             if (Node(GSHP(GSHPNum).SourceSideOutletNodeNum).TempSetPoint == SensedNodeFlagValue)
                 Node(GSHP(GSHPNum).SourceSideOutletNodeNum).TempSetPoint = 0.0;
@@ -673,14 +770,29 @@ namespace HeatPumpWaterToWaterHEATING {
         // Set flows if the heat pump is not running
         if (!GSHP(GSHPNum).MustRun) {
             LoadSideWaterMassFlowRate = 0.0;
-            SetComponentFlowRate(LoadSideWaterMassFlowRate, LoadSideInletNode, LoadSideOutletNode, GSHP(GSHPNum).LoadLoopNum,
-                                 GSHP(GSHPNum).LoadLoopSideNum, GSHP(GSHPNum).LoadBranchNum, GSHP(GSHPNum).LoadCompNum);
+            SetComponentFlowRate(LoadSideWaterMassFlowRate,
+                                 LoadSideInletNode,
+                                 LoadSideOutletNode,
+                                 GSHP(GSHPNum).LoadLoopNum,
+                                 GSHP(GSHPNum).LoadLoopSideNum,
+                                 GSHP(GSHPNum).LoadBranchNum,
+                                 GSHP(GSHPNum).LoadCompNum);
             SourceSideWaterMassFlowRate = 0.0;
-            SetComponentFlowRate(SourceSideWaterMassFlowRate, SourceSideInletNode, SourceSideOutletNode, GSHP(GSHPNum).SourceLoopNum,
-                                 GSHP(GSHPNum).SourceLoopSideNum, GSHP(GSHPNum).SourceBranchNum, GSHP(GSHPNum).SourceCompNum);
-            PlantUtilities::PullCompInterconnectTrigger(GSHP(GSHPNum).LoadLoopNum, GSHP(GSHPNum).LoadLoopSideNum, GSHP(GSHPNum).LoadBranchNum,
-                                                        GSHP(GSHPNum).LoadCompNum, GSHP(GSHPNum).CondMassFlowIndex, GSHP(GSHPNum).SourceLoopNum,
-                                                        GSHP(GSHPNum).LoadLoopSideNum, DataPlant::CriteriaType_MassFlowRate,
+            SetComponentFlowRate(SourceSideWaterMassFlowRate,
+                                 SourceSideInletNode,
+                                 SourceSideOutletNode,
+                                 GSHP(GSHPNum).SourceLoopNum,
+                                 GSHP(GSHPNum).SourceLoopSideNum,
+                                 GSHP(GSHPNum).SourceBranchNum,
+                                 GSHP(GSHPNum).SourceCompNum);
+            PlantUtilities::PullCompInterconnectTrigger(GSHP(GSHPNum).LoadLoopNum,
+                                                        GSHP(GSHPNum).LoadLoopSideNum,
+                                                        GSHP(GSHPNum).LoadBranchNum,
+                                                        GSHP(GSHPNum).LoadCompNum,
+                                                        GSHP(GSHPNum).CondMassFlowIndex,
+                                                        GSHP(GSHPNum).SourceLoopNum,
+                                                        GSHP(GSHPNum).LoadLoopSideNum,
+                                                        DataPlant::CriteriaType_MassFlowRate,
                                                         SourceSideWaterMassFlowRate);
             // now initialize simulation variables for "heat pump off"
             QLoad = 0.0;
@@ -696,26 +808,51 @@ namespace HeatPumpWaterToWaterHEATING {
         } else { // the heat pump must run, request design flow
 
             LoadSideWaterMassFlowRate = GSHP(GSHPNum).LoadSideDesignMassFlow;
-            SetComponentFlowRate(LoadSideWaterMassFlowRate, LoadSideInletNode, LoadSideOutletNode, GSHP(GSHPNum).LoadLoopNum,
-                                 GSHP(GSHPNum).LoadLoopSideNum, GSHP(GSHPNum).LoadBranchNum, GSHP(GSHPNum).LoadCompNum);
+            SetComponentFlowRate(LoadSideWaterMassFlowRate,
+                                 LoadSideInletNode,
+                                 LoadSideOutletNode,
+                                 GSHP(GSHPNum).LoadLoopNum,
+                                 GSHP(GSHPNum).LoadLoopSideNum,
+                                 GSHP(GSHPNum).LoadBranchNum,
+                                 GSHP(GSHPNum).LoadCompNum);
 
             SourceSideWaterMassFlowRate = GSHP(GSHPNum).SourceSideDesignMassFlow;
-            SetComponentFlowRate(SourceSideWaterMassFlowRate, SourceSideInletNode, SourceSideOutletNode, GSHP(GSHPNum).SourceLoopNum,
-                                 GSHP(GSHPNum).SourceLoopSideNum, GSHP(GSHPNum).SourceBranchNum, GSHP(GSHPNum).SourceCompNum);
+            SetComponentFlowRate(SourceSideWaterMassFlowRate,
+                                 SourceSideInletNode,
+                                 SourceSideOutletNode,
+                                 GSHP(GSHPNum).SourceLoopNum,
+                                 GSHP(GSHPNum).SourceLoopSideNum,
+                                 GSHP(GSHPNum).SourceBranchNum,
+                                 GSHP(GSHPNum).SourceCompNum);
             // get inlet temps
             LoadSideWaterInletTemp = Node(LoadSideInletNode).Temp;
             SourceSideWaterInletTemp = Node(SourceSideInletNode).Temp;
             // if there's no flow, turn the "heat pump off"
             if (LoadSideWaterMassFlowRate < MassFlowTolerance || SourceSideWaterMassFlowRate < MassFlowTolerance) {
                 LoadSideWaterMassFlowRate = 0.0;
-                SetComponentFlowRate(LoadSideWaterMassFlowRate, LoadSideInletNode, LoadSideOutletNode, GSHP(GSHPNum).LoadLoopNum,
-                                     GSHP(GSHPNum).LoadLoopSideNum, GSHP(GSHPNum).LoadBranchNum, GSHP(GSHPNum).LoadCompNum);
+                SetComponentFlowRate(LoadSideWaterMassFlowRate,
+                                     LoadSideInletNode,
+                                     LoadSideOutletNode,
+                                     GSHP(GSHPNum).LoadLoopNum,
+                                     GSHP(GSHPNum).LoadLoopSideNum,
+                                     GSHP(GSHPNum).LoadBranchNum,
+                                     GSHP(GSHPNum).LoadCompNum);
                 SourceSideWaterMassFlowRate = 0.0;
-                SetComponentFlowRate(SourceSideWaterMassFlowRate, SourceSideInletNode, SourceSideOutletNode, GSHP(GSHPNum).SourceLoopNum,
-                                     GSHP(GSHPNum).SourceLoopSideNum, GSHP(GSHPNum).SourceBranchNum, GSHP(GSHPNum).SourceCompNum);
-                PlantUtilities::PullCompInterconnectTrigger(GSHP(GSHPNum).LoadLoopNum, GSHP(GSHPNum).LoadLoopSideNum, GSHP(GSHPNum).LoadBranchNum,
-                                                            GSHP(GSHPNum).LoadCompNum, GSHP(GSHPNum).CondMassFlowIndex, GSHP(GSHPNum).SourceLoopNum,
-                                                            GSHP(GSHPNum).LoadLoopSideNum, DataPlant::CriteriaType_MassFlowRate,
+                SetComponentFlowRate(SourceSideWaterMassFlowRate,
+                                     SourceSideInletNode,
+                                     SourceSideOutletNode,
+                                     GSHP(GSHPNum).SourceLoopNum,
+                                     GSHP(GSHPNum).SourceLoopSideNum,
+                                     GSHP(GSHPNum).SourceBranchNum,
+                                     GSHP(GSHPNum).SourceCompNum);
+                PlantUtilities::PullCompInterconnectTrigger(GSHP(GSHPNum).LoadLoopNum,
+                                                            GSHP(GSHPNum).LoadLoopSideNum,
+                                                            GSHP(GSHPNum).LoadBranchNum,
+                                                            GSHP(GSHPNum).LoadCompNum,
+                                                            GSHP(GSHPNum).CondMassFlowIndex,
+                                                            GSHP(GSHPNum).SourceLoopNum,
+                                                            GSHP(GSHPNum).LoadLoopSideNum,
+                                                            DataPlant::CriteriaType_MassFlowRate,
                                                             SourceSideWaterMassFlowRate);
                 QLoad = 0.0;
                 QSource = 0.0;
@@ -726,9 +863,14 @@ namespace HeatPumpWaterToWaterHEATING {
                 SourceSideWaterOutletTemp = SourceSideWaterInletTemp;
                 return;
             }
-            PlantUtilities::PullCompInterconnectTrigger(GSHP(GSHPNum).LoadLoopNum, GSHP(GSHPNum).LoadLoopSideNum, GSHP(GSHPNum).LoadBranchNum,
-                                                        GSHP(GSHPNum).LoadCompNum, GSHP(GSHPNum).CondMassFlowIndex, GSHP(GSHPNum).SourceLoopNum,
-                                                        GSHP(GSHPNum).LoadLoopSideNum, DataPlant::CriteriaType_MassFlowRate,
+            PlantUtilities::PullCompInterconnectTrigger(GSHP(GSHPNum).LoadLoopNum,
+                                                        GSHP(GSHPNum).LoadLoopSideNum,
+                                                        GSHP(GSHPNum).LoadBranchNum,
+                                                        GSHP(GSHPNum).LoadCompNum,
+                                                        GSHP(GSHPNum).CondMassFlowIndex,
+                                                        GSHP(GSHPNum).SourceLoopNum,
+                                                        GSHP(GSHPNum).LoadLoopSideNum,
+                                                        DataPlant::CriteriaType_MassFlowRate,
                                                         SourceSideWaterMassFlowRate);
         }
 
@@ -738,11 +880,13 @@ namespace HeatPumpWaterToWaterHEATING {
         initialQLoad = 0.0;
         IterationCount = 0;
 
-        CpSourceSide = GetSpecificHeatGlycol(PlantLoop(GSHP(GSHPNum).SourceLoopNum).FluidName, SourceSideWaterInletTemp,
-                                             PlantLoop(GSHP(GSHPNum).SourceLoopNum).FluidIndex, RoutineName);
+        CpSourceSide = GetSpecificHeatGlycol(PlantLoop(GSHP(GSHPNum).SourceLoopNum).FluidName,
+                                             SourceSideWaterInletTemp,
+                                             PlantLoop(GSHP(GSHPNum).SourceLoopNum).FluidIndex,
+                                             RoutineName);
 
-        CpLoadSide = GetSpecificHeatGlycol(PlantLoop(GSHP(GSHPNum).LoadLoopNum).FluidName, LoadSideWaterInletTemp,
-                                           PlantLoop(GSHP(GSHPNum).LoadLoopNum).FluidIndex, RoutineName);
+        CpLoadSide = GetSpecificHeatGlycol(
+            PlantLoop(GSHP(GSHPNum).LoadLoopNum).FluidName, LoadSideWaterInletTemp, PlantLoop(GSHP(GSHPNum).LoadLoopNum).FluidIndex, RoutineName);
 
         // Determine effectiveness of Source Side (the Evaporator in heating mode)
         SourceSideEffect = 1.0 - std::exp(-SourceSideUA / (CpSourceSide * SourceSideWaterMassFlowRate));

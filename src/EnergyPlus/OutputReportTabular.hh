@@ -701,6 +701,8 @@ namespace OutputReportTabular {
 
     bool isCompLoadRepReq();
 
+    bool hasSizingPeriodsDays();
+
     void InitializePredefinedMonthlyTitles();
 
     void CreatePredefinedMonthlyReports();

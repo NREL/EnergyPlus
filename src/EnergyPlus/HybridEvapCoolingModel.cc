@@ -106,7 +106,6 @@ namespace HybridEvapCoolingModel {
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using CurveManager::GetCurveMinMaxValues;
-    using CurveManager::GetCurveType;
     using EnergyPlus::CurveManager::GetNormalPoint;
     using ScheduleManager::GetCurrentScheduleValue;
     typedef int *MyType;
@@ -459,8 +458,15 @@ namespace HybridEvapCoolingModel {
                           std::string cCurrentModuleObject)
     {
         CMode newMode;
-        bool error = newMode.ParseMode(ModeCounter, &OperatingModes, ScaledSystemMaximumSupplyAirMassFlowRate, Alphas, cAlphaFields, Numbers,
-                                       cNumericFields, lAlphaBlanks, cCurrentModuleObject);
+        bool error = newMode.ParseMode(ModeCounter,
+                                       &OperatingModes,
+                                       ScaledSystemMaximumSupplyAirMassFlowRate,
+                                       Alphas,
+                                       cAlphaFields,
+                                       Numbers,
+                                       cNumericFields,
+                                       lAlphaBlanks,
+                                       cCurrentModuleObject);
         ModeCounter++;
         return error;
     }
@@ -1641,9 +1647,14 @@ namespace HybridEvapCoolingModel {
 
             // Calculate partload fraction required to meet all requirements
             Real64 PartRuntimeFraction = 0;
-            PartRuntimeFraction = CalculatePartRuntimeFraction(MinOA_Msa, thisSetting.Supply_Air_Ventilation_Volume * StdRhoAir,
-                                                               StepIns.RequestedCoolingLoad, StepIns.RequestedHeatingLoad, SensibleRoomORZone,
-                                                               StepIns.ZoneDehumidificationLoad, StepIns.ZoneMoistureLoad, latentRoomORZone); //
+            PartRuntimeFraction = CalculatePartRuntimeFraction(MinOA_Msa,
+                                                               thisSetting.Supply_Air_Ventilation_Volume * StdRhoAir,
+                                                               StepIns.RequestedCoolingLoad,
+                                                               StepIns.RequestedHeatingLoad,
+                                                               SensibleRoomORZone,
+                                                               StepIns.ZoneDehumidificationLoad,
+                                                               StepIns.ZoneMoistureLoad,
+                                                               latentRoomORZone); //
 
             Real64 RunFractionTotalFuel =
                 ElectricalPower * PartRuntimeFraction; // fraction can be above 1 meaning its not able to do it completely in a time step.

@@ -173,9 +173,9 @@ namespace DataHVACGlobals {
     int const BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int const BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
 
-    Array1D_string const cFanTypes(NumAllFanTypes,
-                                   {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel",
-                                    "Fan:SystemModel"});
+    Array1D_string const
+        cFanTypes(NumAllFanTypes,
+                  {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"});
 
     // parameters describing unitary systems
     int const NumUnitarySystemTypes(7);
@@ -186,11 +186,15 @@ namespace DataHVACGlobals {
     int const UnitarySys_HeatCool(4);
     int const UnitarySys_HeatPump_AirToAir(5);
     int const UnitarySys_HeatPump_WaterToAir(6);
-    int const UnitarySystem_AnyCoilType(7);
+    int const UnitarySys_AnyCoilType(7);
     Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
-                                       {"AirLoopHVAC:Unitary:Furnace:HeatOnly", "AirLoopHVAC:Unitary:Furnace:HeatCool", "AirLoopHVAC:UnitaryHeatOnly",
-                                        "AirLoopHVAC:UnitaryHeatCool", "AirLoopHVAC:UnitaryHeatPump:AirToAir",
-                                        "AirLoopHVAC:UnitaryHeatPump:WaterToAir", "AirLoopHVAC:UnitarySystem"});
+                                       {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
+                                        "AirLoopHVAC:Unitary:Furnace:HeatCool",
+                                        "AirLoopHVAC:UnitaryHeatOnly",
+                                        "AirLoopHVAC:UnitaryHeatCool",
+                                        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
+                                        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+                                        "AirLoopHVAC:UnitarySystem"});
 
     // parameters describing coil types
     int const NumAllCoilTypes(34);
@@ -391,9 +395,9 @@ namespace DataHVACGlobals {
     int const HX_AIRTOAIR_GENERIC(2);
     int const HX_DESICCANT_BALANCED(3);
 
-    Array1D_string const cHXTypes(NumHXTypes,
-                                  {"HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent",
-                                   "HeatExchanger:Desiccant:BalancedFlow"});
+    Array1D_string const
+        cHXTypes(NumHXTypes,
+                 {"HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow"});
 
     // Parameters describing air terminal mixers
     int const NumATMixerTypes(2);

@@ -1526,3 +1526,44 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     //(commented out at line 2397 of RuntimeLanguageProcessor.cc) 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 55 ).Operator,
     // FuncFatalHaltEp ); // terminates program, not unit test friendly
 }
+
+TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
+{
+//    EMSActuatorAvailable.allocate(100);
+    NumOfNodes = 3;
+    numActuatorsUsed = 3;
+    Node.allocate(3);
+    NodeID.allocate(3);
+    EMSActuatorUsed.allocate(3);
+    OutAirNodeManager::NumOutsideAirNodes = 3;
+    OutAirNodeManager::OutsideAirNodeList.allocate(3);
+
+    NodeID(1) = "Node1";
+    NodeID(2) = "Node2";
+    NodeID(3) = "Node3";
+
+    Node(1).TempSetPoint = 23.0;
+    Node(2).TempSetPoint = 23.0;
+    Node(3).TempSetPoint = 23.0;
+
+    Node(1).MassFlowRate = 0.1;
+    Node(2).MassFlowRate = 0.1;
+    Node(3).MassFlowRate = 0.1;
+
+    OutAirNodeManager::OutsideAirNodeList(1) = 1;
+    OutAirNodeManager::OutsideAirNodeList(2) = 2;
+    OutAirNodeManager::OutsideAirNodeList(3) = 3;
+    EMSActuatorUsed(1).ComponentTypeName = "Outdoor Air System Node";
+    EMSActuatorUsed(2).ComponentTypeName = "";
+    EMSActuatorUsed(3).ComponentTypeName = "Outdoor Air System Node";
+    EMSActuatorUsed(1).UniqueIDName = NodeID(1);
+    EMSActuatorUsed(2).UniqueIDName = NodeID(2);
+    EMSActuatorUsed(3).UniqueIDName = NodeID(3);
+
+    SetupNodeSetPointsAsActuators();
+
+    EXPECT_TRUE(Node(1).IsLocalNode);
+    EXPECT_FALSE(Node(2).IsLocalNode);
+    EXPECT_TRUE(Node(3).IsLocalNode);
+
+}
