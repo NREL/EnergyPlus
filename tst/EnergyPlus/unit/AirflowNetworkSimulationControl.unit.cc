@@ -71,7 +71,6 @@
 
 using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
-using namespace DataAirflowNetwork;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
 using namespace DataGlobals;
@@ -168,7 +167,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     GetAirflowNetworkInput();
 
-    EXPECT_EQ(DataAirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, DataAirflowNetwork::AirflowNetworkSimu.solver);
+    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
     Zone.deallocate();
     Surface.deallocate();
@@ -266,7 +265,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     GetAirflowNetworkInput();
 
-    EXPECT_EQ(DataAirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, DataAirflowNetwork::AirflowNetworkSimu.solver);
+    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
     Zone.deallocate();
     Surface.deallocate();

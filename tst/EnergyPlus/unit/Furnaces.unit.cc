@@ -244,8 +244,6 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 {
     // Test passing variables between Furnace and AirflowNetwork #5134
 
-    using DataAirflowNetwork::AirflowNetworkControlMultiADS;
-    using DataAirflowNetwork::SimulateAirflowNetwork;
     using DataAirLoop::AirLoopAFNInfo;
 //    using DataAirLoop::LoopOnOffFanPartLoadRatio;
 //    using DataAirLoop::LoopSystemOffMassFlowrate;
@@ -267,7 +265,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
     Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
 
-    SimulateAirflowNetwork = AirflowNetworkControlMultiADS;
+    AirflowNetwork::SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControlMultiADS;
     ReportFurnace(FurnaceNum, 1);
 
     EXPECT_EQ(2.0, AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
@@ -285,7 +283,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 
     EXPECT_EQ(1.0, AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
     Furnace.deallocate();
 }
 

@@ -51,8 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <DataAirflowNetwork.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -75,7 +75,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace DataAirflowNetwork;
 using namespace DataEnvironment;
 using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
@@ -130,9 +129,9 @@ protected:
         HMassConvInFD.allocate(NumOfSurfaces);
         MAT.allocate(NumOfZones);
         ZoneAirHumRat.allocate(1);
-        AirflowNetworkLinkageData.allocate(5);
-        AirflowNetworkNodeSimu.allocate(6);
-        AirflowNetworkLinkSimu.allocate(5);
+        AirflowNetwork::AirflowNetworkLinkageData.allocate(5);
+        AirflowNetwork::AirflowNetworkNodeSimu.allocate(6);
+        AirflowNetwork::AirflowNetworkLinkSimu.allocate(5);
         RAFN.allocate(NumOfZones);
     }
 
@@ -207,38 +206,38 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).Link(3).AirflowNetworkLinkSimuID = 5;
     RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).AirflowNetworkNodeID = 2;
 
-    AirflowNetworkLinkageData(1).NodeNums[0] = 1;
-    AirflowNetworkLinkageData(2).NodeNums[0] = 1;
-    AirflowNetworkLinkageData(3).NodeNums[0] = 1;
-    AirflowNetworkLinkageData(1).NodeNums[1] = 3;
-    AirflowNetworkLinkageData(2).NodeNums[1] = 4;
-    AirflowNetworkLinkageData(3).NodeNums[1] = 2;
-    AirflowNetworkLinkageData(4).NodeNums[0] = 2;
-    AirflowNetworkLinkageData(5).NodeNums[0] = 2;
-    AirflowNetworkLinkageData(4).NodeNums[1] = 5;
-    AirflowNetworkLinkageData(5).NodeNums[1] = 6;
-    AirflowNetworkNodeSimu(1).TZ = 25.0;
-    AirflowNetworkNodeSimu(1).WZ = 0.001;
-    AirflowNetworkNodeSimu(2).TZ = 20.0;
-    AirflowNetworkNodeSimu(2).WZ = 0.002;
-    AirflowNetworkNodeSimu(3).TZ = 30.0;
-    AirflowNetworkNodeSimu(3).WZ = 0.001;
-    AirflowNetworkNodeSimu(4).TZ = 22.0;
-    AirflowNetworkNodeSimu(4).WZ = 0.001;
-    AirflowNetworkNodeSimu(5).TZ = 27.0;
-    AirflowNetworkNodeSimu(5).WZ = 0.0015;
-    AirflowNetworkNodeSimu(6).TZ = 20.0;
-    AirflowNetworkNodeSimu(6).WZ = 0.002;
-    AirflowNetworkLinkSimu(1).FLOW = 0.0;
-    AirflowNetworkLinkSimu(1).FLOW2 = 0.01;
-    AirflowNetworkLinkSimu(2).FLOW = 0.0;
-    AirflowNetworkLinkSimu(2).FLOW2 = 0.02;
-    AirflowNetworkLinkSimu(3).FLOW = 0.01;
-    AirflowNetworkLinkSimu(3).FLOW2 = 0.0;
-    AirflowNetworkLinkSimu(4).FLOW = 0.0;
-    AirflowNetworkLinkSimu(4).FLOW2 = 0.01;
-    AirflowNetworkLinkSimu(5).FLOW = 0.01;
-    AirflowNetworkLinkSimu(5).FLOW2 = 0.0;
+    AirflowNetwork::AirflowNetworkLinkageData(1).NodeNums[0] = 1;
+    AirflowNetwork::AirflowNetworkLinkageData(2).NodeNums[0] = 1;
+    AirflowNetwork::AirflowNetworkLinkageData(3).NodeNums[0] = 1;
+    AirflowNetwork::AirflowNetworkLinkageData(1).NodeNums[1] = 3;
+    AirflowNetwork::AirflowNetworkLinkageData(2).NodeNums[1] = 4;
+    AirflowNetwork::AirflowNetworkLinkageData(3).NodeNums[1] = 2;
+    AirflowNetwork::AirflowNetworkLinkageData(4).NodeNums[0] = 2;
+    AirflowNetwork::AirflowNetworkLinkageData(5).NodeNums[0] = 2;
+    AirflowNetwork::AirflowNetworkLinkageData(4).NodeNums[1] = 5;
+    AirflowNetwork::AirflowNetworkLinkageData(5).NodeNums[1] = 6;
+    AirflowNetwork::AirflowNetworkNodeSimu(1).TZ = 25.0;
+    AirflowNetwork::AirflowNetworkNodeSimu(1).WZ = 0.001;
+    AirflowNetwork::AirflowNetworkNodeSimu(2).TZ = 20.0;
+    AirflowNetwork::AirflowNetworkNodeSimu(2).WZ = 0.002;
+    AirflowNetwork::AirflowNetworkNodeSimu(3).TZ = 30.0;
+    AirflowNetwork::AirflowNetworkNodeSimu(3).WZ = 0.001;
+    AirflowNetwork::AirflowNetworkNodeSimu(4).TZ = 22.0;
+    AirflowNetwork::AirflowNetworkNodeSimu(4).WZ = 0.001;
+    AirflowNetwork::AirflowNetworkNodeSimu(5).TZ = 27.0;
+    AirflowNetwork::AirflowNetworkNodeSimu(5).WZ = 0.0015;
+    AirflowNetwork::AirflowNetworkNodeSimu(6).TZ = 20.0;
+    AirflowNetwork::AirflowNetworkNodeSimu(6).WZ = 0.002;
+    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW = 0.0;
+    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 = 0.01;
+    AirflowNetwork::AirflowNetworkLinkSimu(2).FLOW = 0.0;
+    AirflowNetwork::AirflowNetworkLinkSimu(2).FLOW2 = 0.02;
+    AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW = 0.01;
+    AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW2 = 0.0;
+    AirflowNetwork::AirflowNetworkLinkSimu(4).FLOW = 0.0;
+    AirflowNetwork::AirflowNetworkLinkSimu(4).FLOW2 = 0.01;
+    AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW = 0.01;
+    AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW2 = 0.0;
 
     ZoneEquipList(ZoneNum).NumOfEquipTypes = 1;
     ZoneEquipList(ZoneNum).EquipName.allocate(1);

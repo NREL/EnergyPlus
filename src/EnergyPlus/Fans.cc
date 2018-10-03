@@ -2506,7 +2506,6 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
         using DataContaminantBalance::Contaminant;
 
         // Locals
@@ -2543,7 +2542,7 @@ namespace Fans {
 
         if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
             Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
-            if (AirflowNetworkNumOfExhFan == 0) {
+            if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
                 UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
                 if (Fan(FanNum).BalancedFractSchedNum > 0) {
                     BalancedExhMassFlow = UnbalExhMassFlow * GetCurrentScheduleValue(Fan(FanNum).BalancedFractSchedNum);

@@ -57,7 +57,7 @@
 
 namespace EnergyPlus {
 
-namespace DataAirflowNetwork {
+namespace AirflowNetwork {
 
     // Using/Aliasing
 

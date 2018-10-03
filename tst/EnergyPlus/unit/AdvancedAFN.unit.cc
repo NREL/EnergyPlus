@@ -62,7 +62,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::AirflowNetworkBalanceManager;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataEnvironment;

@@ -130,14 +130,6 @@ namespace ZoneTempPredictorCorrector {
     using DataZoneEnergyDemands::ZoneSysEnergyDemand;
     using DataZoneEnergyDemands::ZoneSysMoistureDemand;
     using namespace Psychrometrics;
-    using DataAirflowNetwork::AirflowNetworkControlMultiADS;
-    using DataAirflowNetwork::AirflowNetworkControlMultizone;
-    using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-    using DataAirflowNetwork::AirflowNetworkExchangeData;
-    using DataAirflowNetwork::AirflowNetworkFanActivated;
-    using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
-    using DataAirflowNetwork::AirflowNetworkZoneExhaustFan;
-    using DataAirflowNetwork::SimulateAirflowNetwork;
     using namespace DataRoomAirModel;
     using namespace DataZoneControls;
     using namespace FaultsManager;
@@ -4633,12 +4625,15 @@ namespace ZoneTempPredictorCorrector {
             H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum));
 
             // Assume that the system will have flow
-            if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
-                (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated)) {
+            if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+                AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+                (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
+                 AirflowNetwork::AirflowNetworkFanActivated)) {
                 // Multizone airflow calculated in AirflowNetwork
-                B = (LatentGain / H2OHtOfVap) + AirflowNetworkExchangeData(ZoneNum).SumMHrW + AirflowNetworkExchangeData(ZoneNum).SumMMHrW +
-                    SumHmARaW(ZoneNum);
-                A = AirflowNetworkExchangeData(ZoneNum).SumMHr + AirflowNetworkExchangeData(ZoneNum).SumMMHr + SumHmARa(ZoneNum);
+                B = (LatentGain / H2OHtOfVap) + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMHrW +
+                    AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMHrW + SumHmARaW(ZoneNum);
+                A = AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMHr + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMHr +
+                    SumHmARa(ZoneNum);
             } else {
                 B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) +
                     SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
@@ -4979,8 +4974,8 @@ namespace ZoneTempPredictorCorrector {
                               (NonAirSystemResponse(ZoneNum) / ZoneMult + SysDepZoneLoadsLagged(ZoneNum));
                 //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-                if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-                    TempIndCoef += AirflowNetworkExchangeData(ZoneNum).TotalSen;
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+                    TempIndCoef += AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).TotalSen;
                 }
                 //    TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
                 //    TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
@@ -5071,8 +5066,8 @@ namespace ZoneTempPredictorCorrector {
 
                 //      TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-                if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-                    TempIndCoef += AirflowNetworkExchangeData(ZoneNum).TotalSen;
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+                    TempIndCoef += AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).TotalSen;
                 }
                 //      TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
                 //      TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
@@ -5709,17 +5704,21 @@ namespace ZoneTempPredictorCorrector {
             (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
         A = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
             MDotOA(ZoneNum);
-        if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
-            (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated)) {
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
+             AirflowNetwork::AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
-            B = (LatentGain / H2OHtOfVap) + (AirflowNetworkExchangeData(ZoneNum).SumMHrW + AirflowNetworkExchangeData(ZoneNum).SumMMHrW) +
+            B = (LatentGain / H2OHtOfVap) +
+                (AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMHrW + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMHrW) +
                 (MoistureMassFlowRate) + SumHmARaW(ZoneNum);
-            A = ZoneMassFlowRate + AirflowNetworkExchangeData(ZoneNum).SumMHr + AirflowNetworkExchangeData(ZoneNum).SumMMHr + SumHmARa(ZoneNum);
+            A = ZoneMassFlowRate + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMHr +
+                AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMHr + SumHmARa(ZoneNum);
         }
         C = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
-        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            B += AirflowNetworkExchangeData(ZoneNum).TotalLat;
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+            B += AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).TotalLat;
         }
 
         // Use a 3rd order derivative to predict final zone humidity ratio and
@@ -5944,11 +5943,13 @@ namespace ZoneTempPredictorCorrector {
             MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
 
         // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model
-        if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
-            (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated)) {
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
+             AirflowNetwork::AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
-            SumMCp = AirflowNetworkExchangeData(ZoneNum).SumMCp + AirflowNetworkExchangeData(ZoneNum).SumMMCp;
-            SumMCpT = AirflowNetworkExchangeData(ZoneNum).SumMCpT + AirflowNetworkExchangeData(ZoneNum).SumMMCpT;
+            SumMCp = AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMCp + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMCp;
+            SumMCpT = AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMCpT + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMCpT;
         }
 
         // Sum all system air flow: SumSysMCp, SumSysMCpT
@@ -6253,11 +6254,15 @@ namespace ZoneTempPredictorCorrector {
                          MDotCPOA(ZoneNum) * MAT(ZoneNum)); // infiltration | Ventilation (simple) | Earth tube. | Cooltower | combined OA flow
 
         // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model (if used)
-        if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ||
-            (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated)) {
+        if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+            AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
+             AirflowNetwork::AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
-            SumMCpDtInfil = AirflowNetworkExchangeData(ZoneNum).SumMCpT - AirflowNetworkExchangeData(ZoneNum).SumMCp * MAT(ZoneNum);
-            SumMCpDTzones = AirflowNetworkExchangeData(ZoneNum).SumMMCpT - AirflowNetworkExchangeData(ZoneNum).SumMMCp * MAT(ZoneNum);
+            SumMCpDtInfil = AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMCpT -
+                            AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMCp * MAT(ZoneNum);
+            SumMCpDTzones = AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMCpT -
+                            AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMCp * MAT(ZoneNum);
         }
 
         // Sum all system air flow: reusing how SumSysMCp, SumSysMCpT are calculated in CalcZoneSums

@@ -461,9 +461,6 @@ namespace DirectAirManager {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        using DataAirflowNetwork::AirflowNetworkControlMultizone;
-        using DataAirflowNetwork::AirflowNetworkFanActivated;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -555,7 +552,8 @@ namespace DirectAirManager {
         if (FirstHVACIteration) {
             // The first time through set the mass flow rate to the Max
             if ((Node(ZoneNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(DirectAir(DirectAirNum).SchedPtr) > 0.0)) {
-                if (!(SimulateAirflowNetwork > AirflowNetworkControlMultizone && AirflowNetworkFanActivated)) {
+                if (!(AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
+                      AirflowNetwork::AirflowNetworkFanActivated)) {
                     if (DirectAir(DirectAirNum).NoOAFlowInputFromUser) {
                         Node(ZoneNode).MassFlowRate = DirectAir(DirectAirNum).AirMassFlowRateMax;
                         Node(ZoneNode).MassFlowRateMaxAvail = DirectAir(DirectAirNum).AirMassFlowRateMax;

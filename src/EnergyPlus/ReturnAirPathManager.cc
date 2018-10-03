@@ -278,9 +278,6 @@ namespace ReturnAirPathManager {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkControlMultizone;
-        using DataAirflowNetwork::AirflowNetworkFanActivated;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
         using MixerComponent::SimAirMixer;
         using ZonePlenum::SimAirZonePlenum;
 
@@ -294,7 +291,8 @@ namespace ReturnAirPathManager {
 
                 if (SELECT_CASE_var == ZoneMixer_Type) { // 'AirLoopHVAC:ZoneMixer'
 
-                    if (!(AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone)) {
+                    if (!(AirflowNetwork::AirflowNetworkFanActivated &&
+                          AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
                         SimAirMixer(ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
                                     ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
                     }

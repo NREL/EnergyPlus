@@ -93,7 +93,6 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
 using namespace SimulationManager;
 using namespace EnergyPlus::ZoneContaminantPredictorCorrector;
@@ -212,7 +211,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -360,7 +359,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     MDotOA.allocate(1);
     MDotOA(1) = 0.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -544,7 +543,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 
@@ -751,7 +750,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    SimulateAirflowNetwork = 0;
+    AirflowNetwork::SimulateAirflowNetwork = 0;
 
     ZoneAirSolutionAlgo = UseEulerMethod;
 

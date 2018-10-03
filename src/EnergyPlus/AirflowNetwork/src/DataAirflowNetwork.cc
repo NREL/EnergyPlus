@@ -51,7 +51,7 @@
 
 namespace EnergyPlus {
 
-namespace DataAirflowNetwork {
+namespace AirflowNetwork {
 
     // MODULE INFORMATION:
     //       AUTHOR         Lixing Gu, Don Shirey, and Muthusamy V. Swami

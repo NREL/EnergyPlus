@@ -60,7 +60,7 @@ namespace EnergyPlus {
 // define this variable to get new code, commenting should yield original
 #define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
 
-namespace AirflowNetworkSolver {
+namespace AirflowNetwork {
 
     // Data
     extern int NetworkNumOfLinks;
@@ -420,7 +420,7 @@ namespace AirflowNetworkSolver {
 
     //*****************************************************************************************
 
-} // namespace AirflowNetworkSolver
+} // namespace AirflowNetwork
 
 } // namespace EnergyPlus
 

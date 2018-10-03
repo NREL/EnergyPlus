@@ -75,7 +75,7 @@ namespace EnergyPlus {
 // define this variable to get new code, commenting should yield original
 #define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
 
-namespace AirflowNetworkSolver {
+namespace AirflowNetwork {
 
     // MODULE INFORMATION:
     //       AUTHOR         Lixing Gu, Don Shirey, and Muthusamy V. Swami
@@ -116,7 +116,6 @@ namespace AirflowNetworkSolver {
     using Psychrometrics::PsyCpAirFnWTdb;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using namespace DataAirflowNetwork;
 
     // Data
     int NetworkNumOfLinks(0);

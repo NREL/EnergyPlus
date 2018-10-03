@@ -60,8 +60,7 @@
 
 using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
-using namespace DataAirflowNetwork;
-using namespace AirflowNetworkSolver;
+using namespace AirflowNetwork;
 
 TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
 {

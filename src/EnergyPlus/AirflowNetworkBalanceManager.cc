@@ -133,13 +133,6 @@ namespace AirflowNetworkBalanceManager {
     using DataGlobals::WarmupFlag;
     using DataHVACGlobals::SysTimeElapsed;
     using General::RoundSigDigits;
-    using namespace DataAirflowNetwork;
-    using AirflowNetworkSolver::AIRMOV;
-    using AirflowNetworkSolver::AllocateAirflowNetworkData;
-    using AirflowNetworkSolver::InitAirflowNetworkData;
-    using AirflowNetworkSolver::NetworkNumOfLinks;
-    using AirflowNetworkSolver::NetworkNumOfNodes;
-    using AirflowNetworkSolver::SETSKY;
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using DataAirLoop::AirToZoneNodeInfo;
@@ -209,6 +202,7 @@ namespace AirflowNetworkBalanceManager {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
+    using namespace AirflowNetwork;
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -10461,7 +10455,6 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using namespace DataEnvironment;
         using namespace DataIPShortCuts;
-        using namespace DataAirflowNetwork;
 
         // Locals
         int WindDirNum;
