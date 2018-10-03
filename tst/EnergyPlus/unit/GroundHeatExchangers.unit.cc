@@ -4075,8 +4075,6 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Test_ExFT)
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20.0;
 
-    Real64 const tolerance = 0.00001;
-
     thisGLHE.initGLHESimVars();
     thisGLHE.calcAggregateLoad();
     thisGLHE.massFlowRate = 1;
