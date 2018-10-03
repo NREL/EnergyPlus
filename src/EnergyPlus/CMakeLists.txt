@@ -17,8 +17,6 @@ SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
-  AirflowNetworkSolver.cc
-  AirflowNetworkSolver.hh
   AirTerminalUnit.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
@@ -74,8 +72,6 @@ SET( SRC
   DataAirLoop.hh
   DataAirSystems.cc
   DataAirSystems.hh
-  DataAirflowNetwork.cc
-  DataAirflowNetwork.hh
   DataBSDFWindow.cc
   DataBSDFWindow.hh
   DataBranchAirLoopPlant.cc
@@ -641,11 +637,14 @@ add_custom_target( GenerateEmbeddedEpJSONSchema
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    DEPENDS generate_embeddedable_epJSON_schema )
 
+add_subdirectory(AirflowNetwork)
+#message( $<TARGET_PROPERTY:airflownetworklib,INTERFACE_INCLUDE_DIRECTORIES> )
+#include_directories($<TARGET_PROPERTY:airflownetworklib,INTERFACE_INCLUDE_DIRECTORIES>)
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva Windows-CalcEngine)
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva Windows-CalcEngine airflownetworklib )
 add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
