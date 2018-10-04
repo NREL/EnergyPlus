@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetworkBalanceManager.hh>
+#include <AirflowNetworkSolver.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataSurfaces.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -4450,14 +4451,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermConductivity)
 
     Real64 const tol = 0.00001;
 
-    EXPECT_NEAR(airThermConductivity(-30), 0.02212, tol);
-    EXPECT_NEAR(airThermConductivity(-20), 0.02212, tol);
-    EXPECT_NEAR(airThermConductivity(0), 0.02364, tol);
-    EXPECT_NEAR(airThermConductivity(20), 0.02514, tol);
-    EXPECT_NEAR(airThermConductivity(40), 0.02662, tol);
-    EXPECT_NEAR(airThermConductivity(60), 0.02808, tol);
-    EXPECT_NEAR(airThermConductivity(70), 0.02881, tol);
-    EXPECT_NEAR(airThermConductivity(80), 0.02881, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(-30), 0.02212, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(-20), 0.02212, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(0), 0.02364, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(20), 0.02514, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(40), 0.02662, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(60), 0.02808, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(70), 0.02881, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(80), 0.02881, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirDynamicVisc)
@@ -4465,14 +4466,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirDynamicVisc)
 
     Real64 const tol = 0.000001;
 
-    EXPECT_NEAR(airDynamicVisc(-30), 1.635e-5, tol);
-    EXPECT_NEAR(airDynamicVisc(-20), 1.635e-5, tol);
-    EXPECT_NEAR(airDynamicVisc(0), 1.729e-5, tol);
-    EXPECT_NEAR(airDynamicVisc(20), 1.823e-5, tol);
-    EXPECT_NEAR(airDynamicVisc(40), 1.917e-5, tol);
-    EXPECT_NEAR(airDynamicVisc(60), 2.011e-5, tol);
-    EXPECT_NEAR(airDynamicVisc(70), 2.058e-5, tol);
-    EXPECT_NEAR(airDynamicVisc(80), 2.058e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(-30), 1.635e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(-20), 1.635e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(0), 1.729e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(20), 1.823e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(40), 1.917e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(60), 2.011e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(70), 2.058e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(80), 2.058e-5, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirKinematicVisc)
@@ -4480,14 +4481,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirKinematicVisc)
 
     Real64 const tol = 0.000001;
 
-    EXPECT_NEAR(airKinematicVisc(-30, 0.001, 101000), 1.169e-5, tol);
-    EXPECT_NEAR(airKinematicVisc(-20, 0.001, 101000), 1.169e-5, tol);
-    EXPECT_NEAR(airKinematicVisc(0, 0.001, 101000), 1.338e-5, tol);
-    EXPECT_NEAR(airKinematicVisc(20, 0.001, 101000), 1.516e-5, tol);
-    EXPECT_NEAR(airKinematicVisc(40, 0.001, 101000), 1.702e-5, tol);
-    EXPECT_NEAR(airKinematicVisc(60, 0.001, 101000), 1.896e-5, tol);
-    EXPECT_NEAR(airKinematicVisc(70, 0.001, 101000), 1.995e-5, tol);
-    EXPECT_NEAR(airKinematicVisc(80, 0.001, 101000), 1.995e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(-30, 0.001, 101000), 1.169e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(-20, 0.001, 101000), 1.169e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(0, 0.001, 101000), 1.338e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(20, 0.001, 101000), 1.516e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(40, 0.001, 101000), 1.702e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(60, 0.001, 101000), 1.896e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(70, 0.001, 101000), 1.995e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(80, 0.001, 101000), 1.995e-5, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermalDiffusivity)
@@ -4495,14 +4496,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermalDiffusivity)
 
     Real64 const tol = 0.000001;
 
-    EXPECT_NEAR(airThermalDiffusivity(-30, 0.001, 101000), 1.578e-5, tol);
-    EXPECT_NEAR(airThermalDiffusivity(-20, 0.001, 101000), 1.578e-5, tol);
-    EXPECT_NEAR(airThermalDiffusivity(0, 0.001, 101000), 1.818e-5, tol);
-    EXPECT_NEAR(airThermalDiffusivity(20, 0.001, 101000), 2.074e-5, tol);
-    EXPECT_NEAR(airThermalDiffusivity(40, 0.001, 101000), 2.346e-5, tol);
-    EXPECT_NEAR(airThermalDiffusivity(60, 0.001, 101000), 2.632e-5, tol);
-    EXPECT_NEAR(airThermalDiffusivity(70, 0.001, 101000), 2.780e-5, tol);
-    EXPECT_NEAR(airThermalDiffusivity(80, 0.001, 101000), 2.780e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(-30, 0.001, 101000), 1.578e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(-20, 0.001, 101000), 1.578e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(0, 0.001, 101000), 1.818e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(20, 0.001, 101000), 2.074e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(40, 0.001, 101000), 2.346e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(60, 0.001, 101000), 2.632e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(70, 0.001, 101000), 2.780e-5, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(80, 0.001, 101000), 2.780e-5, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirPrandtl)
@@ -4510,14 +4511,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirPrandtl)
 
     Real64 const tol = 0.0001;
 
-    EXPECT_NEAR(airPrandtl(-30, 0.001, 101000), 0.7362, tol);
-    EXPECT_NEAR(airPrandtl(-20, 0.001, 101000), 0.7362, tol);
-    EXPECT_NEAR(airPrandtl(0, 0.001, 101000), 0.7300, tol);
-    EXPECT_NEAR(airPrandtl(20, 0.001, 101000), 0.7251, tol);
-    EXPECT_NEAR(airPrandtl(40, 0.001, 101000), 0.7213, tol);
-    EXPECT_NEAR(airPrandtl(60, 0.001, 101000), 0.7184, tol);
-    EXPECT_NEAR(airPrandtl(70, 0.001, 101000), 0.7172, tol);
-    EXPECT_NEAR(airPrandtl(80, 0.001, 101000), 0.7172, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(-30, 0.001, 101000), 0.7362, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(-20, 0.001, 101000), 0.7362, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(0, 0.001, 101000), 0.7300, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(20, 0.001, 101000), 0.7251, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(40, 0.001, 101000), 0.7213, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(60, 0.001, 101000), 0.7184, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(70, 0.001, 101000), 0.7172, tol);
+    EXPECT_NEAR(AirflowNetwork::airPrandtl(80, 0.001, 101000), 0.7172, tol);
 }
 
 TEST_F(EnergyPlusFixture, TestWindPressureTable)
