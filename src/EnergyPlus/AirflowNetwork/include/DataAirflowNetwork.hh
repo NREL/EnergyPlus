@@ -351,7 +351,7 @@ namespace AirflowNetwork {
 
         // Default Constructor
         MultizoneSurfaceProp()
-            : Factor(0.0), SurfNum(0), NodeNums({0, 0}), OpenFactor(0.0), OpenFactorLast(0.0), EMSOpenFactorActuated(false), EMSOpenFactor(0.0),
+            : Factor(0.0), SurfNum(0), NodeNums{{0, 0}}, OpenFactor(0.0), OpenFactorLast(0.0), EMSOpenFactorActuated(false), EMSOpenFactor(0.0),
               Height(0.0), Width(0.0), CHeight(0.0), VentControl("ZONELEVEL"), ModulateFactor(0.0), LowValueTemp(0.0), UpValueTemp(100.0),
               LowValueEnth(0.0), UpValueEnth(300000.0), VentSchNum(0), VentSurfCtrNum(0), VentingSchNum(0), ZonePtr(0), IndVentControl(false),
               ExtLargeOpeningErrCount(0), ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0), Multiplier(1.0),
@@ -571,7 +571,7 @@ namespace AirflowNetwork {
         int LinkNum;                          // Linkage number
 
         // Default Constructor
-        AirflowNetworkLinkage() : NodeHeights({0.0, 0.0}), CompNum(0), NodeNums({0, 0}), LinkNum(0)
+        AirflowNetworkLinkage() : NodeHeights{{0.0, 0.0}}, CompNum(0), NodeNums{{0, 0}}, LinkNum(0)
         {
         }
     };
