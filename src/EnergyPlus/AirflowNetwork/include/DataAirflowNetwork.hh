@@ -1162,7 +1162,7 @@ namespace AirflowNetwork {
 
     void clear_state();
 
-} // namespace DataAirflowNetwork
+} // namespace AirflowNetwork
 
 } // namespace EnergyPlus
 
