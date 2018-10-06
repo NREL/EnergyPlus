@@ -10,7 +10,7 @@ compilers:
     s3_upload: doc-build
     s3_upload_bucket: energyplus
 
-  - name: "gcc73"
+  - name: "gcc"
     version: "7.3"
     build_package_generator: "TGZ"
     build_tag: "tgz"
