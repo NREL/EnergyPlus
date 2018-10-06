@@ -3,7 +3,7 @@ results_path : _posts
 results_base_url : https://nrel.github.io/EnergyPlusBuildResults
 regression_repository : NREL/EnergyPlusDevSupport
 regression_branch : master
-regression_baseline_default : develop
+regression_baseline_default : DevelopWith73Compiler
 regression_baseline_develop : ""
 regression_baseline_master : ""
 notification_recipients:
