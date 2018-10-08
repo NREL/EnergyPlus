@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <dlfcn.h>
+#include <stdbool.h>
 
 typedef void*           fmi2Component;               /* Pointer to FMU instance       */
 typedef void*           fmi2ComponentEnvironment;    /* Pointer to FMU environment    */
