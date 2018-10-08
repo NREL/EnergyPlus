@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <dlfcn.h>
+#include <stdbool.h>
 
 typedef void*           fmi2Component;               /* Pointer to FMU instance       */
 typedef void*           fmi2ComponentEnvironment;    /* Pointer to FMU environment    */
@@ -106,7 +107,7 @@ int loadLib(const char* libPath, FMU *fmu) {
 		return -1;
 	}
 #else
-	h = dlopen(libPath, RTLD_PRIVATE);
+	h = dlopen(libPath, RTLD_LOCAL);
 	if (!h) {
 		printf("****** Unable to load the "
     "EnergyPlus functions library with path %s ****** \n",
