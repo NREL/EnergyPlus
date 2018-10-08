@@ -87,5 +87,5 @@ const unsigned int outputValueReferences[] = {
   }
 
   terminate(nullptr);
-};
+}
 
