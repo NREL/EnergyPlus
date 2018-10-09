@@ -491,6 +491,7 @@ namespace MixedAir {
                 if (UtilityRoutines::SameString(CompType, "OutdoorAir:Mixer")) {
                     OAMixerNum = UtilityRoutines::FindItemInList(CompName, OAMixer);
                     OAControllerNum = CurrentOASystem.OAControllerIndex;
+                    OAMixer(OAMixerNum).OAControllerIndex = OAControllerNum;
                     if (OAController(OAControllerNum).MixNode != OAMixer(OAMixerNum).MixNode) {
                         ShowSevereError("The mixed air node of Controller:OutdoorAir=\"" + OAController(OAControllerNum).Name + "\"");
                         ShowContinueError("should be the same node as the mixed air node of OutdoorAir:Mixer=\"" + OAMixer(OAMixerNum).Name + "\".");
@@ -3583,6 +3584,7 @@ namespace MixedAir {
 
         // Set the relief air flow rate (must be done last to account for changes in OAMassFlow
         this->RelMassFlow = max(this->OAMassFlow - this->ExhMassFlow, 0.0);
+        this->ExcessExhaust = min(this->OAMassFlow - this->ExhMassFlow, 0.0);
 
         // Save OA fraction for reporting
         if (this->MixMassFlow > 0) {
@@ -4563,6 +4565,7 @@ namespace MixedAir {
 
         // Define a recirculation mass flow rate
         RecircMassFlowRate = OAMixer(OAMixerNum).RetMassFlowRate - OAMixer(OAMixerNum).RelMassFlowRate;
+        if (OAMixer(OAMixerNum).OAControllerIndex > 0) RecircMassFlowRate -= OAController(OAMixer(OAMixerNum).OAControllerIndex).ExcessExhaust;
         // In certain low flow conditions the return air mass flow rate can be below the outside air value established
         //  by the user.  This check will ensure that this condition does not result in unphysical air properties.
         if (RecircMassFlowRate < 0.0) {
