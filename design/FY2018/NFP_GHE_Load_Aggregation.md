@@ -27,7 +27,7 @@ $R_b$ is the borehole thermal resistance
 
 $g$ is the g-function response factors, which are generates previously by EnergyPlus or third-party tools.
 
-Conduction can be described using linear partial differential equations. Because no non-linear terms exist, the principle of superpostiion can be applied to conduction problems. GHE response factor models take advantage of this and apply the principle of superposition to compute the GHE temperature response by using the GHE load history. This series of heat pulses, when superimposed and combined using the response factors, can lead to an accurate calculation of the current GHE temperature response.
+Conduction can be evaluated using linear partial differential equations. Because no non-linear terms exist, the principle of superposition can be applied to conduction problems. GHE response factor models take advantage of this and apply the principle of superposition to compute the GHE temperature response by using the GHE load history. This series of heat pulses, when superimposed and combined using the response factors, can lead to an accurate calculation of the current GHE temperature response.
 
 A practical issue that arises from this superpostion approach, however, is the fact that the number of superposition calculations grows with the square of the number of timesteps. Therefore, this approach greatly affects simulation runtime. Attempting to simulate, say, for example for annual or multi-year simulations may be impractical without some way to reduce the number of computations required.
 
@@ -57,7 +57,7 @@ Yavuzturk & Spitler (1999) were the first to develop a load aggregation procedur
 
 Once a simulation is initiated the GHE hourly load history begins to be stored. For example, once 922 (192 + 730) simulated hours have passed, the hourly loads from hour 729 to 0 are aggregated together into a single block. The mean value of the loads over this period is computed and the 730 individual hourly loads are removed and replaced with a single value. This single value represents the average load over this 730 hour period. As the simulation continues for another 730 hours until hour 1652, the hourly loads from hours 1459 to 730 are aggregated together again into another monthly block.
 
-This method forms the basis for what is termed the "static" method. The method is characterized by smaller load blocks which collapse into larger blocks once a sufficient number of the smaller blocks have been created. This was illustrated in the above example when the smaller hourly load blocks collapsed into the larger 730 hour blocks after a sufficient number of smaller blocks have been created. However, the the optimum number and duration of each block has yet to be determined. 
+This method forms the basis for what is termed the "static" method. The method is characterized by smaller load blocks which collapse into larger blocks once a sufficient number of the smaller blocks have been created. This was illustrated in the above example when the smaller hourly load blocks collapsed into the larger 730 hour blocks after a sufficient number of smaller blocks had been created. However, the the optimum number and duration of each block has yet to be determined. 
 
 The method could loosely be thought of as similar to the Lagrangian approach which, in the case of fluid flow characterizations, tracks individual particles or packets of fluid, rather than tracking a fixed control volume through which fluid flows. In our case, however, we are concerned with tracking individual loads, or load blocks which are formed from previously aggregated smaller blocks.
 
@@ -117,7 +117,7 @@ The methods were tested by performing a parametric study which swept a wide rang
 
 EnergyPlus was used to generate two sets of annual loads. One load set consists of balanced heating and cooling loads, and the other set consists of imbalanced heating and cooling loads.  The simulations were also ran for 1 and 5 years for each of the load cases, resulting in a total of four simulations for each variation of the parametric study.
 
-The simulations were compared against simulations for each of the four load and simulation variations using no load aggregation method. The results from these simulations gives the baseline for comparing the results of the parametric runs.
+The simulations were compared against simulations for each of the four load and simulation variations using a "no-aggregation" method which kept all hourly loads from the entire simulation. The results from these simulations gives the baseline for comparing the results of the parametric runs.
 
 Figures 1 and 2 below show the single-year balanced and imbalanced simulation results. The plots show the fraction of the non-aggregated simulation time on the vertical axis. The root-mean squared error of the mean GHE fluid temperature is plotted on the horizontal axis.
 
@@ -133,7 +133,25 @@ Figure 1: 1-year balanced load parametric results.
 
 Figure 2: 1-year imbalanced load parametric results.
 
-Therefore, based on the above results, implementation of the dynamic method is proposed.
+
+
+Figures 3 and 4 show the results for the balanced and imbalanced load parametric studies using for a 5-year simulation.
+
+![](balanced_5_fraction.png)
+
+Figure 3: 5-year balanced parametric results
+
+
+
+![imbalanced_5_fraction](imbalanced_5_fraction.png)
+
+Figure 4: 5-year imbalanced load parametric results
+
+
+
+In all cases, the dynamic method outperforms the static method. Based on the above results, implementation of the dynamic method is proposed. The specific parameters for the dynamic method have yet to be determined. However, in any case, these are three integer-valued parameters which can be altered easily after implementation. 
+
+Further description of how the parameters are being chosen is given in the draft paper related to this work. Contact me if you are interested and I can provide a working copy of the paper.
 
 ## I/O Reference Documentation
 
@@ -141,7 +159,7 @@ No changes
 
 ## Engineering Reference Documentation
 
-A few paragraphs describing the selected enhanced load aggregation procedure. A paper will be drafted regarding the work. This should also be referenced here.
+A few paragraphs describing the selected enhanced load aggregation procedure. A paper will be drafted regarding the work which should also be referenced here.
 
 ## Transition/Changes
 
