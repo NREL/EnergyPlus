@@ -107,7 +107,7 @@ int loadLib(const char* libPath, FMU *fmu) {
 		return -1;
 	}
 #else
-	h = dlopen(libPath, RTLD_LOCAL);
+	h = dlopen(libPath, RTLD_LAZY);
 	if (!h) {
 		printf("****** Unable to load the "
     "EnergyPlus functions library with path %s ****** \n",
@@ -165,9 +165,9 @@ int main(){
   char msg[500];
   //FMUZone* zone = (FMUZone*) object;
   FMU* fmu;
-	FMU* fmu2;
+	//FMU* fmu2;
   fmu = (FMU*)malloc(sizeof(FMU));
-	fmu2 = (FMU*)malloc(sizeof(FMU));
+	//fmu2 = (FMU*)malloc(sizeof(FMU));
   int retVal;
 
 	const char * inputNames[] = {"Attic,T", "Core_ZN,T", "Perimeter_ZN_1,T", "Perimeter_ZN_2,T", "Perimeter_ZN_3,T", "Perimeter_ZN_4,T"};
@@ -185,22 +185,10 @@ int main(){
 	  18, 19, 20, 21, 22, 23,
 	  24, 25, 26, 27, 28, 29
 	};
-  //const char* input ="RefBldgSmallOfficeNew2004_Chicago.idf";
-	////const char* input2 ="RefBldgSmallOfficeNew5004_Chicago.idf";
-  //const char* weather ="USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
-  //const char* idd ="Energy+.idd";
-
-  /* Loading EnergyPlus library */
-  //const char* eplib = "libepfmi.so";
-	//const char* eplib2 = "libepfmi.so";
   retVal = loadLib(fmulib, fmu);
 	if (retVal  < 0) {
 		 printf("There was an error loading the EnergyPlus library\n");
 		}
-	retVal = loadLib(fmulib, fmu2);
-  if (retVal  < 0) {
-     printf("There was an error loading the EnergyPlus library\n");
-    }
   printf("Initializing library \n");
   int result = fmu->instantiate(input, // input
                            weather, // weather
@@ -217,20 +205,6 @@ int main(){
                            24, // nOut
                            NULL); //log);
 
-	 result = fmu2->instantiate(input2, // input
-	                           weather, // weather
-	                           idd, // idd
-	                           "hotel", // instanceName
-	                           NULL, // parameterNames
-	                           NULL, // parameterValueReferences[]
-	                           0, // nPar
-	                           inputNames, // inputNames
-	                           inputValueReferences, // inputValueReferences[]
-	                           6, // nInp
-	                           outputNames, // outputNames
-	                           outputValueReferences, // outputValueReferences[]
-	                           24, // nOut
-	                           NULL); //log);
 
   double tStart = 0.0;
   int stopTimeDefined = 1;
