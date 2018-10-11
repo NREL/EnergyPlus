@@ -399,7 +399,7 @@ namespace ConvectionCoefficients {
                 }
 
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    HConvIn(SurfNum) = SurfaceGeometry::kivaManager.getConv(SurfNum);
+                    HConvIn(SurfNum) = SurfaceGeometry::kivaManager.surfaceResults[SurfNum].h;
                     Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
                     continue;
                 }
@@ -4220,7 +4220,7 @@ namespace ConvectionCoefficients {
                 } else if (((DeltaTemp < 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
                            ((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt < 0.0))) { // Enhanced Convection
 
-                    HcIn(SurfNum) = 9.482 * std::pow(std::abs(DeltaTemp), OneThird) / (7.283 - std::abs(Surface(SurfNum).CosTilt));
+                    HcIn(SurfNum) = 9.482 * std::pow(std::abs(DeltaTemp), OneThird) / (7.238 - std::abs(Surface(SurfNum).CosTilt));
 
                 } else if (((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
                            ((DeltaTemp < 0.0) && (Surface(SurfNum).CosTilt < 0.0))) { // Reduced Convection
@@ -4247,7 +4247,7 @@ namespace ConvectionCoefficients {
                 } else if (((DeltaTemp < 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
                            ((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt < 0.0))) { // Enhanced Convection
 
-                    HcIn(SurfNum) = 9.482 * std::pow(std::abs(DeltaTemp), 1.0 / 3.0) / (7.283 - std::abs(Surface(SurfNum).CosTilt));
+                    HcIn(SurfNum) = 9.482 * std::pow(std::abs(DeltaTemp), 1.0 / 3.0) / (7.238 - std::abs(Surface(SurfNum).CosTilt));
                     HcIn(SurfNum) = std::pow(std::pow(HcIn(SurfNum), 3.2) + std::pow(Hf, 3.2), 1.0 / 3.2);
 
                 } else if (((DeltaTemp > 0.0) && (Surface(SurfNum).CosTilt > 0.0)) ||
@@ -8014,7 +8014,7 @@ namespace ConvectionCoefficients {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
-        Hn = 9.482 * std::pow(std::abs(DeltaTemp), OneThird) / (7.283 - std::abs(CosineTilt));
+        Hn = 9.482 * std::pow(std::abs(DeltaTemp), OneThird) / (7.238 - std::abs(CosineTilt));
 
         return Hn;
     }

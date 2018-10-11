@@ -9,6 +9,7 @@
 !                          Double pane (no shading device), double pane with interior screen,
 !                          double pane with drapes, double pane with interior roll shade,
 !                          coated double pane (no shading device), "shading coefficient" double pane (no shading device),
+!                          double pane switchable glazing with illuminance setpoint control,
 !                          triple pane (no shading device), and quadruple pane (no shading device).
 !                          All shades are assumed to be perfect diffusers, i.e,
 !                          their optical properties, such as transmittance, do not depend on direction
@@ -37,6 +38,7 @@
 !   Zone 3 has double-pane windows with interior screen.
 !   Zone 4 has double-pane windows with interior drapes.
 !   Zone 5 has double-pane windows with interior roll shades.
+!   Zone 10 has double-pane windows with switchable glazing and illuminance control.
 !
 !
 ! Floor Area:        900 m2
@@ -86,7 +88,7 @@
 ! Interzone Surfaces:             None
 ! Internal Mass:                  None
 ! People:                         None
-! Lights:                         None
+! Lights:                         In zones DPW and DPSG just to avoid daylighting warnings.
 ! Equipment:                      None
 ! Windows:                        0
 ! Detached Shading:               None
@@ -149,8 +151,10 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -162,8 +166,10 @@
     ,                        !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     31,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -382,6 +388,22 @@
     0.8400000,               !- Back Side Infrared Hemispherical Emissivity
     0.9000000;               !- Conductivity {W/m-K}
 
+  WindowMaterial:Glazing,
+    ELECTRO GLASS DARK 1 / 8 IN,  !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    3.0000000E-03,           !- Thickness {m}
+    0.111,                   !- Solar Transmittance at Normal Incidence
+    0.179,                   !- Front Side Solar Reflectance at Normal Incidence
+    0.179,                   !- Back Side Solar Reflectance at Normal Incidence
+    0.128,                   !- Visible Transmittance at Normal Incidence
+    8.1000000E-02,           !- Front Side Visible Reflectance at Normal Incidence
+    8.1000000E-02,           !- Back Side Visible Reflectance at Normal Incidence
+    0,                       !- Infrared Transmittance at Normal Incidence
+    0.8400000,               !- Front Side Infrared Hemispherical Emissivity
+    0.8400000,               !- Back Side Infrared Hemispherical Emissivity
+    0.9000000;               !- Conductivity {W/m-K}
+
   WindowMaterial:Gas,
     WinAirB1 - AIRSPACE RESISTANCE,  !- Name
     AIR,                     !- Gas Type
@@ -539,6 +561,12 @@
     GLASS - CLEAR SHEET 1 / 8 IN;  !- Layer 3
 
   Construction,
+    DOUBLE PANE DARKENED,    !- Name
+    ELECTRO GLASS DARK 1 / 8 IN,  !- Outside Layer
+    WinAirB1 - AIRSPACE RESISTANCE,  !- Layer 2
+    GLASS - CLEAR SHEET 1 / 8 IN;  !- Layer 3
+
+  Construction,
     TPW,                     !- Name
     GLASS - CLEAR SHEET 1 / 8 IN,  !- Outside Layer
     WinAirB1 - AIRSPACE RESISTANCE,  !- Layer 2
@@ -568,8 +596,10 @@
     WinAirB1 - AIRSPACE RESISTANCE,  !- Layer 2
     SCGLAS;                  !- Layer 3
 
-  WindowProperty:ShadingControl,
-    DOUBLE PANE WITH SCREEN, !- Name
+  WindowShadingControl,
+    DOUBLE PANE WITH SCREEN-DPWB,  !- Name
+    DPWB,                    !- Zone Name
+    1,                       !- Shading Control Sequence Number
     ExteriorScreen,          !- Shading Type
     DOUBLE PANE WITH SCREEN, !- Construction with Shading Name
     OnIfScheduleAllows,      !- Shading Control Type
@@ -579,7 +609,14 @@
     NO,                      !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn003:Wall001:Win001,    !- Fenestration Surface 1 Name
+    Zn003:Wall002:Win001,    !- Fenestration Surface 2 Name
+    Zn003:Wall003:Win001,    !- Fenestration Surface 3 Name
+    Zn003:Wall004:Win001;    !- Fenestration Surface 4 Name
 
   Schedule:Compact,
     ScreenSchedule,          !- Name
@@ -600,8 +637,10 @@
     1.0,                     !- Upper Limit Value
     DISCRETE;                !- Numeric Type
 
-  WindowProperty:ShadingControl,
-    DOUBLE PANE WITH DRAPES, !- Name
+  WindowShadingControl,
+    DOUBLE PANE WITH DRAPES-DPWD,  !- Name
+    DPWD,                    !- Zone Name
+    1,                       !- Shading Control Sequence Number
     InteriorShade,           !- Shading Type
     DOUBLE PANE WITH DRAPES, !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
@@ -611,10 +650,19 @@
     NO,                      !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn004:Wall001:Win001,    !- Fenestration Surface 1 Name
+    Zn004:Wall002:Win001,    !- Fenestration Surface 2 Name
+    Zn004:Wall003:Win001,    !- Fenestration Surface 3 Name
+    Zn004:Wall004:Win001;    !- Fenestration Surface 4 Name
 
-  WindowProperty:ShadingControl,
-    DOUBLE PANE WITH SHADE,  !- Name
+  WindowShadingControl,
+    DOUBLE PANE WITH SHADE-DPWS,  !- Name
+    DPWS,                    !- Zone Name
+    1,                       !- Shading Control Sequence Number
     InteriorShade,           !- Shading Type
     DOUBLE PANE WITH SHADE,  !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
@@ -624,7 +672,86 @@
     NO,                      !- Glare Control Is Active
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
-    ;                        !- Slat Angle Schedule Name
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Daylighting Control Object Name
+    Sequential,              !- Multiple Surface Control Type
+    Zn005:Wall001:Win001,    !- Fenestration Surface 1 Name
+    Zn005:Wall002:Win001,    !- Fenestration Surface 2 Name
+    Zn005:Wall003:Win001,    !- Fenestration Surface 3 Name
+    Zn005:Wall004:Win001;    !- Fenestration Surface 4 Name
+
+  WindowShadingControl,
+    DOUBLE PANE WITH SWITCHABLE GLAZING-DPSG,  !- Name
+    DPSG,                    !- Zone Name
+    1,                       !- Shading Control Sequence Number
+    SwitchableGlazing,       !- Shading Type
+    DOUBLE PANE DARKENED,    !- Construction with Shading Name
+    MeetDaylightIlluminanceSetpoint,  !- Shading Control Type
+    ,                        !- Schedule Name
+    20.0,                    !- Setpoint {W/m2, W or deg C}
+    NO,                      !- Shading Control Is Scheduled
+    NO,                      !- Glare Control Is Active
+    ,                        !- Shading Device Material Name
+    ,                        !- Type of Slat Angle Control for Blinds
+    ,                        !- Slat Angle Schedule Name
+    ,                        !- Setpoint 2 {W/m2 or deg C}
+    DPSG Daylighting Ctrl,   !- Daylighting Control Object Name
+    Group,                   !- Multiple Surface Control Type
+    Zn010:Wall001:Win001,    !- Fenestration Surface 1 Name
+    Zn010:Wall002:Win001,    !- Fenestration Surface 2 Name
+    Zn010:Wall003:Win001,    !- Fenestration Surface 3 Name
+    Zn010:Wall004:Win001;    !- Fenestration Surface 4 Name
+
+  Daylighting:Controls,
+    DPW Daylighting Ctrl,    !- Name
+    DPW,                     !- Zone Name
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Continuous,              !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    ,                        !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    DPW Zone DaylRefPt1,     !- Glare Calculation Daylighting Reference Point Name
+    ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
+    ,                        !- Maximum Allowable Discomfort Glare Index
+    ,                        !- DElight Gridding Resolution {m2}
+    DPW Zone DaylRefPt1,     !- Daylighting Reference Point 1 Name
+    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    DPW Zone DaylRefPt1,     !- Name
+    DPW,                     !- Zone Name
+    3.0,                     !- X-Coordinate of Reference Point {m}
+    3.0,                     !- Y-Coordinate of Reference Point {m}
+    0.9;                     !- Z-Coordinate of Reference Point {m}
+
+  Daylighting:Controls,
+    DPSG Daylighting Ctrl,   !- Name
+    DPSG,                    !- Zone Name
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Continuous,              !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    ,                        !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    DPSG Zone DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name
+    ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
+    ,                        !- Maximum Allowable Discomfort Glare Index
+    ,                        !- DElight Gridding Resolution {m2}
+    DPSG Zone DaylRefPt1,    !- Daylighting Reference Point 1 Name
+    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    DPSG Zone DaylRefPt1,    !- Name
+    DPSG,                    !- Zone Name
+    3.0,                     !- X-Coordinate of Reference Point {m}
+    3.0,                     !- Y-Coordinate of Reference Point {m}
+    0.9;                     !- Z-Coordinate of Reference Point {m}
 
   Site:GroundTemperature:BuildingSurface,18.89,18.92,19.02,19.12,19.21,19.23,19.07,19.32,19.09,19.21,19.13,18.96;
 
@@ -730,6 +857,17 @@
     autocalculate,           !- Ceiling Height {m}
     autocalculate;           !- Volume {m3}
 
+  Zone,
+    DPSG,                    !- Name
+    0,                       !- Direction of Relative North {deg}
+    33.00000,                !- X Origin {m}
+    33.00000,                !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+
   ScheduleTypeLimits,
     Any Number;              !- Name
 
@@ -742,7 +880,8 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    Relative;                !- Coordinate System
+    Relative,                !- Coordinate System
+    Relative;                !- Daylighting Reference Point Coordinate System
 
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
@@ -767,7 +906,6 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -799,7 +937,6 @@
     Zn001:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -831,7 +968,6 @@
     Zn001:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -863,7 +999,6 @@
     Zn001:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -927,7 +1062,6 @@
     Zn002:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -959,7 +1093,6 @@
     Zn002:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -991,7 +1124,6 @@
     Zn002:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1023,7 +1155,6 @@
     Zn002:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1087,7 +1218,6 @@
     Zn003:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SCREEN, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1119,7 +1249,6 @@
     Zn003:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SCREEN, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1151,7 +1280,6 @@
     Zn003:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SCREEN, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1183,7 +1311,6 @@
     Zn003:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SCREEN, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1247,7 +1374,6 @@
     Zn004:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH DRAPES, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1279,7 +1405,6 @@
     Zn004:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH DRAPES, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1311,7 +1436,6 @@
     Zn004:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH DRAPES, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1343,7 +1467,6 @@
     Zn004:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH DRAPES, !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1407,7 +1530,6 @@
     Zn005:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SHADE,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1439,7 +1561,6 @@
     Zn005:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SHADE,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1471,7 +1592,6 @@
     Zn005:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SHADE,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1503,7 +1623,6 @@
     Zn005:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    DOUBLE PANE WITH SHADE,  !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1567,7 +1686,6 @@
     Zn006:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1599,7 +1717,6 @@
     Zn006:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1631,7 +1748,6 @@
     Zn006:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1663,7 +1779,6 @@
     Zn006:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1727,7 +1842,6 @@
     Zn007:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1759,7 +1873,6 @@
     Zn007:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1791,7 +1904,6 @@
     Zn007:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1823,7 +1935,6 @@
     Zn007:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1887,7 +1998,6 @@
     Zn008:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1919,7 +2029,6 @@
     Zn008:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1951,7 +2060,6 @@
     Zn008:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -1983,7 +2091,6 @@
     Zn008:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2047,7 +2154,6 @@
     Zn009:Wall001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2079,7 +2185,6 @@
     Zn009:Wall002,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2111,7 +2216,6 @@
     Zn009:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2143,7 +2247,6 @@
     Zn009:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     Autocalculate,           !- Number of Vertices
@@ -2184,6 +2287,190 @@
     10.00000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 3 {m}
     10.00000,10.00000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
 
+  BuildingSurface:Detailed,
+    Zn010:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    DPSG,                    !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    Autocalculate,           !- Number of Vertices
+    0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn010:Wall001:Win001,    !- Name
+    Window,                  !- Surface Type
+    DOUBLE PANE WINDOW,      !- Construction Name
+    Zn010:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    Autocalculate,           !- Number of Vertices
+    0.200000,0.000000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}
+    9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}
+    9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn010:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    DPSG,                    !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    Autocalculate,           !- Number of Vertices
+    10.00000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.00000,10.00000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn010:Wall002:Win001,    !- Name
+    Window,                  !- Surface Type
+    DOUBLE PANE WINDOW,      !- Construction Name
+    Zn010:Wall002,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    Autocalculate,           !- Number of Vertices
+    10.00000,0.20000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,0.20000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,9.90000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}
+    10.00000,9.900000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn010:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    DPSG,                    !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    Autocalculate,           !- Number of Vertices
+    10.00000,10.00000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,10.00000,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.000000,10.00000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn010:Wall003:Win001,    !- Name
+    Window,                  !- Surface Type
+    DOUBLE PANE WINDOW,      !- Construction Name
+    Zn010:Wall003,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    Autocalculate,           !- Number of Vertices
+    9.80000,10.00000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}
+    9.80000,10.00000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.100000,10.00000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.100000,10.00000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn010:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    DPSG,                    !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    Autocalculate,           !- Number of Vertices
+    0.000000,10.00000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.000000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn010:Wall004:Win001,    !- Name
+    Window,                  !- Surface Type
+    DOUBLE PANE WINDOW,      !- Construction Name
+    Zn010:Wall004,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    Autocalculate,           !- Number of Vertices
+    0.000000,9.8000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,9.8000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000000,0.10000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.000000,0.10000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn010:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR38,                 !- Construction Name
+    DPSG,                    !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Zn010:Flr001,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    Autocalculate,           !- Number of Vertices
+    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn010:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    DPSG,                    !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    Autocalculate,           !- Number of Vertices
+    0.000000,10.00000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 3 {m}
+    10.00000,10.00000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  Lights,
+    DPW Lights,              !- Name
+    DPW,                     !- Zone or ZoneList Name
+    On,                      !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    100,                     !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    ,                        !- Return Air Fraction
+    ,                        !- Fraction Radiant
+    ,                        !- Fraction Visible
+    ;                        !- Fraction Replaceable
+
+  Lights,
+    DPSG Lights,             !- Name
+    DPSG,                    !- Zone or ZoneList Name
+    On,                      !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    100,                     !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    ,                        !- Return Air Fraction
+    ,                        !- Fraction Radiant
+    ,                        !- Fraction Visible
+    ;                        !- Fraction Replaceable
+
+  Schedule:Constant,On,Integer,1.0;
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
   Output:Variable,*,Site Direct Solar Radiation Rate per Area,timestep;
@@ -2207,6 +2494,12 @@
   Output:Variable,*,Surface Window Screen Beam to Beam Solar Transmittance,timestep;
 
   Output:Variable,*,Surface Window Screen Beam to Diffuse Solar Transmittance,timestep;
+
+  Output:Variable,*,Surface Window Switchable Glazing Switching Factor,timestep;
+
+  Output:Variable,*,Surface Window Switchable Glazing Visible Transmittance,timestep;
+
+  Output:Variable,*,Daylighting Reference Point 1 Illuminance,timestep;
 
   Output:VariableDictionary,Regular;
 

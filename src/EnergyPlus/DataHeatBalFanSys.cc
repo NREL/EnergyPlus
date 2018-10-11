@@ -212,6 +212,8 @@ namespace DataHeatBalFanSys {
     Array1D<Real64> AdapComfortCoolingSetPoint;
     Array1D<Real64> ZoneThermostatSetPointHi;
     Array1D<Real64> ZoneThermostatSetPointLo;
+    Array1D<Real64> ZoneThermostatSetPointHiAver;
+    Array1D<Real64> ZoneThermostatSetPointLoAver;
 
     Array1D<Real64> LoadCorrectionFactor; // PH 3/3/04
 
@@ -332,6 +334,8 @@ namespace DataHeatBalFanSys {
         AdapComfortCoolingSetPoint.deallocate();
         ZoneThermostatSetPointHi.deallocate();
         ZoneThermostatSetPointLo.deallocate();
+        ZoneThermostatSetPointHiAver.deallocate();
+        ZoneThermostatSetPointLoAver.deallocate();
         LoadCorrectionFactor.deallocate();
         AIRRAT.deallocate();
         ZTM1.deallocate();

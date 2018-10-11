@@ -97,7 +97,6 @@
     WallWindow,              !- Name
     TestWindow,              !- Construction Name
     Zn001:Wall003,           !- Building Surface Name
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     1,                       !- Starting X Coordinate {m}
@@ -112,7 +111,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -128,7 +126,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -144,7 +141,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -160,7 +156,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -176,7 +171,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -192,7 +186,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -208,7 +201,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -224,7 +216,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -240,7 +231,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -256,7 +246,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -272,7 +261,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -288,7 +276,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -304,7 +291,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -320,7 +306,6 @@
     Zn001:Roof001,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -511,15 +496,16 @@
     Annual Run,              !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    Yes;                     !- Use Weather File Snow Indicators
 
   Material:NoMass,
     R13LAYER,                !- Name

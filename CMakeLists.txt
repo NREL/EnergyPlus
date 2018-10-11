@@ -10,7 +10,7 @@ set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} 
 
 set( CMAKE_VERSION_MAJOR 9 )
 set( CMAKE_VERSION_MINOR 0 )
-set( CMAKE_VERSION_PATCH 0 )
+set( CMAKE_VERSION_PATCH 1 )
 
 set( PREV_RELEASE_SHA "40101ea" )
 
@@ -179,10 +179,11 @@ IF( NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
 ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
+if( BUILD_TESTING )
+  ADD_SUBDIRECTORY(third_party/gtest)
+endif()
 
 # Kiva
-option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging only)" OFF )
-mark_as_advanced(FORCE BUILD_GROUND_PLOT)
 INCLUDE(third_party/cmake/kiva.cmake)
 
 execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
@@ -194,15 +195,21 @@ configure_file( idd/Energy+.schema.epJSON.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
 configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
 configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
+# EPLaunch workflow files should be configured -- for now it's just a plain copy
+configure_file( "workflows/app_g_postprocess.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" )
+configure_file( "workflows/calc_soil_surface_temp.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/calc_soil_surface_temp.py" )
+configure_file( "workflows/coeff_check.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_check.py" )
+configure_file( "workflows/coeff_conv.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_conv.py" )
+configure_file( "workflows/energyplus.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/energyplus.py" )
+configure_file( "workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/transition.py" )
+
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
 # Include scripts for enabling the testing of 179D compliance
 include(cmake/179DReporting.cmake)
 
-
 if( BUILD_TESTING )
-  ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
 

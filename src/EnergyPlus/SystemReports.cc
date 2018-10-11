@@ -4619,7 +4619,7 @@ namespace SystemReports {
                             ZFAUZoneVentLoad += 0.0;
                         }
 
-                    } else if (SELECT_CASE_var == ZoneUnitarySystem_Num) {
+                    } else if (SELECT_CASE_var == ZoneUnitarySys_Num) {
                         // add accounting for OA when unitary system is used as zone equipment
 
                     } else if (SELECT_CASE_var == OutdoorAirUnit_Num) {

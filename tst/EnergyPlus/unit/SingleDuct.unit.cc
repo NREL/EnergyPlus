@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <DataAirLoop.hh>
+#include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
@@ -134,7 +135,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues();
 
@@ -306,7 +307,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues();
 
@@ -2722,4 +2723,86 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     DataSizing::TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 1.5;
     SingleDuct::SizeSys(SysNum);
     EXPECT_EQ(1.0, SingleDuct::Sys(SysNum).ZoneMinAirFrac);
+}
+TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
+{
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    SysSizingRunDone = true;
+    SysSizInput.allocate(1);
+    NumSysSizInput = 1;
+    SysSizInput(1).AirLoopNum = 1;
+    SysSizInput(1).AirPriLoopName = "MyAirLoop";
+    FinalSysSizing.allocate(1);
+    FinalSysSizing(1).AirPriLoopName = "MyAirLoop";
+    FinalSysSizing(1).PreheatTemp = 15.0;
+    FinalSysSizing(1).PreheatHumRat = 0.005;
+    FinalSysSizing(1).HeatRetTemp = 20.0;
+    FinalSysSizing(1).HeatRetHumRat = 0.007;
+    FinalSysSizing(1).PrecoolTemp = 18.0;
+    FinalSysSizing(1).PrecoolHumRat = 0.008;
+    FinalSysSizing(1).RetTempAtCoolPeak = 24.0;
+    FinalSysSizing(1).RetHumRatAtCoolPeak = 0.01;
+    FinalSysSizing(1).OutTempAtCoolPeak = 32.0;
+    FinalSysSizing(1).OutHumRatAtCoolPeak = 0.012;
+    FinalSysSizing(1).HeatOutTemp = 10.0;
+    FinalSysSizing(1).HeatOutHumRat = 0.003;
+    FinalSysSizing(1).DesMainVolFlow = 1.2345;
+    FinalSysSizing(1).DesOutAirVolFlow = 1.2345;
+
+    SingleDuct::SysATMixer.allocate(1);
+    SingleDuct::SysATMixer(1).CtrlZoneInNodeIndex = 1;
+    SingleDuct::SysATMixer(1).DesignPrimaryAirVolRate = FinalSysSizing(1).DesMainVolFlow;
+    SingleDuct::SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_InletSide;
+
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).CentralCoolCoilExists = true;
+    DataAirSystems::PrimaryAirSystem(1).CentralHeatCoilExists = true;
+    DataAirSystems::PrimaryAirSystem(1).NumOAHeatCoils = 1;
+    DataAirSystems::PrimaryAirSystem(1).NumOACoolCoils = 1;
+
+    ZoneEqSizing.allocate(1);
+
+    int ATMixerIndex = 1;
+    int ControlledZoneNum = 1;
+    CurZoneEqNum = 1;
+    // set ATMixer properties used for sizing
+    SingleDuct::setATMixerSizingProperties(ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerVolFlow, SingleDuct::SysATMixer(1).DesignPrimaryAirVolRate);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).CoolSupTemp);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).CoolSupHumRat);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).HeatSupTemp);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).HeatSupHumRat);
+
+    DataAirSystems::PrimaryAirSystem(1).CentralCoolCoilExists = false;
+    DataAirSystems::PrimaryAirSystem(1).CentralHeatCoilExists = false;
+    // set ATMixer properties used for sizing
+    SingleDuct::setATMixerSizingProperties(ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).PrecoolTemp);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).PrecoolHumRat);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).PreheatTemp);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).PreheatHumRat);
+
+    // set ATMixer properties used for sizing
+    SingleDuct::SysATMixer(1).DesignPrimaryAirVolRate /= 2.0;
+    SingleDuct::setATMixerSizingProperties(ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).PrecoolTemp, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).PrecoolHumRat, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).PreheatTemp, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).PreheatHumRat, 0.0000001);
+
+    DataAirSystems::PrimaryAirSystem(1).NumOAHeatCoils = 0;
+    DataAirSystems::PrimaryAirSystem(1).NumOACoolCoils = 0;
+    SingleDuct::SysATMixer(1).DesignPrimaryAirVolRate *= 2.0;
+
+    SingleDuct::setATMixerSizingProperties(ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).OutTempAtCoolPeak, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).OutHumRatAtCoolPeak, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).HeatOutTemp, 0.0000001);
+    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).HeatOutHumRat, 0.0000001);
 }
