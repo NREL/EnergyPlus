@@ -2,7 +2,7 @@
 
 \subsection{Chilled-Water-Based Air Cooling Coil}\label{chilled-water-based-air-cooling-coil}
 
-The input object Coil:Cooling:Water is simpler than the detailed geometry model.~ The simple model provides a good prediction of the air and water outlet conditions without requiring the detailed geometric input required for the detailed model.~ A greatly simplified schematic of enthalpy and temperature conditions in a counter flow cooling/dehumidifying coil is shown in the schematic Figure~\ref{fig:simplified-schematic-of-coolingdehumidifying}.~ The input required to model the coil includes only a set of thermodynamic design inputs, which require no specific manufacturer's data.~ The coil simulation model is essentially a modification of one presented by Elmahdy and Mitalas (1977), TRNSYS, 1990 and Threlkeld, J.L. 1970.~ The model calculates the UA values required for a Dry, Wet and Part Wet \& Part Dry Coil and iterates between the Dry and Wet Coil to output the fraction wet.~ There are two modes of flow operation for this model: Cross Flow, which is widely applicable in HVAC systems and the second being Counter flow mode. The default value in program is set up for Counter Flow.~ In addition the coil has two modes of analysis: Simple Analysis and Detailed Analysis. The Simple analysis mode operates the coil as either wet or dry while the detailed mode simulates the coil as part wet part-dry. While the detailed mode provides more accurate results, it is significantly slower than the simple model. The simple mode gives good results for an annual simulation but will not be adequate for a time step performance analysis.
+The input object Coil:Cooling:Water is simpler than the detailed geometry model. The simple model provides a good prediction of the air and water outlet conditions without requiring the detailed geometric input required for the detailed model. A greatly simplified schematic of enthalpy and temperature conditions in a counter flow cooling/dehumidifying coil is shown in the schematic Figure~\ref{fig:simplified-schematic-of-coolingdehumidifying}. The input required to model the coil includes only a set of thermodynamic design inputs, which require no specific manufacturer's data. The coil simulation model is essentially a modification of one presented by Elmahdy and Mitalas (1977), TRNSYS, 1990 and Threlkeld, J.L. 1970. The model calculates the UA values required for a Dry, Wet and Part Wet \& Part Dry Coil and iterates between the Dry and Wet Coil to output the fraction wet. There are two modes of flow operation for this model: CrossFlow or CounterFlow. The default mode is CounterFlow. In addition the coil has two modes of analysis: Simple Analysis and Detailed Analysis. The Simple analysis mode operates the coil as either wet or dry while the detailed mode simulates the coil as part wet part-dry. While the detailed mode provides more accurate results, it is significantly slower than the simple model. The simple mode gives good results for an annual simulation but will not be adequate for a time step performance analysis.
 
 \begin{figure}[hbtp] % fig 162
 \centering
@@ -280,7 +280,7 @@ The above is a simple mode of analysis and the results are very slightly differe
 
 \subsubsection{Effectiveness Equations}\label{effectiveness-equations}
 
-There are two modes of flow for the coil, Counter Flow mode or the Cross Flow mode, default set up is as cross flow since most air condition applications have cross flow heat exchangers. According to the mode of flow the following NTU - Effectiveness relationships are used to calculate coil effectiveness, which is used later by all the three modes (Dry, Wet, Part Wet) for calculating air outlet conditions and heat transfer.
+There are two modes of flow for the coil, CounterFlow or CrossFlow. The default mode is CounterFlow. According to the mode of flow the following NTU - Effectiveness relationships are used to calculate coil effectiveness, which is used later by all the three modes (Dry, Wet, Part Wet) for calculating air outlet conditions and heat transfer.
 
 Following are the relations used for calculating effectiveness equation for the heat exchangers.
 
@@ -319,7 +319,7 @@ NTU = \frac{{CoilUA}}{{MinStrea{m_{Capacity}}}}
 \label{eq:EtaCrossFlow}
 \end{equation}
 
-The variables in the above equation have already been defined earlier. Depending on the mode of operation of the coil model, the cross or the counter flow equations are used to calculate the effectiveness.
+The variables in the above equation have already been defined earlier. Depending on the mode of operation of the coil model, the CrossFlow or CounterFlow equations are used to calculate the effectiveness.
 
 \subsubsection{Coil Outlet Conditions}\label{coil-outlet-conditions}
 
