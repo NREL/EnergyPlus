@@ -83,9 +83,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     MultizoneSurfaceData(i).Height = 5.0;
     MultizoneSurfaceData(i).OpenFactor = 1.0;
 
-    RHOZ.allocate(2);
-    RHOZ(1) = 1.2;
-    RHOZ(2) = 1.18;
+    properties.resize(2);
+    properties[0].density = 1.2;
+    properties[1].density = 1.18;
 
     MultizoneCompHorOpeningData.allocate(1);
     MultizoneCompHorOpeningData(1).FlowCoef = 0.1;
@@ -97,13 +97,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     AirflowNetworkLinkageData(i).NodeHeights[0] = 4.0;
     AirflowNetworkLinkageData(i).NodeHeights[1] = 2.0;
 
-    NF = AFEHOP(1, 1, 0.05, 1, 1, 2, F, DF);
+    NF = AFEHOP(1, 1, 0.05, 1, properties[0], properties[1], F, DF);
     EXPECT_NEAR(3.47863, F[0], 0.00001);
     EXPECT_NEAR(34.7863, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
     EXPECT_EQ(0.0, DF[1]);
 
-    NF = AFEHOP(1, 1, -0.05, 1, 1, 2, F, DF);
+    NF = AFEHOP(1, 1, -0.05, 1, properties[0], properties[1], F, DF);
     EXPECT_NEAR(-3.42065, F[0], 0.00001);
     EXPECT_NEAR(34.20649, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
@@ -111,7 +111,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
 
     AirflowNetworkLinkageData.deallocate();
 
-    RHOZ.deallocate();
     MultizoneCompHorOpeningData.deallocate();
     MultizoneSurfaceData.deallocate();
     AirflowNetworkCompData.deallocate();
