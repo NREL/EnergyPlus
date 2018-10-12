@@ -7,8 +7,8 @@
 </head>
 <body id="preview">
 <p><img src="ep.gif" alt="ep.gif (6134 bytes)"><br>
-    Version 8.9.0<br>
-    31 March 2018<br>
+    Version 9.0.0<br>
+    30 September 2018<br>
     <em>EnergyPlus is a trademark of the US Department of Energy.</em></p>
 <h1><a id="EnergyPlus_8"></a>EnergyPlus</h1>
 <h2><a id="What_it_is_What_it_is_not_10"></a>What it is, What it is not</h2>
@@ -23,8 +23,8 @@
     Some of these may produce out of date IDF files; you can then use the IDFVersionUpdater program to convert older
     files to current EnergyPlus version (you may need to use the Multiple Version Conversions set – see below.
 </p>
-<h2><a id="Whats_going_on_in_V86_18"></a>What’s going on in V8.9?</h2>
-<p>Will there be any considerable difference between version 8.8 and 8.9?</p>
+<h2><a id="Whats_going_on_in_V86_18"></a>What’s going on in V9.0?</h2>
+<p>Will there be any considerable difference between version 8.9 and 9.0?</p>
 <ul>
     <li>Yes... and no. The basic structure of EnergyPlus is still as it has been but there are some significant changes
         that you will want to be aware of. As always, there are a number of new features and bug fixes. The highlights
@@ -34,24 +34,28 @@
 </ul>
 <p>How about IDF and IDD? Do they remain unchanged?</p>
 <ul>
-    <li>There are a few key changes in the V8.9 IDD. For best results, use the transition program to transfer from the
-        earlier V8.8 files. Use the IDFVersionUpdater program for best results.
+    <li>There are a few key changes in the V9.0 IDD. For best results, use the transition program to transfer from the
+        earlier V9.0 files. Use the IDFVersionUpdater program for best results.
     </li>
 </ul>
-<p>Is version 8.9 backward compatible? Can I run v8.8 file in v8.9?</p>
+<p>Is version 9.0 backward compatible? Can I run v8.9 file in v9.0?</p>
 <ul>
     <li>
         <p>There have been changes in the following objects which require conversion. Either read and follow the Rules
             spreadsheet or use the IDFVersionUpdater utility. The “Rules” spreadsheet that contains information on exact
             object changes that you can do by hand. The updater program is described more fully in the Auxiliary
-            Programs document. For the v8.9 release, the following objects require conversion (from V8.8):</p>
+            Programs document. For the v9.0 release, the following objects require conversion (from V8.9):</p>
         <ul>
-            <li>AirTerminal:SingleDuct:Uncontrolled</li>
-            <li>ElectricEquipment:ITE:AirCooled</li>
-            <li>Schedule:Compact</li>
-            <li>Schedule:Day:List</li>
-            <li>Schedule:Day:Interval</li>
-            <li>ZoneHVAC:EquipmentList</li>
+            <li>AirflowNetwork:Distribution:Component:OutdoorAirFlow</li>
+            <li>AirflowNetwork:Distribution:Component:ReliefAirFlow</li>
+            <li>Boiler:HotWater</li>
+            <li>FenestrationSurface:Detailed</li>
+            <li>GlazedDoor</li>
+            <li>WindowMaterial:ComplexShade</li>
+            <li>RunPeriod</li>
+            <li>RunPeriod:CustomRange</li>
+            <li>Window</li>
+            <li>WindowProperty:ShadingControl</li>
         </ul>
     </li>
 </ul>
@@ -80,7 +84,7 @@
     EnergyPlus can read these weather files and provide .csv (comma separated variable) as well as statistics reports
     about the included (or other) files. Weather data for more than 2100 locations in more than 100 countries can be
     downloaded on the <a href="https://energyplus.net/weather">EnergyPlus Weather Page</a>.</p>
-<h2><a id="Highlights_of_this_release_V860_67"></a>Highlights of this release (V8.9.0)</h2>
+<h2><a id="Highlights_of_this_release_V860_67"></a>Highlights of this release (V9.0.0)</h2>
 <p>The highlights – improved and new features – are displayed by category.</p>
 <h3><a id="Core_changes_to_EnergyPlus_71"></a>Core changes to EnergyPlus</h3>
 <p>There were many bug fixes and new features added for this release. Some new features were still added, check the
@@ -92,57 +96,52 @@
 <h3><a id="Prominent_New_Features_79"></a>Prominent New Features</h3>
 <ul>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/5893">#5893</a> : JSON input format and InputProcessor refactor
+        <a href="https://github.com/NREL/EnergyPlus/pull/6247">#6247</a> : Windows calculation engine integration
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6227">#6227</a> : Improving Building Energy Simulation in an
-        Urban Context
+        <a href="https://github.com/NREL/EnergyPlus/pull/6374">#6374</a> : Update NIST escalation rates
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6245">#6245</a> : Improved Airflow Calculations for BSDF window
-        types
+        <a href="https://github.com/NREL/EnergyPlus/pull/6421">#6421</a> : Window shading control order new feature
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6248">#6248</a> : Add air terminal unit sizing option, allow
-        air loops with no return path, and partially allow multiple air loops serving the same zone
+        <a href="https://github.com/NREL/EnergyPlus/pull/6450">#6450</a> : Allow Multiple Air Primary Loops in the Airflow Network
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6291">#6291</a> : IDF Editor - add new Duplicate Object and
-        Change function and support new units
+        <a href="https://github.com/NREL/EnergyPlus/pull/6478">#6478</a> : Merge RunPeriod and RunPeriod:CustomRange
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6385">#6385</a> : On/Off Thermostat
+        <a href="https://github.com/NREL/EnergyPlus/pull/6501">#6501</a> : Simple python script to parse C++ code for EMS variable calls
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6387">#6387</a> : Additional Source Term in the Surface Heat
-        Balance Calculation
+        <a href="https://github.com/NREL/EnergyPlus/pull/6718">#6718</a> : Update fan coil and PT unit HVACTemplate inputs for Single Zone VAV control
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6388">#6388</a> : Automatic Import of Shading from a CSV File
+        <a href="https://github.com/NREL/EnergyPlus/pull/6753">#6753</a> : Include fan heat when sizing zone cooling coils and adjust airloop coil inlet/outlet conditions
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6390">#6390</a> : Add New Options to Disable Self-Shading
-        Effect
+        <a href="https://github.com/NREL/EnergyPlus/pull/6771">#6771</a> : Added New Water Mains Temperature Calculation Method
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6393">#6393</a> : ASHRAE 90.1 SZVAV control for Packaged
-        Terminal Units
+        <a href="https://github.com/NREL/EnergyPlus/pull/6812">#6812</a> : Fan energy index
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6411">#6411</a> : Single Duct Constant Volume Air Terminal No
-        Reheat New Object
+        <a href="https://github.com/NREL/EnergyPlus/pull/6852">#6852</a> : Allow any wall shape for Kiva Foundations
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6432">#6432</a> : Hybrid Air Conditioner
+        <a href="https://github.com/NREL/EnergyPlus/pull/6855">#6855</a> : BSDF Venetian Blinds - Add option for vertical blinds and correct surface emissivity calculation
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6451">#6451</a> : PVWatts Integration
+        <a href="https://github.com/NREL/EnergyPlus/pull/6872">#6872</a> : Improve Kiva longwave radiation methodology and performance
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6454">#6454</a> : New Coil Sizing Reports
+        <a href="https://github.com/NREL/EnergyPlus/pull/6885">#6885</a> : Add API function RunEnergyPlus that uses return codes instead of std::exit()
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6456">#6456</a> : Add annual reporting option
+        <a href="https://github.com/NREL/EnergyPlus/pull/6891">#6891</a> : Updated ASHRAE Revised Clear Sky "tau" Model with new 2017 option
+    </li>
+    <li>
+        <a href="https://github.com/NREL/EnergyPlus/pull/6957">#6957</a> : Initial addition of EP-Launch workflow files
     </li>
 </ul>
 <h3><a id="Platforms_90"></a>Platforms</h3>
@@ -150,7 +149,7 @@
     <li>Windows 7, 8 &amp; 10</li>
     <li>Linux (Ubuntu 14.04 and compatible) 64 bit versions</li>
     <li>Mac OSX 10.9 64 bit versions</li>
-    <li>EnergyPlus V8.9 has been tested on all of these platforms</li>
+    <li>EnergyPlus V9.0 has been tested on all of these platforms</li>
     <li><em>EnergyPlus does intensive computations, and based on configuration, can write massive amounts of data to
         disk. For best performance, computers should have a ubstantial amount of memory and high speed hard drives.</em>
     </li>

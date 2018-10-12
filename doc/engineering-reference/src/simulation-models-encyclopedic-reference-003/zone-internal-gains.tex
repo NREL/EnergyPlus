@@ -2,17 +2,17 @@
 
 \subsection{Sources and Types of Gains}\label{sources-and-types-of-gains}
 
-Internal heat gains from lights, people, and equipment of various types are often significant elements in the zone thermal balance.~ EnergyPlus allows the user to specify heat gains for several equipment types including people, lights, gas/electric equipment, and several other types.~ The total heat gain is comprised of convective, radiant and latent gains in various proportions from these sources.~ Convective gains are instantaneous additions of heat to the zone air.~ Radiant gains are distributed on the surfaces of the zone, where they are first absorbed and then released back into the room (with some fraction conducted through the surface) according to the surface heat balances. \{See Surface Heat Balance Manager / Processes in this document\}.~ Latent gains must be handled by ventilation or air conditioning equipment.~ Recommended heat gains are given by ASHRAE {[}1{]}.~ These recommendations include the sensible (convective plus radiative) and latent proportions.~ Sensible gains from equipment are primarily radiant.~ The user can specify the heat gains and proportions for any type of equipment.~ Determining the gains from lights, people and baseboard heat are slightly more complicated.
+Internal heat gains from lights, people, and equipment of various types are often significant elements in the zone thermal balance.~ EnergyPlus allows the user to specify heat gains for several equipment types including people, lights, gas/electric equipment, and several other types.~ The total heat gain is comprised of convective, radiant and latent gains in various proportions from these sources.~ Convective gains are instantaneous additions of heat to the zone air.~ Radiant gains are distributed on the surfaces of the zone, where they are first absorbed and then released back into the room (with some fraction conducted through the surface) according to the surface heat balances. \{See Surface Heat Balance Manager / Processes in this document\}.~ Latent gains must be handled by ventilation or air conditioning equipment.~ Recommended heat gains are given in the ASHRAE Handbook of Fundamentals.~ These recommendations include the sensible (convective plus radiative) and latent proportions.~ Sensible gains from equipment are primarily radiant.~ The user can specify the heat gains and proportions for any type of equipment.~ Determining the gains from lights, people and baseboard heat are slightly more complicated.
 
 \subsection{Heat Gain from Lights}\label{heat-gain-from-lights}
 
-The input object Lights provides a model for internal gains from lights.~ Radiant gains from lights must be handled differently from other radiant gains for reasons described here (long wavelength description).~ The total radiant gains from lights must be divided into visible and thermal portions.~ For example, the total electric input to typical incandescent lights is converted to 10\% visible radiation, 80\% thermal radiation, and 10\% convective gain.~ In contrast, the electric input to typical fluorescent lights is converted to 20\% visible radiation, 20\% thermal radiation, and 60\% convective gain {[}2{]}.~ These percentage splits are under user control with the Lights input object.
+The input object Lights provides a model for internal gains from lights.~ Radiant gains from lights must be handled differently from other radiant gains for reasons described here (long wavelength description).~ The total radiant gains from lights must be divided into visible and thermal portions.~ For example, the total electric input to typical incandescent lights is converted to 10\% visible radiation, 80\% thermal radiation, and 10\% convective gain.~ In contrast, the electric input to typical fluorescent lights is converted to 20\% visible radiation, 20\% thermal radiation, and 60\% convective gain (see Carrier 1965).~ These percentage splits are under user control with the Lights input object.
 
 \subsection{Heat Gain from People}\label{heat-gain-from-people-000}
 
-The input object People provides a model for internal gains from occupants.~ Heat is generated in the human body by oxidation at a rate called the metabolic rate (see Thermal Comfort discussion for more details).~ This heat is dissipated from the body surface and respiratory tract by a combination of radiation, convection, and evaporation.~ The relative proportions of sensible (radiation plus convection) and latent (evaporation) heat from people is a complex function of the metabolic rate and the environmental conditions.~ EnergyPlus uses a polynomial function to divide the total metabolic heat gain into sensible and latent portions.~ That function is based on a fit to data {[}3{]} at average adjusted metabolic rates of 350, 400, 450, 500, 750, 850, 1000 and 1450 Btu/h each at temperatures of 70, 75, 78, 80, 82 degrees Fahrenheit.~ Sensible gains of 0 at 96 F and sensible gains equal to the metabolic rate at 30 F were assumed in order to give reasonable values beyond the reported temperature range.
+The input object People provides a model for internal gains from occupants.~ Heat is generated in the human body by oxidation at a rate called the metabolic rate (see Thermal Comfort discussion for more details).~ This heat is dissipated from the body surface and respiratory tract by a combination of radiation, convection, and evaporation.~ The relative proportions of sensible (radiation plus convection) and latent (evaporation) heat from people is a complex function of the metabolic rate and the environmental conditions.~ EnergyPlus uses a polynomial function to divide the total metabolic heat gain into sensible and latent portions.~ That function is based on a fit to data {[}3{]} at average adjusted metabolic rates of 350, 400, 450, 500, 750, 850, 1000 and 1450 Btu/h each at temperatures of 70, 75, 78, 80, 82\(^{\circ}\)Fahrenheit.~ Sensible gains of 0 at 96\(^{\circ}\)F and sensible gains equal to the metabolic rate at 30\(^{\circ}\)F were assumed in order to give reasonable values beyond the reported temperature range.
 
-Average adjusted metabolic rate {[}3{]} is the metabolic rate to be applied to a mixed group of people with a typical percent composition based on the following factors:
+Average adjusted metabolic rate (Carrier 1965b) is the metabolic rate to be applied to a mixed group of people with a typical percent composition based on the following factors:
 
 \begin{itemize}
   \item Metabolic rate, adult female = Metabolic rate, adult male X 0.85
@@ -28,13 +28,13 @@ The original data was in I-P (Inch-Pound) units, but the following correlation i
   \end{array}
 \end{equation}
 
-where
+where:
 
-M = Metabolic Rate (W)
+\(M\) is the metabolic rate (W)
 
-T = Air Temperature (C)
+\(T\) is the air temperature (C)
 
-S = Sensible Gain (W)
+\(S\) is the sensible gain (W).
 
 Latent Gain is simply the total gain (metabolic rate) -- sensible gain:
 
@@ -59,33 +59,33 @@ The input object ElectricEquipment:ITE:AirCooled describes air-cooled electric i
 \begin{itemize}
 \tightlist
 \item
-  PDesign = Design power input when fully loaded and entering air temperature is at the user-specified design inlet temperature {[}W{]}
+  PDesign is the design power input when fully loaded and entering air temperature is at the user-specified design inlet temperature (W)
 \item
-  PFanFracDesign = Design fan power input fraction of total power input when fully loaded and entering air temperature is at the user-specified design inlet temperature
+  PFanFracDesign is the design fan power input fraction of total power input when fully loaded and entering air temperature is at the user-specified design inlet temperature
 \item
-  SchDesignLevel = Scheduled fraction of this equipment which is powered up
+  SchDesignLevel is the scheduled fraction of this equipment which is powered up
 \item
-  SchCPULoading = Scheduled fraction of CPU loading
+  SchCPULoading is the scheduled fraction of CPU loading
 \item
-  TAirInDesign = Air inlet temperature at design condition {[}C{]}
+  TAirInDesign is the air inlet temperature at design condition (\(^{\circ}\)C)
 \item
-  VAirDesign = Air volume flow rate at design condition {[}m3/s{]}
+  VAirDesign is the air volume flow rate at design condition (m\(^3\)/s)
 \item
-  VAirfLoadTAir = Air volume flow rate modifier function of TAirIn and SchCPULoading
+  VAirfLoadTAir is the air volume flow rate modifier function of TAirIn and SchCPULoading
 \item
-  PCPUfLoadTAir = CPU power input modifier function of TAirIn and SchCPULoading
+  PCPUfLoadTAir is the CPU power input modifier function of TAirIn and SchCPULoading
 \item
-  PFanfFlowFrac = Fan power input modifier function of air flow fraction
+  PFanfFlowFrac is the fan power input modifier function of air flow fraction
 \item
-  RecircFracDesign = Recirculation Fraction at design condition {[}C{]}
+  RecircFracDesign is the recirculation fraction at design condition (\(^{\circ}\)C)
 \item
-  RecircfLoadTAir = Recirculation Fraction modifier function of TAirSupply and SchCPULoading
+  RecircfLoadTAir is the recirculation fraction modifier function of TAirSupply and SchCPULoading
 \item
-  UPSEfficDesign = Design electric power supply efficiency
+  UPSEfficDesign is the design electric power supply efficiency
 \item
-  UPSEfficfPLR = Electric power supply efficiency function of part load ratio
+  UPSEfficfPLR is the electric power supply efficiency function of part load ratio
 \item
-  UPSLossFracToZone = Fraction of electric power supply losses to zone
+  UPSLossFracToZone is the fraction of electric power supply losses to zone
 \end{itemize}
 
 \subsubsection{Variable Definitions -- Simulation Inputs:}\label{variable-definitions-simulation-inputs}
@@ -93,17 +93,17 @@ The input object ElectricEquipment:ITE:AirCooled describes air-cooled electric i
 \begin{itemize}
 \tightlist
 \item
-  TAirIn = Air inlet temperature at current conditions {[}C{]}
+  TAirIn is the air inlet temperature at current conditions (\(^{\circ}\)C)
 \item
-  TAirSupply = Supply air node temperature at current conditions {[}C{]}
+  TAirSupply is the supply air node temperature at current conditions (\(^{\circ}\)C)
 \item
-  TZone = Zone air temperature at current conditions {[}C{]}
+  TZone is the zone air temperature at current conditions (\(^{\circ}\)C)
 \item
-  TRoomAirNodeIn = Room air model inlet node air temperature at current conditions {[}C{]}
+  TRoomAirNodeIn is the room air model inlet node air temperature at current conditions (\(^{\circ}\)C)
 \item
-  RhoAir = Air density {[}kg/m3{]}
+  RhoAir is the air density (kg/m\(^3\))
 \item
-  CpAir = Air specific heat {[}J/kg-K{]}
+  CpAir is the air specific heat (J/kg-K)
 \end{itemize}
 
 \subsubsection{Variable Definitions -- Intermediate Calculations:}\label{variable-definitions-intermediate-calculations}
@@ -111,11 +111,11 @@ The input object ElectricEquipment:ITE:AirCooled describes air-cooled electric i
 \begin{itemize}
 \tightlist
 \item
-  PCPUDesign = Design CPU power input when fully loaded and entering air temperature is at the user-specified design inlet temperature {[}W{]}
+  PCPUDesign is the design CPU power input when fully loaded and entering air temperature is at the user-specified design inlet temperature (W)
 \item
-  PFanDesign = Design fan power input when fully loaded and entering air temperature is at the user-specified design inlet temperature {[}W{]}
+  PFanDesign is the design fan power input when fully loaded and entering air temperature is at the user-specified design inlet temperature (W)
 \item
-  UPSPLR = Electric power supply part load ratio (can be greater than 1.0)
+  UPSPLR is the electric power supply part load ratio (can be greater than 1.0)
 \end{itemize}
 
 \subsubsection{Variable Definitions -- Outputs:}\label{variable-definitions-outputs}
@@ -123,143 +123,180 @@ The input object ElectricEquipment:ITE:AirCooled describes air-cooled electric i
 \begin{itemize}
 \tightlist
 \item
-  PCPU = CPU power input {[}W{]}
+  PCPU is the CPU power input (W)
 \item
-  PFan = Fan power input {[}W{]}
+  PFan is the fan power input (W)
 \item
-  PUPS = Electric power supply net power input {[}W{]}
+  PUPS is the electric power supply net power input (W)
 \item
-  TAirOut = Air outlet temperature {[}C{]}
+  TAirOut is the air outlet temperature (\(^{\circ}\)C)
 \item
-  VAir = Air volume flow rate {[}m3/s{]}
+  VAir is the air volume flow rate (m\(^3\)/s)
 \item
-  FlowFrac = Air volume flow rate fraction of design flow rate
+  FlowFrac is the air volume flow rate fraction of design flow rate
 \item
-  RecircFrac = Recirculation fraction
+  RecircFrac is the recirculation fraction
 \item
-  QAir = Air cooling rate {[}W{]}
+  QAir is the air cooling rate (W)
 \item
-  QUPS = Electric power supply heat loss rate to zone {[}W{]}
+  QUPS is the electric power supply heat loss rate to zone (W)
 \item
-  QConv = Convective heat gain rate to zone heat balance {[}W{]}
+  QConv is the convective heat gain rate to zone heat balance (W)
 \item
-  SHI = Supply heat index
+  SHI is the supply heat index
 \item
-  SHIZone = Zone average supply heat index
+  SHIZone is the zone average supply heat index
 \end{itemize}
 
 \subsubsection{Calculations}\label{calculations}
 
 The design power input is first split into portions for the CPU (everything in the equipment except the cooling fans) and the fan(s).
 
+\begin{equation}
 PCPUDesign = PDesign * (1 - PFanFracDesign)
+\end{equation}
 
+\begin{equation}
 PFanDesign = PDesign * PFanFracDesign
+\end{equation}
 
 For each time step,  the air inlet and outlet temperature is calculated depending on the type of air flow calculation method. Considering data centers are different from normal well-mixed zones due to the uneven air distribution, two methods are implemented to calculate the IT inlet temperature and zone return air temperature, \textbf{FlowFromSystem} and \textbf{FlowControlWithApproachTemperatures}. Specifically, the IT inlet temperature differs from AHU supply air temperature, and the actual AHU return air temperature differs from the regular return air temperature when the zone is well mixed.
 
 When using \textbf{FlowFromSystem}, the zone is assumed to be well-mixed. The air inlet temperature is calculated depending on the type of air node connection.
 
-TAirIn:
+\emph{\textbf{TAirIn}}:
 
 \begin{itemize}
     \tightlist
   \item
     If Air Node Connection Type = AdjustedSupply
-    \begin{itemize}
-      \item RecircFrac = RecircFracDesign \* RecircfLoadTAir(SchCPULoading TAirSupply)
-      \item TAirIn = TAirSupply \* (1 – RecircFrac) +TAirZone \* RecircFrac
-    \end{itemize}
+\begin{equation}
+RecircFrac = RecircFracDesign * RecircfLoadTAir(SchCPULoading TAirSupply)
+\end{equation}
+
+\begin{equation}
+TAirIn = TAirSupply * (1 – RecircFrac) +TAirZone * RecircFrac
+\end{equation}
+
   \item
     If Air Node Connection Type = ZoneAirNode
-    \begin{itemize}
-      \item   TAirIn = TAirZone
-    \end{itemize}
+    
+\begin{equation}
+TAirIn = TAirZone
+\end{equation}
+
   \item
     If Air Node Connection Type = RoomAirModel
-    \begin{itemize}
-      \item TAirIn = TRoomAirNodeIn
-    \end{itemize}
+\begin{equation}
+TAirIn = TRoomAirNodeIn
+\end{equation}
+
 \end{itemize}
 
 Using the air inlet temperature, the CPU power consumption, air flow rate, fan power consumption, and power supply power consumption are calculated.
 
+\begin{equation}
 PCPU = PCPUDesign * SchDesignLevel * PfLoadTAir(SchCPULoading, TAirIn)
+\end{equation}
 
+\begin{equation}
 FlowFrac = VAirfLoadTAir(SchCPULoading, TAirIn)
+\end{equation}
 
+\begin{equation}
 VAir = VAirDesign * FlowFrac
+\end{equation}
 
+\begin{equation}
 PFan = PFanDesign * SchDesignLevel * PFanfFlowFrac(FlowFrac)
+\end{equation}
 
+\begin{equation}
 UPSPLR = (PCPU + PFan) / (PCPUDesign + PFanDesign)
+\end{equation}
 
+\begin{equation}
 PUPS = (PCPU + PFan) * (1 - UPSEfficDesign * UPSEfficfPLR (UPSPLR))
+\end{equation}
 
 The convective heat gain to the zone and the air outlet temperature are then calculated. The user specified fration of power supply losses are always added to the general zone heat balace convective heat gain. For air node connection types AdjustedSupply and ZoneAirNode, the CPU and fan power consumption are also added to the zone convective heat gain. For air connection type RoomAirModel, the gains from the CPU and fan power consumption are added to the outlet room air model node.
 
+\begin{equation}
 QAir = PCPU + PFan
+\end{equation}
 
+\begin{equation}
 QUPS = PUPS * UPSLossFracToZone
+\end{equation}
 
-QConv:
+\emph{\textbf{QConv}}:
 
 \begin{itemize}
     \tightlist
   \item
     If Air Node Connection Type = AdjustedSupply OR ZoneAirNode
-    \begin{itemize}
-      \item   QConv = QAir + QUPS
-    \end{itemize}
+\begin{equation}
+QConv = QAir + QUPS
+\end{equation}
   \item
     If Air Node Connection Type = RoomAirModel
-    \begin{itemize}
-      \item   QConv = QUPS
-    \end{itemize}
+\begin{equation}
+QConv = QUPS
+\end{equation}
 \end{itemize}
 
+\begin{equation}
 TAirOut = TAirIn + QAir / (VAir * RhoAir * CpAir)
+\end{equation}
 
 The individual ITE supply heat index is calculated as shown below.
 
-SHI = (TAirIn -- TAirSupply) / (TAirOut - TAirSupply)
+\begin{equation}
+SHI = (TAirIn - TAirSupply) / (TAirOut - TAirSupply)
+\end{equation}
 
 The zone average ITE supply heat index is weighted by the air flow rate of each ITE object.
 
-SHIZone = ∑ {[}VAir * (TAirIn -- TAirSupply){]} / ∑ {[}VAir * (TAirOut - TAirSupply){]}
-
+\begin{equation}
+SHIZone = \Sigma [VAir * (TAirIn - TAirSupply)] / \Sigma [VAir * (TAirOut - TAirSupply)]
+\end{equation}
 
 If \textbf{FlowControlWithApproachTemperatures} is chosen, Two indices are introduced to represent the deviation: (1) Supply approach temperature ($\delta T_{supply}$) and (2) Return approach temperature ($\delta T_{return}$). The two temperature differences indicate to what degree the air flow management of data centers affects the air distribution, and how much they deviate from the regular well-mixed zone scenario.
 
-$\delta T_{supply}=T_{in}-T_{supply}$
+\begin{equation}
+\delta T_{supply}=T_{in}-T_{supply}
+\end{equation}
 
-$\delta T_{return}=T_{return}-T_{return-mixed}$
+\begin{equation}
+\delta T_{return}=T_{return}-T_{return,mixed}
+\end{equation}
 
-Where, 
+where:
 
-$T_{in}$: IT equipment inlet temperature
+$T_{in}$ is the IT equipment inlet temperature
 
-$T_{supply}$: AHU supply air temperature
+$T_{supply}$ is the AHU supply air temperature
 
-$T_{return}$: The actual AHU return air temperature
+$T_{return}$ is the actual AHU return air temperature
 
-$T_{airzone}$: The calculated zone air temperature (or return air temperature) if the room is well-mixed
+$T_{airzone}$ is the calculated zone air temperature (or return air temperature) if the room is well-mixed.
 
 The two approach temperatures can be calculated by CFD tools for typical IT load levels and air flow management of data centers, or provided by measurement data or lookup tables. 
 
 It should be noted that, when \textbf{FlowControlWithApproachTemperatures} is chosen, 
 
-(1) The inputs of Air Inlet Connection Type, Design Recirculation Fraction and Recirculation Function of Loading and Supply Temperature Curve Name are ignored.
-
-(2) For multiple ITE objects defined for one zone, the same calculation method should apply. The return air temperature of this zone would be set as the weighted average return temperature of all ITE objects in this zone.
-
-(3) Other return air heat gains from window or lights are not allowed.
-
-(4) Apart from a single VAV terminal unit, other HVAC systems do not apply this method in the ITE zone.
+\begin{itemize}
+\item The inputs of Air Inlet Connection Type, Design Recirculation Fraction and Recirculation Function of Loading and Supply Temperature Curve Name are ignored.
+\item For multiple ITE objects defined for one zone, the same calculation method should apply. The return air temperature of this zone would be set as the weighted average return temperature of all ITE objects in this zone.
+\item Other return air heat gains from window or lights are not allowed.
+\item Apart from a single VAV terminal unit, other HVAC systems do not apply this method in the ITE zone.
+\end{itemize}
 
 When \textbf{FlowControlWithApproachTemperatures} method is applied, during sizing and simulation, as the zone is assumed to be unevenly distributed, the supply air flow rate is calculated as:
 
-${\dot m_{sys}} = {Q_{sys}}/({C_{p,air}} \cdot ({T_{in}} - {T_{return}}))$,
+\begin{equation}
+{\dot m_{sys}} = {Q_{sys}}/({C_{p,air}} \cdot ({T_{in}} - {T_{return}}))
+\end{equation}
 
 where $T_{return}$ is the weighted return air temperature from all ITE objects in the zone. 
 
@@ -279,51 +316,51 @@ The input object ZoneBaseboard:OutdoorTemperatureControlled provides a model for
 Q = Q2 - \frac{{(Q2 - Q1)\cdot (T2 - TA)}}{{(T2 - T1)}}
 \end{equation}
 
-These temperature and capacity fields can be autosized based upon envelope, infiltration, and ventilation loads. To autosize these fields, users may set a design zone heating temperature that is assumed to be 20°C if blank.
+These temperature and capacity fields can be autosized based upon envelope, infiltration, and ventilation loads. To autosize these fields, users may set a design zone heating temperature that is assumed to be 20\(^{\circ}\)C if blank.
 
-The capacity at low temperature is the maximum capacity of the unit. It includes external envelope conduction load, infiltration load, and ventilation load in a space where the unit serves. The model first finds the lowest outdoor air temperature throughout design days included in the simulation, and determines the conduction load through external envelop as:
+The capacity at low temperature is the maximum capacity of the unit. It includes external envelope conduction load, infiltration load, and ventilation load in a space where the unit serves. The model first finds the lowest outdoor air temperature throughout design days included in the simulation, and determines the conduction load through external envelope as:
 
 \begin{equation}
 {q_{Cond}} = UA\left( {{T_{Htg}} - {T_L}} \right)
 \end{equation}
 
-where
+where:
 
-\emph{q\(_{Cond}\)} is conduction load through external envelope, W
+\emph{q\(_{Cond}\)} is the conduction load through external envelope (W)
 
-\emph{U} is heat transfer coefficient of external wall, W/m\(^{2}\)K
+\emph{U} is the heat transfer coefficient of external wall (W/m\(^{2}\)K)
 
-\emph{A} is area of external wall, m\(^{2}\)
+\emph{A} is the area of external wall (m\(^{2}\))
 
-\emph{T\(_{Htg}\)} is baseboard zone heating setpoint temperature, °C
+\emph{T\(_{Htg}\)} is the baseboard zone heating setpoint temperature (\(^{\circ}\)C)
 
-\emph{T\(_{L}\)} is low temperature, °C
+\emph{T\(_{L}\)} is the low temperature, (\(^{\circ}\)C).
 
-The capacity at low temperature that is the maximum capacity of the unit is thus expressed as:
+The capacity at the low temperature that is the maximum capacity of the unit is thus expressed as:
 
 \begin{equation}
 Ca{p_{{T_L}}} = {q_{Cond}} + {q_I} + {q_V}
 \end{equation}
 
-where
+where:
 
-\(Ca{p_{{T_L}}}\) is capacity at low temperature, W
+\(Ca{p_{{T_L}}}\) is the capacity at low temperature (W)
 
-\emph{q\(_{I}\)} is design infiltration sensible load, W
+\emph{q\(_{I}\)} is the design infiltration sensible load (W)
 
-\emph{q\(_{V}\)} = design ventilation sensible load, W
+\emph{q\(_{V}\)} is the design ventilation sensible load (W).
 
-The capacity at high temperature is then prorated against the reference low and high temperatures as:
+The capacity at the high temperature is then prorated against the reference low and high temperatures as:
 
 \begin{equation}
 Ca{p_{{T_H}}} = Ca{p_{{T_L}}}\frac{{\left( {{T_{Htg}} - {T_H}} \right)}}{{\left( {{T_{Htg}} - {T_L}} \right)}}
 \end{equation}
 
-where
+where:
 
-\(Ca{p_{{T_H}}}\) ~is capacity at high temperature, W
+\(Ca{p_{{T_H}}}\) is capacity at high temperature (W)
 
-\emph{T\(_{H}\)} is high temperature, °C
+\emph{T\(_{H}\)} is high temperature (\(^{\circ}\)C).
 
 \subsection{Distribution of Radiant Gains}\label{distribution-of-radiant-gains}
 
@@ -343,7 +380,7 @@ If all surfaces in the room are opaque, the radiation is distributed in proporti
 {\rho_i} = 1 - {\alpha_i} - {\tau_i}
 \end{equation}
 
-That fraction of radiation represented by \({\tau_i}\) ~is lost from the zone.
+That fraction of radiation represented by \({\tau_i}\) is lost from the zone.
 
 The transmittance and absorptance of transparent surfaces (windows or glass doors) are calculated as in section Window Calculation Module based on the optical properties of the window material layers.~ The total absorptance of the window is computed for the interior shading device, the inside surface, and the outside surface for diffuse solar radiation incident from outside the zone.~ Those absorptances are used for short wavelength radiation incident from inside the zone.~ In most cases, this should not cause significant error.~ When movable insulation covers the window, the radiation that would have been transmitted is absorbed at the outer surface of the window (thermally equal to the inside surface of the insulation).
 

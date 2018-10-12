@@ -27,9 +27,9 @@ This section describes the System Curve based VRF Model (VRF-SysCurve), which ca
 
 The figure below schematically depicts the AirConditioner:VariableRefrigerantFlow (VRF AC) system. The outdoor unit is connected directly to the zone terminal units using a zone terminal unit list (ref: ZoneTerminalUnitList). The VRF AC system conditions multiple zones and is controlled by thermostats located in each zone. Zone terminal units operate to meet the zone sensible cooling or sensible heating requirements as determined by the zone thermostat schedule.
 
-When the heat pump does not operate to reclaim waste heat, the VRF AC system can only operate in either cooling \emph{or} heating mode. Based on the master thermostat priority control selection, the operating mode is determined by polling the appropriate zone(s) served by the VRF HP system. When the system is operating in cooling mode, the cooling coils will be enabled only in the terminal units where zone cooling is required. When the system is operating in heating mode, the heating coils will be enabled only in the terminal units where zone heating is required. Supply air fans will continue to operate if the zone terminal unit's fan operating mode is set to continuous fan.
+When the heat pump does \emph{\textbf{not}} operate to reclaim waste heat, the VRF AC system can only operate in either cooling \emph{or} heating mode. Based on the master thermostat priority control selection, the operating mode is determined by polling the appropriate zone(s) served by the VRF HP system. When the system is operating in cooling mode, the cooling coils will be enabled only in the terminal units where zone cooling is required. When the system is operating in heating mode, the heating coils will be enabled only in the terminal units where zone heating is required. Supply air fans will continue to operate if the zone terminal unit's fan operating mode is set to continuous fan.
 
-When the heat pump does operate to reclaim waste heat, the VRF AC system can simultaneously cool and heat multiple zones. The heat pump will select an operating mode according to the dominant load as reported by the zone thermostat(s). The calculation of the dominant load is based on the master thermostat priority control selection and may either be based on individual zone loads, the number of zones requiring cooling or heating, the master thermostat zone load, or an operating mode schedule. The heat pump will operate in cooling mode, and provide waste heat to zones with a heating load, when the dominant load among all zone terminal units is cooling. The heat pump will operate in heating mode, and absorb heat from zones with a cooling load, when the dominant load among all zone terminal units is heating.
+When the heat pump \emph{\textbf{does}} operate to reclaim waste heat, the VRF AC system can simultaneously cool and heat multiple zones. The heat pump will select an operating mode according to the dominant load as reported by the zone thermostat(s). The calculation of the dominant load is based on the master thermostat priority control selection and may either be based on individual zone loads, the number of zones requiring cooling or heating, the master thermostat zone load, or an operating mode schedule. The heat pump will operate in cooling mode, and provide waste heat to zones with a heating load, when the dominant load among all zone terminal units is cooling. The heat pump will operate in heating mode, and absorb heat from zones with a cooling load, when the dominant load among all zone terminal units is heating.
 
 The figure below shows the VRF AC terminal units with draw through fan placement. Blow through fan placement can also be modeled by connecting the supply air fan inlet node to the outside air mixer's mixed air node if an outdoor air mixer is used or to the zone terminal unit inlet node if an outdoor air mixer is not used. The variable refrigerant flow heat pump coordinates the operation of these components and is modeled as a type of zone equipment where the \emph{zone terminal units} are specified in a zone equipment list (Ref. ZoneHVAC: EquipmentList and ZoneHVAC:EquipmentConnections). The AirConditioner: VariableRefrigerantFlow object \emph{is not} specified in an air primary loop or a zone equipment list object.
 
@@ -59,44 +59,44 @@ The operating capacity of the heat pump is calculated based on the user defined 
 
 \subsubsection{Cooling Combination Ratio Correction Factor}\label{cooling-combination-ratio-correction-factor}
 
-The cooling combination ratio correction factor is defined as the total terminal unit rated cooling capacity divided by the heat pump's rated cooling capacity. The combination ratio is important when multiple terminal units (or DX coils) are attached to a single variable-speed condensing unit. If the combination ratio is less than 1, the condenser's rated capacity is assumed to be able to meet the indoor terminal unit's demand request. However, if the combination ratio is determined to be greater than 1, the maximum cooling capacity available from the heat pump's condenser may be higher than the user specified rated cooling capacity. The combination ratio capacity correction factor is based on a linear, quadratic or cubic curve and provides a multiplier \textgreater{} 1 to correct for combination ratio's greater than 1. For example, a combination ratio of 1.3 (130\%) may result in a combination ratio capacity correction factor of 1.06 (outdoor condenser can actually provide 106\% of rated capacity) . The cooling combination ratio correction factor is applied to cooling performance calculations. If the cooling combination ratio correction curve name is not specified by the user, the cooling combination ratio correction factor (CR \(_{cooling,\, correction}\)) in the following equation is assumed to be equal to 1.
+The cooling combination ratio correction factor is defined as the total terminal unit rated cooling capacity divided by the heat pump's rated cooling capacity. The combination ratio is important when multiple terminal units (or DX coils) are attached to a single variable-speed condensing unit. If the combination ratio is less than 1, the condenser's rated capacity is assumed to be able to meet the indoor terminal unit's demand request. However, if the combination ratio is determined to be greater than 1, the maximum cooling capacity available from the heat pump's condenser may be higher than the user specified rated cooling capacity. The combination ratio capacity correction factor is based on a linear, quadratic or cubic curve and provides a multiplier \textgreater{} 1 to correct for combination ratio's greater than 1. For example, a combination ratio of 1.3 (130\%) may result in a combination ratio capacity correction factor of 1.06 (outdoor condenser can actually provide 106\% of rated capacity) . The cooling combination ratio correction factor is applied to cooling performance calculations. If the cooling combination ratio correction curve name is not specified by the user, the cooling combination ratio correction factor (CR\(_{cooling,correction}\)) in the following equation is assumed to be equal to 1.
 
 \begin{equation}
   CR_{cooling,rated} = \frac{\sum \limits_1^n \dot{Q}_{coil(i),cooling,rated}}{\dot{Q}_{cooling,total,rated}}
 \end{equation}
 
 \begin{equation}
-C{R_{\,cooling\,,\,correction}} = a + b\left( {C{R_{cooling\,,\,rated}}} \right) + c{\left( {C{R_{cooling\,,\,rated}}} \right)^2} + d{\left( {C{R_{cooling\,,\,rated}}} \right)^3}
+C{R_{cooling,correction}} = a + b\left( {C{R_{cooling,rated}}} \right) + c{\left( {C{R_{cooling,rated}}} \right)^2} + d{\left( {C{R_{cooling,rated}}} \right)^3}
 \end{equation}
 
 \begin{equation}
-C{R_{\,cooling\,,\,correction}} = MAX\left( {1.0\,\,,\,\,C{R_{\,cooling\,,\,correction}}} \right)
+C{R_{cooling,correction}} = MAX\left( {1.0,C{R_{cooling,correction}}} \right)
 \end{equation}
 
-where
+where:
 
-\({\mathop Q\limits^ \bullet_{coil(i)\,,\,cooling\,,\,rated}}\) ~ = rated total (sensible + latent) cooling capacity in zone \emph{i} (W)
+\({\dot{Q}_{coil(i),cooling,rated}}\) is the rated total (sensible + latent) cooling capacity in zone \emph{i} (W)
 
-\({\mathop Q\limits^ \bullet_{cooling,\,total\,,\,rated}}\) ~~ = rated total cooling capacity of heat pump (W)
+\({\dot{Q}_{cooling,total,rated}}\) is the rated total cooling capacity of heat pump (W)
 
-\(C{R_{\,cooling\,,\,correction}}\) ~ = Cooling Combination Ratio capacity correction factor at rated conditions (this value is reported in the eio file)
+\(C{R_{cooling,correction}}\) is the Cooling Combination Ratio capacity correction factor at rated conditions (this value is reported in the eio file)
 
-\(a - d\) ~~~~~~~ ~~~~~~~ = equation coefficients for cooling combination ratio correction factor
+\(a - d\) are the equation coefficients for cooling combination ratio correction factor
 
-\(C{R_{cooling\,,\,rated}}\) ~~ ~~~ = the cooling combination ratio defined as the total indoor terminal unit's rated total cooling capacity divided by the rated total cooling capacity of the heat pump condenser.
+\(C{R_{cooling,rated}}\) is the cooling combination ratio defined as the total indoor terminal unit's rated total cooling capacity divided by the rated total cooling capacity of the heat pump condenser.
 
 The sum of the individual zone total cooling requirements is used to calculate the performance of the outdoor condensing unit. The operating capacities of the indoor cooling coils are calculated based on the indoor cooling coil's rated cooling capacity and the actual operating conditions. The operating capacity of the heat pump condenser is calculated in a similar fashion using a load-weighted average indoor wet-bulb temperature of all operating cooling coils.
 
 \subsubsection{Cooling Capacity Ratio Modifier Function of Low Temperature}\label{cooling-capacity-ratio-modifier-function-of-low-temperature}
 
-The heat pump's cooling capacity correction factor (function of temperature) is determined by averaging the zone cooling coil inlet air wet-bulb temperature for all operating cooling coils. A load-weighted average inlet air wet-bulb temperature is used in the calculations. The weighted average cooling coil inlet air wet-bulb temperature and the outdoor condenser entering air dry-bulb temperature are then used to calculate the temperature correction factor in cooling mode for the heat pump condenser. The actual zone air wet-bulb temperature is used to calculate the operating capacity of the individual zone cooling coils.
+The heat pump's cooling capacity correction factor (function of temperature) is determined by averaging the zone cooling coil inlet air wet-bulb temperature for all operating cooling coils. A load-weighted average inlet air wet-bulb temperature is used in the calculations. The weighted average cooling coil inlet air wet-bulb temperature and the outdoor condenser entering air dry-bulb temperature are then used to calculate the temperature correction factor in cooling mode for the heat pump condenser. If the \textit{Condenser Type} is WaterCooled, then the cooling capacity curve will be function of weighted average cooling coil inlet air wet-bulb temperature and outdoor condenser entering water temperature. The actual zone air wet-bulb temperature is used to calculate the operating capacity of the individual zone cooling coils.
 
 \begin{equation}
-{\mathop Q\limits^ \bullet_{zone,\,total}} = \sum\limits_1^i {{{\mathop Q\limits^ \bullet  }_{zone(i)}}}
+{\dot{Q}_{zone,total}} = \sum\limits_1^i {\dot{Q}_{zone(i)}}
 \end{equation}
 
 \begin{equation}
-  T_{wb,avg} = \sum\limits_1^i {\PB{T_{wb,i}}} \PB{\dot{Q}_{zone(i)}}{\dot{Q}_{zone,total}}
+  T_{wb,avg} = \sum\limits_1^i {\PB{T_{wb,i}}} \PB{\frac{\dot{Q}_{zone(i)}}{\dot{Q}_{zone,total}}}
 \end{equation}
 
 The operating capacity of the heat pump is calculated using a bi-quadratic equation using a load-weighted average indoor wet-bulb temperature and outdoor dry-bulb temperature as the independent variables.
@@ -111,37 +111,37 @@ The operating capacity of the terminal unit's DX cooling coil is calculated usin
 CAPF{T_{coil,\,cooling}} = a + b\left( {{T_{wb,i}}} \right) + c{\left( {{T_{wb,i}}} \right)^2} + d{\left( {{T_{wb,i}}} \right)^3}
 \end{equation}
 
-~- or -
+or
 
 \begin{equation}
 CAPF{T_{coil,cooling}} = a + b\left( {{T_{wb,i}}} \right) + c{\left( {{T_{wb,i}}} \right)^2} + d\left( {{T_c}} \right) + e{\left( {{T_c}} \right)^2} + f\left( {{T_{wb,i}}} \right)\left( {{T_c}} \right)
 \end{equation}
 
-where
+where:
 
-\({T_{wb,i}}\) ~ = wet-bulb temperature of the air entering the cooling coil in zone \emph{i} (°C)
+\({T_{wb,i}}\) is the wet-bulb temperature of the air entering the cooling coil in zone \emph{i} (\(^{\circ}\)C)
 
-\({T_{wb,avg}}\) = load-weighted average wet-bulb temperature of the air entering all operating cooling coils (°C)
+\({T_{wb,avg}}\) is the load-weighted average wet-bulb temperature of the air entering all operating cooling coils (\(^{\circ}\)C)
 
-\({\mathop Q\limits^ \bullet_{zone(i)}}\) ~ = total (sensible + latent) cooling load in zone \emph{i} (W)
+\({\dot{Q}_{zone(i)}}\) is the total (sensible + latent) cooling load in zone \emph{i} (W)
 
-\({\mathop Q\limits^ \bullet_{zone,\,total}}\) ~ = total (sensible + latent) cooling load in all zones (W)
+\({\dot{Q}_{zone,\,total}}\) is the total (sensible + latent) cooling load in all zones (W)
 
-\(CAPF{T_{\,HP,cooling}}\) ~ = heat pump Cooling Capacity Ratio Modifier (function of temperature)
+\(CAPF{T_{HP,cooling}}\) is the heat pump Cooling Capacity Ratio Modifier (function of temperature)
 
-\(CAPF{T_{\,coil,cooling}}\) ~ = zone coil Cooling Capacity Ratio Modifier (function of temperature)
+\(CAPF{T_{coil,cooling}}\) is the zone coil Cooling Capacity Ratio Modifier (function of temperature)
 
-\(a - f\) ~ = equation coefficients for Cooling Capacity Ratio Modifier
+\(a - f\) are the equation coefficients for Cooling Capacity Ratio Modifier
 
-\({T_c}\) ~~~ = temperature of the air entering an air-cooled or evaporatively-cooled condenser (°C)
+\({T_c}\) is the temperature of the air entering an air-cooled or evaporatively-cooled condenser (\(^{\circ}\)C).
 
 \subsubsection{Using multiple curves to define Cooling Capacity Ratio Modifier}\label{using-multiple-curves-to-define-cooling-capacity-ratio-modifier}
 
-The cooling capacity ratio modifier determines the change in total (sensible + latent) capacity with respect to the heat pump rated cooling capacity. This modifier corrects for off-design performance and provides the operating total (sensible + latent) cooling capacity for the heat pump condenser. The performance data for VRF AC systems may be specified using a single curve object, however, if the performance data does not reflect a smooth change in performance as outdoor conditions vary, the overall performance of the system may be described using two cooling capacity ratio modifier curves (i.e., a separate curve at low and high outdoor temperatures) and a boundary curve (i.e., the curve defining the separation at specific outdoor temperatures).
+The cooling capacity ratio modifier determines the change in total (sensible + latent) capacity with respect to the heat pump rated cooling capacity. This modifier corrects for off-design performance and provides the operating total (sensible + latent) cooling capacity for the heat pump condenser. The performance data for VRF AC systems may be specified using a single curve object, however, if the performance data does not reflect a smooth change in performance as outdoor conditions vary, the overall performance of the system may be described using two cooling capacity ratio modifier curves (i.e., a separate curve at low and high outdoor temperatures) and a boundary curve (i.e., the curve defining the separation at specific outdoor temperatures). If the \textit{Condenser Type} is WaterCooled, the cooling capacity and EIR modifier curves may be represented using the low temperature curve input field only. 
 
 \subsubsection{Application of Dual Performance Curves}\label{application-of-dual-performance-curves}
 
-Two additional inputs are available to more accurately model the cooling performance of a VRF AC system. The first additional input is a boundary curve which is used to distinguish differences in performance at ``low'' and ``high'' outdoor temperature regions and the second input is a cooling capacity performance curve for the ``high'' outdoor temperature region. The boundary curve is a linear, quadratic or cubic curve defining the outdoor temperature as a function of average indoor wet-bulb temperature. The cooling capacity ratio function of high temperature curve is a biquadratic curve using average indoor wet-bulb temperature and outdoor dry-bulb temperature as the two independent variables. These additional curves are used to define the performance over two separate performance regions as shown in Figure 244. The red circles in the figure identify the points at which the performance changes abruptly (i.e., slopes or shapes are significantly different) and are used to create the boundary curve. The performance on either side of the boundary curve can be a smooth curve changing with outdoor condition or a flat plateau where system controls maintain a constant operating condition. This type of performance cannot be accurately simulated using a single performance curve object. For this reason, dual capacity performance curves may be used.
+Two additional inputs are available to more accurately model the cooling performance of a VRF AC system. The first additional input is a boundary curve which is used to distinguish differences in performance at ``low'' and ``high'' outdoor temperature regions and the second input is a cooling capacity performance curve for the ``high'' outdoor temperature region. The boundary curve is a linear, quadratic or cubic curve defining the outdoor temperature as a function of average indoor wet-bulb temperature. The cooling capacity ratio function of high temperature curve is a biquadratic curve using average indoor wet-bulb temperature and outdoor dry-bulb temperature as the two independent variables. These additional curves are used to define the performance over two separate performance regions as shown in Figure~\ref{fig:non-linear-performance-of-vrf-heat-pump-in-cooling-mode}. The red circles in the figure identify the points at which the performance changes abruptly (i.e., slopes or shapes are significantly different) and are used to create the boundary curve. The performance on either side of the boundary curve can be a smooth curve changing with outdoor condition or a flat plateau where system controls maintain a constant operating condition. This type of performance cannot be accurately simulated using a single performance curve object. For this reason, dual capacity performance curves may be used.
 
 Note: If the cooling performance can be described using a single performance curve object, the boundary and high temperature performance curve objects are not required.
 
@@ -153,15 +153,15 @@ The cooling capacity ratio boundary curve object is used to differentiate betwee
 {T_{OA,DB}} = a + b\left( {{T_{I,WB}}} \right) + c{\left( {{T_{I,WB}}} \right)^2} + d{\left( {{T_{I,WB}}} \right)^3}
 \end{equation}
 
-where
+where:
 
-T\(_{OA,DB}\) = Outside air dry-bulb temperature (C)
+T\(_{OA,DB}\) is the outside air dry-bulb temperature (\(^{\circ}\)C)
 
-a-d = coefficients for cooling capacity ratio boundary curve object
+a-d are the coefficients for cooling capacity ratio boundary curve object
 
-T\(_{I,WB}\) = Weighted average indoor wet-bulb temperature (C)
+T\(_{I,WB}\) is the weighted average indoor wet-bulb temperature (\(^{\circ}\)C).
 
-For the performance data shown below, the boundary curve would be created by identifying the outdoor dry-bulb temperature at which the performance changed abruptly for each of the indoor wet-bulb temperature curves shown in the figure. The following example shows the data interpreted from the figure used to regress the cooling capacity ratio boundary curve coefficients. For this example, the regression coefficients were found to be: A1 = 29.87396, B1 = -0.6928, C1 = 0.01928, D1 = -0.000532
+For the performance data shown below in Figure~\ref{fig:performance-data-for-variable-refrigerant-flow-air-conditioner-model}, the boundary curve would be created by identifying the outdoor dry-bulb temperature at which the performance changed abruptly for each of the indoor wet-bulb temperature curves shown in the figure. The following example shows the data interpreted from the figure used to regress the cooling capacity ratio boundary curve coefficients. For this example, the regression coefficients were found to be: A1 = 29.87396, B1 = -0.6928, C1 = 0.01928, D1 = -0.000532.
 
 \begin{figure}[hbtp] % table 73
 \centering
@@ -184,7 +184,7 @@ A regression is then performed on the data to the left of the boundary curve to 
 The zone terminal unit's cooling coil is controlled by a zone thermostat and must meet a zone ``sensible'' load. The cooling coil's sensible capacity is defined as the cooling coil's total capacity multiplied by the coil's sensible heat ratio (SHR) at the current operation conditions. Since the SHR of the variable refrigerant flow cooling coil changes as the inlet air wet-bulb temperature and the operating part-load ratio change, an iterative solution technique must be used to determine the coil's sensible capacity. The target solution is found when the sensible capacity of the zone cooling coil equals the zone sensible cooling load (if sufficient capacity is available). The iterative solution converges when the difference (error) between the zone sensible cooling load and the terminal unit sensible cooling capacity is within tolerance (0.001) or the terminal unit has insufficient capacity to meet the zone sensible cooling load. Refer to the description of the VRF cooling coil model for further details (ref: Variable Refrigerant Flow Cooling Coil).
 
 \begin{equation}
-  \dot{Q}_{coil(i),\,cooling,\,total} = \dot{Q}_{coil(i),\,cooling,\,rated} \left( CAPFT_{coil,cooling} \right)
+  \dot{Q}_{coil(i),cooling,total} = \dot{Q}_{coil(i),cooling,rated} \left( CAPFT_{coil,cooling} \right)
 \end{equation}
 
 \begin{equation}
@@ -193,25 +193,25 @@ The zone terminal unit's cooling coil is controlled by a zone thermostat and mus
 
 \begin{equation}
   \begin{array}{l}
-    Iteration\,\,Loop(PLR_i) \\
-    \,\,\,\,SHR_{PLR} = f \left( T_{wb,\,i},\,PLR_i ,\, \dot{m}_i \right) \\
-    \,\,\,\, \dot{Q}_{coil(i),\,cooling,\,sensible} = \dot{Q}_{coil(i),\,cooling,\,total} \left( SHR_{PLR} \right) \left( PLR_i \right) \\
-    \,\,\,\,Error = \left( \dot{Q}_{zone(i)} - \dot{Q}_{coil(i),\,cooling,\,sensible} \right) / \dot{Q}_{zone(i)} \\
-    End\,Iteration\,Loop
+    Iteration~Loop~(PLR_i) \\
+    ~~~~SHR_{PLR} = f \left( T_{wb,i},PLR_i,\dot{m}_i \right) \\
+    ~~~~\dot{Q}_{coil(i),cooling,sensible} = \dot{Q}_{coil(i),cooling,total} \left( SHR_{PLR} \right) \left( PLR_i \right) \\
+    ~~~~Error = \left( \dot{Q}_{zone(i)} - \dot{Q}_{coil(i),cooling,sensible} \right) / \dot{Q}_{zone(i)} \\
+    End~Iteration~Loop
   \end{array}
 \end{equation}
 
-where
+where:
 
-\(\dot{Q}_{coil(i),\,cooling,\,total}\) = zone terminal unit total (sensible + latent) cooling capacity, [W], report variable ``Zone VRF Air Terminal Total Cooling Rate''
+\(\dot{Q}_{coil(i),cooling,total}\) is the zone terminal unit total (sensible + latent) cooling capacity (W), report variable ``Zone VRF Air Terminal Total Cooling Rate''
 
-\(\dot{Q}_{coil(i),\,cooling,\,sensible}\) = zone terminal unit sensible cooling capacity [W], report variable ``Zone VRF Air Terminal Sensible Cooling Rate''
+\(\dot{Q}_{coil(i),cooling,sensible}\) is the zone terminal unit sensible cooling capacity (W), report variable ``Zone VRF Air Terminal Sensible Cooling Rate''
 
-\(PLR_i\) = cooling coil sensible part-load ratio in zone \emph{i}
+\(PLR_i\) is the cooling coil sensible part-load ratio in zone \emph{i}
 
-\(SHR_{PLR}\) = cooling coil sensible heat ratio (function of PLR, inlet air wet-bulb temperature, and cooling coil inlet air mass flow rate)
+\(SHR_{PLR}\) is the cooling coil sensible heat ratio (function of PLR, inlet air wet-bulb temperature, and cooling coil inlet air mass flow rate)
 
-\(\dot{m}_{i}\) = cooling coil inlet air mass flow rate [m\(^3\)/s]
+\(\dot{m}_{i}\) is the cooling coil inlet air mass flow rate (m\(^3\)/s).
 
 The terminal unit total cooling (sensible + latent) capacity is then summed to provide the total terminal unit cooling requirement. The cooling coils capacity includes the impacts of fan heat and any outdoor air provided to the zone.
 
@@ -219,46 +219,44 @@ The terminal unit total cooling (sensible + latent) capacity is then summed to p
   \dot{Q}_{cooling,TerminalUnits} = \sum\limits_1^i \left( \dot{Q}_{coil(i),cooling,total} \right) \left( PLR(i) \right)
 \end{equation}
 
-where
-
-\(\dot{Q}_{cooling,\,TerminalUnits}\) = total terminal unit cooling requirement (sensible + latent) in all zones, [W]
+where \(\dot{Q}_{cooling,\,TerminalUnits}\) is the total terminal unit cooling requirement (sensible + latent) in all zones (W).
 
 The piping correction factor is then used to adjust the total zone cooling requirement to account for piping losses in the air conditioner's refrigeration piping system.
 
 \subsubsection{Cooling Piping Correction Factor in cooling mode}\label{cooling-piping-correction-factor-in-cooling-mode}
 
-The cooling piping correction factor is calculated using either one or two independent variables. Both the equivalent piping length and the combination ratio are used together to determine piping losses, or the equivalent piping length itself is used. The vertical height specified by the user is also added to the result calculated by either. If a single independent variable is used, a linear, quadratic, or cubic equation is used to determine the equivalent length correction factor. If two independent variables are used, a biquadratic equation is used to determine the equivalent length correction factor. The program will automatically use the correct equation based on the performance curve type. In either case, a single coefficient adjusts the piping correction factor based on the difference in height from the highest to lowest terminal unit. Coefficients a-d (e) in the following equation(s) are inputs in the piping correction factor for length in cooling mode performance curve object. Coefficient f is a direct input to the VRF model as the piping correction factor for height in cooling mode coefficient. The equivalent piping length in cooling mode (P\(_{EQ,cooling}\)) is also a direct input in the VRF model. The cooling combination ratio (CR\(_{cooling}\)) is automatically calculated by the program. The vertical height, the difference between the highest and lowest terminal unit (e.g., 12 m higher than condenser – 3 m lower than condenser = 9 m height), is a common input for both cooling and heating. When all terminal units are above or below the outdoor unit, an average positive or negative value is used. The limits on the calculated cooling piping correction factor are 0.5 < P\(correction,cooling\) < 1.
+The cooling piping correction factor is calculated using either one or two independent variables. Both the equivalent piping length and the combination ratio are used together to determine piping losses, or the equivalent piping length itself is used. The vertical height specified by the user is also added to the result calculated by either. If a single independent variable is used, a linear, quadratic, or cubic equation is used to determine the equivalent length correction factor. If two independent variables are used, a biquadratic equation is used to determine the equivalent length correction factor. The program will automatically use the correct equation based on the performance curve type. In either case, a single coefficient adjusts the piping correction factor based on the difference in height from the highest to lowest terminal unit. Coefficients a-d (e) in the following equation(s) are inputs in the piping correction factor for length in cooling mode performance curve object. Coefficient f is a direct input to the VRF model as the piping correction factor for height in cooling mode coefficient. The equivalent piping length in cooling mode (P\(_{EQ,cooling}\)) is also a direct input in the VRF model. The cooling combination ratio (CR\(_{cooling}\)) is automatically calculated by the program. The vertical height, the difference between the highest and lowest terminal unit (e.g., 12 m higher than condenser – 3 m lower than condenser = 9 m height), is a common input for both cooling and heating. When all terminal units are above or below the outdoor unit, an average positive or negative value is used. The limits on the calculated cooling piping correction factor are 0.5 < P\(_{correction,cooling}\) < 1.
 
 \begin{equation}
   CR_{cooling} = \frac{\sum\limits_1^n {\dot{Q}_{coil(i),cooling,rated}}}{\dot{Q}_{cooling,total,rated}}
 \end{equation}
 
 \begin{equation}
-  P_{correction,\,cooling} = a + b \left( P_{EQ,\,cooling} \right) + c \left( P_{EQ,\,cooling} \right)^2 + d \left( P_{EQ,\,cooling} \right)^3 + f \left( P_H \right)
+  P_{correction,cooling} = a + b \left( P_{EQ,cooling} \right) + c \left( P_{EQ,cooling} \right)^2 + d \left( P_{EQ,cooling} \right)^3 + f \left( P_H \right)
 \end{equation}
 
 or
 
 \begin{equation}
-  \begin{array}{l}
-  P_{correction,\,cooling} = a + b \left( P_{EQ,\,cooling} \right) + c \left( P_{EQ,\,cooling} \right)^2 + d \left( CR_{cooling} \right) + e \left( CR_{cooling} \right)^2 \\
-  \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + f \left( P_{EQ,\,cooling} \right) \left( CR_{cooling} \right) + g \left( P_H \right)
+  \begin{array}{rl}
+  P_{correction,\,cooling} =& a + b \left( P_{EQ,cooling} \right) + c \left( P_{EQ,cooling} \right)^2 + d \left( CR_{cooling} \right) + e \left( CR_{cooling} \right)^2 \\
+ & + f \left( P_{EQ,cooling} \right) \left( CR_{cooling} \right) + g \left( P_H \right)
   \end{array}
 \end{equation}
 
-where
+where:
 
-\({P_{\,correction,\,cooling}}\) = Piping Correction Factor in Cooling Mode
+\({P_{\,correction,cooling}}\) is the Piping Correction Factor in Cooling Mode
 
-\emph{a -- f} = equation coefficients for piping correction factor in cooling mode
+\emph{a -- f} are equation coefficients for piping correction factor in cooling mode
 
-\emph{g} = user specified piping correction factor for height in cooling mode coefficient
+\emph{g} is the user specified piping correction factor for height in cooling mode coefficient
 
-\(P_{EQ,\,cooling}\) = user specified equivalent piping length in cooling mode [m]
+\(P_{EQ,\,cooling}\) is the user specified equivalent piping length in cooling mode (m)
 
-\(CR_{cooling}\) = combination ratio in cooling mode (total rated indoor terminal unit capacity divided by the rated condenser cooling capacity) (reported to eio file)
+\(CR_{cooling}\) is the combination ratio in cooling mode (total rated indoor terminal unit capacity divided by the rated condenser cooling capacity) (reported to eio file)
 
-\(P_H\) = user specified vertical height used for piping correction factor calculation [m]
+\(P_H\) is the user specified vertical height used for piping correction factor calculation (m).
 
 An example piping correction factor chart is shown in the following figure. The height selected for use in the equation above is selected to minimize the piping correction factor and serves to identify the worst case piping losses.
 
@@ -271,20 +269,20 @@ An example piping correction factor chart is shown in the following figure. The 
 The total demand on the heat pump condenser is then calculated as the quotient of the total terminal unit cooling capacity and the cooling piping correction factor. The piping losses are fixed throughout the simulation (i.e., these losses are not based on which terminal units are requesting refrigerant).
 
 \begin{equation}
-  \dot{Q}_{cooling,\,total} = \frac{\dot{Q}_{cooling,\,TerminalUnits}}{P_{correction,\,cooling}}
+  \dot{Q}_{cooling,total} = \frac{\dot{Q}_{cooling,TerminalUnits}}{P_{correction,cooling}}
 \end{equation}
 
 The heat pump's total available cooling capacity is then calculated as:
 
 \begin{equation}
-  \dot{Q}_{HP,\,cooling,\,total} = \dot{Q}_{cooling,\,total,\,rated} \left( CAPFT_{HP,\,cooling} \right) \left( CR_{cooling,\,correction} \right)
+  \dot{Q}_{HP,cooling,total} = \dot{Q}_{cooling,total,rated} \left( CAPFT_{HP,cooling} \right) \left( CR_{cooling,correction} \right)
 \end{equation}
 
-where
+where:
 
-\(\dot{Q}_{cooling,\,total}\) = total heat pump condenser cooling load (W)
+\(\dot{Q}_{cooling,total}\) is the total heat pump condenser cooling load (W)
 
-\(\dot{Q}_{HP,\,cooling,\,total}\) = heat pump total available cooling capacity (W)
+\(\dot{Q}_{HP,cooling,total}\) is the heat pump total available cooling capacity (W).
 
 \subsubsection{Heat-Recovery-Cooling-Capacity-Modifier}\label{heat-recovery-cooling-capacity-modifier}
 
@@ -297,12 +295,10 @@ When operating in heat recovery mode, the heat pump's available cooling capacity
 This equation can be used to provide a constant fractional difference for available cooling capacity in heat recovery mode (i.e., only \emph{a} is non-zero) or a fractional term that varies with indoor and outdoor conditions. With very limited performance data available at this time, it is recommended that only the constant (a) term be used at this time. When the VRF system is not operating in heat recovery mode, this fraction is set to 1. The available cooling capacity in heat recovery mode is then:
 
 \begin{equation}
-  \dot{Q}_{HR,\,cooling,\,total} = \dot{Q}_{HP,\,cooling,\,total} \left( HRCapMod_{HP,\,cooling} \right)
+  \dot{Q}_{HR,cooling,total} = \dot{Q}_{HP,cooling,total} \left( HRCapMod_{HP,cooling} \right)
 \end{equation}
 
-where
-
-\(\dot{Q}_{HR,\,cooling,\,total}\) = heat recovery total available cooling capacity (W)
+where \(\dot{Q}_{HR,cooling,total}\) = heat recovery total available cooling capacity (W).
 
 The figure below shows VRF system laboratory data for cooling only mode (solid characters) and heat recovery mode (dotted characters). Using the limited laboratory data, the available cooling capacity fraction used to model heat recovery mode is approximately 0.91 and the cooling energy fraction is approximately 1.14. This is the only data available at this time to estimate the impact of heat recovery mode on performance. In the bi-quadratic equation, only coefficient a should be used until more complete data sets exist. Laboratory testing will eventually provide more data and better estimates of performance in heat recovery mode.
 
@@ -327,40 +323,38 @@ When the VRF system transitions from cooling only operation to heat recovery ope
 When the heat pump changes operating modes (i.e., from cooling only to heat recovery mode), the transition does not happen immediately. There is a time delay, and a period of time where the available cooling capacity is well below the steady-state capacity available after the system has had time to adjust. When this type of transition is modeled, an exponential decay curve is used. At the start of the transition period, only a fraction (\(k_{cool}\)) of the steady-state capacity in heat recovery mode is available. The remaining capacity is recovered over a period of 5 time constants (t\(_{c}\)) and is modeled with the following equation. This equation was used to replicate both the cooling capacity and condenser power curves in the previous figure.
 
 \begin{equation}
-  \dot{Q}_{HR,\,avail,\,cooling} = k_{cool} \left( \dot{Q}_{HR,\,cooling,\,total} \right) + \left( 1 - k_{cool} \right) \left( \dot{Q}_{HR,\,cooling,\,total} \right) \left( 1 - e^{\left( -t / \tau_c \right)}  \right)
+  \dot{Q}_{HR,avail,cooling} = k_{cool} \left( \dot{Q}_{HR,cooling,total} \right) + \left( 1 - k_{cool} \right) \left( \dot{Q}_{HR,cooling,total} \right) \left( 1 - e^{\left( -t / \tau_c \right)}  \right)
 \end{equation}
 
 where:
 
-\(k_{cool}\) = fraction of steady-state capacity at beginning of heat recovery mode
+\(k_{cool}\) is the fraction of steady-state capacity at beginning of heat recovery mode
 
-\emph{t}\(_c\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
+\emph{t}\(_c\) is the time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
 
-\(Q_{HR,avail,cooling}\) = available cooling capacity in heat recovery mode (W)
+\(Q_{HR,avail,cooling}\) is the available cooling capacity in heat recovery mode (W)
 
-\(\left( 1 - e^{\left( -t / t_{c,cool} \right)} \right)\) = The multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: object Output:Variable).
+\(\left( 1 - e^{\left( -t / t_{c,cool} \right)} \right)\) is the multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: object Output:Variable).
 
 The operating part-load ratio of the VRF system can then be calculated:
 
 \begin{equation}
-  PLR = \frac{\dot{Q}_{cooling,\,total}}{\dot{Q}_{HR,\,avail,\,cooling}}
+  PLR = \frac{\dot{Q}_{cooling,total}}{\dot{Q}_{HR,avail,cooling}}
 \end{equation}
 
-\(PLR\) = heat pump part-load ratio, report variable ``VRF Heat Pump Part Load Ratio''
+where \(PLR\) is the heat pump part-load ratio, report variable ``VRF Heat Pump Part Load Ratio''.
 
-Note: for calculation purposes \(\dot{Q}_{HR,\,avail,\,cooling}\) is equivalent to \(\dot{Q}_{HR,\,cooling,\,total}\) when heat recovery mode is not active.
+Note: for calculation purposes \(\dot{Q}_{HR,avail,cooling}\) is equivalent to \(\dot{Q}_{HR,cooling,total}\) when heat recovery mode is not active.
 
 The heat pump total available cooling capacity must be greater than or equal to the total cooling capacity requested by the zone terminal units. When the total operating capacity of all terminal unit's will be greater than the available operating capacity of the heat pump condenser, one or more of the terminal unit's operating capacity must be reduced to the point where the sum of the indoor terminal unit demand request plus piping losses is equal to the total available cooling capacity of the outdoor condenser. At this point, the part-load ratio of the heat pump condenser will be equal to 1.
 
 A maximum terminal unit cooling capacity limit is used to restrict the cooling capacity of each indoor terminal unit. The capacity limit is equivalent to a maximum allowed operating capacity for all zone terminal units. This limit is used to conserve energy between multiple indoor terminal units and a single outdoor condensing unit. Assuming no terminal unit can provide more capacity than can be delivered by the outdoor condenser, the terminal unit total cooling capacity calculation previously discussed is revised as follows:
 
 \begin{equation}
-  \dot{Q}_{coil(i),\,cooling} = \sum\limits_1^i MIN \left( \left( \dot{Q}_{coil(i),cooling,total} \right) \left( PLR(i) \right),\,CoolingCapacityLimit \right)
+  \dot{Q}_{coil(i),\,cooling} = \sum\limits_1^i MIN \left( \left( \dot{Q}_{coil(i),cooling,total} \right) \left( PLR(i) \right),CoolingCapacityLimit \right)
 \end{equation}
 
-where:
-
-\(CoolingCapacityLimit(CL_{cooling})\) = Report variable (ref: Output:Variable) describing the ``VRF Heat Pump Maximum Capacity Cooling Rate'', W
+where \(CoolingCapacityLimit(CL_{cooling})\) is the report variable (ref: Output:Variable) describing the ``VRF Heat Pump Maximum Capacity Cooling Rate'' (W).
 
 When multiple terminal units are operating, the terminal units near their maximum capacity are more likely to be capacity limited than those terminal units operating well below their available capacity. The assumption here is that terminal units that are not capacity limited can provide more refrigerant to meet the same load. When the model finds that there is no terminal unit capacity limit, this variable will report 1E+20 indicating that no limit exists.  The figure below demonstrates the application of the capacity limit factor for the case where all indoor terminal units are operating at different capacities. A solution is reached when the sum of the indoor terminal unit's cooling capacities (accounting for piping losses) is equal to the heat pump condenser's available cooling capacity.
 
@@ -380,24 +374,24 @@ The cooling part-load fraction correlation (function of heat pump cycling ratio)
   CyclingRatioFrac = a + b \left( CyclingRatio \right) + c \left( CyclingRatio \right)^2 + d \left( CyclingRatio \right)^3
 \end{equation}
 
-where
+where:
 
 \begin{equation}
   CyclingRatio = \frac{PLR}{PLR_{min}}
 \end{equation}
 
-a-c (d) = coefficients for the quadratic (cubic) cycling ratio correlation curve equation
+a-c (d) are the coefficients for the quadratic (cubic) cycling ratio correlation curve equation.
 
 The cycling ratio can be viewed using the report variable ``VRF Heat Pump Cycling Ratio'' (ref: Output:Variable).
 
-The cooling part-load ratio correlation should be normalized to a value of 1.0 when the cycling ratio equals 1.0 (i.e., no efficiency losses when the heat pump runs continuously [PLR ≥ PLR\(_{min}\)] for the simulation time step). For cycling ratio values between 0 and 1 (0 <= CyclingRatio < 1), the following rules apply:
+The cooling part-load ratio correlation should be normalized to a value of 1.0 when the cycling ratio equals 1.0 (i.e., no efficiency losses when the heat pump runs continuously [PLR \(\geq\) PLR\(_{min}\)] for the simulation time step). For cycling ratio values between 0 and 1 (0 \(\leq\) CyclingRatio < 1), the following rules apply:
 
-\(CyclingRatioFrac \ge 0.7\) and \(CyclingRatioFrac \ge CyclingRatio\)
+\(CyclingRatioFrac \geq 0.7\) and \(CyclingRatioFrac \geq CyclingRatio\)
 
 If CyclingRatioFrac < 0.7 a warning message is issued, the program resets the CyclingRatioFrac value to 0.7, and the simulation proceeds. The runtime fraction of the heat pump is defined as CyclingRatio/CyclingRatioFrac. If CyclingRatioFrac < CyclingRatio, the runtime fraction will exceed 1. In this case a warning message is issued and the runtime fraction of the heat pump is limited to 1.0.
 
 \begin{equation}
-  Heat\,Pump\,Runtime\,Fraction\,(HPRTF) = \frac{CyclingRatio}{CyclingRatioFrac}
+  Heat~Pump~Runtime~Fraction~(HPRTF) = \frac{CyclingRatio}{CyclingRatioFrac}
 \end{equation}
 
 The heat pump runtime fraction can be viewed using the report variable ``VRF Heat Pump Runtime Fraction'' (ref: Output:Variable).
@@ -412,15 +406,13 @@ The electrical power consumed by the heat pump condenser is then calculated base
 
 \subsubsection{Cooling Energy Input Ratio Modifier Function of Low Temperature}\label{cooling-energy-input-ratio-modifier-function-of-low-temperature}
 
-As described previously (Ref. Application of Dual Performance Curves), the cooling energy input ratio modifier curve can either be applied as a single curve object as shown below, or applied using dual performance curve objects. The equation form used for a single or dual performance curve application is shown here.
+As described previously (Ref. Application of Dual Performance Curves), the cooling energy input ratio modifier curve can either be applied as a single curve object as shown below, or applied using dual performance curve objects. If the \textit{Condenser Type} is WaterCooled, then the cooling energy input ratio modifier curve will be function of weighted average indoor air wet-bulb temperature and outdoor condenser entering water temperature. The equation form used for a single or dual performance curve application is shown here.
 
 \begin{equation}
   EIRFT_{cooling} = a + b \left( T_{wb,avg} \right) + c \left( T_{wb,avg} \right)^2 + d \left( T_c \right) + e \left( T_c \right)^2 + f \left( T_{wb,avg} \right) \left( T_c \right)
 \end{equation}
 
-where
-
-\(EIRFT_{cooling}\) = cooling energy input ratio modifier (function of temperature)
+where \(EIRFT_{cooling}\) is the cooling energy input ratio modifier (function of temperature).
 
 \subsubsection{Cooling Energy Input Ratio Modifier Function of Part-Load Ratio}\label{cooling-energy-input-ratio-modifier-function-of-part-load-ratio}
 
@@ -428,25 +420,25 @@ The cooling energy input ratio calculation is based on 2 EIR curves. One is used
 
 \begin{equation}
   \begin{array}{l}
-  IF\left( {PLR \le 1} \right)THEN \\
-  \,\,\,\,EIRFPLR_{cooling} = a + b \left( PLR \right) + c \left( PLR \right)^2 + d \left( PLR \right)^3 \\
+  IF\left( {PLR \leq 1} \right)THEN \\
+  ~~~~EIRFPLR_{cooling} = a + b \left( PLR \right) + c \left( PLR \right)^2 + d \left( PLR \right)^3 \\
   ELSE \\
-  \,\,\,\,EIRFPLR_{cooling} = e + f \left( PLR \right) + g \left( PLR \right)^2 + h \left( PLR \right)^3
+  ~~~~EIRFPLR_{cooling} = e + f \left( PLR \right) + g \left( PLR \right)^2 + h \left( PLR \right)^3
   \end{array}
 \end{equation}
 
-where
+where:
 
-\(EIRFPLR_{cooling}\) = cooling energy input ratio correction factor (function of part-load ratio)
+\(EIRFPLR_{cooling}\) is the cooling energy input ratio correction factor (function of part-load ratio)
 
-a-d = coefficient for cooling energy input ratio correlation when part-load ratio ≤ 1
+a-d are the coefficient for cooling energy input ratio correlation when part-load ratio \(\leq\) 1
 
-e-h = coefficient for cooling energy input ratio correlation when part-load ratio > 1
+e-h are the coefficient for cooling energy input ratio correlation when part-load ratio > 1.
 
 The total power consumed by the heat pump condenser in cooling mode is based on the user specified coefficient of performance (COP) and calculated as:
 
 \begin{equation}
-  CoolingPower = \left( \frac{\dot{Q}_{cooling,total,rated} CAPFT_{cooling}}{COP_{cooling,\,reference}} \right) \left( EIRFT_{cooling} \right) \left( EIRFPLR_{cooling} \right) \left( HPRTF \right)
+  CoolingPower = \left( \frac{\dot{Q}_{cooling,total,rated} CAPFT_{cooling}}{COP_{cooling,reference}} \right) \left( EIRFT_{cooling} \right) \left( EIRFPLR_{cooling} \right) \left( HPRTF \right)
 \end{equation}
 
 The cooling COP is then calculated as the ratio of the outdoor unit cooling capacity divided by the total electric consumption rate of all components associated with the outdoor unit. Although included in the equiation, defrost power is typically 0 during cooling mode operation.
@@ -455,15 +447,17 @@ The cooling COP is then calculated as the ratio of the outdoor unit cooling capa
   COP_{cooling} = \frac{\dot{Q}_{cooling,total}}{CoolingPower + P_{CrankCaseHeater} + P_{EvapCoolerPower} + P_{defrost}}
 \end{equation}
 
-COP\(_{cooling}\) = operating coefficient of performance, report variable ``VRF Heat Pump Cooling COP''
+where:
 
-CoolingPower = operating electric consumption rate, [W], report variable ``VRF Heat Pump Cooling Electric Power''
+COP\(_{cooling}\) is the operating coefficient of performance, report variable ``VRF Heat Pump Cooling COP''
 
-P\(_{CrankcaseHeater}\) = report variable for electric consumption rate of crankcase heater (W)
+CoolingPower is the operating electric consumption rate (W), report variable ``VRF Heat Pump Cooling Electric Power''
 
-P\(_{EvapCoolerPump}\) = report variable for electric consumption rate of evaporatively-cooled condenser water pump (W)
+P\(_{CrankcaseHeater}\) is the report variable for electric consumption rate of crankcase heater (W)
 
-\({P_{defrost}}\) = report variable for average defrost power for the simulation time step (W)
+P\(_{EvapCoolerPump}\) is the report variable for electric consumption rate of evaporatively-cooled condenser water pump (W)
+
+\({P_{defrost}}\) is the report variable for average defrost power for the simulation time step (W).
 
 When operating in heat recovery mode, equations similar to those used for available cooling capacity are used to model heating electric consumption rate.
 
@@ -483,13 +477,13 @@ This equation can be used to provide a constant fractional difference for coolin
   
 where:
 
-\(k_{EIR,\, copl}\) = fraction of steady-state cooling electric consumption rate at beginning of heat recovery mode
+\(k_{EIR,cool}\) is the fraction of steady-state cooling electric consumption rate at beginning of heat recovery mode
 
-\(t_{c,EIR,\, cool}\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
+\(\tau_{c,EIR,cool}\) is the time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
 
-\(CoolingPower_{HR}\) = cooling electric consumption rate in heat recovery mode (W)
+\(CoolingPower_{HR}\) is the cooling electric consumption rate in heat recovery mode (W)
 
-\(\left( 1 - e^{\left( -t / \tau_{c,\,EIR,\,cool} \right)} \right)\) = The multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
+\(\left( 1 - e^{\left( -t / \tau_{c,EIR,cool} \right)} \right)\) is the multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
 
 \subsubsection{Heating Operation}\label{heating-operation-201605050924}
 
@@ -499,7 +493,7 @@ The sum of the individual zone total heating requirements are used to calculate 
 
 \textbf{Heating Combination Ratio Correction Factor (function of capacity ratio)}
 
-The heating combination ratio correction factor is defined as the total terminal unit rated heating capacity divided by the heat pump's rated heating capacity. In some instances, the cooling combination ratio may be used to define the correction factor used to modify the heat pump's rated heating capacity and is manufacturer specific. The combination ratio is important when multiple terminal units (or DX coils) are attached to a single variable-speed condensing unit. If the combination ratio is less than 1, the condenser has sufficient capacity to meet the indoor terminal unit's capacity request. However, if the combination ratio is determined to be greater than 1, the maximum heating capacity available from the heat pump's condenser may be higher than the user specified rated heating capacity. The combination ratio capacity correction factor is based on a linear, quadratic or cubic curve and provides a multiplier > 1 to correct for combination ratio's greater than 1. For example, a combination ratio of 1.3 (130\%) may result in a combination ratio capacity correction factor of 1.06 (outdoor condenser can actually provide 106\% of rated capacity) . The heating combination ratio correction factor is applied to heating performance calculations. If the heating combination ratio correction curve name is not specified by the user, the heating combination ratio correction factor (CR\(_{heating,\, correction}\)) in the following equation is assumed to be equal to 1.
+The heating combination ratio correction factor is defined as the total terminal unit rated heating capacity divided by the heat pump's rated heating capacity. In some instances, the cooling combination ratio may be used to define the correction factor used to modify the heat pump's rated heating capacity and is manufacturer specific. The combination ratio is important when multiple terminal units (or DX coils) are attached to a single variable-speed condensing unit. If the combination ratio is less than 1, the condenser has sufficient capacity to meet the indoor terminal unit's capacity request. However, if the combination ratio is determined to be greater than 1, the maximum heating capacity available from the heat pump's condenser may be higher than the user specified rated heating capacity. The combination ratio capacity correction factor is based on a linear, quadratic or cubic curve and provides a multiplier > 1 to correct for combination ratio's greater than 1. For example, a combination ratio of 1.3 (130\%) may result in a combination ratio capacity correction factor of 1.06 (outdoor condenser can actually provide 106\% of rated capacity) . The heating combination ratio correction factor is applied to heating performance calculations. If the heating combination ratio correction curve name is not specified by the user, the heating combination ratio correction factor (CR\(_{heating,correction}\)) in the following equation is assumed to be equal to 1.
 
 \begin{equation}
   CR_{heating} = \frac{\sum\limits_1^n \dot{Q}_{coil(i),heating,rated}}{\dot{Q}_{heating,total,rated}}
@@ -510,20 +504,20 @@ The heating combination ratio correction factor is defined as the total terminal
 \end{equation}
 
 \begin{equation}
-  CR_{heating,\,correction} = MAX \left( 1.0,\,CR_{heating,\,correction} \right)
+  CR_{heating,correction} = MAX \left( 1.0,\,CR_{heating,correction} \right)
 \end{equation}
 
-where
+where:
 
-\(\dot{Q}_{coil(i),\,heating,\,rated}\) = rated total heating capacity in zone \emph{i} (W)
+\(\dot{Q}_{coil(i),heating,rated}\) is the rated total heating capacity in zone \emph{i} (W)
 
-\(\dot{Q}_{heating,\,total,\,rated}\) = rated total heating capacity of heat pump (W)
+\(\dot{Q}_{heating,total,rated}\) is the rated total heating capacity of heat pump (W)
 
-\(CR_{heating,\,correction}\) = Heating Combination Ratio capacity correction factor at rated conditions
+\(CR_{heating,correction}\) is the heating Combination Ratio capacity correction factor at rated conditions
 
-\(a - d\) = cubic equation coefficients for heating combination ratio correction factor
+\(a - d\) are the cubic equation coefficients for heating combination ratio correction factor
 
-\(CR_{heating}\) = combination ratio in heating mode (total rated indoor terminal unit capacity divided by the rated condenser heating capacity) (reported to eio file)
+\(CR_{heating}\) is the combination ratio in heating mode (total rated indoor terminal unit capacity divided by the rated condenser heating capacity) (reported to eio file).
 
 \subsubsection{Heating Capacity Ratio Modifier (function of temperature)}\label{heating-capacity-ratio-modifier-function-of-temperature}
 
@@ -545,29 +539,29 @@ Note that some manufacturers do not provide performance data as a function of ou
   CAPFT_{coil,heating} = a + b \left( T_{db,i} \right) + c \left( T_{db,i} \right)^2 + d \left( T_c \right) + e \left( T_c \right)^2 + f \left( T_{db,i} \right) \left( T_c \right)
 \end{equation}
 
-where
+where:
 
-\(T_{db,i}\) = dry-bulb temperature of the air entering the heating coil in zone \emph{i}, °C
+\(T_{db,i}\) is the dry-bulb temperature of the air entering the heating coil in zone \emph{i} (\(^{\circ}\)C
 
-\(T_{db,avg}\) = weighted-average dry-bulb temperature of the air entering all operating heating coils, °C
+\(T_{db,avg}\) is the weighted-average dry-bulb temperature of the air entering all operating heating coils (\(^{\circ}\)C
 
-\(CAPFT_{heating}\) = Heating Capacity Correction Factor (function of temperature)
+\(CAPFT_{heating}\) is the heating Capacity Correction Factor (function of temperature)
 
-\(a - f\)  = bi-quadratic equation coefficients
+\(a - f\) are the bi-quadratic equation coefficients
 
-\(T_c\)    = wet-bulb temperature of the air entering an air-cooled condenser, °C
+\(T_c\) is the wet-bulb temperature of the air entering an air-cooled condenser (\(^{\circ}\)C.
 
 The total terminal unit heating capacity required is the simple sum of the terminal unit capacity. If the heat pump is off or there is no zone heating requirement, the terminal unit total heating requirement will be zero. The heating coils capacity includes the impacts of fan heat and any outdoor air provided to the zone.
 
 \begin{equation}
-  \dot{Q}_{heating,TerminalUnits} = \sum\limits_1^i \left( \dot{Q}_{coil(i),\,heating,\,total} \right) \left( PLR(i) \right)
+  \dot{Q}_{heating,TerminalUnits} = \sum\limits_1^i \left( \dot{Q}_{coil(i),heating,total} \right) \left( PLR(i) \right)
 \end{equation}
 
-where
+where:
 
-\(\dot{Q}_{heating,\,TerminalUnits}\) = heat pump's outdoor condenser total zone heating requirement (W)
+\(\dot{Q}_{heating,TerminalUnits}\) is the heat pump's outdoor condenser total zone heating requirement (W)
 
-\(\dot{Q}_{coil(i),\,heating,\,total}\) = zone terminal unit total heating capacity [W], report variable ``Zone VRF Air Terminal Total Heating Rate''
+\(\dot{Q}_{coil(i),heating,total}\) is the zone terminal unit total heating capacity (W), report variable ``Zone VRF Air Terminal Total Heating Rate''.
 
 The piping correction factor is then used to adjust the zone heating requirement to account for piping losses in the AC refrigeration system.
 
@@ -576,29 +570,29 @@ The piping correction factor is then used to adjust the zone heating requirement
 The piping correction factor in heating mode is calculated based on the length of the farthest terminal unit and the difference in height from the highest to lowest terminal unit. The piping losses are fixed throughout the simulation (i.e., these losses are not based on which terminal units are requesting refrigerant). Coefficients a-f in the following equations are inputs in the piping correction factor for length in heating mode curve object. The curve may use either one or two independent variables. Coefficient g is a direct input to the VRF model as piping correction factor for height in heating mode coefficient. The equivalent piping length in heating mode (P\(_{EQ,heating}\)) is also a direct input in the VRF model. The vertical height (P\(_H\)), the difference between the highest and lowest terminal unit (e.g., 12 m higher than condenser – 3 m lower than condenser = 9 m height), is a common input for both cooling and heating.
 
 \begin{equation}
-  P_{correction,\,heating} = a + b \left( P_{EQ,\,heating} \right) + c \left( P_{EQ,\,heating} \right)^2 + d \left( P_{EQ,\,heating} \right)^3 + g \left( P_H \right)
+  P_{correction,heating} = a + b \left( P_{EQ,heating} \right) + c \left( P_{EQ,heating} \right)^2 + d \left( P_{EQ,heating} \right)^3 + g \left( P_H \right)
 \end{equation}
 
 or
 
 \begin{equation}
-  \begin{array}{l}
-  {P_{correction,\,heating}} = a + b \left( P_{EQ,\,heating} \right) + c \left( P_{EQ,\,heating} \right)^2 + d \left( CR_{heating} \right) + e \left( CR_{heating} \right)^2 \\
-  \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + f \left( P_{EQ,\,heating} \right) \left( CR_{heating} \right) + g \left( P_H \right)
-  \end{array}
+\begin{array}{rl}
+{P_{correction,heating}} =& a + b \left( P_{EQ,heating} \right) + c \left( P_{EQ,heating} \right)^2 + d \left( CR_{heating} \right) + e \left( CR_{heating} \right)^2 \\
+ & + f \left( P_{EQ,heating} \right) \left( CR_{heating} \right) + g \left( P_H \right)
+\end{array}
 \end{equation}
 
-where
+where:
 
-\(P_{correction,\,heating}\) = Piping Correction Factor in Heating Mode
+\(P_{correction,heating}\) is the piping correction factor in heating mode
 
-\emph{a-f} = equation coefficients for piping correction factor in heating mode
+\emph{a-f} are the equation coefficients for piping correction factor in heating mode
 
-\emph{g} = user specified piping correction factor for height in heating mode coefficient
+\emph{g} is the user specified piping correction factor for height in heating mode coefficient
 
-\(P_{EQ,\,heating}\) = the equivalent piping length for heating specified by the user [m]
+\(P_{EQ,heating}\) is the equivalent piping length for heating specified by the user (m)
 
-\(P_H\) = user specified vertical height used for piping correction factor [m]
+\(P_H\) is the user specified vertical height used for piping correction factor (m).
 
 The heat pump's total available heating capacity is then determined using the previously described modifiers.
 
@@ -611,13 +605,13 @@ The heat pump's total available heating capacity is then determined using the pr
 When operating in heat recovery mode, the heat pump's available heating capacity is typically different than the available capacity when operating in heating only mode. This modifier is used to adjust the available heating capacity using a fraction when heat recovery is active. This fraction is based on a bi-quadratic equation with indoor and outdoor temperatures used as the independent terms.
 
 \begin{equation}
-  HRCapMod_{HP,heating} = a + b \left( T_{ent} \right) + c \left( T_{ent} \right)^2 + d \left( T_{cond} \right) + e \left( T_{cond} \right)^2 + f \left( T_{ent} \right) \left( T_{cond} \right)
+HRCapMod_{HP,heating} = a + b \left( T_{ent} \right) + c \left( T_{ent} \right)^2 + d \left( T_{cond} \right) + e \left( T_{cond} \right)^2 + f \left( T_{ent} \right) \left( T_{cond} \right)
 \end{equation}
 
 This equation can be used to provide a constant fractional difference for available heating capacity in heat recovery mode (i.e., only \emph{a} is non-zero) or a fractional term that varies with indoor and outdoor conditions. With very limited performance data available at this time, it is recommended that only the constant (a) term be used at this time. The available heating capacity in heat recovery mode is then:
 
 \begin{equation}
-  \dot{Q}_{HR,\,heating,\,total} = \dot{Q}_{HP,\,heating,\,total} \left( HRCapMod_{HP,\,heating} \right)
+  \dot{Q}_{HR,heating,total} = \dot{Q}_{HP,heating,total} \left( HRCapMod_{HP,heating} \right)
 \end{equation}
 
 \subsubsection{Transition from Heating Only mode to Heat Recovery mode}\label{transition-from-heating-only-mode-to-heat-recovery-mode}
@@ -626,21 +620,21 @@ When the VRF system transitions from heating only operation to heat recovery ope
 
 \subsubsection{Heat Recovery Heating Capacity Fraction and Time Constant}\label{heat-recovery-heating-capacity-fraction-and-time-constant}
 
-When the heat pump changes operating modes (i.e., from heating only to heat recovery mode), the transition does not happen immediately. There is a time delay, and a period of time where the available heating capacity is different from the steady-state capacity available after the system has had time to adjust. When this type of transition is modeled, an exponential decay curve is used. At the start of the transition period, only a fraction (\(k_{heat}\)) of the steady-state capacity in heat recovery mode is available. The remaining capacity is recovered over a period of 5 time constants (\(t_{c,\, heat}\)) and is modeled with the following equation. This equation was used to replicate both the cooling capacity and condenser power curves in the previous figure.
+When the heat pump changes operating modes (i.e., from heating only to heat recovery mode), the transition does not happen immediately. There is a time delay, and a period of time where the available heating capacity is different from the steady-state capacity available after the system has had time to adjust. When this type of transition is modeled, an exponential decay curve is used. At the start of the transition period, only a fraction (\(k_{heat}\)) of the steady-state capacity in heat recovery mode is available. The remaining capacity is recovered over a period of 5 time constants (\(t_{c,heat}\)) and is modeled with the following equation. This equation was used to replicate both the cooling capacity and condenser power curves in the previous figure.
 
 \begin{equation}
-  \dot{Q}_{HR,\,avail,\,heating} = k_{heat} \left( \dot{Q}_{HR,\,heating,\,total} \right) + \left( 1 - k_{heat} \right) \left( \dot{Q}_{HR,\,heating,\,total} \right) \left( 1 - e^{\left( -t / \tau_{c,\,heat} \right)} \right)
+  \dot{Q}_{HR,avail,heating} = k_{heat} \left( \dot{Q}_{HR,heating,total} \right) + \left( 1 - k_{heat} \right) \left( \dot{Q}_{HR,heating,total} \right) \left( 1 - e^{\left( -t / \tau_{c,heat} \right)} \right)
 \end{equation}
 
 where:
 
-\(k_{heat}\) = fraction of steady-state heating capacity at beginning of heat recovery mode
+\(k_{heat}\) is the fraction of steady-state heating capacity at beginning of heat recovery mode
 
-\(t_{c,\, heat}\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
+\(\tau_{c,heat}\) is the time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
 
-\(Q_{HR,avail,heating}\) = available heating capacity in heat recovery mode (W)
+\(Q_{HR,avail,heating}\) is the available heating capacity in heat recovery mode (W)
 
-\(\left( 1 - e^{\left( -t / t_{c,heat} \right)} \right)\) = The multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
+\(\left( 1 - e^{\left( -t / \tau_{c,heat} \right)} \right)\) is the multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
 
 \subsubsection{Defrost Energy Input Ratio Modifier (function of temperature)}\label{defrost-energy-input-ratio-modifier-function-of-temperature}
 
@@ -653,32 +647,32 @@ The defrost energy input ratio (EIR) modifier curve (function of temperature) is
 The heat pump condenser's total heating load is then calculated as the quotient of the total terminal unit capacity and the piping correction factor. Additional load due to defrost is also included (see following section).
 
 \begin{equation}
-  \dot{Q}_{heating,\,total} = \left( \frac{\dot{Q}_{heating,\,TerminalUnits}}{P_{correction,\,heating}} \right) + \dot{Q}_{defrost}
+  \dot{Q}_{heating,total} = \left( \frac{\dot{Q}_{heating,TerminalUnits}}{P_{correction,heating}} \right) + \dot{Q}_{defrost}
 \end{equation}
 
 The heat pump's total (gross) heating capacity is then calculated based on the capacity correction factor as a function of temperatures. The impact of defrost on total heat pump heating capacity is also accounted for (see following section). The part-load ratio of the heat pump condenser can then be calculated.
 
 \begin{equation}
-  \dot{Q}_{HP,\,total} = \dot{Q}_{total,\,rated} \left( CAPFT_{HP,\,heating} \right) \left( CR_{heating,\,correction} \right) \left( HCAP_{defrost} \right)
+  \dot{Q}_{HP,total} = \dot{Q}_{total,rated} \left( CAPFT_{HP,heating} \right) \left( CR_{heating,correction} \right) \left( HCAP_{defrost} \right)
 \end{equation}
 
 \begin{equation}
-  PLR = \frac{\dot{Q}_{heating,\,total}}{\dot{Q}_{HP,\,total}}
+  PLR = \frac{\dot{Q}_{heating,total}}{\dot{Q}_{HP,total}}
 \end{equation}
 
-where
+where:
 
-\(\dot{Q}_{HP,\,total}\) = heat pump total available heating capacity (W)
+\(\dot{Q}_{HP,total}\) is the heat pump total available heating capacity (W)
 
-\(PLR\) = heat pump part-load ratio
+\(PLR\) is the heat pump part-load ratio
 
-\(HCAP_{defrost}\) = heating capacity correction factor for defrost mode
+\(HCAP_{defrost}\) is the heating capacity correction factor for defrost mode.
 
 As described for cooling operation, the available heating capacity of the heat pump is compared to the requested heating capacity of all indoor terminal units. If the requested heating capacity of all indoor terminal units is greater than the available heating capacity of the heat pump, one or more of the indoor terminal unit's capacity is limited such that the sum of the zone terminal unit heating demand plus piping losses is equal to the available heat pump heating capacity (including the impact due to defrost).
 
 The electrical power consumed by the heat pump condenser is calculated based on the heat pump's nominal electric power consumption in heating mode and the actual operating conditions. A performance correction factor is used to correct for off-design performance as follows:
 
-Heating Part-Load Fraction Correlation (function of heat pump cycling ratio)
+\emph{\textbf{Heating Part-Load Fraction Correlation (function of heat pump cycling ratio)}}
 
 The part-load fraction correlation (function of heat pump cycling ratio) is a linear, quadratic or a cubic curve with the independent variable being cycling ratio (part-load ratio / minimum part-load ratio). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the ``effective'' EIR for a given simulation time step. The cycling ratio correlation accounts for startup losses of the heat pump's compression system.
 
@@ -700,14 +694,14 @@ where
 
 The cycling ratio can be viewed using the report variable ``VRF Heat Pump Cycling Ratio'' (ref: Output:Variable).
 
-The cycling ratio correlation should be normalized to a value of 1.0 when the cycling ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation time step). For cycling ratio values between 0 and 1 (0 <= CyclingRatio < 1), the following rules apply:
+The cycling ratio correlation should be normalized to a value of 1.0 when the cycling ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation time step). For cycling ratio values between 0 and 1 (0 \(\leq\) CyclingRatio < 1), the following rules apply:
 
-\(CyclingRatioFrac \ge 0.7\)   and   \(CyclingRatioFrac \ge CyclingRatio\)
+\(CyclingRatioFrac \geq 0.7\)   and   \(CyclingRatioFrac \geq CyclingRatio\)
 
 If CyclingRatioFrac < 0.7 a warning message is issued, the program resets the CyclingRatioFrac value to 0.7, and the simulation proceeds. The runtime fraction of the heat pump is defined as CyclingRatio/CyclingRatioFrac. If CyclingRatioFrac < CyclingRatio, then a warning message is issued and the runtime fraction of the heat pump is limited to 1.0.
 
 \begin{equation}
-  Heat\,Pump\,Runtime\,Fraction \left( HPRTF \right) = \frac{CyclingRatio}{CyclingRatioFrac}
+  Heat~Pump~Runtime~Fraction \left( HPRTF \right) = \frac{CyclingRatio}{CyclingRatioFrac}
 \end{equation}
 
 The heat pump runtime fraction can be viewed using the report variable ``VRF Heat Pump Runtime Fraction'' (ref: Output:Variable).
@@ -718,7 +712,7 @@ Since manufacturers data do not typically provide information defining the cycli
   CyclingRatioFrac = 0.85 + 0.15(CyclingRatio)
 \end{equation}
 
-Heating Energy Input Ratio Modifier (function of temperature)
+\emph{\textbf{Heating Energy Input Ratio Modifier (function of temperature)}}
 
 As described previously (Ref. Application of Dual Performance Curves), the heating energy input ratio modifier curve can either be applied as a single curve object as shown below, or applied using dual performance curve objects. The single curve object application is discussed here.
 
@@ -726,48 +720,49 @@ As described previously (Ref. Application of Dual Performance Curves), the heati
   EIRFT_{heating} = a + b \left( T_{db,avg} \right) + c \left( T_{db,avg} \right)^2 + d \left( T_c \right) + e \left( T_c \right)^2 + f \left( T_{db,avg} \right) \left( T_c \right)
 \end{equation}
 
-where
+where \(EIRFT_{heating}\) = heating energy input ratio correction factor (function of temperature) (0-1).
 
-\(EIRFT_{heating}\) = heating energy input ratio correction factor (function of temperature) (0-1)
-
-Heating Energy Input Ratio Modifier (function of part-load ratio)
+\emph{\textbf{Heating Energy Input Ratio Modifier (function of part-load ratio)}}
 
 \begin{equation}
   \begin{array}{l}
-    IF \left( PLR \le 1 \right) THEN \\
-    \,\,\,\,EIRFPLR_{heating} = a + b \left( PLR \right) + c \left( PLR \right)^2 + d \left( PLR \right)^3 \\
+    IF \left( PLR \leq 1 \right) THEN \\
+    ~~~~EIRFPLR_{heating} = a + b \left( PLR \right) + c \left( PLR \right)^2 + d \left( PLR \right)^3 \\
     ELSE \\
-    \,\,\,\,EIRFPLR_{heating} = e + f \left( PLR \right) + g \left( PLR \right)^2 + h \left( PLR \right)^3
+    ~~~~EIRFPLR_{heating} = e + f \left( PLR \right) + g \left( PLR \right)^2 + h \left( PLR \right)^3
   \end{array}
 \end{equation}
 
-where
+where:
 
-\(EIRFPLR_{heating}\) = heating energy input ratio modifier (function of part-load ratio)
+\(EIRFPLR_{heating}\) is the heating energy input ratio modifier (function of part-load ratio)
 
-a-d = coefficient for heating energy input ratio modifier when part-load ratio ≤ 1
+a-d are the coefficients for the heating energy input ratio modifier when part-load ratio \(\leq\) 1
 
-e-h = coefficient for heating energy input ratio modifier when part-load ratio > 1
+e-h are the coefficients for the heating energy input ratio modifier when part-load ratio > 1
 
 The total power consumed by the heat pump condenser in heating mode is then calculated. A correction for power consumed due to defrost is also included (see following section).
 
 The total power consumed by the heat pump condenser in heating mode is based on the user specified coefficient of performance (COP). A correction for power consumed due to defrost is also included (see following section).
 
 \begin{equation}
-  HeatingPower = \left( \frac{\dot{Q}_{heating,\,total,\,rated} CAPFT_{heating}}{COP_{heating,\,reference}} \right) \left( EIRFT_{heating} \right) \left( EIRFPLR_{heating} \right) \left( HPRTF \right) \left( EIR_{defrost} \right)
+\begin{array}{rl}
+  HeatingPower =& \left( \frac{\dot{Q}_{heating,\,total,\,rated} CAPFT_{heating}}{COP_{heating,reference}} \right) \left( EIRFT_{heating} \right) \left( EIRFPLR_{heating} \right) \\
+  & * \left( HPRTF \right) \left( EIR_{defrost} \right)
+\end{array}
 \end{equation}
-
-The operating COP is then calculated as:
 
 The heating COP is then calculated as the ratio of the outdoor unit heating capacity divided by the total electric consumption rate of all components associated with the outdoor unit. Evaporatively-cooled condenser pump power is typically 0 during heating mode operation.
 
 \begin{equation}
-  COP_{heating} = \dot{Q}_{heating,total} / \left( HeatingPower + P_{CrankaseHeater} + P_{EvapCoolerPower} + P_{defrost} \right)
+  COP_{heating} = \dot{Q}_{heating,total} / \left( HeatingPower + P_{CrankcaseHeater} + P_{EvapCoolerPower} + P_{defrost} \right)
 \end{equation}
 
-COP\(_{heating}\) = operating coefficient of performance, report variable ``VRF Heat Pump Heating COP''
+where:
 
-HeatingPower = operating electric consumption rate, [W], report variable ``VRF Heat Pump Heating Electric Power''
+COP\(_{heating}\) is the operating coefficient of performance, report variable ``VRF Heat Pump Heating COP''
+
+HeatingPower is the operating electric consumption rate (W), report variable ``VRF Heat Pump Heating Electric Power''.
 
 When operating in heat recovery mode, equations similar to those used for available heating capacity are used to model operating power.
 
@@ -778,38 +773,38 @@ When operating in heat recovery mode, equations similar to those used for availa
 This equation can be used to provide a constant fractional difference for heating electric consumption rate in heat recovery mode (i.e., only *a* is non-zero) or a fractional term that varies with indoor and outdoor conditions. With very limited performance data available at this time, it is recommended that only the constant (a) term be used at this time. When the VRF system is not operating in heat recovery mode, this fraction is set to 1.The available heating electric consumption rate in heat recovery mode is then calculated as:
 
 \begin{equation}
-  HeatingPower_{HR} = HeatingPower \left( HREIRMod_{HP,\,heating} \right)
+  HeatingPower_{HR} = HeatingPower \left( HREIRMod_{HP,heating} \right)
 \end{equation}
 
 \begin{equation}
-  Power_{HR} = k_{EIR,\,heat} \left( HeatingPower_{HR} \right) + \left( 1 - k_{EIR,\,heat} \right) \left( HeatingPower_{HR} \right) \left( 1 - e^{\left( -t / \tau_{c,\,EIR,\,heat} \right)} \right)
+  Power_{HR} = k_{EIR,heat} \left( HeatingPower_{HR} \right) + \left( 1 - k_{EIR,heat} \right) \left( HeatingPower_{HR} \right) \left( 1 - e^{\left( -t / \tau_{c,EIR,heat} \right)} \right)
 \end{equation}
 
 where:
 
-\(k_{EIR,\,heat}\) = fraction of steady-state heating electric consumption rate at beginning of heat recovery mode
+\(k_{EIR,heat}\) is the fraction of steady-state heating electric consumption rate at beginning of heat recovery mode
 
-\(\tau_{c,\,EIR,\,heat}\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
+\(\tau_{c,EIR,heat}\) is the time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
 
-HeatingPower\(_{HR}\) = heating electric consumption rate in heat recovery mode (W)
+HeatingPower\(_{HR}\) is the heating electric consumption rate in heat recovery mode (W)
 
-\(\left( 1 - e^{\left( -t / \tau_{c,\,EIR,\,heat} \right)} \right)\) = The multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
+\(\left( 1 - e^{\left( -t / \tau_{c,EIR,heat} \right)} \right)\) = The multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
 
 \subsubsection{Operating Coefficient of Performance}\label{operating-coefficient-of-performance}
 
 Similar to the cooling and heating COP report variables, a report variable is included to identify the overall COP of the system. The numerator represents the total cooling and heating coil capacities (or loads) where piping losses have been accounted for. If heat recovery is not used only one of these terms is non-zero. When heat recovery is used, one or both of these terms can be non-zero, therefore, the operating COP includes recovered energy. The denominator includes the electric consumption rates of all system components. For water-cooled VRF AC systems, the plant pump power is not included.
 
 \begin{equation}
-  COP_{operating} = \frac{\left( \dot{Q}_{cooling,TerminalUnits} + \dot{Q}_{heating,TerminalUnits} \right)}{\left( OutdoorUnitPower + P_{CrankaseHeater} + P_{EvapCoolerPower} + P_{defrost} + P_{TU,fan} + P_{TU,parasitic} \right)}
+  COP_{operating} = \frac{\left( \dot{Q}_{cooling,TerminalUnits} + \dot{Q}_{heating,TerminalUnits} \right)}{\left( OutdoorUnitPower + P_{CrankcaseHeater} + P_{EvapCoolerPower} + P_{defrost} + P_{TU,fan} + P_{TU,parasitic} \right)}
 \end{equation}
 
 where:
 
-OutdoorUnitPower = Cooling or heating electric consumption rate of outdoor unit (W)
+OutdoorUnitPower is the cooling or heating electric consumption rate of outdoor unit (W)
 
-P\(_{TU,fan}\) = electric consumption rate of all terminal unit fans (W)
+P\(_{TU,fan}\) is the electric consumption rate of all terminal unit fans (W)
 
-P\(_{TU,parasitic}\) = electric consumption rate of all terminal unit parasitic electric (W)
+P\(_{TU,parasitic}\) is the electric consumption rate of all terminal unit parasitic electric (W).
 
 \subsubsection{Defrost Adjustment Factors}\label{defrost-adjustment-factors}
 
@@ -830,14 +825,14 @@ The difference between the outdoor air humidity ratio (from the weather file) an
 Frost formation on the outdoor coil must be periodically removed. The fraction of compressor runtime when the coil is being defrosted is entered by the user. Adjustment factors to total heating coil capacity and input power due to frost formation on the outdoor coil are calculated by an empirical model with \(\Delta \omega_{coil,out}\) as the independent variable as shown below.
 
 \begin{equation}
-  HCAP_{defrost} = 0.909 - 107.33 \left( \Delta w_{coil,\,out} \right)
+  HCAP_{defrost} = 0.909 - 107.33 \left( \Delta \omega_{coil,\,out} \right)
 \end{equation}
 
 \begin{equation}
-  EIR_{defrost} = 0.9 - 36.45 \left( \Delta w_{coil,\,out} \right)
+  EIR_{defrost} = 0.9 - 36.45 \left( \Delta \omega_{coil,\,out} \right)
 \end{equation}
 
-If the outdoor air dry-bulb temperature is above the specified maximum temperature for defrost operation, the fractional defrost time period is set to zero and the heating capacity/input power multipliers are set to unity (1).
+If the outdoor air dry-bulb temperature is \emph{above} the specified maximum temperature for defrost operation, the fractional defrost time period is set to zero and the heating capacity/input power multipliers are set to unity (1).
 
 \subsubsection{Defrost Operation}\label{defrost-operation-201605050925}
 
@@ -853,18 +848,18 @@ If the fractional defrost time period is greater than zero for the simulation ti
 
 where:
 
-\(Q_{defrost}\) = additional indoor heating load due to reverse-cycle defrost (W)
+\(Q_{defrost}\) is the additional indoor heating load due to reverse-cycle defrost (W)
 
-\(Q_{total,rated}\) = total full-load heating capacity of the coil at rated conditions (W)
+\(Q_{total,rated}\) is the total full-load heating capacity of the coil at rated conditions (W)
 
-\(P_{defrost}\) = report variable for average defrost power for the simulation time step (W)
+\(P_{defrost}\) is the report variable for average defrost power for the simulation time step (W)
 
-\emph{DefrostEIRTempModFac} = energy input ratio modifier curve applicable during defrost
+\emph{DefrostEIRTempModFac} is the energy input ratio modifier curve applicable during defrost
 
-\(t_{frac,\,defrost}\) = defrost time period fraction specified by user
+\(t_{frac,\,defrost}\) is the defrost time period fraction specified by user
 
 \begin{equation}
-  RTF = \left(  \frac{PLR}{PartLoadFrac} \right) = runtime\;fraction\;of\;the\;heating\;coil
+  RTF = \left(  \frac{PLR}{PartLoadFrac} \right) = runtime~fraction~of~the~heating~coil
 \end{equation}
 
 \subsection{Physics based VRF Heat Pump Model (VRF-FluidTCtrl-HP)}\label{VRF-FluidTCtrl-HP}
@@ -905,7 +900,7 @@ The object connections for VRF-FluidTCtrl model is similar to those for VRF-SysC
 \begin{figure}[hbtp] % figure VRF-FluidTCtrl-1b
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/VRF-FluidTCtrl-1b.png}
-\caption{Energyplus object connections for VRF-FluidTCtrl model \label{fig:energyplus-object-connections-for-vrf-fluidtctrl-model}}
+\caption{EnergyPlus object connections for VRF-FluidTCtrl model \label{fig:energyplus-object-connections-for-vrf-fluidtctrl-model}}
 \end{figure}
 
 \subsubsection{Model Description}\label{vrf-heat-pump-model-description}
@@ -967,17 +962,17 @@ Assuming the coil air flow rate is at the maximum ($G_{a,rate}$), the entering a
   T_{coil,in}=T_{in}+Q_{fan}/(G_{a,rate}\times{c_p}\times\rho_{in})
 \end{equation}
 
-Where
+where:
 
-$c_p$	air heat capacity (kJ/(kg$\cdot$K))
+$c_p$ is the air heat capacity (kJ/(kg$\cdot$K))
 
-$G_{a,rate}$	volumetric flow rate of the air through the indoor unit, at the rated conditions (m\(^3\)/s)
+$G_{a,rate}$	 is the volumetric flow rate of the air through the indoor unit, at the rated conditions (m\(^3\)/s)
 
-$Q_{fan}$	sensible heat released by fan (W)
+$Q_{fan}$ is the sensible heat released by fan (W)
 
-$T_{coil,in}$	temperature of air entering the indoor coil (°C)
+$T_{coil,in}$ is the temperature of air entering the indoor coil (°C)
 
-$\rho_{in}$	density of indoor air, $f_{\rho}(T_{in},W_{in})$  (kg/m\(^3\))
+$\rho_{in}$ is the density of indoor air, $f_{\rho}(T_{in},W_{in})$ (kg/m\(^3\)).
 
 The supply air temperature $T_{out}$ can be calculated by:
 
@@ -985,9 +980,7 @@ The supply air temperature $T_{out}$ can be calculated by:
   T_{out} = T_{coil,in} - Q_{in, sensible} / (G_{a,rate}\times{c_p}\times\rho_{in})
 \end{equation}
 
-Where
-
-$T_{out}$	temperature of the air leaving the indoor unit (supply air) (°C)
+where $T_{out}$ is the temperature of the air leaving the indoor unit (supply air) (\(^{\circ}\)C).
 
 The coil surface air temperature $T_{fs}$ can be calculated, given the bypass factor $BF$:
 
@@ -995,11 +988,11 @@ The coil surface air temperature $T_{fs}$ can be calculated, given the bypass fa
   T_{fs}= T_{coil,in} - (T_{coil,in}-T_{out}) / (1-BF)
 \end{equation}
 
-Where
+where:
 
-$BF$ bypass factor (different values for cooling mode and heating mode) 
+$BF$ is the bypass factor (different values for cooling mode and heating mode) 
 
-$T_{fs}$ indoor unit coil surface air temperature (°C)
+$T_{fs}$ is the indoor unit coil surface air temperature (\(^{\circ}\)C).
 
 In the cooling mode, the superheating degree $SH$ is given and thus the required evaporating temperature $Te_{req}$ for the associated indoor unit can be obtained:
 
@@ -1009,13 +1002,13 @@ In the cooling mode, the superheating degree $SH$ is given and thus the required
  
 Where
 
-$A_c$, $B_c$, $C_c$ coefficients (°C)
+$A_c$, $B_c$, $C_c$ are coefficients
 
-$SH$ superheating degrees for the indoor unit (°C) 
+$SH$ is the superheating degrees for the indoor unit (\(^{\circ}\)C) 
 
-$SH_{ref}$ reference superheating degrees for the indoor unit (e.g., 3) (°C)
+$SH_{ref}$ is the reference superheating degrees for the indoor unit (e.g., 3) (\(^{\circ}\)C)
 
-$Te_{req}$ required evaporating temperature for a specific indoor unit (°C)
+$Te_{req}$ is the required evaporating temperature for a specific indoor unit (\(^{\circ}\)C).
 
 In the heating mode, the subcooling degree $SC$ is given and thus the required condensing temperature $Tc_{req}$ for the associated indoor unit can be obtained:
 
@@ -1023,15 +1016,15 @@ In the heating mode, the subcooling degree $SC$ is given and thus the required c
   Tc_{req}=T_{fs}+[A_h\cdot SC^2+B_h\cdot SC+C_h]
 \end{equation}
  
-Where
+where:
 
-$A_h$, $B_h$, $C_h$ coefficients (°C)
+$A_h$, $B_h$, $C_h$ are coefficients
 
-$SC$ subcooling degrees for the indoor unit (°C) 
+$SC$ is the subcooling degrees for the indoor unit (\(^{\circ}\)C) 
 
-$SC_{ref}$ reference subcooling degrees for the indoor unit (e.g., 5) (°C)
+$SC_{ref}$ is the reference subcooling degrees for the indoor unit (e.g., 5) (\(^{\circ}\)C)
 
-$Tc_{req}$ required condensing temperature for a specific indoor unit (°C)
+$Tc_{req}$ is the required condensing temperature for a specific indoor unit (\(^{\circ}\)C).
 
 \textbf{Step 1.3: Calculate effective evaporating /condensing temperature}
 
@@ -1051,13 +1044,13 @@ In the cooling mode:
   Te = min \{ max [ min(Te_{req,i}), Te_{min}], Te_{max}\}
 \end{equation}
  
-Where
+where:
 
-$Te_{req,i}$ required evaporating temperature for the ith indoor unit (°C)
+$Te_{req,i}$ is the required evaporating temperature for the ith indoor unit (\(^{\circ}\)C)
 
-$Te_{min}$ minimum evaporating temperature for the indoor unit (e.g. 3) (°C)
+$Te_{min}$ is the minimum evaporating temperature for the indoor unit (e.g. 3) (\(^{\circ}\)C)
 
-$Te_{max}$ maximum evaporating temperature for the indoor unit (e.g. 13) (°C)
+$Te_{max}$ is the maximum evaporating temperature for the indoor unit (e.g. 13) (\(^{\circ}\)C).
 
 In the heating mode:
 
@@ -1065,13 +1058,13 @@ In the heating mode:
   Tc = min \{ max[min(Tc_{req,i}),Tc_{min}],Tc_{max} \}
 \end{equation}
  
-Where
+where:
 
-$Tc_{req,i}$ required condensing temperature for the ith indoor unit (°C)
+$Tc_{req,i}$ is the required condensing temperature for the ith indoor unit (\(^{\circ}\)C)
 
-$Tc_{min}$ minimum condensing temperature for the indoor unit (e.g. 42) (°C)
+$Tc_{min}$ is the minimum condensing temperature for the indoor unit (e.g. 42) (\(^{\circ}\)C)
 
-$Tc_{max}$ maximum condensing temperature for the indoor unit (e.g. 46) (°C)
+$Tc_{max}$ is the maximum condensing temperature for the indoor unit (e.g. 46) (\(^{\circ}\)C).
 
 \paragraph{Modeling of the outdoor unit (O/U) - Cooling Mode}\label{modeling-of-the-outdoor-unit-ou-cooling-mode}
 
@@ -1087,15 +1080,15 @@ Calculate the refrigerant flow rate for each indoor unit using assumed $h_{Hexin
   G_i=Q_i/(h_{Hexout,i}-h_{Hexin})
 \end{equation}
 
-Where
+where:
 
-$G_i$ refrigerant flow rate for the i\(^{th}\) indoor unit (kg/s) 
+$G_i$ is the refrigerant flow rate for the i\(^{th}\) indoor unit (kg/s) 
 
-$Q_i$ total cooling load of the i\(^{th}\) zone (W) 
+$Q_i$ is the total cooling load of the i\(^{th}\) zone (W) 
 
-$h_{Hexin}$ enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+$h_{Hexin}$ is the enthalpy of the refrigerant entering the indoor unit (kJ/kg)
 
-$h_{Hexout,i}$ enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
+$h_{Hexout,i}$ is the enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
 
 $h_{Hexout,i}$ is a function of $P_e$, $T_e$, and $SH_i$. It can be calculated using refrigerant thermodynamic property equations $f_{g\_h}(P_e,T_e+SH_i)$.
 
@@ -1109,11 +1102,11 @@ The enthalpy of the refrigerant in the main loop $h_{Hexout}$ can be obtained by
   G_{tot}=\sum{G_i}
 \end{equation}
 
-Where
+where:
 
-$G_{tot}$ refrigerant flow rate in the main loop (kg/s) 
+$G_{tot}$ is the refrigerant flow rate in the main loop (kg/s) 
 
-$h_{Hexout}$ enthalpy of the main loop refrigerant leaving indoor units (kJ/kg)
+$h_{Hexout}$ is the enthalpy of the main loop refrigerant leaving indoor units (kJ/kg).
 
 The viscosity of the refrigerant within the pipe can be calculated via:
 
@@ -1130,18 +1123,22 @@ The viscosity of the refrigerant within the pipe can be calculated via:
 \end{equation}
 
 \begin{equation}
-  \mu=10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2+118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}}-8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)
+\begin{array}{rl}
+\mu =& 10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2 \\
+ & +118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}} \\
+ & -8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)
+\end{array}
 \end{equation}
 
-Where
+where:
 
-$\mu$ viscosity of the refrigerant within the pipe (Pa-s)
+$\mu$ is the viscosity of the refrigerant within the pipe (Pa-s)
 
-$k_{v,i}$	coefficients to calculate the refrigerant viscosity 
+$k_{v,i}$ is the coefficients to calculate the refrigerant viscosity 
 
-$T_{Hexout}$ temperature of main loop refrigerant leaving indoor units, $f_{g\_t}(P_e,h_{Hexout})$ (°C)
+$T_{Hexout}$ is the temperature of main loop refrigerant leaving indoor units, $f_{g\_t}(P_e,h_{Hexout})$ (\(^{\circ}\)C)
 
-$f_{g\_t}$ functions calculating the temperature of superheating refrigerant 
+$f_{g\_t}$ are functions calculating the temperature of superheating refrigerant.
 
 Given $h_{Hexout}$ and $P_e=f_{s\_p}(T_e)$, the following dimensionless quantities describing the refrigerant flow state can be obtained:
 
@@ -1161,25 +1158,25 @@ Given $h_{Hexout}$ and $P_e=f_{s\_p}(T_e)$, the following dimensionless quantiti
   St=Nu/Re/Pr
 \end{equation}
 
-Where
+where:
 
-$P_e$ evaporating pressure (Pa) 
+$P_e$ is the evaporating pressure (Pa) 
 
-$Re$ Reynolds number 
+$Re$ is the Reynolds number 
 
-$Pr$ Prandtl number 
+$Pr$ is the Prandtl number 
 
-$Nu$ Nusselt number 
+$Nu$ is the Nusselt number 
 
-$St$ Stanton number 
+$St$ is the Stanton number 
 
-$\mu$ viscosity of the refrigerant within the pipe (Pa-s)
+$\mu$ is the viscosity of the refrigerant within the pipe (Pa-s)
 
-$f_{s\_p}$ functions calculating the pressure of saturated refrigerant 
+$f_{s\_p}$ are functions calculating the pressure of saturated refrigerant 
 
-$f_{g\_Cp}$ functions calculating the specific heat of superheating refrigerant 
+$f_{g\_Cp}$ are functions calculating the specific heat of superheating refrigerant 
 
-$f_{g\_\lambda}$ functions calculating the conductivity of superheating refrigerant 
+$f_{g\_\lambda}$ are functions calculating the conductivity of superheating refrigerant.
 
 Then the piping pressure loss $\Delta{P_{pipe}}$ can be obtained using the above dimensionless quantities:
 
@@ -1191,21 +1188,21 @@ Then the piping pressure loss $\Delta{P_{pipe}}$ can be obtained using the above
   P_s=P_e-\Delta{P_{pipe}}
 \end{equation}
 
-Where
+where:
 
-$f_{g\_\rho}$	functions calculating the density of superheating refrigerant 
+$f_{g\_\rho}$ are functions calculating the density of superheating refrigerant
 
-$D$ main pipe diameter (m) 
+$D$ is the main pipe diameter (m) 
 
-$H$ height difference between the outdoor unit node and indoor unit node of the main pipe (m)
+$H$ is the height difference between the outdoor unit node and indoor unit node of the main pipe (m)
 
-$L$ main pipe length (outdoor unit to the first branch joint) (m) 
+$L$ is the main pipe length (outdoor unit to the first branch joint) (m) 
 
-$P_s$ compressor suction pressure (Pa) 
+$P_s$ is the compressor suction pressure (Pa) 
 
-$\Delta{P_{pipe}}$ pressure drop in the pipe (Pa)
+$\Delta{P_{pipe}}$ is the pressure drop in the pipe (Pa)
 
-$V$ refrigerant flow velocity (m/s)
+$V$ is the refrigerant flow velocity (m/s).
 
 The suction saturated temperature $T'_e$ (i.e., saturated vapor temperature corresponding to the compressor suction pressure) can be obtained via refrigerant thermodynamic property equations:
 
@@ -1213,11 +1210,11 @@ The suction saturated temperature $T'_e$ (i.e., saturated vapor temperature corr
   T'_e=f_{s\_t}(P_e-\Delta{P_{pipe}})
 \end{equation}
 
-Where
+where:
 
-$f_{s\_t}$	functions calculating the temperature of saturated refrigerant
+$f_{s\_t}$ are functions calculating the temperature of saturated refrigerant
 
-$T'_e$   	suction saturated temperature at the compressor inlet (°C)
+$T'_e$ is the suction saturated temperature at the compressor inlet (\(^{\circ}\)C).
 
 The heat loss through the pipe can be obtained via:
 
@@ -1231,21 +1228,21 @@ k_1=Nu\times{f_{g\_\lambda}(P_e,h_{Hexout})}
 
 \begin{equation}Q_{pipe}=(\pi\times{L})\times(T_a-T_{Hexout})/(1/k_1+1/k_2+1/k_3)\end{equation}
 
-Where
+where:
 
-$f_{g\_\lambda}$	functions calculating the conductivity of superheating refrigerant 
+$f_{g\_\lambda}$ are functions calculating the conductivity of superheating refrigerant 
 
-$Q_{pipe}$ 	heat loss through the pipe (W)
+$Q_{pipe}$ is the heat loss through the pipe (W)
 
-$T_a$ 	average of outdoor air temperature and indoor temperature (°C)
+$T_a$ is the average of outdoor air temperature and indoor temperature (\(^{\circ}\)C)
 
-$T_{Hexout}$	temperature of main pipe refrigerant leaving indoor units (°C) 
+$T_{Hexout}$ is the temperature of main pipe refrigerant leaving indoor units (\(^{\circ}\)C) 
 
-$w_i$	pipe insulation thickness (m) 
+$w_i$ is the pipe insulation thickness (m) 
 
-$k_i$	coefficients for the piping loss calculation  
+$k_i$ are coefficients for the piping loss calculation.
 
-Note that $Q_{pipe}$ is calculated using an assumed $h_{Hexin}$. Its value affects the compressor operation calculations as shown in Step 2c.2~2c.6 and may change the value of condensing temperature $T_c$. This leads to an updated $h_{Hexin}=f(P_c,T_c-SC)$. If the difference between the calculated $h_{Hexin}$ and the assumed $h_{Hexin}$ is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated $h_{Hexin}$.
+Note that $Q_{pipe}$ is calculated using an assumed $h_{Hexin}$. Its value affects the compressor operation calculations as shown in Steps 2c.2 - 2c.6 and may change the value of condensing temperature $T_c$. This leads to an updated $h_{Hexin}=f(P_c,T_c-SC)$. If the difference between the calculated $h_{Hexin}$ and the assumed $h_{Hexin}$ is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated $h_{Hexin}$.
 
 \textbf{Step 2c.2: Initialize O/U operation conditions} 
 
@@ -1255,36 +1252,37 @@ For the first iteration,
 
 \begin{itemize}
   \item
-    Initialize outdoor unit $SC$ with the reference value (from IDF input, e.g., 5°C)
+    Initialize outdoor unit $SC$ with the reference value (from IDF input, e.g., 5\(^{\circ}\)C)
   \item
     Initialize the compressor power $N_{comp}$ with the value calculated from the reference $COP$ (e.g., 3.5):
 \end{itemize}
 
 \begin{equation}N'_{comp}=\frac{\sum_iQ_{in,total,i}}{COP}\end{equation}
 
-Where
+where:
 
-$N_{comp}$	compressor power (W)
+$N_{comp}$ is the compressor power (W)
 
-$N'_{comp}$	assumed compressor power for the first iteration (W)
+$N'_{comp}$ is the assumed compressor power for the first iteration (W)
 
-$Q_{in,total,i}$	total cooling load for zone $i$ (W)
+$Q_{in,total,i}$ is the total cooling load for zone $i$ (W).
 
 For the following iterations,
 
-* Initialize $SC$ with the calculated value in the previous iteration  
-
-* Initialize the compressor power $N_{comp}$ with the calculated value in the previous iteration
+\begin{itemize}
+\item Initialize $SC$ with the calculated value in the previous iteration
+\item Initialize the compressor power $N_{comp}$ with the calculated value in the previous iteration
+\end{itemize}
 
 The heat rate released from the outdoor unit can be calculated by:
 
 \begin{equation}Q_{out}=\sum_iQ_{in,total,i}+N_{comp}+Q_{pipe}\end{equation} 
 
-Where
+where:
 
-$Q_{out}$	heat rate released from the outdoor unit (W)
+$Q_{out}$ is the heat rate released from the outdoor unit (W)
 
-$Q_{pipe}$ 	heat loss through the pipe (W)
+$Q_{pipe}$ is the heat loss through the pipe (W).
 
 \textbf{Step 2c.3: Calculate O/U effective condensing temperature} 
 
@@ -1294,41 +1292,43 @@ The temperature of the air leaving the outdoor unit ${T_{out}}'$ can be calculat
  
 \begin{equation}{T_{out}}'={T_{in}}'+Q_{out}/({G_{a,rate}}'\times{c_p}\times{{\rho_{in}}'})\end{equation}
  
-Where
+where:
 
-${G_{a,rate}}'$ volumetric flow rate of the air through the outdoor unit, at the rating conditions (m\(^3\)/s)
+${G_{a,rate}}'$ is the volumetric flow rate of the air through the outdoor unit, at the rating conditions (m\(^3\)/s)
 
-${T_{out}}'$ temperature of the air leaving the outdoor unit (°C)
+${T_{out}}'$ is the temperature of the air leaving the outdoor unit (\(^{\circ}\)C)
 
-${T_{in}}'$	temperature of the air entering the outdoor unit, i.e., outdoor air (°C)
+${T_{in}}'$ is the temperature of the air entering the outdoor unit, i.e., outdoor air (\(^{\circ}\)C)
 
-${\rho_{in}}'$ air density at outdoor conditions, $f_{\rho}({T_{in}}',{W_{in}}')$ (kg/m\(^3\))
+${\rho_{in}}'$ is the air density at outdoor conditions, $f_{\rho}({T_{in}}',{W_{in}}')$ (kg/m\(^3\)).
 
 The condenser surface temperature ${T_{fs}}'$ can be calculated by:
  
 \begin{equation}{T_{fs}}'={T_{in}}'+({T_{out}}'-{T_{in}}')/(1-{BF_c}')\end{equation}
  
-Where
+where ${BF_c}'$ is the bypass factor for the outdoor unit.
 
-${BF_c}'$ 	bypass factor for the outdoor unit  
-
-(2) Calculate required condensing temperature for the outdoor unit $Tc_{req}$ and then the effective condensing temperature $Tc$ (between 42-46°C)
+(2) Calculate required condensing temperature for the outdoor unit $Tc_{req}$ and then the effective condensing temperature $Tc$ (between 42-46\(^{\circ}\)C)
  
-\begin{equation}Tc_{req}={T_{fs}}'+[A_h\cdot SC^2+B_h\cdot SC+C_h]\end{equation}
+\begin{equation}
+Tc_{req}={T_{fs}}'+[A_h\cdot SC^2+B_h\cdot SC+C_h]
+\end{equation}
 
-\begin{equation}Tc=Tc_{req}\end{equation}
+\begin{equation}
+Tc=Tc_{req}
+\end{equation}
 
-Where	
+where:	
 
-$A_h$, $B_h$, $C_h$ coefficients (°C)
+$A_h$, $B_h$, $C_h$ are coefficients
 
-$SC$ subcooling degrees for the outdoor unit (°C)
+$SC$ is the subcooling degrees for the outdoor unit (\(^{\circ}\)C)
 
-$SC_{ref}$ reference subcooling degrees for the outdoor unit (°C)
+$SC_{ref}$ is the reference subcooling degrees for the outdoor unit (\(^{\circ}\)C)
 
-$Tc_{req}$ required condensing temperature for the outdoor unit (°C)
+$Tc_{req}$ is the required condensing temperature for the outdoor unit (\(^{\circ}\)C)
 
-$Tc$ effective condensing temperature (°C)
+$Tc$ is the effective condensing temperature (\(^{\circ}\)C).
 
 \textbf{Step 2c.4: Calculate required Loading Index}
 
@@ -1336,42 +1336,50 @@ Loading Index is used to describe the operational mode of the compressor system.
 
 The required Loading Index can be calculated by the following procedures. 
 
-a. Calculate the evaporative capacity at a variety of Loading Index:
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\tightlist
+\item Calculate the evaporative capacity at a variety of Loading Index:
+\end{enumerate}
 
-\begin{equation}M_{cap}=(r_1+r_2T_c+r_3{T_e}'+r_4T_c^2+r_5T_c{T_e}'+r_6{T_e}'^2)\end{equation}
+\begin{equation}
+M_{cap}=(r_1+r_2T_c+r_3{T_e}'+r_4T_c^2+r_5T_c{T_e}'+r_6{T_e}'^2)
+\end{equation}
 
-\begin{equation}Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref} \end{equation}
+\begin{equation}
+Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref}
+\end{equation}
 
-Where	
+where:
 
-$C_{cap,system}$ evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (a constant value obtained from manufacturer data)  
+$C_{cap,system}$ is the evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (a constant value obtained from manufacturer data)  
 
-$r_1$, \ldots, $r_6$ empirical coefficients corresponding to $rps$  
+$r_1$, \ldots, $r_6$ are the empirical coefficients corresponding to $rps$  
 
-$rps$	compressor speed (r/s) 
+$rps$ is the compressor speed (r/s) 
 
-${T_e}'$ suction saturated temperature at the compressor inlet (°C)
+${T_e}'$ is the suction saturated temperature at the compressor inlet (\(^{\circ}\)C)
 
-$T_c$	effective condensing temperature (°C)
+$T_c$ is the effective condensing temperature (\(^{\circ}\)C)
 
-$M_{cap}$	multiplier for the evaporative capacity calculation (--)
+$M_{cap}$ is the multiplier for the evaporative capacity calculation (--)
 
-$Q_{rps}$	evaporative capacity corresponding to $rps$ (W) 
+$Q_{rps}$ is the evaporative capacity corresponding to $rps$ (W) 
 
-$Q_{ref}$	rated evaporative capacity (W) 
+$Q_{ref}$ is the rated evaporative capacity (W).
 
-An example of resulting capacity for different $rps$ (at $T_c$=36°C and ${T_e}'$=9°C) is presented in Table~\ref{table:evaporative-capacity-at-different-loading-index}.
+An example of resulting capacity for different $rps$ (at $T_c$=36\(^{\circ}\)C and ${T_e}'$=9\(^{\circ}\)C) is presented in Table~\ref{table:evaporative-capacity-at-different-loading-index}.
 
 \begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
 \caption{Evaporative capacity at different Loading Index \label{table:evaporative-capacity-at-different-loading-index}} \tabularnewline
 \toprule 
-Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36°C, ${T_e}'$=9°C & Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36°C, ${T_e}'$=9°C \tabularnewline
+Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36\(^{\circ}\)C, ${T_e}'$=9\(^{\circ}\)C & Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36\(^{\circ}\)C, ${T_e}'$=9\(^{\circ}\)C \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Evaporative capacity at different Loading Index} \tabularnewline
 \toprule 
-Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36°C, ${T_e}'$=9°C & Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36°C, ${T_e}'$=9°C \tabularnewline
+Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36\(^{\circ}\)C, ${T_e}'$=9\(^{\circ}\)C & Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36\(^{\circ}\)C, ${T_e}'$=9\(^{\circ}\)C \tabularnewline
 \midrule
 \endhead
 
@@ -1411,27 +1419,27 @@ C_{cap,enthalpy} = \frac{h_{Evapout,test}-h_{Evapin,test}}{h_{Compin,real}-h_{Ev
 h_{Compin,real} = h_{Hexout,real}+Q_{pipe}/G_{tot}
 \end{equation}
 
-Where
+where:
 
-\(C_{cap,operation}\) evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., \(SH\) and \(SC\) )
+\(C_{cap,operation}\) is the evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., \(SH\) and \(SC\) )
 
-\(C_{cap,density}\) evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions
+\(C_{cap,density}\) is the evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions
 
-\(C_{cap,enthalpy}\) evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions
+\(C_{cap,enthalpy}\) is the evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions
 
-\(G_{tot}\) refrigerant flow rate in the main loop (kg/s)
+\(G_{tot}\) is the refrigerant flow rate in the main loop (kg/s)
 
-\(h_{Evapin,real}\) enthalpy of refrigerant entering the evaporators (IU) at real conditions {[}kJ/kg{]}
+\(h_{Evapin,real}\) is the enthalpy of refrigerant entering the evaporators (IU) at real conditions (kJ/kg)
 
-\(h_{Evapout,real}\) average enthalpy of refrigerant leaving the evaporators (IU) at real conditions {[}kJ/kg{]}
+\(h_{Evapout,real}\) is the average enthalpy of refrigerant leaving the evaporators (IU) at real conditions (kJ/kg)
 
-\(h_{Evapin,test}\) enthalpy of refrigerant entering the evaporator at test conditions (It corresponds to \(SC\) at test condition(e.g., 5 °C) and Tc) (kJ/kg)
+\(h_{Evapin,test}\) is the enthalpy of refrigerant entering the evaporator at test conditions (i.e., \(SC\) at test conditions (e.g., 5\(^{\circ}\)C) and Tc) (kJ/kg)
 
-\(h_{Evapout,test}\) enthalpy of refrigerant leaving the evaporator at test conditions (It corresponds to \(SH\) at test condition(e.g., 8 °C) and Te) (kJ/kg)
+\(h_{Evapout,test}\) is the enthalpy of refrigerant leaving the evaporator at test conditions (i.e., \(SH\) at test conditions (e.g., 8\(^{\circ}\)C) and Te) (kJ/kg)
 
-\(h_{Compin}\) enthalpy of refrigerant entering the compressor (kJ/kg)
+\(h_{Compin}\) is the enthalpy of refrigerant entering the compressor (kJ/kg)
 
-\(Q_{pipe}\) heat loss through the pipe (W)
+\(Q_{pipe}\) is the heat loss through the pipe (W).
 
 For example, if the required capacity is 8 kW, the \(rps\) range is 30 to 36.
 
@@ -1439,25 +1447,25 @@ For example, if the required capacity is 8 kW, the \(rps\) range is 30 to 36.
 \def\labelenumi{\alph{enumi}.}
 \setcounter{enumi}{2}
 \item
-  Calculate the \(rps\) that meets the required capacity by interpolation. In the above example, the resulting \(rps\) is 34.5 \(rps\) .
+  Calculate the \(rps\) that meets the required capacity by interpolation. In the above example, the resulting \(rps\) is 34.5 \(rps\).
 \item
-  If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), go to Step 2c.5, otherwise skip Step 2c.5 and directly go to Step 2c. 6.
+  If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18~\(rps\) ), go to Step 2c.5, otherwise skip Step 2c.5 and directly go to Step 2c.6.
 \end{enumerate}
 
 \textbf{Step 2c.5: Modify evaporating temperature to further reduce outdoor unit capacity} 
 
-If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), it means that the zone cooling load is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature \(T_e\) as well as the superheating degree \(SH\) is modified to further reduce the outdoor unit capacity. More specifically:
+If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18~\(rps\) ), it means that the zone cooling load is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature \(T_e\) as well as the superheating degree \(SH\) is modified to further reduce the outdoor unit capacity. More specifically:
 
 \begin{enumerate}
 \def\labelenumi{\alph{enumi}.}
 \item
-  Set \(rps\) at its minimum value (e.g., 18 \(rps\) ).
+  Set \(rps\) at its minimum value (e.g., 18~\(rps\)).
 \item
   Update \({T_e}'\) to meet the required evaporative capacity, using equations described in Step 2c.4a.
 \item
-  Update \(T_e\) to meet the updated \({T_e}'\) . Note that due to the \(T_e\) updates, the refrigerant state and flow rate are changed and thus the piping loss analysis should also be repeated (Step 2c.1). So is the calculation of \(C_{cap,operation}\) (Step 2c.2-2c.3).
+  Update \(T_e\) to meet the updated \({T_e}'\) . Note that due to the \(T_e\) updates, the refrigerant state and flow rate are changed and thus the piping loss analysis should also be repeated (Step 2c.1). So is the calculation of \(C_{cap,operation}\) (Step 2c.2 - 2c.3).
 \item
-  \(SH\) can be updated based on the updated \(T_e\) , using the equations shown in Step 1.2.
+  \(SH\) can be updated based on the updated \(T_e\), using the equations shown in Step 1.2.
 \end{enumerate}
 
 \textbf{Step 2c.6: Calculate the compressor power} 
@@ -1473,7 +1481,7 @@ If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), i
 \def\labelenumi{\alph{enumi}.}
 \tightlist
 \item
-  Calculate the compressor power at a variety of loading index using the following equation. The resulting table (Table 2) from the same example used above is shown below.
+  Calculate the compressor power at a variety of loading index using the following equation. The resulting table from the same example used above is shown below in Table~\ref{table:outdoor-unit-compressor-power-at-different-loading-index-20160504}.
 \end{enumerate}
 
 \begin{equation}
@@ -1484,30 +1492,30 @@ If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), i
   N_{comp,rps} = M_{comp} \times N_{comp,ref}
 \end{equation}
 
-Where
+where:
 
-\(c_1\) ,\ldots{},\(c_6\) empirical coefficients corresponding to \(rps\)
+\(c_1\),~\ldots{},~\(c_6\) are the empirical coefficients corresponding to \(rps\)
 
-\({T_e}'\) suction saturated temperature at the compressor inlet (°C)
+\({T_e}'\) is the suction saturated temperature at the compressor inlet (\(^{\circ}\)C)
 
-\(T_c\) effective condensing temperature (°C)
+\(T_c\) is the effective condensing temperature (\(^{\circ}\)C)
 
-\(M_{comp}\) multiplier for the compressor power calculation (--)
+\(M_{comp}\) is the multiplier for the compressor power calculation (--)
 
-\(N_{comp,ref}\) rated compressor power (W)
+\(N_{comp,ref}\) is the rated compressor power (W)
 
-\(N_{comp,rps}\) compressor power corresponding to \(rps\) (W)
+\(N_{comp,rps}\) is the compressor power corresponding to \(rps\) (W).
 
 \begin{longtable}[c]{ll}
 \caption{Outdoor unit compressor power at different Loading Index \label{table:outdoor-unit-compressor-power-at-different-loading-index-20160504}} \tabularnewline
 \toprule 
-Loading Index (\(rps\)) & Evaporative Capacity (kW), \(T_c\)=36°C, \({T_e}'\)=9°C \tabularnewline
+Loading Index (\(rps\)) & Evaporative Capacity (kW), \(T_c\)=36\(^{\circ}\)C, \({T_e}'\)=9\(^{\circ}\)C \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Outdoor unit compressor power at different Loading Index} \tabularnewline
 \toprule 
-Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36°C, ${T_e}'$=9°C \tabularnewline
+Loading Index ($rps$) & Evaporative Capacity (kW), $T_c$=36\(^{\circ}\)C, ${T_e}'$=9\(^{\circ}\)C \tabularnewline
 \midrule
 \endhead
 
@@ -1554,13 +1562,13 @@ Calculate the total electric power consumption by the outdoor unit:
 N_{out} = N_{fan}+N_{comp}/e_{inv}
 \end{equation}
 
-Where
+where:
 
-\(e_{inv}\) efficiency of the inverter of compressor
+\(e_{inv}\) is the efficiency of the inverter of compressor
 
-\(N_{fan}\) electric power consumption by the outdoor fan (W)
+\(N_{fan}\) is the electric power consumption by the outdoor fan (W)
 
-\(N_{out}\) total electric power consumption by the outdoor unit (W)
+\(N_{out}\) is the total electric power consumption by the outdoor unit (W).
 
 \subsubsection{\emph{Modeling of the outdoor unit (O/U) - Heating Mode}}\label{modeling-of-the-outdoor-unit-ou---heating-mode}
 
@@ -1568,23 +1576,23 @@ Where
 
 Similarly to that in the cooling mode, the piping loss analysis in the heating mode needs to address the coupling effect between the piping loss and system operations. However, due to the control strategy difference between the two modes, the piping loss algorithm in the heating mode requires different calculation steps and more numerical iterations, as shown below.
 
-Calculate the refrigerant flow rate for each indoor unit using assumed \(h_{Hexin}\) :
+Calculate the refrigerant flow rate for each indoor unit using assumed \(h_{Hexin}\):
 
 \begin{equation}
 G_i = Q_i/(h_{Hexin}-h_{Hexout,i})
 \end{equation}
 
-Where
+where:
 
-\(G_i\) refrigerant flow rate for the i\(^{th}\) indoor unit (kg/s)
+\(G_i\) is the refrigerant flow rate for the i\(^{th}\) indoor unit (kg/s)
 
-\(Q_i\) total heating load of the i\(^{th}\) zone (W)
+\(Q_i\) is the total heating load of the i\(^{th}\) zone (W)
 
-\(h_{Hexin}\) enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+\(h_{Hexin}\) is the enthalpy of the refrigerant entering the indoor unit (kJ/kg)
 
-\(h_{Hexout,i}\) enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
+\(h_{Hexout,i}\) is the enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
 
-\(h_{Hexout,i}\) is a function of \(P_c\) , \(T_c\) , and \(SC_i\) . It can be calculated using refrigerant thermodynamic property equations \(f_{g_h}(P_c,T_c-SC_i)\) .
+\(h_{Hexout,i}\) is a function of \(P_c\), \(T_c\), and \(SC_i\). It can be calculated using refrigerant thermodynamic property equations \(f_{g_h}(P_c,T_c-SC_i)\).
 
 The refrigerant flow rate in the main loop can be obtained by summing up the flow rate in each indoor unit:
 
@@ -1592,9 +1600,7 @@ The refrigerant flow rate in the main loop can be obtained by summing up the flo
 G_{tot} = \sum{G_i}
 \end{equation}
 
-Where
-
-\(G_{tot}\) refrigerant flow rate in the main loop (kg/s)
+where \(G_{tot}\) refrigerant flow rate in the main loop (kg/s).
 
 Calculate the average refrigerant pressure and enthalpy within the pipes, using assumed piping pressure loss \(\Delta{P_{pipe}}\) and \(h_{Tdi}\) :
 
@@ -1606,21 +1612,21 @@ P_{ave} = P_c+\Delta{P_{pipe}}/2
 h_{ave} = (h_{Hexin}+h_{Tdi})/2
 \end{equation}
 
-Where
+where:
 
-\(h_{ave}\) average refrigerant enthalpy within the main pipe (kJ/kg)
+\(h_{ave}\) is the average refrigerant enthalpy within the main pipe (kJ/kg)
 
-\(h_{Hexin}\) enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+\(h_{Hexin}\) is the enthalpy of the refrigerant entering the indoor unit (kJ/kg)
 
-\(h_{Tdi}\) enthalpy of the refrigerant leaving the compressor (kJ/kg)
+\(h_{Tdi}\) is the enthalpy of the refrigerant leaving the compressor (kJ/kg)
 
-\(P_{ave}\) average refrigerant pressure within the main pipe (Pa)
+\(P_{ave}\) is the average refrigerant pressure within the main pipe (Pa)
 
-\(P_c\) condensing pressure (Pa)
+\(P_c\) is the condensing pressure (Pa)
 
-\(\Delta{P_{pipe}}\) pressure drop in the main pipe (Pa)
+\(\Delta{P_{pipe}}\) is the pressure drop in the main pipe (Pa).
 
-The viscosity of the refrigerant within the pipe can be calculated given \(P_{ave}\) and \(h_{ave}\) , using the following equations:
+The viscosity of the refrigerant within the pipe can be calculated given \(P_{ave}\) and \(h_{ave}\), using the following equations:
 
 \begin{equation}
 k_{v,1} = P_{ave}/4926000
@@ -1635,29 +1641,33 @@ k_{v,3} = (T_{ave}+273.15)/344.39
 \end{equation}
 
 \begin{equation}
-\mu = 10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2+118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}}-8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)
+\begin{array}{rl}
+\mu =& 10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2 \\
+ & +118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}} \\
+ & -8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)
+\end{array}
 \end{equation}
 
-Where
+where:
 
-\(\mu\) viscosity of the refrigerant within the pipe (Pa-s)
+\(\mu\) is the viscosity of the refrigerant within the pipe (Pa-s)
 
-\(k_{v,i}\) coefficients to calculate the refrigerant viscosity
+\(k_{v,i}\) are coefficients to calculate the refrigerant viscosity
 
-\(h_{ave}\) average refrigerant enthalpy within the pipes (kJ/kg)
+\(h_{ave}\) is the average refrigerant enthalpy within the pipes (kJ/kg)
 
-\(P_{ave}\) average refrigerant pressure within the pipes (Pa)
+\(P_{ave}\) is the average refrigerant pressure within the pipes (Pa)
 
-\(T_{ave}\) average temperature of refrigerant leaving indoor units, which corresponds to \(P_{ave}\) and \(h_{ave}\) (°C)
+\(T_{ave}\) is the average temperature of refrigerant leaving indoor units, which corresponds to \(P_{ave}\) and \(h_{ave}\) (\(^{\circ}\)C)
 
-Given \(P_{ave}\) and \(h_{ave}\) , the following dimensionless quantities describing the refrigerant flow state can be obtained:
+Given \(P_{ave}\) and \(h_{ave}\), the following dimensionless quantities describing the refrigerant flow state can be obtained:
 
 \begin{equation}
 Re = G_{tot}/3600/(0.25\times\pi\times{D^2})\times{D}/\mu
 \end{equation}
 
 \begin{equation}
-Pr = \mu\times{f_{g_Cp}(P_{ave},h_{ave})}\times{0.001}/f_{g_\lambda}(P_{ave},h_{ave})
+Pr = \mu\times{f_{g_{C_p}}(P_{ave},h_{ave})}\times{0.001}/f_{g_\lambda}(P_{ave},h_{ave})
 \end{equation}
 
 \begin{equation}
@@ -1668,49 +1678,49 @@ Nu = 0.023\times{Re^{0.8}\times{Pr^{0.4}}}
 St = Nu/Re/Pr
 \end{equation}
 
-Where
+where:
 
-\(Re\) Reynolds number
+\(Re\) is the Reynolds number
 
-\(Pr\) Prandtl number
+\(Pr\) is the Prandtl number
 
-\(Nu\) Nusselt number
+\(Nu\) is the Nusselt number
 
-\(St\) Stanton number
+\(St\) is the Stanton number
 
-\(\mu\) viscosity of the refrigerant within the pipe (Pa-s)
+\(\mu\) is the viscosity of the refrigerant within the pipe (Pa-s)
 
-\(f_{g_Cp}\) functions calculating the specific heat of superheating refrigerant
+\(f_{g_{C_p}}\) are functions calculating the specific heat of superheating refrigerant
 
-\(f_{g_\lambda}\) functions calculating the conductivity of superheating refrigerant
+\(f_{g_\lambda}\) are functions calculating the conductivity of superheating refrigerant.
 
-Then the piping pressure loss \(\Delta{P_{pipe}}\) can be obtained using the above dimensionless quantities:
+Then, the piping pressure loss \(\Delta{P_{pipe}}\) can be obtained using the above dimensionless quantities:
 
 \begin{equation}
 \Delta{P_{pipe}} = 8\times{St}\times{Pr^{2/3}}\times{L/D}\times{f_{g_\rho}(P_{ave},h_{ave})}\times{V^2}/2-H\times{f_{g_\rho}(P_{ave},h_{ave})}\times9.80665
 \end{equation}
 
-Where
+where:
 
-\(f_{g_\rho}\) functions calculating the density of superheating refrigerant
+\(f_{g_\rho}\) are functions calculating the density of superheating refrigerant
 
-\(D\) main pipe diameter (m)
+\(D\) is the main pipe diameter (m)
 
-\(H\) height difference between the outdoor unit node and indoor unit node of the main pipe (m)
+\(H\) is the height difference between the outdoor unit node and indoor unit node of the main pipe (m)
 
-\(L\) main pipe length (outdoor unit to the first branch joint) (m)
+\(L\) is the main pipe length (outdoor unit to the first branch joint) (m)
 
-\(St\) Stanton number
+\(St\) is the Stanton number
 
-\(Re\) Reynolds number
+\(Re\) is the Reynolds number
 
-\(Pr\) Prandtl number
+\(Pr\) is the Prandtl number
 
-\(\Delta{P_{pipe}}\) pressure drop in the pipe (Pa)
+\(\Delta{P_{pipe}}\) is the pressure drop in the pipe (Pa)
 
-\(V\) refrigerant flow velocity (m/s)
+\(V\) is the refrigerant flow velocity (m/s).
 
-Compare the calculated \(\Delta{P_{pipe}}\) and the one assumed above. If the difference is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(\Delta{P_{pipe}}\) .
+Compare the calculated \(\Delta{P_{pipe}}\) and the one assumed above. If the difference is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(\Delta{P_{pipe}}\).
 
 The compressor discharge saturated temperature \(T'_c\) (i.e., saturated vapor temperature corresponding to compressor discharge pressure) can be obtained via:
 
@@ -1718,15 +1728,15 @@ The compressor discharge saturated temperature \(T'_c\) (i.e., saturated vapor t
 T'_c = f_{s_t}(P_c+\Delta{P_{pipe}})
 \end{equation}
 
-Where
+where:
 
-\(f_{s_t}\) functions calculating the temperature of saturated refrigerant
+\(f_{s_t}\) are functions calculating the temperature of saturated refrigerant
 
-\(T'_c\) discharge saturated temperature at the compressor outlet (°C)
+\(T'_c\) is the discharge saturated temperature at the compressor outlet (\(^{\circ}\)C)
 
-\(P_c\) condensing pressure (Pa)
+\(P_c\) is the condensing pressure (Pa)
 
-\(\Delta{P_{pipe}}\) pressure drop in the pipe (Pa)
+\(\Delta{P_{pipe}}\) is the pressure drop in the pipe (Pa).
 
 The heat loss through the pipe can be obtained via:
 
@@ -1746,47 +1756,47 @@ k_3 = h\times(D+2\times{W_i})
 Q_{pipe} = (\pi\times{L})\times(T_a-T_{Hexin})/(1/k_1+1/k_2+1/k_3)
 \end{equation}
 
-Where
+where:
 
-\(f_{g_\lambda}\) functions calculating the conductivity of superheating refrigerant
+\(f_{g_\lambda}\) are functions calculating the conductivity of superheating refrigerant
 
-\(Q_{pipe}\) heat loss through the pipe (W)
+\(Q_{pipe}\) is the heat loss through the pipe (W)
 
-\(T_a\) average of outdoor air temperature and indoor temperature (°C)
+\(T_a\) is the average of outdoor air temperature and indoor temperature (\(^{\circ}\)C)
 
-\(T_{Hexin}\) average of entering indoor units (°C)
+\(T_{Hexin}\) is the average of entering indoor units (\(^{\circ}\)C)
 
-\(w_i\) pipe insulation thickness (m)
+\(w_i\) is the pipe insulation thickness (m)
 
-\(k_i\) coefficients for the piping loss calculation
+\(k_i\) is the coefficients for the piping loss calculation.
 
-The enthalpy of the refrigerant entering the indoor unit can be updated using the calculated \(Q_{pipe}\) :
+The enthalpy of the refrigerant entering the indoor unit can be updated using the calculated \(Q_{pipe}\):
 
 \begin{equation}
 h_{Tdi} = h_{Hexin}+Q_{pipe}/G_{tot}
 \end{equation}
 
-Where
+where:
 
-\(h_{Hexin}\) enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+\(h_{Hexin}\) is the enthalpy of the refrigerant entering the indoor unit (kJ/kg)
 
-\(h_{Tdi}\) enthalpy of the refrigerant leaving the compressor (kJ/kg)
+\(h_{Tdi}\) is the enthalpy of the refrigerant leaving the compressor (kJ/kg)
 
-\(G_{tot}\) refrigerant flow rate in the main loop (kg/s)
+\(G_{tot}\) is the refrigerant flow rate in the main loop (kg/s).
 
-Compare the calculated \(h_{Tdi}\) and the one assumed above. If the difference is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(h_{Tdi}\) .
+Compare the calculated \(h_{Tdi}\) and the one assumed above. If the difference is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(h_{Tdi}\).
 
-Note that \(Q_{pipe}\) is calculated using an assumed \(h_{Hexin}\) at the beginning of the piping loss algorithm. Its value affects the compressor operation calculations as shown in Step 2h.2\textasciitilde{}2h.6 and may change the value of evaporating temperature \(T_e\) . This leads to an updated \(h_{Hexin} = f(P_e,T_e+SH,N_{comp},G_{tot})\) . If the difference between the calculated result and the assumed value is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(h_{Hexin}\) .
+Note that \(Q_{pipe}\) is calculated using an assumed \(h_{Hexin}\) at the beginning of the piping loss algorithm. Its value affects the compressor operation calculations as shown in Step 2h.2\textasciitilde{}2h.6 and may change the value of evaporating temperature \(T_e\). This leads to an updated \(h_{Hexin} = f(P_e,T_e+SH,N_{comp},G_{tot})\). If the difference between the calculated result and the assumed value is higher than the assigned tolerance (5\%), a new round of iteration is performed using the calculated \(h_{Hexin}\).
 
 \textbf{Step 2h.2: Initialize O/U operation conditions}
 
-Similar to that in cooling mode, an iteration approach is designed to determine the energy consumption of the compressor (Step 2h. 2 to Step 2h. 6).
+Similar to that in cooling mode, an iteration approach is designed to determine the energy consumption of the compressor (Step 2h.2 to Step 2h.6).
 
 For the first iteration,
 
 \begin{itemize}
 \item
-  Initialize outdoor unit \(SH\) with the reference value (from IDF input, e.g., 1.5°C)
+  Initialize outdoor unit \(SH\) with the reference value (from IDF input, e.g., 1.5\(^{\circ}\)C)
 \item
   Iinitialize the compressor power \(N_{comp}\) with the value calculated from the reference \(COP\) (e.g., 3.5):
 \end{itemize}
@@ -1795,15 +1805,15 @@ For the first iteration,
 N'_{comp} = \frac{\sum_iQ_{in,total,i}}{COP}
 \end{equation}
 
-Where
+where:
 
-\(N_{comp}\) compressor power (W)
+\(N_{comp}\) is the compressor power (W)
 
-\(N'_{comp}\) assumed compressor power for the first iteration (W)
+\(N'_{comp}\) is the assumed compressor power for the first iteration (W)
 
-\(Q_{in,total,i}\) total heating load for zone \(i\) (W)
+\(Q_{in,total,i}\) is the total heating load for zone \(i\) (W).
 
-For the following iterations,
+For the following iterations:
 
 \begin{itemize}
 \item
@@ -1818,11 +1828,11 @@ Calculate the heat rate extracted by the outdoor unit by:
 Q_{out} = \sum_iQ_{in,total,i}+Q_{pipe}-N_{comp}
 \end{equation}
 
-Where
+where:
 
-\(Q_{out}\) heat rate extracted by the outdoor unit (W)
+\(Q_{out}\) is the heat rate extracted by the outdoor unit (W)
 
-\(Q_{pipe}\) heat loss through the pipe (W)
+\(Q_{pipe}\) is the heat loss through the pipe (W).
 
 \textbf{Step 2h.3: Calculate O/U effective evaporating temperature} 
 
@@ -1839,36 +1849,36 @@ The enthalpy of the air leaving the outdoor unit can be calculated by:
 {H_{fs}}' = {H_{in}}'-Q_{out}/({G_{a,rate}}'\times{\rho_o})/(1-BF')
 \end{equation}
 
-The coil surface air temperature \({T_{fs}}'\) can be calculated from the \({H_{fs}}'\) :
+The coil surface air temperature \({T_{fs}}'\) can be calculated from the \({H_{fs}}'\):
 
 \begin{equation}
-if\quad{H_{fs}}'<H_{98\%,W_o}\quad{then}\quad{T_{fs}}' = f({H_{fs}}',98\%)
+if~{H_{fs}}'<H_{98\%,W_o}{,~then~}{T_{fs}}' = f({H_{fs}}',98\%)
 \end{equation}
 
 \begin{equation}
-if\quad{H_{fs}}'\ge{H_{98\%,W_o}}\quad{then}\quad{T_{fs}}' = f({H_{fs}}',W_o)
+if~{H_{fs}}'\ge{H_{98\%,W_o}}{,~then~}{T_{fs}}' = f({H_{fs}}',W_o)
 \end{equation}
 
-Where
+where:
 
-\(BF'\) bypass factor for the outdoor unit
+\(BF'\) is the bypass factor for the outdoor unit
 
-\({G_{a,rate}}'\) volumetric flow rate of the air through the outdoor unit, at the rating conditions (m\(^{3}\)/s)
+\({G_{a,rate}}'\) is the volumetric flow rate of the air through the outdoor unit, at the rating conditions (m\(^{3}\)/s)
 
-\({H_{fs}}'\) enthalpy of the air leaving the outdoor unit (kJ/kg)
+\({H_{fs}}'\) is the enthalpy of the air leaving the outdoor unit (kJ/kg)
 
-\({H_{in}}'\) enthalpy of the air entering the outdoor unit, i.e., outdoor air (kJ/kg)
+\({H_{in}}'\) is the enthalpy of the air entering the outdoor unit, i.e., outdoor air (kJ/kg)
 
-\(W_o\) humidity ratio of the outdoor air (kg/kg)
+\(W_o\) is the humidity ratio of the outdoor air (kg/kg)
 
-\(\rho_o\) density of the outdoor air (kg/m\(^{3}\))
+\(\rho_o\) is the density of the outdoor air (kg/m\(^{3}\)).
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
 \setcounter{enumi}{1}
 \tightlist
 \item
-  Calculate required evaporating temperature for the outdoor unit \(Te_{req}\) and then the effective evaporating temperature \(Te\) .
+  Calculate required evaporating temperature for the outdoor unit \(Te_{req}\) and then the effective evaporating temperature \(Te\).
 \end{enumerate}
 
 \begin{equation}
@@ -1879,17 +1889,17 @@ Te_{req} = {T_{fs}}'-[{A_c}'\cdot SH^2+{B_c}'\cdot SH+{C_c}']
 Te = Te_{req}
 \end{equation}
 
-Where
+where:
 
-\({A_c}'\) ,\({B_c}'\) ,\({C_c}'\) coefficients (°C)
+\({A_c}'\),\({B_c}'\),\({C_c}'\) are coefficients
 
-\(SH\) superheating degrees for the outdoor unit (°C)
+\(SH\) is the superheating degrees for the outdoor unit (\(^{\circ}\)C)
 
-\(SH_{ref}\) reference superheating degrees for the outdoor unit (°C)
+\(SH_{ref}\) is the reference superheating degrees for the outdoor unit (\(^{\circ}\)C)
 
-\(Te_{req}\) required evaporating temperature for the outdoor unit (°C)
+\(Te_{req}\) is the required evaporating temperature for the outdoor unit (\(^{\circ}\)C)
 
-\(Te\) effective evaporating temperature (°C)
+\(Te\) is the effective evaporating temperature (\(^{\circ}\)C).
 
 \textbf{Step 2h.4: Calculate required compressor Loading Index}
 
@@ -1910,25 +1920,25 @@ Calculate the required compressor Loading Index by the following procedures.
   Q_{rps} = C_{cap,system} \times M_{cap} \times Q_{ref}
 \end{equation}
 
-Where
+where:
 
-\(C_{cap,system}\) evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (obtained from manufacturer data)
+\(C_{cap,system}\) is the evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (obtained from manufacturer data)
 
-\(r_1\) ,\ldots{},\(r_6\) empirical coefficients corresponding to \(rps\)
+\(r_1\), \ldots{}, \(r_6\) is the empirical coefficients corresponding to \(rps\)
 
-\(rps\) compressor speed (r/s)
+\(rps\) is the compressor speed (r/s)
 
-\(T_e\) effective evaporating temperature (°C)
+\(T_e\) is the effective evaporating temperature (\(^{\circ}\)C)
 
-\(M_{cap}\) multiplier for the evaporative capacity calculation (--)
+\(M_{cap}\) is the multiplier for the evaporative capacity calculation (--)
 
-\({T_c}'\) discharge saturated temperature at the compressor outlet (°C)
+\({T_c}'\) is the discharge saturated temperature at the compressor outlet (\(^{\circ}\)C)
 
-\(Q_{rps}\) evaporative capacity corresponding to \(rps\) (W)
+\(Q_{rps}\) is the evaporative capacity corresponding to \(rps\) (W)
 
-\(Q_{ref}\) rated evaporative capacity (W)
+\(Q_{ref}\) is the rated evaporative capacity (W).
 
-An example of resulting capacity for different \(rps\) (at \({T_c}'\) = 36°C and \(T_e\) = 9°C) is presented in Table 3.
+An example of resulting capacity for different \(rps\) (at \({T_c}'\) = 36\(^{\circ}\)C and \(T_e\) = 9\(^{\circ}\)C) is presented in Table 3.
 
 Table 3-- evaporative capacity at different Loading Index
 
@@ -1937,7 +1947,7 @@ Table 3-- evaporative capacity at different Loading Index
 \setcounter{enumi}{1}
 \tightlist
 \item
-  Find the \(rps\) range that covers the required evaporative capacity \(Q_{rps,modify}\) .
+  Find the \(rps\) range that covers the required evaporative capacity \(Q_{rps,modify}\).
 \end{enumerate}
 
 \begin{equation}
@@ -1956,21 +1966,21 @@ C_{cap,density} = \rho_{test}/\rho_{real}
 C_{cap,enthalpy} = \frac{h_{Evapout,test}-h_{Condout,test}}{h_{Compin,real}-h_{Condout,real}}
 \end{equation}
 
-Where
+where:
 
-\(C_{cap,operation}\) evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., \(SH\) and \(SC\) )
+\(C_{cap,operation}\) is the evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., \(SH\) and \(SC\))
 
-\(C_{cap,density}\) evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions
+\(C_{cap,density}\) is the evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions
 
-\(C_{cap,enthalpy}\) evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions
+\(C_{cap,enthalpy}\) is the evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions
 
-\(h_{Condout,test}\) enthalpy of refrigerant leaving the condensers (IU) at test conditions (It corresponds to \(SH\) at test condition(e.g., 8°C) and \(Te\) ) (kJ/kg)
+\(h_{Condout,test}\) is the enthalpy of refrigerant leaving the condensers (IU) at test conditions which corresponds to \(SH\) at test conditions (e.g., 8\(^{\circ}\)C) and \(Te\)) (kJ/kg)
 
-\(h_{Condout,real}\) average enthalpy of refrigerant leaving the condensers (IU) at real conditions (kJ/kg)
+\(h_{Condout,real}\) is the average enthalpy of refrigerant leaving the condensers (IU) at real conditions (kJ/kg)
 
-\(h_{Compin,real}\) enthalpy of refrigerant entering the compressor at real conditions (It corresponds to \(SH\) and \(Te\) at real conditions) (kJ/kg)
+\(h_{Compin,real}\) is the enthalpy of refrigerant entering the compressor at real conditions which corresponds to \(SH\) and \(Te\) at real conditions (kJ/kg)
 
-\(Q_{pipe}\) heat loss through the pipe (W)
+\(Q_{pipe}\) is the heat loss through the pipe (W).
 
 For example, if the required capacity is 8 kW, the \(rps\) range is 30 to 36 \(rps\) based on Table 3.
 
@@ -1978,19 +1988,19 @@ For example, if the required capacity is 8 kW, the \(rps\) range is 30 to 36 \(r
 \def\labelenumi{\alph{enumi}.}
 \setcounter{enumi}{2}
 \item
-  Calculate the \(rps\) that meets the need by interpolation. In the above example, the resulting \(rps\) is 34.5 \(rps\) .
+  Calculate the \(rps\) that meets the need by interpolation. In the above example, the resulting \(rps\) is 34.5 \(rps\).
 \item
-  If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\) ), go to Step 2h. 5; otherwise, skip Step 2h. 5 and go to Step 2h. 6.
+  If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18\(rps\)), go to Step 2h.5; otherwise, skip Step 2h.5 and go to Step 2h.6.
 \end{enumerate}
 
 \textbf{Step 2h.5: Modify evaporating temperature to further reduce outdoor unit capacity}
 
-If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18 \(rps\) ), it means that the zone heating load (indoor unit side) is so low that it leads to an evaporative capacity (outdoor unit side) which is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature \(Te\) as well as the superheating degree \(SH\) is modified to further reduce the outdoor unit capacity. More specifically:
+If the calculated \(rps\) is lower than the minimum \(rps\) (e.g.~18 \(rps\)), it means that the zone heating load (indoor unit side) is so low that it leads to an evaporative capacity (outdoor unit side) which is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature \(Te\) as well as the superheating degree \(SH\) is modified to further reduce the outdoor unit capacity. More specifically:
 
 \begin{enumerate}
 \def\labelenumi{\alph{enumi}.}
 \item
-  Set \(rps\) at its minimum value (e.g., 18 \(rps\) ).
+  Set \(rps\) at its minimum value (e.g., 18 \(rps\)).
 \item
   Update \(Te\) to meet the required evaporative capacity, using equations described in Step 2h.4a.
 \item
@@ -2023,23 +2033,23 @@ It should be noted that, different from the corresponding step in the cooling mo
   N_{comp,rps} = M_{comp} \times N_{comp,ref}
 \end{equation}
 
-Where
+where:
 
-\(c_1\) ,\ldots{},\(c_6\) empirical coefficients corresponding to \(rps\)
+\(c_1\), \ldots{}, \(c_6\) empirical coefficients corresponding to \(rps\)
 
-\(T_e\) effective evaporating temperature (°C)
+\(T_e\) is the effective evaporating temperature (\(^{\circ}\)C)
 
-\(T_{e,ref}\) reference evaporating temperature (°C)
+\(T_{e,ref}\) is the reference evaporating temperature (\(^{\circ}\)C)
 
-\({T_c}'\) discharge saturated temperature at the compressor outlet (°C)
+\({T_c}'\) is the discharge saturated temperature at the compressor outlet (\(^{\circ}\)C)
 
-\(T_{c,ref}\) reference condensing temperature (°C)
+\(T_{c,ref}\) is the reference condensing temperature (\(^{\circ}\)C)
 
-\(M_{comp}\) multiplier for the compressor power calculation (--)
+\(M_{comp}\) is the multiplier for the compressor power calculation (--)
 
-\(N_{comp,ref}\) rated compressor power (W)
+\(N_{comp,ref}\) is the rated compressor power (W)
 
-\(N_{comp,rps}\) compressor power corresponding to \(rps\) (W)
+\(N_{comp,rps}\) is the compressor power corresponding to \(rps\) (W).
 
 Table~\ref{table:atmospheric-variables-at-two-different} -- Outdoor unit compressor power at different Loading Index
 
@@ -2068,7 +2078,7 @@ Table~\ref{table:atmospheric-variables-at-two-different} -- Outdoor unit compres
 
 \textbf{Step 2h.7: Total power consumption of the outdoor unit}
 
-Same as that in the cooling mode (Step 2c. 7)
+Same as that in the cooling mode (Step 2c.7)
 
 \subsubsection{\emph{Modeling of the indoor unit (I/U) - Part II - Cooling Mode}}\label{modeling-of-the-indoor-unit-iu---part-ii---cooling-mode}
 
@@ -2085,35 +2095,35 @@ Same as that in the cooling mode (Step 2c. 7)
 T_{fs} = T_e+[A_c\cdot SH^2+B_c\cdot SH+C_c]
 \end{equation}
 
-Where
+where:
 
-\(T_e\) evaporating temperature decided in the outdoor unit calculations (°C)
+\(T_e\) is the evaporating temperature decided in the outdoor unit calculations (\(^{\circ}\)C)
 
-\(T_{fs}\) coil surface temperature (°C)
+\(T_{fs}\) is the coil surface temperature (\(^{\circ}\)C)
 
-\(SH\) superheating degrees decided in the outdoor unit calculations (°C)
+\(SH\) is the superheating degrees decided in the outdoor unit calculations (\(^{\circ}\)C).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
 \setcounter{enumi}{1}
 \tightlist
 \item
-  Calculate the enthalpy of the air at the coil surface, \(H_{fs}\) :
+  Calculate the enthalpy of the air at the coil surface, \(H_{fs}\):
 \end{enumerate}
 
 \begin{equation}
-if\quad{T_{fs}}<T_{98\%,W_{in}}\quad{then}\quad{H_{fs}} = f(T_{fs},98\%)
+if\quad{T_{fs}}<T_{98\%,W_{in}}{, ~then}\quad{H_{fs}} = f(T_{fs},98\%)
 \end{equation}
 
 \begin{equation}
-if\quad{T_{fs}}\ge{T_{98\%,W_{in}}}\quad{then}\quad{H_{fs}} = f(T_{fs},W_{in})
+if\quad{T_{fs}}\ge{T_{98\%,W_{in}}}{,~then}\quad{H_{fs}} = f(T_{fs},W_{in})
 \end{equation}
 
-Where
+where:
 
-\(T_{98\%,W_{in}}\) dew point temperature of the indoor air (°C)
+\(T_{98\%,W_{in}}\) is the dew point temperature of the indoor air (\(^{\circ}\)C)
 
-\(H_{fs}\) enthalpy of the air at the coil surface (kJ/kg)
+\(H_{fs}\) is the enthalpy of the air at the coil surface (kJ/kg).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
@@ -2127,13 +2137,13 @@ Where
 G_a = Q_{in,total}/[(H_{coil,in}-H_{fs})\times{(1-BF)}\times{\rho_{in}}]
 \end{equation}
 
-Where
+where:
 
-\(Q_{in,total}\) total cooling load for the zone (W)
+\(Q_{in,total}\) is the total cooling load for the zone (W)
 
-\(H_{coil,in}\) enthalpy of the entering air of the indoor unit (kJ/kg)
+\(H_{coil,in}\) is the enthalpy of the entering air of the indoor unit (kJ/kg)
 
-\(\rho_{in}\) density of indoor air,\(f_{\rho}(T_{in},W_{in})\) (kg/m\(^{3}\))
+\(\rho_{in}\) is the density of indoor air,\(f_{\rho}(T_{in},W_{in})\) (kg/m\(^{3}\)).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
@@ -2145,26 +2155,26 @@ Where
 
 \begin{itemize}
 \item
-  If \(G_a\) \textless{} \(G_{a,min}\) (e.g., \(0.7\times\) \(G_{a,rate}\) ) go to Step 3c. 2
+  If \(G_a\) \textless{} \(G_{a,min}\) (e.g., \(0.7\times\) \(G_{a,rate}\) ) go to Step 3c.2
 \item
-  Else, directly go to Step 3c. 3
+  Else, directly go to Step 3c.3
 \end{itemize}
 
-\paragraph{Step 3c.2: Modify \(SH\) to adjust the indoor unit capacity}\label{step-3c.2-modify-sh-to-adjust-the-indoor-unit-capacity}
+\textbf{Step 3c.2: Modify \(SH\) to adjust the indoor unit capacity}
 
-Set \(G_a\) at its minimum value (e.g., \(0.7\times\) \(G_{a,rate}\) ).
+Set \(G_a\) at its minimum value (e.g., \(0.7\times\) \(G_{a,rate}\)).
 
 The required coil surface temperature \(T_{fs}\) can be determined as described in Step 1.2.
 
-Given \(T_{fs}\) and \(T_e\) , \(SH\) can be determined using the equation shown in Step 1.3.
+Given \(T_{fs}\) and \(T_e\), \(SH\) can be determined using the equation shown in Step 1.3.
 
 \begin{itemize}
 \tightlist
 \item
-  If \(SH\) \textgreater{} 15°C, Set \(SH\) as 15°C. On/Off control strategy may be implemented when needed.
+  If \(SH\) \textgreater{} 15\(^{\circ}\)C, Set \(SH\) as 15\(^{\circ}\)C. On/Off control strategy may be implemented when needed.
 \end{itemize}
 
-\textbf{Step 3c. 3: Total power consumption of the indoor unit}
+\textbf{Step 3c.3: Total power consumption of the indoor unit}
 
 The power consumption of the indoor unit comes from the fan operations. This can be calculated using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
 
@@ -2183,13 +2193,13 @@ The power consumption of the indoor unit comes from the fan operations. This can
 T_{fs} = T_c-[A_h\cdot SC^2+B_h\cdot SC+C_h]
 \end{equation}
 
-Where
+where:
 
-\(T_c\) condensing temperature decided in the outdoor unit calculations (°C)
+\(T_c\) is the condensing temperature decided in the outdoor unit calculations (\(^{\circ}\)C)
 
-\(T_{fs}\) coil surface temperature (°C)
+\(T_{fs}\) is the coil surface temperature (\(^{\circ}\)C)
 
-\(SC\) subcooling degrees decided in the outdoor unit calculations (°C)
+\(SC\) is the subcooling degrees decided in the outdoor unit calculations (\(^{\circ}\)C).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
@@ -2203,13 +2213,13 @@ Where
 G_a = Q_{in,total}/[(T_{fs}-T_{coil,in})\times{(1-BF)}\times{\rho_{in}}]
 \end{equation}
 
-Where
+where:
 
-\(Q_{in,total}\) total heating load for the zone (W)
+\(Q_{in,total}\) is the total heating load for the zone (W)
 
-\(T_{coil,in}\) temperature of the entering air of the indoor unit (°C)
+\(T_{coil,in}\) is the temperature of the entering air of the indoor unit (\(^{\circ}\)C)
 
-\(\rho_{in}\) density of indoor air,\(f_{\rho}(T_{in},W_{in})\) (kg/m\(^{3}\))
+\(\rho_{in}\) is the density of indoor air,\(f_{\rho}(T_{in},W_{in})\) (kg/m\(^{3}\)).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
@@ -2221,23 +2231,23 @@ Where
 
 \begin{itemize}
 \item
-  If \(G_a\) \textless{} \(G_{a,min}\) (e.g., \(0.7\times\) \(G_{a,rate}\) ) go to Step 3h. 2
+  If \(G_a\) \textless{} \(G_{a,min}\) (e.g., \(0.7\times\) \(G_{a,rate}\) ) go to Step 3h.2
 \item
-  Else, directly go to Step 3h. 3
+  Else, directly go to Step 3h.3
 \end{itemize}
 
-\paragraph{Step 3h.2: Modify \(SC\) to modify the indoor unit capacity}\label{step-3h.2-modify-sc-to-modify-the-indoor-unit-capacity}
+\textbf{Step 3h.2: Modify \(SC\) to modify the indoor unit capacity}
 
-Set \(G_a\) at its minimum value (\(0.7\times\) \(G_{a,rate}\) ).
+Set \(G_a\) at its minimum value (\(0.7\times\) \(G_{a,rate}\)).
 
 The required coil surface temperature \(T_{fs}\) can be determined as described in Step 2.
 
-Given \(T_{fs}\) and \(T_e\) , \(SC\) can be determined using the equation shown in Step 1.3.
+Given \(T_{fs}\) and \(T_e\), \(SC\) can be determined using the equation shown in Step 1.3.
 
 \begin{itemize}
 \tightlist
 \item
-  If \(SC\) \textgreater{} 20°C, Set \(SC\) as 20°C. On/Off control strategy may be implemented when needed.
+  If \(SC\) \textgreater{} 20\(^{\circ}\)C, Set \(SC\) as 20\(^{\circ}\)C. On/Off control strategy may be implemented when needed.
 \end{itemize}
 
 \textbf{Step 3h.3: Total power consumption of the indoor unit} 
@@ -2248,12 +2258,9 @@ Calculate electric power consumption by the indoor unit using the existing VAV f
 
 There may be additional energy consumption due to the defrost operation and crankcase heater operation. These components have no impact on the heat pump operations. The calculation methods in the VRF-FluidTCtrl model are the same as those in VRF-SysCurve model. Please refer to the VRF-SysCurve section for more details.
 
-
-
 \subsection{Physics based VRF Heat Recovery Model (VRF-FluidTCtrl-HR)}\label{VRF-FluidTCtrl-HR}
 
 \subsubsection{Overview}\label{VRF-FluidTCtrl-HR-overview}
-
 
 \paragraph{Introduction of VRF-HR Systems}\label{Introduction-of-VRF-HR-Systems}
 
@@ -2316,10 +2323,9 @@ A number of operational parameters are controlled to ensure system heat balance 
 \caption{Illustration of the six VRF-HR operational modes on Pressure-Enthalpy diagrams \label{fig:VRF-HR-Chart-EnthalpyPressure}}
 \end{figure}
 
-
 \subsubsection{Model Description}\label{vrf-heat-pump-model-description-2016-07-20-09-10}
 
-The algorithm of the VRF-HR Cooling Only Mode and Heating Only Mode are the same as those in the VRF-HP Cooling Mode (Figure~\ref{fig:vrf-fluid-t-ctrl-3b}) and Heating Mode (Figure~\ref{fig:vrf-fluid-t-ctrl-3a}), respectively.The holistic logics of the VRF-HR Simultaneous Heating and Cooling Mode are illustrated in Figure~\ref{fig:VRF-HR-AlgorithmOverview-Mode2-5}. In general, the effective evaporating temperature and/or condensing temperature for the indoor units is first determined based on the load requirements and indoor unit configurations. Then the pressure and heat losses through the main pipe are calculated at the given operational conditions. After that, the effective condensing temperature and/or evaporating temperature of the outdoor unit is calculated, taking into account the piping loss. With the above calculations, the compressor speed can be determined using the performance curves describing the evaporative capacity of the system at specific condensing/evaporating temperature combinations at various compressor speeds. Finally, the compressor power at that speed is calculated and the total electric power consumption by the outdoor unit is obtained. Note that particular control logics are designed for various operational modes, and therefore lead to different refrigerant temperature adjustments. Also, note that a number of calculation steps are coupled together, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the system, which may lead to a different control strategy and thus affect the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem.
+The algorithm of the VRF-HR Cooling Only Mode and Heating Only Mode are the same as those in the VRF-HP Cooling Mode (Figure~\ref{fig:vrf-fluid-t-ctrl-3b}) and Heating Mode (Figure~\ref{fig:vrf-fluid-t-ctrl-3a}), respectively. The holistic logics of the VRF-HR Simultaneous Heating and Cooling Mode are illustrated in Figure~\ref{fig:VRF-HR-AlgorithmOverview-Mode2-5}. In general, the effective evaporating temperature and/or condensing temperature for the indoor units is first determined based on the load requirements and indoor unit configurations. Then the pressure and heat losses through the main pipe are calculated at the given operational conditions. After that, the effective condensing temperature and/or evaporating temperature of the outdoor unit is calculated, taking into account the piping loss. With the above calculations, the compressor speed can be determined using the performance curves describing the evaporative capacity of the system at specific condensing/evaporating temperature combinations at various compressor speeds. Finally, the compressor power at that speed is calculated and the total electric power consumption by the outdoor unit is obtained. Note that particular control logics are designed for various operational modes, and therefore lead to different refrigerant temperature adjustments. Also, note that a number of calculation steps are coupled together, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the system, which may lead to a different control strategy and thus affect the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem.
 
 \begin{figure}[hbtp] % figure VRF-HR-AlgorithmOverview-Mode2-5
 \centering

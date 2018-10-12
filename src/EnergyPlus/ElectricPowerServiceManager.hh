@@ -503,10 +503,11 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
         pvWatts,
     };
 
-    std::string name;        // user identifier
-    std::string typeOfName;  // equipment type
-    int compGenTypeOf_Num;   // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
-    int compPlantTypeOf_Num; // numeric designator for plant component, in DataPlant
+    std::string name;          // user identifier
+    std::string typeOfName;    // equipment type
+    int compGenTypeOf_Num;     // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
+    int compPlantTypeOf_Num;   // numeric designator for plant component, in DataPlant
+    std::string compPlantName; // name of plant component if heat recovery
     GeneratorType generatorType;
     int generatorIndex;              // index in generator model data struct
     Real64 maxPowerOut;              // Maximum Power Output (W)

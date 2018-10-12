@@ -1062,6 +1062,17 @@ namespace WindowAC {
         CompType = "ZoneHVAC:WindowAirConditioner";
         CompName = WindAC(WindACNum).Name;
         DataZoneNumber = WindAC(WindACNum).ZonePtr;
+        if (WindAC(WindACNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = WindAC(WindACNum).FanIndex;
+        if (WindAC(WindACNum).FanPlace == BlowThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        } else if (WindAC(WindACNum).FanPlace == DrawThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+        }
 
         if (CurZoneEqNum > 0) {
             if (WindAC(WindACNum).HVACSizingIndex > 0) {
@@ -1366,6 +1377,12 @@ namespace WindowAC {
         WindAC(WindACNum).TotCoolEnergy = WindAC(WindACNum).TotCoolEnergyRate * ReportingConstant;
         WindAC(WindACNum).LatCoolEnergy = WindAC(WindACNum).LatCoolEnergyRate * ReportingConstant;
         WindAC(WindACNum).ElecConsumption = WindAC(WindACNum).ElecPower * ReportingConstant;
+
+        if (WindAC(WindACNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, WindAC(WindACNum).FirstPass);
+            }
+        }
     }
 
     void CalcWindowACOutput(int const WindACNum,           // Unit index in fan coil array

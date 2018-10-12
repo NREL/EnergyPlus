@@ -8,7 +8,7 @@ The input objects CoolingTower:SingleSpeed, CoolingTower:TwoSpeed, and CoolingTo
 
 For single speed cooling towers, the capacity control can be fan cycling or fluid bypass. In fluid bypass mode, portion of the water goes through the tower media and gets cooled while the remaining water flow gets bypassed, two water flows then mix together trying to meet the tower exiting water setpoint temperature. In both the free convection cooling when fan is off and normal cooling when fan is on for the entire time step, if the tower exiting water temperature is lower than the setpoint, the tower operates in fluid bypass mode. The model determines the fluid bypass fraction by iterations until the mixed water meets the tower exiting water temperature setpoint. In the fluid bypass mode, except the free convection, the tower fan runs at full speed for the entire time step. The maximum amount of tower water that can be bypassed is bounded by the freezing point of the tower water -- the tower exiting water temperature cannot be lower than the freezing setpoint.
 
-Evaporative fluid coolers are modeled very similar to cooling towers. The main difference between the two is in the ``Performance input method'' input field. Cooling tower has two choices for this field namely ``UFactorTimesAreaAndDesignWaterFlowRate'' and ``Nominal capacity''. The nominal capacity is specified for the standard conditions i.e.~entering water at 35C (95F), leaving water at 29.44C (85F), entering air at 25.56C (78F) wet-bulb temperature and 35C (95F) dry-bulb temperature. On the other hand evaporative fluid cooler has three choices for ``Performance input method'' which are ``UFactorTimesAreaAndDesignWaterFlowRate'', ``StandardDesignCapacity'' and ``UserSpecifiedDesignCapacity''. First method is same for both tower and fluid cooler. Standard design capacity is specified for the same conditions which are used to specify nominal capacity for tower as described above. If the capacity of fluid cooler for conditions other than the standard ones is known then UserSpecifiedDesignCapacity method should be used. In this case, the conditions for which the fluid cooler capacity is known i.e.~entering water temperature, entering air temperature and entering air wet bulb temperature must be specified in the input. To calculate evaporation loss for fluid cooler, spray water flow rate which is different than the process fluid flow rate must be specified for all the performance input methods. This is not required for cooling tower because cooled fluid i.e.~water is in direct contact with the air so the water loss is calculated by using cooled fluid flow rate only. Unlike cooling tower, evaporative fluid cooler model does not account for free convection.
+Evaporative fluid coolers are modeled very similar to cooling towers. The main difference between the two is in the ``Performance input method'' input field. Cooling tower has two choices for this field namely ``UFactorTimesAreaAndDesignWaterFlowRate'' and ``Nominal capacity''. The nominal capacity is specified for the standard conditions i.e.~entering water at 35\(^{\circ}\)C (95\(^{\circ}\)F), leaving water at 29.44\(^{\circ}\)C (85\(^{\circ}\)F), entering air at 25.56\(^{\circ}\)C (78\(^{\circ}\)F) wet-bulb temperature and 35\(^{\circ}\)C (95\(^{\circ}\)F) dry-bulb temperature. On the other hand evaporative fluid cooler has three choices for ``Performance input method'' which are ``UFactorTimesAreaAndDesignWaterFlowRate'', ``StandardDesignCapacity'' and ``UserSpecifiedDesignCapacity''. First method is same for both tower and fluid cooler. Standard design capacity is specified for the same conditions which are used to specify nominal capacity for tower as described above. If the capacity of fluid cooler for conditions other than the standard ones is known then UserSpecifiedDesignCapacity method should be used. In this case, the conditions for which the fluid cooler capacity is known i.e.~entering water temperature, entering air temperature and entering air wet bulb temperature must be specified in the input. To calculate evaporation loss for fluid cooler, spray water flow rate which is different than the process fluid flow rate must be specified for all the performance input methods. This is not required for cooling tower because cooled fluid i.e.~water is in direct contact with the air so the water loss is calculated by using cooled fluid flow rate only. Unlike cooling tower, evaporative fluid cooler model does not account for free convection.
 
 Cooling tower model is described below which holds equally good for evaporative fluid cooler. The differences are mentioned whenever required.
 
@@ -17,105 +17,120 @@ Cooling tower model is described below which holds equally good for evaporative 
 Based on Merkel's theory, the steady-state total heat transfer between the air and water entering the tower can be defined by the following equation:
 
 \begin{equation}
-d{\dot Q_{total}} = \frac{{UdA}}{{cp}}\left( {{h_s} - {h_a}} \right)
+d{\dot Q_{total}} = \frac{{UdA}}{{c_p}}\left( {{h_s} - {h_a}} \right)
+\label{eq:MerkelTheorySteadyStateQtotal}
 \end{equation}
 
-where
+where:
 
-\emph{h\(_{s}\)} = enthalpy of saturated air at the wetted-surface temperature, J/kg
+\emph{h\(_{s}\)} is the enthalpy of saturated air at the wetted-surface temperature (J/kg)
 
-\emph{h\(_{a}\)} = enthalpy of air in the free stream, J/kg
+\emph{h\(_{a}\)} is the enthalpy of air in the free stream (J/kg)
 
-\emph{c\(_{p}\)} = specific heat of moist air, J/kg-\(^{o}\)C
+\emph{c\(_{p}\)} is the specific heat of moist air (J/kg-\(^{\circ}\)C)
 
-\emph{U} = cooling tower overall heat transfer coefficient, W/m\(^{2}\)- \(^{o}\)C
+\emph{U} is the cooling tower overall heat transfer coefficient (W/m\(^{2}\)-\(^{\circ}\)C)
 
-\emph{A} = heat transfer surface area, m\(^{2}\)
+\emph{A} is the heat transfer surface area (m\(^{2}\)).
 
-Equation is based on several assumptions:
+Equation~\ref{eq:MerkelTheorySteadyStateQtotal} is based on several assumptions:
 
-n~air and water vapor behave as ideal gases
+\begin{itemize}
+\item air and water vapor behave as ideal gases
 
-n~the effect of water evaporation is neglected
+\item the effect of water evaporation is neglected
 
-n~fan heat is neglected
+\item fan heat is neglected
 
-n~the interfacial air film is assumed to be saturated
+\item the interfacial air film is assumed to be saturated
 
-n~the Lewis number is equal to 1
+\item the Lewis number is equal to 1
+
+\end{itemize}
 
 In this model, it is also assumed that the moist air enthalpy is solely a function of the wet-bulb temperature and that the moist air can be treated as an equivalent ideal gas with its mean specific heat defined by the following equation:
 
 \begin{equation}
-\bar cpe = \frac{{\Delta h}}{{\Delta {T_{wb}}}}
+\bar c_{pe} = \frac{{\Delta h}}{{\Delta {T_{wb}}}}
+\label{eq:cpebardeltahdeltaTwb}
 \end{equation}
 
-where
+where:
 
-Δ\emph{h} = enthalpy difference between the air entering and leaving the tower, J/kg
+\(\Delta h\) is the enthalpy difference between the air entering and leaving the tower (J/kg)
 
-\(\Delta T_{wb}\) = wet-bulb temperature difference between the air entering and leaving the tower, \(^{o}\)C
+\(\Delta T_{wb}\) is the wet-bulb temperature difference between the air entering and leaving the tower (\(^{\circ}\)C).
 
-Since the liquid side conductance is much greater than the gas side conductance, the wetted-surface temperature is assumed to be equal to the water temperature. Based on this assumption and equations and , the expression for total heat transfer becomes:
+Since the liquid side conductance is much greater than the gas side conductance, the wetted-surface temperature is assumed to be equal to the water temperature. Based on this assumption and Equations~\ref{eq:MerkelTheorySteadyStateQtotal} and~\ref{eq:cpebardeltahdeltaTwb}, the expression for total heat transfer becomes:
 
 \begin{equation}
-d{\dot Q_{total}} = UedA\left( {{T_w} - {T_{wb}}} \right)
+d{\dot Q_{total}} = U_e dA\left( {{T_w} - {T_{wb}}} \right)
+\label{eq:dQtotal509}
 \end{equation}
 
-where
+where:
 
 \begin{equation}
-Ue = \frac{{U\,\bar cpe}}{{cp}}
+U_e = \frac{{U\,\bar c_{pe}}}{{cp}}
 \end{equation}
 
-\(T_{wb}\) = wet-bulb temperature of the air, \(^{o}\)C
+\(T_{wb}\) is the wet-bulb temperature of the air (\(^{\circ}\)C)
 
-\emph{T\(_{w}\)} = temperature of the water, \(^{o}\)C
+\emph{T\(_{w}\)} is the temperature of the water (\(^{\circ}\)C).
 
 An energy balance on the water and air sides of the air/water interface yields the following equations:
 
 \begin{equation}
-d{\dot Q_{total}} = {\dot m_w}cpw\,\,\,dTw
+d{\dot Q_{total}} = {\dot m_w} c_{pw} dT_w
+\label{eq:dQtotal510}
 \end{equation}
 
 \begin{equation}
-d{\dot Q_{total}} = {\dot m_a}\bar cpe\,\,\,dTwb
+d{\dot Q_{total}} = {\dot m_a} \bar c_{pe} dT_{wb}
+\label{eq:dQtotal511}
 \end{equation}
 
-where
+where:
 
-\({\dot m_w}\) ~ = mass flow rate of water, kg/s
+\({\dot m_w}\) is the mass flow rate of water (kg/s)
 
-\({\dot m_a}\) ~ = mass flow rate of air, kg/s
+\({\dot m_a}\) is the mass flow rate of air (kg/s).
 
-Assuming that the heat capacity rate (\(\dot mcp\) ) for the cooling tower water is less than that for the air,the effectiveness of the cooling tower can be defined by analogy to the effectiveness of a simple heat exchanger:
+Assuming that the heat capacity rate (\(\dot mc_p\) ) for the cooling tower water is less than that for the air, the effectiveness of the cooling tower can be defined by analogy to the effectiveness of a simple heat exchanger:
 
 \begin{equation}
 \varepsilon  = \frac{{{T_{win}} - {T_{wout}}}}{{{T_{win}} - {T_{wbin}}}}
+\label{eq:varepsilon512}
 \end{equation}
 
 where
 
-\emph{ε} = heat exchanger effectiveness
+\emph{\(\varepsilon\)} is the heat exchanger effectiveness
 
-\emph{T\(_{win}\)} = inlet water temperature, \(^{o}\)C
+\emph{T\(_{win}\)} is the inlet water temperature (\(^{\circ}\)C)
 
-\emph{T\(_{wout}\)} = outlet water temperature, \(^{o}\)C
+\emph{T\(_{wout}\)} is the outlet water temperature (\(^{\circ}\)C)
 
-\emph{T\(_{wbin}\)} = wet-bulb temperature of the inlet air, \(^{o}\)C
+\emph{T\(_{wbin}\)} is the wet-bulb temperature of the inlet air (\(^{o\circ}\)C).
 
-Combining equations , , and and integrating over the entire heat transfer surface area, and combining the result with equation provides the following expression for cooling tower effectiveness:
+Combining Equations~\ref{eq:dQtotal509},~\ref{eq:dQtotal510}, and~\ref{eq:dQtotal511} and integrating over the entire heat transfer surface area, and combining the result with Equation~\ref{eq:varepsilon512} provides the following expression for cooling tower effectiveness:
 
 \begin{equation}
-\varepsilon \,\, = \,\frac{{1 - \exp \left\{ { - NTU\left[ {1 - \left( {\frac{{{{\dot C}_w}}}{{{{\dot C}_a}}}} \right)} \right]} \right\}}}{{1 - \left( {\frac{{{{\dot C}_w}}}{{{{\dot C}_a}}}} \right)\exp \left\{ { - NTU\left[ {1 - \left( {\frac{{{{\dot C}_w}}}{{{{\dot C}_a}}}} \right)} \right]} \right\}}}
+\varepsilon = \frac{{1 - \exp \left\{ { - NTU\left[ {1 - \left( {\frac{{{{\dot C}_w}}}{{{{\dot C}_a}}}} \right)} \right]} \right\}}}{{1 - \left( {\frac{{{{\dot C}_w}}}{{{{\dot C}_a}}}} \right)\exp \left\{ { - NTU\left[ {1 - \left( {\frac{{{{\dot C}_w}}}{{{{\dot C}_a}}}} \right)} \right]} \right\}}}
 \end{equation}
 
-where
-
-\({\dot C_w} = {\dot m_w}c{p_w}\) ~and \({\dot C_a} = {\dot m_a}\bar c{p_e}\)
+where:
 
 \begin{equation}
-NTU = Number\,of\,Transfer\,Units = \frac{{UAe}}{{{{\dot C}_w}}}
+{\dot C_w} = {\dot m_w}c_{pw}
+\end{equation}
+
+\begin{equation}
+{\dot C_a} = {\dot m_a}\bar c_{pe}
+\end{equation}
+
+\begin{equation}
+NTU = Number~of~Transfer~Units = \frac{{UA_e}}{{{{\dot C}_w}}}
 \end{equation}
 
 This equation is identical to the expression for effectiveness of an indirect contact (i.e., fluids separated by a solid wall) counterflow heat exchanger (Incropera and DeWitt 1981). Therefore, the cooling tower can be modeled, in the steady-state regime, by an equivalent counterflow heat exchanger as shown in the following figure.
@@ -126,10 +141,11 @@ This equation is identical to the expression for effectiveness of an indirect co
 \caption{Cooling Tower Schematic \protect \label{fig:cooling-tower-schematic}}
 \end{figure}
 
-The first fluid is water and the second fluid is an equivalent fluid entering the heat exchanger at temperature T\(_{wbin}\) and specific heat \(\bar cpe\) . The heat exchanger is characterized by a single parameter, its overall heat transfer coefficient-area product UA\(_{e}\). The actual cooling tower heat transfer coefficient-area product is related to UA\(_{e}\) by the following expression:
+The first fluid is water and the second fluid is an equivalent fluid entering the heat exchanger at temperature T\(_{wbin}\) and specific heat \(\bar c_{pe}\). The heat exchanger is characterized by a single parameter, its overall heat transfer coefficient-area product UA\(_{e}\). The actual cooling tower heat transfer coefficient-area product is related to UA\(_{e}\) by the following expression:
 
 \begin{equation}
-UA = UAe\frac{{cp}}{{\bar cpe}}
+UA = UA_e\frac{{c_p}}{{\bar c_{pe}}}
+\label{eq:UA514}
 \end{equation}
 
 This heat transfer coefficient-area product is assumed to be a function of the air mass flow rate only and can be estimated from laboratory test results or manufacturers' catalog data.
@@ -140,19 +156,19 @@ The model for the variable speed Merkel tower also includes Scheier's modificati
 {f_{UA,wetbulb}} = func\left( {\left( {{T_{des,wetbulb}} - {T_{current,wetbulb}}} \right)} \right)
 \end{equation}
 
-The second factor, \({f_{UA,airflow}}\) , adjusts UA for the current air flow rate.~ The user enters a performance curve or lookup table that is a function of one independent variable.~ The independent variable is the ratio of the current air flow rate to the design air flow rate at full speed.
+The second factor, \({f_{UA,airflow}}\), adjusts UA for the current air flow rate.~ The user enters a performance curve or lookup table that is a function of one independent variable.~ The independent variable is the ratio of the current air flow rate to the design air flow rate at full speed.
 
 \begin{equation}
 {f_{UA,airflow}} = func\left( {AirFlowRatio} \right)
 \end{equation}
 
-The third factor, \({f_{UA,waterflow}}\) , adjusts UA for the current water flow rate.~ The user enters a performance curve or lookup table that is a function of one independent variable.~ The independent variable is the ratio of the current water flow rate to the design water flow rate.
+The third factor, \({f_{UA,waterflow}}\), adjusts UA for the current water flow rate.~ The user enters a performance curve or lookup table that is a function of one independent variable.~ The independent variable is the ratio of the current water flow rate to the design water flow rate.
 
 \begin{equation}
 {f_{UA,waterflow}} = func\left( {WaterFlowRatio} \right)
 \end{equation}
 
-Then the UA value at any given time is calculated using
+Then the UA value at any given time is calculated using:
 
 \begin{equation}
 U{A_e} = U{A_{design}} \bullet {f_{UA,wetbulb}} \bullet {f_{UA,airflow}} \bullet {f_{UA,waterflow}}
@@ -162,38 +178,50 @@ U{A_e} = U{A_{design}} \bullet {f_{UA,wetbulb}} \bullet {f_{UA,airflow}} \bullet
 
 The objective of the cooling tower model is to predict the exiting water temperature and the fan power required to meet the exiting water setpoint temperature. Since only the inlet air and inlet water temperatures are known at any simulation time step, an iterative procedure is required to determine the exiting fluid temperatures using the equations defined in the previous section. In the case of the EnergyPlus model, the iterations are performed to determine the exiting wet-bulb temperature of the air. The exiting water temperature is then calculated based on an energy balance that assumes that the energy absorbed by the air is equivalent to the energy removed from the water. The procedure for calculating the steady-state, exiting air wet-bulb temperature is outlined below.
 
-As explained previously, it is assumed that the moist air enthalpy can be defined by the wet-bulb temperature alone. Therefore, the first step in the procedure is to calculate the enthalpy of moist air entering the cooling tower based on the ambient wet-bulb temperature from the weather file. Since an iterative solution is required, a first guess of the outlet air wet-bulb temperature is then made and the enthalpy of this estimated outlet air wet-bulb temperature is calculated. Based on these inlet and outlet air conditions, the mean specific heat of the air is calculated based on equation , repeated here:
+As explained previously, it is assumed that the moist air enthalpy can be defined by the wet-bulb temperature alone. Therefore, the first step in the procedure is to calculate the enthalpy of moist air entering the cooling tower based on the ambient wet-bulb temperature from the weather file. Since an iterative solution is required, a first guess of the outlet air wet-bulb temperature is then made and the enthalpy of this estimated outlet air wet-bulb temperature is calculated. Based on these inlet and outlet air conditions, the mean specific heat of the air is calculated based on Equation~\ref{eq:cpebardeltahdeltaTwb}, repeated here:
 
 \begin{equation}
-\bar cpe = \frac{{\Delta h}}{{\Delta Twb}}
+\bar c_{pe} = \frac{{\Delta h}}{{\Delta T_{wb}}}
 \end{equation}
 
-With the overall heat transfer coefficient-area product for the cooling tower entered by the user, the effective heat transfer coefficient-area product is calculated by rearranging equation :
+With the overall heat transfer coefficient-area product for the cooling tower entered by the user, the effective heat transfer coefficient-area product is calculated by rearranging Equation~\ref{eq:UA514}:
 
 \begin{equation}
-UAe = UA\frac{{\bar cpe}}{{cp}}
+UA_e = UA\frac{{\bar c_{pe}}}{{c_p}}
 \end{equation}
 
-With \(\bar cpe\) ~and \(UAe\) ~known, the effectiveness of the heat exchanger is then calculated:
+With \(\bar c_{pe}\) and \(UA_e\) known, the effectiveness of the heat exchanger is then calculated:
 
 \begin{equation}
 \varepsilon \,\, = \,\frac{{1 - \exp \left\{ { - NTU\left[ {1 - \left( {\frac{{{{\dot C}_{\min }}}}{{{{\dot C}_{\max }}}}} \right)} \right]} \right\}}}{{1 - \left( {\frac{{{{\dot C}_{\min }}}}{{{{\dot C}_{\max }}}}} \right)\exp \left\{ { - NTU\left[ {1 - \left( {\frac{{{{\dot C}_{\min }}}}{{{{\dot C}_{\max }}}}} \right)} \right]} \right\}}}
 \end{equation}
 
-where
-
-\({\dot C_{\min }} = \,Minimum\,({\dot C_w},\,{\dot C_a})\) ~and \({\dot C_{\max }} = \,Maximum\,({\dot C_w},\,{\dot C_a})\)
-
-\({\dot C_w} = {\dot m_w}c{p_w}\) ~and \({\dot C_a} = {\dot m_a}\bar cpe\)
+where:
 
 \begin{equation}
-NTU = Number\,of\,Transfer\,Units = \frac{{UAe}}{{{{\dot C}_{\min }}}}
+{\dot C_{\min }} = Minimum({\dot C_w},{\dot C_a})
+\end{equation}
+
+\begin{equation}
+{\dot C_{\max }} = Maximum({\dot C_w},{\dot C_a})
+\end{equation}
+
+\begin{equation}
+{\dot C_w} = {\dot m_w}c_{pw}
+\end{equation}
+
+\begin{equation}
+{\dot C_a} = {\dot m_a}\bar c_{pe}
+\end{equation}
+
+\begin{equation}
+NTU = Number~of~Transfer~Units = \frac{{UAe}}{{{{\dot C}_{\min }}}}
 \end{equation}
 
 The heat transfer rate is then calculated as follows:
 
 \begin{equation}
-\dot Qtotal = \,\varepsilon \,{\dot C_{\min }}\left( {Twin\, - \,Twbin} \right)
+\dot Qtotal = \varepsilon {\dot C_{\min }}\left( {T_{win} - T_{wbin}} \right)
 \end{equation}
 
 The outlet air wet-bulb temperature is then recalculated:
@@ -202,7 +230,7 @@ The outlet air wet-bulb temperature is then recalculated:
 {T_{wbout}} = {T_{wbin}} + \frac{{{{\dot Q}_{total}}}}{{{{\dot C}_a}}}
 \end{equation}
 
-The iterative process of calculating \({T_{wbout}}\) ~continues until convergence is reached.
+The iterative process of calculating \({T_{wbout}}\) continues until convergence is reached.
 
 Finally, the outlet water temperature is calculated as follows:
 
@@ -221,20 +249,21 @@ If the exiting water temperature remains above the setpoint after ``free convect
 The fraction of time that the tower fan must operate is calculated based on the following equation:
 
 \begin{equation}
-\omega \,\, = \frac{{{T_{set}} - {T_{wout,off}}}}{{{T_{wout,on}} - {T_{wout,off}}}}
+\omega = \frac{{{T_{set}} - {T_{wout,off}}}}{{{T_{wout,on}} - {T_{wout,off}}}}
+\label{eq:omegafunctionvariousTs515}
 \end{equation}
 
-where
+where:
 
-\({T_{set}}\) ~ = exiting water setpoint temperature, \(^{o}\)C
+\({T_{set}}\) is the exiting water setpoint temperature (\(^{\circ}\)C)
 
-\({T_{wout,off}}\) ~ = exiting water temperature with tower fan off, \(^{o}\)C
+\({T_{wout,off}}\) is the exiting water temperature with tower fan off (\(^{\circ}\)C)
 
-\({T_{wout,on}}\) ~ = exiting water temperature with tower fan on, \(^{o}\)C
+\({T_{wout,on}}\) is the exiting water temperature with tower fan on (\(^{\circ}\)C).
 
-The average fan power for the simulation time step is calculated by multiplying \(\omega \,\) by the steady-state fan power specified by the user.
+The average fan power for the simulation time step is calculated by multiplying \(\omega\) by the steady-state fan power specified by the user.
 
-The calculation method for the two-speed tower is similar to that for the single-speed tower example described above. The model first checks to see if ``free convection'' is specified and if the resulting exiting water temperature is below the setpoint temperature. If not, then the model calculates the steady-state exiting water temperature with the tower fan at low speed. If the exiting water temperature at low fan speed is below the setpoint temperature, then the average fan power is calculated based on the result of equation and the steady-state, low speed fan power specified by the user. If low-speed fan operation is unable to reduce the exiting water temperature below the setpoint, then the tower fan is increased to its high speed and the steady-state exiting water temperature is calculated. If this temperature is below the setpoint, then a modified version of equation is used to calculate runtime at high fan speed:
+The calculation method for the two-speed tower is similar to that for the single-speed tower example described above. The model first checks to see if ``free convection'' is specified and if the resulting exiting water temperature is below the setpoint temperature. If not, then the model calculates the steady-state exiting water temperature with the tower fan at low speed. If the exiting water temperature at low fan speed is below the setpoint temperature, then the average fan power is calculated based on the result of Equation~\ref{eq:omegafunctionvariousTs515} and the steady-state, low speed fan power specified by the user. If low-speed fan operation is unable to reduce the exiting water temperature below the setpoint, then the tower fan is increased to its high speed and the steady-state exiting water temperature is calculated. If this temperature is below the setpoint, then a modified version of Equation~\ref{eq:omegafunctionvariousTs515} is used to calculate runtime at high fan speed:
 
 \begin{equation}
 \omega \,\, = \frac{{{T_{set}} - {T_{wout,low}}}}{{{T_{wout,high}} - {T_{wout,low}}}}
@@ -242,16 +271,16 @@ The calculation method for the two-speed tower is similar to that for the single
 
 where
 
-\({T_{set}}\) ~ = exiting water setpoint temperature, \(^{o}\)C
+\({T_{set}}\) is the exiting water setpoint temperature (\(^{\circ}\)C)
 
-\({T_{wout,low}}\) ~ = exiting water temperature with tower fan at low speed, \(^{o}\)C
+\({T_{wout,low}}\) is the exiting water temperature with tower fan at low speed (\(^{\circ}\)C)
 
-\({T_{wout,high}}\) ~ = exiting water temperature with tower fan at high speed, \(^{o}\)C
+\({T_{wout,high}}\) is the exiting water temperature with tower fan at high speed (\(^{\circ}\)C).
 
 The average fan power for the simulation time step is calculated for the two-speed cooling tower as follows:
 
 \begin{equation}
-{P_{fan,avg}}\, = \,\omega \,({P_{fan,high}})\, + \,\left( {1 - \omega } \right)\left( {{P_{fan,low}}} \right)
+{P_{fan,avg}} = \omega ({P_{fan,high}}) + \left( {1 - \omega } \right)\left( {{P_{fan,low}}} \right)
 \end{equation}
 
 The calculation method for the variable-speed Merkel/Scheier model is different from the one- and two-speed models.~ Whereas the other towers are setpoint driven, the variable speed Merkel/Scheier model is driven by the load dispatched from the plant operation scheme, such as PlantEquipmentOperation:CoolingLoad.~ The plant operation scheme provides the cooling tower model with a target load to meet and the tower is controlled to meet that load (as opposed to meeting a leaving setpoint).~ This allows complex configurations with more than one cooling tower to be properly dispatched using all the features available in the various plant operation schemes.~ The model first evaluates the load provided with the fans off using only free convection.~ If the free convection mode meets or exceeds the target load then the tower runs in free convection mode.~ The model then evaluates the load provided by running the fans at full speed.~ If the full fan speed load provided is less than or equal to the target load then the tower runs at full speed.~ The model then evaluates the load provided with the variable speed fan running at the minimum air speed ratio, which is a user input (default is 0.2).~ If the minimum fan speed load provided meets or exceeds the target load, then tower runs at the minimum fan speed.~ If the target load is between the load provided by minimum and maximum fans speeds, then the model solves for an airflow rate ratio that just meets the target load using root solver numerical method.~ The variable speed Merkel/Scheier model does not model bypass and may provided excess cooling at times when running in free convection or at the minimum fan speed.~ Fan power for the variable speed Merkel/Scheier model is then calculated from the airflow rate ratio using a design fan power and a performance curve or lookup table with one independent variable for the airflow ratio.
@@ -280,13 +309,12 @@ The input object CoolingTower:VariableSpeed provides models for variable speed t
 
 The cooling tower seeks to maintain the temperature of the water exiting the cooling tower at (or below) a setpoint. The setpoint temperature is defined by the setpoints placed on either the tower outlet node or the loop's overall setpoint node (typically set to the supply side outlet node). The model checks to see if the outlet node has a setpoint placed on it and uses that if it does.~ If the outlet node does not have a temperature setpoint then the model uses the loop-level outlet node specified in the input field called Loop Temperature Setpoint Node Name in the PlantLoop or CondenserLoop object. The model simulates the outlet water temperature in four successive steps:
 
-·~~~~~~~~The model first determines the tower outlet water temperature with the tower fan operating at maximum speed. If the outlet water temperature is above the setpoint temperature, the fan runs at maximum speed.
-
-·~~~~~~~~If the outlet water temperature with maximum fan speed is below the setpoint temperature, then the model next determines the impact of ``free convection'' (water flowing through tower with fan off). If the exiting water temperature based on ``free convection'' is at or below the setpoint, then the tower fan is not turned on.
-
-·~~~~~~~~If the outlet water temperature remains above the setpoint after ``free convection'' is modeled, then the tower fan is turned on at the minimum fan speed (minimum air flow rate ratio) to reduce the leaving water temperature. If the outlet water temperature is below the setpoint at minimum fan speed, the tower fan is cycled on and off to maintain the outlet water setpoint temperature.
-
-·~~~~~~~~If the outlet water temperature remains above the setpoint after minimum fan speed is modeled, then the tower fan is turned on and the model determines the required air flow rate and corresponding fan speed to meet the desired setpoint temperature.
+\begin{itemize}
+\item The model first determines the tower outlet water temperature with the tower fan operating at maximum speed. If the outlet water temperature is above the setpoint temperature, the fan runs at maximum speed.
+\item If the outlet water temperature with maximum fan speed is below the setpoint temperature, then the model next determines the impact of ``free convection'' (water flowing through tower with fan off). If the exiting water temperature based on ``free convection'' is at or below the setpoint, then the tower fan is not turned on.
+\item If the outlet water temperature remains above the setpoint after ``free convection'' is modeled, then the tower fan is turned on at the minimum fan speed (minimum air flow rate ratio) to reduce the leaving water temperature. If the outlet water temperature is below the setpoint at minimum fan speed, the tower fan is cycled on and off to maintain the outlet water setpoint temperature.
+\item If the outlet water temperature remains above the setpoint after minimum fan speed is modeled, then the tower fan is turned on and the model determines the required air flow rate and corresponding fan speed to meet the desired setpoint temperature.
+\end{itemize}
 
 \subsubsection{Model Description}\label{model-description-1-005}
 
@@ -298,49 +326,39 @@ Heat rejection by the variable speed cooling tower is modeled based on the CoolT
 
 The CoolTools correlation has 35 terms with four independent variables:
 
-~~~ Approach = ~~ Coeff(1)~ +~ Coeff(2)•FRair~ +~ Coeff(3)•(FRair)\(^{2}\)~ +
-
-Coeff(4)•(FRair)\(^{3}\)~ +~ Coeff(5)•FRwater~ +
-
-Coeff(6)•FRair•FRwater~ +~ Coeff(7)•(FRair)\(^{2}\)•FRwater~ +
-
-Coeff(8)•(FRwater)\(^{2}\)~ +~ Coeff(9)•FRair•(FRwater)\(^{2}\)~ +
-
-Coeff(10)•(FRwater)\(^{3}\)~ +~ Coeff(11)•Twb~ +~ Coeff(12)•FRair•Twb~ +
-
-Coeff(13)•(FRair)\(^{2}\)•Twb~ +~ Coeff(14)•FRwater•Twb~ +
-
-Coeff(15)•FRair•FRwater•Twb~ +~ Coeff(16)•(FRwater)\(^{2}\)•Twb~ +
-
-Coeff(17)•(Twb)\(^{2}\)~ +~ Coeff(18)•FRair•(Twb)\(^{2}\)~ +
-
-Coeff(19)•FRwater•(Twb)\(^{2}\)~ +~ Coeff(20)•(Twb)\(^{3}\)~ +~ Coeff(21)•Tr~ +
-
-Coeff(22)•FRair•Tr~ +~ Coeff(23)•(FRair)\(^{2}\)•Tr~ +
-
-Coeff(24)•FRwater•Tr~ +~ Coeff(25)•FRair•FRwater•Tr~ +
-
-Coeff(26)•(FRwater)\(^{2}\)•Tr~ +~ Coeff(27)•Twb•Tr~ +
-
-Coeff(28)•FRair•Twb•Tr~ +~ Coeff(29)•FRwater•Twb•Tr~ +
-
-Coeff(30)•(Twb)\(^{2}\)•Tr~ +~ Coeff(31)•(Tr)\(^{2}\) + Coeff(32)•FRair•(Tr)\(^{2}\) +
-
-Coeff(33)•FRwater•(Tr)\(^{2}\) +~ Coeff(34)•Twb•(Tr)\(^{2}\) +~ Coeff(35)•(Tr)\(^{3}\)
+\begin{equation}
+\begin{array}{rl}
+Approach =& Coeff(1) + Coeff(2)•FRair + Coeff(3)•(FRair)^{2} + \\
+ & Coeff(4)•(FRair)^{3} + Coeff(5)•FRwater + \\
+ & Coeff(6)•FRair•FRwater + Coeff(7)•(FRair)^{2}•FRwater + \\
+ & Coeff(8)•(FRwater)^{2} + Coeff(9)•FRair•(FRwater)^{2} + \\
+ & Coeff(10)•(FRwater)^{3} + Coeff(11)•Twb + Coeff(12)•FRair•Twb + \\
+ & Coeff(13)•(FRair)^{2}•Twb + Coeff(14)•FRwater•Twb + \\
+ & Coeff(15)•FRair•FRwater•Twb + Coeff(16)•(FRwater)^{2}•Twb + \\
+ & Coeff(17)•(Twb)^{2} + Coeff(18)•FRair•(Twb)^{2} + \\
+ & Coeff(19)•FRwater•(Twb)^{2} + Coeff(20)•(Twb)^{3} + Coeff(21)•Tr +  \\
+ & Coeff(22)•FRair•Tr + Coeff(23)•(FRair)^{2}•Tr + \\
+ & Coeff(24)•FRwater•Tr + Coeff(25)•FRair•FRwater•Tr + \\
+ & Coeff(26)•(FRwater)^{2}•Tr + Coeff(27)•Twb•Tr + \\
+ & Coeff(28)•FRair•Twb•Tr + Coeff(29)•FRwater•Twb•Tr + \\
+ & Coeff(30)•(Twb)^{2}•Tr + Coeff(31)•(Tr)^{2} + Coeff(32)•FRair•(Tr)^{2} + \\
+ & Coeff(33)•FRwater•(Tr)^{2} + Coeff(34)•Twb•(Tr)^{2} + Coeff(35)•(Tr)^{3}
+\end{array}
+\end{equation}
 
 where:
 
-Approach = approach temperature (\(^{o}\)C) = outlet water temperature minus inlet air wet-bulb temperature
+Approach is the approach temperature (\(^{\circ}\)C) which is equal to the outlet water temperature minus the inlet air wet-bulb temperature
 
-FRair = air flow rate ratio (actual air flow rate divided by design air flow rate)
+FRair is the air flow rate ratio (actual air flow rate divided by design air flow rate)
 
-FRwater = water flow rate ratio (actual water flow rate divided by design water flow rate)
+FRwater is the water flow rate ratio (actual water flow rate divided by design water flow rate)
 
-Tr = range temperature (\(^{o}\)C) = inlet water temperature minus outlet water temperature
+Tr is the range temperature (\(^{\circ}\)C) which is the inlet water temperature minus the outlet water temperature
 
-Twb = inlet air wet-bulb temperature (\(^{o}\)C)
+Twb is the inlet air wet-bulb temperature (\(^{\circ}\)C)
 
-Coeff(\#) = correlation coefficients
+Coeff(\#) are the correlation coefficients.
 
 If the user selects Tower Model Type = CoolToolsCrossFlow, then the 35 coefficients derived for the CoolTools simulation model (Benton et al. 2002) are used and these coefficients are already defined within EnergyPlus as shown in Table~\ref{table:approach-temperature-correlation-coefficients}. If the user specifies Tower Model Type = CoolToolsUserDefined, then the user must enter a CoolingTowerPerformance:CoolTools object to define the 35 coefficients that will be used by the CoolTools approach temperature correlation.
 
@@ -403,41 +421,34 @@ Coeff(35) & 0.00080737066446 & N/A \tabularnewline
 
 Similarly, the YorkCalc correlation has 27 terms with three independent variables:
 
-~~~ Approach = ~~ Coeff(1)~ +~ Coeff(2)•Twb +~ Coeff(3)•Twb\(^{2}\)~ +~ Coeff(4)•Tr~ +
-
-Coeff(5)•Twb•Tr~ +~ Coeff(6)•Twb\(^{2}\)•Tr~ +~ Coeff(7)•Tr\(^{2}\)~ +
-
-Coeff(8)•Twb•Tr\(^{2}\) +~ Coeff(9)•Twb\(^{2}\)•Tr\(^{2}\) +~ Coeff(10)•LGRatio~ +
-
-Coeff(11)•Twb•LGRatio~ + Coeff(12)•Twb\(^{2}\)•LGRatio~ +
-
-Coeff(13)•Tr•LGRatio~ +~ Coeff(14)•Twb•Tr•LGRatio~ +
-
-Coeff(15)•Twb\(^{2}\)•Tr•LGRatio~ +~ Coeff(16)•Tr\(^{2}\)•LGRatio~ +
-
-Coeff(17)•Twb•Tr\(^{2}\)•LGRatio~ + Coeff(18)•Twb\(^{2}\)•Tr\(^{2}\)•LGRatio +
-
-Coeff(19)•LGRatio\(^{2}\) +~ Coeff(20)•Twb•LGRatio\(^{2}\)~ +
-
-Coeff(21)• Twb\(^{2}\)•LGRatio\(^{2}\) +~ Coeff(22)•Tr•LGRatio\(^{2}\) +
-
-Coeff(23)•Twb•Tr•LGRatio\(^{2}\) +~ Coeff(24)•Twb\(^{2}\)•Tr•LGRatio\(^{2}\) +
-
-Coeff(25)•Tr\(^{2}\)•LGRatio\(^{2}\) +~ Coeff(26)•Twb•Tr\(^{2}\)•LGRatio\(^{2}\) +
-
-Coeff(27)•Twb\(^{2}\)•Tr\(^{2}\)•LGRatio\(^{2}\)
+\begin{equation}
+\begin{array}{rl}
+Approach =& Coeff(1) + Coeff(2)•Twb + Coeff(3)•Twb^{2} + Coeff(4)•Tr + \\
+ & Coeff(5)•Twb•Tr + Coeff(6)•Twb^{2}•Tr + Coeff(7)•Tr^{2} + \\
+ & Coeff(8)•Twb•Tr^{2} + Coeff(9)•Twb^{2}•Tr^{2} + Coeff(10)•LGRatio + \\
+ & Coeff(11)•Twb•LGRatio + Coeff(12)•Twb^{2}•LGRatio + \\
+ & Coeff(13)•Tr•LGRatio + Coeff(14)•Twb•Tr•LGRatio + \\
+ & Coeff(15)•Twb^{2}•Tr•LGRatio + Coeff(16)•Tr^{2}•LGRatio + \\
+ & Coeff(17)•Twb•Tr^{2}•LGRatio + Coeff(18)•Twb^{2}•Tr^{2}•LGRatio + \\
+ & Coeff(19)•LGRatio^{2} + Coeff(20)•Twb•LGRatio^{2} + \\
+ & Coeff(21)• Twb^{2}•LGRatio^{2} + Coeff(22)•Tr•LGRatio^{2} + \\
+ & Coeff(23)•Twb•Tr•LGRatio^{2} + Coeff(24)•Twb^{2}•Tr•LGRatio^{2} + \\
+ & Coeff(25)•Tr^{2}•LGRatio^{2} + Coeff(26)•Twb•Tr^{2}•LGRatio^{2} + \\
+ & Coeff(27)•Twb^{2}•Tr^{2}•LGRatio^{2}
+\end{array}
+\end{equation}
 
 where:
 
-~~~~~~~~~~~ Approach = approach temperature (\(^{o}\)C) = outlet water temperature minus inlet air wet-bulb temperature
+Approach is the approach temperature (\(^{\circ}\)C) which is the outlet water temperature minus the inlet air wet-bulb temperature
 
-~~~~~~~~~~~ Tr = range temperature (\(^{o}\)C) = inlet water temperature minus outlet water temperature
+Tr is the range temperature (\(^{\circ}\)C) which is the inlet water temperature minus the outlet water temperature
 
-~~~~~~~~~~~ Twb = inlet air wet-bulb temperature (\(^{o}\)C)
+Twb is the inlet air wet-bulb temperature (\(^{\circ}\)C)
 
-~~~~~~~~~~~ LGratio = liquid-to-gas ratio = ratio of water flow rate ratio (FRwater) to air flow rate ratio (FRair)
+LGratio is the liquid-to-gas ratio which is the ratio of water flow rate ratio (FRwater) to air flow rate ratio (FRair)
 
-~~~~~ Coeff(\#) = correlation coefficients
+Coeff(\#) are the correlation coefficients.
 
 If the user selects Tower Model Type = YorkCalc, then the 27 coefficients derived for the YorkCalc simulation model (York International Corp. 2002) are used and these coefficients are already defined within EnergyPlus as shown in Table~\ref{table:approach-temperature-correlation-coefficients}. If the user specifies Tower Model Type = YorkCalcUserDefined, then the user must enter a CoolingTowerPerformance:YorkCalc object to define the 27 coefficients that will be used by the YorkCalc approach temperature correlation.
 
@@ -469,128 +480,131 @@ Maximum Liquid-to-Gas Ratio & N/A & 8.0 \tabularnewline
 \bottomrule
 \end{longtable}
 
-The approach temperature correlation(s) used to simulate cooling tower heat rejection are based on water and air flow rate ``ratios'' and are not directly dependent on the size of the tower or the actual air and water flow rates through the tower. However, the model correlations are developed based on a reference condition. For Model Types ``CoolToolsCrossFlow'' and ``YorkCalc'', the reference condition is a water flow rate of 0.000043 m\(^{3}\)/s per kW of heat rejected (2.4 gal/min per ton of heat rejected) with 25.6\(^{o}\)C (78\(^{o}\)F) enter air wet-bulb temperature, 35\(^{o}\)C (95\(^{o}\)F) hot water inlet temperature, and 29.4\(^{o}\)C (85\(^{o}\)F) cold water outlet temperature. The reference condition may be different if the user defines tower model coefficients using CoolingTowerPerformance:CoolTools or CoolingTowerPerformance:YorkCalc.
+The approach temperature correlation(s) used to simulate cooling tower heat rejection are based on water and air flow rate ``ratios'' and are not directly dependent on the size of the tower or the actual air and water flow rates through the tower. However, the model correlations are developed based on a reference condition. For Model Types ``CoolToolsCrossFlow'' and ``YorkCalc'', the reference condition is a water flow rate of 0.000043 m\(^{3}\)/s per kW of heat rejected (2.4 gal/min per ton of heat rejected) with 25.6\(^{\circ}\)C (78\(^{\circ}\)F) enter air wet-bulb temperature, 35\(^{\circ}\)C (95\(^{\circ}\)F) hot water inlet temperature, and 29.4\(^{\circ}\)C (85\(^{\circ}\)F) cold water outlet temperature. The reference condition may be different if the user defines tower model coefficients using CoolingTowerPerformance:CoolTools or CoolingTowerPerformance:YorkCalc.
 
 Due to the inherent reference condition used to generate the tower performance curves, the water flow rate at the reference condition must be determined using the design performance information specified by the user and the tower model's approach temperature correlation. This is done by using the model's approach temperature correlation (described earlier in this section) to calculate the water flow rate ratio which yields the user-defined design approach temperature based on an air flow rate ratio of 1.0 (\emph{FR\(_{air}\)} = 1.0), the design inlet air wet-bulb temperature, and the design range temperature. The calculated approach temperature (using the model correlation) must satisfy the following two equations:
 
-\({T_{water,outlet,design}} = {T_{wb,air,design}} + {T_{approach,design}}\quad \{ F{R_{air}} = 1.0\}\) \({T_{water,inlet,design}} = {T_{wb,air,design}} + {T_{approach,design}} + {T_{range,design}}\quad \{ F{R_{air}} = 1.0\}\)
-
-where:
-
-\({T_{water,outlet,design}}\) = design outlet water temperature (\(^{o}\)C)
-
-\({T_{water,inlet,design}}\) = design inlet water temperature (\(^{o}\)C)
-
-\({T_{wb,air,design}}\) = design inlet air wet-bulb temperature (\(^{o}\)C)
-
-\({T_{approach,design}}\) = design approach temperature (\(^{o}\)C)
-
-\({T_{range,design}}\) = design range temperature (\(^{o}\)C)
-
-\(F{R_{air}}\) = air flow rate ratio (actual air flow rate divided by design air flow rate)
-
-The water flow rate ratio used in the approach temperature correlation which satisfies these two equations is the ratio of the design water flow rate (specified by the user) to the water flow rate at the reference condition. This ratio is used to calculate the reference water volumetric flow rate, which is then used throughout the simulation to determine the actual water flow rate ratio used in the approach temperature correlation for each simulation time step.
+\begin{equation}
+{T_{water,outlet,design}} = {T_{wb,air,design}} + {T_{approach,design}}\quad \{ F{R_{air}} = 1.0\}
+\end{equation}
 
 \begin{equation}
-{\dot V_{reference}} = \frac{{{{\dot V}_{design}}}}{{F{R_{water\;reference}}}}
+{T_{water,inlet,design}} = {T_{wb,air,design}} + {T_{approach,design}} + {T_{range,design}}\quad \{ F{R_{air}} = 1.0\}
 \end{equation}
 
 where:
 
-\({\dot V_{reference}}\) = water volumetric flow rate at the reference condition (m\(^{3}\)/s)
+\({T_{water,outlet,design}}\) is the design outlet water temperature (\(^{\circ}\)C)
 
-\({\dot V_{design}}\) = design water volumetric flow rate specified by the user (m\(^{3}\)/s)
+\({T_{water,inlet,design}}\) is the design inlet water temperature (\(^{\circ}\)C)
 
-\(F{R_{water,reference}}\) = design water flow rate divided by the reference water flow rate
+\({T_{wb,air,design}}\) is the design inlet air wet-bulb temperature (\(^{\circ}\)C)
+
+\({T_{approach,design}}\) is the design approach temperature (\(^{\circ}\)C)
+
+\({T_{range,design}}\) is the design range temperature (\(^{\circ}\)C)
+
+\(F{R_{air}}\) is the air flow rate ratio (actual air flow rate divided by design air flow rate).
+
+The water flow rate ratio used in the approach temperature correlation which satisfies these two equations is the ratio of the design water flow rate (specified by the user) to the water flow rate at the reference condition. This ratio is used to calculate the reference water volumetric flow rate, which is then used throughout the simulation to determine the actual water flow rate ratio used in the approach temperature correlation for each simulation time step.
+
+\begin{equation}
+{\dot V_{reference}} = \frac{{{{\dot V}_{design}}}}{{F{R_{water,reference}}}}
+\end{equation}
+
+where:
+
+\({\dot V_{reference}}\) is the water volumetric flow rate at the reference condition (m\(^{3}\)/s)
+
+\({\dot V_{design}}\) is the design water volumetric flow rate specified by the user (m\(^{3}\)/s)
+
+\(F{R_{water,reference}}\) is the design water flow rate divided by the reference water flow rate.
 
 The cooling tower seeks to maintain the temperature of the water exiting the cooling tower at (or below) a setpoint. The setpoint temperature is defined by the field ``Condenser Loop Temperature Setpoint schedule or reference'' for the CondenserLoop object. The model simulates the outlet water temperature in four successive steps:
 
-·~~~~~~~~The model first determines the tower outlet water temperature with the tower fan operating at maximum speed. If the outlet water temperature is above the setpoint temperature, the fan runs at maximum speed.
-
-·~~~~~~~~If the outlet water temperature with maximum fan speed is below the setpoint temperature, then the model next determines the impact of ``free convection'' (water flowing through tower with fan off). If the exiting water temperature based on ``free convection'' is at or below the setpoint, then the tower fan is not turned on.
-
-·~~~~~~~~If the outlet water temperature remains above the setpoint after ``free convection'' is modeled, then the tower fan is turned on at the minimum fan speed (minimum air flow rate ratio) to reduce the leaving water temperature. If the outlet water temperature is below the setpoint at minimum fan speed, the tower fan is cycled on and off to maintain the outlet water setpoint temperature.
-
-·~~~~~~~~If the outlet water temperature remains above the setpoint after minimum fan speed is modeled, then the tower fan is turned on and the model determines the required air flow rate and corresponding fan speed to meet the desired setpoint temperature.
+\begin{itemize}
+\item The model first determines the tower outlet water temperature with the tower fan operating at maximum speed. If the outlet water temperature is above the setpoint temperature, the fan runs at maximum speed.
+\item If the outlet water temperature with maximum fan speed is below the setpoint temperature, then the model next determines the impact of ``free convection'' (water flowing through tower with fan off). If the exiting water temperature based on ``free convection'' is at or below the setpoint, then the tower fan is not turned on.
+\item If the outlet water temperature remains above the setpoint after ``free convection'' is modeled, then the tower fan is turned on at the minimum fan speed (minimum air flow rate ratio) to reduce the leaving water temperature. If the outlet water temperature is below the setpoint at minimum fan speed, the tower fan is cycled on and off to maintain the outlet water setpoint temperature.
+\item If the outlet water temperature remains above the setpoint after minimum fan speed is modeled, then the tower fan is turned on and the model determines the required air flow rate and corresponding fan speed to meet the desired setpoint temperature.
+\end{itemize}
 
 For each simulation time step, the model first calculates the outlet water temperature with the tower fan operating at maximum speed (FRair = 1.0). The calculated approach temperature (using the correlations described above), inlet air wet-bulb temperature (weather data), and range temperature are used to determine the tower outlet water temperature as follows:
 
 \begin{equation}
   \begin{array}{rl}
-    T_{water,outlet,fanMAX} &= T_{wb,air} + T_{approach} \quad FR_{air} = 1.0 \\
+    T_{water,outlet,fanMAX} &= T_{wb,air} + T_{approach} \quad \{FR_{air} = 1.0\} \\
                               &= {T_{water,inlet}} + {T_{range}}
   \end{array}
 \end{equation}
 
 where:
 
-\({T_{water,outlet,fanMAX}}\) ~ = tower outlet water temperature at maximum fan speed (\(^{o}\)C)
+\({T_{water,outlet,fanMAX}}\) is the tower outlet water temperature at maximum fan speed (\(^{\circ}\)C)
 
-\({T_{wb,air}}\) ~ = tower inlet air wet-bulb temperature (\(^{o}\)C)
+\({T_{wb,air}}\) is the tower inlet air wet-bulb temperature (\(^{\circ}\)C)
 
-\({T_{approach}}\) = approach temperature at current operating conditions (\(^{o}\)C)
+\({T_{approach}}\) is the approach temperature at current operating conditions (\(^{\circ}\)C)
 
-\({T_{range}}\) = range temperature at current operating conditions (\(^{o}\)C)
+\({T_{range}}\) is the range temperature at current operating conditions (\(^{\circ}\)C).
 
 Note that the approach temperature correlation as described previously is a function of range temperature, so the equations above must be solved iteratively to converge on a solution. If the resulting outlet water temperature is above the desired setpoint temperature, then the fan runs at maximum speed and does not cycle on/off (fan part-load ratio = FanPLR = 1.0 and \emph{FR\(_{air}\)} = 1.0).
 
 If the outlet water temperature with maximum fan speed is below the setpoint temperature, then the model next determines the impact of ``free convection'' (water flowing through tower with fan off). In the free convection regime, the outlet water temperature is calculated using a fraction of the water temperature difference through the tower when the fan is at its maximum speed. This fraction is defined by the user (Fraction of Tower Capacity in Free Convection Regime).
 
 \begin{equation}
-{T_{water,outlet,fanOFF}} = {T_{water,inlet}}\,\,\,\, - \,\,\left[ {Fra{c_{freeconv}}\left( {{T_{water,inlet}}\,{\rm{ - }}\,\,{T_{water,outlet,fanMAX}}} \right)} \right]
+{T_{water,outlet,fanOFF}} = {T_{water,inlet}} - \left[ {Fra{c_{freeconv}}\left( {{T_{water,inlet}} - {T_{water,outlet,fanMAX}}} \right)} \right]
 \end{equation}
 
 where:
 
-\({T_{water,outlet,fanOFF}}\) ~ = tower outlet water temperature in free convection regime (\(^{o}\)C)
+\({T_{water,outlet,fanOFF}}\) is the tower outlet water temperature in free convection regime (\(^{\circ}\)C)
 
-\({T_{water,inlet}}\) ~ = tower inlet water temperature (\(^{o}\)C)
+\({T_{water,inlet}}\) is the tower inlet water temperature (\(^{\circ}\)C)
 
-\(Fra{c_{freeconv}}\) = fraction of tower capacity in free convection regime (user specified)
+\(Fra{c_{freeconv}}\) is the fraction of tower capacity in free convection regime (user specified).
 
 If the outlet water temperature in the free convection regime is below the setpoint temperature, the tower fan is not turned on and the fan part-load ratio is set equal to 0. In addition, the air flow rate ratio through the tower is assumed to be equal to the fraction of tower capacity in the free convection regime.
 
 \begin{equation}
-FanPLR\,\, = \,\,FanPL{R_{freeconv}} = 0.0
+FanPLR = FanPL{R_{freeconv}} = 0.0
 \end{equation}
 
 \begin{equation}
-F{R_{air}}\, = F{R_{air,freeconv}} = Fra{c_{freeconv}}
+F{R_{air}} = F{R_{air,freeconv}} = Fra{c_{freeconv}}
 \end{equation}
 
 where:
 
-\(FanPLR\) = fan part-load ratio
+\(FanPLR\) is the fan part-load ratio
 
-\(FanPL{R_{freeconv}}\) = fan part-load ratio in free convection regime
+\(FanPL{R_{freeconv}}\) is the fan part-load ratio in free convection regime
 
-\(F{R_{air,freeconv}}\) ~ = air flow rate ratio in free convection regime
+\(F{R_{air,freeconv}}\) is the air flow rate ratio in free convection regime.
 
-If the outlet water temperature in the free convection regime is above the setpoint temperature, then the fan is turned on at the minimum fan speed (minimum air flow rate ratio, FR\(_{air,min}\) , entered by the user) and the outlet water temperature is calculated as the inlet air wet-bulb temperature plus the calculated approach temperature:
+If the outlet water temperature in the free convection regime is above the setpoint temperature, then the fan is turned on at the minimum fan speed (minimum air flow rate ratio, FR\(_{air,min}\), entered by the user) and the outlet water temperature is calculated as the inlet air wet-bulb temperature plus the calculated approach temperature:
 
 \begin{equation}
-F{R_{air}} = F{R_{air,\min }}
+FR_{air} = FR_{air,min}
 \end{equation}
 
 \begin{equation}
-{T_{water,outlet,fanMIN}} = {T_{wb,air}}{\rm{ + }}\,{T_{approach}}\,\,\,\,\{ F{R_{air}}\, = \,F{R_{air,\min }}\}
+T_{water,outlet,fanMIN} = T_{wb,air} + T_{approach}
 \end{equation}
 
 where:
 
-\({T_{water,outlet,FanMIN}}\) ~ = outlet water temperature at minimum fan speed (\(^{o}\)C)
+\({T_{water,outlet,FanMIN}}\)is the outlet water temperature at minimum fan speed (\(^{\circ}\)C)
 
-\(F{R_{air,\min }}\) ~ = air flow rate ratio at the minimum fan speed
+\(F{R_{air,\min }}\) is the air flow rate ratio at the minimum fan speed.
 
 If the outlet water temperature at minimum fan speed is below the setpoint temperature, the cooling tower fan cycles on and off at the minimum air flow rate ratio in order to meet the setpoint temperature.
 
 \begin{equation}
-FanPLR = \left( {\frac{{{T_{water,outlet,fanOFF}} - {T_{{\rm{setpoint}}}}}}{{{T_{water,outlet,fanOFF}} - {T_{water,outlet,fanMIN}}}}} \right)
+FanPLR = \left( {\frac{{{T_{water,outlet,fanOFF}} - {T_{setpoint}}}}{{{T_{water,outlet,fanOFF}} - {T_{water,outlet,fanMIN}}}}} \right)
 \end{equation}
 
-where:
-
-\({T_{{\rm{setpoint}}}}\) ~ = outlet water setpoint temperature (\(^{o}\)C)
+where \({T_{{\rm{setpoint}}}}\) is the outlet water setpoint temperature (\(^{\circ}\)C).
 
 If the outlet water temperature at minimum fan speed is above the outlet water temperature setpoint, then the cooling tower fan speed (\emph{FR\(_{air}\)}) is increased until the calculated approach temperature produces the required outlet water temperature to meet the setpoint.
 
@@ -599,10 +613,12 @@ If the outlet water temperature at minimum fan speed is above the outlet water t
 \end{equation}
 
 \begin{equation}
-{T_{water,outlet}} = {T_{{\rm{setpoint}}}}\, = {T_{wb,air}}{\rm{ + }}\,{T_{approach}}
+{T_{water,outlet}} = {T_{{\rm{setpoint}}}} = {T_{wb,air}} + {T_{approach}}
 \end{equation}
 
-\(FanPLR = 1.0\) ~\emph{(i.e., fan does not cycle on/off)}
+\begin{equation}
+FanPLR = 1.0~~(i.e., fan does not cycle on/off)
+\end{equation}
 
 \subsubsection{Fan Power}\label{fan-power}
 
@@ -620,27 +636,29 @@ Else:
   P_{fan} = \left( {{P_{fan,design}}} \right)\left( {FanPLR} \right){\left( {F{R_{air}}} \right)^{\rm{3}}}
 \end{equation}
 
+In addition:
+
 \begin{equation}
-{E_{fan}} = \left( {{P_{fan}}} \right)\left( {TimeStepSys} \right)3600.
+{E_{fan}} = \left( {{P_{fan}}} \right)\left( {TimeStepSys} \right)3600
 \end{equation}
 
 where:
 
-\(FanPowerCurveObject\) ~ = name of fan power ratio as a function of air flow rate ratio curve
+\(FanPowerCurveObject\) is the name of fan power ratio as a function of air flow rate ratio curve
 
-\({P_{fan}}\) ~ = tower fan electric power (W)
+\({P_{fan}}\) is the tower fan electric power (W)
 
-\({E_{fan}}\) ~ = tower fan electric consumption (J)
+\({E_{fan}}\) is the tower fan electric consumption (J)
 
-\(CurveOutput\) ~ = output of FanPowerCurveObject evaluated at the operating air flow rate ratio (\emph{FR\(_{air}\)})
+\(CurveOutput\) is the output of FanPowerCurveObject evaluated at the operating air flow rate ratio (\emph{FR\(_{air}\)})
 
-\({P_{fan,design}}\) ~ = design fan power at design (maximum) air flow through the tower (W)
+\({P_{fan,design}}\) is the design fan power at design (maximum) air flow through the tower (W)
 
-\emph{TimeStepSys} = HVAC system simulation time step (hr)
+\emph{TimeStepSys} is the HVAC system simulation time step (hr).
 
 \subsubsection{Tower Basin Heater}\label{tower-basin-heater-1}
 
-Calculations are also made to estimate the electric power input to the tower basin heater. A schedule may be used to disable the basin heater during regular maintenance periods or other time periods (e.g., during summer). If a schedule is not provided, the basin heater is assumed to be available the entire simulation time period. The basin heater operates when it is scheduled on, the outdoor air dry-bulb temperature is below the basin heater setpoint temperature, and the cooling tower is not active (i.e., water is not flowing through the tower). The user is required to enter a basin heater capacity (watts per degree Kelvin) and a heater setpoint temperature (\(^{o}\)C) if they want to model basin heater electric power.
+Calculations are also made to estimate the electric power input to the tower basin heater. A schedule may be used to disable the basin heater during regular maintenance periods or other time periods (e.g., during summer). If a schedule is not provided, the basin heater is assumed to be available the entire simulation time period. The basin heater operates when it is scheduled on, the outdoor air dry-bulb temperature is below the basin heater setpoint temperature, and the cooling tower is not active (i.e., water is not flowing through the tower). The user is required to enter a basin heater capacity (Watts per degree Kelvin) and a heater setpoint temperature (\(^{\circ}\)C) if they want to model basin heater electric power.
 
 \begin{lstlisting}
 P_heater_basin =0.0
@@ -658,22 +676,22 @@ ENDIF
 \end{lstlisting}
 
 \begin{equation}
-{E_{{\rm{heater,basin}}}} = \left( {{P_{{\rm{heater,basin}}}}} \right)\left( {TimeStepSys} \right){\rm{3600}}{\rm{.}}
+{E_{heater,basin}} = \left( {P_{heater,basin}} \right)\left( {TimeStepSys} \right) {3600}
 \end{equation}
 
 where:
 
-\({P_{{\rm{heater,basin}}}}\) ~ = tower basin heater electric power (W)
+\({P_{{\rm{heater,basin}}}}\) is the tower basin heater electric power (W)
 
-\({E_{{\rm{heater,basin}}}}\) ~ = tower basin heater electric consumption (J)
+\({E_{{\rm{heater,basin}}}}\) is the tower basin heater electric consumption (J)
 
-\emph{T\(_{setpoint,basin}\)} = basin heater setpoint temperature (\(^{o}\)C)
+\emph{T\(_{setpoint,basin}\)} is the basin heater setpoint temperature (\(^{\circ}\)C)
 
-\emph{T\(_{db,outdoor}\)}~~~ = outdoor air dry-bulb temperature (\(^{o}\)C)
+\emph{T\(_{db,outdoor}\)} is the outdoor air dry-bulb temperature (\(^{\circ}\)C)
 
-CAP\emph{\(_{heater,basin}\)} = basin heater capacity (W/K)
+CAP\emph{\(_{heater,basin}\)} is the basin heater capacity (W/K)
 
-\emph{Schedule\(_{heater,basin}\)} = basin heater schedule (schedule value \textgreater{} 0 means ON)
+\emph{Schedule\(_{heater,basin}\)} is the basin heater schedule (schedule value \textgreater{} 0 means ON).
 
 \subsubsection{References}\label{references-1-005}
 
@@ -699,7 +717,7 @@ Many towers are constructed to be capable of being grouped together to achieve t
 
 For the operation of multi-cell towers, the first step is to determine the number of cells \emph{n,} which will be operating during the timestep using the calculation logic from DOE-2.1E.
 
-The maximum and minimum flow rates per cell are determined according to the input fractions (\emph{Minimum~ Water Flow Rate Fraction:}\({k_{min}}\) \emph{~}~and \emph{Maximum~ Water Flow Rate Fraction:} \({k_{max}}\) ) as follows:
+The maximum and minimum flow rates per cell are determined according to the input fractions (\emph{Minimum Water Flow Rate Fraction:}\({k_{min}}\) and \emph{Maximum Water Flow Rate Fraction:} \({k_{max}}\)) as follows:
 
 \begin{equation}
     \begin{array}{rl}
@@ -708,7 +726,7 @@ The maximum and minimum flow rates per cell are determined according to the inpu
     \end{array}
 \end{equation}
 
-where \({{{\dot m}_{w,des}}}\) ~is the design water flow rate through the entire cooling tower.
+where \({{{\dot m}_{w,des}}}\) is the design water flow rate through the entire cooling tower.
 
 Then, we determine the minimum and maximum number of cells that can operate with this water flow rate:
 
@@ -719,19 +737,15 @@ Then, we determine the minimum and maximum number of cells that can operate with
     \end{array}
 \end{equation}
 
-where \emph{n\(_{tot}\)} is the total number of cells of the tower, and\({{{\dot m}_{w,tot}}}\) ~is the water flow rate to the tower.
+where \emph{n\(_{tot}\)} is the total number of cells of the tower and \({{{\dot m}_{w,tot}}}\) is the water flow rate to the tower.
 
 The number of cells operating\emph{n} is set accordingly:
 
-If the \emph{Cell Control} method is \emph{MinimalCell,}
+If the \emph{Cell Control} method is \emph{MinimalCell}, \emph{n =} \({{n_{min}}}\).
 
-\emph{n =} \({{n_{min}}}\)
+If the \emph{Cell Control} method is \emph{MaximalCell}, \emph{n =} \({{n_{max}}}\).
 
-If the \emph{Cell Control} method is \emph{MaximalCell,}
-
-\emph{n =} \({{n_{max}}}\)
-
-Finally, the water mass flow rate per cell (\({{\dot m}_w})\) ~will be:
+Finally, the water mass flow rate per cell (\({{\dot m}_w})\) will be:
 
 \begin{equation}
 {{\dot m}_w} = \frac{{{{\dot m}_{w,tot}}}}{n}
@@ -769,17 +783,17 @@ Makeup water use for all types of cooling towers is made up of three components:
 
 where:
 
-\({\dot Q_{water}}\) ~ = water-side heat transfer (W)
+\({\dot Q_{water}}\) is the water-side heat transfer (W)
 
-\({\dot m_{_{water}}}\) ~ = mass flow rate of water through the tower (kg/s)
+\({\dot m_{_{water}}}\) is the mass flow rate of water through the tower (kg/s)
 
-\({C_p}\) ~ = specific heat of water (W/kg-K)
+\({C_p}\) is the specific heat of water (W/kg-K)
 
-\({h_{sat\,air,outlet}}\) ~ = saturated outlet air enthalpy (J/kg)
+\({h_{sat\,air,outlet}}\) is the saturated outlet air enthalpy (J/kg)
 
-\({h_{air,inlet}}\) ~ = inlet air enthalpy (J/kg)
+\({h_{air,inlet}}\) is the inlet air enthalpy (J/kg)
 
-\({\dot m_{air}}\) ~ = mass flow rate of air through the tower (kg/s)
+\({\dot m_{air}}\) is the mass flow rate of air through the tower (kg/s).
 
 The saturation temperature and humidity ratio are then calculated for the tower's outlet air.
 
@@ -793,15 +807,15 @@ The saturation temperature and humidity ratio are then calculated for the tower'
 
 where:
 
-\({T_{sat\,air,outlet}}\) ~ = saturated outlet air temperature (\(^{o}\)C)
+\({T_{sat\,air,outlet}}\) is the saturated outlet air temperature (\(^{\circ}\)C)
 
-\(PsyTsatFnHPb\) ~ = EnergyPlus psychrometric function, returns saturation temperature given enthalpy and barometric pressure
+\(PsyTsatFnHPb\) is an EnergyPlus psychrometric function, returns saturation temperature given enthalpy and barometric pressure
 
-\({\rm{OutBaroPress}}\) ~ = outdoor barometric pressure (Pa)
+\({\rm{OutBaroPress}}\) is the outdoor barometric pressure (Pa)
 
-\({\omega_{sat\,air,outlet}}\) ~ = saturated outlet air humidity ratio (kg\(_{water}\)/kg\(_{dry\, air}\))
+\({\omega_{sat\,air,outlet}}\) is the saturated outlet air humidity ratio (kg\(_{water}\)/kg\(_{dry~air}\))
 
-\(PsyWFnTdbH\) ~ = EnergyPlus psychrometric function, returns humidity ratio given dry-bulb temperature and enthalpy
+\(PsyWFnTdbH\) is an EnergyPlus psychrometric function, returns humidity ratio given dry-bulb temperature and enthalpy.
 
 The makeup water quantity required to replenish the water lost due to evaporation is then calculated as the product of the air mass flow rate and the difference between the entering and leaving air humidity ratio divided by the density of water.
 
@@ -811,13 +825,13 @@ The makeup water quantity required to replenish the water lost due to evaporatio
 
 where:
 
-\({\dot V_{evaporation,makeup}}\) ~ = makeup water usage due to evaporation (m\(^{3}\)/s)
+\({\dot V_{evaporation,makeup}}\) is the makeup water usage due to evaporation (m\(^{3}\)/s)
 
-\({\dot m_{air}}\) ~ = mass flow rate of air through tower (kg/s)
+\({\dot m_{air}}\) is the mass flow rate of air through tower (kg/s)
 
-\({\omega_{air,inlet}}\) ~ = humidity ratio of tower inlet air (kg\(_{water}\)/kg\(_{dry\, air}\))
+\({\omega_{air,inlet}}\) is the humidity ratio of tower inlet air (kg\(_{water}\)/kg\(_{dry\, air}\))
 
-\({\rho_{water}}\) ~ = density of water evaluated at the tower inlet air temperature (kg/m\(^{3}\))
+\({\rho_{water}}\) is the density of water evaluated at the tower inlet air temperature (kg/m\(^{3}\)).
 
 The second method available for calculating water makeup for evaporation is for the user to provide a value for a loss factor.~ The evaporation loss is then calculated as a fraction of the circulating condenser water flow and varies with the temperature change in the condenser water.~ The value provided by the user is in units of percent-per-degree Kelvin.~ The evaporation rate will equal this value times each degree Kelvin of temperature drop in the condenser water.~ Typical values are from 0.15 to 0.27 {[}percent/K{]}. The default is 0.2.~ The rate of water makeup for evaporation is then calculated by multiplying this factor times the condenser water flow rate and the temperature decrease in the condenser water flow rate. For evaporative fluid coolers, a numerical value of loss factor can be entered in the same manner as for cooling towers. If this field is blank, an empirical correlation will be used to calculate the value based on current outdoor dry bulb temperature and relative humidity. The following correlation from Qureshi and Zubair (2007) is used to calculate the loss factor:
 
@@ -825,11 +839,7 @@ The second method available for calculating water makeup for evaporation is for 
 Loss\;Factor = (113 - 8.417\phi  + 1.6147{t_{db}})*{10^{ - 5}}
 \end{equation}
 
-where:
-
-\(\phi\) ~ = relative humidity of inlet air
-
-\({t_{db}}\) ~ = Dry-bulb temperature of inlet air
+where \(\phi\) is the relative humidity of inlet air and \({t_{db}}\) is the dry-bulb temperature of inlet air.
 
 Additional makeup water usage is modeled as a percentage of design water flow rate through the tower to account for drift, and as a scheduled flow rate to model blowdown. Drift is water loss due to the entrainment of small water droplets in the air stream passing through the tower. Drift is defined by the model user as a percentage of the tower's design water flow rate, and is assumed to vary with tower air flow rate ratio as follows:
 
@@ -839,13 +849,13 @@ Additional makeup water usage is modeled as a percentage of design water flow ra
 
 where:
 
-\({\dot V_{drift,makeup}}\) ~ = makeup water usage due to drift (m\(^{3}\)/s)
+\({\dot V_{drift,makeup}}\) is the makeup water usage due to drift (m\(^{3}\)/s)
 
-\({\dot m_{water,design}}\) ~ = design (volumetric) water flow rate (m\(^{3}\)/s)
+\({\dot m_{water,design}}\) is the design (volumetric) water flow rate (m\(^{3}\)/s)
 
-\(PercentWatertoDrift\) ~ = percent of design water flow rate lost to drift at the tower design air flow rate
+\(PercentWatertoDrift\) is the percent of design water flow rate lost to drift at the tower design air flow rate
 
-\(F{R_{air}}\) = ratio of actual air flow rate to tower design air flow rate
+\(F{R_{air}}\) is the ratio of actual air flow rate to tower design air flow rate.
 
 Blowdown is water flushed from the basin on a periodic basis to purge the concentration of mineral scale or other contaminants. There are two ways that blowdown is calculated in EnergyPlus.~ Blowdown water rates can be scheduled so that we have:.
 
@@ -863,9 +873,9 @@ Else:
 
 where:
 
-\({\dot V_{blowdown,makeup}}\) ~ = makeup water usage due to blowdown (m\(^{3}\)/s)
+\({\dot V_{blowdown,makeup}}\) is the makeup water usage due to blowdown (m\(^{3}\)/s)
 
-\emph{ScheduleValue\(_{blowdown}\)} = blowdown schedule value for the time step being simulated (m\(^{3}\)/s)
+\emph{ScheduleValue\(_{blowdown}\)} is the blowdown schedule value for the time step being simulated (m\(^{3}\)/s).
 
 The second (and default) way that blowdown can be calculated is to assume that blowdown water is continually introduced at a rate that will provide a constant concentration ratio.~ As water evaporates it leaves behind minerals and the like causing the concentration of water impurities to be higher in the tower than in the makeup water.~ Acceptable concentration ratios are in the range of 3 to 5 depending on the purity of the make up water.~ Water lost as drift does not evaporate and decrease the water needed for blowdown.~ Using the ``Concentration Ratio'' method, the rate of blowdown can be calculated using:
 
@@ -873,19 +883,15 @@ The second (and default) way that blowdown can be calculated is to assume that b
 {\dot V_{blowdown,makeup}} = \frac{{{{\dot V}_{evaporation,makeup}}}}{{{R_{concentration}} - 1}} - {\dot V_{drift,makeup}}
 \end{equation}
 
-where,
-
-\({R_{concentration}}\) ~is the concentration ratio or the ratio of solids in the blowdown water to solids in the makeup water.
+where \({R_{concentration}}\) is the concentration ratio or the ratio of solids in the blowdown water to solids in the makeup water.
 
 The tower makeup water consumption (m\(^{3}\)) for each simulation time step is calculated as the sum of the individual components of makeup water usage multiplied by the simulation time step in hours and the conversion for hours to seconds (3600 sec/hr). Makeup water usage is only calculated when the cooling tower is active and water is flowing through the cooling tower.
 
 \begin{equation}
-{V_{water,\;makeup}} = \left( {{{\dot V}_{evaporation,makeup}} + {{\dot V}_{drift,makeup}} + {{\dot V}_{blowdown,makeup}}} \right)\cdot TimeStepSys\cdot 3600.
+{V_{water,\;makeup}} = \left( {{{\dot V}_{evaporation,makeup}} + {{\dot V}_{drift,makeup}} + {{\dot V}_{blowdown,makeup}}} \right)\cdot TimeStepSys\cdot 3600
 \end{equation}
 
-where:
-
-\({V_{water,makeup}}\) ~ = tower makeup water consumption (m\(^{3}\))
+where \({V_{water,makeup}}\) is the tower makeup water consumption (m\(^{3}\)).
 
 \subsubsection{References}\label{references-2-003}
 
@@ -904,28 +910,48 @@ The input objects FluidCooler:SingleSpeed and FluidCooler:TwoSpeed provide model
 The expression for fluid cooler effectiveness is as follows:
 
 \begin{equation}
-  \varepsilon = 1-\exp{\CB{ \frac{\exp{\PB{-NTU C_r \eta}}-1}{C_{r}^{\eta}} }}
+  \varepsilon = 1-\exp{\CB{ \frac{\exp{\PB{\frac{-NTU C_r}{\eta}}}-1}{\frac{C_{r}}{\eta}} }}
 \end{equation}
 
-Where
-
-\(\varepsilon\) \(\varepsilon\) \emph{~} = heat exchanger effectiveness
+where \(\varepsilon\) is the heat exchanger effectiveness and the following equations define terms important to this equation:
 
 \begin{equation}
 {C_r} = \frac{{{{\dot C}_{\min }}}}{{{{\dot C}_{\max }}}}
 \end{equation}
 
-\({\dot C_a} = {\dot m_a}{c_{pa}}\) \({\dot C_a} = {\dot m_a}{c_{pa}}\) ~and\({\dot C_w} = {\dot m_w}{c_{pw}}\)
-
-\({\dot C_{\max }} = Max({\dot C_a},{\dot C_w})\) \({\dot C_{\max }} = Max({\dot C_a},{\dot C_w})\) ;\({\dot C_{\min }} = Min({\dot C_a},{\dot C_w})\)
-
 \begin{equation}
-NTU = \frac{{UA}}{{{{\dot C}_{\min }}}}
+{\dot C_a} = {\dot m_a}{c_{pa}}
 \end{equation}
 
-\(\eta = NT{U^{( - 0.22)}}\) \(\eta = NT{U^{( - 0.22)}}\)
+\begin{equation}
+{\dot C_a} = {\dot m_a}{c_{pa}}
+\end{equation}
 
-The first fluid is water and the second fluid is air entering the heat exchanger at temperature \({T_{db,in}}\) \({T_{db,in}}\) ~and specific heat \({c_{pa}}\) \({c_{pa}}\) . The heat exchanger is characterized by a single parameter, its overall heat transfer coefficient-area product UA.
+\begin{equation}
+{\dot C_w} = {\dot m_w}{c_{pw}}
+\end{equation}
+
+\begin{equation}
+{\dot C_{\max }} = Max({\dot C_a},{\dot C_w})
+\end{equation}
+
+\begin{equation}
+{\dot C_{\max }} = Max({\dot C_a},{\dot C_w})
+\end{equation}
+
+\begin{equation}
+{\dot C_{\min }} = Min({\dot C_a},{\dot C_w})
+\end{equation}
+
+\begin{equation}
+NTU = \frac{{UA}}{{{{\dot C}_{min}}}}
+\end{equation}
+
+\begin{equation}
+\eta = NT{U^{(-0.22)}}
+\end{equation}
+
+The first fluid is water and the second fluid is air entering the heat exchanger at temperature \({T_{db,in}}\) and specific heat \({c_{pa}}\). The heat exchanger is characterized by a single parameter, its overall heat transfer coefficient-area product UA.
 
 When the user selects the nominal capacity method, the UA is calculated as follows:
 
@@ -938,30 +964,38 @@ The objective of the fluid cooler model is to predict the exiting water temperat
 With the overall heat transfer coefficient-area product for the fluid cooler calculated by the nominal capacity information entered by the user, the effectiveness of the heat exchanger is then calculated as:
 
 \begin{equation}
-  \varepsilon = 1-\exp{\CB{ \frac{\exp{\PB{-NTU C_r \eta}}-1}{C_{r}^{\eta}} }}
+  \varepsilon = 1-\exp{\CB{ \frac{\exp{\PB{\frac{-NTU C_r}{\eta}}}-1}{\frac{C_{r}}{\eta}} }}
 \end{equation}
 
 The heat transfer rate is then calculated as follows:
 
-\(\dot Q = \varepsilon {\dot C_{\min }}({T_{w,in}} - {T_{db,in}})\) \(\dot Q = \varepsilon {\dot C_{\min }}({T_{w,in}} - {T_{db,in}})\)
+\begin{equation}
+\dot Q = \varepsilon {\dot C_{\min }}({T_{w,in}} - {T_{db,in}})
+\end{equation}
+
+\begin{equation}
+\dot Q = \varepsilon {\dot C_{\min }}({T_{w,in}} - {T_{db,in}})
+\end{equation}
 
 Then the outlet air dry-bulb and outlet water temperature are calculated:
 
 \begin{equation}
-{T_{db,out}} = {T_{db,in}} + \frac{{\mathop Q\limits^. }}{{{{\mathop C\limits^. }_a}}}
+{T_{db,out}} = {T_{db,in}} + \frac{\dot{Q}}{\dot{C_a}}
 \end{equation}
 
 \begin{equation}
-{T_{w,out}} = {T_{w,in}} - \frac{{\mathop Q\limits^. }}{{{{\mathop C\limits^. }_w}}}
+{T_{w,out}} = {T_{w,in}} - \frac{\dot{Q}}{\dot{C_w}}
 \end{equation}
 
-\({T_{w,in}}\) = inlet water temperature, \(^{o}\)C
+where:
 
-\({T_{w,out}}\) = outlet water temperature, \(^{o}\)C
+\({T_{w,in}}\) is the inlet water temperature (\(^{\circ}\)C)
 
-\({T_{db,in}}\) ~ = dry-bulb temperature of the inlet air, \(^{o}\)C
+\({T_{w,out}}\) is the outlet water temperature (\(^{\circ}\)C)
 
-\({T_{db,out}}\) = dry-bulb temperature of the outlet air, \(^{o}\)C
+\({T_{db,in}}\) is the dry-bulb temperature of the inlet air (\(^{\circ}\)C)
+
+\({T_{db,out}}\) is the dry-bulb temperature of the outlet air (\(^{\circ}\)C).
 
 \subsubsection{Calculating the Actual Exiting Water Temperature and Fan Power}\label{calculating-the-actual-exiting-water-temperature-and-fan-power-1}
 
@@ -972,35 +1006,35 @@ The fluid cooler model seeks to maintain the temperature of the water exiting th
 The fluid cooler fans are turned on to reduce the exiting water temperature to the setpoint. The model assumes that part-load operation is represented by a simple linear interpolation between two steady-state regimes (e.g., Fluid cooler fans on for the entire simulation time step and fluid cooler fans off for the entire simulation time step). Cyclic losses are not taken into account. If the outlet water temperature is less than the set-point then the fraction of time for which the fluid cooler must operate to meet the set-point is calculated by using the following equation:
 
 \begin{equation}
-\omega \,\, = \frac{{{T_{set}} - {T_{wout,off}}}}{{{T_{wout,on}} - {T_{wout,off}}}}
+\omega = \frac{{{T_{set}} - {T_{wout,off}}}}{{{T_{wout,on}} - {T_{wout,off}}}}
 \end{equation}
 
-Where
+where:
 
-\({T_{set}}\) ~ = exiting water setpoint temperature, \(^{o}\)C
+\({T_{set}}\) is the exiting water setpoint temperature (\(^{\circ}\)C)
 
-\({T_{wout,off}}\) ~ = exiting water temperature with all fluid cooler fans off, \(^{o}\)C
+\({T_{wout,off}}\) is the exiting water temperature with all fluid cooler fans off (\(^{\circ}\)C)
 
-\({T_{wout,on}}\) ~ = exiting water temperature with all fluid cooler fans on, \(^{o}\)C
+\({T_{wout,on}}\) is the exiting water temperature with all fluid cooler fans on (\(^{\circ}\)C).
 
-The average fan power for the simulation time step is calculated by multiplying \(\omega \,\) by the steady-state fan power specified by the user.
+The average fan power for the simulation time step is calculated by multiplying \(\omega\) by the steady-state fan power specified by the user.
 
 The calculation method for the two-speed fluid cooler is similar to that for the single-speed fluid cooler example described above. The model first calculates the steady-state exiting water temperature with the fluid cooler fans at low speed. If the exiting water temperature at low fan speed is below the setpoint temperature, then the average fan power is calculated based on the result of previous equation and the steady-state, low speed fan power specified by the user.~ If low-speed fan operation is unable to reduce the exiting water temperature below the setpoint, then the fluid cooler fans' speed is increased to high speed and the steady-state exiting water temperature is calculated. If this temperature is below the setpoint, then a modified version of previous equation is used to calculate runtime at high fan speed:
 
 \begin{equation}
-\omega \,\, = \frac{{{T_{set}} - {T_{wout,low}}}}{{{T_{wout,high}} - {T_{wout,low}}}}
+\omega = \frac{{{T_{set}} - {T_{wout,low}}}}{{{T_{wout,high}} - {T_{wout,low}}}}
 \end{equation}
 
-where
+where:
 
-\({T_{set}}\) ~ = exiting water setpoint temperature, \(^{o}\)C
+\({T_{set}}\) is the exiting water setpoint temperature (\(^{\circ}\)C)
 
-\({T_{wout,low}}\) ~ = exiting water temperature with fluid cooler fans at low speed, \(^{o}\)C
+\({T_{wout,low}}\) is the exiting water temperature with fluid cooler fans at low speed (\(^{\circ}\)C)
 
-\({T_{wout,high}}\) ~ = exiting water temperature with fluid cooler fans at high speed, \(^{o}\)C
+\({T_{wout,high}}\) is the exiting water temperature with fluid cooler fans at high speed (\(^{\circ}\)C).
 
-The average fan power for the simulation time step is calculated for the two-speed fluid cooler as follows
+The average fan power for the simulation time step is calculated for the two-speed fluid cooler as follows:
 
 \begin{equation}
-{P_{fan,avg}}\, = \,\omega \,({P_{fan,high}})\, + \,\left( {1 - \omega } \right)\left( {{P_{fan,low}}} \right)
+{P_{fan,avg}} = \omega ({P_{fan,high}}) + \left( {1 - \omega } \right)\left( {{P_{fan,low}}} \right)
 \end{equation}
