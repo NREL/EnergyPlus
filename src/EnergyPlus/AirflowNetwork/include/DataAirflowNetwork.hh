@@ -362,7 +362,7 @@ namespace AirflowNetwork {
         }
     };
 
-    struct MultizoneCompDetOpeningProp // Large detailed opening component
+    struct DetailedOpening // Large detailed opening component
     {
         // Members
         std::string Name;     // Name of large detailed opening component
@@ -400,7 +400,7 @@ namespace AirflowNetwork {
         int HeightErrIndex; // Height error index
 
         // Default Constructor
-        MultizoneCompDetOpeningProp()
+        DetailedOpening()
             : FlowCoef(0.0), FlowExpo(0.0), TypeName("NONPIVOTED"), LVOType(0), LVOValue(0.0), NumFac(0), OpenFac1(0.0), DischCoeff1(0.0),
               WidthFac1(0.0), HeightFac1(0.0), StartHFac1(0.0), OpenFac2(0.0), DischCoeff2(0.0), WidthFac2(0.0), HeightFac2(0.0), StartHFac2(0.0),
               OpenFac3(0.0), DischCoeff3(0.0), WidthFac3(0.0), HeightFac3(0.0), StartHFac3(0.0), OpenFac4(0.0), DischCoeff4(0.0), WidthFac4(0.0),
@@ -409,7 +409,7 @@ namespace AirflowNetwork {
         }
     };
 
-    struct MultizoneCompSimpleOpeningProp // Large simple opening component
+    struct SimpleOpening // Large simple opening component
     {
         // Members
         std::string Name;  // Name of large simple opening component
@@ -420,12 +420,12 @@ namespace AirflowNetwork {
         Real64 OpenFactor; // Opening factor
 
         // Default Constructor
-        MultizoneCompSimpleOpeningProp() : FlowCoef(0.0), FlowExpo(0.0), MinRhoDiff(0.0), DischCoeff(0.0), OpenFactor(0.0)
+        SimpleOpening() : FlowCoef(0.0), FlowExpo(0.0), MinRhoDiff(0.0), DischCoeff(0.0), OpenFactor(0.0)
         {
         }
     };
 
-    struct MultizoneCompHorOpeningProp // Large horizontal opening component
+    struct HorizontalOpening // Large horizontal opening component
     {
         // Members
         std::string Name;  // Name of large horizontal opening component
@@ -435,12 +435,12 @@ namespace AirflowNetwork {
         Real64 DischCoeff; // Discharge coefficient at full opening
 
         // Default Constructor
-        MultizoneCompHorOpeningProp() : FlowCoef(0.0), FlowExpo(0.0), Slope(0.0), DischCoeff(0.0)
+        HorizontalOpening() : FlowCoef(0.0), FlowExpo(0.0), Slope(0.0), DischCoeff(0.0)
         {
         }
     };
 
-    struct MultizoneSurfaceCrackStdCndns // Surface crack standard conditions
+    struct ReferenceConditions // Surface crack standard conditions
     {
         // Members
         std::string Name; // Name of standard conditions component
@@ -449,16 +449,16 @@ namespace AirflowNetwork {
         Real64 StandardW; // Standard humidity ratio for crack data
 
         // Default Constructor
-        MultizoneSurfaceCrackStdCndns() : StandardT(0.0), StandardP(0.0), StandardW(0.0)
+        ReferenceConditions() : StandardT(0.0), StandardP(0.0), StandardW(0.0)
         {
         }
     };
 
-    struct MultizoneSurfaceCrackProp // Surface crack component
+    struct SurfaceCrack // Surface crack component
     {
         // Members
         std::string Name;              // Name of crack component
-        std::string ExternalNodeNames; // Name of external node.Not required for internal surface
+        //std::string ExternalNodeNames; // Name of external node.Not required for internal surface
         Real64 FlowCoef;               // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;               // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
         Real64 StandardT;              // Standard temperature for crack data
@@ -466,12 +466,12 @@ namespace AirflowNetwork {
         Real64 StandardW;              // Standard humidity ratio for crack data
 
         // Default Constructor
-        MultizoneSurfaceCrackProp() : FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0)
+        SurfaceCrack() : FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0)
         {
         }
     };
 
-    struct MultizoneSurfaceELAProp // Surface effective leakage area component
+    struct SurfaceEffectiveLeakageArea // Surface effective leakage area component
     {
         // Members
         std::string Name;   // Name of effective leakage area component
@@ -483,12 +483,12 @@ namespace AirflowNetwork {
         Real64 TestDisCoef; // Testing Discharge coefficient
 
         // Default Constructor
-        MultizoneSurfaceELAProp() : ELA(0.0), DischCoeff(0.0), RefDeltaP(0.0), FlowExpo(0.0), TestDeltaP(0.0), TestDisCoef(0.0)
+        SurfaceEffectiveLeakageArea() : ELA(0.0), DischCoeff(0.0), RefDeltaP(0.0), FlowExpo(0.0), TestDeltaP(0.0), TestDisCoef(0.0)
         {
         }
     };
 
-    struct MultizoneCompExhaustFanProp // Zone exhaust fan component
+    struct ZoneExhaustFan // Zone exhaust fan component
     {
         // Members
         std::string Name; // Name of exhaust fan component
@@ -505,7 +505,7 @@ namespace AirflowNetwork {
         int PressCtrlNum; // pressure control number
 
         // Default Constructor
-        MultizoneCompExhaustFanProp()
+        ZoneExhaustFan()
             : FlowRate(0.0), SchedPtr(0), FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), InletNode(0), OutletNode(0),
               EPlusZoneNum(0), PressCtrlNum(0)
         {
@@ -603,7 +603,7 @@ namespace AirflowNetwork {
         }
     };
 
-    struct DisSysCompLeakProp // duct leak component
+    struct DuctLeak // duct leak component
     {
         // Members
         std::string Name; // Name of component leak
@@ -611,12 +611,12 @@ namespace AirflowNetwork {
         Real64 FlowExpo;  // Air Mass Flow exponent [dimensionless]
 
         // Default Constructor
-        DisSysCompLeakProp() : FlowCoef(0.0), FlowExpo(0.0)
+        DuctLeak() : FlowCoef(0.0), FlowExpo(0.0)
         {
         }
     };
 
-    struct DisSysCompELRProp // effective leakage ratio component
+    struct EffectiveLeakageRatio // effective leakage ratio component
     {
         // Members
         std::string Name; // Name of component leak
@@ -626,12 +626,12 @@ namespace AirflowNetwork {
         Real64 FlowExpo;  // Air Mass Flow exponent
 
         // Default Constructor
-        DisSysCompELRProp() : ELR(0.0), FlowRate(0.0), RefPres(0.0), FlowExpo(0.0)
+        EffectiveLeakageRatio() : ELR(0.0), FlowRate(0.0), RefPres(0.0), FlowExpo(0.0)
         {
         }
     };
 
-    struct DisSysCompDuctProp // Duct component
+    struct Duct // Duct component
     {
         // Members
         std::string Name;        // Name of duct component
@@ -655,14 +655,14 @@ namespace AirflowNetwork {
         Real64 A1;               // 1.14 - 0.868589*ln(e/D),
 
         // Default Constructor
-        DisSysCompDuctProp()
+        Duct()
             : L(0.0), D(0.0), A(0.0), Rough(0.0), TurDynCoef(0.0), UThermConduct(0.0), UMoisture(0.0), InsideConvCoeff(0.0), OutsideConvCoeff(0.0),
               MThermal(0.0), MMoisture(0.0), LamDynCoef(0.0), LamFriCoef(0.0), InitLamCoef(0.0), RelRough(0.0), RelL(0.0), g(0.0), A1(0.0)
         {
         }
     };
 
-    struct DisSysCompDamperProp // Damper component
+    struct Damper // Damper component
     {
         // Members
         std::string Name; // Name of damper component
@@ -678,12 +678,12 @@ namespace AirflowNetwork {
         Real64 A3;        // Fourth polynomial coefficient of the control variable (cubic coefficient)
 
         // Default Constructor
-        DisSysCompDamperProp() : LTP(0.0), LamFlow(0.0), TurFlow(0.0), FlowExpo(0.0), FlowMin(0.0), FlowMax(0.0), A0(0.0), A1(0.0), A2(0.0), A3(0.0)
+        Damper() : LTP(0.0), LamFlow(0.0), TurFlow(0.0), FlowExpo(0.0), FlowMin(0.0), FlowMax(0.0), A0(0.0), A1(0.0), A2(0.0), A3(0.0)
         {
         }
     };
 
-    struct DisSysCompCVFProp // Constant volume fan component
+    struct ConstantVolumeFan // Constant volume fan component
     {
         // Members
         std::string Name;          // Name of detailed fan component
@@ -697,13 +697,13 @@ namespace AirflowNetwork {
         int AirLoopNum;            // Air loop number
 
         // Default Constructor
-        DisSysCompCVFProp()
+        ConstantVolumeFan()
             : FlowRate(0.0), Ctrl(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0)
         {
         }
     };
 
-    struct DisSysCompDetFanProp // Detailed fan component
+    struct DetailedFan // Detailed fan component
     {
         // Members
         std::string Name;      // Name of constant volume fan component
@@ -718,7 +718,7 @@ namespace AirflowNetwork {
         // Each range has a min flow rate and 4 coefficients
 
         // Default Constructor
-        DisSysCompDetFanProp() : FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0)
+        DetailedFan() : FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0)
         {
         }
     };
@@ -770,7 +770,7 @@ namespace AirflowNetwork {
         }
     };
 
-    struct DisSysCompCPDProp // Constant pressure drop component
+    struct ConstantPressureDrop // Constant pressure drop component
     {
         // Members
         std::string Name; // Name of constant pressure drop component
@@ -778,7 +778,7 @@ namespace AirflowNetwork {
         Real64 DP;        // Pressure difference across the component
 
         // Default Constructor
-        DisSysCompCPDProp() : A(0.0), DP(0.0)
+        ConstantPressureDrop() : A(0.0), DP(0.0)
         {
         }
     };
@@ -1131,29 +1131,29 @@ namespace AirflowNetwork {
     extern Array1D<AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
     extern Array1D<MultizoneZoneProp> MultizoneZoneData;
     extern Array1D<MultizoneSurfaceProp> MultizoneSurfaceData;
-    extern Array1D<MultizoneCompDetOpeningProp> MultizoneCompDetOpeningData;
-    extern Array1D<MultizoneCompSimpleOpeningProp> MultizoneCompSimpleOpeningData;
-    extern Array1D<MultizoneCompHorOpeningProp> MultizoneCompHorOpeningData;
-    extern Array1D<MultizoneSurfaceCrackStdCndns> MultizoneSurfaceStdConditionsCrackData;
-    extern Array1D<MultizoneSurfaceCrackProp> MultizoneSurfaceCrackData;
-    extern Array1D<MultizoneSurfaceELAProp> MultizoneSurfaceELAData;
+    extern Array1D<DetailedOpening> MultizoneCompDetOpeningData;
+    extern Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
+    extern Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
+    extern Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
+    extern Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
+    extern Array1D<SurfaceEffectiveLeakageArea> MultizoneSurfaceELAData;
     extern Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;
     extern Array1D<DeltaCpProp> DeltaCp;
     extern Array1D<DeltaCpProp> EPDeltaCP;
-    extern Array1D<MultizoneCompExhaustFanProp> MultizoneCompExhaustFanData;
+    extern Array1D<ZoneExhaustFan> MultizoneCompExhaustFanData;
     extern Array1D<IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
     extern Array1D<IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
     extern Array1D<DisSysNodeProp> DisSysNodeData;
-    extern Array1D<DisSysCompLeakProp> DisSysCompLeakData;
-    extern Array1D<DisSysCompELRProp> DisSysCompELRData;
-    extern Array1D<DisSysCompDuctProp> DisSysCompDuctData;
-    extern Array1D<DisSysCompDamperProp> DisSysCompDamperData;
-    extern Array1D<DisSysCompCVFProp> DisSysCompCVFData;
-    extern Array1D<DisSysCompDetFanProp> DisSysCompDetFanData;
+    extern Array1D<DuctLeak> DisSysCompLeakData;
+    extern Array1D<EffectiveLeakageRatio> DisSysCompELRData;
+    extern Array1D<Duct> DisSysCompDuctData;
+    extern Array1D<Damper> DisSysCompDamperData;
+    extern Array1D<ConstantVolumeFan> DisSysCompCVFData;
+    extern Array1D<DetailedFan> DisSysCompDetFanData;
     extern Array1D<DisSysCompCoilProp> DisSysCompCoilData;
     extern Array1D<DisSysCompHXProp> DisSysCompHXData;
     extern Array1D<DisSysCompTermUnitProp> DisSysCompTermUnitData;
-    extern Array1D<DisSysCompCPDProp> DisSysCompCPDData;
+    extern Array1D<ConstantPressureDrop> DisSysCompCPDData;
     extern Array1D<AiflowNetworkReportProp> AirflowNetworkReportData;
     extern Array1D<PressureControllerProp> PressureControllerData;
     extern Array1D<DisSysCompAirflowProp> DisSysCompOutdoorAirData;
