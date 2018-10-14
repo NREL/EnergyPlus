@@ -2426,7 +2426,7 @@ namespace AirflowNetwork {
                Real64 &PDROP,               // Total pressure drop across a component (P1 - P2) [Pa]
                int const i,                 // Linkage number
                const AirProperties &propN,  // Node 1 properties
-               const AirProperties &propM,  // Node 2 properties
+               const AirProperties &EP_UNUSED(propM),  // Node 2 properties
                std::array<Real64, 2> &F,    // Airflow through the component [kg/s]
                std::array<Real64, 2> &DF    // Partial derivative:  DF/DP
     )
