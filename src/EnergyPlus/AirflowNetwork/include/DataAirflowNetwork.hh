@@ -636,9 +636,9 @@ namespace AirflowNetwork {
         // Members
         std::string Name;        // Name of duct component
         Real64 L;                // Duct length [m]
-        Real64 D;                // Hydraulic diameter [m]
+        Real64 hydraulicDiameter; // Hydraulic diameter [m]
         Real64 A;                // Cross section area [m2]
-        Real64 Rough;            // Surface roughness [m]
+        Real64 roughness;        // Surface roughness [m]
         Real64 TurDynCoef;       // Turbulent dynamic loss coefficient
         Real64 UThermConduct;    // Conduction heat transmittance [W/m2-K]
         Real64 UMoisture;        // Overall moisture transmittance [kg/m2]
@@ -656,9 +656,186 @@ namespace AirflowNetwork {
 
         // Default Constructor
         Duct()
-            : L(0.0), D(0.0), A(0.0), Rough(0.0), TurDynCoef(0.0), UThermConduct(0.0), UMoisture(0.0), InsideConvCoeff(0.0), OutsideConvCoeff(0.0),
+            : L(0.0), hydraulicDiameter(0.0), A(0.0), roughness(0.0), TurDynCoef(0.0), UThermConduct(0.0), UMoisture(0.0), InsideConvCoeff(0.0), OutsideConvCoeff(0.0),
               MThermal(0.0), MMoisture(0.0), LamDynCoef(0.0), LamFriCoef(0.0), InitLamCoef(0.0), RelRough(0.0), RelL(0.0), g(0.0), A1(0.0)
         {
+        }
+
+        template <typename NODE> 
+        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                // Linkage number
+                      const NODE &propN, // Node 1 properties
+                      const NODE &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        )
+        {
+
+            // SUBROUTINE INFORMATION:
+            //       AUTHOR         George Walton
+            //       DATE WRITTEN   Extracted from AIRNET
+            //       MODIFIED       Lixing Gu, 2/1/04
+            //                      Revised the subroutine to meet E+ needs
+            //       MODIFIED       Lixing Gu, 6/8/05
+            //       RE-ENGINEERED  na
+
+            // PURPOSE OF THIS SUBROUTINE:
+            // This subroutine solves airflow for a duct/pipe component using Colebrook equation for the
+            // turbulent friction factor
+
+            // METHODOLOGY EMPLOYED:
+            // na
+
+            // REFERENCES:
+            // na
+
+            // USE STATEMENTS:
+            // na
+
+            // Locals
+            // SUBROUTINE ARGUMENT DEFINITIONS:
+
+            // SUBROUTINE PARAMETER DEFINITIONS:
+            Real64 const C(0.868589);
+            Real64 const EPS(0.001);
+
+            // INTERFACE BLOCK SPECIFICATIONS
+            // na
+
+            // DERIVED TYPE DEFINITIONS
+            // na
+
+            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+            //     RE      - Reynolds number.
+            //     FL      - friction factor for laminar flow.
+            //     FT      - friction factor for turbulent flow.
+
+            Real64 A0;
+            Real64 A1;
+            Real64 A2;
+            Real64 B;
+            Real64 D;
+            Real64 S2;
+            Real64 CDM;
+            Real64 FL;
+            Real64 FT;
+            Real64 FTT;
+            Real64 RE;
+            //int CompNum;
+            Real64 ed;
+            Real64 ld;
+            Real64 g;
+            Real64 AA1;
+
+            // Formats
+            static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
+
+            // FLOW:
+            //CompNum = AirflowNetworkCompData(j).TypeNum;
+            ed = roughness / hydraulicDiameter;
+            ld = L / hydraulicDiameter;
+            g = 1.14 - 0.868589 * std::log(ed);
+            AA1 = g;
+
+            if (LFLAG) {
+                // Initialization by linear relation.
+                if (PDROP >= 0.0) {
+                    DF[0] = (2.0 * propN.density * A * hydraulicDiameter) /
+                            (propN.viscosity * InitLamCoef * ld);
+                } else {
+                    DF[0] = (2.0 * propM.density * A * hydraulicDiameter) /
+                            (propM.viscosity * InitLamCoef * ld);
+                }
+                F[0] = -DF[0] * PDROP;
+                if (LIST >= 4) gio::write(Unit21, Format_901) << " dwi:" << i << InitLamCoef << F[0] << DF[0];
+            } else {
+                // Standard calculation.
+                if (PDROP >= 0.0) {
+                    // Flow in positive direction.
+                    // Laminar flow coefficient !=0
+                    if (LamFriCoef >= 0.001) {
+                        A2 = LamFriCoef /
+                             (2.0 * propN.density * A * A);
+                        A1 = (propN.viscosity * LamDynCoef * ld) /
+                             (2.0 * propN.density * A * hydraulicDiameter);
+                        A0 = -PDROP;
+                        CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
+                        FL = (CDM - A1) / (2.0 * A2);
+                        CDM = 1.0 / CDM;
+                    } else {
+                        CDM = (2.0 * propN.density * A * hydraulicDiameter) /
+                              (propN.viscosity * LamDynCoef * ld);
+                        FL = CDM * PDROP;
+                    }
+                    RE = FL * hydraulicDiameter / (propN.viscosity * A);
+                    if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
+                    // Turbulent flow; test when Re>10.
+                    if (RE >= 10.0) {
+                        S2 = std::sqrt(2.0 * propN.density * PDROP) * A;
+                        FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
+                        if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
+                        while (true) {
+                            FT = FTT;
+                            B = (9.3 * propN.viscosity * A) / (FT * roughness);
+                            D = 1.0 + g * B;
+                            g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
+                            FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
+                            if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
+                            if (std::abs(FTT - FT) / FTT < EPS) break;
+                        }
+                        FT = FTT;
+                    } else {
+                        FT = FL;
+                    }
+                } else {
+                    // Flow in negative direction.
+                    // Laminar flow coefficient !=0
+                    if (LamFriCoef >= 0.001) {
+                        A2 = LamFriCoef /
+                             (2.0 * propM.density * A * A);
+                        A1 = (propM.viscosity * LamDynCoef * ld) /
+                             (2.0 * propM.density * A * hydraulicDiameter);
+                        A0 = PDROP;
+                        CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
+                        FL = -(CDM - A1) / (2.0 * A2);
+                        CDM = 1.0 / CDM;
+                    } else {
+                        CDM = (2.0 * propM.density * A * hydraulicDiameter) /
+                              (propM.viscosity * LamDynCoef * ld);
+                        FL = CDM * PDROP;
+                    }
+                    RE = -FL * hydraulicDiameter / (propM.viscosity * A);
+                    if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
+                    // Turbulent flow; test when Re>10.
+                    if (RE >= 10.0) {
+                        S2 = std::sqrt(-2.0 * propM.density * PDROP) * A;
+                        FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
+                        if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
+                        while (true) {
+                            FT = FTT;
+                            B = (9.3 * propM.viscosity * A) / (FT * roughness);
+                            D = 1.0 + g * B;
+                            g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
+                            FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
+                            if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
+                            if (std::abs(FTT - FT) / FTT < EPS) break;
+                        }
+                        FT = -FTT;
+                    } else {
+                        FT = FL;
+                    }
+                }
+                // Select laminar or turbulent flow.
+                if (std::abs(FL) <= std::abs(FT)) {
+                    F[0] = FL;
+                    DF[0] = CDM;
+                } else {
+                    F[0] = FT;
+                    DF[0] = 0.5 * FT / PDROP;
+                }
+            }
+            return 1;
         }
     };
 

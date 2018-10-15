@@ -1038,7 +1038,8 @@ namespace AirflowNetwork {
                 if (SELECT_CASE_var == CompTypeNum_PLR) { // Distribution system crack component
                     NF = AFEPLR(j, LFLAG, DP, i, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_DWC) { // Distribution system duct component
-                    NF = AFEDWC(j, LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    //NF = AFEDWC(j, LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompDuctData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_CVF) { // Distribution system constant volume fan component
                     NF = AFECFR(j, LFLAG, DP, i, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_FAN) { // Distribution system detailed fan component
@@ -1438,181 +1439,6 @@ namespace AirflowNetwork {
             } else {
                 F[0] = FT;
                 DF[0] = FT * expn / PDROP;
-            }
-        }
-        return 1;
-    }
-
-    int AFEDWC(int const j,              // Component number
-               bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
-               Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
-               int const i,              // Linkage number
-               const AirProperties &propN, // Node 1 properties
-               const AirProperties &propM, // Node 2 properties
-               std::array<Real64, 2> &F, // Airflow through the component [kg/s]
-               std::array<Real64, 2> &DF // Partial derivative:  DF/DP
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a duct/pipe component using Colebrook equation for the
-        // turbulent friction factor
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const C(0.868589);
-        Real64 const EPS(0.001);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //     RE      - Reynolds number.
-        //     FL      - friction factor for laminar flow.
-        //     FT      - friction factor for turbulent flow.
-
-        Real64 A0;
-        Real64 A1;
-        Real64 A2;
-        Real64 B;
-        Real64 D;
-        Real64 S2;
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 FTT;
-        Real64 RE;
-        int CompNum;
-        Real64 ed;
-        Real64 ld;
-        Real64 g;
-        Real64 AA1;
-
-        // Formats
-        static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-        // FLOW:
-        CompNum = AirflowNetworkCompData(j).TypeNum;
-        ed = DisSysCompDuctData(CompNum).Rough / DisSysCompDuctData(CompNum).D;
-        ld = DisSysCompDuctData(CompNum).L / DisSysCompDuctData(CompNum).D;
-        g = 1.14 - 0.868589 * std::log(ed);
-        AA1 = g;
-
-        if (LFLAG) {
-            // Initialization by linear relation.
-            if (PDROP >= 0.0) {
-                DF[0] = (2.0 * propN.density * DisSysCompDuctData(CompNum).A * DisSysCompDuctData(CompNum).D) /
-                        (propN.viscosity * DisSysCompDuctData(CompNum).InitLamCoef * ld);
-            } else {
-                DF[0] = (2.0 * propM.density * DisSysCompDuctData(CompNum).A * DisSysCompDuctData(CompNum).D) /
-                        (propM.viscosity * DisSysCompDuctData(CompNum).InitLamCoef * ld);
-            }
-            F[0] = -DF[0] * PDROP;
-            if (LIST >= 4) gio::write(Unit21, Format_901) << " dwi:" << i << DisSysCompDuctData(CompNum).InitLamCoef << F[0] << DF[0];
-        } else {
-            // Standard calculation.
-            if (PDROP >= 0.0) {
-                // Flow in positive direction.
-                // Laminar flow coefficient !=0
-                if (DisSysCompDuctData(CompNum).LamFriCoef >= 0.001) {
-                    A2 = DisSysCompDuctData(CompNum).LamFriCoef / (2.0 * propN.density * DisSysCompDuctData(CompNum).A * DisSysCompDuctData(CompNum).A);
-                    A1 = (propN.viscosity * DisSysCompDuctData(CompNum).LamDynCoef * ld) /
-                         (2.0 * propN.density * DisSysCompDuctData(CompNum).A * DisSysCompDuctData(CompNum).D);
-                    A0 = -PDROP;
-                    CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                    FL = (CDM - A1) / (2.0 * A2);
-                    CDM = 1.0 / CDM;
-                } else {
-                    CDM = (2.0 * propN.density * DisSysCompDuctData(CompNum).A * DisSysCompDuctData(CompNum).D) /
-                          (propN.viscosity * DisSysCompDuctData(CompNum).LamDynCoef * ld);
-                    FL = CDM * PDROP;
-                }
-                RE = FL * DisSysCompDuctData(CompNum).D / (propN.viscosity * DisSysCompDuctData(CompNum).A);
-                if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
-                // Turbulent flow; test when Re>10.
-                if (RE >= 10.0) {
-                    S2 = std::sqrt(2.0 * propN.density * PDROP) * DisSysCompDuctData(CompNum).A;
-                    FTT = S2 / std::sqrt(ld / pow_2(g) + DisSysCompDuctData(CompNum).TurDynCoef);
-                    if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
-                    while (true) {
-                        FT = FTT;
-                        B = (9.3 * propN.viscosity * DisSysCompDuctData(CompNum).A) / (FT * DisSysCompDuctData(CompNum).Rough);
-                        D = 1.0 + g * B;
-                        g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                        FTT = S2 / std::sqrt(ld / pow_2(g) + DisSysCompDuctData(CompNum).TurDynCoef);
-                        if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
-                        if (std::abs(FTT - FT) / FTT < EPS) break;
-                    }
-                    FT = FTT;
-                } else {
-                    FT = FL;
-                }
-            } else {
-                // Flow in negative direction.
-                // Laminar flow coefficient !=0
-                if (DisSysCompDuctData(CompNum).LamFriCoef >= 0.001) {
-                    A2 = DisSysCompDuctData(CompNum).LamFriCoef / (2.0 * propM.density * DisSysCompDuctData(CompNum).A * DisSysCompDuctData(CompNum).A);
-                    A1 = (propM.viscosity * DisSysCompDuctData(CompNum).LamDynCoef * ld) /
-                         (2.0 * propM.density * DisSysCompDuctData(CompNum).A * DisSysCompDuctData(CompNum).D);
-                    A0 = PDROP;
-                    CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                    FL = -(CDM - A1) / (2.0 * A2);
-                    CDM = 1.0 / CDM;
-                } else {
-                    CDM = (2.0 * propM.density * DisSysCompDuctData(CompNum).A * DisSysCompDuctData(CompNum).D) /
-                          (propM.viscosity * DisSysCompDuctData(CompNum).LamDynCoef * ld);
-                    FL = CDM * PDROP;
-                }
-                RE = -FL * DisSysCompDuctData(CompNum).D / (propM.viscosity * DisSysCompDuctData(CompNum).A);
-                if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
-                // Turbulent flow; test when Re>10.
-                if (RE >= 10.0) {
-                    S2 = std::sqrt(-2.0 * propM.density * PDROP) * DisSysCompDuctData(CompNum).A;
-                    FTT = S2 / std::sqrt(ld / pow_2(g) + DisSysCompDuctData(CompNum).TurDynCoef);
-                    if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
-                    while (true) {
-                        FT = FTT;
-                        B = (9.3 * propM.viscosity * DisSysCompDuctData(CompNum).A) / (FT * DisSysCompDuctData(CompNum).Rough);
-                        D = 1.0 + g * B;
-                        g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                        FTT = S2 / std::sqrt(ld / pow_2(g) + DisSysCompDuctData(CompNum).TurDynCoef);
-                        if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
-                        if (std::abs(FTT - FT) / FTT < EPS) break;
-                    }
-                    FT = -FTT;
-                } else {
-                    FT = FL;
-                }
-            }
-            // Select laminar or turbulent flow.
-            if (std::abs(FL) <= std::abs(FT)) {
-                F[0] = FL;
-                DF[0] = CDM;
-            } else {
-                F[0] = FT;
-                DF[0] = 0.5 * FT / PDROP;
             }
         }
         return 1;
@@ -2570,7 +2396,7 @@ namespace AirflowNetwork {
         // FLOW:
         // Get component properties
         CompNum = AirflowNetworkCompData(j).TypeNum;
-        ed = Rough / DisSysCompDuctData(CompNum).D;
+        ed = Rough / DisSysCompCoilData(CompNum).D;
         area = pow_2(DisSysCompCoilData(CompNum).D) * Pi;
         ld = DisSysCompCoilData(CompNum).L / DisSysCompCoilData(CompNum).D;
         g = 1.14 - 0.868589 * std::log(ed);

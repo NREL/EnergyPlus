@@ -3161,9 +3161,9 @@ namespace AirflowNetworkBalanceManager {
                 UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
                 DisSysCompDuctData(i).Name = Alphas(1);                   // Name of duct effective leakage ratio component
                 DisSysCompDuctData(i).L = Numbers(1);                     // Duct length [m]
-                DisSysCompDuctData(i).D = Numbers(2);                     // Hydraulic diameter [m]
+                DisSysCompDuctData(i).hydraulicDiameter = Numbers(2);     // Hydraulic diameter [m]
                 DisSysCompDuctData(i).A = Numbers(3);                     // Cross section area [m2]
-                DisSysCompDuctData(i).Rough = Numbers(4);                 // Surface roughness [m]
+                DisSysCompDuctData(i).roughness = Numbers(4);             // Surface roughness [m]
                 DisSysCompDuctData(i).TurDynCoef = Numbers(5);            // Turbulent dynamic loss coefficient
                 DisSysCompDuctData(i).UThermConduct = Numbers(6);         // Conduction heat transmittance [W/m2.K]
                 DisSysCompDuctData(i).UMoisture = Numbers(7);             // Overall moisture transmittance [kg/m2]
@@ -6672,7 +6672,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 Tin = AirflowNetworkNodeSimu(LF).TZ;
                 Real64 TDuctSurf = (Tamb + Tin) / 2.0;
                 Real64 TDuctSurf_K = TDuctSurf + KelvinConv;
-                Real64 DuctSurfArea = DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).D * Pi;
+                Real64 DuctSurfArea = DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi;
 
                 // If user defined view factors not present, calculate air-to-air heat transfer
                 if (AirflowNetworkLinkageData(i).LinkageViewFactorObjectNum == 0) {
@@ -6683,12 +6683,12 @@ namespace AirflowNetworkBalanceManager {
                             UThermal_iter = UThermal;
 
                             Real64 RThermConvIn = CalcDuctInsideConvResist(
-                                Tin, AirflowNetworkLinkSimu(i).FLOW, DisSysCompDuctData(TypeNum).D, DisSysCompDuctData(TypeNum).InsideConvCoeff);
+                                Tin, AirflowNetworkLinkSimu(i).FLOW, DisSysCompDuctData(TypeNum).hydraulicDiameter, DisSysCompDuctData(TypeNum).InsideConvCoeff);
                             Real64 RThermConvOut = CalcDuctOutsideConvResist(TDuctSurf,
                                                                              Tamb,
                                                                              Wamb,
                                                                              Pamb,
-                                                                             DisSysCompDuctData(TypeNum).D,
+                                                                             DisSysCompDuctData(TypeNum).hydraulicDiameter,
                                                                              AirflowNetworkLinkageData(i).ZoneNum,
                                                                              DisSysCompDuctData(TypeNum).OutsideConvCoeff);
                             Real64 RThermConduct = 1.0 / DisSysCompDuctData(TypeNum).UThermConduct;
@@ -6703,12 +6703,12 @@ namespace AirflowNetworkBalanceManager {
                         }
                     } else { // Air-to-air only. U and h values are all known
                         Real64 RThermConvIn = CalcDuctInsideConvResist(
-                            Tin, AirflowNetworkLinkSimu(i).FLOW, DisSysCompDuctData(TypeNum).D, DisSysCompDuctData(TypeNum).InsideConvCoeff);
+                            Tin, AirflowNetworkLinkSimu(i).FLOW, DisSysCompDuctData(TypeNum).hydraulicDiameter, DisSysCompDuctData(TypeNum).InsideConvCoeff);
                         Real64 RThermConvOut = CalcDuctOutsideConvResist(TDuctSurf,
                                                                          Tamb,
                                                                          Wamb,
                                                                          Pamb,
-                                                                         DisSysCompDuctData(TypeNum).D,
+                                                                         DisSysCompDuctData(TypeNum).hydraulicDiameter,
                                                                          AirflowNetworkLinkageData(i).ZoneNum,
                                                                          DisSysCompDuctData(TypeNum).OutsideConvCoeff);
                         Real64 RThermConduct = 1.0 / DisSysCompDuctData(TypeNum).UThermConduct;
@@ -6731,12 +6731,12 @@ namespace AirflowNetworkBalanceManager {
                         UThermal_iter = UThermal;
 
                         Real64 RThermConvIn = CalcDuctInsideConvResist(
-                            Tin_ave, AirflowNetworkLinkSimu(i).FLOW, DisSysCompDuctData(TypeNum).D, DisSysCompDuctData(TypeNum).InsideConvCoeff);
+                            Tin_ave, AirflowNetworkLinkSimu(i).FLOW, DisSysCompDuctData(TypeNum).hydraulicDiameter, DisSysCompDuctData(TypeNum).InsideConvCoeff);
                         Real64 RThermConvOut = CalcDuctOutsideConvResist(TDuctSurf,
                                                                          Tamb,
                                                                          Wamb,
                                                                          Pamb,
-                                                                         DisSysCompDuctData(TypeNum).D,
+                                                                         DisSysCompDuctData(TypeNum).hydraulicDiameter,
                                                                          AirflowNetworkLinkageData(i).ZoneNum,
                                                                          DisSysCompDuctData(TypeNum).OutsideConvCoeff);
 
@@ -7133,7 +7133,7 @@ namespace AirflowNetworkBalanceManager {
                 if (AirflowNetworkLinkSimu(i).FLOW == 0.0) {
                     Ei = 1.0;
                 } else {
-                    Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).D * Pi /
+                    Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi /
                         (DirSign * AirflowNetworkLinkSimu(i).FLOW));
                 }
                 if (AirflowNetworkLinkageData(i).ZoneNum < 0) {
@@ -7147,7 +7147,7 @@ namespace AirflowNetworkBalanceManager {
                     if (AirflowNetworkLinkSimu(i).FLOW2 == 0.0) {
                         Ei = 1.0;
                     } else {
-                        Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).D * Pi /
+                        Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi /
                             (AirflowNetworkLinkSimu(i).FLOW2));
                     }
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
