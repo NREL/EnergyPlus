@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include "Properties.hh"
 
 namespace EnergyPlus {
 
@@ -555,11 +556,11 @@ namespace AirflowNetwork {
             if (LFLAG) {
                 // Initialization by linear relation.
                 if (PDROP >= 0.0) {
-                    RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
+                    RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     DF[0] = coef * propN.density / propN.viscosity * Ctl;
                 } else {
-                    RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
+                    RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     DF[0] = coef * propM.density / propM.viscosity * Ctl;
                 }
@@ -569,7 +570,7 @@ namespace AirflowNetwork {
                 if (PDROP >= 0.0) {
                     // Flow in positive direction.
                     // Laminar flow.
-                    RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
+                    RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     CDM = coef * propN.density / propN.viscosity * Ctl;
                     FL = CDM * PDROP;
@@ -582,7 +583,7 @@ namespace AirflowNetwork {
                 } else {
                     // Flow in negative direction.
                     // Laminar flow.
-                    RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
+                    RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     CDM = coef * propM.density / propM.viscosity * Ctl;
                     FL = CDM * PDROP;
@@ -798,13 +799,13 @@ namespace AirflowNetwork {
         }
 
         template <typename NODE> 
-        int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                // Linkage number
-                      const NODE &propN, // Node 1 properties
-                      const NODE &propM, // Node 2 properties
-                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        int calculate(bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const EP_UNUSED(i),   // Linkage number
+                      const NODE &propN,        // Node 1 properties
+                      const NODE &propM,        // Node 2 properties
+                      std::array<Real64, 2> &F, // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF // Partial derivative:  DF/DP
         )
         {
 

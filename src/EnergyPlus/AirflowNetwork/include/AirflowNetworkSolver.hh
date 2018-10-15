@@ -55,18 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
-#ifndef AIRDENSITY
-#include "Psychrometrics.hh"
-#define AIRDENSITY(P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(P, T, W)
-#else
-// Need a fallback
-#endif
-
-#ifndef AIRDYNAMICVISCOSITY
-#define AIRDYNAMICVISCOSITY(T) airDynamicVisc(T)
-#else
-// Need a fallback
-#endif
+#include "Properties.hh"
 
 namespace EnergyPlus {
 
@@ -75,31 +64,10 @@ namespace EnergyPlus {
 
 namespace AirflowNetwork {
 
-    Real64 airThermConductivity(Real64 T // Temperature in Celsius
-    );
-
-    Real64 airDynamicVisc(Real64 T // Temperature in Celsius
-    );
-
-    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
-                            Real64 W, // Humidity ratio
-                            Real64 P  // Barometric pressure
-    );
-
-    Real64 airThermalDiffusivity(Real64 T, // Temperature in Celsius
-                                 Real64 W, // Humidity ratio
-                                 Real64 P  // Barometric pressure
-    );
-
-    Real64 airPrandtl(Real64 T, // Temperature in Celsius
-                      Real64 W, // Humidity ratio
-                      Real64 P  // Barometric pressure
-    );
-
     struct AirProperties
     {
         Real64 temperature{20.0};
-        //Real64 pressure;      //{0.0}; // gage pressure
+        // Real64 pressure;      //{0.0}; // gage pressure
         Real64 humidityRatio{0.0};
         Real64 density{AIRDENSITY(20.0, 101325.0, 0.0)};
         Real64 sqrtDensity{sqrt(AIRDENSITY(20.0, 101325.0, 0.0))};
@@ -221,6 +189,16 @@ namespace AirflowNetwork {
     );
 
     int AFEPLR(int const j,                // Component number
+               bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,                // Linkage number
+               const AirProperties &propN, // Node 1 properties
+               const AirProperties &propM, // Node 2 properties
+               std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    );
+
+    int AFESCR(int const j,                // Component number
                bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                int const i,                // Linkage number

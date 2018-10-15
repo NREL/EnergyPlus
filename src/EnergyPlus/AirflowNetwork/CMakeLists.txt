@@ -16,10 +16,12 @@ project(AirflowNetwork)
 
 set( HDRS include/AirflowNetworkSolver.hh
           include/DataAirflowNetwork.hh
+          include/Properties.hh
 )
 
 set( SRCS src/AirflowNetworkSolver.cc
           src/DataAirflowNetwork.cc
+          src/Properties.cc
 )
 
 #include_directories( include )

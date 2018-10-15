@@ -171,100 +171,6 @@ namespace AirflowNetwork {
 
     // Functions
 
-    Real64 airThermConductivity(Real64 T // Temperature in Celsius
-    )
-    {
-        // Dry air thermal conductivity {W/m-K}
-        // Correlated over the range -20C to 70C
-        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
-
-        Real64 const LowerLimit = -20;
-        Real64 const UpperLimit = 70;
-
-        Real64 const a = 0.02364;
-        Real64 const b = 0.0000754772569209165;
-        Real64 const c = -2.40977632412045e-8;
-
-        if (T < LowerLimit) {
-            ShowWarningMessage("Air temperature out of limits for conductivity calculation");
-            T = LowerLimit;
-        } else if (T > UpperLimit) {
-            ShowWarningMessage("Air temperature out of limits for conductivity calculation");
-            T = UpperLimit;
-        }
-
-        return a + b * T + c * pow_2(T);
-    }
-
-    Real64 airDynamicVisc(Real64 T // Temperature in Celsius
-    )
-    {
-        return 1.71432e-5 + 4.828e-8 * T;
-    }
-
-    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
-                            Real64 W, // Humidity ratio
-                            Real64 P  // Barometric pressure
-    )
-    {
-        // Dry air kinematic viscosity {m2/s}
-        // Correlated over the range -20C to 70C
-        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
-
-        Real64 const LowerLimit = -20;
-        Real64 const UpperLimit = 70;
-
-        if (T < LowerLimit) {
-            T = LowerLimit;
-        } else if (T > UpperLimit) {
-            T = UpperLimit;
-        }
-
-        return airDynamicVisc(T) / PsyRhoAirFnPbTdbW(P, T, W);
-    }
-
-    Real64 airThermalDiffusivity(Real64 T, // Temperature in Celsius
-                                 Real64 W, // Humidity ratio
-                                 Real64 P  // Barometric pressure
-    )
-    {
-        // Dry air thermal diffusivity {-}
-        // Correlated over the range -20C to 70C
-        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
-
-        Real64 const LowerLimit = -20;
-        Real64 const UpperLimit = 70;
-
-        if (T < LowerLimit) {
-            T = LowerLimit;
-        } else if (T > UpperLimit) {
-            T = UpperLimit;
-        }
-
-        return airThermConductivity(T) / (PsyCpAirFnWTdb(W, T) * PsyRhoAirFnPbTdbW(P, T, W));
-    }
-
-    Real64 airPrandtl(Real64 T, // Temperature in Celsius
-                      Real64 W, // Humidity ratio
-                      Real64 P  // Barometric pressure
-    )
-    {
-        // Dry air Prandtl number {-}
-        // Correlated over the range -20C to 70C
-        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
-
-        Real64 const LowerLimit = -20;
-        Real64 const UpperLimit = 70;
-
-        if (T < LowerLimit) {
-            T = LowerLimit;
-        } else if (T > UpperLimit) {
-            T = UpperLimit;
-        }
-
-        return airKinematicVisc(T, W, P) / airThermalDiffusivity(T, W, P);
-    }
-
     void AllocateAirflowNetworkData()
     {
 
@@ -1057,8 +963,8 @@ namespace AirflowNetwork {
                 } else if (SELECT_CASE_var == CompTypeNum_SOP) { // Simple opening
                     NF = AFESOP(j, LFLAG, DP, i, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_SCR) { // Surface crack component
-                    //NF = AFESCR(j, LFLAG, DP, i, properties[n], properties[m], F, DF);
-                    NF = MultizoneSurfaceCrackData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = AFESCR(j, LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    //NF = MultizoneSurfaceCrackData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_SEL) { // Surface effective leakage ratio component
                     NF = AFESEL(j, LFLAG, DP, i, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_COI) { // Distribution system coil component
@@ -1299,6 +1205,141 @@ namespace AirflowNetwork {
             }
             // Select laminar or turbulent flow.
             if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << PDROP << FL << FT;
+            if (std::abs(FL) <= std::abs(FT)) {
+                F[0] = FL;
+                DF[0] = CDM;
+            } else {
+                F[0] = FT;
+                DF[0] = FT * expn / PDROP;
+            }
+        }
+        return 1;
+    }
+
+    int AFESCR(int const j,                // Component number
+               bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+               Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+               int const i,                // Linkage number
+               const AirProperties &propN, // Node 1 properties
+               const AirProperties &propM, // Node 2 properties
+               std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+               std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         George Walton
+        //       DATE WRITTEN   Extracted from AIRNET
+        //       MODIFIED       Lixing Gu, 2/1/04
+        //                      Revised the subroutine to meet E+ needs
+        //       MODIFIED       Lixing Gu, 6/8/05
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine solves airflow for a surface crack component
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 CDM;
+        Real64 FL;
+        Real64 FT;
+        Real64 RhozNorm;
+        Real64 VisczNorm;
+        Real64 expn;
+        Real64 Ctl;
+        Real64 coef;
+        Real64 Corr;
+        Real64 VisAve;
+        Real64 Tave;
+        Real64 RhoCor;
+        int CompNum;
+
+        // Formats
+        static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
+
+        // FLOW:
+        // Crack standard condition from given inputs
+        if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
+            Corr = 1.0;
+        } else {
+            Corr = MultizoneSurfaceData(i).Factor;
+        }
+        CompNum = AirflowNetworkCompData(j).TypeNum;
+        RhozNorm = PsyRhoAirFnPbTdbW(
+            MultizoneSurfaceCrackData(CompNum).StandardP, MultizoneSurfaceCrackData(CompNum).StandardT, MultizoneSurfaceCrackData(CompNum).StandardW);
+        VisczNorm = 1.71432e-5 + 4.828e-8 * MultizoneSurfaceCrackData(CompNum).StandardT;
+
+        expn = MultizoneSurfaceCrackData(CompNum).FlowExpo;
+        VisAve = (propN.viscosity + propM.viscosity) / 2.0;
+        Tave = (propN.temperature + propM.temperature) / 2.0;
+        if (PDROP >= 0.0) {
+            coef = MultizoneSurfaceCrackData(CompNum).FlowCoef / propN.sqrtDensity * Corr;
+        } else {
+            coef = MultizoneSurfaceCrackData(CompNum).FlowCoef / propM.sqrtDensity * Corr;
+        }
+
+        if (LFLAG) {
+            // Initialization by linear relation.
+            if (PDROP >= 0.0) {
+                RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
+                Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
+                DF[0] = coef * propN.density / propN.viscosity * Ctl;
+            } else {
+                RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
+                Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
+                DF[0] = coef * propM.density / propM.viscosity * Ctl;
+            }
+            F[0] = -DF[0] * PDROP;
+        } else {
+            // Standard calculation.
+            if (PDROP >= 0.0) {
+                // Flow in positive direction.
+                // Laminar flow.
+                RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
+                Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
+                CDM = coef * propN.density / propN.viscosity * Ctl;
+                FL = CDM * PDROP;
+                // Turbulent flow.
+                if (expn == 0.5) {
+                    FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                } else {
+                    FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                }
+            } else {
+                // Flow in negative direction.
+                // Laminar flow.
+                RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
+                Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
+                CDM = coef * propM.density / propM.viscosity * Ctl;
+                FL = CDM * PDROP;
+                // Turbulent flow.
+                if (expn == 0.5) {
+                    FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                } else {
+                    FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                }
+            }
+            // Select laminar or turbulent flow.
+            if (LIST >= 4) gio::write(Unit21, Format_901) << " scr: " << i << PDROP << FL << FT;
             if (std::abs(FL) <= std::abs(FT)) {
                 F[0] = FL;
                 DF[0] = CDM;
