@@ -779,10 +779,13 @@ namespace HeatBalanceKivaManager {
                             ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\".");
                             ShowContinueError("   Wall Surface=\"" + Surfaces(wl).Name + "\", does not have any vertices that are");
                             ShowContinueError("   coplanar with the corresponding Floor Surface=\"" + Surfaces(surfNum).Name + "\".");
-                            ShowContinueError("   Simulation will continue with <Language to be inserted from NK>.");
+                            ShowContinueError("   Simulation will continue using the distance between the two lowest points in the wall for the interface distance.");
 
                             // sort vertices by Z-value
-                            std::vector<int> zs = {0, 1, 2, 3};
+                            std::vector<int> zs;
+                            for (std::size_t i = 0; i < numVs; ++i) {
+                                zs.push_back(i);
+                            }
                             sort(zs.begin(), zs.end(), [v](int a, int b) { return v[a].z < v[b].z; });
                             perimeter = distance(v[zs[0]], v[zs[1]]);
                         }
