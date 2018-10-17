@@ -380,6 +380,7 @@ namespace CommandLineInterface {
         outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
         outputTSHvacJsonFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.json";
         outputTSJsonFileName = outputFilePrefix + normalSuffix + "_timestep.json";
+        outputYRJsonFileName = outputFilePrefix + normalSuffix + "_yearly.json";
         outputMNJsonFileName = outputFilePrefix + normalSuffix + "_monthly.json";
         outputDYJsonFileName = outputFilePrefix + normalSuffix + "_daily.json";
         outputHRJsonFileName = outputFilePrefix + normalSuffix + "_hourly.json";
@@ -388,6 +389,7 @@ namespace CommandLineInterface {
         outputTSZoneCborFileName = outputFilePrefix + normalSuffix + "_detailed_zone.cbor";
         outputTSHvacCborFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.cbor";
         outputTSCborFileName = outputFilePrefix + normalSuffix + "_timestep.cbor";
+        outputYRCborFileName = outputFilePrefix + normalSuffix + "_yearly.cbor";
         outputMNCborFileName = outputFilePrefix + normalSuffix + "_monthly.cbor";
         outputDYCborFileName = outputFilePrefix + normalSuffix + "_daily.cbor";
         outputHRCborFileName = outputFilePrefix + normalSuffix + "_hourly.cbor";
@@ -396,6 +398,7 @@ namespace CommandLineInterface {
         outputTSZoneMsgPackFileName = outputFilePrefix + normalSuffix + "_detailed_zone.msgpack";
         outputTSHvacMsgPackFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.msgpack";
         outputTSMsgPackFileName = outputFilePrefix + normalSuffix + "_timestep.msgpack";
+        outputYRMsgPackFileName = outputFilePrefix + normalSuffix + "_yearly.msgpack";
         outputMNMsgPackFileName = outputFilePrefix + normalSuffix + "_monthly.msgpack";
         outputDYMsgPackFileName = outputFilePrefix + normalSuffix + "_daily.msgpack";
         outputHRMsgPackFileName = outputFilePrefix + normalSuffix + "_hourly.msgpack";

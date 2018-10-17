@@ -270,6 +270,7 @@ rm -f  eplusout_detailed_HVAC.json
 rm -f  eplusout_timestep.json
 rm -f  eplusout_hourly.json
 rm -f  eplusout_daily.json
+rm -f  eplusout_yearly.json
 rm -f  eplusout_monthly.json
 rm -f  eplusout_runperiod.json
 rm -f  eplusout.cbor
@@ -278,6 +279,7 @@ rm -f  eplusout_detailed_HVAC.cbor
 rm -f  eplusout_timestep.cbor
 rm -f  eplusout_hourly.cbor
 rm -f  eplusout_daily.cbor
+rm -f  eplusout_yearly.cbor
 rm -f  eplusout_monthly.cbor
 rm -f  eplusout_runperiod.cbor
 rm -f  eplusout.msgpack
@@ -286,6 +288,7 @@ rm -f  eplusout_detailed_HVAC.msgpack
 rm -f  eplusout_timestep.msgpack
 rm -f  eplusout_hourly.msgpack
 rm -f  eplusout_daily.msgpack
+rm -f  eplusout_yearly.msgpack
 rm -f  eplusout_monthly.msgpack
 rm -f  eplusout_runperiod.msgpack
 
@@ -361,6 +364,7 @@ rm -f "${OUT_P}/${ARG1}_detailed_HVAC.json"
 rm -f "${OUT_P}/${ARG1}_timestep.json"
 rm -f "${OUT_P}/${ARG1}_hourly.json"
 rm -f "${OUT_P}/${ARG1}_daily.json"
+rm -f "${OUT_P}/${ARG1}_yearly.json"
 rm -f "${OUT_P}/${ARG1}_monthly.json"
 rm -f "${OUT_P}/${ARG1}_runperiod.json"
 rm -f "${OUT_P}/${ARG1}.cbor"
@@ -369,6 +373,7 @@ rm -f "${OUT_P}/${ARG1}_detailed_HVAC.cbor"
 rm -f "${OUT_P}/${ARG1}_timestep.cbor"
 rm -f "${OUT_P}/${ARG1}_hourly.cbor"
 rm -f "${OUT_P}/${ARG1}_daily.cbor"
+rm -f "${OUT_P}/${ARG1}_yearly.cbor"
 rm -f "${OUT_P}/${ARG1}_monthly.cbor"
 rm -f "${OUT_P}/${ARG1}_runperiod.cbor"
 rm -f "${OUT_P}/${ARG1}.msgpack"
@@ -377,6 +382,7 @@ rm -f "${OUT_P}/${ARG1}_detailed_HVAC.msgpack"
 rm -f "${OUT_P}/${ARG1}_timestep.msgpack"
 rm -f "${OUT_P}/${ARG1}_hourly.msgpack"
 rm -f "${OUT_P}/${ARG1}_daily.msgpack"
+rm -f "${OUT_P}/${ARG1}_yearly.msgpack"
 rm -f "${OUT_P}/${ARG1}_monthly.msgpack"
 rm -f "${OUT_P}/${ARG1}_runperiod.msgpack"
 
@@ -709,6 +715,9 @@ fi
 if [ -f eplusout_daily.json ]; then
   mv eplusout_daily.json "${OUT_P}/${ARG1}_daily.json"
 fi
+if [ -f eplusout_yearly.json ]; then
+  mv eplusout_yearly.json "${OUT_P}/${ARG1}_yearly.json"
+fi
 if [ -f eplusout_monthly.json ]; then
   mv eplusout_monthly.json "${OUT_P}/${ARG1}_monthly.json"
 fi
@@ -733,6 +742,9 @@ fi
 if [ -f eplusout_daily.cbor ]; then
   mv eplusout_daily.cbor "${OUT_P}/${ARG1}_daily.cbor"
 fi
+if [ -f eplusout_yearly.cbor ]; then
+  mv eplusout_yearly.cbor "${OUT_P}/${ARG1}_yearly.cbor"
+fi
 if [ -f eplusout_monthly.cbor ]; then
   mv eplusout_monthly.cbor "${OUT_P}/${ARG1}_monthly.cbor"
 fi
@@ -756,6 +768,9 @@ if [ -f eplusout_hourly.msgpack ]; then
 fi
 if [ -f eplusout_daily.msgpack ]; then
   mv eplusout_daily.msgpack "${OUT_P}/${ARG1}_daily.msgpack"
+fi
+if [ -f eplusout_yearly.msgpack ]; then
+  mv eplusout_yearly.msgpack "${OUT_P}/${ARG1}_yearly.msgpack"
 fi
 if [ -f eplusout_monthly.msgpack ]; then
   mv eplusout_monthly.msgpack "${OUT_P}/${ARG1}_monthly.msgpack"

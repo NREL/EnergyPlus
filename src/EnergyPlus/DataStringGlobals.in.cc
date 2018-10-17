@@ -130,6 +130,7 @@ namespace DataStringGlobals {
     std::string outputTSHvacJsonFileName("eplusout_detailed_HVAC.json");
     std::string outputTSZoneJsonFileName("eplusout_detailed_zone.json");
     std::string outputTSJsonFileName("eplusout_timestep.json");
+    std::string outputYRJsonFileName("eplusout_yearly.json");
     std::string outputMNJsonFileName("eplusout_monthly.json");
     std::string outputDYJsonFileName("eplusout_daily.json");
     std::string outputHRJsonFileName("eplusout_hourly.json");
@@ -138,6 +139,7 @@ namespace DataStringGlobals {
     std::string outputTSHvacCborFileName("eplusout_detailed_HVAC.cbor");
     std::string outputTSZoneCborFileName("eplusout_detailed_zone.cbor");
     std::string outputTSCborFileName("eplusout_timestep.cbor");
+    std::string outputYRCborFileName("eplusout_yearly.cbor");
     std::string outputMNCborFileName("eplusout_monthly.cbor");
     std::string outputDYCborFileName("eplusout_daily.cbor");
     std::string outputHRCborFileName("eplusout_hourly.cbor");
@@ -146,6 +148,7 @@ namespace DataStringGlobals {
     std::string outputTSHvacMsgPackFileName("eplusout_detailed_HVAC.msgpack");
     std::string outputTSZoneMsgPackFileName("eplusout_detailed_zone.msgpack");
     std::string outputTSMsgPackFileName("eplusout_timestep.msgpack");
+    std::string outputYRMsgPackFileName("eplusout_yearly.msgpack");
     std::string outputMNMsgPackFileName("eplusout_monthly.msgpack");
     std::string outputDYMsgPackFileName("eplusout_daily.msgpack");
     std::string outputHRMsgPackFileName("eplusout_hourly.msgpack");

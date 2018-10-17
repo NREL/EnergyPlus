@@ -1149,6 +1149,10 @@ namespace ResultsFramework {
             meterVars["RunPeriod"] = SMMeters.getVariablesJSON();
         }
 
+        if (YRMeters.rDataFrameEnabled()) {
+            meterVars["Yearly"] = YRMeters.getVariablesJSON();
+        }
+
         if (TSMeters.rDataFrameEnabled()) {
             meterData["Timestep"] = TSMeters.getJSON();
         }
