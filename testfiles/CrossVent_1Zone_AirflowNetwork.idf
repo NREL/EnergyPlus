@@ -94,29 +94,31 @@
     ,                        !- Name
     8,                       !- Begin Month
     15,                      !- Begin Day of Month
+    ,                        !- Begin Year
     8,                       !- End Month
     17,                      !- End Day of Month
+    ,                        !- End Year
     ,                        !- Day of Week for Start Day
     ,                        !- Use Weather File Holidays and Special Days
     ,                        !- Use Weather File Daylight Saving Period
     ,                        !- Apply Weekend Holiday Rule
     ,                        !- Use Weather File Rain Indicators
-    ,                        !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    ;                        !- Use Weather File Snow Indicators
 
   RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
     15,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     17,                      !- End Day of Month
+    ,                        !- End Year
     ,                        !- Day of Week for Start Day
     ,                        !- Use Weather File Holidays and Special Days
     ,                        !- Use Weather File Daylight Saving Period
     ,                        !- Apply Weekend Holiday Rule
     ,                        !- Use Weather File Rain Indicators
-    ,                        !- Use Weather File Snow Indicators
-    1;                       !- Number of Times Runperiod to be Repeated
+    ;                        !- Use Weather File Snow Indicators
 
   Site:Location,
     SAN_FRANCISCO_CA_USA_WMO_724940,  !- Name
@@ -846,7 +848,6 @@
     ZONAW,                   !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
@@ -862,7 +863,6 @@
     ZONAE,                   !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5,                     !- View Factor to Ground
-    ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices

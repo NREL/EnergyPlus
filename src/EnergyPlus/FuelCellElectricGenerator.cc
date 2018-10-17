@@ -216,12 +216,13 @@ namespace FuelCellElectricGenerator {
         using ScheduleManager::GetScheduleIndex;
 
         // LOCAL VARIABLES
-        int GeneratorNum;               // Generator counter
-        int NumAlphas;                  // Number of elements in the alpha array
-        int NumNums;                    // Number of elements in the numeric array
-        int IOStat;                     // IO Status when calling get input subroutine
-        Array1D_string AlphArray(25);   // character string data
-        Array1D<Real64> NumArray(200);  // numeric data TODO deal with allocatable for extensible
+        int GeneratorNum;              // Generator counter
+        int NumAlphas;                 // Number of elements in the alpha array
+        int NumNums;                   // Number of elements in the numeric array
+        int IOStat;                    // IO Status when calling get input subroutine
+        Array1D_string AlphArray(25);  // character string data
+        Array1D<Real64> NumArray(200); // numeric data TODO deal with allocatable for extensible
+        Array1D_bool lAlphaBlanks(25);
         static bool ErrorsFound(false); // error flag
         int NumFuelCellPMs;             // number of power subsystems in input file
         int NumFuelCellAirSups;         // number of air supply subsystems in input file
@@ -302,8 +303,17 @@ namespace FuelCellElectricGenerator {
             }
 
             for (FCPMNum = 1; FCPMNum <= NumFuelCellPMs; ++FCPMNum) {
-                inputProcessor->getObjectItem(
-                    cCurrentModuleObject, FCPMNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              FCPMNum,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), FuelCell, &FCDataStruct::NameFCPM);
@@ -355,7 +365,7 @@ namespace FuelCellElectricGenerator {
                     }
                     FuelCell(thisFuelCell).FCPM.ZoneName = AlphArray(5);
                     FuelCell(thisFuelCell).FCPM.ZoneID = UtilityRoutines::FindItemInList(FuelCell(thisFuelCell).FCPM.ZoneName, Zone);
-                    if (FuelCell(thisFuelCell).FCPM.ZoneID == 0) {
+                    if (FuelCell(thisFuelCell).FCPM.ZoneID == 0 && !lAlphaBlanks(5)) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(5) + " = " + AlphArray(5));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                         ShowContinueError("Zone Name was not found ");
@@ -1082,14 +1092,15 @@ namespace FuelCellElectricGenerator {
                                     "System",
                                     "Average",
                                     FuelCell(GeneratorNum).Name);
-
-                SetupZoneInternalGain(FuelCell(GeneratorNum).FCPM.ZoneID,
-                                      "Generator:FuelCell",
-                                      FuelCell(GeneratorNum).Name,
-                                      IntGainTypeOf_GeneratorFuelCell,
-                                      FuelCell(GeneratorNum).Report.SkinLossConvect,
-                                      _,
-                                      FuelCell(GeneratorNum).Report.SkinLossRadiat);
+                if (FuelCell(GeneratorNum).FCPM.ZoneID > 0) {
+                    SetupZoneInternalGain(FuelCell(GeneratorNum).FCPM.ZoneID,
+                                          "Generator:FuelCell",
+                                          FuelCell(GeneratorNum).Name,
+                                          IntGainTypeOf_GeneratorFuelCell,
+                                          FuelCell(GeneratorNum).Report.SkinLossConvect,
+                                          _,
+                                          FuelCell(GeneratorNum).Report.SkinLossRadiat);
+                }
 
                 if (DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
                     SetupOutputVariable("Generator Air Inlet Temperature",
@@ -1888,8 +1899,10 @@ namespace FuelCellElectricGenerator {
             } else if (FuelCell(GeneratorNum).FCPM.SkinLossMode == UADTSkinLoss) {
 
                 // get zone air temp
-                FuelCell(GeneratorNum).FCPM.QdotSkin =
-                    FuelCell(GeneratorNum).FCPM.UAskin * (FuelCell(GeneratorNum).FCPM.TprodGasLeavingFCPM - ZT(FuelCell(GeneratorNum).FCPM.ZoneID));
+                if (FuelCell(GeneratorNum).FCPM.ZoneID > 0) {
+                    FuelCell(GeneratorNum).FCPM.QdotSkin = FuelCell(GeneratorNum).FCPM.UAskin *
+                                                           (FuelCell(GeneratorNum).FCPM.TprodGasLeavingFCPM - ZT(FuelCell(GeneratorNum).FCPM.ZoneID));
+                }
 
             } else if (FuelCell(GeneratorNum).FCPM.SkinLossMode == QuadraticFuelNdotSkin) {
 
@@ -3828,7 +3841,8 @@ namespace FuelCellElectricGenerator {
                             for (loop = 1; loop <= 5;
                                  ++loop) { // iterative soluion because in condensing case THXexh is function of qSens and qLatent
 
-                                if ((THXexh - TwaterIn) != 0.0) { // trap divide by zero
+                                if ((THXexh - TwaterIn) != 0.0 &&
+                                    ((TauxMix - TwaterOut) / (THXexh - TwaterIn) > 0.0001)) { // trap divide by zero and negative log
                                     qSens =
                                         UAeff * ((TauxMix - TwaterOut) - (THXexh - TwaterIn)) / std::log((TauxMix - TwaterOut) / (THXexh - TwaterIn));
                                 } else {
@@ -3862,7 +3876,8 @@ namespace FuelCellElectricGenerator {
                         TwaterOut = TwaterIn;
                     }
 
-                    if ((THXexh - TwaterIn) != 0.0) { // trap divide by zero
+                    if ((THXexh - TwaterIn) != 0.0 &&
+                        ((TauxMix - TwaterOut) / (THXexh - TwaterIn) > 0.0001)) { // trap divide by zero and negative log
 
                         qHX = UAeff * ((TauxMix - TwaterOut) - (THXexh - TwaterIn)) / std::log((TauxMix - TwaterOut) / (THXexh - TwaterIn)) +
                               NdotWaterCond * hfpwater;
@@ -4006,10 +4021,10 @@ namespace FuelCellElectricGenerator {
                                             TypeOf_Generator_FCExhaust,
                                             FuelCell(CompNum).ExhaustHX.WaterInNode,
                                             FuelCell(CompNum).ExhaustHX.WaterOutNode,
-                                            FuelCell(CompNum).Report.qHX,
-                                            FuelCell(CompNum).Report.HeatRecInletTemp,
-                                            FuelCell(CompNum).Report.HeatRecOutletTemp,
-                                            FuelCell(CompNum).Report.HeatRecMdot,
+                                            FuelCell(CompNum).ExhaustHX.qHX,
+                                            FuelCell(CompNum).ExhaustHX.WaterInletTemp,
+                                            FuelCell(CompNum).ExhaustHX.WaterOutletTemp,
+                                            FuelCell(CompNum).ExhaustHX.WaterMassFlowRate,
                                             FirstHVACIteration);
         }
     }
@@ -4094,6 +4109,7 @@ namespace FuelCellElectricGenerator {
 
         if (MyPlantScanFlag(FCnum) && allocated(PlantLoop)) {
             errFlag = false;
+
             ScanPlantLoopsForObject(FuelCell(FCnum).NameExhaustHX,
                                     TypeOf_Generator_FCExhaust,
                                     FuelCell(FCnum).CWLoopNum,
@@ -4106,6 +4122,9 @@ namespace FuelCellElectricGenerator {
                                     _,
                                     _,
                                     errFlag);
+
+            // if there is a stack cooler option it might be connected to plant as well
+
             if (errFlag) {
                 ShowFatalError("InitFuelCellGenerators: Program terminated due to previous condition(s).");
             }
@@ -4242,6 +4261,22 @@ namespace FuelCellElectricGenerator {
         }
     }
 
+    void getFuelCellGeneratorHeatRecoveryInfo(std::string const &GeneratorName, // user specified name of Generator
+                                              std::string &heatRecoveryCompName)
+    {
+
+        if (GetFuelCellInput) {
+
+            // Read input data.
+            GetFuelCellGeneratorInput();
+            GetFuelCellInput = false;
+        }
+
+        int thisFuelCell = UtilityRoutines::FindItemInList(GeneratorName, FuelCell);
+        if (thisFuelCell > 0) {
+            heatRecoveryCompName = FuelCell(thisFuelCell).ExhaustHX.Name;
+        }
+    }
     // End FuelCell Generator Module Utility Subroutines
     // *****************************************************************************
 

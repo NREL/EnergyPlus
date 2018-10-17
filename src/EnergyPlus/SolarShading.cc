@@ -1486,7 +1486,7 @@ namespace SolarShading {
 
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
-                    if (Surface(SurfLoop).WindowShadingControlPtr > 0) {
+                    if (Surface(SurfLoop).HasShadeControl) {
                         if (WindowShadingControl(Surface(SurfLoop).WindowShadingControlPtr).ShadingType == WSC_ST_SwitchableGlazing) {
                             // IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
                             SetupOutputVariable("Surface Window Switchable Glazing Switching Factor",
@@ -8781,7 +8781,11 @@ namespace SolarShading {
                 //  Calculate average Equation of Time, Declination Angle for this period
 
                 if (!WarmupFlag) {
-                    DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDy);
+                    if (KindOfSim == ksRunPeriodWeather) {
+                        DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDyYr);
+                    } else {
+                        DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDy);
+                    }
                     DisplayPerfSimulationFlag = true;
                 }
 
@@ -9509,7 +9513,7 @@ namespace SolarShading {
 
             if (Surface(ISurf).Class != SurfaceClass_Window) continue;
             if (Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
-            if (Surface(ISurf).WindowShadingControlPtr == 0) continue;
+            if (!Surface(ISurf).HasShadeControl) continue;
 
             // Initialize switching factor (applicable only to switchable glazing) to unswitched
             SurfaceWindow(ISurf).SwitchingFactor = 0.0;
@@ -11288,7 +11292,7 @@ namespace SolarShading {
         //  removed that is absorbed
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).WindowShadingControlPtr > 0) {
+            if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
                 WinShadeCtrlNum = Surface(SurfNum).WindowShadingControlPtr;
                 if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
                     WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||

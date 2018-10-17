@@ -532,11 +532,19 @@ namespace SimulationManager {
                     cWarmupDay = TrimSigDigits(NumOfWarmupDays);
                     DisplayString("Warming up {" + cWarmupDay + '}');
                 } else if (DayOfSim == 1) {
-                    DisplayString("Starting Simulation at " + CurMnDy + " for " + EnvironmentName);
+                    if (KindOfSim == ksRunPeriodWeather) {
+                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    } else {
+                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                    }
                     gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
-                    DisplayString("Continuing Simulation at " + CurMnDy + " for " + EnvironmentName);
+                    if (KindOfSim == ksRunPeriodWeather) {
+                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                    } else {
+                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                    }
                     DisplayPerfSimulationFlag = false;
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started

@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -86,8 +87,8 @@ namespace SimAirServingZones {
     extern int const Desiccant;
     extern int const Unglazed_SolarCollector;
     extern int const EvapCooler;
-    extern int const UnitarySystem;
-    extern int const Furnace_UnitarySys;
+    extern int const Furnace_UnitarySys_HeatOnly;
+    extern int const Furnace_UnitarySys_HeatCool;
     extern int const Humidifier;
     extern int const Duct;
     extern int const UnitarySystem_BypassVAVSys;
@@ -95,6 +96,8 @@ namespace SimAirServingZones {
     extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
     extern int const DXHeatPumpSystem;
     extern int const CoilUserDefined;
+    extern int const Fan_System_Object;
+    extern int const UnitarySystemModel;
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -166,8 +169,8 @@ namespace SimAirServingZones {
                              int const CompType_Num,        // numeric equivalent for component type
                              bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                              int const AirLoopNum,          // Primary air loop number
-                             int &CompIndex                 // numeric pointer for CompType/CompName -- passed back from other routines
-    );
+                             int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
+                             UnitarySystems::UnitarySys *CompPointer);
 
     void UpdateBranchConnections(int const AirLoopNum, // primary air system number
                                  int const BranchNum,  // branch reference number

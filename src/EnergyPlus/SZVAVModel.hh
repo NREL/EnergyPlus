@@ -63,8 +63,8 @@
 #include <EnergyPlus.hh>
 #include <FanCoilUnits.hh>
 #include <General.hh>
-#include <HVACUnitarySystem.hh>
 #include <PackagedTerminalHeatPump.hh>
+#include <UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -91,18 +91,6 @@ namespace SZVAVModel {
     // PUBLIC  ErfFunction
 
     // Functions
-
-    void calcSZVAVModel(HVACUnitarySystem::UnitarySystemData &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
-                        Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
-                        Real64 &PartLoadFrac,
-                        int const &CompressorONFlag);
 
     void calcSZVAVModel(PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
                         int const &SysIndex,
@@ -131,6 +119,18 @@ namespace SZVAVModel {
                         int const &CompressorONFlag
 
     );
+
+    void calcSZVAVModel(UnitarySystems::UnitarySys &SZVAVModel,
+                        int const &SysIndex,
+                        bool const &FirstHVACIteration,
+                        bool const &CoolingLoad,
+                        bool const &HeatingLoad,
+                        Real64 const &ZoneLoad,
+                        Real64 &OnOffAirFlowRatio,
+                        bool const &HXUnitOn,
+                        int const &AirLoopNum,
+                        Real64 &PartLoadFrac,
+                        int const &CompressorONFlag);
 
 } // namespace SZVAVModel
 

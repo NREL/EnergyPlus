@@ -92,6 +92,16 @@ namespace General {
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
+                   std::function<Real64(Real64 const, std::vector<Real64> const &)> f,
+                   Real64 const X_0,         // 1st bound of interval that contains the solution
+                   Real64 const X_1,         // 2nd bound of interval that contains the solution
+                   std::vector<Real64> const &Par // array with additional parameters used for function evaluation
+    );
+
+    void SolveRoot(Real64 const Eps, // required absolute accuracy
+                   int const MaxIte, // maximum number of allowed iterations
+                   int &Flag,        // integer storing exit status
+                   Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
                    std::function<Real64(Real64 const, Array1<Real64> const &)> f,
                    Real64 const X_0,         // 1st bound of interval that contains the solution
                    Real64 const X_1,         // 2nd bound of interval that contains the solution
@@ -237,12 +247,12 @@ namespace General {
                           int const Month,
                           bool &ErrorsFound);
 
-    int JulianDay(int const Month,        // Month, 1..12
-                  int const Day,          // Day of Month, not validated by month
-                  int const LeapYearValue // 1 if leap year indicated, 0 if not
+    int OrdinalDay(int const Month,        // Month, 1..12
+                   int const Day,          // Day of Month, not validated by month
+                   int const LeapYearValue // 1 if leap year indicated, 0 if not
     );
 
-    void InvJulianDay(int const Number, int &PMonth, int &PDay, int const LeapYr);
+    void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr);
 
     bool BetweenDates(int const TestDate,  // Date to test
                       int const StartDate, // Start date in sequence

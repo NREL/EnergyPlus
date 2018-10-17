@@ -1923,7 +1923,7 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 PTUnit(PTUnitNum).ATMixerExists = true;
             }
-            // check that air-conditioner doesn' have local outside air and DOA
+            // check that air-conditioner doesn't have local outside air and DOA
             if (PTUnit(PTUnitNum).ATMixerExists && OANodeNums(4) > 0) {
                 ShowSevereError(CurrentModuleObject + " = \"" + PTUnit(PTUnitNum).Name +
                                 "\". Air-conditioners has local as well as central outdoor air specified");
@@ -4846,9 +4846,35 @@ namespace PackagedTerminalHeatPump {
         CompType = PTUnit(PTUnitNum).UnitType;
         CompName = PTUnit(PTUnitNum).Name;
         DataZoneNumber = PTUnit(PTUnitNum).ZonePtr;
+        if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = PTUnit(PTUnitNum).FanIndex;
+        if (PTUnit(PTUnitNum).FanPlace == BlowThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        } else if (PTUnit(PTUnitNum).FanPlace == DrawThru) {
+            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+        }
 
         if (CurZoneEqNum > 0) {
             if (PTUnit(PTUnitNum).HVACSizingIndex > 0) {
+                // initialize OA flow for sizing other inputs (e.g., capacity)
+                if (PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = PTUnit(PTUnitNum).CoolOutAirVolFlow;
+                }
+                if (PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                }
+
+                if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for scalable capacity sizing
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                    SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
+                }
+
                 zoneHVACIndex = PTUnit(PTUnitNum).HVACSizingIndex;
                 SizingMethod = CoolingAirflowSizing;
                 FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
@@ -5021,8 +5047,19 @@ namespace PackagedTerminalHeatPump {
                     }
                 }
             } else {
-                // no scalble sizing method has been specified. Sizing proceeds using the method
+                // no scalable sizing method has been specified. Sizing proceeds using the method
                 // specified in the zoneHVAC object
+
+                // initialize OA flow for sizing other inputs (e.g., capacity)
+                if (PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = PTUnit(PTUnitNum).CoolOutAirVolFlow;
+                }
+                if (PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                }
+
                 PrintFlag = false;
                 SizingMethod = CoolingAirflowSizing;
                 FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
@@ -5109,6 +5146,11 @@ namespace PackagedTerminalHeatPump {
                 DataConstantUsedForSizing = 0.0;
                 DataFractionUsedForSizing = 0.0;
             }
+        }
+
+        if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for use in component sizing
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+            SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
         }
 
         if (PTUnit(PTUnitNum).MaxCoolAirVolFlow > 0.0) {
@@ -6720,19 +6762,8 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-
-            if (!SysSizingCalc) {
-
-                if (CurZoneEqNum > 0) {
-                    ZoneEqSizing(CurZoneEqNum).AirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).SystemAirFlow = false;
-                    ZoneEqSizing(CurZoneEqNum).Capacity = false;
-                    ZoneEqSizing(CurZoneEqNum).CoolingCapacity = false;
-                    ZoneEqSizing(CurZoneEqNum).HeatingCapacity = false;
-                }
-                PTUnit(PTUnitNum).FirstPass = false;
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, PTUnit(PTUnitNum).FirstPass);
             }
         }
 

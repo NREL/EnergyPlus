@@ -871,6 +871,9 @@ namespace OutputReportTabular {
             // add to the data structure
             curTable = AddMonthlyReport(AlphArray(1), int(NumArray(1)));
             for (jField = 2; jField <= NumAlphas; jField += 2) {
+                if (AlphArray(jField).empty()) {
+                    ShowFatalError("Blank report name in Oputput:Table:Monthly");
+                }
                 curAggString = AlphArray(jField + 1);
                 // set accumulator values to default as appropriate for aggregation type
                 if (UtilityRoutines::SameString(curAggString, "SumOrAverage")) {
@@ -1988,7 +1991,9 @@ namespace OutputReportTabular {
             // loop through the fields looking for matching report titles
             for (iReport = 1; iReport <= NumAlphas; ++iReport) {
                 nameFound = false;
-                if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
+                if (AlphArray(iReport).empty()) {
+                    ShowFatalError("Blank report name in Oputput:Table:SummaryReports");
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2440,6 +2445,13 @@ namespace OutputReportTabular {
         }
         isCompLoadRepReq = isFound; // return true if either report was found
         return isCompLoadRepReq;
+    }
+
+    bool hasSizingPeriodsDays()
+    {
+        int sizePerDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay");
+        int sizePerWeathFileDays = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
+        return ((sizePerDesDays + sizePerWeathFileDays) > 0);
     }
 
     void InitializePredefinedMonthlyTitles()
@@ -13107,9 +13119,13 @@ namespace OutputReportTabular {
 
             if (isCooling) {
                 // Time of Peak Load
-                compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                         General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                         coilSelectionReportObj->getTimeText(timeOfMax);
+                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                } else {
+                    compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
+                }
 
                 // Outside  Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax);
@@ -13156,9 +13172,13 @@ namespace OutputReportTabular {
 
             } else {
                 // Time of Peak Load
-                compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                         General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                         coilSelectionReportObj->getTimeText(timeOfMax);
+                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                } else {
+                    compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
+                }
 
                 // Outside  Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax);

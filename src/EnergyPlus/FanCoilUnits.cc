@@ -277,7 +277,7 @@ namespace FanCoilUnits {
         ZoneEqFanCoil = true;
 
         // Initialize the fan coil unit
-        InitFanCoilUnits(FanCoilNum, ZoneNum);
+        InitFanCoilUnits(FanCoilNum, ZoneNum, ControlledZoneNum);
 
         // Select the correct unit type
         {
@@ -1072,8 +1072,9 @@ namespace FanCoilUnits {
         }
     }
 
-    void InitFanCoilUnits(int const FanCoilNum, // number of the current fan coil unit being simulated
-                          int const ZoneNum     // number of zone being served
+    void InitFanCoilUnits(int const FanCoilNum,       // number of the current fan coil unit being simulated
+                          int const ZoneNum,          // number of zone being served
+                          int const ControlledZoneNum // index into ZoneEquipConfig array may not be equal to ZoneNum
     )
     {
 
@@ -1218,7 +1219,7 @@ namespace FanCoilUnits {
 
         if (!SysSizingCalc && MySizeFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
 
-            SizeFanCoilUnit(FanCoilNum);
+            SizeFanCoilUnit(FanCoilNum, ControlledZoneNum);
 
             MySizeFlag(FanCoilNum) = false;
         }
@@ -1334,7 +1335,9 @@ namespace FanCoilUnits {
         }
     }
 
-    void SizeFanCoilUnit(int const FanCoilNum)
+    void SizeFanCoilUnit(int const FanCoilNum,
+                         int const ControlledZoneNum // index into ZoneEquipConfig array may not be equal to ZoneNum
+    )
     {
 
         // SUBROUTINE INFORMATION:
@@ -1452,9 +1455,28 @@ namespace FanCoilUnits {
         CompType = FanCoil(FanCoilNum).UnitType;
         CompName = FanCoil(FanCoilNum).Name;
         DataZoneNumber = FanCoil(FanCoilNum).ControlZoneNum;
+        if (FanCoil(FanCoilNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataSizing::DataFanIndex = FanCoil(FanCoilNum).FanIndex;
+        // fan coil unit is always blow thru
+        DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
         if (CurZoneEqNum > 0) {
             if (FanCoil(FanCoilNum).HVACSizingIndex > 0) {
+
+                // initialize OA flow for sizing other inputs (e.g., inlet temp, capacity, etc.)
+                if (FanCoil(FanCoilNum).OutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
+                }
+                if (FanCoil(FanCoilNum).ATMixerExists) {        // set up ATMixer conditions for scalable capacity sizing
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                    SingleDuct::setATMixerSizingProperties(FanCoil(FanCoilNum).ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+                }
 
                 zoneHVACIndex = FanCoil(FanCoilNum).HVACSizingIndex;
                 FieldNum = 1;
@@ -1534,6 +1556,12 @@ namespace FanCoilUnits {
                         TempSize = AutoSize;
                         PrintFlag = false;
                         DataScalableSizingON = true;
+                        // initialize OA flow for sizing capacity
+                        if (FanCoil(FanCoilNum).OutAirVolFlow == AutoSize) {
+                            ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                        } else {
+                            ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
+                        }
                         RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                             DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
@@ -1691,6 +1719,12 @@ namespace FanCoilUnits {
                         }
                     }
                 }
+            }
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow; // sets OA frac in sizing
+
+            if (FanCoil(FanCoilNum).ATMixerExists) {        // set up ATMixer conditions for use in component sizing
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                SingleDuct::setATMixerSizingProperties(FanCoil(FanCoilNum).ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
             }
         }
 
@@ -2080,7 +2114,6 @@ namespace FanCoilUnits {
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = FanCoil(FanCoilNum).MaxHotWaterVolFlow;
             ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow = FanCoil(FanCoilNum).MaxColdWaterVolFlow;
-            ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).AirVolFlow = FanCoil(FanCoilNum).MaxAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FanCoil(FanCoilNum).DesCoolingLoad;
             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FanCoil(FanCoilNum).DesHeatingLoad;
@@ -2185,14 +2218,14 @@ namespace FanCoilUnits {
         Real64 MinSAMassFlowRate;     // minimum supply air mass flow rate [kg/s]
         Real64 MaxSAMassFlowRate;     // maximum supply air mass flow rate [kg/s]
         // Real64 FCOutletTempOn;        // ASHRAE outlet air temperature when coil is on [C]
-        Real64 HWFlow;                // hot water mass flow rate solution [kg/s]		Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
-        Real64 MdotLockH;             // saved value of locked chilled water mass flow rate [kg/s]
-        Real64 MdotLockC;             // saved value of locked hot water mass flow rate [kg/s]
-        Real64 CWFlow;                // cold water mass flow rate solution [kg/s]
-        Real64 CWFlowBypass;          // cold water bypassed mass flow rate [kg/s]
-        Real64 HWFlowBypass;          // hot water bypassed mass flow rate [kg/s]
-        bool ColdFlowLocked;          // if true cold water flow is locked
-        bool HotFlowLocked;           // if true Hot water flow is locked
+        Real64 HWFlow;       // hot water mass flow rate solution [kg/s]
+        Real64 MdotLockH;    // saved value of locked chilled water mass flow rate [kg/s]
+        Real64 MdotLockC;    // saved value of locked hot water mass flow rate [kg/s]
+        Real64 CWFlow;       // cold water mass flow rate solution [kg/s]
+        Real64 CWFlowBypass; // cold water bypassed mass flow rate [kg/s]
+        Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
+        bool ColdFlowLocked; // if true cold water flow is locked
+        bool HotFlowLocked;  // if true Hot water flow is locked
         // initialize local variables
         UnitOn = true;
         ControlNode = 0;
@@ -4441,6 +4474,12 @@ namespace FanCoilUnits {
         FanCoil(FanCoilNum).SensCoolEnergy = FanCoil(FanCoilNum).SensCoolPower * ReportingConstant;
         FanCoil(FanCoilNum).TotCoolEnergy = FanCoil(FanCoilNum).TotCoolPower * ReportingConstant;
         FanCoil(FanCoilNum).ElecEnergy = FanCoil(FanCoilNum).ElecPower * ReportingConstant;
+
+        if (FanCoil(FanCoilNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, FanCoil(FanCoilNum).FirstPass);
+            }
+        }
     }
 
     int GetFanCoilZoneInletAirNode(int const FanCoilNum)

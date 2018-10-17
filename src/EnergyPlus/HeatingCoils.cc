@@ -2779,15 +2779,16 @@ namespace HeatingCoils {
                 coilObjClassName = "Coil:Heating:Desuperheater";
             }
         }
-        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing &&
-            HeatingCoil(CoilNum).reportCoilFinalSizes) {
-            coilSelectionReportObj->setCoilFinalSizes(HeatingCoil(CoilNum).Name,
-                                                      coilObjClassName,
-                                                      HeatingCoil(CoilNum).NominalCapacity,
-                                                      HeatingCoil(CoilNum).NominalCapacity,
-                                                      -999.0,
-                                                      -999.0);
-            HeatingCoil(CoilNum).reportCoilFinalSizes = false;
+        if (HeatingCoil(CoilNum).reportCoilFinalSizes) {
+            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+                coilSelectionReportObj->setCoilFinalSizes(HeatingCoil(CoilNum).Name,
+                                                          coilObjClassName,
+                                                          HeatingCoil(CoilNum).NominalCapacity,
+                                                          HeatingCoil(CoilNum).NominalCapacity,
+                                                          -999.0,
+                                                          -999.0);
+                HeatingCoil(CoilNum).reportCoilFinalSizes = false;
+            }
         }
     }
 

@@ -68,6 +68,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ThermalComfort;
@@ -889,4 +890,62 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveASH55Test)
     EXPECT_NEAR(ThermalComfort::runningAverageASH, 9.29236111, 0.001);
     useEpwData = false;
     DataGlobals::BeginDayFlag = false;
+}
+
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
+{
+    NumOfZones = 1;
+    ZoneSysEnergyDemand.allocate(NumOfZones);
+    ThermalComfortSetPoint.allocate(NumOfZones);
+    TempControlType.allocate(1);
+    AirModel.allocate(NumOfZones);
+    AirModel(1).AirModelType = RoomAirModel_Mixing;
+    ZTAV.allocate(NumOfZones);
+    ZoneThermostatSetPointLo.allocate(NumOfZones);
+    ZoneThermostatSetPointHi.allocate(NumOfZones);
+    ZoneThermostatSetPointLoAver.allocate(NumOfZones);
+    ZoneThermostatSetPointHiAver.allocate(NumOfZones);
+    ThermalComfortInASH55.allocate(NumOfZones);
+    ThermalComfortInASH55(1).ZoneIsOccupied = true;
+    TimeStepZone = 0.25;
+    Zone.allocate(NumOfZones);
+    ZoneTempPredictorCorrector::NumOnOffCtrZone = 1;
+
+    TempControlType(1) = DualSetPointWithDeadBand;
+
+    // heating
+    ZTAV(1) = 21.1;                                     // 70F
+    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    ZoneThermostatSetPointLoAver(1) = 22.2;                 // 72F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
+
+    // cooling
+    ZTAV(1) = 25.0;                                      // 77F
+    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    ZoneThermostatSetPointHiAver(1) = 23.9;                  // 75F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCoolingOccupied);
+
+    // no cooling or heating
+    ZTAV(1) = 23.0;                                      // 73F
+    ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0; // must be zero
+    CalcIfSetPointMet();
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetHeating);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetHeatingOccupied);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetCooling);
+    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetCoolingOccupied);
+
 }

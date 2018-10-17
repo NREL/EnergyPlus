@@ -1,430 +1,506 @@
+  Version,9.0;
 
-Version, 9.0;
+  Building,
+    PVWatts Test Case,       !- Name
+    0.0,                     !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value
+    0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
 
-Building,
-  PVWatts Test Case,  !- Name
-  0.0,                     !- North Axis {deg}
-  Suburbs,                 !- Terrain
-  0.04,                    !- Loads Convergence Tolerance Value
-  0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
-  FullInteriorAndExterior, !- Solar Distribution
-  25,                      !- Maximum Number of Warmup Days
-  6;                       !- Minimum Number of Warmup Days
+  Timestep,1;
 
-Timestep, 1;
-
-SimulationControl,
-  No,                      !- Do Zone Sizing Calculation
-  No,                      !- Do System Sizing Calculation
-  No,                      !- Do Plant Sizing Calculation
-  No,                      !- Run Simulation for Sizing Periods
-  Yes;                     !- Run Simulation for Weather File Run Periods
+  SimulationControl,
+    No,                      !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    No,                      !- Run Simulation for Sizing Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
     All Year,                !- Name
-    1, 1,                    !- Begin
-    12, 31,                  !- End
-    UseWeatherFile,          !- Day of Week for Start Day
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-GlobalGeometryRules,
-  UpperLeftCorner,         !- Starting Vertex Position
-  CounterClockWise,        !- Vertex Entry Direction
-  Relative;                !- Coordinate System
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    Relative;                !- Coordinate System
 
-Site:Location,
-  Phoenix Sky Harbor Intl Ap_AZ_USA Design_Conditions,     !- Location Name
-     33.45,     !- Latitude {N+ S-}
-   -111.98,     !- Longitude {W- E+}
-     -7.00,     !- Time Zone Relative to GMT {GMT+/-}
-    337.00;     !- Elevation {m}
+  Site:Location,
+    Phoenix Sky Harbor Intl Ap_AZ_USA Design_Conditions,  !- Name
+    33.45,                   !- Latitude {deg}
+    -111.98,                 !- Longitude {deg}
+    -7.00,                   !- Time Zone {hr}
+    337.00;                  !- Elevation {m}
 
 ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Heating 99%, MaxDB=5.2°C
-SizingPeriod:DesignDay,
- Phoenix Sky Harbor Intl Ap Ann Htg 99% Condns DB,     !- Name
-        12,      !- Month
-        21,      !- Day of Month
- WinterDesignDay,!- Day Type
-       5.2,      !- Maximum Dry-Bulb Temperature {C}
-       0.0,      !- Daily Dry-Bulb Temperature Range {C}
-DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-          ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-   Wetbulb,      !- Humidity Condition Type
-       5.2,      !- Wetbulb at Maximum Dry-Bulb {C}
-          ,      !- Humidity Indicating Day Schedule Name
-          ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-          ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-          ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-    97342.,      !- Barometric Pressure {Pa}
-       1.7,      !- Wind Speed {m/s} design conditions vs. traditional 6.71 m/s (15 mph)
-       100,      !- Wind Direction {Degrees; N=0, S=180}
-        No,      !- Rain {Yes/No}
-        No,      !- Snow on ground {Yes/No}
-        No,      !- Daylight Savings Time Indicator
- ASHRAEClearSky, !- Solar Model Indicator
-          ,      !- Beam Solar Day Schedule Name
-          ,      !- Diffuse Solar Day Schedule Name
-          ,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-          ,      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
-      0.00;      !- Clearness {0.0 to 1.1}
+
+  SizingPeriod:DesignDay,
+    Phoenix Sky Harbor Intl Ap Ann Htg 99% Condns DB,  !- Name
+    12,                      !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    5.2,                     !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    5.2,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    97342.,                  !- Barometric Pressure {Pa}
+    1.7,                     !- Wind Speed {m/s}
+    100,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
 
 ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (DB=>MWB) 1%, MaxDB=42.3°C MWB=21°C
-SizingPeriod:DesignDay,
- Phoenix Sky Harbor Intl Ap Ann Clg 1% Condns DB=>MWB,     !- Name
-         7,      !- Month
-        21,      !- Day of Month
- SummerDesignDay,!- Day Type
-      42.3,      !- Maximum Dry-Bulb Temperature {C}
-        12,      !- Daily Dry-Bulb Temperature Range {C}
-DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-          ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-   Wetbulb,      !- Humidity Condition Type
-        21,      !- Wetbulb at Maximum Dry-Bulb {C}
-          ,      !- Humidity Indicating Day Schedule Name
-          ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-          ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-          ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-    97342.,      !- Barometric Pressure {Pa}
-       4.1,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
-       260,      !- Wind Direction {Degrees; N=0, S=180}
-        No,      !- Rain {Yes/No}
-        No,      !- Snow on ground {Yes/No}
-        No,      !- Daylight Savings Time Indicator
-      ASHRAETau, !- Solar Model Indicator
-          ,      !- Beam Solar Day Schedule Name
-          ,      !- Diffuse Solar Day Schedule Name
-     0.588,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-     1.653;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
 
-Material:NoMass,
-  R13LAYER,                !- Name
-  Rough,                   !- Roughness
-  2.290965,                !- Thermal Resistance {m2-K/W}
-  0.9000000,               !- Thermal Absorptance
-  0.7500000,               !- Solar Absorptance
-  0.7500000;               !- Visible Absorptance
+  SizingPeriod:DesignDay,
+    Phoenix Sky Harbor Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    42.3,                    !- Maximum Dry-Bulb Temperature {C}
+    12,                      !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    21,                      !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    97342.,                  !- Barometric Pressure {Pa}
+    4.1,                     !- Wind Speed {m/s}
+    260,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAETau,               !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    0.588,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    1.653;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
-Material:NoMass,
-  R31LAYER,                !- Name
-  Rough,                   !- Roughness
-  5.456,                   !- Thermal Resistance {m2-K/W}
-  0.9000000,               !- Thermal Absorptance
-  0.7500000,               !- Solar Absorptance
-  0.7500000;               !- Visible Absorptance
+  Material:NoMass,
+    R13LAYER,                !- Name
+    Rough,                   !- Roughness
+    2.290965,                !- Thermal Resistance {m2-K/W}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
 
-Material,
-  C5 - 4 IN HW CONCRETE,   !- Name
-  MediumRough,             !- Roughness
-  0.1014984,               !- Thickness {m}
-  1.729577,                !- Conductivity {W/m-K}
-  2242.585,                !- Density {kg/m3}
-  836.8000,                !- Specific Heat {J/kg-K}
-  0.9000000,               !- Thermal Absorptance
-  0.6500000,               !- Solar Absorptance
-  0.6500000;               !- Visible Absorptance
+  Material:NoMass,
+    R31LAYER,                !- Name
+    Rough,                   !- Roughness
+    5.456,                   !- Thermal Resistance {m2-K/W}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
 
-Construction,
-  R13WALL,                 !- Name
-  R13LAYER;                !- Outside Layer
+  Material,
+    C5 - 4 IN HW CONCRETE,   !- Name
+    MediumRough,             !- Roughness
+    0.1014984,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
 
-Construction,
-  FLOOR,                   !- Name
-  C5 - 4 IN HW CONCRETE;   !- Outside Layer
+  Construction,
+    R13WALL,                 !- Name
+    R13LAYER;                !- Outside Layer
 
-Construction,
-  ROOF31,                  !- Name
-  R31LAYER;                !- Outside Layer
+  Construction,
+    FLOOR,                   !- Name
+    C5 - 4 IN HW CONCRETE;   !- Outside Layer
 
-Zone,
-  ZONE ONE,                !- Name
-  0,                       !- Direction of Relative North {deg}
-  0,                       !- X Origin {m}
-  0,                       !- Y Origin {m}
-  0,                       !- Z Origin {m}
-  1,                       !- Type
-  1,                       !- Multiplier
-  autocalculate,           !- Ceiling Height {m}
-  autocalculate;           !- Volume {m3}
+  Construction,
+    ROOF31,                  !- Name
+    R31LAYER;                !- Outside Layer
 
-ScheduleTypeLimits,
-  OnOff,
-  0,
-  1,
-  Discrete;
+  Zone,
+    ZONE ONE,                !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
-Schedule:Constant,
-  AlwaysOn,
-  OnOff,
-  1;
+  ScheduleTypeLimits,
+    OnOff,                   !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    Discrete;                !- Numeric Type
 
-BuildingSurface:Detailed,
-  Zn001:Wall001,           !- Name
-  Wall,                    !- Surface Type
-  R13WALL,                 !- Construction Name
-  ZONE ONE,                !- Zone Name
-  Outdoors,                !- Outside Boundary Condition
-  ,                        !- Outside Boundary Condition Object
-  SunExposed,              !- Sun Exposure
-  WindExposed,             !- Wind Exposure
-  0.5000000,               !- View Factor to Ground
-  4,                       !- Number of Vertices
-  0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-  0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-  15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-  15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+  Schedule:Constant,AlwaysOn,OnOff,1;
 
-BuildingSurface:Detailed,
-  Zn001:Wall002,           !- Name
-  Wall,                    !- Surface Type
-  R13WALL,                 !- Construction Name
-  ZONE ONE,                !- Zone Name
-  Outdoors,                !- Outside Boundary Condition
-  ,                        !- Outside Boundary Condition Object
-  SunExposed,              !- Sun Exposure
-  WindExposed,             !- Wind Exposure
-  0.5000000,               !- View Factor to Ground
-  4,                       !- Number of Vertices
-  15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-  15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-  15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
-  15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+  BuildingSurface:Detailed,
+    Zn001:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
-  Zn001:Wall003,           !- Name
-  Wall,                    !- Surface Type
-  R13WALL,                 !- Construction Name
-  ZONE ONE,                !- Zone Name
-  Outdoors,                !- Outside Boundary Condition
-  ,                        !- Outside Boundary Condition Object
-  SunExposed,              !- Sun Exposure
-  WindExposed,             !- Wind Exposure
-  0.5000000,               !- View Factor to Ground
-  4,                       !- Number of Vertices
-  15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-  15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
-  0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
-  0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+  BuildingSurface:Detailed,
+    Zn001:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
-  Zn001:Wall004,           !- Name
-  Wall,                    !- Surface Type
-  R13WALL,                 !- Construction Name
-  ZONE ONE,                !- Zone Name
-  Outdoors,                !- Outside Boundary Condition
-  ,                        !- Outside Boundary Condition Object
-  SunExposed,              !- Sun Exposure
-  WindExposed,             !- Wind Exposure
-  0.5000000,               !- View Factor to Ground
-  4,                       !- Number of Vertices
-  0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
-  0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
-  0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-  0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+  BuildingSurface:Detailed,
+    Zn001:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
-  Zn001:Flr001,            !- Name
-  Floor,                   !- Surface Type
-  FLOOR,                   !- Construction Name
-  ZONE ONE,                !- Zone Name
-  Adiabatic,               !- Outside Boundary Condition
-  ,                        !- Outside Boundary Condition Object
-  NoSun,                   !- Sun Exposure
-  NoWind,                  !- Wind Exposure
-  1.000000,                !- View Factor to Ground
-  4,                       !- Number of Vertices
-  15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}
-  0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}
-  0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}
-  15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+  BuildingSurface:Detailed,
+    Zn001:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
-  Zn001:Roof001,           !- Name
-  Roof,                    !- Surface Type
-  ROOF31,                  !- Construction Name
-  ZONE ONE,                !- Zone Name
-  Outdoors,                !- Outside Boundary Condition
-  ,                        !- Outside Boundary Condition Object
-  SunExposed,              !- Sun Exposure
-  WindExposed,             !- Wind Exposure
-  0,                       !- View Factor to Ground
-  4,                       !- Number of Vertices
-  0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}
-  0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}
-  15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}
-  15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR,                   !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Adiabatic,               !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
-ElectricLoadCenter:Distribution,
-  ELC1,                       !- Name
-  PVList1,                    !- Generator List Name
-  Baseload,                   !- Generator Operation Scheme Type
-  0,                          !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
-  ,                           !- Generator Track Schedule Name Scheme Schedule Name
-  ,                           !- Generator Track Meter Scheme Meter Name
-  DirectCurrentWithInverter,  !- Electrical Buss Type
-  Inverter1;                  !- Inverter Name
+  BuildingSurface:Detailed,
+    Zn001:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
-ElectricLoadCenter:Inverter:PVWatts,
-  Inverter1,                  !- Name
-  1.10,                       !- DC to AC Size Ratio
-  0.96;                       !- Inverter Efficiency
+  ElectricLoadCenter:Distribution,
+    ELC1,                    !- Name
+    PVList1,                 !- Generator List Name
+    Baseload,                !- Generator Operation Scheme Type
+    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
+    DirectCurrentWithInverter,  !- Electrical Buss Type
+    Inverter1;               !- Inverter Name
 
-ElectricLoadCenter:Generators,
-  PVList1,                    !- Name
-  PVWatts1,                   !- Generator 1 Name
-  Generator:PVWatts,          !- Generator 1 Object Type
-  4000,                       !- Generator 1 Rated Electric Power Output {W}
-  AlwaysOn,                   !- Generator 1 Availability Schedule Name
-  ,                           !- Generator 1 Rated Thermal to Electrical Power Ratio
-  PVWatts2,                   !- Generator 2 Name
-  Generator:PVWatts,          !- Generator 2 Object Type
-  3000,                       !- Generator 2 Rated Electric Power Output {W}
-  AlwaysOn,                   !- Generator 2 Availability Schedule Name
-  ,                           !- Generator 2 Rated Thermal to Electrical Power Ratio
-  PVWatts3,                   !- Generator 3 Name
-  Generator:PVWatts,          !- Generator 3 Object Type
-  3000,                       !- Generator 3 Rated Electric Power Output {W}
-  AlwaysOn,                   !- Generator 3 Availability Schedule Name
-  ;                           !- Generator 3 Rated Thermal to Electrical Power Ratio
+  ElectricLoadCenter:Inverter:PVWatts,
+    Inverter1,               !- Name
+    1.10,                    !- DC to AC Size Ratio
+    0.96;                    !- Inverter Efficiency
 
-Generator:PVWatts,
-  PVWatts1,                   !- Name
-  5,                          !- Version
-  4000,                       !- DC System Capacity
-  Standard,                   !- Module Type
-  FixedOpenRack,              !- Array Type
-  0.14,                       !- System Losses
-  TiltAzimuth,                !- Array Geometry Type
-  20,                         !- Tilt Angle
-  180;                        !- Azimuth Angle
+  ElectricLoadCenter:Generators,
+    PVList1,                 !- Name
+    PVWatts1,                !- Generator 1 Name
+    Generator:PVWatts,       !- Generator 1 Object Type
+    4000,                    !- Generator 1 Rated Electric Power Output {W}
+    AlwaysOn,                !- Generator 1 Availability Schedule Name
+    ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio
+    PVWatts2,                !- Generator 2 Name
+    Generator:PVWatts,       !- Generator 2 Object Type
+    3000,                    !- Generator 2 Rated Electric Power Output {W}
+    AlwaysOn,                !- Generator 2 Availability Schedule Name
+    ,                        !- Generator 2 Rated Thermal to Electrical Power Ratio
+    PVWatts3,                !- Generator 3 Name
+    Generator:PVWatts,       !- Generator 3 Object Type
+    3000,                    !- Generator 3 Rated Electric Power Output {W}
+    AlwaysOn,                !- Generator 3 Availability Schedule Name
+    ;                        !- Generator 3 Rated Thermal to Electrical Power Ratio
 
-Shading:Site:Detailed,
-  FlatSurface,             !- Name
-  ,                        !- Transmittance Schedule Name
-  4,                       !- Number of Vertices
-  40.0,2.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
-  40.0,0.00,0.0,  !- X,Y,Z ==> Vertex 2 {m}
-  45.0,0.00,0.0,  !- X,Y,Z ==> Vertex 3 {m}
-  45.0,2.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+  Generator:PVWatts,
+    PVWatts1,                !- Name
+    5,                       !- PVWatts Version
+    4000,                    !- DC System Capacity {W}
+    Standard,                !- Module Type
+    FixedOpenRack,           !- Array Type
+    0.14,                    !- System Losses
+    TiltAzimuth,             !- Array Geometry Type
+    20,                      !- Tilt Angle {deg}
+    180;                     !- Azimuth Angle {deg}
 
-Generator:PVWatts,
-  PVWatts2,                   !- Name
-  5,                          !- Version
-  3000,                       !- DC System Capacity
-  Premium,                    !- Module Type
-  FixedOpenRack,              !- Array Type
-  0.14,                       !- System Losses
-  Surface,                    !- Array Geometry Type
-  ,                           !- Tilt Angle
-  ,                           !- Azimuth Angle
-  FlatSurface;                !- Surface Name
+  Shading:Site:Detailed,
+    FlatSurface,             !- Name
+    ,                        !- Transmittance Schedule Name
+    4,                       !- Number of Vertices
+    40.0,2.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    40.0,0.00,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    45.0,0.00,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    45.0,2.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
-Shading:Site:Detailed,
-  FlatSurfaceShadetoEast,  !- Name
-  ,                        !- Transmittance Schedule Name
-  4,                       !- Number of Vertices
-  0.0,25.0,12.0,  !- X,Y,Z ==> Vertex 1 {m}
-  0.0,20.00,12.0,  !- X,Y,Z ==> Vertex 2 {m}
-  5.0,20.00,12.0,  !- X,Y,Z ==> Vertex 3 {m}
-  5.0,25.0,12.0;  !- X,Y,Z ==> Vertex 4 {m}
+  Generator:PVWatts,
+    PVWatts2,                !- Name
+    5,                       !- PVWatts Version
+    3000,                    !- DC System Capacity {W}
+    Premium,                 !- Module Type
+    FixedOpenRack,           !- Array Type
+    0.14,                    !- System Losses
+    Surface,                 !- Array Geometry Type
+    ,                        !- Tilt Angle {deg}
+    ,                        !- Azimuth Angle {deg}
+    FlatSurface;             !- Surface Name
 
-Shading:Site:Detailed,
-  ShadetoEast,             !- Name
-  ,                        !- Transmittance Schedule Name
-  4,                       !- Number of Vertices
-  5.0,25.0,22.0,  !- X,Y,Z ==> Vertex 1 {m}
-  5.0,25.00,12.0,  !- X,Y,Z ==> Vertex 2 {m}
-  5.0,20.00,12.0,  !- X,Y,Z ==> Vertex 3 {m}
-  5.0,20.0,22.0;  !- X,Y,Z ==> Vertex 4 {m}
+  Shading:Site:Detailed,
+    FlatSurfaceShadetoEast,  !- Name
+    ,                        !- Transmittance Schedule Name
+    4,                       !- Number of Vertices
+    0.0,25.0,12.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,20.00,12.0,  !- X,Y,Z ==> Vertex 2 {m}
+    5.0,20.00,12.0,  !- X,Y,Z ==> Vertex 3 {m}
+    5.0,25.0,12.0;  !- X,Y,Z ==> Vertex 4 {m}
 
-Generator:PVWatts,
-  PVWatts3,                   !- Name
-  5,                          !- Version
-  3000,                       !- DC System Capacity
-  Premium,                    !- Module Type
-  FixedOpenRack,              !- Array Type
-  0.14,                       !- System Losses
-  Surface,                    !- Array Geometry Type
-  ,                           !- Tilt Angle
-  ,                           !- Azimuth Angle
-  FlatSurfaceShadetoEast;     !- Surface Name
+  Shading:Site:Detailed,
+    ShadetoEast,             !- Name
+    ,                        !- Transmittance Schedule Name
+    4,                       !- Number of Vertices
+    5.0,25.0,22.0,  !- X,Y,Z ==> Vertex 1 {m}
+    5.0,25.00,12.0,  !- X,Y,Z ==> Vertex 2 {m}
+    5.0,20.00,12.0,  !- X,Y,Z ==> Vertex 3 {m}
+    5.0,20.0,22.0;  !- X,Y,Z ==> Vertex 4 {m}
 
-Output:VariableDictionary, regular;
+  Generator:PVWatts,
+    PVWatts3,                !- Name
+    5,                       !- PVWatts Version
+    3000,                    !- DC System Capacity {W}
+    Premium,                 !- Module Type
+    FixedOpenRack,           !- Array Type
+    0.14,                    !- System Losses
+    Surface,                 !- Array Geometry Type
+    ,                        !- Tilt Angle {deg}
+    ,                        !- Azimuth Angle {deg}
+    FlatSurfaceShadetoEast;  !- Surface Name
 
-Output:Variable,*,Site Outdoor Air Drybulb Temperature,Timestep;
-Output:Variable,*,Site Outdoor Air Dewpoint Temperature,Timestep;
-Output:Variable,*,Site Outdoor Air Wetbulb Temperature,Timestep;
-Output:Variable,*,Site Outdoor Air Humidity Ratio,Timestep;
-Output:Variable,*,Site Outdoor Air Relative Humidity,Timestep;
-Output:Variable,*,Site Outdoor Air Barometric Pressure,Timestep;
-Output:Variable,*,Site Wind Speed,Timestep;
-Output:Variable,*,Site Wind Direction,Timestep;
-Output:Variable,*,Site Sky Temperature,Timestep;
-Output:Variable,*,Site Horizontal Infrared Radiation Rate per Area,Timestep;
-Output:Variable,*,Site Diffuse Solar Radiation Rate per Area,Timestep;
-Output:Variable,*,Site Direct Solar Radiation Rate per Area,Timestep;
-Output:Variable,*,Site Precipitation Depth,Timestep;
-Output:Variable,*,Site Ground Reflected Solar Radiation Rate per Area,Timestep;
-Output:Variable,*,Site Ground Temperature,Timestep;
-Output:Variable,*,Site Surface Ground Temperature,Timestep;
-Output:Variable,*,Site Deep Ground Temperature,Timestep;
-Output:Variable,*,Site Simple Factor Model Ground Temperature,Timestep;
-Output:Variable,*,Site Outdoor Air Enthalpy,Timestep;
-Output:Variable,*,Site Outdoor Air Density,Timestep;
-Output:Variable,*,Site Solar Azimuth Angle,Timestep;
-Output:Variable,*,Site Solar Altitude Angle,Timestep;
-Output:Variable,*,Site Solar Hour Angle,Timestep;
-Output:Variable,*,Site Rain Status,Timestep;
-Output:Variable,*,Site Snow on Ground Status,Timestep;
-Output:Variable,*,Site Exterior Horizontal Sky Illuminance,Timestep;
-Output:Variable,*,Site Exterior Horizontal Beam Illuminance,Timestep;
-Output:Variable,*,Site Exterior Beam Normal Illuminance,Timestep;
-Output:Variable,*,Site Sky Diffuse Solar Radiation Luminous Efficacy,Timestep;
-Output:Variable,*,Site Beam Solar Radiation Luminous Efficacy,Timestep;
-Output:Variable,*,Site Daylighting Model Sky Clearness,Timestep;
-Output:Variable,*,Site Daylighting Model Sky Brightness,Timestep;
-Output:Variable,*,Site Daylight Saving Time Status,Timestep;
-Output:Variable,*,Site Day Type Index,Timestep;
-Output:Variable,*,Site Mains Water Temperature,Timestep;
-Output:Variable,*,HVAC System Solver Iteration Count,Timestep;
-Output:Variable,*,Air System Solver Iteration Count,Timestep;
-Output:Variable,*,Air System Simulation Maximum Iteration Count,Timestep;
-Output:Variable,*,Air System Simulation Iteration Count,Timestep;
-Output:Variable,*,Air System Component Model Simulation Calls,Timestep;
-Output:Variable,*,Generator Requested Electric Power,Timestep;
-Output:Variable,*,Inverter DC to AC Efficiency,Timestep;
-Output:Variable,*,Inverter DC Input Electric Power,Timestep;
-Output:Variable,*,Inverter DC Input Electric Energy,Timestep;
-Output:Variable,*,Inverter AC Output Electric Power,Timestep;
-Output:Variable,*,Inverter AC Output Electric Energy,Timestep;
-Output:Variable,*,Inverter Conversion Loss Power,Timestep;
-Output:Variable,*,Inverter Conversion Loss Energy,Timestep;
-Output:Variable,*,Inverter Conversion Loss Decrement Energy,Timestep;
-Output:Variable,*,Inverter Thermal Loss Rate,Timestep;
-Output:Variable,*,Inverter Thermal Loss Energy,Timestep;
-Output:Variable,*,Inverter Ancillary AC Electric Power,Timestep;
-Output:Variable,*,Inverter Ancillary AC Electric Energy,Timestep;
-Output:Variable,*,Generator Produced DC Electric Power,Timestep;
-Output:Variable,*,Generator Produced DC Electric Energy,Timestep;
-Output:Variable,*,Generator PV Cell Temperature,Timestep;
-Output:Variable,*,Electric Load Center Produced Electric Power,Timestep;
-Output:Variable,*,Electric Load Center Produced Electric Energy,Timestep;
-Output:Variable,*,Electric Load Center Supplied Electric Power,Timestep;
-Output:Variable,*,Electric Load Center Drawn Electric Power,Timestep;
-Output:Variable,*,Electric Load Center Produced Thermal Rate,Timestep;
-Output:Variable,*,Electric Load Center Produced Thermal Energy,Timestep;
-Output:Variable,*,Electric Load Center Requested Electric Power,Timestep;
-Output:Variable,*,Facility Total Purchased Electric Power,Timestep;
-Output:Variable,*,Facility Total Purchased Electric Energy,Timestep;
-Output:Variable,*,Facility Total Surplus Electric Power,Timestep;
-Output:Variable,*,Facility Total Surplus Electric Energy,Timestep;
-Output:Variable,*,Facility Net Purchased Electric Power,Timestep;
-Output:Variable,*,Facility Net Purchased Electric Energy,Timestep;
-Output:Variable,*,Facility Total Building Electric Demand Power,Timestep;
-Output:Variable,*,Facility Total HVAC Electric Demand Power,Timestep;
-Output:Variable,*,Facility Total Electric Demand Power,Timestep;
-Output:Variable,*,Facility Total Produced Electric Power,Timestep;
-Output:Variable,*,Facility Total Produced Electric Energy,Timestep;
+  Output:VariableDictionary,regular;
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,Timestep;
+
+  Output:Variable,*,Site Outdoor Air Dewpoint Temperature,Timestep;
+
+  Output:Variable,*,Site Outdoor Air Wetbulb Temperature,Timestep;
+
+  Output:Variable,*,Site Outdoor Air Humidity Ratio,Timestep;
+
+  Output:Variable,*,Site Outdoor Air Relative Humidity,Timestep;
+
+  Output:Variable,*,Site Outdoor Air Barometric Pressure,Timestep;
+
+  Output:Variable,*,Site Wind Speed,Timestep;
+
+  Output:Variable,*,Site Wind Direction,Timestep;
+
+  Output:Variable,*,Site Sky Temperature,Timestep;
+
+  Output:Variable,*,Site Horizontal Infrared Radiation Rate per Area,Timestep;
+
+  Output:Variable,*,Site Diffuse Solar Radiation Rate per Area,Timestep;
+
+  Output:Variable,*,Site Direct Solar Radiation Rate per Area,Timestep;
+
+  Output:Variable,*,Site Precipitation Depth,Timestep;
+
+  Output:Variable,*,Site Ground Reflected Solar Radiation Rate per Area,Timestep;
+
+  Output:Variable,*,Site Ground Temperature,Timestep;
+
+  Output:Variable,*,Site Surface Ground Temperature,Timestep;
+
+  Output:Variable,*,Site Deep Ground Temperature,Timestep;
+
+  Output:Variable,*,Site Simple Factor Model Ground Temperature,Timestep;
+
+  Output:Variable,*,Site Outdoor Air Enthalpy,Timestep;
+
+  Output:Variable,*,Site Outdoor Air Density,Timestep;
+
+  Output:Variable,*,Site Solar Azimuth Angle,Timestep;
+
+  Output:Variable,*,Site Solar Altitude Angle,Timestep;
+
+  Output:Variable,*,Site Solar Hour Angle,Timestep;
+
+  Output:Variable,*,Site Rain Status,Timestep;
+
+  Output:Variable,*,Site Snow on Ground Status,Timestep;
+
+  Output:Variable,*,Site Exterior Horizontal Sky Illuminance,Timestep;
+
+  Output:Variable,*,Site Exterior Horizontal Beam Illuminance,Timestep;
+
+  Output:Variable,*,Site Exterior Beam Normal Illuminance,Timestep;
+
+  Output:Variable,*,Site Sky Diffuse Solar Radiation Luminous Efficacy,Timestep;
+
+  Output:Variable,*,Site Beam Solar Radiation Luminous Efficacy,Timestep;
+
+  Output:Variable,*,Site Daylighting Model Sky Clearness,Timestep;
+
+  Output:Variable,*,Site Daylighting Model Sky Brightness,Timestep;
+
+  Output:Variable,*,Site Daylight Saving Time Status,Timestep;
+
+  Output:Variable,*,Site Day Type Index,Timestep;
+
+  Output:Variable,*,Site Mains Water Temperature,Timestep;
+
+  Output:Variable,*,HVAC System Solver Iteration Count,Timestep;
+
+  Output:Variable,*,Air System Solver Iteration Count,Timestep;
+
+  Output:Variable,*,Air System Simulation Maximum Iteration Count,Timestep;
+
+  Output:Variable,*,Air System Simulation Iteration Count,Timestep;
+
+  Output:Variable,*,Air System Component Model Simulation Calls,Timestep;
+
+  Output:Variable,*,Generator Requested Electric Power,Timestep;
+
+  Output:Variable,*,Inverter DC to AC Efficiency,Timestep;
+
+  Output:Variable,*,Inverter DC Input Electric Power,Timestep;
+
+  Output:Variable,*,Inverter DC Input Electric Energy,Timestep;
+
+  Output:Variable,*,Inverter AC Output Electric Power,Timestep;
+
+  Output:Variable,*,Inverter AC Output Electric Energy,Timestep;
+
+  Output:Variable,*,Inverter Conversion Loss Power,Timestep;
+
+  Output:Variable,*,Inverter Conversion Loss Energy,Timestep;
+
+  Output:Variable,*,Inverter Conversion Loss Decrement Energy,Timestep;
+
+  Output:Variable,*,Inverter Thermal Loss Rate,Timestep;
+
+  Output:Variable,*,Inverter Thermal Loss Energy,Timestep;
+
+  Output:Variable,*,Inverter Ancillary AC Electric Power,Timestep;
+
+  Output:Variable,*,Inverter Ancillary AC Electric Energy,Timestep;
+
+  Output:Variable,*,Generator Produced DC Electric Power,Timestep;
+
+  Output:Variable,*,Generator Produced DC Electric Energy,Timestep;
+
+  Output:Variable,*,Generator PV Cell Temperature,Timestep;
+
+  Output:Variable,*,Electric Load Center Produced Electric Power,Timestep;
+
+  Output:Variable,*,Electric Load Center Produced Electric Energy,Timestep;
+
+  Output:Variable,*,Electric Load Center Supplied Electric Power,Timestep;
+
+  Output:Variable,*,Electric Load Center Drawn Electric Power,Timestep;
+
+  Output:Variable,*,Electric Load Center Produced Thermal Rate,Timestep;
+
+  Output:Variable,*,Electric Load Center Produced Thermal Energy,Timestep;
+
+  Output:Variable,*,Electric Load Center Requested Electric Power,Timestep;
+
+  Output:Variable,*,Facility Total Purchased Electric Power,Timestep;
+
+  Output:Variable,*,Facility Total Purchased Electric Energy,Timestep;
+
+  Output:Variable,*,Facility Total Surplus Electric Power,Timestep;
+
+  Output:Variable,*,Facility Total Surplus Electric Energy,Timestep;
+
+  Output:Variable,*,Facility Net Purchased Electric Power,Timestep;
+
+  Output:Variable,*,Facility Net Purchased Electric Energy,Timestep;
+
+  Output:Variable,*,Facility Total Building Electric Demand Power,Timestep;
+
+  Output:Variable,*,Facility Total HVAC Electric Demand Power,Timestep;
+
+  Output:Variable,*,Facility Total Electric Demand Power,Timestep;
+
+  Output:Variable,*,Facility Total Produced Electric Power,Timestep;
+
+  Output:Variable,*,Facility Total Produced Electric Energy,Timestep;
+
