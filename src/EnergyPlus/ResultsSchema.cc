@@ -341,9 +341,17 @@ namespace ResultsFramework {
 
     void DataFrame::newRow(const int month, const int dayOfMonth, const int hourOfDay, const int curMin)
     {
-        std::string ts =
-            std::to_string(month) + "/" + std::to_string(dayOfMonth) + " " + std::to_string(hourOfDay) + ":" + std::to_string(curMin) + ":00";
-        TS.push_back(ts);
+        char buffer[100];
+        int cx = snprintf(buffer, 100, "%02d/%02d %02d:%02d:00", month, dayOfMonth, hourOfDay, curMin );
+
+        // future start of ISO 8601 datetime output
+        // int cx = snprintf(buffer, 100, "YYYY-%02d/%02dT%02d:%02d:00", month, dayOfMonth, hourOfDay, curMin );
+
+        if (cx < 0 || cx > 100 ) {
+            ShowWarningMessage("Failed to convert datetime when adding new output row. Skipping row.");
+            return;
+        }
+        TS.push_back(buffer);
     }
 
     void DataFrame::newRow(const std::string &ts)
