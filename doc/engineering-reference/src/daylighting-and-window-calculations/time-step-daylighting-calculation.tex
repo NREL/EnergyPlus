@@ -66,9 +66,22 @@ Sky brightness is given by:
 
 \begin{equation}
 \Delta  = {S_{h,dif}}m/S_{norm,dir}^{ext}
-\end{equation}
+
 
 where \emph{m} is the relative optical air mass and \(S_{norm,dir}^{ext}\) is the extraterrestrial direct normal solar irradiance.
+
+The relative optional air mass is calculated as follows:
+
+\begin{equation}
+m = \frac{1- 1\mathrm{e}{-4}\cdot h}{\frac{\sin(b) + 0.15}{(b+3.885)^{1.253}}}
+\end{equation}
+
+where $b$ is the Solar Altitude Angle, that is the angle of the sun above the horizontal (in degrees), and $h$ is the building altitude (elevation, in meters).
+
+\begin{equation}
+b = \frac{\frac{\Pi}{2} - Z}{DegToRadians}
+\end{equation}
+
 
 If \emph{$\varepsilon$} $\leq$ 1.2,
 
