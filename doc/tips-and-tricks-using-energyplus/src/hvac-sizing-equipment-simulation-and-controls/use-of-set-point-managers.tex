@@ -41,7 +41,7 @@ It is possible to place the control node downstream of the actual object being c
 
 \emph{Appendix G, in G3.1.3.4, mandates to reset Hot Water Supply Temperature based on outdoor dry-bulb temperature, \SI{82.22}{\celsius} / \SI{180}{\farenheit} at \SI{-6.66}{\celsius} / \SI{20}{\farenheit} and below, \SI{65.56}{\celsius} / \SI{150}{\farenheit} at\SI{10}{\celsius} / \SI{50}{\farenheit} and above. How can I do this in EnergyPlus?}
 
-For this, you would simply place a \textbf{SetpointManager:OutdoorAirReset} on your PlantLoop supply outlet node, defining the appropriate temperatures:
+For this, you would place a \textbf{SetpointManager:OutdoorAirReset} on your PlantLoop supply outlet node, defining the appropriate temperatures:
 
 \begin{lstlisting}
 
@@ -64,7 +64,7 @@ For this, you would simply place a \textbf{SetpointManager:OutdoorAirReset} on y
 
 \emph{How can I do this in EnergyPlus?}
 
-For this, you would simply place a \textbf{SetpointManager:OutdoorAirReset} on your PlantLoop supply outlet node, defining the appropriate temperatures:
+For this, you would place a \textbf{SetpointManager:OutdoorAirReset} on your PlantLoop supply outlet node, defining the appropriate temperatures:
 
 \begin{lstlisting}
 
@@ -99,7 +99,7 @@ In our case, let's assume we have VAV With Reheat (System Type 7), and that we w
     Temperature,                   !- Control Variable
     VAV with Reheat,               !- HVAC Air Loop Name
     12.78,                         !- Minimum Setpoint Temperature {C}
-    15.5.,                         !- Maximum Setpoint Temperature {C}
+    15.56,                         !- Maximum Setpoint Temperature {C}
     MaximumTemperature,            !- Strategy
     VAV with Reheat SAT Nodes;     !- Setpoint Node or NodeList Name
 
