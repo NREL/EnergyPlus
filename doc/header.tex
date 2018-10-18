@@ -77,9 +77,13 @@
 % this is a great package for printing units in a standard way, we should move this way
 \usepackage{siunitx}
 
-% Add a few IP units, eg use like \SI{80}{\farenheit}
+% The current implementation of \degree doesn't use ensuremath, see https://github.com/josephwright/siunitx/issues/351
 \DeclareSIUnit[number-unit-product = \,]
-\farenheit{ \ensuremath { { } ^ { \circ } } \kern -\scriptspace F }
+\degree{ \ensuremath { { } ^ { \circ } } }
+
+% Add a few IP units, eg use like \SI{80}{\fahrenheit}
+\DeclareSIUnit[number-unit-product = \,]
+\fahrenheit{ \ensuremath { { } ^ { \circ } } \kern -\scriptspace F }
 
 % some additional macros
 \newcommand{\PB}[1]{\left(#1\right)}
