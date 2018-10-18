@@ -48,6 +48,7 @@
 // C++ Headers
 #include <cmath>
 #include <fstream>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -597,9 +598,9 @@ namespace GroundHeatExchangers {
 
         // save data for later
         if (!DataSystemVariables::DisableGLHECaching) {
-            myCacheData["Response Factors"]["time"] = myRespFactors->time;
-            myCacheData["Response Factors"]["LNTTS"] = myRespFactors->LNTTS;
-            myCacheData["Response Factors"]["GFNC"] = myRespFactors->GFNC;
+            myCacheData["Response Factors"]["time"] = std::vector<Real64>(myRespFactors->time.begin(), myRespFactors->time.end());
+            myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(myRespFactors->LNTTS.begin(), myRespFactors->LNTTS.end());
+            myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(myRespFactors->GFNC.begin(), myRespFactors->GFNC.end());
             writeGLHECacheToFile();
         }
     }
