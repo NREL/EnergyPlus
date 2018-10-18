@@ -77,6 +77,10 @@
 % this is a great package for printing units in a standard way, we should move this way
 \usepackage{siunitx}
 
+% Add a few IP units, eg use like \SI{80}{\farenheit}
+\DeclareSIUnit[number-unit-product = \,]
+\farenheit{ \ensuremath { { } ^ { \circ } } \kern -\scriptspace F }
+
 % some additional macros
 \newcommand{\PB}[1]{\left(#1\right)}
 \newcommand{\RB}[1]{\left[#1\right]}
