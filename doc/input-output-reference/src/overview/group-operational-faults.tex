@@ -31,11 +31,17 @@ The objects used by EnergyPlus to model the faults are as follows:
 \item
   FaultModel:EnthalpySensorOffset:OutdoorAir
 \item
+  FaultModel:PressureSensorOffset:OutdoorAir
+\item
   FaultModel:TemperatureSensorOffset:ReturnAir
 \item
   FaultModel:EnthalpySensorOffset:ReturnAir
 \item
-  FaultModel:Fouling:Coil
+  FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+\item
+  FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+\item
+  FaultModel:TemperatureSensorOffset:CoilSupplyAir
 \item
   FaultModel:ThermostatOffset
 \item
@@ -43,13 +49,15 @@ The objects used by EnergyPlus to model the faults are as follows:
 \item
   FaultModel:Fouling:AirFilter
 \item
-  FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+  FaultModel:Fouling:Boiler
 \item
-  FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+  FaultModel:Fouling:Chiller
+\item
+  FaultModel:Fouling:Coil
 \item
   FaultModel:Fouling:CoolingTower
 \item
-  FaultModel:TemperatureSensorOffset:CoilSupplyAir
+  FaultModel:Fouling:EvaporativeCooler
 \end{itemize}
 
 \subsection{FaultModel:TemperatureSensorOffset:OutdoorAir}\label{faultmodeltemperaturesensoroffsetoutdoorair}
