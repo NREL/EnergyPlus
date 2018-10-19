@@ -204,15 +204,15 @@ This field is optional and can be used to model additional water consumed by the
 
 \paragraph{Field: Evaporative Cooler Operation Minimum Drybulb Temperature}\label{field-evaporative-cooler-operation-minimum-drybulb-temperature}
 
-This numeric field defines the evaporative cooler inlet node drybulb temperature minimum limit in degrees Celsius. The evaporative cooler will be turned off when evaporator cooler air inlet node dry-bulb temperature falls below this value. The typical minimum value is 16 °C. Users are allowed to specify their own limits. If this field is left blank, then there is no drybulb temperature lower limit for evaporative cooler operation.
+This numeric field defines the evaporative cooler inlet node drybulb temperature minimum limit in degrees Celsius. The evaporative cooler will be turned off when evaporator cooler air inlet node dry-bulb temperature falls below this value. The typical minimum value is \SI{16}{\celsius}. Users are allowed to specify their own limits. If this field is left blank, then there is no drybulb temperature lower limit for evaporative cooler operation.
 
 \paragraph{Field: Evaporative Operation Maximum Limit Wetbulb Temperature}\label{field-evaporative-operation-maximum-limit-wetbulb-temperature}
 
-This numeric field defines the evaporative cooler air inlet node air wetbulb temperature maximum limits in degree Celsius. When the evaporative cooler air inlet node air wetbulb temperature exceeds this limit, then the evaporative cooler is turns off. The typical maximum value is 24 °C. If this input field is left blank, then there is no wetbulb temperature upper limit for evaporative cooler operation.
+This numeric field defines the evaporative cooler air inlet node air wetbulb temperature maximum limits in degree Celsius. When the evaporative cooler air inlet node air wetbulb temperature exceeds this limit, then the evaporative cooler is turns off. The typical maximum value is \SI{24}{\celsius}. If this input field is left blank, then there is no wetbulb temperature upper limit for evaporative cooler operation.
 
 \paragraph{Field: Evaporative Operation Maximum Limit Drybulb Temperature}\label{field-evaporative-operation-maximum-limit-drybulb-temperature}
 
-This numeric field defines the evaporative cooler air inlet node drybulb temperature maximum limits in degree Celsius. The evaporative cooler will be turned off when the evaporative cooler air inlet node drybulb temperature exceeds this value. The typical maximum value is 28 °C. If this input field is left blank, then there is no upper drybulb temperature limit for evaporative cooler operation.
+This numeric field defines the evaporative cooler air inlet node drybulb temperature maximum limits in degree Celsius. The evaporative cooler will be turned off when the evaporative cooler air inlet node drybulb temperature exceeds this value. The typical maximum value is \SI{28}{\celsius}. If this input field is left blank, then there is no upper drybulb temperature limit for evaporative cooler operation.
 
 An example IDF entry is
 
@@ -220,18 +220,19 @@ An example IDF entry is
 
 EvaporativeCooler:Direct:ResearchSpecial,
   Direct Evap Cooler, !- Name
-  ALWAYS_ON, !- Availability Schedule Name
-  0.7 , !- Cooler Design Effectiveness
-  ,     !- Effectiveness Flow Ratio Modifier Curve Name
-  30.0 , !- Recirculating Water Pump Design Power
-  ,     !- Water Pump Power Sizing Factor
-  ,     !- Water Pump Power Modifier Curve Name
+  ALWAYS_ON,          !- Availability Schedule Name
+  0.7 ,               !- Cooler Design Effectiveness
+  ,                   !- Effectiveness Flow Ratio Modifier Curve Name
+  autosize,           !- Primary Air Design Flow Rate {m3/s}
+  30.0 ,              !- Recirculating Water Pump Design Power
+  ,                   !- Water Pump Power Sizing Factor
+  ,                   !- Water Pump Power Modifier Curve Name
   OAIndRDD Evap Cooler- OADirect Evap CoolerNode , !- Air Inlet Node Name
   OADirect Evap Cooler- OAMixing BoxNode, !- Air Outlet Node Name
   OADirect Evap Cooler- OAMixing BoxNode, !- Sensor Node Name
-  , !- Water Supply Storage Tank Name
-  0.0, !- Drift Loss Fraction
-  3; !- Blowdown Concentration Ratio
+  ,                   !- Water Supply Storage Tank Name
+  0.0,                !- Drift Loss Fraction
+  3;                  !- Blowdown Concentration Ratio
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-009}
