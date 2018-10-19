@@ -1,7 +1,10 @@
 \documentclass[12pt,twoside,letterpaper,titlepage]{report}
 
 \usepackage{amssymb,amsmath}
-\usepackage{mathspec}
+
+% By default mathspec uses no-math, which is passed to fontspec, and creates problem with siunitx
+\usepackage[math]{mathspec}
+
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
 \usepackage[margin=0.75in, top=1in]{geometry}
 % fixltx2e has been merged into LaTeX2e proper
@@ -77,6 +80,9 @@
 % this is a great package for printing units in a standard way, we should move this way
 \usepackage[per-mode=symbol]{siunitx}
 
+% Note: To use a unit without a number, use either `\si{\wattperVolumeFlowRate}`
+% or `\SI{}{\wattperVolumeFlowRate}`.
+
 % add some helper unit macros
 \DeclareSIUnit\area{\m\squared}
 \DeclareSIUnit\volume{\m\cubed}
@@ -88,6 +94,11 @@
 \DeclareSIUnit\specificEnthalpy{\J\per\kg}
 \DeclareSIUnit\coefficientOfPerformance{\watt\per\watt}
 \DeclareSIUnit\wattperVolumeFlowRate{\watt\per({\volumeFlowRate})} % Displays "W/(m^3/s)"
+
+% Add a few IP units, eg use like \SI{80}{\fahrenheit}
+\DeclareSIUnit[number-unit-product = \,]
+\fahrenheit{ \ensuremath { { } ^ { \circ } } \kern -\scriptspace F }
+
 % some additional macros
 \newcommand{\PB}[1]{\left(#1\right)}
 \newcommand{\RB}[1]{\left[#1\right]}
