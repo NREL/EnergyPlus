@@ -1,7 +1,10 @@
 \documentclass[12pt,twoside,letterpaper,titlepage]{report}
 
 \usepackage{amssymb,amsmath}
-\usepackage{mathspec}
+
+% By default mathspec uses no-math, which is passed to fontspec, and creates problem with siunitx
+\usepackage[math]{mathspec}
+
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
 \usepackage[margin=0.75in, top=1in]{geometry}
 % fixltx2e has been merged into LaTeX2e proper
@@ -77,9 +80,11 @@
 % this is a great package for printing units in a standard way, we should move this way
 \usepackage{siunitx}
 
-% The current implementation of \degree doesn't use ensuremath, see https://github.com/josephwright/siunitx/issues/351
-\DeclareSIUnit[number-unit-product = \,]
-\degree{ \ensuremath { { } ^ { \circ } } }
+% The current implementation of \degree doesn't use ensuremath and doesn't show
+% see https://github.com/josephwright/siunitx/issues/351
+% But requried mathspec with options 'math' above fixes it
+%\DeclareSIUnit[number-unit-product = \,]
+%\degree{ \ensuremath { { } ^ { \circ } } }
 
 % Add a few IP units, eg use like \SI{80}{\fahrenheit}
 \DeclareSIUnit[number-unit-product = \,]
