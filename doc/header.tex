@@ -75,8 +75,18 @@
 \fi
 
 % this is a great package for printing units in a standard way, we should move this way
-\usepackage{siunitx}
+\usepackage[per-mode=symbol]{siunitx}
 
+% add some helper unit macros
+\DeclareSIUnit\area{\m\squared}
+\DeclareSIUnit\volume{\m\cubed}
+\DeclareSIUnit\volumeFlowRate{\m\cubed\per\s}
+\DeclareSIUnit\massFlowRate{\kg\per\s}
+\DeclareSIUnit\density{\kg\per\m\cubed}
+\DeclareSIUnit\humidityRatio{\kg\of{W}\per\kg\of{DA}}
+\DeclareSIUnit\specificHeatCapacity{\J\per\kg\per\K}
+\DeclareSIUnit\specificEnthalpy{\J\per\kg}
+\DeclareSIUnit\coefficientOfPerformance{\watt\per\watt}
 % some additional macros
 \newcommand{\PB}[1]{\left(#1\right)}
 \newcommand{\RB}[1]{\left[#1\right]}
