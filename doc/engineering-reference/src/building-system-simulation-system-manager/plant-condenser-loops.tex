@@ -212,9 +212,109 @@ Five load distribution schemes are employed in EnergyPlus. The figure below illu
 \includegraphics{media/image1974.png}\caption{Loop Capacitance Tank Models \protect \label{loop-capacitance-tank-models}}
 \end{figure}
 
-The OPTIMAL scheme first loads each component to its optimal part load ratio (specified in input). Any remaining loop demand is distributed evenly to all the components. The UNIFORMLOAD scheme first divides the load evenly among all available components. If some components do not have the capacity to meet the uniformly distributed load, the remaining load is divided among the remaining components. The SEQUENTIALLOAD scheme loads each component one at a time to capacity until the loop demand is met. The components are loaded up in the order that they appear in the equipment list specified in input. The UNIFORMPLR scheme loads all equipment uniformly by maintaining uniform part load ratios across all equipment on the equipment list. If the load is below the load required by the plant to operate at the largest component minimum part load ratio, the last item is removed from each equipment list. This process is repeated until the plant can operate above the largest component minimum part load ratio. The SEQUENTIALUNIFORMPLR scheme loads all equipment in the order specified on the equipment list to capacity while operating all operational equipment at uniform part load ratios.
+\begin{itemize}
+\item
+    The \textbf{OPTIMAL} scheme first loads each component to its optimal part load ratio (specified in input). Any remaining loop demand is distributed evenly to all the components.
+\item
+    The \textbf{UNIFORMLOAD} scheme first divides the load evenly among all available components.
+    If some components do not have the capacity to meet the uniformly distributed load, the remaining load is divided among the remaining components.
+\item
+    The \textbf{SEQUENTIALLOAD} scheme loads each component one at a time to capacity until the loop demand is met.
+    The components are loaded up in the order that they appear in the equipment list specified in input.
+\item
+    The \textbf{UNIFORMPLR} scheme loads all equipment uniformly by maintaining uniform part load ratios across all equipment on the equipment list.
+    If the load is below the load required by the plant to operate at the largest component minimum part load ratio, the last item is removed from each equipment list.
+    This process is repeated until the plant can operate above the largest component minimum part load ratio.
+\item
+    The \textbf{SEQUENTIALUNIFORMPLR} scheme loads all equipment in the order specified on the equipment list to capacity while operating all operational equipment at uniform part load ratios.
+\end{itemize}
 
-\emph{Note:} For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
+\textbf{Note}: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
+
+Examples of application of two Load Distribution schemes can be found in the following sub sections.
+All assume that we have two pieces of equipment, with Equipment A being first in line in the \lstinline!PlantEquipmentList!, and having the following characteristics:
+
+\begin{table}[htbp]
+    \centering
+    \caption{Equipment description}
+    \label{tab:example-load-distribution-eq}
+\begin{tabular}{|l|l|l|}
+\hline
+Equipment   & A   & B   \\ \hline
+Priority    & 1   & 2   \\ \hline
+Min PLR     & 0.2 & 0.1 \\ \hline
+Max PLR     & 1   & 1   \\ \hline
+Optimum PLR & 0.6 & 0.4 \\ \hline
+Capacity    & 50  & 100 \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Note}: In any of the examples below:
+
+\begin{itemize}
+\item
+    "*" Means it will false load or cycle
+\item
+    "**" Means it's capped by maximum PLR
+\end{itemize}
+
+
+\subsubsection{UniformLoad}%
+\label{ssub:uniformload}
+
+Examples for the \textbf{UniformLoad} Load Distribution can be found in the table~\ref{tab:uniform-load-overview}.
+
+
+\begin{longtable}[c]{|l|p{0.5in}|p{0.5in}|p{0.5in}|p{0.5in}|l|p{0.5in}|p{0.5in}|}
+
+\caption{Overview of the UniformLoad Load Distribution Scheme}
+\label{tab:uniform-load-overview}\\
+\hline
+\textbf{UniformLoad} & \multicolumn{2}{l|}{Initial Loading} & \multicolumn{2}{l|}{Final Loading} & \multirow{2}{*}{Load Not Met} & \multicolumn{2}{l|}{Final PLR} \\ \cline{1-5} \cline{7-8}
+Plant Load           & A                 & B                & A                & B               &                               & A              & B             \\ \hline
+\endfirsthead
+\hline
+\textbf{UniformLoad} & \multicolumn{2}{l|}{Initial Loading} & \multicolumn{2}{l|}{Final Loading} & \multirow{2}{*}{Load Not Met} & \multicolumn{2}{l|}{Final PLR} \\ \cline{1-5} \cline{7-8}
+Plant Load           & A                 & B                & A                & B               &                               & A              & B             \\ \hline
+\endhead
+
+10          & 5                 & 5                & 5            & 5           & 0                      & 0.2 *      & 0.15 *      \\ \hline
+25          & 12.5              & 12.5             & 12.5         & 12.5        & 0                      & 0.31       & 0.15 *      \\ \hline
+50          & 25                & 25               & 25           & 25          & 0                      & 0.63       & 0.25        \\ \hline
+100         & 50                & 50               & 40           & 60          & 0                      & 1 **       & 0.60        \\ \hline
+150         & 75                & 75               & 40           & 100         & 10                     & 1 **       & 1 **        \\ \hline
+200         & 100               & 100              & 40           & 100         & 60                     & 1 **       & 1 **        \\ \hline
+
+\end{longtable}
+
+
+\subsubsection{SequentialLoad}%
+\label{ssub:sequentialload}
+
+Examples for the \textbf{SequentialLoad} Load Distribution can be found in the table~\ref{tab:sequantial-load-overview}.
+
+\begin{longtable}[c]{|l|p{0.5in}|p{0.5in}|l|p{0.5in}|p{0.5in}|}
+
+\caption{Overview of the Sequential Load Distribution Scheme}
+\label{tab:sequantial-load-overview}\\
+\hline
+
+\textbf{SequentialLoad} & \multicolumn{2}{l|}{Loading} & \multirow{2}{*}{Load Not Met} & \multicolumn{2}{l|}{PLR} \\ \cline{1-3} \cline{5-6}
+Plant Load      & A             & B            &                               & A          & B           \\ \hline
+\endfirsthead
+\hline
+\textbf{SequentialLoad} & \multicolumn{2}{l|}{Loading} & \multirow{2}{*}{Load Not Met} & \multicolumn{2}{l|}{PLR} \\ \cline{1-3} \cline{5-6}
+Plant Load      & A             & B            &                               & A          & B           \\ \hline
+\endhead
+
+5               & 5             & 0            & 0                             & 0.2 *      & -           \\ \hline
+25              & 25            & 0            & 0                             & 0.625      & -           \\ \hline
+50              & 40            & 10           & 0                             & 1 **       & 0.15 *      \\ \hline
+100             & 40            & 60           & 0                             & 1 **       & 0.6         \\ \hline
+150             & 40           & 100           & 0                             & 1 **       & 1 **        \\ \hline
+200             & 40           & 100           & 50                            & 1 **       & 1 **        \\ \hline
+\end{longtable}
+
 
 \subsection{Summary of Plant Loop Demand Calculation Schemes}\label{summary-of-plant-loop-demand-calculation-schemes}
 
