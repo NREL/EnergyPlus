@@ -6022,6 +6022,8 @@ This output field is the average electricity consumption rate of the DX coil com
 
 This output field is the electricity consumption of the DX coil compressor in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
+
+
 \subsection{Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed}\label{coil-waterheating-airtowaterheatpump-variablespeed}
 
 \lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed! object described here models an air-to-water DX compression system to determine its air-side and water-side performance.
@@ -6057,7 +6059,7 @@ Any reference to this coil by another object (e.g., \lstinline!WaterHeater:HeatP
 
 This numeric field contains the maximum number of speed levels that the module uses.
 The number of speeds, for which the user input the performance data and curves, should be equal or higher than the maximum number.
-The performance inputs at higher speed levels are ignored.
+The performance inputs at higher speed levels are ignored. This must be greater or equal to 1, and lesser or equal to 10.
 
 
 \paragraph{Field: Nominal Speed Level}\label{vshpwhheating-nominal-speed-level}
