@@ -95,10 +95,26 @@
 \DeclareSIUnit\specificEnthalpy{\J\per\kg}
 \DeclareSIUnit\coefficientOfPerformance{\watt\per\watt}
 \DeclareSIUnit\wattperVolumeFlowRate{\watt\per({\volumeFlowRate})} % Displays "W/(m^3/s)"
+\DeclareSIUnit\volumeFlowRateperArea{({\volumeFlowRate})\per\area}
+\DeclareSIUnit\volumeFlowRateperWatt{({\volumeFlowRate})\per\watt}
 
-% Add a few IP units, eg use like \SI{80}{\fahrenheit}
-\DeclareSIUnit[number-unit-product = \,]
+% Make alias, so its clear these are IP units
+\let\DeclareIPUnit\DeclareSIUnit
+\let\IP\SI
+\let\ip\si
+
+% Add a few IP units, eg use like \IP{80}{\fahrenheit}
+\DeclareIPUnit[number-unit-product = \,]
 \fahrenheit{ \ensuremath { { } ^ { \circ } } \kern -\scriptspace F }
+\DeclareIPUnit\in{in}
+\DeclareIPUnit\ft{ft}
+\DeclareIPUnit\sqft{\ft\squared}
+\DeclareIPUnit\cfm{\ft\cubed\per\minute}
+\DeclareIPUnit\CFM{CFM}
+\DeclareIPUnit\gal{gal}
+\DeclareIPUnit\gpm{gpm}
+\DeclareIPUnit\MBH{MBH}
+
 
 % some additional macros
 \newcommand{\PB}[1]{\left(#1\right)}
