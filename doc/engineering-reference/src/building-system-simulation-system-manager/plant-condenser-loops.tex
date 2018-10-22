@@ -231,8 +231,7 @@ Five load distribution schemes are employed in EnergyPlus. The figure below illu
 
 \textbf{Note}: For all schemes, if the load for any individual component is less than the component load at the minimum PLR, the individual component model will false load or reduce duty cycle while operating at the minimum part load ratio until the load is met.
 
-Examples of application of two Load Distribution schemes can be found in the following sub sections.
-All assume that we have two pieces of equipment, with Equipment A being first in line in the \lstinline!PlantEquipmentList!, and having the following characteristics:
+In the following tables, we assume that we have two pieces of equipment, with Equipment A being first in line in the \lstinline!PlantEquipmentList!, and having the following characteristics:
 
 \begin{table}[htbp]
     \centering
@@ -249,21 +248,14 @@ Capacity    & 40  & 100 \\ \hline
 \end{tabular}
 \end{table}
 
-\textbf{Note}: In any of the examples below:
+\textbf{Note}: In the examples below:
 
 \begin{itemize}
 \item
     "*" Means it will false load or cycle
 \item
-    "**" Means it's capped by maximum PLR
+    "**" Means it is capped by maximum PLR
 \end{itemize}
-
-
-\subsubsection{UniformLoad}%
-\label{ssub:uniformload}
-
-Examples for the \textbf{UniformLoad} Load Distribution can be found in the table~\ref{tab:uniform-load-overview}.
-
 
 \begin{longtable}[c]{|l|p{0.5in}|p{0.5in}|p{0.5in}|p{0.5in}|l|p{0.5in}|p{0.5in}|}
 
@@ -286,12 +278,6 @@ Plant Load           & A                 & B                & A                &
 200         & 100               & 100              & 40           & 100         & 60                     & 1 **       & 1 **        \\ \hline
 
 \end{longtable}
-
-
-\subsubsection{SequentialLoad}%
-\label{ssub:sequentialload}
-
-Examples for the \textbf{SequentialLoad} Load Distribution can be found in the table~\ref{tab:sequantial-load-overview}.
 
 \begin{longtable}[c]{|l|p{0.5in}|p{0.5in}|l|p{0.5in}|p{0.5in}|}
 
