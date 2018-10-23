@@ -802,7 +802,7 @@ ElectricLoadCenter:Inverter:LookUpTable,
 
 \subsection{ElectricLoadCenter:Inverter:PVWatts}\label{electricloadcenterinverterpvwatts}
 
-The ElectricLoadCenter:Inverter:PVWatts is intended to be used in an \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} with one or more \hyperref[generatorpvwatts]{Generator:PVWatts} objects. It is \textbf{not} compatible with other Generator objects, such as \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic}. 
+The ElectricLoadCenter:Inverter:PVWatts is intended to be used in an \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} with one or more \hyperref[generatorpvwatts]{Generator:PVWatts} objects. It is \textbf{not} compatible with other Generator objects, such as \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic}.
 
 \subsubsection{Inputs}\label{inputs-electricloadcenterinverterpvwatts}
 
@@ -4762,7 +4762,7 @@ When using EpMacro with an typical installation of EnergyPlus, the above entry c
 
 \subsection{Generator:PVWatts}\label{generatorpvwatts}
 
-PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}. 
+PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}.
 
 \subsubsection{Inputs}\label{input-description}
 

@@ -299,7 +299,7 @@ atmospheric pressure {[}Pa{]}.
 \paragraph{Fields: Moisture equilibrium
 	constants}\label{fields-moisture-equilibrium-constants}
 
-The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d}, 
+The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d},
 define the sorption isotherm curve used for building materials under
 equilibrium conditions. They define the relationship between
 the material's moisture content and the surface air relative humidity
@@ -351,8 +351,8 @@ where
 \(\frac{du}{d\phi}\) = slope of moisture soprtion curve,
 \(a b \phi^{b-1} + c d \phi^{d-1}\)
 
-If this field is left blank or set to \texttt{autocalculate}, 
-the above equation will be used to calculate the surface layer penetration depth 
+If this field is left blank or set to \texttt{autocalculate},
+the above equation will be used to calculate the surface layer penetration depth
 assuming a $\tau_{surf}$ of 24 hours.
 To use a period different than 24 hours, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{surf}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}. If calculating $d_{EMPD,surf}$, the assumed value of $\tau_{surf}$ should not be less than 4x the simulation timestep to ensure an accurate and stable solution.
 
@@ -374,8 +374,8 @@ where each term is the same as the surface layer, except that the cycle
 period is different. This is usually on the order of weeks for the deep
 layer.
 
-If this field is left blank or set to \texttt{autocalculate}, 
-the above equation will be used to calculate the deep layer penetration depth 
+If this field is left blank or set to \texttt{autocalculate},
+the above equation will be used to calculate the deep layer penetration depth
 assuming a $\tau_{deep}$ of three weeks. To use a period different than 3 weeks, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{deep}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}.
 
 
@@ -1152,7 +1152,7 @@ HAMT origins,FLOOR,FLOOR, 0.0000000, 0.0122726, 0.0601616, 0.1512518, 0.2766268,
 \end{lstlisting}
 
 Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
- 
+
 \begin{itemize}
 \item
   Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
@@ -1323,7 +1323,7 @@ If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angl
 If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 It should be pointed out that when Optical Data Type = SpectralAndAngle for a glass layer in a construction, the table input data are converted into polynomial curve fits with 6 coefficients, so that all outputs of optical properties for the same construction will be curve values for a given incident angle. Therefore, the values may be slightly different from input values.
-  
+
 IDF examples of Spectral average and using a Spectral data set:
 
 \begin{lstlisting}
@@ -1357,7 +1357,7 @@ MATERIAL:WINDOWGLASS, GLASS - CLEAR SHEET 1 / 8 IN,
       0.84,  ! IR emissivity: front side
       0.84,  ! IR emissivity: back side
       0.798; ! Conductivity {W/m-K}
-      
+
 \end{lstlisting}
 
 IDF example using a SpectralAndAngle data set:
@@ -2889,7 +2889,7 @@ WindowMaterial:Screen,
 
 \subsection{WindowMaterial:Shade:EquivalentLayer}\label{windowmaterialshadeequivalentlayer}
 
-This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittence is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank. The equivalent layer window shade model does not support WindowShadingControl. 
+This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittence is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank. The equivalent layer window shade model does not support WindowShadingControl.
 
 \subsubsection{Inputs}\label{inputs-26-002}
 
@@ -3061,7 +3061,7 @@ This object specifies the properties of an Equivalent Layer window blind consist
 \end{figure}
 
 The input data required to characterize a venetian blind are: front and back side reflectance and transmittance of the slat, geometry (Slat width, w, slat spacing, s, slat crown, c, and slat angle, $\phi$, and long wave emittance and transmittance of the slat. Blinds can be located on the inside of the window, on the outside of the window, or between two layers of glass. The blind is assumed to cover all of the glazed part of the window.
-The equivalent layer window blind model allows three slat angle control types (see \textit{Slat Angle Control} input field) but does not support WindowShadingControl. 
+The equivalent layer window blind model allows three slat angle control types (see \textit{Slat Angle Control} input field) but does not support WindowShadingControl.
 
 \subsubsection{Inputs}\label{inputs-28-001}
 

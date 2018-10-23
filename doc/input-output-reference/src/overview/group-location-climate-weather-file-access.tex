@@ -51,10 +51,10 @@ This variable location class describes the parameters for a moving and/or rotati
 The applications for this include:
 
 \begin{itemize}
- \item a vehicle driving along the road, 
+ \item a vehicle driving along the road,
  \item a rotating building, such as for experimental testing at different orientations, or
  \item if combind with a ``SurfaceProperty:Underwater'' boundary condition, it could apply to ships and vessels.
-\end{itemize} 
+\end{itemize}
 
 The latitude, longitude, and orientation are all defined according to the same conventions as in the regular ``Site:Location'' object.
 
@@ -84,7 +84,7 @@ Site:VariableLocation,
   LatitudeSchedule,          !- Building Location Latitude Schedule
   LongitudeSchedule,         !- Building Location Longitude Schedule
   OrientationSchedule;       !- Building Location Orientation Schedule
- 
+
 Schedule:File,
   LatitudeSchedule,          !- Name
   ,                          !- Schedule Type Limits Name
@@ -194,13 +194,13 @@ The Humidity Condition Type fields have interacting uses and units, summarized a
 % table 2
 \begin{longtable}[c]{p{2.25in}p{1.75in}p{2.0in}}
 \caption{Humidity Indicating Field Interactions - Design Day \label{table:humidity-indicating-field-interactions-design}} \tabularnewline
-\toprule 
+\toprule
 Humidity Condition Type & Primary Humidity Indicating Field & Humidity Indicating Day Schedule \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Humidity Indicating Field Interactions - Design Day} \tabularnewline
-\toprule 
+\toprule
 Humidity Condition Type & Primary Humidity Indicating Field & Humidity Indicating Day Schedule \tabularnewline
 \midrule
 \endhead
@@ -302,7 +302,7 @@ Optical depth for beam radiation, used only when Solar Model Indicator is ASHRAE
 
 \paragraph{Field: ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)}\label{field-ashrae-clear-sky-optical-depth-for-diffuse-irradiance-taud}
 
-Optical depth for diffuse radiation, used only when Solar Model Indicator is ASHRAETau or ASHRAETau2017. Taub and Taud values are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE HOF. 
+Optical depth for diffuse radiation, used only when Solar Model Indicator is ASHRAETau or ASHRAETau2017. Taub and Taud values are tabulated by month for 5564 locations worldwide on the CD that accompanies the ASHRAE HOF.
 ASHRAETau model Taub and Taud values are used from the 2009 ASHRAE HOF and ASHRAETau2017 model Taub and Taud values are used from either 2013 or 2017 ASHRAE HOF as needed.
 
 \paragraph{Field: Sky Clearness}\label{field-sky-clearness}
@@ -605,7 +605,7 @@ annual run period desired.
 This optional numeric field may contain the beginning year for the range. If this field is specified
 along with the \textbf{Day of Week for Start Day}, the inputs are validated to make sure that the date is
 valid. If this field is not specified, then a year will be selected based upon other inputs (which, in the
-case of the day of the week, may be defaulted). 
+case of the day of the week, may be defaulted).
 
 \paragraph{Field: End Month}\label{field-end-month-2}
 
@@ -753,13 +753,13 @@ This field is the starting date for the special day period. Dates in this field 
 % table 3
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Date Field Interpretation \label{table:date-field-interpretation}} \tabularnewline
-\toprule 
+\toprule
 Field Contents & Interpretation \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Date Field Interpretation} \tabularnewline
-\toprule 
+\toprule
 Field Contents & Interpretation \tabularnewline
 \midrule
 \endhead
@@ -906,13 +906,13 @@ The \textbf{Site:WeatherStation} object is useful when working with a custom wea
 % table 4
 \begin{longtable}[c]{@{}lll@{}}
 \caption{Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005). \label{table:wind-speed-profile-coefficients-ashrae}} \tabularnewline
-\toprule 
+\toprule
 Terrain Description & Exponent & Boundary Layer Thickness (m) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005).} \tabularnewline
-\toprule 
+\toprule
 Terrain Description & Exponent & Bounhary Layer Thickness (m) \tabularnewline
 \midrule
 \endhead
@@ -966,13 +966,13 @@ The Site:HeightVariation object is used to specify the local variation in atmosp
 % table 5
 \begin{longtable}[c]{@{}lllll@{}}
 \caption{Atmospheric Variables at Two Different Heights Above Ground Level. \label{table:atmospheric-variables-at-two-different}} \tabularnewline
-\toprule 
+\toprule
 Variable & 1.5 m & 284 m & Absolute Diff & Percent Diff \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Atmospheric Variables at Two Different Heights Above Ground Level.} \tabularnewline
-\toprule 
+\toprule
 Variable & 1.5 m & 284 m & Absolute Diff & Percent Diff \tabularnewline
 \midrule
 \endhead
@@ -1111,7 +1111,7 @@ Site:GroundTemperature:Undisturbed:FiniteDifference,
   962,      !- Soil Density {kg/m3}
   2576,     !- Soil Specific Heat {J/kg-K}
   30,       !- Soil Moisture Content Volume Fraction {percent}
-  50,       !- Soil Moisture Content Volume Fraction at Saturation {percent} 
+  50,       !- Soil Moisture Content Volume Fraction at Saturation {percent}
   0.408;    !- Evapotranspiration Ground Cover Parameter
 \end{lstlisting}
 
@@ -1702,7 +1702,7 @@ If the calculation method is Schedule, the water mains temperatures are read fro
 
 \paragraph{Field: Annual Average Outdoor Air Temperature}\label{field-annual-average-outdoor-air-temperature}
 
-If the calculation method is Correlation, this field is used in the calculation as the annual average outdoor air temperature (dry-bulb) {[}C{]}. If the calculation method is Schedule or CorrelationFromWeatherFile, this field is ignored. 
+If the calculation method is Correlation, this field is used in the calculation as the annual average outdoor air temperature (dry-bulb) {[}C{]}. If the calculation method is Schedule or CorrelationFromWeatherFile, this field is ignored.
 
 \paragraph{Field: Maximum Difference In Monthly Average Outdoor Air Temperatures}\label{field-maximum-difference-in-monthly-average-outdoor-air-temperatures}
 
@@ -2079,13 +2079,13 @@ The Solar Hour Angle (\emph{H}) gives the apparent solar time for the current ti
 % table 6
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Relationship of Angles (degrees) to Time \label{table:relationship-of-angles-degrees-to-time}} \tabularnewline
-\toprule 
+\toprule
 Unit of Angle & Equivalent time \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Relationship of Angles (degrees) to Time} \tabularnewline
-\toprule 
+\toprule
 Unit of Angle & Equivalent time \tabularnewline
 \midrule
 \endhead

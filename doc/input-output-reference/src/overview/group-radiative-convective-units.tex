@@ -631,7 +631,7 @@ Since radiant cooling panels provide a cold surface in what could be a humid zon
 
 \begin{itemize}
 \item
-  Off - EnergyPlus will not do anything other than produce a warning message when condensation is predicted to occur. The program will simply continue on; no moisture will be removed from the zone air and there will be no adjustment of the surface temperature as a result of the condensation. 
+  Off - EnergyPlus will not do anything other than produce a warning message when condensation is predicted to occur. The program will simply continue on; no moisture will be removed from the zone air and there will be no adjustment of the surface temperature as a result of the condensation.
 \item
   SimpleOff - the program will predict cases where condensation will occur and shut-off the radiant system to avoid this situation. With this option, the user also has the option to adjust when the system will shut down. This is specified with the next parameter (field: Condensation Differential Parameter).
 \item
@@ -1022,7 +1022,7 @@ This field is the inside diameter of the tubes through which water is circulated
 
 \paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length}
 
-This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.  
+This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type}
 
@@ -1123,7 +1123,7 @@ When radiant systems do cooling, there is the possibility that condensation will
 \item
   Off - EnergyPlus will not do anything other than produce a warning message when condensation is predicted to occur. The program will simply continue on, no moisture will be removed from the zone air, and there will be no adjustment of the surface temperature as a result of the condensation.
 \item
-  SimpleOff - the program will predict cases where condensation will occur and shut-off the radiant system to avoid this situation. With this option, the users also have the opportunity to adjust when the system will shut down. This is specified with the next parameter (field: Condensation Control Dewpoint Offset). 
+  SimpleOff - the program will predict cases where condensation will occur and shut-off the radiant system to avoid this situation. With this option, the users also have the opportunity to adjust when the system will shut down. This is specified with the next parameter (field: Condensation Control Dewpoint Offset).
 \item
   VariableOff - the program will determine whether condensation is predicted for the flow rate determined by the unit control scheme.  If condensation is predicted, the unit makes one attempt to reduce the flow rate using linear interpolation between the controlled flow rate and a zero flow rate to achieve a surface temperature that would match the dew-point temperature modified by the condensation control dew-point offset (field: Condensation Control Dewpoint Offset). For example, if the controlled flow rate results in a surface temperature of 10°C, a zero flow rate results in a surface temperature of 12°C, and the modified condensation dew-point temperature is 11°C, then the reduced flow rate would be half of the controlled flow rate.  If this reduced flow approximation does not result in condensation, then this reduced flow is used for the unit.  If the reduced flow approximation still results in condensation, then the unit is turned off to avoid excessive iterations.
 \end{itemize}
@@ -1611,7 +1611,7 @@ An example IDF with an electric low temperature radiant system is shown below.
 
 \begin{lstlisting}
 
-ZoneHVAC:LowTemperatureRadiant:Electric, 
+ZoneHVAC:LowTemperatureRadiant:Electric,
            Zone 2 Radiant Floor,       !- Name
            RadiantPanelAvailSched ,    !- Availability Schedule Name
            EAST ZONE ,                 !- Zone name (name of zone system is serving)

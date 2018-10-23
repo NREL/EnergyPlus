@@ -95,7 +95,7 @@ Note: For all schemes, if the load for any individual component is less than the
 This alpha field contains the identifying name given to the System Availability Manager List.
 
 \paragraph{Field: Plant Loop Demand Calculation Scheme}\label{field-plant-loop-demand-calculation-scheme}
-There are two choices for plant loop demand calculations schemes in EnergyPlus: SingleSetpoint and DualSetpointDeadband. 
+There are two choices for plant loop demand calculations schemes in EnergyPlus: SingleSetpoint and DualSetpointDeadband.
 
 SingleSetpoint - For the SingleSetpoint scheme, the plant loop is controlled to a single temperature setpoint. This requires a setpoint manager with Control Variable = Temperature to place a setpoint on the Loop Temperature Setpoint Node. The setpoint will be stored in the Node\%TempSetpoint variable which may be reported using Output:Variable "System Node Setpoint Temperature." Examples of applicable setpoint managers include: SetpointManager:Scheduled, SetpointManager:OutdoorAirReset, SetpointManager:FollowOutdoorAirTemperature, etc. SingleSetpoint is the default.
 
@@ -113,7 +113,7 @@ This field lets user to choose if this plant loop will be involved in a pressure
 
 \paragraph{Field: Loop Circulation Time}\label{field-pressure-simulation-type}
 
-This field specifies the time it takes the fluid to circulate through the entire loop. It is only used when Plant Loop Volume is set to autocalculate. The default is 2 minutes. 
+This field specifies the time it takes the fluid to circulate through the entire loop. It is only used when Plant Loop Volume is set to autocalculate. The default is 2 minutes.
 
 An example of this statement used in an IDF is:
 
@@ -312,7 +312,7 @@ The following advanced output variables are also available for plant loops (and 
 \item
   HVAC,Sum,Plant Supply Side Lumped Capacitance Excessive Storage Time {[}hrW{]}
 
-  
+
 \item
   HVAC,Average,Plant Component Distributed Demand Rate {[}W{]}
 \end{itemize}
@@ -441,7 +441,7 @@ This field lets user to choose if this plant loop will be involved in a pressure
 
 \paragraph{Field: Loop Circulation Time}\label{field-pressure-simulation-type}
 
-This field specifies the time it takes the fluid to circulate through the entire loop. It is only used when Condenser Loop Volume is set to autocalculate. The default is 2 minutes. 
+This field specifies the time it takes the fluid to circulate through the entire loop. It is only used when Condenser Loop Volume is set to autocalculate. The default is 2 minutes.
 
 An example of this statement used in an IDF is:
 

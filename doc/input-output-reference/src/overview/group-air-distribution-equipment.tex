@@ -172,7 +172,7 @@ There are no outputs for the constant volume reheat air terminal.
 
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airterminalsingleductconstantvolumenoreheat}
-The AirTerminal:SingleDuct:ConstantVolume:NoReheat object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system and furnaces which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate. 
+The AirTerminal:SingleDuct:ConstantVolume:NoReheat object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system and furnaces which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate.
 
 This object allows the program to know what zone this branch of the air system is attached to, and input fields for availability schedule, air inlet and outlet nodes, the maximum air flow rate, and other two optional input fields. The air inlet node should be the same as one of the \emph{AirLoopHVAC:ZoneSplitter} or \emph{AirLoopHVAC:SupplyPlenum} component  outlet nodes. The air outlet node name should be same as zone air inlet node name and the air distribution unit air outlet node name. The last two optional input fields: \textit{Design Specification Outdoor Air Object Name}, and \textit{Per Person Ventilation Rate Mode} are used for modulating the outdoor air requirement of an air terminal unit depending on the method.
 
@@ -748,7 +748,7 @@ This field is used to select how the program will determine the minimum flow rat
 
 \paragraph{Field: Constant Minimum Air Flow Fraction}\label{field-constant-minimum-air-flow-fraction-1}
 
-The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to Constant. 
+The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to Constant.
 
 This field is autosizable and defaulted to autosize. The autosized flow fraction is calculated using the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 are used.
 
@@ -1033,7 +1033,7 @@ This field reports the dry air sensible heat extraction of the series PIU termin
 
 The parallel powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a variable total flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The secondary and primary air streams enter the unit in parallel. The fan sits in the secondary air stream and runs only when the primary air flow is below the Fan On Flow Fraction and the fan's availability schedule is on or it is activated by an availability manager. The primary air inlet contains a damper that can move from fully open (maximum primary air) to a minimum stop (minimum primary air).
 
-At full cooling load the primary air damper is fully open and the fan is off. The primary air flow is at maximum and there is little or no secondary air flow. As the cooling load decreases, the primary air damper gradually closes and the secondary air flow remains close to zero. At some point, usually when the primary air flow has reached the minimum, the fan switches on and secondary air is induced. The heating coil will switch on as needed to meet any heating demand. The Fan On Flow Fraction field controls the fan operation; see this field description for more details. 
+At full cooling load the primary air damper is fully open and the fan is off. The primary air flow is at maximum and there is little or no secondary air flow. As the cooling load decreases, the primary air damper gradually closes and the secondary air flow remains close to zero. At some point, usually when the primary air flow has reached the minimum, the fan switches on and secondary air is induced. The heating coil will switch on as needed to meet any heating demand. The Fan On Flow Fraction field controls the fan operation; see this field description for more details.
 
 The EnergyPlus model of the parallel PIU terminal unit is composed of three components: a constant volume fan, a zone mixer, and a heating coil (hot water, electric, or gas).
 
@@ -1807,7 +1807,7 @@ This terminal mixer object mixes conditioned outdoor air (primary air) from DOAS
 \item ZoneHVAC:PackagedTerminalAirConditioner
 \item ZoneHVAC:PackagedTerminalHeatPump
 \item ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-\item ZoneHVAC:UnitVentilator 
+\item ZoneHVAC:UnitVentilator
 \item AirLoopHVAC:UnitarySystem
 \end{itemize}
 
@@ -1835,7 +1835,7 @@ A unique user assigned name for a particular terminal mixer unit. Any reference 
 
 \paragraph{Field: ZoneHVAC Unit Object Type}\label{field-zonehvac-unit-object-type}
 
-The type of ZoneHVAC equipment to which this terminal mixer will be connected. This is a choice input field. 
+The type of ZoneHVAC equipment to which this terminal mixer will be connected. This is a choice input field.
 Valid ZoneHVAC choices are:
 \begin{itemize}
 \setlength{\parskip}{0pt}
@@ -1845,7 +1845,7 @@ Valid ZoneHVAC choices are:
 \item ZoneHVAC:PackagedTerminalAirConditioner
 \item ZoneHVAC:PackagedTerminalHeatPump
 \item ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-\item ZoneHVAC:UnitVentilator 
+\item ZoneHVAC:UnitVentilator
 \item AirLoopHVAC:UnitarySystem
 \end{itemize}
 
@@ -1867,7 +1867,7 @@ The secondary air (recirculating air) inlet node name of the mixer. This will be
 
 \paragraph{Field: Mixer Connection Type}\label{field-mixer-connection-type}
 
-This input field allows user to specify the mixer connection type. Valid choices are \textbf{InletSide} or \textbf{SupplySide}. This is a required input field. If the mixer connection type selected is \textbf{InletSide}, then the mixer is connected on the inlet side of the ZoneHVAC equipment, or else if the mixer connection type selected is \textbf{SupplySide}, then the mixer is connected at the outlet side of the ZoneHVAC equipment.\\ 
+This input field allows user to specify the mixer connection type. Valid choices are \textbf{InletSide} or \textbf{SupplySide}. This is a required input field. If the mixer connection type selected is \textbf{InletSide}, then the mixer is connected on the inlet side of the ZoneHVAC equipment, or else if the mixer connection type selected is \textbf{SupplySide}, then the mixer is connected at the outlet side of the ZoneHVAC equipment.\\
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-DSOA-object-name}
 
@@ -1888,7 +1888,7 @@ AirTerminal:SingleDuct:Mixer,
       SPACE2-1 Fan Coil Inlet,     !- Mixer Outlet Node Name
       SPACE2-1 ATM Primary Inlet,  !- Mixer Primary Air Inlet Node Name
       SPACE2-1 ATM Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
-      InletSide;                   !- Mixer Connection Type   
+      InletSide;                   !- Mixer Connection Type
 \end{lstlisting}
 
 \begin{lstlisting}

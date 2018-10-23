@@ -217,7 +217,7 @@ The Zone Air Heat Balance Outdoor Air Transfer Rate is the sum, in watts, of hea
 
 \subsubsection{Zone Air Heat Balance System Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-system-air-transfer-rate-w}
 
-The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers. The Zone Air Heat Balance System Air Transfer Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time. 
+The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers. The Zone Air Heat Balance System Air Transfer Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
 
 \subsubsection{Zone Air Heat Balance System Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-system-convective-heat-gain-rate-w}
 
@@ -2723,8 +2723,8 @@ In order to find a corresponding construction using the index, following steps a
 
 2. Search the surface name in lines starting with HeatTransfer Surface in the .eio file
 
-3. The seventh item is the construction name with matched surface name. 
- 
+3. The seventh item is the construction name with matched surface name.
+
 \subsection{Surface Output Variables (exterior heat transfer surfaces)}\label{surface-output-variables-exterior-heat-transfer-surfaces}
 
 \subsubsection{Surface Outside Face Outdoor Air Drybulb Temperature {[}C{]}}\label{surface-outside-face-outdoor-air-drybulb-temperature-c}
@@ -4272,7 +4272,7 @@ Construction, SINGLE PANE WITH INT SHADE, ! Name of construction with shade
        GLASS - CLEAR SHEET 1 / 8 IN,  !- First material layer
        ROLL SHADE                  ;  !- Second material layer
 
-WindowShadingControl, 
+WindowShadingControl,
        CONTROL ON INCIDENT SOLAR,    !- Name
        West Zone,                    !- Zone Name
        1,                            !- Shading Control Sequence Number
@@ -4291,7 +4291,7 @@ WindowShadingControl,
        Sequential,                   !- Multiple Surface Control Type
        Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name
 
-FenestrationSurface:Detailed, 
+FenestrationSurface:Detailed,
        Zn001:Wall001:Win001,         !- SubSurface Name
        Window                   ,    !- Class
        SINGLE PANE WITH NO SHADE,    !- Name of construction without shading device
@@ -4343,7 +4343,7 @@ WindowMaterial:Shade, ROLL SHADE,  !- Material Name
 Construction, SINGLE PANE WITH NO SHADE,  ! Name of construction without shade
        GLASS - CLEAR SHEET 1 / 8 IN;  !- First material layer
 
-WindowShadingControl, 
+WindowShadingControl,
        CONTROL ON INCIDENT SOLAR,    !- Name
        West Zone,                    !- Zone Name
        1,                            !- Shading Control Sequence Number
@@ -4362,7 +4362,7 @@ WindowShadingControl,
        Sequential,                   !- Multiple Surface Control Type
        Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name
 
-FenestrationSurface:Detailed, 
+FenestrationSurface:Detailed,
        Zn001:Wall001:Win001,         !- SubSurface Name
        Window                   ,    !- Class
        SINGLE PANE WITH NO SHADE,    !- Name of construction without shade

@@ -134,7 +134,7 @@ If ``Average'' is entered, it is used to apply values that aren't coincident wit
 
 If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5. No is the default for this field.
 
-If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5. 
+If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5.
 
 \paragraph{Field-Set: Time and Value (extensible object)}\label{field-set-time-and-value-extensible-object}
 
@@ -181,7 +181,7 @@ If ``Average'' is entered, it is used to apply values that aren't coincident wit
 
 If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5. No is the default for this field.
 
-If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5. 
+If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5.
 
 
 \paragraph{Field: Minutes Per Item}\label{field-minutes-per-item}
@@ -357,13 +357,13 @@ This field starts with ``For:'' and contains the applicable days (reference the 
 
 \paragraph{Field: Interpolate (optional)}\label{field-interpolate-optional}
 
-This field, if used, starts with ``Interpolate:'' and contains the word ``Average'', ``Linear'' or ``No''. If this field is not used, it should not be blank -- rather just have the following field appear in this slot. 
+This field, if used, starts with ``Interpolate:'' and contains the word ``Average'', ``Linear'' or ``No''. If this field is not used, it should not be blank -- rather just have the following field appear in this slot.
 
 If ``Average'' is entered, it is used to apply values that aren't coincident with the given timestep (ref: Timestep) intervals. If ``Average'' is entered, then any intervals entered here will be interpolated/averaged and that value will be used at the appropriate minute in the hour. For example, if ``Average'' is entered and the interval is every 15 minutes (say a value of 0 for the first 15 minutes, then .5 for the second 15 minutes) AND there is a 10 minute timestep for the simulation: the value at 10 minutes will be 0 and the value at 20 minutes will be .25. In earlier versions of EnergyPlus, this was the Yes option for the field.
 
 If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5. No is the default for this field.
 
-If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5. 
+If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5.
 
 
 

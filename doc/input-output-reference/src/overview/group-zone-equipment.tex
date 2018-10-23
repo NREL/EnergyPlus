@@ -7,13 +7,13 @@ Types of Zone equipment are listed below and shown below in figure ``Zone Equipm
 % table 26
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \caption{Available Zone Equipment Types \label{table:available-zone-equipment-types}} \tabularnewline
-\toprule 
+\toprule
 Air Distribution Equipment & AirTerminal:SingleDuct:Uncontrolled    AirTerminal:SingleDuct:ConstantVolume:Reheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Available Zone Equipment Types} \tabularnewline
-\toprule 
+\toprule
 Air Distribution Equipment & AirTerminal:SingleDuct:Uncontrolled    AirTerminal:SingleDuct:ConstantVolume:Reheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
 \midrule
 \endhead
@@ -78,9 +78,9 @@ The ZoneHVAC:AirDistributionUnit object gives further information on what air lo
   AirTerminal:SingleDuct:UserDefined
 \item
   AirTerminal:SingleDuct:Mixer
- 
+
 \end{itemize}
-   
+
 Connections between the air distribution unit, the supply air duct, and the zone are specified in the input syntax for the air distribution unit and the AirLoopHVAC:ZoneSplitter. The input syntax also explicitly defines an outlet identifier. This implies a connection to a zone through a NodeList for zone inlets (see the ZoneHVAC:EquipmentConnections statement). The air distribution unit is limited to one combined component-controller unit; because controls are normally based on the zone thermostat and can work in parallel or series in complex fashion. Since the control and the flow resolution can be complex, each air distribution unit is unique in addressing these combinations and therefore only one is allowed per zone.
 
 The Air Distribution unit also allows the user to specify leaks in the supply air duct system. These inputs are used in the EnergyPlus Simplified Duct Leakage Model (SDLM). This model simulates a specific configuration: supply leaks to a return plenum in a commercial VAV or CV system. The system must have a constant static pressure setpoint. Within these limitations SDLM allows the user to easily evaluate the energy penalty due to duct leakage.
@@ -213,11 +213,11 @@ The Load Distribution Scheme selects the algorithm used to allocate the current 
 
 \begin{itemize}
 \item
-  SequentialLoad loads each piece of available equipment sequentially with the full remaining load. 
+  SequentialLoad loads each piece of available equipment sequentially with the full remaining load.
 \item
-  UniformLoad evenly distributes the total load equally among all available components on the equipment list for the current load type. 
+  UniformLoad evenly distributes the total load equally among all available components on the equipment list for the current load type.
 \item
-  UniformPLR evenly distributes the total load among all available components on the equipment list for the current load type at a uniform part load ratio (PLR). 
+  UniformPLR evenly distributes the total load among all available components on the equipment list for the current load type at a uniform part load ratio (PLR).
 \item
   SequentialUniformPLR determines how many of the available components are required to meet the current load, then distributes the load at a uniform part load ratio (PLR).
 \end{itemize}
@@ -234,13 +234,13 @@ Type of zone equipment such as air distribution unit, baseboard, window air cond
 % table 27
 \begin{longtable}[c]{@{}l@{}}
 \caption{Legal Zone Equipment Types (ZoneHVAC:EquipmentList) \label{table:legal-zone-equipment-types-zonehvac}} \tabularnewline
-\toprule 
+\toprule
 Legal Zone Equipment Types \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Legal Zone Equipment Types (ZoneHVAC:EquipmentList)} \tabularnewline
-\toprule 
+\toprule
 Legal Zone Equipment Types \tabularnewline
 \midrule
 \endhead

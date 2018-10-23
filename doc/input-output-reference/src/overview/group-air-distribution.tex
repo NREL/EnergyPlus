@@ -248,13 +248,13 @@ The ventilation zone load output variables are shown in Table~\ref{table:ventila
 % table 24
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \caption{Ventilation Load Output Variables \label{table:ventilation-load-output-variables}} \tabularnewline
-\toprule 
+\toprule
  & No Zone Load & Zone Cooling Load & Zone Heating Load \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Ventilation Load Output Variables} \tabularnewline
-\toprule 
+\toprule
  & No Zone Load & Zone Cooling Load & Zone Heating Load \tabularnewline
 \midrule
 \endhead
@@ -749,19 +749,19 @@ The \emph{Height Above Ground} field is used to adjust the weather file air cond
 
 \textbf{OutdoorAir:Node} and \textbf{OutdoorAir:NodeList} both set a node to outdoor air conditions. \textbf{OutdoorAir:Node} modifies the weather file conditions if a height has been specified. \textbf{OutdoorAir:NodeList} does not have a height input and always uses the weather file conditions without modification. The same node name may not be used with both of these objects.
 
-When declared in surface property objects \textbf{SurfaceProperty:LocalEnvironment}, in zone property objects \textbf{ZoneProperty:LocalEnvironment}, or as an external node in the airflow network calculation linking to a surface node \textbf{AirflowNetwork:Multizone:Surface}, the object can also be used to define local outdoor air conditions for surfaces, zones or air loop components. The local outdoor air conditions would be used in the EnergyPlus calculations for: 
+When declared in surface property objects \textbf{SurfaceProperty:LocalEnvironment}, in zone property objects \textbf{ZoneProperty:LocalEnvironment}, or as an external node in the airflow network calculation linking to a surface node \textbf{AirflowNetwork:Multizone:Surface}, the object can also be used to define local outdoor air conditions for surfaces, zones or air loop components. The local outdoor air conditions would be used in the EnergyPlus calculations for:
 \begin{enumerate}
 \item Convection coefficients used in the exterior surface heat balance
 
-If the user declares a local surface outdoor air node to overwrite the surface level environmental data, the convection coefficients would be calculated based on the local outdoor air node data accordingly based on surface level outdoor dry-bulb temperature, humidity ratio and wind speed. 
+If the user declares a local surface outdoor air node to overwrite the surface level environmental data, the convection coefficients would be calculated based on the local outdoor air node data accordingly based on surface level outdoor dry-bulb temperature, humidity ratio and wind speed.
 
 \item Zone air infiltration and simple ventilation
 
-If the user declares a local zone outdoor air node to overwrite zone level environmental data, global environmental variables used in the subroutines for infiltration and ventilation calculation, including outdoor air temperature, humidity ratio, enthalpy, wind speed and direction, would be overwritten accordingly with zone level data. 
+If the user declares a local zone outdoor air node to overwrite zone level environmental data, global environmental variables used in the subroutines for infiltration and ventilation calculation, including outdoor air temperature, humidity ratio, enthalpy, wind speed and direction, would be overwritten accordingly with zone level data.
 
 \item External air nodes used in the AirFlowNetwork
 
-When used in the airflow network for wind pressure calculation, global environmental variables used in the subroutines for wind pressure calculation, including outdoor air temperature, humidity ratio, air density, wind speed and direction, would be overwritten accordingly with local data. 
+When used in the airflow network for wind pressure calculation, global environmental variables used in the subroutines for wind pressure calculation, including outdoor air temperature, humidity ratio, air density, wind speed and direction, would be overwritten accordingly with local data.
 
 \end{enumerate}
 
@@ -821,10 +821,10 @@ OutdoorAir:Node,
 OutdoorAir:Node,
   LocalOutdoorAirNode:0001,     !- Name
   ,                             !- Height Above Ground
-  OutdoorAirNodeDryBulb:0001,   !- Drybulb Temperature Schedule Name 
+  OutdoorAirNodeDryBulb:0001,   !- Drybulb Temperature Schedule Name
   OutdoorAirNodeWetBulb:0001,   !- Wetbulb Temperature Schedule Name
   OutdoorAirNodeWindSpeed:0001, !- Wind Speed Schedule Name
-  OutdoorAirNodeWindDir:0001;   !- Wind Direction Schedule Name 
+  OutdoorAirNodeWindDir:0001;   !- Wind Direction Schedule Name
   NFacade_WPCValue,             !- Wind Pressure Coefficient Curve Name
   No,                           !- Symmetric Wind Pressure Coefficient Curve
   Absolute;                     !- Wind Angle Type

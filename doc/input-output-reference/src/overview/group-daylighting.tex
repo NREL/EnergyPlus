@@ -8,7 +8,7 @@ Daylighting can be invoked in EnergyPlus primarily by the use of the objects: \t
 
 \subsection{Daylighting:Controls}\label{daylightingcontrols-000}
 
-When this object is used, daylighting illuminance levels are calculated and then used to determine how much the electric lighting can be reduced. The daylight illuminance level in a zone depends on many factors, including sky condition; sun position; calculation point; location, size, and glass transmittance of windows; window shading devices; and reflectance of interior surfaces. Reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled and type of lighting control. Two different methods of computing the daylighitng illuminance and subsequent lighting reduction called SplitFlux and DElight. After the object description below is are sections that describe the two methodologies in more detail. 
+When this object is used, daylighting illuminance levels are calculated and then used to determine how much the electric lighting can be reduced. The daylight illuminance level in a zone depends on many factors, including sky condition; sun position; calculation point; location, size, and glass transmittance of windows; window shading devices; and reflectance of interior surfaces. Reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled and type of lighting control. Two different methods of computing the daylighitng illuminance and subsequent lighting reduction called SplitFlux and DElight. After the object description below is are sections that describe the two methodologies in more detail.
 
 \subsubsection{Inputs}\label{inputs-009}
 
@@ -39,13 +39,13 @@ For Lighting Control Type set to Stepped, the electric power input and light out
 % table 18
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Example of a Stepped Lighting Control System with Three Steps \label{table:stepped-lighting-control-example}} \tabularnewline
-\toprule 
+\toprule
 Daylight illuminance & Fraction of lights that are on \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Example of a Stepped Lighting Control System with Three Steps} \tabularnewline
-\toprule 
+\toprule
 Daylight illuminance & Fraction of lights that are on \tabularnewline
 \midrule
 \endhead
@@ -108,13 +108,13 @@ The following table gives recommended values of Maximum Allowable Discomfort Gla
 % table 19
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI) \label{table:recommended-values-discomfort-glare-index}} \tabularnewline
-\toprule 
+\toprule
 Activity or Zone Type & Maximum Allowable DGI \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Recommended Values of Maximum Allowable Discomfort Glare Index (DGI)} \tabularnewline
-\toprule 
+\toprule
 Activity or Zone Type & Maximum Allowable DGI \tabularnewline
 \midrule
 \endhead
@@ -142,7 +142,7 @@ This set of fields is used together and can be repeated an unlimited number of t
 
 \paragraph{Field: Daylighting Reference Point Name <x>}\label{field-daylighting-reference-point-name-x}
 
-The Daylighting:ReferencePoint name should be specified that is used for determining the daylighting control sensor location. 
+The Daylighting:ReferencePoint name should be specified that is used for determining the daylighting control sensor location.
 
 \paragraph{Field: Fraction of Zone Controlled by Reference Point <x>}\label{field-fraction-of-zone-controlled-by-reference-point-x}
 
@@ -154,7 +154,7 @@ The desired lighting level (in lux) at the named Daylighting:ReferencePoint. Thi
 
 \subsection{Daylighting:ReferencePoint}\label{daylightingreferencepoint-000}
 
-This object is referenced by Daylighting:Controls to identify the reference point coordinates for each sensor. The reference points in the zone are where horizontal daylighting illuminance will be calculated. It is assumed that the photocells that control the overhead electric lighting respond to the light levels at the specified coordinates. Reference points are given in coordinates specified in the GlobalGeometryRules object Daylighting Reference Point CoordinateSystem field. 
+This object is referenced by Daylighting:Controls to identify the reference point coordinates for each sensor. The reference points in the zone are where horizontal daylighting illuminance will be calculated. It is assumed that the photocells that control the overhead electric lighting respond to the light levels at the specified coordinates. Reference points are given in coordinates specified in the GlobalGeometryRules object Daylighting Reference Point CoordinateSystem field.
 
 When the DElight Daylighting Method is used, there may be up to a maximum of 100 reference points for each zone. Each Reference Point that is input does NOT need to be included in the control of the electric lighting system within the zone. This is determined by the fraction of the zone controlled by each Reference Point, which can be input as 0. Note when the DElight Daylighting Method is used, that the sum of all Reference Point control fractions must equal 1 to obtain correct overall results.
 
@@ -350,7 +350,7 @@ There are two primary differences between the SplitFlux and DElight methods of c
 
 There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the SplitFlux method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles).  A second is the current lack of visual quality (e.g., glare) calculations performed by DElight. Third, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the SplitFlux method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details. Fourth, when using DElight daylighting the presence of exterior shading surfaces such as overhangs is ignored.
 
-Input for invoking the DElight method involves three object types: \textbf{Daylighting:Controls}, \textbf{Daylighting:ReferencePoint}, and \textbf{Daylighting:DELight:ComplexFenestration}. 
+Input for invoking the DElight method involves three object types: \textbf{Daylighting:Controls}, \textbf{Daylighting:ReferencePoint}, and \textbf{Daylighting:DELight:ComplexFenestration}.
 
 
 \subsection{Daylighting:DELight:ComplexFenestration}\label{daylightingdelightcomplexfenestration}
@@ -521,7 +521,7 @@ The amount by which the overhead electric lighting power in a zone is multiplied
 
 \subsection{Output:IlluminanceMap}\label{outputilluminancemap}
 
-The Output:IlluminanceMap object expands on the reporting capabilities of the daylighting simulation. For any zone simulated with Daylighting:Controls, the illuminance map can generate up to 2,500 points of additional daylighting illuminance values. The resulting map is output as a comma delimited text file that can be imported into a spreadsheet program for rapid visualization of the daylighting illuminance patterns in a zone. The values are produced on an hourly basis. The Z height of the map is constant (parallel to a flat floor). More than one illuminance map can be created for a zone. IlluminanceMap output is available only when SplitFlux daylighting method is selected in Daylighting:Controls object. 
+The Output:IlluminanceMap object expands on the reporting capabilities of the daylighting simulation. For any zone simulated with Daylighting:Controls, the illuminance map can generate up to 2,500 points of additional daylighting illuminance values. The resulting map is output as a comma delimited text file that can be imported into a spreadsheet program for rapid visualization of the daylighting illuminance patterns in a zone. The values are produced on an hourly basis. The Z height of the map is constant (parallel to a flat floor). More than one illuminance map can be created for a zone. IlluminanceMap output is available only when SplitFlux daylighting method is selected in Daylighting:Controls object.
 
 \subsubsection{Inputs}\label{inputs-4-006}
 
@@ -1047,13 +1047,13 @@ The following table shows what input objects/fields to use to model different da
 {\scriptsize
 \begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{3.0in}>{\raggedright}p{1.5in}}
 \caption{Daylighting Modeling Options \label{table:daylighting-modeling-options}} \tabularnewline
-\toprule 
+\toprule
 Option & Object/Field or Output Variable & Input File \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Daylighting Modeling Options} \tabularnewline
-\toprule 
+\toprule
 Option & Object/Field or Output Variable & Input File \tabularnewline
 \midrule
 \endhead

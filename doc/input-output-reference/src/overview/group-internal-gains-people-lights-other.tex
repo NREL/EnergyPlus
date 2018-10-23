@@ -90,18 +90,18 @@ This field accepts either ``Yes'' or ``No'' as values. When ``Yes'' is specified
 % table 11
 \begin{longtable}[c]{p{2.0in}p{1.34in}p{1.33in}p{1.33in}}
 \caption{Metabolic Rates for Various Activities \label{table:metabolic-rates-for-various-activities}} \tabularnewline
-\toprule 
+\toprule
 Activity & Activity Level w/ Person EnergyPlus Schedule Value & Activity Level W/m\(^2\) & met* \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Metabolic Rates for Various Activities} \tabularnewline
-\toprule 
+\toprule
 Activity & Activity Level w/Person EnergyPlus Schedule Value & Activity Level W/m2 & met* \tabularnewline
 \midrule
 \endhead
 
-\emph{Resting} \tabularnewline \midrule 
+\emph{Resting} \tabularnewline \midrule
 Sleeping & 72 & 40 & 0.7 \tabularnewline
 Reclining & 81 & 45 & 0.8 \tabularnewline
 Seated, quiet & 108 & 60 & 1 \tabularnewline
@@ -150,7 +150,7 @@ This field is only valid when the user selects ``SurfaceWeighted'' or ``AngleFac
 
 \paragraph{Field: Work Efficiency Schedule Name}\label{field-work-efficiency-schedule-name}
 
-This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero corresponds to all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts the thermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.~ Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU. 
+This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero corresponds to all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts the thermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.~ Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU.
 
 \paragraph{Field: Clothing Insulation Calculation Method}\label{field-clothing-insulation-calculation-method}
 
@@ -192,11 +192,11 @@ This field specifies which clothing insulation method (ClothingInsulationSchedul
 
 \paragraph{Field: Clothing Insulation Schedule Name}\label{field-clothing-insulation-schedule-name}
 
-This field is the name of the schedule that defines the amount of clothing being worn by a typical zone occupant during various times in the simulation period. The choice from the Clothing Insulation Calculation Method field should be ``\textbf{ClothingInsulationSchedule}''. This parameter must be a positive real number and has units of Clo. Typical values for Clo can be seen in the ASHRAE 2009 HOF Table 7, page 9.8 (for clothing ensembles) and Table~\ref{table:window-modeling-options}, page 9.9 (for garment values) ) or www.cbe.berkeley.edu/comforttool/. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU. 
+This field is the name of the schedule that defines the amount of clothing being worn by a typical zone occupant during various times in the simulation period. The choice from the Clothing Insulation Calculation Method field should be ``\textbf{ClothingInsulationSchedule}''. This parameter must be a positive real number and has units of Clo. Typical values for Clo can be seen in the ASHRAE 2009 HOF Table 7, page 9.8 (for clothing ensembles) and Table~\ref{table:window-modeling-options}, page 9.9 (for garment values) ) or www.cbe.berkeley.edu/comforttool/. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU.
 
 \paragraph{Field: Air Velocity Schedule Name}\label{field-air-velocity-schedule-name}
 
-This field is the name of the schedule that approximates the amount of air movement in the space as a function of time throughout the simulation period. The user has control over this parameter through the schedule that requires the individual numbers in the schedule to be positive real numbers having units of meters per second. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU. 
+This field is the name of the schedule that approximates the amount of air movement in the space as a function of time throughout the simulation period. The user has control over this parameter through the schedule that requires the individual numbers in the schedule to be positive real numbers having units of meters per second. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU.
 
 \paragraph{Field: Thermal Comfort Model Type (up to 5 allowed)}\label{field-thermal-comfort-model-type-up-to-5-allowed}
 
@@ -533,13 +533,13 @@ The following output variables are all based on whether the humidity ratio and t
 % table 12
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Winter Clothes (1.0 Clo) \label{table:winter-clothes-1.0-clo}} \tabularnewline
-\toprule 
+\toprule
 Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Winter Clothes (1.0 Clo)} \tabularnewline
-\toprule 
+\toprule
 Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline
 \midrule
 \endhead
@@ -560,13 +560,13 @@ Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline
 % table 13
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Summer Clothes (0.5 Clo) \label{table:summer-clothes-0.5-clo}} \tabularnewline
-\toprule 
+\toprule
 Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Summer Clothes (0.5 Clo)} \tabularnewline
-\toprule 
+\toprule
 Operative Temperature (C) & Humidity Ratio (kgWater/kgDryAir) \tabularnewline
 \midrule
 \endhead
@@ -773,13 +773,13 @@ Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible
 % table 14
 \begin{longtable}[c]{p{0.8in}>{\raggedright}p{1.6in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}>{\raggedright}p{0.9in}}
 \caption{Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. \label{table:approximate-values-of-return-air-fraction}} \tabularnewline
-\toprule 
+\toprule
 Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fraction Visible & fconvected \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations.} \tabularnewline
-\toprule 
+\toprule
 Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fraction Visible & \(f_{\rm{convected}}\) \tabularnewline
 \midrule
 \endhead
@@ -1053,13 +1053,13 @@ As described in the Lights Outputs, values for lights will show up on the follow
 % table 15
 \begin{longtable}[c]{>{\raggedright}p{3.0in}p{1.5in}p{1.5in}}
 \caption{Distribution of Lights to Meters \label{table:distribution-of-lights-to-meters}} \tabularnewline
-\toprule 
+\toprule
 Meter Name & Scope & Lights Specifics \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Distribution of Lights to Meters} \tabularnewline
-\toprule 
+\toprule
 Meter Name & Scope & Lights Specfics \tabularnewline
 \midrule
 \endhead
@@ -1797,7 +1797,7 @@ The name of the OtherEquipment object.
 
 \paragraph{Field: Fuel Type}\label{field-fuel-use-type}
 
-This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains. 
+This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-6}
 
@@ -1884,7 +1884,7 @@ IDF Examples
 OtherEquipment,
 	BASE-1 OthEq 1, !- Name
 	PropaneGas,  !- Fuel Use Type
-	BASE-1, !- Zone Name 
+	BASE-1, !- Zone Name
 	ALWAYSON, !- SCHEDULE Name
 	EquipmentLevel, !- Design Level calculation method
 	6766., !- Design Level {W}
@@ -2208,9 +2208,9 @@ This field is the name of the thermal zone (ref: Zone) which contains this Elect
 
 \paragraph{Field: Air Flow Calculation Method}\label{field-air-flow-calculation-method}
 
-This field specifies the method used to calculate the IT inlet temperature and zone return air temperature. 
+This field specifies the method used to calculate the IT inlet temperature and zone return air temperature.
 
-If \textbf{FlowFromSystem} is chosen, the zone is assumed to be well-mixed. 
+If \textbf{FlowFromSystem} is chosen, the zone is assumed to be well-mixed.
 
 If \textbf{FlowControlWithApproachTemperatures} is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution.The inputs of \textit{Air Inlet Connection Type}, \textit{Design Recirculation Fraction} and \textit{Recirculation Function of Loading and Supply Temperature Curve Name} are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. The \textbf{FlowControlWithApproachTemperatures} only applies to ITE zones with single duct VAV terminal unit. Other return air heat gains from window or lights are not allowed when \textbf{FlowControlWithApproachTemperatures} is chosen.
 
@@ -2419,7 +2419,7 @@ Another IDF example when Air Flow Calculation Method = FlowControlWithApproachTe
     ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
     3,                       !- field Supply Approach Temperature
     ,                        !- field Supply Approach Temperature Schedule
-    -3,                      !- field Return Approach Temperature 
+    -3,                      !- field Return Approach Temperature
     ;                        !- field Return Approach Temperature Schedule
 \end{lstlisting}
 
@@ -3282,13 +3282,13 @@ This object specifies outside temperature-controlled (OTC) baseboard heating. Th
 % table 16
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity \label{table:outdoor-temperature-controlled-baseboard-heat}} \tabularnewline
-\toprule 
+\toprule
 Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity} \tabularnewline
-\toprule 
+\toprule
 Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
 \midrule
 \endhead
@@ -3461,13 +3461,13 @@ As described in each of the equipment sections, values for specific equipments w
 % table 17
 \begin{longtable}[c]{>{\raggedright}p{2.8in}>{\raggedright}p{1.2in}>{\raggedright}p{2.0in}}
 \caption{Distribution of Equipment to Meters \label{table:distribution-of-equipment-to-meters}} \tabularnewline
-\toprule 
+\toprule
 Meter Name & Scope & Equipment Specfics \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Distribution of Equipment to Meters} \tabularnewline
-\toprule 
+\toprule
 Meter Name & Scope & Equipment Specfics \tabularnewline
 \midrule
 \endhead
@@ -3484,4 +3484,3 @@ Interior\-Equipment:\-Gas & AllZones & Gas Equipment \tabularnewline
 <End-Use Subcategory> :Interior\-Equipment:\-Gas & Specific Subcategory & Gas Equipment \tabularnewline
 \bottomrule
 \end{longtable}
-

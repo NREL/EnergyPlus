@@ -376,7 +376,7 @@ FaultModel:ThermostatOffset,
   AlwaysOne,           !- Severity Schedule Name
   2.0;                 !- Reference Thermostat Offset
 
-  FaultModel:HumidistatOffset, 
+  FaultModel:HumidistatOffset,
   Humi_Offset_Zone1,   !- Name
   Zone 1 Humidistat,   !- Humidistat Name
   ThermostatOffsetDependent, !- Humidistat Offset Type
@@ -385,7 +385,7 @@ FaultModel:ThermostatOffset,
   ,                    !- Reference Humidistat Offset
   Ther_Offset_Zone1;   !- Related Thermostat Offset Fault Name
 
-  FaultModel:HumidistatOffset, 
+  FaultModel:HumidistatOffset,
   Humi_Offset_Zone2,   !- Name
   Zone 2 Humidistat,   !- Humidistat Name
   ThermostatOffsetIndependent, !- Humidistat Offset Type
@@ -429,7 +429,7 @@ This field provides the name of a fan curve for the fan associated with the faul
 
 \begin{lstlisting}
 ! IDF examples:
-! example faults for the fouling air filter 
+! example faults for the fouling air filter
 
 FaultModel:Fouling:AirFilter,
   DF_VAV_1_Fan,             !- Name
@@ -446,14 +446,14 @@ FaultModel:Fouling:AirFilter,
   For: AllDays,            !- Field 2
   Until: 24:00,1.1;        !- Field 3
 
-  Curve:Cubic,        
-  VAV_1_Fan_Curve,         ! name     
-  1263.1,                  ! Coefficient1 Constant        
-  33.773,                  ! Coefficient2 x       
-  -5.6906,                  ! Coefficient3 x**2        
-  -0.2023,                  ! Coefficient4 x**3        
-  4.0,                     ! Minimum Value of x       
-  15.0;                    ! Maximum Value of x       
+  Curve:Cubic,
+  VAV_1_Fan_Curve,         ! name
+  1263.1,                  ! Coefficient1 Constant
+  33.773,                  ! Coefficient2 x
+  -5.6906,                  ! Coefficient3 x**2
+  -0.2023,                  ! Coefficient4 x**3
+  4.0,                     ! Minimum Value of x
+  15.0;                    ! Maximum Value of x
 
   Fan:VariableVolume,
   VAV_1_Fan,               !- Name
@@ -612,7 +612,7 @@ This field defines the reference offset of the temperature sensor. A positive va
     ,                        !- Low Speed Nominal Capacity Sizing Factor
     2000.0,                  !- Free Convection Nominal Capacity {W}
     ;                        !- Free Convection Nominal Capacity Sizing Factor
-  
+
   FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
     Fault_SWT_CoolTower,     !- Name
     ,                        !- Availability Schedule Name
@@ -709,7 +709,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Boiler Object Type}\label{field-boiler-object-type}
 
-This field defines the boiler object type that this fault is associated with. Choices are the boiler types with water-based heat exchangers. 
+This field defines the boiler object type that this fault is associated with. Choices are the boiler types with water-based heat exchangers.
 
 \paragraph{Field: Boiler Object Name}\label{field-boiler-object-name}
 
@@ -774,7 +774,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Chiller Object Type}\label{field-chiller-object-type}
 
-This field defines the chiller object type that this fault is associated with. Choices are the chiller types with water-cooled condensers. 
+This field defines the chiller object type that this fault is associated with. Choices are the chiller types with water-cooled condensers.
 
 \paragraph{Field: Chiller Object Name}\label{field-chiller-object-name}
 
@@ -849,7 +849,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Evaporative Cooler Object Type}\label{field-evaporative cooler-object-type}
 
-This field defines the evaporative cooler object type that this fault is associated with. Choices are the wetted coil evaporative coolers. 
+This field defines the evaporative cooler object type that this fault is associated with. Choices are the wetted coil evaporative coolers.
 
 \paragraph{Field: Evaporative Cooler Object Name}\label{field-evaporative cooler-object-name}
 
@@ -969,4 +969,3 @@ This field defines the reference offset of the temperature sensor. A positive va
     2.0;                     !- Reference Sensor Offset {deltaC}
 
 \end{lstlisting}
-

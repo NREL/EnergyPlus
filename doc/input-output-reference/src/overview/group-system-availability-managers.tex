@@ -149,13 +149,13 @@ The possible inputs are \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZ
 
 \begin{itemize}
 \tightlist
-\item  \emph{StayOff} means the availability manager will have no effect air handler on/off will be determined by the fan schedule. 
-\item  \emph{CycleOnAny} means that if any zone served by a system whose AvailabilityManagerAssignmentList references this system availability manager has an air temperature outside the cooling or heating set points the central fan will turn on even though the fan schedule indicates the fan is off. 
-\item  \emph{CycleOnControlZone} means the same thing except the availability manager looks at the temperature in any one or more zones specified in the Control Zone or Zone List Name field. 
-\item  \emph{CycleOnAnyZoneFansOnly} is the same as \emph{CycleOnAny} except that only the zone fans are cycled on and the central air handler fan is left off. 
+\item  \emph{StayOff} means the availability manager will have no effect air handler on/off will be determined by the fan schedule.
+\item  \emph{CycleOnAny} means that if any zone served by a system whose AvailabilityManagerAssignmentList references this system availability manager has an air temperature outside the cooling or heating set points the central fan will turn on even though the fan schedule indicates the fan is off.
+\item  \emph{CycleOnControlZone} means the same thing except the availability manager looks at the temperature in any one or more zones specified in the Control Zone or Zone List Name field.
+\item  \emph{CycleOnAnyZoneFansOnly} is the same as \emph{CycleOnAny} except that only the zone fans are cycled on and the central air handler fan is left off.
 \item  \emph{CycleOnAnyCoolingOrHeatingZone} means that the central fan will turn on if any zone listed in the Cooling Control Zone or Zone List Name is outside the cooling setpoint or any zone listed in the Heating Control Zone or Zone List Name is outside the heating setpoint. If the central fan is activated, then the zone fans are enabled.  If the central fan is not activated, but any zone in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint, then the zone fans only will be enabled.
-\item  \emph{CycleOnAnyCoolingZone} means that the central fan will turn on if any zone listed in the Cooling Control Zone or Zone List Name is outside the cooling setpoint. If the central fan is activated, then the zone fans are enabled.  
-\item  \emph{CycleOnAnyHeatingZone} means that the central fan will turn on if any zone listed in the Heating Control Zone or Zone List Name is outside the heating setpoint. If the central fan is activated, then the zone fans are enabled.   If the central fan is not activated, but any zone in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint, then the zone fans only will be enabled. 
+\item  \emph{CycleOnAnyCoolingZone} means that the central fan will turn on if any zone listed in the Cooling Control Zone or Zone List Name is outside the cooling setpoint. If the central fan is activated, then the zone fans are enabled.
+\item  \emph{CycleOnAnyHeatingZone} means that the central fan will turn on if any zone listed in the Heating Control Zone or Zone List Name is outside the heating setpoint. If the central fan is activated, then the zone fans are enabled.   If the central fan is not activated, but any zone in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint, then the zone fans only will be enabled.
 \item  \emph{CycleOnAnyHeatingZoneFansOnly} means that the zone fans will be enabled if any zone listed in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint. The central fan is never activated with this control type.
 \end{itemize}
 
@@ -169,7 +169,7 @@ The possible inputs are: \emph{FixedRunTime}, \emph{Thermostat}, and \emph{Therm
 
 \begin{itemize}
 \tightlist
-\item  \emph{FixedRunTime} cycling run time control type the AvailabilityManager:NightCycle activates an airloop or zone equipment for a fixed amount of run time when the zone air temperature is one half of the Thermostat Tolerance above the thermostat cooling setpoint or when the zone air temperature is one half of the Thermostat Tolerance below the thermostat heating setpoint. 
+\item  \emph{FixedRunTime} cycling run time control type the AvailabilityManager:NightCycle activates an airloop or zone equipment for a fixed amount of run time when the zone air temperature is one half of the Thermostat Tolerance above the thermostat cooling setpoint or when the zone air temperature is one half of the Thermostat Tolerance below the thermostat heating setpoint.
 \item  \emph{Thermostat} cycling run time control type the AvailabilityManager:NightCycle activates an airloop or zone equipment until the zone air temperature is within 0.05 deg C above the thermostat cooling setpoint in cooling mode or until the zone air temperature is within 0.05 deg C below the thermostat heating setpoint in heating mode. Cycling Run Time input field below is not used for this cycling run time control type.
 \item  \emph{ThermostatWithMinimumRunTime} cycling run time control type the AvailabilityManager:NightCycle activates an airloop or zone equipment for the specified minimum Cycling Run Time when the zone air temperature is with in 0.05 deg C above the thermostat cooling setpoint or when the zone air temperature is within 0.05 deg C below the thermostat heating setpoint and then continues running beyond the minimum Cycling Run Time until the zone air temperature reaches the thermostat setpoint within 0.05 deg C thermostat tolerance.
 \end{itemize}
@@ -554,15 +554,15 @@ The name of a schedule defined elsewhere in the input file. This schedule determ
 \begin{description}
   \item
   0 = No ventilation control
-  
+
   Natural ventilation and HVAC system operation are performed based on their own controls.
   \item
   1 = Temperature control for either cooling or heating
-  
+
   The control mode is determined internally based on thermostat set point and temperature control type and is restricted between the minimum and maximum outdoor temperatures provided in two additional input fields: Minimum Outdoor Temperature and Maximum Outdoor Temperature.
   \item
   2 = Enthalpy control
-  
+
   The control is restricted between minimum and maximum outdoor enthalpy values given in two additional input fields: Minimum Outdoor Enthalpy and Maximum Outdoor Enthalpy.
   \item
   3 = Dewpoint control for either dehumidification or humidification
@@ -570,23 +570,23 @@ The name of a schedule defined elsewhere in the input file. This schedule determ
   The control is restricted between minimum and maximum outdoor dew point temperatures given in two additional input fields: Minimum Outdoor Dewpoint and Maximum Outdoor Dewpoint.
   \item
   4 = Outdoor ventilation air control
-  
+
   The outdoor ventilation air control works with AirflowNetwork opening objects only, and is not allowed to work with ZoneVentilation:* and ZoneMixing objects.
-  
+
   If the zone air change per hour (ACH) level is above the outdoor air setpoint, specified in the Minimum Outdoor Ventilation Air Schedule Name field, the natural ventilation is on and the HVAC system is shut off. Otherwise, the natural ventilation is shut off (i.e., the window or door openings are closed) and the HVAC system may operate if needed.
   \item
   5 = Operative temperature control using adaptive comfort 80\% acceptability limits
-  
+
   If the operative temperature is within the upper and lower 80\% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off.
   This control model requires the choice = AdaptiveASH55 in one of Thermal Comfort Model Type fields of the People object in the same controlled zone.
   \item
   6 = Operative temperature control using adaptive comfort 90\% acceptability limits
-  
+
   If the operative temperature is within the upper and lower 90\% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off.
   This control model requires the choice = AdaptiveASH55 in one of Thermal Comfort Model Type fields of the People object in the same controlled zone.
   \item
   7 = Carbon dioxide (CO2) control
-   
+
   If the zone CO2 level is above the setpoint, the program will check the HVAC system availability first. If available, HVAC operation will be allowed, and natural ventilation is shut off. If the system is not available, the natural ventilation will be allowed.
   The CO2 setpoint is provided in the ZoneControl:ContaminantController object in the same controlled zone.
 \end{description}
@@ -653,7 +653,7 @@ The name of a ZoneVentilation:* object whose zone name is the controlled zone na
 
 \paragraph{Field: Minimum HVAC Operation Time}\label{field-minimum-hvac-operation-time}
 
- The field represents the minimum time that HVAC system operation will be forced on, and the natural ventilation will be off. If accumulated system operation time is less than this value, the system operation status will be forced regardless of other operation conditions, and natural ventilation will shut off. 
+ The field represents the minimum time that HVAC system operation will be forced on, and the natural ventilation will be off. If accumulated system operation time is less than this value, the system operation status will be forced regardless of other operation conditions, and natural ventilation will shut off.
 
 \paragraph{Field: Minimum Ventilation Time}\label{field-minimum-ventilation-time}
 

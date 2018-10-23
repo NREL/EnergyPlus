@@ -43,13 +43,13 @@ For autosizing to occur at the component level the user must enter the special v
 % table 22
 \begin{longtable}[c]{p{2.75in}p{3.24in}}
 \caption{Details of Autosizable Objects/Fields \label{table:details-of-autosizable-objectsfields}} \tabularnewline
-\toprule 
+\toprule
 Component / Object Name & Autosizable Fields \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Details of Autosizable Objects/Fields} \tabularnewline
-\toprule 
+\toprule
 Component / Object Name & Autosizable Fields \tabularnewline
 \midrule
 \endhead
@@ -755,13 +755,13 @@ The complete list of objects that have autosized fields is shown in the followin
 % table 23
 \begin{longtable}[c]{p{3.02in}p{2.97in}}
 \caption{Complete list of Objects with autosized Fields \label{table:complete-list-of-objects-with-autosized}} \tabularnewline
-\toprule 
+\toprule
 Object Name & Object Name \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Complete list of Objects with autosized Fields} \tabularnewline
-\toprule 
+\toprule
 Object Name & Object Name \tabularnewline
 \midrule
 \endhead
@@ -870,27 +870,27 @@ Unique identifying name. Any reference to this name by other objects will denote
 \paragraph{Field: Outdoor Air Method}\label{field-outdoor-air-method}
 
 The input must be either \emph{Flow/Person}, \emph{Flow/Area}, \emph{Flow/Zone, AirChanges/Hour}, \emph{Sum}, \emph{Maximum}, \emph{IndoorAirQualityProcedure}, \emph{ProportionalControlBasedOnDesignOccupancy}, or \emph{ProportionalControlBasedonOccupancySchedule}. The default is \emph{Flow/Person}.
-\begin{itemize} 
-\tightlist 
+\begin{itemize}
+\tightlist
 
-\item  \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the actual zone occupancy to calculate a zone outdoor air flow rate.  
+\item  \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the actual zone occupancy to calculate a zone outdoor air flow rate.
 
-\item  \emph{Flow/Area} means that the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} and the actual zone floor area as the zone outdoor air flow rate.   
-\item  \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow per Zone} as the zone outdoor air flow rate.   
+\item  \emph{Flow/Area} means that the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} and the actual zone floor area as the zone outdoor air flow rate.
+\item  \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow per Zone} as the zone outdoor air flow rate.
 
-\item  \emph{AirChanges/Hour} means that the program will use the input from the field \emph{Air Changes per Hour} and the actual zone volume (divided by 3600 seconds per hour) as the zone outdoor air flow rate.  
+\item  \emph{AirChanges/Hour} means that the program will use the input from the field \emph{Air Changes per Hour} and the actual zone volume (divided by 3600 seconds per hour) as the zone outdoor air flow rate.
 
 \item  \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area, Outdoor Air Flow per Zone}, and \emph{Air Changes per Hour} (using the associated conversions to m\(^{3}\)/s for each field) will be added to obtain the zone outdoor air flow rate.
 
 \item  \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area, Outdoor Air Flow per Zone,} and \emph{Air Changes per Hour} (using the associated conversions to m\(^{3}\)/s for each field) will be used as the zone outdoor air flow rate.
-   
-\item  \emph{IndoorAirQualityProcedure} means that the program will use the other procedure defined in ASHRAE Standard 62.1-2007 to calculate the amount of outdoor air necessary in order to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the ZoneControl:ContaminantController object. Appendix A of the ASHRAE 62.1-2010 userâ€™s manual discusses another method for implementing CO2-based DCV in a single zone system. The last two methods of Proportional Control calculate the required outdoor air flow rate which varies in proportion to the percentage of the CO2 signal range and has two choices to calculate occupancy-based outdoor air rate. 
-  
+
+\item  \emph{IndoorAirQualityProcedure} means that the program will use the other procedure defined in ASHRAE Standard 62.1-2007 to calculate the amount of outdoor air necessary in order to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the ZoneControl:ContaminantController object. Appendix A of the ASHRAE 62.1-2010 userâ€™s manual discusses another method for implementing CO2-based DCV in a single zone system. The last two methods of Proportional Control calculate the required outdoor air flow rate which varies in proportion to the percentage of the CO2 signal range and has two choices to calculate occupancy-based outdoor air rate.
+
 \item  \emph{ProportionalControlBasedonOccupancySchedule} uses the real occupancy at the current time step to calculate outdoor air rate.
 
 \item  \emph{ProportionalControlBasedonDesignOccupancy} uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate. However, for practical applications, the zone controller usually does not have the real time occupancy information, and the design occupancy level is assumed. The latter choice is used in the design stage.
 
-\end{itemize} 
+\end{itemize}
 
 
 \paragraph{Field: Outdoor Air Flow per Person}\label{field-outdoor-air-flow-per-person}
@@ -911,7 +911,7 @@ The design outdoor air volume flow rate in air changes per hour. This factor is 
 
 \paragraph{Field: Outdoor Air Schedule Name}\label{field-outdoor-air-schedule-name}
 
-This field is the name of schedule that defines how outdoor air requirements change over time. The field is optional. If left blank, the schedule defaults to 1.0. If used, then the schedule values are multiplied by the outdoor air flow rate defined by the previous fields. The schedule values must be between 0 and 1, inclusive.  
+This field is the name of schedule that defines how outdoor air requirements change over time. The field is optional. If left blank, the schedule defaults to 1.0. If used, then the schedule values are multiplied by the outdoor air flow rate defined by the previous fields. The schedule values must be between 0 and 1, inclusive.
 
 If this DesignSpecification:OutdoorAir object is referenced by a Controller:MechanicalVentilation object (either directly or indirectly through Sizing:Zone), the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calculations.
 
@@ -941,7 +941,7 @@ DesignSpecification:OutdoorAir
       Until: 24:00, 1.0,       !- Field 4
       For: AllOtherDays,       !- Field 5
       Until: 24:00, 0.5;       !- Field 7
-      
+
 \end{lstlisting}
 
 \subsection{DesignSpecification:ZoneAirDistribution}\label{designspecificationzoneairdistribution}
@@ -976,7 +976,7 @@ This optional field input points to a schedule with values of zone air distribut
 
 The non-negative numeric input for this field is the fraction of a zone's recirculation air that does not directly mix with the outdoor air. The zone secondary recirculation fraction Er is determined by the designer based on system configuration. For plenum return systems with secondary recirculation (e.g., fan-powered VAV with plenum return) Er is usually less than 1.0, although values may range from 0.1 to 1.2 depending upon the location of the ventilation zone relative to other zones and the air handler. For ducted return systems with secondary recirculation (e.g., fan-powered VAV with ducted return), Er is typically 0.0, while for those with system-level recirculation (e.g, dual-fan dual-duct systems with ducted return) Er is typically 1.0. For other system types, Er is typically 0.75. Minimum is 0.0, and default is 0.0 for single-path systems (also to maintain backward compatibility). For parallel fan-powered VAV systems, the secondary ventilation path only functions (Er \textgreater{} 0.0) when the fans in the VAV boxes operate, which is during heating. The local ventilation path and the benefits of secondary recirculation disappear during cooling, when the local parallel fans are off (Er = 0.0).
 
-\paragraph{Field: Minimum Zone Ventilation 
+\paragraph{Field: Minimum Zone Ventilation
 Efficiency}\label{field-minimum-zone-ventilation-efficiency}
 
 This optional input sets a minimum on the ventilation efficiency for the zone. It is only used with the Ventilation Rate Procedure (VRP), single-path method. VRP should be chosen in Sizing System, System Outdoor Air Method = VentilationRateProcedure. Single-path method is indicated by leaving the previous input (Zone Secondary Recirculation Fraction) blank or setting it to 0.0. If the calculated value of ventilation efficiency for a zone is less than this value, it is raised to this minimum by raising the zone minimum air flow rate. This new value for zone minimum air flow rate then overrides other defaults and inputs in Sizing:Zone.
@@ -1120,7 +1120,7 @@ This alpha field specifies the name of a DesignSpecification:OutdoorAir object w
 
 When a choice of IndoorAirQualityProcedure is entered in the Outdoor Air Method field of the DesignSpecification:OutdoorAir object, the design outdoor airflow rate is calculated based on the choice of Sum in the same field.
 
-When a choice of ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedonOccupancySchedule is entered, the design outdoor airflow rate is calculated based on equations specified in the "Proportional Control" section in the Engineering Reference.  
+When a choice of ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedonOccupancySchedule is entered, the design outdoor airflow rate is calculated based on equations specified in the "Proportional Control" section in the Engineering Reference.
 
 \paragraph{Field: Zone Heating Sizing Factor}\label{field-zone-heating-sizing-factor}
 
@@ -1589,7 +1589,7 @@ The design outdoor air flow rate in cubic meters per second. Generally this shou
 
 The ratio of the maximum system air flow rate for heating to the maximum system air flow rate. The value must be between 0 and 1. For constant volume systems the ratio should be set to 1. This ratio should be set to reflect what the user expects the system flow rate to be when maximum heating demand occurs. This ratio is used in calculating the central system heating capacity. Thus if the system is VAV with the zone VAV dampers held at minimum flow when there is a zone heating demand, this ratio should be set to the minimum flow ratio. If the zone VAV dampers are reverse action and can open to full flow to meet heating demand, this ratio should be set to 1. The default is set to 0.5, reflecting the fact that VAV dampers are typically not allowed to fully open during heating.
 
-This field can be set to \emph{AutoSize}.  When automatically calculated, the ratio is determined from the system heating design flow rate divided by the main (which is usually the max of heating and cooling design flow rates) design flow rate.  The design flow rates are also adjusted to be more accurate by examining each of the air terminals attached to the air system and summing the heating and maximum flow rates. 
+This field can be set to \emph{AutoSize}.  When automatically calculated, the ratio is determined from the system heating design flow rate divided by the main (which is usually the max of heating and cooling design flow rates) design flow rate.  The design flow rates are also adjusted to be more accurate by examining each of the air terminals attached to the air system and summing the heating and maximum flow rates.
 
 \paragraph{Field: Preheat Design Temperature}\label{field-preheat-design-temperature}
 

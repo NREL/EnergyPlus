@@ -2510,7 +2510,7 @@ This field specifies the aspect ratio that the building described in the rest of
 
 The object is used to calculate long wave radiation to an external surface from its surrounding surfaces, defining the properties of the surrounding surfaces. The property object declares a list of single surrounding surfaces which has a name, a field of view factor, and another field Temperature Schedule Name referencing a schedule containing the temperature of the surrounding surface, which can be overwritten at each time step in EnergyPlus run time through co-simulation. View factors are assumed to be constant values. At least one surrounding surface should be defined in this object.
 
-The object also defines the sky and ground temperature and view factors to the external surface. The sum of all defined view factors should not exceed 1.0. If only sky view is defined in this object, the ground view factor to this surface will be 1.0 subtracted with the ground view factor and all other defined surface view factors. If only ground view is defined in this object, the sky view factor to this surface will be 1.0 subtracted with the sky view factor and all other defined surface view factors. If neither of the sky and ground view factors are explicitly declared here, the sum of the sky and ground view factor would be 1.0 subtracted with all other defined surface view factors and the proportion will be set as the same with the global setting. 
+The object also defines the sky and ground temperature and view factors to the external surface. The sum of all defined view factors should not exceed 1.0. If only sky view is defined in this object, the ground view factor to this surface will be 1.0 subtracted with the ground view factor and all other defined surface view factors. If only ground view is defined in this object, the sky view factor to this surface will be 1.0 subtracted with the sky view factor and all other defined surface view factors. If neither of the sky and ground view factors are explicitly declared here, the sum of the sky and ground view factor would be 1.0 subtracted with all other defined surface view factors and the proportion will be set as the same with the global setting.
 
 \subsubsection{Field: Name}\label{field-srd-surfs-name}
 
@@ -2534,15 +2534,15 @@ This field is used to supply a schedule name of the ground temperature. The grou
 
 \subsubsection{Field: Surrounding Surface 1 Name}\label{field-surrounding-surface-1-name}
 
-This field defines the name of a surrounding surface to the external surface. 
+This field defines the name of a surrounding surface to the external surface.
 
 \subsubsection{Field: Surrounding Surface 1 View Factor}\label{field-surrounding-surface-1-view-factor}
 
-This field defines the constant view factor of a surrounding surface to an external surface. 
+This field defines the constant view factor of a surrounding surface to an external surface.
 
 \subsubsection{Field: Surrounding Surface 1 Temperature Schedule Name}\label{field-surrounding-surface-1-temp-schedule-name}
 
-This field is used to supply a schedule name of the of a surrounding surface temperature. 
+This field is used to supply a schedule name of the of a surrounding surface temperature.
 
 The last three fields are extensible to define multiple surrounding surface name, temperature and view factor sets.
 
@@ -2558,18 +2558,18 @@ SurfaceProperty:SurroundingSurfaces,
   SurroundingSurface1,         !- Surrounding Surface 1 Name
   0.6,                         !- Surrounding Surface 1 View Factor
   Surrounding Temp Sch 1;      !- Surrounding Surface 1 Temperature Schedule Name
-  
+
 Schedule:Compact,
   Surrounding Temp Sch 1,       !- Name
   Any Number,                   !- Schedule Type Limits Name
   Through: 12/31,               !- Field 1
   For: AllDays,                 !- Field 2
-  Until: 24:00, 15.0;           !- Field 3  
+  Until: 24:00, 15.0;           !- Field 3
 \end{lstlisting}
 
 \subsection{SurfaceProperty:LocalEnvironment}\label{surfacePropertylocalEnvironment}
 
-The object links to a surface object \textbf{Surface:Detailed} and is used when there is a need to calculate surface level environmental data externally and import them into the simulation to override existing environmental data, including external solar shading fractions, local air velocity, temperature and humidity, and surrounding surface temperatures and view factors. The object links to three optional objects including a schedule object declared by \textbf{Field: External Shading Fraction Schedule Name}, a \textbf{SurfaceProperty:SurroundingSurfaces} object declared by \textbf{Field: Surrounding Surfaces Object Name}, and an \textbf{OutdoorAir:Node} object declared by \textbf{Field: Outdoor Air Node Name}. The object provides inputs to calculate shading, solar radiation, zone air balance and surface exterior heat balance. 
+The object links to a surface object \textbf{Surface:Detailed} and is used when there is a need to calculate surface level environmental data externally and import them into the simulation to override existing environmental data, including external solar shading fractions, local air velocity, temperature and humidity, and surrounding surface temperatures and view factors. The object links to three optional objects including a schedule object declared by \textbf{Field: External Shading Fraction Schedule Name}, a \textbf{SurfaceProperty:SurroundingSurfaces} object declared by \textbf{Field: Surrounding Surfaces Object Name}, and an \textbf{OutdoorAir:Node} object declared by \textbf{Field: Outdoor Air Node Name}. The object provides inputs to calculate shading, solar radiation, zone air balance and surface exterior heat balance.
 
 \subsubsection{Field: Name}\label{field-surf-localenv-name}
 
@@ -2599,7 +2599,7 @@ SurfaceProperty:LocalEnvironment,
     Zn001:Wall001,                !- Exterior Surface Name
     ExtShadingSch:Zn001:Wall001,  !- External Shading Fraction Schedule Name
     SrdSurf:Zn001:Wall001,        !- Surrounding Surfaces Object Name
-    OutdoorAirNode:0001;          !- Outdoor Air Node Name    
+    OutdoorAirNode:0001;          !- Outdoor Air Node Name
 \end{lstlisting}
 
 \subsection{ZoneProperty:LocalEnvironment}\label{ZonePropertylocalEnvironment}
@@ -2624,7 +2624,7 @@ An example IDF object follows.
 ZoneProperty:LocalEnvironment,
     LocEnv:Zn001,                 !- Name
     Zn001,                        !- Exterior Surface Name
-    OutdoorAirNode:0001;          !- Outdoor Air Node Name    
+    OutdoorAirNode:0001;          !- Outdoor Air Node Name
 \end{lstlisting}
 
 \subsection{SurfaceProperty:HeatBalanceSourceTerm}\label{surfacePropertyHeatBalanceSourceTerm}

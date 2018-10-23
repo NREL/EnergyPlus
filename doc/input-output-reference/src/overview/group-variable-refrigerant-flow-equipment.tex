@@ -45,7 +45,7 @@ The following schematic demonstrates these connection rules.
 
 Energyplus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics{media/image311.png}
 \emph{(a) VRF model based on system curves (VRF-SysCurve)}
@@ -1171,11 +1171,11 @@ This output only applies for the VRF-FluidTCtrl model. This is the power consume
 
 \paragraph{VRF Heat Pump Cooling Capacity at Max Compressor Speed {[}W{]}}\label{vrf-heat-pump-cooling-capacity-at-max-compressor-speed}
 
-This output field is the maximum cooling capacity of the variable refrigerant flow system at particular operational conditions, corresponding to the maximum compressor speed. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This output only applies for the VRF-FluidTCtrl model. 
+This output field is the maximum cooling capacity of the variable refrigerant flow system at particular operational conditions, corresponding to the maximum compressor speed. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This output only applies for the VRF-FluidTCtrl model.
 
 \paragraph{VRF Heat Pump Heating Capacity at Max Compressor Speed {[}W{]}}\label{vrf-heat-pump-heating-capacity-at-max-compressor-speed}
 
-This output field is the maximum heating capacity of the variable refrigerant flow system at particular operational conditions, corresponding to the maximum compressor speed. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This output only applies for the VRF-FluidTCtrl model. 
+This output field is the maximum heating capacity of the variable refrigerant flow system at particular operational conditions, corresponding to the maximum compressor speed. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This output only applies for the VRF-FluidTCtrl model.
 
 \paragraph{VRF Heat Pump Outdoor Unit Evaporator Heat Extract Rate {[}W{]}}\label{vrf-heat-pump-outdoor-unit-evaporator-heat-extract-rate}
 
@@ -1211,7 +1211,7 @@ This alpha field defines the name of the refrigerant used in the VRF system. The
 
 This numeric field defines the total evaporative capacity in watts at rated conditions. This is the capacity corresponding to the max compressor speed at rated conditions. The actual evaporative capacity is obtained by multiplying the rated capacity with the modification factor calculated by Evaporative Capacity Multiplier Function of Temperature Curve. The value must be greater than 0. This filed is autosizable.
 
-\paragraph{Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity} 
+\paragraph{Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity}
 
 This numeric field defines the rated compressor power per Watt of rated evaporative capacity. Rated compressor power corresponds to the max compressor speed at rated conditions. The actual compressor power is obtained by multiplying the rated power with the modification factor calculated by Compressor Power Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 0.35 W/W is assumed.
 
@@ -1376,25 +1376,25 @@ This numeric field defines the capacity of the resistive defrost heating element
 This numeric field defines the outdoor air dry-bulb temperature above which outdoor coil defrosting is disabled. If this input field is left blank, the default value is 5°C. Defrost can be completely eliminated by selecting a temperature lower than the minimum expected outdoor temperature found in the weather file.
 
 
-\paragraph{Field: Initial Heat Recovery Cooling Capacity Fraction} 
+\paragraph{Field: Initial Heat Recovery Cooling Capacity Fraction}
 
-This numeric field defines the fraction of cooling capacity available when the system transitions from cooling only operation to simultaneous cooling and heating. It is common for the cooling capacity to decrease before the system recovers. The system will recovery according to the time constant entered in Heat Recovery Cooling Capacity Time Constant input field. If the transition period will not be modeled, this input field must be set to 1. 
+This numeric field defines the fraction of cooling capacity available when the system transitions from cooling only operation to simultaneous cooling and heating. It is common for the cooling capacity to decrease before the system recovers. The system will recovery according to the time constant entered in Heat Recovery Cooling Capacity Time Constant input field. If the transition period will not be modeled, this input field must be set to 1.
 
-\paragraph{Field: Heat Recovery Cooling Capacity Time Constant} 
+\paragraph{Field: Heat Recovery Cooling Capacity Time Constant}
 
 This numeric field defines the cooling capacity time constant, in hours, used to model the time it takes for the system to change from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Cooling Capacity Fraction field must be set to 1.
 
 \paragraph{Field: Initial Heat Recovery Cooling Energy Fraction}
 
-This numeric field defines the fraction of cooling energy consumed when the system transitions from cooling only operation to simultaneous cooling and heating. It is common for the cooling energy to drop before the system recovers. If the transition period will not be modeled, this input field must be set to 1. 
+This numeric field defines the fraction of cooling energy consumed when the system transitions from cooling only operation to simultaneous cooling and heating. It is common for the cooling energy to drop before the system recovers. If the transition period will not be modeled, this input field must be set to 1.
 
 \paragraph{Field: Heat Recovery Cooling Energy Time Constant}
 
-This numeric field defines the cooling energy time constant, in hours, used to model the time it takes for the system to transition from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Cooling Energy Fraction field must be set to 1. 
+This numeric field defines the cooling energy time constant, in hours, used to model the time it takes for the system to transition from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Cooling Energy Fraction field must be set to 1.
 
 \paragraph{Field: Initial Heat Recovery Heating Capacity Fraction}
 
-This numeric field defines the fraction of heating capacity available when the system changes from heating only operation to simultaneous heating and cooling. It is common for the heating capacity to decrease before the system recovers. The system will recovery according to the time constant entered in Heat Recovery Heating Capacity Time Constant input field. If the transition period will not be modeled, this input field must be set to 1. 
+This numeric field defines the fraction of heating capacity available when the system changes from heating only operation to simultaneous heating and cooling. It is common for the heating capacity to decrease before the system recovers. The system will recovery according to the time constant entered in Heat Recovery Heating Capacity Time Constant input field. If the transition period will not be modeled, this input field must be set to 1.
 
 \paragraph{Field: Heat Recovery Heating Capacity Time Constant}
 
@@ -1402,11 +1402,11 @@ This numeric field defines the heating capacity time constant, in hours, used to
 
 \paragraph{Field: Initial Heat Recovery Heating Energy Fraction}
 
-This numeric field defines the fraction of heating energy consumed when the system changes from heating only operation to simultaneous heating and cooling. It is common for the heating energy to decrease before the system recovers. If the transition period will not be modeled, this input field must be set to 1. 
+This numeric field defines the fraction of heating energy consumed when the system changes from heating only operation to simultaneous heating and cooling. It is common for the heating energy to decrease before the system recovers. If the transition period will not be modeled, this input field must be set to 1.
 
 \paragraph{Field: Heat Recovery Heating Energy Time Constant}
 
-This numeric field defines the heating energy time constant, in hours, used to model the time it takes for the system to change from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Heating Energy Fraction field must be set to 1. 
+This numeric field defines the heating energy time constant, in hours, used to model the time it takes for the system to change from cooling only operation to simultaneous cooling and heating. Total response time is defined as 5 time constants. If this field is left blank, a default value of 0.0 is used. If the transition period will not be modeled, the Initial Heat Recovery Heating Energy Fraction field must be set to 1.
 
 \paragraph{Field: Compressor maximum delta Pressure}
 

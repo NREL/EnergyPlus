@@ -82,7 +82,7 @@ The corresponding control type name. The name is used in an object with the name
 
 This optional choice field provides a temperature difference between cutout temperature and setpoint. When the temperature difference is greater than 0.0, the difference is applied to both heating and cooling by possibly revising setpoints based on control types.
 
-If MAT is defined as zone air temperature at previous time step, DeltaT represents the temperature difference between cutout and setpoint and is greater than 0.0, and PredictedLoad represents predicted load calculated in the ZoneTempPredictorCorrector, following action will be taken: 
+If MAT is defined as zone air temperature at previous time step, DeltaT represents the temperature difference between cutout and setpoint and is greater than 0.0, and PredictedLoad represents predicted load calculated in the ZoneTempPredictorCorrector, following action will be taken:
 
 \begin{lstlisting}
 0 - Uncontrolled (No specification or default)
@@ -392,9 +392,9 @@ ThermostatSetpoint:SingleHeating, Heating Setpoint with SB, Heating Setpoints;
 
 \subsection{ZoneControl:Thermostat:OperativeTemperature}\label{zonecontrolthermostatoperativetemperature}
 
-This object is used to modify the program's behavior for ZoneControl:Thermostat objects. One input object is used for each thermal zone to indicate if that zone's thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related setpoint objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures). 
+This object is used to modify the program's behavior for ZoneControl:Thermostat objects. One input object is used for each thermal zone to indicate if that zone's thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related setpoint objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures).
 
-When using this object, the setpoint temperature values (e.g. input in schedules named in ThermostatSetpoint:DualSetpoint objects) become targets for the desired operative temperatures. As of version 8.7 new options are added that allow automatically generating values for the setpoint temperature, as a function of outdoor air temperatures, using various adaptive comfort models based on ASHRAE Standard 55-2010 and CEN 15251-2007. The adaptive comfort model relates the zone operative temperature setpoint to the recent history of the outdoor air temperatures.  The adaptive comfort models only apply to cooling mode and generate a single setpoint value for each day. During summer time in hot climates, the zone thermostat setting can be higher than the traditional thermostat setting based on the adaptive thermal comfort model, which results in energy savings of HVAC systems. 
+When using this object, the setpoint temperature values (e.g. input in schedules named in ThermostatSetpoint:DualSetpoint objects) become targets for the desired operative temperatures. As of version 8.7 new options are added that allow automatically generating values for the setpoint temperature, as a function of outdoor air temperatures, using various adaptive comfort models based on ASHRAE Standard 55-2010 and CEN 15251-2007. The adaptive comfort model relates the zone operative temperature setpoint to the recent history of the outdoor air temperatures.  The adaptive comfort models only apply to cooling mode and generate a single setpoint value for each day. During summer time in hot climates, the zone thermostat setting can be higher than the traditional thermostat setting based on the adaptive thermal comfort model, which results in energy savings of HVAC systems.
 
 This thermostatic operative temperature, \({T_{OP}}\) , is defined as:
 
@@ -415,13 +415,13 @@ The radiative fraction \(\gamma\) is selected by the user and can be scheduled t
 % table 28
 \begin{longtable}[c]{@{}llll@{}}
 \caption{Radiative Fraction vs Air Velocity (Operative Temperature Control) \label{table:radiative-fraction-vs-air-velocity-operative}} \tabularnewline
-\toprule 
+\toprule
 Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Radiative Fraction vs Air Velocity (Operative Temperature Control)} \tabularnewline
-\toprule 
+\toprule
 Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
 \midrule
 \endhead
@@ -431,7 +431,7 @@ Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
 
 When the adaptive comfort model is selected, the thermostat setpoint temperature schedule for space cooling will be overwritten with the calculated operative temperature based on the selected acceptability limits of the comfort model defined in ASHRAE 55-2010 or CEN 15251-2007. The ASHRAE adaptive comfort model is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 33.5°C; while the CEN 15251-2007 adaptive comfort model is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 30.0°C. The user can choose whether to overwrite the cooling setpoint temperature only when the adaptive setpoint is higher than the user input one for the purpose of energy saving.
 
-Reference: 
+Reference:
 \begin{itemize}
 \tightlist
 \item Niu and J. Burnett. 1998. Integrating Radiant/Operative Temperature Controls into Building Energy Simulations. ASHRAE Transactions Vol. 104. Part 2. page 210. ASHRAE. Atlanta, GA.
@@ -460,16 +460,16 @@ Note that by setting the values in this schedule separately for design days, the
 
 \paragraph{Field: Adaptive Comfort Model Type}\label{field-adaptive-comfort-mode-type}
 
-This field controls which of the seven adaptive comfort model is chosen, if any, listed as following: 
+This field controls which of the seven adaptive comfort model is chosen, if any, listed as following:
 \begin{itemize}
 \tightlist
 \item None. The adaptive comfort model is not applied and the setpoint temperatures are not adjusted from those input in the thermostat setpoints.
 \item AdaptiveASH55CentralLine. The central line of the acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint.
 \item AdaptiveASH5580PercentUpperLine. The upper line of the 80\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint.
-\item AdaptiveASH5590PercentUpperLine. The upper line of the 90\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint. 
+\item AdaptiveASH5590PercentUpperLine. The upper line of the 90\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint.
 \item AdaptiveCEN15251CentralLine. The central line of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used to generate the zone operative temperature setpoint.
 \item AdaptiveCEN15251CategoryIUpperLine. The upper line of the Category I of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used to generate the zone operative temperature setpoint.
-\item AdaptiveCEN15251CategoryIIUpperLine. The upper line of the Category II of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be generate to adjust the zone operative temperature setpoint; and 
+\item AdaptiveCEN15251CategoryIIUpperLine. The upper line of the Category II of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be generate to adjust the zone operative temperature setpoint; and
 \item AdaptiveCEN15251CategoryIIIUpperLine. The upper line of the Category III of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be generate as the zone operative temperature setpoint.
 \end{itemize}
 
@@ -1107,7 +1107,7 @@ The ZoneControl:ContaminantController object is also used for any of the followi
 \item
   To control a zone to a specified indoor level of contaminants. When this zone is served by a dedicated outdoor air system AirLoopHVAC through a terminal unit, some type of terminal units are able to call a DesignSpecification:OutdoorAir object with Outdoor Air Method = IndoorAirQualityProcedure, so that the required outdoor airflow rate to reach the zone air setpoint can be assigned to the terminal unit. The total outdoor air flow in the AirLoopHVAC is a sum of all terminal units. In this way, each zone served by the same AirLoopHVAC can reach the zone air CO2 setpoint precisely.
 \item
-  To specify minimum CO2 concentration schedule name for a zone. When this zone is served by a dedicated outdoor air system AirLoopHVAC through a terminal unit, some type of terminal units are able to call a DesignSpecification:OutdoorAir object with Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy. The outdoor airflow rate is determined by one of proportional control procedures. Then, the calculated outdoor airflow rate is assigned to the terminal unit. The total outdoor air flow in the AirLoopHVAC is a sum of all terminal units. In this way, each zone served by the same AirLoopHVAC will receive the outdoor airflow rate based on terminal unit request. 
+  To specify minimum CO2 concentration schedule name for a zone. When this zone is served by a dedicated outdoor air system AirLoopHVAC through a terminal unit, some type of terminal units are able to call a DesignSpecification:OutdoorAir object with Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy. The outdoor airflow rate is determined by one of proportional control procedures. Then, the calculated outdoor airflow rate is assigned to the terminal unit. The total outdoor air flow in the AirLoopHVAC is a sum of all terminal units. In this way, each zone served by the same AirLoopHVAC will receive the outdoor airflow rate based on terminal unit request.
 
 \end{enumerate}
 

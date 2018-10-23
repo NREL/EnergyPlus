@@ -10,13 +10,13 @@ EnergyPlus offers the different types of air models listed in the table below al
 {\scriptsize
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \caption{Summary of Room Air Models \label{table:summary-of-room-air-models}} \tabularnewline
-\toprule 
+\toprule
 Air Model Key & Air model Algorithm & Applicability & Input Objects Required \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Summary of Room Air Models} \tabularnewline
-\toprule 
+\toprule
 Air Model Key & Air model Algorithm & Applicability & Input Objects Required \tabularnewline
 \midrule
 \endhead
@@ -867,7 +867,7 @@ This model simulates a thermal zone using a network approach by assuming intra-z
     Airflow\-Net\-work:\-Intra\-zone:\-Link\-age
 \end{itemize}
 
-The first five objects are described below. The last two objects are described in the Airflow Network Model section. This model also requires additional AirflowNetwork:* objects to form a complete network. 
+The first five objects are described below. The last two objects are described in the Airflow Network Model section. This model also requires additional AirflowNetwork:* objects to form a complete network.
 
 \subsection{RoomAirSettings:AirflowNetwork}\label{roomairsettingsairflownetwork}
 
@@ -896,7 +896,7 @@ An IDF example input is:
 \begin{lstlisting}
 
 RoomAirSettings:AirflowNetwork,
-  NORTH_ZONE,     !- Name 
+  NORTH_ZONE,     !- Name
   NORTH_ZONE,              !- Zone Name
   RoomAir Schedule,        !- Availability Schedule Name
   NORTH_ZONE,              !- Control Point RoomAir:Node Name
@@ -1037,7 +1037,7 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
   CentralUpper_HVAC,        !- Name
   ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
   NORTH_ZONE PTAC,       !- ZoneHVAC or Air Terminal Equipment Object Name 1
-  0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
+  0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1
   0.14;                   !- Fraction of Input or Return Air to HVAC Equipment 1
 \end{lstlisting}
 
