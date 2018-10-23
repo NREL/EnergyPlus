@@ -22,17 +22,17 @@ This alpha field contains the keyword for the type of control scheme used. The o
 
 \begin{itemize}
 \item
-  PlantEquipmentOperation:Uncontrolled
+  \hyperref[plantequipmentoperationuncontrolled]{PlantEquipmentOperation:Uncontrolled}
 \item
-  PlantEquipmentOperation:CoolingLoad
+  \hyperref[plantequipmentoperationcoolingload]{PlantEquipmentOperation:CoolingLoad}
 \item
-  PlantEquipmentOperation:HeatingLoad
+  \hyperref[plantequipmentoperationheatingload]{PlantEquipmentOperation:HeatingLoad}
 \item
-  PlantEquipmentOperation:ComponentSetpoint
+  \hyperref[plantequipmentoperationcomponentsetpoint]{PlantEquipmentOperation:ComponentSetpoint}
 \item
-  PlantEquipmentOperation:ThermalEnergyStorage
+  \hyperref[plantequipmentoperationthermalenergystorage]{PlantEquipmentOperation:ThermalEnergyStorage}
 \item
-  PlantEquipmentOperation:UserDefined
+  \hyperref[plantequipmentoperationuserdefined]{PlantEquipmentOperation:UserDefined}
 \end{itemize}
 
 \paragraph{Field: Control Scheme \textless{}\#\textgreater{} Name}\label{field-control-scheme-name}
@@ -63,7 +63,7 @@ PlantEquipmentOperationSchemes,
       PlantOnSched;            !- Control Scheme 1 Schedule
 \end{lstlisting}
 
-In the first IDF example, ``PlantEquipmentOperation:CoolingLoad'' is the type of control scheme. ``Peak Operation'' and ``Off Peak Operation'' are the names of two different load range based controls defined separately (see below -- ). ``On Peak'' and ``Off Peak'' are schedules defined elsewhere in the input file.
+In the first IDF example, ``\hyperref[plantequipmentoperationcoolingload]{PlantEquipmentOperation:CoolingLoad}'' is the type of control scheme. ``Peak Operation'' and ``Off Peak Operation'' are the names of two different load range based controls defined separately (see below -- ). ``On Peak'' and ``Off Peak'' are schedules defined elsewhere in the input file.
 
 The load range based operation scheme has two statements associated with it: a main statement that defines the ranges that individual priority settings are valid and the lists of equipment that may be used for each range.
 
@@ -87,27 +87,27 @@ This alpha field contains the keyword for the type of control scheme used. Curre
 
 \begin{itemize}
 \item
-  PlantEquipmentOperation:Uncontrolled
+  \hyperref[plantequipmentoperationuncontrolled]{PlantEquipmentOperation:Uncontrolled}
 \item
-  PlantEquipmentOperation:CoolingLoad
+  \hyperref[plantequipmentoperationcoolingload]{PlantEquipmentOperation:CoolingLoad}
 \item
-  PlantEquipmentOperation:HeatingLoad
+  \hyperref[plantequipmentoperationheatingload]{PlantEquipmentOperation:HeatingLoad}
 \item
-  PlantEquipmentOperation:OutdoorDryBulb
+  \hyperref[plantequipmentoperationoutdoordrybulb]{PlantEquipmentOperation:OutdoorDryBulb}
 \item
-  PlantEquipmentOperation:OutdoorWetBulb
+  \hyperref[plantequipmentoperationoutdoorwetbulb]{PlantEquipmentOperation:OutdoorWetBulb}
 \item
-  PlantEquipmentOperation:OutdoorDewpoint
+  \hyperref[plantequipmentoperationoutdoordewpoint]{PlantEquipmentOperation:OutdoorDewpoint}
 \item
-  PlantEquipmentOperation:OutdoorRelativeHumidity
+  \hyperref[plantequipmentoperationoutdoorrelativehumidity]{PlantEquipmentOperation:OutdoorRelativeHumidity}
 \item
-  PlantEquipmentOperation:OutdoorDryBulbDifference
+  \hyperref[plantequipmentoperationoutdoordrybulbdifference]{\hyperref[plantequipmentoperationoutdoordrybulb]{PlantEquipmentOperation:OutdoorDryBulb}Difference}
 \item
-  PlantEquipmentOperation:OutdoorWetBulbDifference
+  \hyperref[plantequipmentoperationoutdoorwetbulbdifference]{\hyperref[plantequipmentoperationoutdoorwetbulb]{PlantEquipmentOperation:OutdoorWetBulb}Difference}
 \item
-  PlantEquipmentOperation:OutdoorDewpointDifference
+  \hyperref[plantequipmentoperationoutdoordewpointdifference]{\hyperref[plantequipmentoperationoutdoordewpoint]{PlantEquipmentOperation:OutdoorDewpoint}Difference}
 \item
-  PlantEquipmentOperation:UserDefined
+  \hyperref[plantequipmentoperationuserdefined]{PlantEquipmentOperation:UserDefined}
 \end{itemize}
 
 The condenser operation schemes apply to the equipment on the `supply side' of the condenser loop---pumps, cooling towers, ground coupled heat exchangers, etc. The keywords select the algorithm that will be used to determine which equipment is available for each timestep. The Load Schemes schemes select a user specified set of equipment for each user specified range of a particular simulation variable. Load schemes compare the demand on the condenser supply side with specified load ranges and associated equipment lists. Outdoor schemes compare the current value of an environmental parameter with user specified ranges of that parameter.
@@ -156,7 +156,7 @@ This alpha field contains the identifying name for the Equipment List. This fiel
 
 \paragraph{Field: Equipment List Name}\label{field-equipment-list-name-1}
 
-This alpha field contains the identifying name for the Equipment List. This field ties to the PlantEquipmentList or CondenserEquipmentList input structure, which must also be defined.
+This alpha field contains the identifying name for the Equipment List. This field ties to the \hyperref[plantequipmentlist]{PlantEquipmentList} or \hyperref[condenserequipmentlist]{CondenserEquipmentList} input structure, which must also be defined.
 
 \subsection{PlantEquipmentOperation:CoolingLoad}\label{plantequipmentoperationcoolingload}
 
@@ -164,7 +164,7 @@ This alpha field contains the identifying name for the Equipment List. This fiel
 
 \subsection{PlantEquipmentOperation:HeatingLoad}\label{plantequipmentoperationheatingload}
 
-The PlantEquipmentOperation:CoolingLoad ~and PlantEquipmentOperation:HeatingLoad objects define the different ranges and which equipment list is valid for each range. After the keyword and the identifying name, a series of data trios is expected. In each trio, there is a lower limit for the load range, an upper limit for the load range, and a name that links to an equipment availability list (the PlantEquipmentList or CondenserEquipmentList objects).
+The \hyperref[plantequipmentoperationcoolingload]{PlantEquipmentOperation:CoolingLoad} ~and PlantEquipmentOperation:HeatingLoad objects define the different ranges and which equipment list is valid for each range. After the keyword and the identifying name, a series of data trios is expected. In each trio, there is a lower limit for the load range, an upper limit for the load range, and a name that links to an equipment availability list (the \hyperref[plantequipmentlist]{PlantEquipmentList} or \hyperref[condenserequipmentlist]{CondenserEquipmentList} objects).
 
 \subsubsection{Inputs}\label{inputs-4-022}
 
@@ -184,7 +184,7 @@ This numeric field contains the upper demand range (W) for the equipment list. I
 
 \paragraph{Field: Range \textless{}\#\textgreater{} Equipment List Name}\label{field-range-equipment-list-name}
 
-This alpha field contains the identifying name for the Equipment List (i.e., the name of a PlantEquipmentList or CondenserEquipmentList object).
+This alpha field contains the identifying name for the Equipment List (i.e., the name of a \hyperref[plantequipmentlist]{PlantEquipmentList} or \hyperref[condenserequipmentlist]{CondenserEquipmentList} object).
 
 An example of these statements in an IDF is:
 
@@ -196,7 +196,7 @@ PlantEquipmentOperation:CoolingLoad, Peak Operation,
           24500,500000, Purchased Only;
 \end{lstlisting}
 
-This particular load based operation scheme (above) has three different ranges. ``Chiller Plant'', ``Chiller Plant and Purchased'', and ``Purchased Only'' are names which link to various PlantEquipmentList or CondenserEquipmentList objects as described below. Gaps may be left in the load ranges specified, but to operate equipment over the entire range the upper limit of a given range must equal the lower limit of the next range as shown in the example. If gaps are left in the load ranges specified, a warning message will be issued when the load to be met falls within a load range ``gap''. If the user wishes to leave a load range ``gap'' for a specific reason (no equipment to operate on this plant {[}or condenser{]} loop within this load range) and does not want the warning messages to be generated, then specify a lower limit, upper limit and equipment list name for the gap and do not specify any equipment in the associated equipment list, as shown below.
+This particular load based operation scheme (above) has three different ranges. ``Chiller Plant'', ``Chiller Plant and Purchased'', and ``Purchased Only'' are names which link to various \hyperref[plantequipmentlist]{PlantEquipmentList} or \hyperref[condenserequipmentlist]{CondenserEquipmentList} objects as described below. Gaps may be left in the load ranges specified, but to operate equipment over the entire range the upper limit of a given range must equal the lower limit of the next range as shown in the example. If gaps are left in the load ranges specified, a warning message will be issued when the load to be met falls within a load range ``gap''. If the user wishes to leave a load range ``gap'' for a specific reason (no equipment to operate on this plant {[}or condenser{]} loop within this load range) and does not want the warning messages to be generated, then specify a lower limit, upper limit and equipment list name for the gap and do not specify any equipment in the associated equipment list, as shown below.
 
 \begin{lstlisting}
 
@@ -235,7 +235,7 @@ PlantEquipmentOperation:CoolingLoad, Peak Operation,
 
 \subsection{PlantEquipmentOperation:OutdoorDewpoint}\label{plantequipmentoperationoutdoordewpoint}
 
-The outdoor operation objects define the different ranges of the various environmental parameters and which equipment list is valid for each range. After the keyword and the identifying name, a series of data trios is expected. In each trio, there is a lower limit for the load range, an upper limit for the load range, and a name that links to an equipment availability list (the CondenserEquipmentList).
+The outdoor operation objects define the different ranges of the various environmental parameters and which equipment list is valid for each range. After the keyword and the identifying name, a series of data trios is expected. In each trio, there is a lower limit for the load range, an upper limit for the load range, and a name that links to an equipment availability list (the \hyperref[condenserequipmentlist]{CondenserEquipmentList}).
 
 The fields for each of these are:
 
@@ -257,7 +257,7 @@ This numeric field contains the lower limit (C for temperature operations, Perce
 
 \paragraph{Field: Range \textless{}\#\textgreater{} Equipment List Name}\label{field-range-equipment-list-name-1}
 
-This alpha field contains the identifying name for the Equipment List (i.e., the name of a CondenserEquipmentList object).
+This alpha field contains the identifying name for the Equipment List (i.e., the name of a \hyperref[condenserequipmentlist]{CondenserEquipmentList} object).
 
 \subsection{PlantEquipmentOperation:OutdoorDryBulbDifference}\label{plantequipmentoperationoutdoordrybulbdifference}
 
@@ -293,7 +293,7 @@ This numeric field specifies the maximum temperature difference below which the 
 
 \paragraph{Field: Range \textless{}\#\textgreater{} Equipment List Name}\label{field-range-equipment-list-name-2}
 
-This alpha field contains the identifying name for the Equipment List (i.e., the name of a CondenserEquipmentList object).
+This alpha field contains the identifying name for the Equipment List (i.e., the name of a \hyperref[condenserequipmentlist]{CondenserEquipmentList} object).
 
 \subsection{PlantEquipmentOperation:ComponentSetpoint}\label{plantequipmentoperationcomponentsetpoint}
 
@@ -365,7 +365,7 @@ Users of thermal energy storage, particularly ice storage systems, are often fac
 
 \paragraph{Field: Name}\label{field-name-7-013}
 
-This field defines the name of the thermal energy (ice) storage plant equipment operation scheme that will be referenced by the PlantEquipmentOperationSchemes list in the plant input.
+This field defines the name of the thermal energy (ice) storage plant equipment operation scheme that will be referenced by the \hyperref[plantequipmentoperationschemes]{PlantEquipmentOperationSchemes} list in the plant input.
 
 \paragraph{Field: On-Peak Schedule}\label{field-on-peak-schedule}
 
@@ -445,9 +445,9 @@ PlantEquipmentOperationSchemes,
 
 \subsection{CondenserEquipmentList}\label{condenserequipmentlist}
 
-The PlantEquipmentList ~and CondenserEquipmentList ~specify available plant and condenser loop equipment respectively for any loop operation scheme. Each statement contains the object name, an identifying name (which links the definition back to one of the operation scheme statements) and a variable length of data pairs. These pairs refer to a plant equipment type and an identifying name. The type in this list of pairs must correspond to a valid plant object as described in the next subsection.
+The \hyperref[plantequipmentlist]{PlantEquipmentList} ~and CondenserEquipmentList ~specify available plant and condenser loop equipment respectively for any loop operation scheme. Each statement contains the object name, an identifying name (which links the definition back to one of the operation scheme statements) and a variable length of data pairs. These pairs refer to a plant equipment type and an identifying name. The type in this list of pairs must correspond to a valid plant object as described in the next subsection.
 
-Note: If a PlantEquipmentList or CondenserEquipmentList object is specified with no equipment object types or equipment names, then the corresponding PlantEquipmentOperation:* object will assume all available equipment on this plant (or condenser) loop should be OFF (not operate) within the specified lower/upper limit.
+Note: If a \hyperref[plantequipmentlist]{PlantEquipmentList} or CondenserEquipmentList object is specified with no equipment object types or equipment names, then the corresponding PlantEquipmentOperation:* object will assume all available equipment on this plant (or condenser) loop should be OFF (not operate) within the specified lower/upper limit.
 
 \subsubsection{Inputs}\label{inputs-15-009}
 
@@ -461,7 +461,7 @@ Remember the order of equipment on this list determines operation priority. Equi
 
 \paragraph{Field: Equipment \textless{}\#\textgreater{} Object Type}\label{field-equipment-object-type-1}
 
-This alpha field contains the keyword for the type of equipment in operation. Example: (Chiller:Electric, DistrictCooling). The full list of allowable plant equipment is valid plant objects as described in the next subsection.
+This alpha field contains the keyword for the type of equipment in operation. Example: (\hyperref[chillerelectric]{Chiller:Electric}, \hyperref[districtcooling]{DistrictCooling}). The full list of allowable plant equipment is valid plant objects as described in the next subsection.
 
 \paragraph{Field: Equipment \textless{}\#\textgreater{} Name}\label{field-equipment-name-1}
 
@@ -476,4 +476,4 @@ PlantEquipmentList, Chiller Plant and Purchased,
           DistrictCooling, Purchased Cooling;
 \end{lstlisting}
 
-Note that this list is the middle range defined in the PlantEquipmentOperation:CoolingLoad statement named ``Peak Operation'' above. This defines the equipment available when the load encountered by the plant (chiller water demand, for example) is between 7000 W and 24500 W. EnergyPlus will run the ``Big Chiller'' first up to its capacity and then attempt to meet the remaining load (while in that range) with the next piece of equipment (in this case, ``Purchased:Cooling'') in the list.
+Note that this list is the middle range defined in the \hyperref[plantequipmentoperationcoolingload]{PlantEquipmentOperation:CoolingLoad} statement named ``Peak Operation'' above. This defines the equipment available when the load encountered by the plant (chiller water demand, for example) is between 7000 W and 24500 W. EnergyPlus will run the ``Big Chiller'' first up to its capacity and then attempt to meet the remaining load (while in that range) with the next piece of equipment (in this case, ``Purchased:Cooling'') in the list.

@@ -2,7 +2,7 @@
 
 The Energy Management System (EMS) is one of the high-level control methods available in EnergyPlus. An EMS is able to access a wide variety of sensor data and use this data to direct various types of control actions. The concept is to emulate, inside EnergyPlus, the types of controls possible with the digital energy management systems used in real buildings.
 
-In the hierarchy of EnergyPlus controls, the EMS module is a high-level, generalized, supervisory control for building systems. The EMS replicates the functionality of many of the existing high-level control objects in EnergyPlus. Similar to the AvailabilityManager objects, the EMS can turn on and off pumps and fans. Similar to the DemandManager objects, the EMS can turn on and off lights and electric equipment, change the set points on zone thermostats, and dispatch on-site generation. Similar to the SetpointManager objects, the EMS can change the set points on system nodes. Similar to the PlantEquipmentOperation objects, the EMS can turn on and off supply-side heating, cooling, and heat rejection equipment, i.e., boilers, chillers, cooling towers, etc. Similar to the ElectricLoadCenter:Distribution, the EMS can turn on and off on-site generation equipment.
+In the hierarchy of EnergyPlus controls, the EMS module is a high-level, generalized, supervisory control for building systems. The EMS replicates the functionality of many of the existing high-level control objects in EnergyPlus. Similar to the AvailabilityManager objects, the EMS can turn on and off pumps and fans. Similar to the DemandManager objects, the EMS can turn on and off lights and electric equipment, change the set points on zone thermostats, and dispatch on-site generation. Similar to the SetpointManager objects, the EMS can change the set points on system nodes. Similar to the PlantEquipmentOperation objects, the EMS can turn on and off supply-side heating, cooling, and heat rejection equipment, i.e., boilers, chillers, cooling towers, etc. Similar to the \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution}, the EMS can turn on and off on-site generation equipment.
 
 A separate document called \emph{Application Guide for EMS} contains much more information on how to use the EMS. The EMS uses the EnergyPlus Runtime Language (Erl) for custom programming of control routines.
 
@@ -61,11 +61,11 @@ The field contains a unique name for the actuator that becomes the name of a var
 
 \paragraph{Field: Actuated Component Unique Name}\label{field-actuated-component-unique-name}
 
-This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object Output:EnergyManagementSystem for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
+This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
 
 \paragraph{Field: Actuated Component Type}\label{field-actuated-component-type}
 
-The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object Output:EnergyManagementSystem for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
+The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
 
 \paragraph{Field: Actuated Component Control Type}\label{field-actuated-component-control-type}
 
@@ -96,7 +96,7 @@ EnergyManagementSystem:Actuator,
 
 \subsection{EnergyManagementSystem:ProgramCallingManager}\label{energymanagementsystemprogramcallingmanager}
 
-The EnergyManagementSystem:ProgramCallingManager object is used to specify when individual Erl programs are run. This object manages two temporal aspects of running Erl programs. The first is when they are run relative to the rest of EnergyPlus, and the second is when they are run relative to each other. EMS applications can use multiple EnergyManagementSystem:ProgramCallingManager objects. For example, one manager may execute an initialization program once at the beginning of the run period while additional managers call various sets of programs from different EMS Calling Points.
+The \hyperref[energymanagementsystemprogram]{EnergyManagementSystem:Program}CallingManager object is used to specify when individual Erl programs are run. This object manages two temporal aspects of running Erl programs. The first is when they are run relative to the rest of EnergyPlus, and the second is when they are run relative to each other. EMS applications can use multiple \hyperref[energymanagementsystemprogram]{EnergyManagementSystem:Program}CallingManager objects. For example, one manager may execute an initialization program once at the beginning of the run period while additional managers call various sets of programs from different EMS Calling Points.
 
 Control schemes can be organized using a multiple Erl programs and this object this specifies the order in which they are executed. \emph{Program Name 1} is run first, \emph{Program Name 2} is run second, etc. The run order can be important if there are interactions or dependencies between two or more programs. Within each program there may be calls to execute subroutine programs but only calling managers are used to execute main-level programs.
 
@@ -138,18 +138,18 @@ This field describes when the Erl programs managed under this object are called 
 \item
   AfterComponentInputReadIn. This calling point occurs early in the simulation when HVAC component s input data has been processed but before any component-level calculations for automatic sizing. This calling point occurs once for each of the types of HVAC components that have EMS actuators for autosize overrides. This calling point is not directly useful for control actions but is useful for overriding the results of sizing at the component level.
 \item
-  UserDefinedComponentModel. This calling point occurs when user-defined HVAC and plant component models are called to be simulated. This calling point is only used for the programs that model custom components. This calling point differs from the others in that when it is being used the calls to trigger include a reference to a specific EnergyManagementSystem:ProgramCallingManager and only the one manger is executed.
+  UserDefinedComponentModel. This calling point occurs when user-defined HVAC and plant component models are called to be simulated. This calling point is only used for the programs that model custom components. This calling point differs from the others in that when it is being used the calls to trigger include a reference to a specific \hyperref[energymanagementsystemprogram]{EnergyManagementSystem:Program}CallingManager and only the one manger is executed.
 \item
-  UnitarySystemSizing. This calling point occurs when Unitary systems begin their calculations for determining the size values for autosized input fields. This calling point is used for overriding the autosizing outcomes for unitary systems. Each unitary system in the simulation will call this point one time. This calling point is used to override sizing in the following input objects: AirLoopHVAC:UnitarySystem, AirLoopHVAC:Unitary:Furnace:HeatOnly, AirLoopHVAC:UnitaryHeatOnly, AirLoopHVAC:UnitaryHeatCool,AirLoopHVAC:Unitary:Furnace:HeatCool, AirLoopHVAC:UnitaryHeatPump:AirToAir, and AirLoopHVAC:UnitaryHeatPump:WaterToAir.
+  UnitarySystemSizing. This calling point occurs when Unitary systems begin their calculations for determining the size values for autosized input fields. This calling point is used for overriding the autosizing outcomes for unitary systems. Each unitary system in the simulation will call this point one time. This calling point is used to override sizing in the following input objects: \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem}, \hyperref[airloophvacunitaryfurnaceheatonly]{AirLoopHVAC:Unitary:Furnace:HeatOnly}, \hyperref[airloophvacunitaryheatonly]{AirLoopHVAC:UnitaryHeatOnly}, \hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool},\hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool}, \hyperref[airloophvacunitaryheatpumpairtoair]{AirLoopHVAC:UnitaryHeatPump:AirToAir}, and \hyperref[airloophvacunitaryheatpumpwatertoair]{AirLoopHVAC:UnitaryHeatPump:WaterToAir}.
 \end{itemize}
 
 \paragraph{Field: Program Name 1}\label{field-program-name-1}
 
-The name of the EnergyManagementSystem:Program object that will be the first to run for the calling point.
+The name of the \hyperref[energymanagementsystemprogram]{EnergyManagementSystem:Program} object that will be the first to run for the calling point.
 
 \paragraph{Field: Program Name 2 .. N}\label{field-program-name-2-..-n}
 
-The name of the EnergyManagementSystem:Program object that will be the second to run. Additional programs can be listed. The object is automatically extensible to accommodate as many programs as needed.
+The name of the \hyperref[energymanagementsystemprogram]{EnergyManagementSystem:Program} object that will be the second to run. Additional programs can be listed. The object is automatically extensible to accommodate as many programs as needed.
 
 IDF examples:
 
@@ -183,7 +183,7 @@ EnergyManagementSystem:ProgramCallingManager,
 
 \subsection{EnergyManagementSystem:Program}\label{energymanagementsystemprogram}
 
-The EnergyManagementSystem:Program object is the central processor of the EMS and the primary container for the \emph{EnergyPlus Runtime Language}, or Erl. The EnergyManagementSystem:Program objects are run in the order and point during an EnergyPlus simulation that is specified in an EnergyManagementSystem:ProgramCallingManager object. Multiple EnergyManagementSystem:Program objects are allowed and may interact (or interfere) with each other. The \emph{Application Guide for EMS} provides a comprehensive overview of Erl programming.
+The EnergyManagementSystem:Program object is the central processor of the EMS and the primary container for the \emph{EnergyPlus Runtime Language}, or Erl. The EnergyManagementSystem:Program objects are run in the order and point during an EnergyPlus simulation that is specified in an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} object. Multiple EnergyManagementSystem:Program objects are allowed and may interact (or interfere) with each other. The \emph{Application Guide for EMS} provides a comprehensive overview of Erl programming.
 
 The object definition is very simple. There is a name followed by lines of Erl program code.
 
@@ -311,7 +311,7 @@ EnergyManagementSystem:GlobalVariable,
 
 \subsection{EnergyManagementSystem:OutputVariable}\label{energymanagementsystemoutputvariable}
 
-The \textbf{EnergyManagementSystem:OutputVariable} object creates a custom output variable that is mapped to an EMS variable. These can be declared by an \textbf{EnergyManagementSystem:Sensor} object, an \textbf{EnergyManagementSystem:Actuator} object, or an \textbf{EnergyManagementSystem:GlobalVariable} object, or any local variable in an Erl program. The custom output variable can then be reported to the output file using the standard EnergyPlus output mechanisms such as with the Output:Variable object.
+The \textbf{EnergyManagementSystem:OutputVariable} object creates a custom output variable that is mapped to an EMS variable. These can be declared by an \textbf{\hyperref[energymanagementsystemsensor]{EnergyManagementSystem:Sensor}} object, an \textbf{\hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator}} object, or an \textbf{\hyperref[energymanagementsystemglobalvariable]{EnergyManagementSystem:GlobalVariable}} object, or any local variable in an Erl program. The custom output variable can then be reported to the output file using the standard EnergyPlus output mechanisms such as with the \hyperref[outputvariable]{Output:Variable} object.
 
 The EnergyManagementSystem:OutputVariable object is a primary way to obtain data from an Erl program and is likely to be essential for developing and debugging programs. This object also provides a powerful mechanism to create custom output variables. See the \emph{Application Guide for EMS} for more information.
 
@@ -319,7 +319,7 @@ The EnergyManagementSystem:OutputVariable object is a primary way to obtain data
 
 \paragraph{Field: Name}\label{field-name-5-008}
 
-This field contains the user-defined name for the new output variable. This is the name that will appear in the RDD output file and can be referenced in other input for output such as an Output:Variable object. By convention, the name is in title case for capitalization. Units are provided in the Units field.
+This field contains the user-defined name for the new output variable. This is the name that will appear in the RDD output file and can be referenced in other input for output such as an \hyperref[outputvariable]{Output:Variable} object. By convention, the name is in title case for capitalization. Units are provided in the Units field.
 
 \paragraph{Field: EMS Variable Name}\label{field-ems-variable-name}
 
@@ -365,11 +365,11 @@ EnergyManagementSystem:OutputVariable,
 
 \subsection{EnergyManagementSystem:MeteredOutputVariable}\label{energymanagementsystemmeteredoutputvariable}
 
-The EnergyManagementSystem:MeteredOutputVariable object creates a custom output variable that is mapped to an EMS variable and is also included in the metering system that EnergyPlus has for aggregating results for different resources across the model. This object is very similar to EnergyManagementSystem:OutputVariable with the main differences being that only summed types of data in the Erl variable and the quantity is to be added to a meter. This allows for custom output variables that also impact the results for the amount of electricity or gas consumed.
+The EnergyManagementSystem:MeteredOutputVariable object creates a custom output variable that is mapped to an EMS variable and is also included in the metering system that EnergyPlus has for aggregating results for different resources across the model. This object is very similar to \hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable} with the main differences being that only summed types of data in the Erl variable and the quantity is to be added to a meter. This allows for custom output variables that also impact the results for the amount of electricity or gas consumed.
 
 \subsubsection{Field: Name}\label{field-name-6-006}
 
-This field contains the user-defined name for the new output variable. This is the name that will appear in the RDD and MTD output files and can be referenced in other input for output such as an Output:Variable object. Units are provided in the Units field.
+This field contains the user-defined name for the new output variable. This is the name that will appear in the RDD and MTD output files and can be referenced in other input for output such as an \hyperref[outputvariable]{Output:Variable} object. Units are provided in the Units field.
 
 \subsubsection{Field: EMS Variable Name}\label{field-ems-variable-name-1}
 
@@ -421,9 +421,9 @@ This field is used to specify the type of resource that the output variable cons
 \item
   \textbf{Steam}, this selects the meter for steam energy consumption, in units of Joules {[}J{]},
 \item
-  \textbf{DistrictCooling}, this selects the meter for district chilled water energy consumption, in units of Joules {[}J{]},
+  \textbf{\hyperref[districtcooling]{DistrictCooling}}, this selects the meter for district chilled water energy consumption, in units of Joules {[}J{]},
 \item
-  \textbf{DistrictHeating}, this selects the meter for district hot water energy consumption, in units of Joules {[}J{]},
+  \textbf{\hyperref[districtheating]{DistrictHeating}}, this selects the meter for district hot water energy consumption, in units of Joules {[}J{]},
 \item
   \textbf{ElectricityProducedOnSite}, this selects the meter for electricity produced on the site, in units of Joules {[}J{]},
 \item
@@ -540,7 +540,7 @@ EnergyManagementSystem:TrendVariable,
 
 \subsection{EnergyManagementSystem:InternalVariable}\label{energymanagementsysteminternalvariable}
 
-The EMS also provides a method to obtain static data from elsewhere in the model. Whereas EMS sensors are used for time-varying data, there are also data that describe certain design parameters for the building which may be useful for EMS calculations. A method for accessing internal data is provided as a time saver and means of better generalizing Erl programs for wider applicability. Information needed for this input object is output by EnergyPlus to the eplusout.edd file see the Output:EnergyManagementSystem input object. The EDD file can list the internal data index keys and types that are available for use with this object. The Application Guide for EMS discusse internal variables in more depth.
+The EMS also provides a method to obtain static data from elsewhere in the model. Whereas EMS sensors are used for time-varying data, there are also data that describe certain design parameters for the building which may be useful for EMS calculations. A method for accessing internal data is provided as a time saver and means of better generalizing Erl programs for wider applicability. Information needed for this input object is output by EnergyPlus to the eplusout.edd file see the \hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem} input object. The EDD file can list the internal data index keys and types that are available for use with this object. The Application Guide for EMS discusse internal variables in more depth.
 
 \subsubsection{Inputs}\label{inputs-8-006}
 
@@ -568,7 +568,7 @@ EnergyManagementSystem:InternalVariable,
 
 \subsection{EnergyManagementSystem:CurveOrTableIndexVariable}\label{energymanagementsystemcurveortableindexvariable}
 
-The EMS provides a method for reusing curve and table input objects from elsewhere in the model. Input objects, such as Curve:Cubic, Curve:Biquadratic, or Table:TwoIndependetVariables, are used by various component models to describe performance relationships in a generic way. By using an EnergyManagementSystem:CurveOrTableIndexVariable input object, these curves and tables can be used in your own Erl programs. This object sets up an Erl variable that contains an index that points to specific curve or table. This index variable is then used as the first argument in a call to the built-in function called @CurveValue so that the correct curve or table is evaluated.
+The EMS provides a method for reusing curve and table input objects from elsewhere in the model. Input objects, such as \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvebiquadratic]{Curve:Biquadratic}, or Table:TwoIndependetVariables, are used by various component models to describe performance relationships in a generic way. By using an EnergyManagementSystem:CurveOrTableIndexVariable input object, these curves and tables can be used in your own Erl programs. This object sets up an Erl variable that contains an index that points to specific curve or table. This index variable is then used as the first argument in a call to the built-in function called @CurveValue so that the correct curve or table is evaluated.
 
 \subsubsection{Inputs}\label{inputs-9-005}
 

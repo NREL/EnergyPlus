@@ -33,7 +33,7 @@ The local outdoor dry-bulb temperature used in the above basic equation (T\(_{od
 The local outdoor wind speed used in the above basic equation (WindSpeed) is also a function of the height of the zone centroid above ground. The corresponding zone name is given in the second filed. The local outdoor wind speed calculation procedure is given in the section of ``Local Wind Speed Calculation'' in the Engineering Reference.
 
 \begin{callout}
-  Note: When the value of the Wind Speed Profile Exponent field in the Site:HeightVariation is equal to 0.0. The local wind speed is always equal to the wind speed given in the weather data and will not be dependent on zone centroid height. Similarly, if the value of the Air Temperature Gradient Coefficient is set equal to 0 the local air dry-bulb temperature is also always equal to the air dry-bulb temperature given in the weather data and will not be dependent on zone centroid height.
+  Note: When the value of the Wind Speed Profile Exponent field in the \hyperref[siteheightvariation]{Site:HeightVariation} is equal to 0.0. The local wind speed is always equal to the wind speed given in the weather data and will not be dependent on zone centroid height. Similarly, if the value of the Air Temperature Gradient Coefficient is set equal to 0 the local air dry-bulb temperature is also always equal to the air dry-bulb temperature given in the weather data and will not be dependent on zone centroid height.
 \end{callout}
 
 One or more infiltration objects can be defined for each zone, and the resulting infiltration rate for the zone will simply be the summation of the flow rates specified by the infiltration objects.
@@ -46,7 +46,7 @@ The name of the ZoneInfiltration:DesignFlowRate object. This needs to be unique 
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name}
 
-This field is the name of the zone (ref: Zone) or ZoneList (ref: ZoneLIst) and attaches a particular infiltration statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this infiltration definition is applied to each of the zones in the zone list effecting a global definition for the amount of infiltration flow rate in the zone. The Zonelist option can be used effectively with the flow/area, flow/exteriorarea, flow/exteriorwallarea, or airchanges/hour of the Design Flow Rate Calculation Method.
+This field is the name of the zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: ZoneLIst) and attaches a particular infiltration statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this infiltration definition is applied to each of the zones in the zone list effecting a global definition for the amount of infiltration flow rate in the zone. The Zonelist option can be used effectively with the flow/area, flow/exteriorarea, flow/exteriorwallarea, or airchanges/hour of the Design Flow Rate Calculation Method.
 
 The name of the actual infiltration object becomes \textless{}Zone Name\textgreater{} \textless{}ZoneInfiltration:DesignFlowRate Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
@@ -181,7 +181,7 @@ Infiltration = \left( {{F_{Schedule}}} \right)\frac{{{A_L}}}{{1000}}\sqrt {{C_s}
 
 where \(\Delta T\) ~is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
-Note that the coefficients for the ``EffectiveLeakageArea'' model are not interchangeable with the similarly named coefficients in the ``FlowCoefficient'' model (see ZoneInfiltration:FlowCoefficient object).
+Note that the coefficients for the ``EffectiveLeakageArea'' model are not interchangeable with the similarly named coefficients in the ``FlowCoefficient'' model (see \hyperref[zoneinfiltrationflowcoefficient]{ZoneInfiltration:FlowCoefficient} object).
 
 One or more infiltration objects of different types can be defined for each zone, and the resulting infiltration rate for the zone will simply be the summation of the flow rates specified by the infiltration objects.
 
@@ -287,7 +287,7 @@ Infiltration = \left( {{F_{Schedule}}} \right)\sqrt {{{\left( {c\,{C_s}\Delta {T
 
 Where \(\Delta T\) ~is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
-Note that the coefficients for the ``Flow Coefficient'' model are not interchangeable with the similarly named coefficients in the ``Effective Leakage Area'' model (see ZoneInfiltration:EffectiveLeakageArea object).
+Note that the coefficients for the ``Flow Coefficient'' model are not interchangeable with the similarly named coefficients in the ``Effective Leakage Area'' model (see \hyperref[zoneinfiltrationeffectiveleakagearea]{ZoneInfiltration:EffectiveLeakageArea} object).
 
 One or more infiltration objects of different types can be defined for each zone, and the resulting infiltration rate for the zone will simply be the summation of the flow rates specified by the infiltration objects.
 
@@ -516,9 +516,9 @@ The local outdoor dry-bulb temperature used in the above basic equation (T\(_{od
 
 The local outdoor wind speed used in the above basic equation (WindSpeed) is also a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor wind speed calculation procedure is described in the ``Local Wind Speed Calculation'' section of the Engineering Reference.
 
-Note: When the value of the Wind Speed Profile Exponent field in the Site:HeightVariation object is equal to 0.0, the local wind speed is always equal to the wind speed given in the weather data and will not be dependent on zone centroid height.~ Similarly, if the value of the Air Temperature Gradient Coefficient is set equal to 0, the local air dry-bulb temperature is also always equal to the air dry-bulb temperature given in the weather data and will not be dependent on zone centroid height.
+Note: When the value of the Wind Speed Profile Exponent field in the \hyperref[siteheightvariation]{Site:HeightVariation} object is equal to 0.0, the local wind speed is always equal to the wind speed given in the weather data and will not be dependent on zone centroid height.~ Similarly, if the value of the Air Temperature Gradient Coefficient is set equal to 0, the local air dry-bulb temperature is also always equal to the air dry-bulb temperature given in the weather data and will not be dependent on zone centroid height.
 
-One or more ventilation objects (i.e., ZoneVentilation:DesignFlowRate and/or ZoneVentilation:WindandStackOpenArea) can be defined for each zone, and the resulting ventilation rate for the zone will simply be the summation of the flow rates specified by the ventilation objects.
+One or more ventilation objects (i.e., ZoneVentilation:DesignFlowRate and/or \hyperref[zoneventilationwindandstackopenarea]{ZoneVentilation:WindandStackOpenArea}) can be defined for each zone, and the resulting ventilation rate for the zone will simply be the summation of the flow rates specified by the ventilation objects.
 
 More advanced ventilation calculations are possible using the EnergyPlus AirflowNetwork model.
 
@@ -530,7 +530,7 @@ The name of the ZoneVentilation:DesignFlowRate object.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-1}
 
-This field is the name of the zone (ref: Zone) or ZoneList (ref: ZoneList) and attaches a particular ventilation statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this ventilation definition is applied to each of the zones in the zone list effecting a global definition for the amount of infiltration flow rate in the zone. The Zonelist option can be used effectively with the flow/area, flow/person, or airchanges/hour of the Design Flow Rate Calculation Method.
+This field is the name of the zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and attaches a particular ventilation statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this ventilation definition is applied to each of the zones in the zone list effecting a global definition for the amount of infiltration flow rate in the zone. The Zonelist option can be used effectively with the flow/area, flow/person, or airchanges/hour of the Design Flow Rate Calculation Method.
 
 The name of the actual ventilation object becomes \textless{}Zone Name\textgreater{} \textless{}ZoneVentilation:DesignFlowRate Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
@@ -761,7 +761,7 @@ Global Ventilation example:
 
 \subsection{ZoneVentilation:WindandStackOpenArea}\label{zoneventilationwindandstackopenarea}
 
-For this model, the ventilation air flow rate is a function of wind speed and thermal stack effect, along with the area of the opening being modeled. This object can be used alone or in combination with ZoneVentilation:DesignFlowRate objects. This model is intended for simplified ventilation calculations as opposed to the more detailed ventilation investigations that can be performed with the AirflowNetwork model. Using the ``Wind and Stack with Open Area'' model, the natural ventilation flow rate can be controlled by a multiplier fraction schedule applied to the user-defined opening area and through the specification of minimum, maximum and delta temperatures. The temperatures can be either single constant values for the entire simulation or schedules which can vary over time. The equation used to calculate the ventilation rate driven by wind is:
+For this model, the ventilation air flow rate is a function of wind speed and thermal stack effect, along with the area of the opening being modeled. This object can be used alone or in combination with \hyperref[zoneventilationdesignflowrate]{ZoneVentilation:DesignFlowRate} objects. This model is intended for simplified ventilation calculations as opposed to the more detailed ventilation investigations that can be performed with the AirflowNetwork model. Using the ``Wind and Stack with Open Area'' model, the natural ventilation flow rate can be controlled by a multiplier fraction schedule applied to the user-defined opening area and through the specification of minimum, maximum and delta temperatures. The temperatures can be either single constant values for the entire simulation or schedules which can vary over time. The equation used to calculate the ventilation rate driven by wind is:
 
 \begin{equation}
 {Q_w} = {C_w}{A_{opening}}{F_{schedule}}V
@@ -813,9 +813,9 @@ The local outdoor air dry-bulb temperature used in the stack effect equation (T\
 
 The local outdoor wind speed used in the above wind-driven equation (V) is also a function of the height of the zone centroid above ground. The corresponding zone name is given in the second field. The local outdoor wind speed calculation procedure is described in the ``Local Wind Speed Calculation'' section of the Engineering Reference.
 
-Note: When the value of the Wind Speed Profile Exponent field in the Site:HeightVariation object is equal to 0.0, the local wind speed is always equal to the wind speed given in the weather data and will not be dependent on zone centroid height.~ Similarly, if the value of the Air Temperature Gradient Coefficient is set equal to 0, the local air dry-bulb temperature is also always equal to the air dry-bulb temperature given in the weather data and will not be dependent on zone centroid height.
+Note: When the value of the Wind Speed Profile Exponent field in the \hyperref[siteheightvariation]{Site:HeightVariation} object is equal to 0.0, the local wind speed is always equal to the wind speed given in the weather data and will not be dependent on zone centroid height.~ Similarly, if the value of the Air Temperature Gradient Coefficient is set equal to 0, the local air dry-bulb temperature is also always equal to the air dry-bulb temperature given in the weather data and will not be dependent on zone centroid height.
 
-One or more ventilation objects (i.e., ZoneVentilation:DesignFlowRate and/or ZoneVentilation:WindandStackOpenArea) can be defined for each zone, and the resulting ventilation rate for the zone will simply be the summation of the flow rates specified by the ventilation objects.
+One or more ventilation objects (i.e., \hyperref[zoneventilationdesignflowrate]{ZoneVentilation:DesignFlowRate} and/or ZoneVentilation:WindandStackOpenArea) can be defined for each zone, and the resulting ventilation rate for the zone will simply be the summation of the flow rates specified by the ventilation objects.
 
 More advanced ventilation calculations are possible using the EnergyPlus AirflowNetwork model.
 
@@ -843,7 +843,7 @@ This field is the opening effectiveness (C\(_{w}\)). The value must be between 0
 
 \paragraph{Field: Effective Angle}\label{field-effective-angle}
 
-This is the angle in degrees counting from the North clockwise to the opening outward normal. The value must be between 0 and 360, with the default being 0 if this input field is left blank. The Effective Angle is 0 if the opening outward normal faces North, 90 if faces East, 180 if faces South, and 270 if faces West. The value is fixed and independent of coordinate system defined in the GlobalGeometryRules object. This input field value is used to calculate the angle between the wind direction and the opening outward normal to determine the opening effectiveness values when the input field Opening Effectiveness = Autocalculate.
+This is the angle in degrees counting from the North clockwise to the opening outward normal. The value must be between 0 and 360, with the default being 0 if this input field is left blank. The Effective Angle is 0 if the opening outward normal faces North, 90 if faces East, 180 if faces South, and 270 if faces West. The value is fixed and independent of coordinate system defined in the \hyperref[globalgeometryrules]{GlobalGeometryRules} object. This input field value is used to calculate the angle between the wind direction and the opening outward normal to determine the opening effectiveness values when the input field Opening Effectiveness = Autocalculate.
 
 \paragraph{Field: Height Difference}\label{field-height-difference}
 
@@ -1026,7 +1026,7 @@ This is equal to the outdoor air temperature except when INTAKE fan power is inc
 
 \subsection{ZoneAirBalance:OutdoorAir}\label{zoneairbalanceoutdoorair}
 
-This model calculates a combined zone outdoor airflow by including interactions between mechanical ventilation, infiltration and duct leakage. It is mainly applied to a single zone (e.g., residential) building. The model combines all outdoor airflows from ZoneInfiltration and ZoneVentilation objects in the same zone. This object also includes the induced outdoor airflows due to unbalanced duct leakage, and unbalanced outdoor airflows introduced by unbalanced airflows from ZoneHVAC:EnergyRecoveryVentilator objects when the exhaust airflow is greater than the supply outdoor airflow. This model is intended for simplified outdoor airflow calculations as opposed to the more detailed outdoor airflow investigations that can be performed with the AirflowNetwork model. The equation used to calculate the combined zone outdoor airflow is:
+This model calculates a combined zone outdoor airflow by including interactions between mechanical ventilation, infiltration and duct leakage. It is mainly applied to a single zone (e.g., residential) building. The model combines all outdoor airflows from ZoneInfiltration and ZoneVentilation objects in the same zone. This object also includes the induced outdoor airflows due to unbalanced duct leakage, and unbalanced outdoor airflows introduced by unbalanced airflows from \hyperref[zonehvacenergyrecoveryventilator]{ZoneHVAC:EnergyRecoveryVentilator} objects when the exhaust airflow is greater than the supply outdoor airflow. This model is intended for simplified outdoor airflow calculations as opposed to the more detailed outdoor airflow investigations that can be performed with the AirflowNetwork model. The equation used to calculate the combined zone outdoor airflow is:
 
 \begin{equation}
 Q = \sqrt {{Q_n}^2 + {Q_{u,v}}^2 + {Q_{u,l}}^2}  + {Q_{b,v}}
@@ -1046,9 +1046,9 @@ where,
 
 This object cannot be used simultaneously with the EnergyPlus AirflowNetwork model.~ If the AirflowNetwork model is active for a simulation time step, the Air Balance Method is reset to ``None'' for that time step. More advanced outdoor airflow calculations are possible using the EnergyPlus AirflowNetwork model.
 
-This object does not combine any airflows from Fan:ZoneExhaust objects and is independent of HVAC equipment operation.
+This object does not combine any airflows from \hyperref[fanzoneexhaust]{Fan:ZoneExhaust} objects and is independent of HVAC equipment operation.
 
-This object will not work with the AvailabilityManager:HybridVentilation object in the same zone, when the Simple Airflow Control Type Schedule Name is provided in the HybridVentilation object. For this case, the Air Balance Method is reset to ``None''.
+This object will not work with the \hyperref[availabilitymanagerhybridventilation]{AvailabilityManager:HybridVentilation} object in the same zone, when the Simple Airflow Control Type Schedule Name is provided in the HybridVentilation object. For this case, the Air Balance Method is reset to ``None''.
 
 \subsubsection{Inputs}\label{inputs-4-004}
 
@@ -1177,7 +1177,7 @@ ZoneVentilation:DesignFlowRate objects used to calculate a combined zone outdoor
 
 \subsection{ZoneMixing}\label{zonemixing}
 
-ZoneMixing is intended to allow simplified treatment of air exchange between zones. Note that this statement only affects the energy balance of the ``receiving'' zone and that this statement will not produce any effect on the ``source'' zone. ZoneMixing statements can be complementary and include multiple zones, but the balancing of flows between zones is left to the user's discretion. Also see ZoneCrossMixing and ZoneRefrigerationDoorMixing. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation.
+ZoneMixing is intended to allow simplified treatment of air exchange between zones. Note that this statement only affects the energy balance of the ``receiving'' zone and that this statement will not produce any effect on the ``source'' zone. ZoneMixing statements can be complementary and include multiple zones, but the balancing of flows between zones is left to the user's discretion. Also see \hyperref[zonecrossmixing]{ZoneCrossMixing} and \hyperref[zonerefrigerationdoormixing]{ZoneRefrigerationDoorMixing}. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation.
 
 \subsubsection{Inputs}\label{inputs-5-004}
 
@@ -1373,7 +1373,7 @@ The total heat gain due to the sum of mixing, cross-mixing, and refrigeration-do
 
 \subsection{ZoneCrossMixing}\label{zonecrossmixing}
 
-ZoneCrossMixing is ideally suited for two zones that exchange an equal amount of air between each other. As with ZoneMixing, this is a simplified interzone airflow in EnergyPlus. The main difference between ZoneMixing and ZoneCrossMixing is that cross mixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. For refrigerated zones, see ZoneRefrigerationDoorMixing. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation.
+ZoneCrossMixing is ideally suited for two zones that exchange an equal amount of air between each other. As with \hyperref[zonemixing]{ZoneMixing}, this is a simplified interzone airflow in EnergyPlus. The main difference between \hyperref[zonemixing]{ZoneMixing} and ZoneCrossMixing is that cross mixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. For refrigerated zones, see \hyperref[zonerefrigerationdoormixing]{ZoneRefrigerationDoorMixing}. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation.
 
 ZoneCrossMixing can be entered once (in one of the mixing zones), twice (once for each zone), or multiple times (exchanging with more than one zone). Each object will be modeled with its own control conditions. The object may be entered once if Delta Temperature \textgreater{} 0.0 and it is desirable to have mixing only when the source zone~ is warmer than the receiving zone. This might be the case when the warmer zone is below the colder zone and the mixing is buoyancy driven. If the zones are next to each other, separated by an open doorway, it would be more suitable to input a cross mixing object for each zone. Then mixing would occur if the zone temperatures differed by Delta Temperature or greater regardless of which is the warmer zone.
 
@@ -1583,7 +1583,7 @@ The total heat gain due to the sum of mixing, cross-mixing, and refrigeration-do
 
 \subsection{ZoneRefrigerationDoorMixing}\label{zonerefrigerationdoormixing}
 
-ZoneRefrigerationDoorMixing is ideally suited for two zones, at least one of which is refrigerated, that exchange an equal amount of dry air. As with ZoneMixing, this is a simplified interzone airflow in EnergyPlus. The ZoneRefrigerationDoorMixing approach shares some features of both ZoneMixing and ZoneCrossMixing. Like ZoneCrossMixing, ZoneRefrigerationDoorMixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. Unlike the other two mixing objects, ZoneRefrigerationDoorMixing always calculates the air exchange rate based on the zone temperature and relative humidity. That is, the user does not specify the air flow rate. The user can moderate the flow through a door-opening schedule.
+ZoneRefrigerationDoorMixing is ideally suited for two zones, at least one of which is refrigerated, that exchange an equal amount of dry air. As with \hyperref[zonemixing]{ZoneMixing}, this is a simplified interzone airflow in EnergyPlus. The ZoneRefrigerationDoorMixing approach shares some features of both \hyperref[zonemixing]{ZoneMixing} and \hyperref[zonecrossmixing]{ZoneCrossMixing}. Like \hyperref[zonecrossmixing]{ZoneCrossMixing}, ZoneRefrigerationDoorMixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. Unlike the other two mixing objects, ZoneRefrigerationDoorMixing always calculates the air exchange rate based on the zone temperature and relative humidity. That is, the user does not specify the air flow rate. The user can moderate the flow through a door-opening schedule.
 
 ZoneRefrigerationDoorMixing can only be entered once for any unique pair of zones. It doesn't matter which zone is listed first and the zones will automatically switch back and forth between source and receiving zones depending upon which zone is colder.
 
@@ -2163,7 +2163,7 @@ A thermal chimney is a vertical shaft utilizing solar radiation to enhance the n
 
 The key output parameter in the thermal chimney model is the enhanced amount of natural ventilation rate caused by the presence of a thermal chimney. In order to determine the enhanced ventilation, the discharge air temperature from a thermal chimney should be calculated, which, in turn, should be computed based on the information on the absorber wall temperature, glass cover temperature and the vertical air temperature distribution within the thermal chimney. Among them, energy balances for the absorber wall and the glass cover are carried out using the existing algorithm currently available in EnergyPlus, which has the similar approach to the Trombe wall. As stated in the Trombe wall object as well, this approach allows the flexibility for users to specify the various wall parameters and to explore unusual configurations. On the other hand, the vertical air temperature distribution and the resultant discharge air temperature of the thermal chimney are computed using the separate thermal chimney algorithm described in the Engineering Reference document.
 
-Similar to the Trombe wall model, a zone is coupled to the desired surface via an interzone partition. To simulate the thermal chimney, the Solar Distribution field in the Building object should be set to FullInteriorAndExterior so that the majority of the solar flux is directed on the absorber wall. For a normal sized thermal chimney zone, the user can set the Zone Inside Convection Algorithm to ``Detailed'', which takes into account natural convection effects intended for a normal zone. For a narrow cavity zone having high aspect ratios, there is no built-in algorithm for calculating the correct convection coefficients on the inside of thermal chimney zone walls. One option is to use the ``Detailed'' convection algorithm similar to the Trombe wall model. However, some error may be incurred when used with a narrow zone. Another option is to use the SurfaceProperty:ConvectionCoefficients object to schedule coefficients that have been determined beforehand by the user. In addition, the wall construction of the adjoining zone must be the mirror image of the wall construction in the thermal chimney zone.
+Similar to the Trombe wall model, a zone is coupled to the desired surface via an interzone partition. To simulate the thermal chimney, the Solar Distribution field in the Building object should be set to FullInteriorAndExterior so that the majority of the solar flux is directed on the absorber wall. For a normal sized thermal chimney zone, the user can set the Zone Inside Convection Algorithm to ``Detailed'', which takes into account natural convection effects intended for a normal zone. For a narrow cavity zone having high aspect ratios, there is no built-in algorithm for calculating the correct convection coefficients on the inside of thermal chimney zone walls. One option is to use the ``Detailed'' convection algorithm similar to the Trombe wall model. However, some error may be incurred when used with a narrow zone. Another option is to use the \hyperref[surfacepropertyconvectioncoefficients]{SurfaceProperty:ConvectionCoefficients} object to schedule coefficients that have been determined beforehand by the user. In addition, the wall construction of the adjoining zone must be the mirror image of the wall construction in the thermal chimney zone.
 
 The full input description of a thermal chimney in EnergyPlus is given below.
 
@@ -2287,7 +2287,7 @@ The temperature of the air which is discharged from the thermal chimney through 
 
 This global object allows users to trigger the zone air mass flow conservation calculation when desired. This object has three input fields; the first choice input field allows the user whether to adjust mixing flows to enforce the zone air mass flow conservation; and the other fields allows the user to specify how infiltration object mass flow rate is calculated for zone air mass flow balance calculation.~ If adjustments for either mixing or infiltration is specified then the zone air mass balance attempts to enforce conservation. If both mixing and infiltration adjustments are off, then the zone air mass flow calculation uses the default method which does not include zone mixing objects and assumes self-balanced simple infiltration. The default method may not necessarily enforce zone air mass flow conservation unless the user has specified a balanced flow to begin with. The zone air mass flow conservation primarily accounts for the zonemixing objects air flow in the zone air flow mass balance calculation. In addition to the zonemixing object flow, the procedure accounts for zone supply, exhaust, and return flows and adjusts infiltration air flows (up or down) when required in order to balance the zone air mass flow.~ Mixing and infiltration adjustments will only be made in zones which have zonemixing or infiltration objects defined in the input. For example, if a zone does not have any infiltration objects, then no infiltration adjustment will be made for that zone.
 
-First, the ZoneMixing object mass flow rate is adjusted or modified in order to balance zone air mass flow while assuming any zone infiltration objects are self-balanced. This step will always results in balanced zone air mass for receiving zones of ZoneMixing object but it may not necessarily result in a balanced air mass flow for source zones.~
+First, the \hyperref[zonemixing]{ZoneMixing} object mass flow rate is adjusted or modified in order to balance zone air mass flow while assuming any zone infiltration objects are self-balanced. This step will always results in balanced zone air mass for receiving zones of \hyperref[zonemixing]{ZoneMixing} object but it may not necessarily result in a balanced air mass flow for source zones.~
 
 Second, infiltration flow rates are adjusted accoring to the options set. Infiltration flow will be increased or decreased to balance the net flow from supply, exhaust, mixing, and return air flows. If a negative infiltration rate (exfiltration) is required to balance a zone's airflow, then the infiltration rate will be set to zero. This can happen, for example, if the total supply flow exceeds the total exahust plus return flow.
 
@@ -2297,7 +2297,7 @@ This object is optional. If it is not present in the input file, the default zon
 
 \paragraph{Field: Adjust Zone Mixing For Zone Air Mass Flow Balance}\label{field-adjust-zone-mixing-for-zone-air-mass-flow-balance}
 
-This field has two choices: \emph{Yes} or \emph{No}.~ When set to \emph{Yes}, the zone air mass flow balance attempts to enforce conservation by adjusting zone mixing flow rates. When set to \emph{No}, mixing flow rates are not adjusted; the mixing flows specified in ZoneMixing obects will be used.~ The default is \emph{No}.
+This field has two choices: \emph{Yes} or \emph{No}.~ When set to \emph{Yes}, the zone air mass flow balance attempts to enforce conservation by adjusting zone mixing flow rates. When set to \emph{No}, mixing flow rates are not adjusted; the mixing flows specified in \hyperref[zonemixing]{ZoneMixing} obects will be used.~ The default is \emph{No}.
 
 \paragraph{Field: Infiltration Balancing Method}\label{field-infiltration-balancing-method}
 

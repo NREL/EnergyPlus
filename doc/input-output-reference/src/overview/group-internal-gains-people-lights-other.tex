@@ -15,7 +15,7 @@ The name of the People object. Must be unique across all People objects.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-000}
 
-This field is the name of the zone (ref: Zone) or ZoneList (ref: ZoneList) and links a particular people statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this people definition is applied to each of the zones in the zone list effecting a global definition for the number of people in the zone. The Zonelist option can be used effectively with the people/area and area/person options of the Number of People Calculation Method.
+This field is the name of the zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and links a particular people statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this people definition is applied to each of the zones in the zone list effecting a global definition for the number of people in the zone. The Zonelist option can be used effectively with the people/area and area/person options of the Number of People Calculation Method.
 
 The name of the actual people object becomes \textless{}Zone Name\textgreater{} \textless{}People Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
@@ -142,11 +142,11 @@ Wrestling, competitive & 738 to 909 & 410 to 505 & 7.0 to 8.7 \tabularnewline
 
 This field specifies the type of Mean Radiant Temperature (MRT) calculation the user wishes to use for the thermal comfort model. At the present time, there are three options for MRT calculation type: zone averaged, surface weighted, and a list of angle factors. The default calculation is ``ZoneAveraged'' and is used if field is left blank. In the zone averaged MRT calculation, the MRT used for the thermal comfort calculations is for an ``average'' point in the zone. MRT is calculated based on an area-emissivity weighted average of all of the surfaces in the zone. In cases where the emissivity of all of the surfaces are sufficiently small (near zero), the mean radiant temperature will be set to the mean air temperature of the space to avoid divide by zero errors. The other MRT calculation type is ``SurfaceWeighted''. The goal of this calculation type is to estimate a person in the space close to a particular surface without having to define exact view factors for all of the surfaces and the location of the person in the space. The MRT used in the thermal comfort calculations when the ``surface weighted'' calculation type is selected is actually the average of the temperature of the surface to which the person is closest (defined by the next field ``Surface Name'') and the zone averaged MRT (defined above). The surface temperature alone is not used because in theory the maximum view factor from a person to any flat surface is roughly 0.5. In the ``surfaceweighted'' calculation, the surface in question actually gets slightly more weighting than 50\% since the surface selected is still a part of the zone average MRT calculation. Again, this simplification was made to avoid the specification of view factors and the exact location of the person.
 
-A third option is to use ``AngleFactor''. This option allows for more explicit positioning of the person within the space by defining the angle factors from the person to the various surfaces in the zone. This option requires the user to list the surfaces that the person can see from a radiation standpoint and also define the angle (or view) factor for each surface. The ComfortViewFactorAngles object (see next object description) is intended to give the user this opportunity.
+A third option is to use ``AngleFactor''. This option allows for more explicit positioning of the person within the space by defining the angle factors from the person to the various surfaces in the zone. This option requires the user to list the surfaces that the person can see from a radiation standpoint and also define the angle (or view) factor for each surface. The \hyperref[comfortviewfactorangles]{ComfortViewFactorAngles} object (see next object description) is intended to give the user this opportunity.
 
 \paragraph{Field: Surface Name/Angle Factor List Name}\label{field-surface-nameangle-factor-list-name}
 
-This field is only valid when the user selects ``SurfaceWeighted'' or ``AngleFactor'' for the MRT calculation type (see the previous input field description). In the case of ``SurfaceWeighted'', the field is the name of a surface within the zone the people are residing. This surface will be used in the MRT calculation as defined above to come up with a more representative MRT for a person near a particular surface. The MRT used for thermal comfort calculations using the ``SurfaceWeighted'' MRT calculation method is the average of the temperature of the surface specified in this field and the ``zone averaged'' MRT (see the Mean Radiant Temperature calculation type field above). In the case of ``AngleFactor'', the field is the name of a ComfortViewFactorAngles input object defined elsewhere. This field is required when the previous field is set to ``SurfaceWeighted'' or ``AngleFactor'' and is set to run one of the following thermal comfort models: Fanger, Pierce, or KSU.
+This field is only valid when the user selects ``SurfaceWeighted'' or ``AngleFactor'' for the MRT calculation type (see the previous input field description). In the case of ``SurfaceWeighted'', the field is the name of a surface within the zone the people are residing. This surface will be used in the MRT calculation as defined above to come up with a more representative MRT for a person near a particular surface. The MRT used for thermal comfort calculations using the ``SurfaceWeighted'' MRT calculation method is the average of the temperature of the surface specified in this field and the ``zone averaged'' MRT (see the Mean Radiant Temperature calculation type field above). In the case of ``AngleFactor'', the field is the name of a \hyperref[comfortviewfactorangles]{ComfortViewFactorAngles} input object defined elsewhere. This field is required when the previous field is set to ``SurfaceWeighted'' or ``AngleFactor'' and is set to run one of the following thermal comfort models: Fanger, Pierce, or KSU.
 
 \paragraph{Field: Work Efficiency Schedule Name}\label{field-work-efficiency-schedule-name}
 
@@ -698,7 +698,7 @@ The name of the Lights object.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-1-000}
 
-The field is the name of the thermal zone (ref: Zone) or ZoneList (ref: ZoneLIst) and links this Lights statement to a thermal zone or set of thermal zones in the buidling. When the ZoneList option is used then this lights definition is applied to each of the zones in the zone list effecting a global definition for the amount of light wattage in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+The field is the name of the thermal zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: ZoneLIst) and links this Lights statement to a thermal zone or set of thermal zones in the buidling. When the \hyperref[zonelist]{ZoneList} option is used then this lights definition is applied to each of the zones in the zone list effecting a global definition for the amount of light wattage in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
 
 The name of the actual lights object becomes \textless{}Zone Name\textgreater{} \textless{}Lights Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
@@ -815,11 +815,11 @@ Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fract
 
 This field defines the daylighting control for the LIGHTS object.
 
-If \textbf{Daylighting:Controls} is specified for the zone, this field is used as an on/off flag for dimming controls. If set to 0.0, the lights are not dimmed by the daylighting controls. If set to 1.0, the lights are allowed to be dimmed by the daylighting controls.
+If \textbf{\hyperref[daylightingcontrols-000]{Daylighting:Controls}} is specified for the zone, this field is used as an on/off flag for dimming controls. If set to 0.0, the lights are not dimmed by the daylighting controls. If set to 1.0, the lights are allowed to be dimmed by the daylighting controls.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-002}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Task Lights'', ``Hall Lights'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the lights will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED EAp2-4/5. Performance Rating Method Compliance table.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Task Lights'', ``Hall Lights'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the lights will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED EAp2-4/5. Performance Rating Method Compliance table.
 
 \paragraph{Field: Return Air Fraction Calculated from Plenum Temperature}\label{field-return-air-fraction-calculated-from-plenum-temperature}
 
@@ -857,7 +857,7 @@ The coefficient C\(_{2}\) in the equation for (Return Air Fraction)\(_{calculate
 
 \paragraph{Field: Return Air Heat Gain Node Name}\label{field-return-air-heat-gain-node-name}
 
-Name of the return air node for this heat gain. If left blank, it defaults to the first return air node for the zone containing this Lights object. Leave blank when using a ZoneList name.
+Name of the return air node for this heat gain. If left blank, it defaults to the first return air node for the zone containing this Lights object. Leave blank when using a \hyperref[zonelist]{ZoneList} name.
 
 \begin{figure}[hbtp] % fig 52
 \centering
@@ -1085,7 +1085,7 @@ The name of the ElectricEquipment object.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-2}
 
-This field is the name of the zone (ref: Zone) or ZoneList (ref: ZoneList) and attaches a particular electric equipment statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this electric equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of electric wattage in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+This field is the name of the zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and attaches a particular electric equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this electric equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of electric wattage in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
 
 The name of the actual electric equipment object becomes \textless{}Zone Name\textgreater{} \textless{}ElectricEquipment Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
@@ -1157,7 +1157,7 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-1-001}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Computers'', ``Copy Machines'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5. Performance Rating Method Compliance.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Computers'', ``Copy Machines'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5. Performance Rating Method Compliance.
 
 
 An IDF example:
@@ -1207,7 +1207,7 @@ The name of the GasEquipment object.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-3}
 
-This field is the name of the thermal zone (ref: Zone) or ZoneList (ref: ZoneList) and attaches a particular gas equipment statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this gas equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of gas in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+This field is the name of the thermal zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and attaches a particular gas equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this gas equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of gas in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
 
 The name of the actual gas equipment object becomes \textless{}Zone Name\textgreater{} \textless{}GasEquipment Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
@@ -1283,7 +1283,7 @@ This numeric input field specifies carbon dioxide generation rate with units of 
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-2-001}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
 
 An IDF example:
 
@@ -1323,7 +1323,7 @@ GasEquipment,
 
 \subsection{HotWaterEquipment}\label{hotwaterequipment}
 
-The object models hot water equipment in the zone which consumes district heating, such as cooking equipment or process loads. All of the energy consumed by the equipment becomes a heat gain in the zone or is lost (exhausted) as specified below. This object consumes district heating energy directly and does not cause a load on a hot water plant loop or water heater. For domestic hot water uses, such as sinks and showers, see WaterUse:Equipment.
+The object models hot water equipment in the zone which consumes district heating, such as cooking equipment or process loads. All of the energy consumed by the equipment becomes a heat gain in the zone or is lost (exhausted) as specified below. This object consumes district heating energy directly and does not cause a load on a hot water plant loop or water heater. For domestic hot water uses, such as sinks and showers, see \hyperref[wateruseequipment]{WaterUse:Equipment}.
 
 \subsubsection{Inputs}\label{inputs-5-015}
 
@@ -1333,7 +1333,7 @@ The name of the HotWaterEquipment object.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-4}
 
-This field is the name of the thermal zone (ref: Zone) or ZoneList (ref: ZoneList) and attaches a particular hot water equipment statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this hot water equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of hot water in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+This field is the name of the thermal zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and attaches a particular hot water equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this hot water equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of hot water in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
 
 The name of the actual hot water equipment object becomes \textless{}Zone Name\textgreater{} \textless{}HotWaterEquipment Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
@@ -1405,7 +1405,7 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-3-000}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter obejct). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} obejct). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
 
 IDF Examples:
 
@@ -1454,7 +1454,7 @@ The name of the SteamEquipment object.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-5}
 
-This field is the name of the thermal zone (ref: Zone) and attaches a particular steam equipment statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this steam equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of steam in the zone. This option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+This field is the name of the thermal zone (ref: Zone) and attaches a particular steam equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this steam equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of steam in the zone. This option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-4-000}
 
@@ -1524,7 +1524,7 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-4-000}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
 
 IDF Examples:
 
@@ -1572,7 +1572,7 @@ This field references a schedule that contains values for pool activity. This pa
 
 \paragraph{Field: Make-up Water Supply Schedule Name}\label{field-make-up-water-supply-schedule-name}
 
-The scheduled named by this field establishes a cold water temperature {[}C{]} for the water that replaces the water which is lost from the pool due to evaporation. If blank, water temperatures are calculated by the Site:WaterMainsTemperature object. This field (even if blank) overrides the Cold Water Supply Temperature Schedule in all of the listed WaterUse:Equipment objects.
+The scheduled named by this field establishes a cold water temperature {[}C{]} for the water that replaces the water which is lost from the pool due to evaporation. If blank, water temperatures are calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object. This field (even if blank) overrides the Cold Water Supply Temperature Schedule in all of the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects.
 
 \paragraph{Field: Cover Schedule Name}\label{field-cover-schedule-name}
 
@@ -1797,11 +1797,11 @@ The name of the OtherEquipment object.
 
 \paragraph{Field: Fuel Type}\label{field-fuel-use-type}
 
-This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains.
+This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains.
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-6}
 
-This field is the name of the thermal zone (ref: Zone) and attaches a particular other equipment statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this other equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of other in the zone. This option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+This field is the name of the thermal zone (ref: Zone) and attaches a particular other equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this other equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of other in the zone. This option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-5-000}
 
@@ -1875,7 +1875,7 @@ This numeric input field specifies carbon dioxide generation rate with units of 
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-otherequip}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
 
 
 IDF Examples
@@ -2286,17 +2286,17 @@ AdjustedSupply = This option is used to apply a recirculation adjustment to the 
 
 ZoneAirNode = This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain.
 
-RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. RoomAirModelType and RoomAir:Node).
+RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. \hyperref[roomairmodeltype]{RoomAirModelType} and \hyperref[roomairnode]{RoomAir:Node}).
 
 This field is only used when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Air Inlet Room Air Model Node Name}\label{field-air-inlet-room-air-model-node-name}
 
-Specifies the name of a room air model node (ref. RoomAir:Node) which is the air inlet to this equipment. This field is required if the Air Node Connection Type = RoomAirModel.
+Specifies the name of a room air model node (ref. \hyperref[roomairnode]{RoomAir:Node}) which is the air inlet to this equipment. This field is required if the Air Node Connection Type = RoomAirModel.
 
 \paragraph{Field: Air Outlet Room Air Model Node Name}\label{field-air-outlet-room-air-model-node-name}
 
-Specifies the node name of a room air model node (ref. RoomAir:Node) which is the air outlet from this equipment. This field is required if the Air Node Connection Type = RoomAirModel.
+Specifies the node name of a room air model node (ref. \hyperref[roomairnode]{RoomAir:Node}) which is the air outlet from this equipment. This field is required if the Air Node Connection Type = RoomAirModel.
 
 \paragraph{Field: Supply Air Node Name}\label{field-supply-air-node-name}
 
@@ -2324,15 +2324,15 @@ This field is a decimal number between 0.0 and 1.0 and is used to specify the fr
 
 \paragraph{Field: CPU End-Use Subcategory}\label{field-cpu-end-use-subcategory}
 
-This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the CPU power consumption. A new meter for reporting is created for each unique subcategory (ref: Output:Meter object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-CPU.
+This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the CPU power consumption. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-CPU.
 
 \paragraph{Field: Fan End-Use Subcategory}\label{field-fan-end-use-subcategory}
 
-This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the fan power consumption. A new meter for reporting is created for each unique subcategory (ref: Output:Meter object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-Fans
+This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the fan power consumption. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-Fans
 
 \paragraph{Field: Electric Power Supply End-Use Subcategory}\label{field-electric-power-supply-end-use-subcategory}
 
-This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the electric power supply power consumption. A new meter for reporting is created for each unique subcategory (ref: Output:Meter object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-UPS
+This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the electric power supply power consumption. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-UPS
 
 \paragraph{Field: Supply Temperature Difference}\label{field-supply-temperature-difference}
 
@@ -2557,7 +2557,7 @@ ITE CPU Electric Power {[}W{]}
 
 \paragraph{ITE CPU Electric Energy {[}J{]}}\label{ite-cpu-electric-energy-j}
 
-The electric power (or energy) input to the ITE equipment CPU (total power input less cooling fan power). The ITE CPU Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. Output:Meter object).
+The electric power (or energy) input to the ITE equipment CPU (total power input less cooling fan power). The ITE CPU Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object).
 
 \paragraph{Zone ITE CPU Electric Power at Design Inlet Conditions {[}W{]}}\label{zone-ite-cpu-electric-power-at-design-inlet-conditions-w}
 
@@ -2577,7 +2577,7 @@ The electric power (or energy) input to the ITE equipment CPU (total power input
 
 \paragraph{ITE Fan Electric Energy {[}J{]}}\label{ite-fan-electric-energy-j}
 
-The electric power (or energy) input to the ITE cooling fan. The ITE Fan Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. Output:Meter object).
+The electric power (or energy) input to the ITE cooling fan. The ITE Fan Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object).
 
 \paragraph{Zone ITE Fan Electric Power at Design Inlet Conditions {[}W{]}}\label{zone-ite-fan-electric-power-at-design-inlet-conditions-w}
 
@@ -2597,7 +2597,7 @@ The electric power (or energy) input to the ITE cooling fan if the air inlet tem
 
 \paragraph{ITE UPS Electric Energy {[}J{]}}\label{ite-ups-electric-energy-j}
 
-The net electric power (or energy) input to the ITE equipment UPS (total power input less power delivered to ITE). The ITE UPS Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. Output:Meter object).
+The net electric power (or energy) input to the ITE equipment UPS (total power input less power delivered to ITE). The ITE UPS Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object).
 
 \paragraph{Zone ITE UPS Heat Gain to Zone Rate {[}W{]}}\label{zone-ite-ups-heat-gain-to-zone-rate-w}
 
@@ -2731,7 +2731,7 @@ Return air temperature after adjustment by ITE objects.
 
 \subsection{ZoneContaminantSourceAndSink:CarbonDioxide}\label{zonecontaminantsourceandsinkcarbondioxide}
 
-The ZoneContaminantSourceAndSink:CarbonDioxide object allows users to input carbon dioxide sources or sinks in a zone. Note that carbon dioxide generation within a zone can also be specified using People and GasEquipment objects. Multiple ZoneContaminantSourceAndSink:CarbonDioxide~ objects can be specified for the same zone.
+The ZoneContaminantSourceAndSink:CarbonDioxide object allows users to input carbon dioxide sources or sinks in a zone. Note that carbon dioxide generation within a zone can also be specified using People and \hyperref[gasequipment]{GasEquipment} objects. Multiple ZoneContaminantSourceAndSink:CarbonDioxide~ objects can be specified for the same zone.
 
 \subsubsection{Inputs}\label{inputs-10-008}
 
@@ -3340,7 +3340,7 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-5}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Perimeter Baseboards'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. If this field is omitted or blank, the baseboard equipment will be assigned to the ``General'' end-use subcategory.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Perimeter Baseboards'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. If this field is omitted or blank, the baseboard equipment will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Design Zone Heating Setpoint}\label{field-design-zone-heating-setpoint}
 

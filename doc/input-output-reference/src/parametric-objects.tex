@@ -6,13 +6,13 @@ In order to assess a group of alternatives, the Parametric objects can be used i
 
 \begin{itemize}
 \item
-  Parametric:SetValueForRun
+  \hyperref[parametricsetvalueforrun]{Parametric:SetValueForRun}
 \item
-  Parametric:Logic
+  \hyperref[parametriclogic]{Parametric:Logic}
 \item
-  Parametric:RunControl
+  \hyperref[parametricruncontrol]{Parametric:RunControl}
 \item
-  Parametric:FileNameSuffix
+  \hyperref[parametricfilenamesuffix]{Parametric:FileNameSuffix}
 \end{itemize}
 
 A simple example of part of an IDF file is shown below:
@@ -39,27 +39,27 @@ A simple example of part of an IDF file is shown below:
       0.5000000;               !- Visible Absorptance
 \end{lstlisting}
 
-In this example, the parameter \$insDepth is used in the Material object to describe the thickness of the material, in this case insulation.~ For the first simulation, \$insDepth is set to 0.0508 (2 inches) shown as the first value in the Parametric:SetValueForRun object. This value is then substituted in where ever the \$insDepth is shown in the file, in this example, in the Material object. The simulation would use this first value and produce a set of results based on this insulation thickness. The second simulation would use the second value of the Parametric:SetValueForRun object of 0.0762 (3 inches) for the thickness of the insulation described in the Material object. This would then be simulated with a second set of results. This would be repeated a third time with 0.1015 (4 inches) and 0.1270 (5 inches) of insulation.
+In this example, the parameter \$insDepth is used in the Material object to describe the thickness of the material, in this case insulation.~ For the first simulation, \$insDepth is set to 0.0508 (2 inches) shown as the first value in the \hyperref[parametricsetvalueforrun]{Parametric:SetValueForRun} object. This value is then substituted in where ever the \$insDepth is shown in the file, in this example, in the Material object. The simulation would use this first value and produce a set of results based on this insulation thickness. The second simulation would use the second value of the \hyperref[parametricsetvalueforrun]{Parametric:SetValueForRun} object of 0.0762 (3 inches) for the thickness of the insulation described in the Material object. This would then be simulated with a second set of results. This would be repeated a third time with 0.1015 (4 inches) and 0.1270 (5 inches) of insulation.
 
-A new IDF file is created for each of these simulations and is named the original name of the file plus either a number or a user defined suffix (if Parametric:FileNameSuffix is used). Looking at how these created IDF files show the substituted values can help understand problems that may occur.
+A new IDF file is created for each of these simulations and is named the original name of the file plus either a number or a user defined suffix (if \hyperref[parametricfilenamesuffix]{Parametric:FileNameSuffix} is used). Looking at how these created IDF files show the substituted values can help understand problems that may occur.
 
 The `` = \$insDepth'' is a simple substation but could also be a more complex expression involving operators and predefined functions such as
 
 ~ = \$insDepth * 1.1 + 0.0004 * SQRT(12)
 
-Many sets of simulations can be defined just using different Parametric:SetValueForRun objects but for more advanced sets of parametric runs, the Parametric:Logic object can be used to perform additional calculations, logical operations, and to exclude entire objects in the file. The Parametric:RunControl allows individual runs to be performed or not. The Parametric:FileNameSuffix object controls the naming of the resulting sets of output files.
+Many sets of simulations can be defined just using different \hyperref[parametricsetvalueforrun]{Parametric:SetValueForRun} objects but for more advanced sets of parametric runs, the \hyperref[parametriclogic]{Parametric:Logic} object can be used to perform additional calculations, logical operations, and to exclude entire objects in the file. The \hyperref[parametricruncontrol]{Parametric:RunControl} allows individual runs to be performed or not. The \hyperref[parametricfilenamesuffix]{Parametric:FileNameSuffix} object controls the naming of the resulting sets of output files.
 
 \subsection{Expressions}\label{expressions}
 
-Expressions can occur anywhere in the IDF file as a field value if the expression begins with an equals sign ( = ) and can also occur in assignment statements in the Parametric:Logic object. The operators include: +, -, *, /, \^{} (exponent), \&\& (and), \textbar{}\textbar{} (or), = = , \textgreater{}, \textless{}, \textless{} = , \textgreater{} = ,~ \textless{}\textgreater{}, and //. These are computed using standard operator precedence rules. The parenthesis are used to execute sub-expressions with higher precedence. Some built in functions, such as ABS, ACOS, ASIN, ATAN, COS, EXP, INT, LEN, LOG, MOD, NOT, SIN, SQRT, TAN are supported in expressions. Theses built in functions all take a single argument.
+Expressions can occur anywhere in the IDF file as a field value if the expression begins with an equals sign ( = ) and can also occur in assignment statements in the \hyperref[parametriclogic]{Parametric:Logic} object. The operators include: +, -, *, /, \^{} (exponent), \&\& (and), \textbar{}\textbar{} (or), = = , \textgreater{}, \textless{}, \textless{} = , \textgreater{} = ,~ \textless{}\textgreater{}, and //. These are computed using standard operator precedence rules. The parenthesis are used to execute sub-expressions with higher precedence. Some built in functions, such as ABS, ACOS, ASIN, ATAN, COS, EXP, INT, LEN, LOG, MOD, NOT, SIN, SQRT, TAN are supported in expressions. Theses built in functions all take a single argument.
 
 \subsection{Processing Order}\label{processing-order}
 
 The order that the parameters are processed is important to understand their values. Like other objects in EnergyPlus, the order that they occur in the file is not important.~ The order of evaluation is:
 
-1)~~~~Parameter values are based on Parametric:SetValueForRun
+1)~~~~Parameter values are based on \hyperref[parametricsetvalueforrun]{Parametric:SetValueForRun}
 
-2)~~~~All lines of the Parametric:Logic object are evaluated
+2)~~~~All lines of the \hyperref[parametriclogic]{Parametric:Logic} object are evaluated
 
 3)~~~~All embedded expressions in the file are evaluated
 
@@ -133,7 +133,7 @@ Parametric:Logic,
 
 The statements include PARAMETER, IF, ELSE, ELSEIF, ENDIF, SELECT, CASE, DEFAULT, ENDSELECT, ENABLE, DISABLE, and REMARK. Nested IF and SELECT statements are allowed.~ All objects are enabled until they are specifically disabled using the DISABLE statement and could be later re-enabled with ENABLE. An object that is named with the DISABLE statement would not appear in that simulation run.
 
-The PARAMETER statement declares the name of the parameter. It is necessary that every parameter used in the Parametric:Logic object be initialized using the PARAMETER statement unless the parametes are created using the Parametric:SetValueForRun object. Requiring explicit parameter declaration reduces errors in software programming. Parameter names would not be case sensitive.
+The PARAMETER statement declares the name of the parameter. It is necessary that every parameter used in the Parametric:Logic object be initialized using the PARAMETER statement unless the parametes are created using the \hyperref[parametricsetvalueforrun]{Parametric:SetValueForRun} object. Requiring explicit parameter declaration reduces errors in software programming. Parameter names would not be case sensitive.
 
 The DISABLE and ENABLE commands can have one or two arguments. If a second argument is present it is the kind of object.
 

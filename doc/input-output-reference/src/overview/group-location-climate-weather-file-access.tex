@@ -53,10 +53,10 @@ The applications for this include:
 \begin{itemize}
  \item a vehicle driving along the road,
  \item a rotating building, such as for experimental testing at different orientations, or
- \item if combind with a ``SurfaceProperty:Underwater'' boundary condition, it could apply to ships and vessels.
+ \item if combind with a ``\hyperref[surfacepropertyunderwater]{SurfaceProperty:Underwater}'' boundary condition, it could apply to ships and vessels.
 \end{itemize}
 
-The latitude, longitude, and orientation are all defined according to the same conventions as in the regular ``Site:Location'' object.
+The latitude, longitude, and orientation are all defined according to the same conventions as in the regular ``\hyperref[sitelocation]{Site:Location}'' object.
 
 \subsubsection{Inputs}\label{inputs-026}
 
@@ -114,7 +114,7 @@ The design day input describes the parameters to effect a ``design day'' simulat
 We refer you to the ASHRAE Handbook of Fundamentals for philosophy of what parameters are important for use as ``design conditions'' in sizing equipment.
 
 \begin{callout}
-  In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. \url{https://www.energyplus.net/weather} These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{RunPeriodControl:DaylightSavingTime} objects.
+  In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. \url{https://www.energyplus.net/weather} These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{\hyperref[runperiodcontroldaylightsavingtime]{\hyperref[runperiod]{RunPeriod}Control:DaylightSavingTime}} objects.
 \end{callout}
 
 \subsubsection{Inputs}\label{inputs-1-024}
@@ -183,7 +183,7 @@ If you leave this field blank or enter \textbf{DefaultMultipliers}, then the def
 
 \paragraph{Field: Dry-Bulb Temperature Range Modifier Day Schedule Name}\label{field-dry-bulb-temperature-range-modifier-day-schedule-name}
 
-This field is the name of a \textbf{day schedule} (ref. Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List objects) with the values as specified in the Dry-Bulb Temperature Range Modifier Type field above.
+This field is the name of a \textbf{day schedule} (ref. \hyperref[scheduledayhourly]{Schedule:Day:Hourly}, \hyperref[scheduledayinterval]{Schedule:Day:Interval}, \hyperref[scheduledaylist]{Schedule:Day:List} objects) with the values as specified in the Dry-Bulb Temperature Range Modifier Type field above.
 
 \paragraph{Field: Humidity Condition Type}\label{field-humidity-condition-type}
 
@@ -246,7 +246,7 @@ If you choose \textbf{Wetbulb} or \textbf{Dewpoint} in the Humidity Condition Ty
 
 \paragraph{Field: Humidity Condition Day Schedule Name}\label{field-humidity-condition-day-schedule-name}
 
-Allows specification a day schedule (ref. Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List objects) of values for relative humidity or wet-bulb profile per Humidity Indicating Type field.
+Allows specification a day schedule (ref. \hyperref[scheduledayhourly]{Schedule:Day:Hourly}, \hyperref[scheduledayinterval]{Schedule:Day:Interval}, \hyperref[scheduledaylist]{Schedule:Day:List} objects) of values for relative humidity or wet-bulb profile per Humidity Indicating Type field.
 
 \paragraph{Field: Humidity Ratio at Maximum Dry-Bulb}\label{field-humidity-ratio-at-maximum-dry-bulb}
 
@@ -290,11 +290,11 @@ This field allows the user to select \textbf{ASHRAE\-Clear\-Sky, ASHRAE\-Tau, AS
 
 \paragraph{Field: Beam Solar Day Schedule Name}\label{field-beam-solar-day-schedule-name}
 
-This field allows the option for you to put in your own day profile of beam solar values (wh/m2). These values will replace the calculated values during design day processing. Only day schedules (ref. Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List objects) are used here.
+This field allows the option for you to put in your own day profile of beam solar values (wh/m2). These values will replace the calculated values during design day processing. Only day schedules (ref. \hyperref[scheduledayhourly]{Schedule:Day:Hourly}, \hyperref[scheduledayinterval]{Schedule:Day:Interval}, \hyperref[scheduledaylist]{Schedule:Day:List} objects) are used here.
 
 \paragraph{Field: Diffuse Solar Day Schedule Name}\label{field-diffuse-solar-day-schedule-name}
 
-This field allows the option for you to put in your own day profile of diffuse solar values (wh/m2). These values will replace the calculated values during design day processing. Only day schedules (ref. Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List objects) are used here.
+This field allows the option for you to put in your own day profile of diffuse solar values (wh/m2). These values will replace the calculated values during design day processing. Only day schedules (ref. \hyperref[scheduledayhourly]{Schedule:Day:Hourly}, \hyperref[scheduledayinterval]{Schedule:Day:Interval}, \hyperref[scheduledaylist]{Schedule:Day:List} objects) are used here.
 
 \paragraph{Field: ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)}\label{field-ashrae-clear-sky-optical-depth-for-beam-irradiance-taub}
 
@@ -637,7 +637,7 @@ Weather files can contain holiday designations or other kinds of special days. T
 corresponding day's schedule (see SCHEDULE definitions below) to be used during that day. This field
 should contain the word \textbf{Yes} if holidays or other special days indicated directly on the weather
 file should retain their ``day type'' or \textbf{No} if holidays or other special days on the weather file
-should be ignored. Reference the RunPeriodControl:SpecialDays object below to enter your own special days
+should be ignored. Reference the \hyperref[runperiodcontrolspecialdays]{RunPeriodControl:SpecialDays} object below to enter your own special days
 and holidays.
 
 Note that a blank or null field in this field will indicate \textbf{Yes}.
@@ -795,12 +795,12 @@ RunPeriodControl:SpecialDays, Vacation, 5/1, 14, CustomDay1;
 
 \subsection{RunPeriodControl:DaylightSavingTime}\label{runperiodcontroldaylightsavingtime}
 
-Similar to a special day period, a daylight saving period may be entered to be applied to weather file run periods. These will always be in effect, regardless of the value entered on the RunPeriod object. Note that this period will always override any daylight saving period specified in a weather file.
+Similar to a special day period, a daylight saving period may be entered to be applied to weather file run periods. These will always be in effect, regardless of the value entered on the \hyperref[runperiod]{RunPeriod} object. Note that this period will always override any daylight saving period specified in a weather file.
 
 \begin{callout}
 Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{https://www.energyplus.net/weather} have neither special days specified nor daylight saving period.
 
-\warning{Note: For EnergyPlus Output:Variable and Output:Meter reporting, the time stamps are always in standard time. When daylight saving time is active, scheduled loads and controls will shift one hour relative to standard time.}
+\warning{Note: For EnergyPlus \hyperref[outputvariable]{Output:Variable} and \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} reporting, the time stamps are always in standard time. When daylight saving time is active, scheduled loads and controls will shift one hour relative to standard time.}
 \end{callout}
 
 \subsubsection{Inputs}\label{inputs-7-013}
@@ -836,7 +836,7 @@ Sky Temperature, or radiative sky temperature, is internally calculated by Energ
 
 \paragraph{Field: Name}\label{field-name-7-009}
 
-This name references an existing design period (i.e., SizingPeriod:DesignDay, SizingPeriod:WeatherFileDays, or SizingPeriod:WeatherFileConditionType) or run period (by name or blank for all run periods).
+This name references an existing design period (i.e., \hyperref[sizingperioddesignday]{SizingPeriod:DesignDay}, \hyperref[sizingperiodweatherfiledays]{SizingPeriod:WeatherFileDays}, or \hyperref[sizingperiodweatherfileconditiontype]{SizingPeriod:WeatherFileConditionType}) or run period (by name or blank for all run periods).
 
 \paragraph{Field: Calculation Type}\label{field-calculation-type}
 
@@ -844,7 +844,7 @@ Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDr
 
 \paragraph{Field: ScheduleName}\label{field-schedulename}
 
-This field specifies a schedule name to accomplish the sky temperature calculation from the previous field. A Schedule:Day:* (i.e., Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List) should be specified if the name in the name field matches a SizingPeriod:DesignDay object. If the name is one of the weather file period specifications (i.e. matches a SizingPeriod:WeatherFileDays, SizingPeriod:WeatherFileConditionType or RunPeriod), then the schedule name must match a full year schedule (i.e. Schedule:Year, Schedule:Compact, Schedule:File, or Schedule:Constant).
+This field specifies a schedule name to accomplish the sky temperature calculation from the previous field. A Schedule:Day:* (i.e., \hyperref[scheduledayhourly]{Schedule:Day:Hourly}, \hyperref[scheduledayinterval]{Schedule:Day:Interval}, \hyperref[scheduledaylist]{Schedule:Day:List}) should be specified if the name in the name field matches a \hyperref[sizingperioddesignday]{SizingPeriod:DesignDay} object. If the name is one of the weather file period specifications (i.e. matches a \hyperref[sizingperiodweatherfiledays]{SizingPeriod:WeatherFileDays}, \hyperref[sizingperiodweatherfileconditiontype]{SizingPeriod:WeatherFileConditionType} or \hyperref[runperiod]{RunPeriod}), then the schedule name must match a full year schedule (i.e. \hyperref[scheduleyear]{Schedule:Year}, \hyperref[schedulecompact]{Schedule:Compact}, \hyperref[schedulefile]{Schedule:File}, or \hyperref[scheduleconstant]{Schedule:Constant}).
 
 An example of IDF usage (with DesignDay):
 
@@ -899,7 +899,7 @@ Weather stations throughout the world (ref: WMO -- World Meteorological Organiza
 
 When using weather data from standard sources (e.g., TMY2, IWEC, TMY, or ASHRAE design day data), it is not necessary to use the \textbf{Site:WeatherStation} object. However, if you are using custom weather data or real-time weather data, you may need to read and understand the concepts in the \textbf{Site:WeatherStation} object.
 
-The measurement conditions at the weather station (i.e., the weather file) are used by EnergyPlus in conjunction with the \emph{Terrain} field of the \textbf{Building} object, or optionally with the \textbf{Site:HeightVariation} object (see below), to calculate the local variation in atmospheric properties as a function of height above ground. Outdoor air temperature decreases with height, while wind speed increases with height. The algorithms for this calculation are in the Engineering Reference.
+The measurement conditions at the weather station (i.e., the weather file) are used by EnergyPlus in conjunction with the \emph{Terrain} field of the \textbf{Building} object, or optionally with the \textbf{\hyperref[siteheightvariation]{Site:HeightVariation}} object (see below), to calculate the local variation in atmospheric properties as a function of height above ground. Outdoor air temperature decreases with height, while wind speed increases with height. The algorithms for this calculation are in the Engineering Reference.
 
 The \textbf{Site:WeatherStation} object is useful when working with a custom weather file that includes data that were not measured at the WMO standard conditions. For example, the weather data could be measured on site, or on the roof top of a nearby building. The wind speed profile coefficients can be estimated from the table below or calculated beforehand using more sophisticated techniques such as CFD modeling of the weather station terrain.
 
@@ -945,7 +945,7 @@ The wind speed profile boundary layer thickness {[}m{]} for the terrain surround
 
 The height {[}m{]} above ground for the air temperature sensor.
 
-For example, if you are using weather data measured on the top of your building, you should set the \emph{Wind Sensor Height Above Ground} and the \emph{Air Temperature Sensor Height Above Ground} to equal the height of your building (say 30 m). The \emph{Wind Speed Profile Exponent} and \emph{Wind Speed Profile Boundary Layer Thickness} should be set to match the values associated with the \emph{Terrain} field of the \textbf{Building} object, or the equivalent fields of the \textbf{Site:HeightVariation} object.
+For example, if you are using weather data measured on the top of your building, you should set the \emph{Wind Sensor Height Above Ground} and the \emph{Air Temperature Sensor Height Above Ground} to equal the height of your building (say 30 m). The \emph{Wind Speed Profile Exponent} and \emph{Wind Speed Profile Boundary Layer Thickness} should be set to match the values associated with the \emph{Terrain} field of the \textbf{Building} object, or the equivalent fields of the \textbf{\hyperref[siteheightvariation]{Site:HeightVariation}} object.
 
 Or, in IDF terms, with a building in a town or city:
 
@@ -961,7 +961,7 @@ This would change if you had a different wind speed profile exponent or wind spe
 
 \subsection{Site:HeightVariation}\label{siteheightvariation}
 
-The Site:HeightVariation object is used to specify the local variation in atmospheric properties at the site and should be used only if you require advanced control over the height-dependent variations for wind speed and temperature. The coefficients set by this object are used by EnergyPlus, in conjunction with the Site:WeatherStation object (see above), to calculate the local variation in atmospheric properties as a function of height above ground. Outdoor air temperature decreases with height, while wind speed increases with height. The local outdoor air temperature and wind speed are calculated separately for all zones and surfaces, and optionally for outdoor air nodes for which a height has been specified (see OutdoorAir:Node object). With the default inputs, wind speed falls significantly at heights lower than the weather station measurement height, and temperature increases slightly. The algorithms for this calculation are in the Engineering Reference. There are necessary correlations between the entries for this object and some entries in the Building object, specifically the \textbf{Terrain} field.
+The Site:HeightVariation object is used to specify the local variation in atmospheric properties at the site and should be used only if you require advanced control over the height-dependent variations for wind speed and temperature. The coefficients set by this object are used by EnergyPlus, in conjunction with the \hyperref[siteweatherstation]{Site:WeatherStation} object (see above), to calculate the local variation in atmospheric properties as a function of height above ground. Outdoor air temperature decreases with height, while wind speed increases with height. The local outdoor air temperature and wind speed are calculated separately for all zones and surfaces, and optionally for outdoor air nodes for which a height has been specified (see \hyperref[outdoorairnode]{OutdoorAir:Node} object). With the default inputs, wind speed falls significantly at heights lower than the weather station measurement height, and temperature increases slightly. The algorithms for this calculation are in the Engineering Reference. There are necessary correlations between the entries for this object and some entries in the Building object, specifically the \textbf{Terrain} field.
 
 % table 5
 \begin{longtable}[c]{@{}lllll@{}}
@@ -983,21 +983,21 @@ Wind Speed & 2.46 m/s & 7.75 m/s & 5.29 m/s & 215\% \tabularnewline
 \bottomrule
 \end{longtable}
 
-Note that using this object overrides the wind speed profile coefficients implied by the \emph{Terrain} field of the \textbf{Building} object even if the wind speed profile fields are left blank. The wind speed profile coefficients can be estimated from the table above (see \textbf{Site:WeatherStation}) or calculated beforehand using more sophisticated techniques such as CFD modeling of the site terrain.
+Note that using this object overrides the wind speed profile coefficients implied by the \emph{Terrain} field of the \textbf{Building} object even if the wind speed profile fields are left blank. The wind speed profile coefficients can be estimated from the table above (see \textbf{\hyperref[siteweatherstation]{Site:WeatherStation}}) or calculated beforehand using more sophisticated techniques such as CFD modeling of the site terrain.
 
 \subsubsection{Inputs}\label{inputs-10-009}
 
 \paragraph{Field: Wind Speed Profile Exponent}\label{field-wind-speed-profile-exponent-1}
 
-The wind speed profile exponent for the terrain surrounding the site. The exponent can be estimated from the table above (see \textbf{Site:WeatherStation}) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the \emph{Terrain} field of the \textbf{Building} object even if this field is left blank. This field can be set to zero to turn off all wind dependence on height.
+The wind speed profile exponent for the terrain surrounding the site. The exponent can be estimated from the table above (see \textbf{\hyperref[siteweatherstation]{Site:WeatherStation}}) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the \emph{Terrain} field of the \textbf{Building} object even if this field is left blank. This field can be set to zero to turn off all wind dependence on height.
 
 \paragraph{Field: Wind Speed Profile Boundary Layer Thickness}\label{field-wind-speed-profile-boundary-layer-thickness-1}
 
-The wind speed profile boundary layer thickness {[}m{]} for the terrain surrounding the site. The boundary layer can be estimated from the table above (see \textbf{Site:WeatherStation}) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the \emph{Terrain} field of the \textbf{Building} object even if this field is left blank.
+The wind speed profile boundary layer thickness {[}m{]} for the terrain surrounding the site. The boundary layer can be estimated from the table above (see \textbf{\hyperref[siteweatherstation]{Site:WeatherStation}}) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the \emph{Terrain} field of the \textbf{Building} object even if this field is left blank.
 
 \paragraph{Field: Air Temperature Gradient Coefficient}\label{field-air-temperature-gradient-coefficient}
 
-The air temperature gradient coefficient {[}K/m{]} is a research option that allows the user to control the variation in outdoor air temperature as a function of height above ground. The real physical value is 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height. Note that the \emph{Air Temperature Sensor Height} in the \textbf{Site:WeatherStation} object should also be set to zero in order to force the local outdoor air temperatures to match the weather file outdoor air temperature. This change is required because the \textbf{Site:WeatherStation} object assumes an air temperature gradient of 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height.
+The air temperature gradient coefficient {[}K/m{]} is a research option that allows the user to control the variation in outdoor air temperature as a function of height above ground. The real physical value is 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height. Note that the \emph{Air Temperature Sensor Height} in the \textbf{\hyperref[siteweatherstation]{Site:WeatherStation}} object should also be set to zero in order to force the local outdoor air temperatures to match the weather file outdoor air temperature. This change is required because the \textbf{\hyperref[siteweatherstation]{Site:WeatherStation}} object assumes an air temperature gradient of 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height.
 
 \begin{lstlisting}
 Site:HeightVariation,
@@ -1008,10 +1008,10 @@ Site:HeightVariation,
 
 \subsection{Site:GroundTemperature:BuildingSurface}\label{sitegroundtemperaturebuildingsurface}
 
-Ground temperatures are used for the ground heat transfer model. There can be only one ground temperature object included, and it is used as the outside surface temperature for all surfaces with Outside Boundary Condition = Ground. The object is options if you have no surfaces with ground contact. The outside surface temperature for individual surfaces can be specified using the OtherSideCoefficients (ref: SurfaceProperty:OtherSideCoefficients) object that allows Toutside to be set with a schedule. This permits using any number of different outside face temperatures in addition to the ground temperature.
+Ground temperatures are used for the ground heat transfer model. There can be only one ground temperature object included, and it is used as the outside surface temperature for all surfaces with Outside Boundary Condition = Ground. The object is options if you have no surfaces with ground contact. The outside surface temperature for individual surfaces can be specified using the OtherSideCoefficients (ref: \hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients}) object that allows Toutside to be set with a schedule. This permits using any number of different outside face temperatures in addition to the ground temperature.
 
 \begin{callout}
-Caution: The ``undisturbed'' ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the Site:GroundTemperature:Shallow and Site:GroundTemperature:Deep objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
+Caution: The ``undisturbed'' ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the \hyperref[sitegroundtemperatureshallow]{Site:GroundTemperature:Shallow} and \hyperref[sitegroundtemperaturedeep]{Site:GroundTemperature:Deep} objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
 \end{callout}
 
 More information about determining appropriate ground temperatures is given in the Auxiliary Programs document.
@@ -1030,7 +1030,7 @@ Site:GroundTemperature:BuildingSurface,19,20,20,20,20,20,20,20,20,20,20,20;
 
 \subsection{Site:GroundTemperature:Shallow}\label{sitegroundtemperatureshallow}
 
-Site:GroundTemperature:Shallow are used by the Surface Ground Heat Exchanger (i.e. object: GroundHeatExchanger:Surface). Only one shallow ground temperature object can be included.
+Site:GroundTemperature:Shallow are used by the Surface Ground Heat Exchanger (i.e. object: \hyperref[groundheatexchangersurface]{GroundHeatExchanger:Surface}). Only one shallow ground temperature object can be included.
 
 \begin{callout}
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields -- namely, the .5 m depth temperatures that are calculated for ``undisturbed'' soil of ``typical'' conditions. However, you may wish to use some other change effect -- based on the weather conditions of the building location.
@@ -1052,7 +1052,7 @@ Site:GroundTemperature:Shallow,4,4,6,6,10,10,15,15,14,14,8,8;
 
 \subsection{Site:GroundTemperature:Deep}\label{sitegroundtemperaturedeep}
 
-Site:GroundTemperature:Deep are used by the Pond Ground Heat Exchanger object (i.e. object: GroundHeatExchanger:Pond). Only one deep ground temperature object can be included.
+Site:GroundTemperature:Deep are used by the Pond Ground Heat Exchanger object (i.e. object: \hyperref[groundheatexchangerpond]{GroundHeatExchanger:Pond}). Only one deep ground temperature object can be included.
 
 \begin{callout}
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields -- namely, the 4 m depth temperatures that are calculated for ``undisturbed'' soil of ``typical'' conditions. However, you may wish to use some other change effect -- based on the weather conditions or special knowledge of the building location.
@@ -1119,7 +1119,7 @@ Site:GroundTemperature:Undisturbed:FiniteDifference,
 
 Site:GroundTemperature:Undisturbed:KusudaAchenbach may be used by all objects requiring ``undisturbed'' ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Kusuda T. and P. Achenbach. 1965. The correlation uses three parameters for ground temperature at the surface to define a correlation for undisturbed ground temperatures as a function of depth and time. If one thinks of the ground temperature for a given depth as a sinusoid, the average ground temperature, amplitude (average difference between maximum ground temperature and minimum ground temperature), and the phase shift (day of minimum surface temperature) are all required to define the correlation.
 
-If the parameters are left blank they can be autocalculated by including soil surface temperatures in the input using the Site:GroundTemperature:Shallow object. They can also be calculated by using the CalcSoilSurfTemp preprocessor.
+If the parameters are left blank they can be autocalculated by including soil surface temperatures in the input using the \hyperref[sitegroundtemperatureshallow]{Site:GroundTemperature:Shallow} object. They can also be calculated by using the CalcSoilSurfTemp preprocessor.
 
 Kusuda, T. and P.R. Achenbach. 1965. `Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' \emph{ASHRAE Transactions}. 71(1): 61-74.
 
@@ -1219,7 +1219,7 @@ Site:GroundTemperature:Undisturbed:Xing,
 
 \subsection{Site:GroundDomain:Slab}\label{sitegrounddomainslab}
 
-This section documents the input object used to simulate ground coupled heat transfer with horizontal building surfaces within EnergyPlus. Horizontal ground surfaces within EnergyPlus interact with the Site:GroundDomain object by utilizing the SurfaceProperty:OtherSideConditionsModel object. By utilizing this object, multiple horizontal surfaces can be coupled to the same Site:GroundDomain object. Each horizontal surface may also have its unique ground domain, however, runtime will be adversely affected.
+This section documents the input object used to simulate ground coupled heat transfer with horizontal building surfaces within EnergyPlus. Horizontal ground surfaces within EnergyPlus interact with the Site:GroundDomain object by utilizing the \hyperref[surfacepropertyothersideconditionsmodel]{SurfaceProperty:OtherSideConditionsModel} object. By utilizing this object, multiple horizontal surfaces can be coupled to the same Site:GroundDomain object. Each horizontal surface may also have its unique ground domain, however, runtime will be adversely affected.
 
 Generally, there are two scenarios which Site:GroundDomain is equipped to model: in-grade slabs, and on-grade slabs.
 
@@ -1421,7 +1421,7 @@ This is the value of the SurfaceProperty:OtherSideConditionsModel surface temper
 
 \subsection{Site:GroundDomain:Basement}\label{sitegrounddomainbasement}
 
-This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the SurfaceProperty:OtherSideConditionsModel object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the BuildingSurface:Detailed object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects.
+This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the \hyperref[surfacepropertyothersideconditionsmodel]{SurfaceProperty:OtherSideConditionsModel} object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects.
 
 \begin{figure}[htbp]
 \centering
@@ -1588,7 +1588,7 @@ This is the value of the SurfaceProperty:OtherSideConditionsModel surface temper
 
 \subsection{Site:GroundTemperature:FCfactorMethod}\label{sitegroundtemperaturefcfactormethod}
 
-Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (Construction:CfactorUndergroundWall) and F-factor (Construction:FfactorGroundFloor) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available. Entering these will also overwrite any ground temperatures from the weather file in the F and C factor usage. If neither is available, an error will result.
+Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (\hyperref[constructioncfactorundergroundwall]{Construction:CfactorUndergroundWall}) and F-factor (\hyperref[constructionffactorgroundfloor]{Construction:FfactorGroundFloor}) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available. Entering these will also overwrite any ground temperatures from the weather file in the F and C factor usage. If neither is available, an error will result.
 
 \subsubsection{Inputs}\label{inputs-18-004}
 
@@ -1673,7 +1673,7 @@ Outputs will show both the inputs from the above object as well as monthly value
 
 \subsection{Site:WaterMainsTemperature}\label{sitewatermainstemperature}
 
-The Site:WaterMainsTemperature object is used to calculate water temperatures delivered by underground water main pipes. The mains temperatures are used as default, make-up water temperature inputs for several plant objects, including: \textbf{WaterUse:Equipment, WaterUse:Connections, WaterHeater:Mixed} and \textbf{WaterHeater:Stratified}. The mains temperatures are also used in the water systems objects to model the temperature of cold water supplies.
+The Site:WaterMainsTemperature object is used to calculate water temperatures delivered by underground water main pipes. The mains temperatures are used as default, make-up water temperature inputs for several plant objects, including: \textbf{\hyperref[wateruseequipment]{WaterUse:Equipment}, \hyperref[wateruseconnections]{WaterUse:Connections}, \hyperref[waterheatermixed]{WaterHeater:Mixed}} and \textbf{\hyperref[waterheaterstratified]{WaterHeater:Stratified}}. The mains temperatures are also used in the water systems objects to model the temperature of cold water supplies.
 
 Water mains temperatures are a function of outdoor climate conditions and vary with time of year. A correlation has been formulated to predict water mains temperatures based on two weather inputs:
 
@@ -2178,4 +2178,4 @@ The outdoor wind speed calculated at the height above ground of the surface cent
 
 \subsubsection{System Node Temperature {[}C{]}}\label{system-node-temperature-c}
 
-When reporting for the \textbf{OutdoorAir:Node} object, this is the outdoor air dry-bulb temperature calculated at the height above ground of the node, if height is specified in the input.
+When reporting for the \textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}} object, this is the outdoor air dry-bulb temperature calculated at the height above ground of the node, if height is specified in the input.

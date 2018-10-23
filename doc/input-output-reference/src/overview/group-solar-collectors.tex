@@ -4,11 +4,11 @@ Solar collectors are thermal devices that convert solar energy into thermal ener
 
 In EnergyPlus solar collectors are components that are connected to the plant loop. A solar heating system can be constructed with a combination of solar collectors, pumps, and hot water tanks.
 
-Flate plate solar collectors are defined using two objects: SolarCollector:FlatPlate:Water and SolarCollectorPerformance:FlatPlate. Similarly, Integral-Collector-Storage (ICS) solar collectors are defined using two objects: SolarCollector:IntegralCollectorStorage, and SolarCollectorPerformance:IntegralCollectorStorage. The SolarCollector:FlatPlate:Water and SolarCollector:IntegralCollectorStorage objects describe the plant component connections. These object also reference SolarCollectorPerformance:FlatPlate and SolarCollectorPerformance:IntegralCollectorStorage performance objects which contains the thermal and optical performance test data for a specific make and model of collector. Parameters are defined separately so that these values can be organized into a reference data set and need only be entered once if for an array of the same type of collectors.
+Flate plate solar collectors are defined using two objects: \hyperref[solarcollectorflatplatewater]{SolarCollector:FlatPlate:Water} and \hyperref[solarcollectorperformanceflatplate]{SolarCollectorPerformance:FlatPlate}. Similarly, Integral-Collector-Storage (ICS) solar collectors are defined using two objects: \hyperref[solarcollectorintegralcollectorstorage]{SolarCollector:IntegralCollectorStorage}, and \hyperref[solarcollectorperformanceintegralcollectorstorage]{SolarCollectorPerformance:IntegralCollectorStorage}. The \hyperref[solarcollectorflatplatewater]{SolarCollector:FlatPlate:Water} and \hyperref[solarcollectorintegralcollectorstorage]{SolarCollector:IntegralCollectorStorage} objects describe the plant component connections. These object also reference \hyperref[solarcollectorperformanceflatplate]{SolarCollectorPerformance:FlatPlate} and \hyperref[solarcollectorperformanceintegralcollectorstorage]{SolarCollectorPerformance:IntegralCollectorStorage} performance objects which contains the thermal and optical performance test data for a specific make and model of collector. Parameters are defined separately so that these values can be organized into a reference data set and need only be entered once if for an array of the same type of collectors.
 
 \subsection{SolarCollector:FlatPlate:Water}\label{solarcollectorflatplatewater}
 
-The flat-plate solar collector model simulates glazed, unglazed, and tubular (i.e.~evacuated tube) collectors. The SolarCollector:FlatPlate:Water object represents a single collector module connected to the plant loop. The thermal and optical properties of the collector module are taken from the referenced SolarCollectorPerformance:FlatPlate object. A surface or shading object defines the collector tilt, azimuth, and gross area. The collector surface participates normally in all shading calculations if the ``FullExterior,'' ``FullInteriorAndExterior,'' FullExteriorWithReflections , or FullInteriorAndExteriorWithReflections flags are set in the Solar Distribution field of the Building object. Inlet and outlet nodes are specified for plant connections on the demand side of the plant loop.
+The flat-plate solar collector model simulates glazed, unglazed, and tubular (i.e.~evacuated tube) collectors. The SolarCollector:FlatPlate:Water object represents a single collector module connected to the plant loop. The thermal and optical properties of the collector module are taken from the referenced \hyperref[solarcollectorperformanceflatplate]{SolarCollectorPerformance:FlatPlate} object. A surface or shading object defines the collector tilt, azimuth, and gross area. The collector surface participates normally in all shading calculations if the ``FullExterior,'' ``FullInteriorAndExterior,'' FullExteriorWithReflections , or FullInteriorAndExteriorWithReflections flags are set in the Solar Distribution field of the Building object. Inlet and outlet nodes are specified for plant connections on the demand side of the plant loop.
 
 \subsubsection{Inputs}\label{inputs-045}
 
@@ -18,11 +18,11 @@ The unique name of the SolarCollector:FlatPlate:Water object.
 
 \paragraph{Field: Solar Collector Performance Name}\label{field-solar-collector-performance-name}
 
-Reference name of a SolarCollectorPerformance:FlatPlate object that defines the thermal and optical properties of the collector.
+Reference name of a \hyperref[solarcollectorperformanceflatplate]{SolarCollectorPerformance:FlatPlate} object that defines the thermal and optical properties of the collector.
 
 \paragraph{Field: Surface Name}\label{field-surface-name-005}
 
-Reference to one of the many different types of surfaces such as the BuildingSurface:Detailed or the Shading:Zone:Detailed objects. The surface named here is used to define the solar collector tilt, azimuth, and gross area.
+Reference to one of the many different types of surfaces such as the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} or the \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed} objects. The surface named here is used to define the solar collector tilt, azimuth, and gross area.
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-007}
 
@@ -193,7 +193,7 @@ This object does not generate any output; see SolarCollector:FlatPlate:Water Out
 
 \subsection{SolarCollector:IntegralCollectorStorage}\label{solarcollectorintegralcollectorstorage}
 
-The Integral-Collector-Storage (ICS) solar collector model simulates glazed collectors with integral storage unit. The SolarCollector:IntegralCollectorStorage object represents a single collector module connected to the plant loop. The thermal and optical properties of the collector module are calculated from inputs in SolarCollectorPerformance:IntegralCollectorStorage object. A surface or shading object defines the collector tilt, and azimuth. The collector surface participates normally in all shading calculations if the ``FullExterior,'' ``FullInteriorAndExterior,'' FullExteriorWithReflections , or FullInteriorAndExteriorWithReflections flags are set in the Solar Distribution field of the Building object. Inlet and outlet nodes are specified for plant connections on the demand side of the plant loop. The SurfaceProperty:ExteriorNaturalVentedCavity, object is required to describe the surface properties, the characteristics of the cavity and opening for natural ventilation if OtherSideConditionsModel is specified as the collector bottom surface outside boundary condition type.
+The Integral-Collector-Storage (ICS) solar collector model simulates glazed collectors with integral storage unit. The SolarCollector:IntegralCollectorStorage object represents a single collector module connected to the plant loop. The thermal and optical properties of the collector module are calculated from inputs in \hyperref[solarcollectorperformanceintegralcollectorstorage]{SolarCollectorPerformance:IntegralCollectorStorage} object. A surface or shading object defines the collector tilt, and azimuth. The collector surface participates normally in all shading calculations if the ``FullExterior,'' ``FullInteriorAndExterior,'' FullExteriorWithReflections , or FullInteriorAndExteriorWithReflections flags are set in the Solar Distribution field of the Building object. Inlet and outlet nodes are specified for plant connections on the demand side of the plant loop. The \hyperref[surfacepropertyexteriornaturalventedcavity]{SurfaceProperty:ExteriorNaturalVentedCavity}, object is required to describe the surface properties, the characteristics of the cavity and opening for natural ventilation if OtherSideConditionsModel is specified as the collector bottom surface outside boundary condition type.
 
 \subsubsection{Inputs}\label{inputs-2-039}
 
@@ -203,19 +203,19 @@ The unique name of the SolarCollector:IntegralCollectorStorage object.
 
 \paragraph{Field: Solar Collector Performance Name}\label{field-solar-collector-performance-name-1}
 
-Reference name of a SolarCollectorPerformance:IntegralCollectorStorage object that defines the thermal and optical properties of the collector.
+Reference name of a \hyperref[solarcollectorperformanceintegralcollectorstorage]{SolarCollectorPerformance:IntegralCollectorStorage} object that defines the thermal and optical properties of the collector.
 
 \paragraph{Field: Surface Name}\label{field-surface-name-1-001}
 
-Reference to one of the many different types of surfaces such as the BuildingSurface:Detailed or the Shading:Zone:Detailed objects. The surface named here is used to define the solar collector tilt, and azimuth. The collector shades the surface it is mounted on and hence impacts the surface heat balance.
+Reference to one of the many different types of surfaces such as the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} or the \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed} objects. The surface named here is used to define the solar collector tilt, and azimuth. The collector shades the surface it is mounted on and hence impacts the surface heat balance.
 
 \paragraph{Field: Bottom surface Boundary Conditions Type}\label{field-bottom-surface-boundary-conditions-type}
 
-This field contains the type of boundary conditions applicable to the ICS collector bottom surface. Allowed boundary condition types are: AmbientAir and OtherSideConditionsModel. If the other side conditions model is selected, specify the name of the SurfaceProperty:OtherSideConditionsModel object in the next input field, otherwise, leave the next input field blank. The AmbientAir boundary condition uses outdoor air temperature as boundary condition, hence the subsurface is assumed to be exposed to the sun and wind.
+This field contains the type of boundary conditions applicable to the ICS collector bottom surface. Allowed boundary condition types are: AmbientAir and OtherSideConditionsModel. If the other side conditions model is selected, specify the name of the \hyperref[surfacepropertyothersideconditionsmodel]{SurfaceProperty:OtherSideConditionsModel} object in the next input field, otherwise, leave the next input field blank. The AmbientAir boundary condition uses outdoor air temperature as boundary condition, hence the subsurface is assumed to be exposed to the sun and wind.
 
 \paragraph{Field: Other Side Conditions Model Name}\label{field-other-side-conditions-model-name}
 
-This field contains the name of a SurfaceProperty:OtherSideConditionsModel object declared elsewhere in the input file. This will connect the collector to the exterior boundary conditions for the underlying heat transfer surface specified above..
+This field contains the name of a \hyperref[surfacepropertyothersideconditionsmodel]{SurfaceProperty:OtherSideConditionsModel} object declared elsewhere in the input file. This will connect the collector to the exterior boundary conditions for the underlying heat transfer surface specified above..
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-1-004}
 
@@ -437,11 +437,11 @@ This field is the user-defined name of a surface object (defined elsewhere) to w
 
 \paragraph{Field: Photovoltaic-Thermal Model Performance Name}\label{field-photovoltaic-thermal-model-performance-name}
 
-This field is the user-defined name of an object (defined elsewhere) that provides the performance details of the PVT module. This should be the name of a SolarCollectorPerformance:PhotovoltaicThermal:Simple object. Multiple different SolarCollector:FlatPlate:PhotovoltaicThermal objects can reference the same object that provides performance details.
+This field is the user-defined name of an object (defined elsewhere) that provides the performance details of the PVT module. This should be the name of a \hyperref[solarcollectorperformancephotovoltaicthermalsimple]{SolarCollectorPerformance:PhotovoltaicThermal:Simple} object. Multiple different SolarCollector:FlatPlate:PhotovoltaicThermal objects can reference the same object that provides performance details.
 
 \paragraph{Field: Photovoltaic Generator Name}\label{field-photovoltaic-generator-name}
 
-This field is the user-defined name of a Generator:Photovoltaic object (defined elsewhere) that will be used to model the solar electric portion of the PVT solar collector. The PVT models make any adjustments needed to model PV performance in the context of the PVT collector.
+This field is the user-defined name of a \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object (defined elsewhere) that will be used to model the solar electric portion of the PVT solar collector. The PVT models make any adjustments needed to model PV performance in the context of the PVT collector.
 
 \paragraph{Field: Thermal Working Fluid Type}\label{field-thermal-working-fluid-type}
 
@@ -572,7 +572,7 @@ SolarCollectorPerformance:PhotovoltaicThermal:Simple,
 
 This section provides an overview of how to model solar heating systems. A solar heating system can be constructed using a combination of solar collectors, pumps, water tanks and water heaters. The solar collector must be connected on the demand side of the plant loop. Multiple collector modules can be combined in series and parallel using the normal plant connection rules. The supply side of the plant loop should contain a water heater with the solar collector loop connecting to the \emph{Source Side Inlet} and \emph{Source Side Outlet} nodes. As usual, the pump must be the first component on the supply side.
 
-If the solar heating system is for domestic hot water (or service water heating) usage only, the field \emph{Use Flow Rate Fraction Schedule Name} of the WaterHeater:Mixed object can be used to avoid additional plant connections. If the system has more complicated hot water requirements or if the system is for space heating, the \emph{Use Side Inlet} and \emph{Use Side Outlet} nodes must be connected to another plant loop to serve zone and non-zone equipment. (See the WaterHeater:Mixed object documentation for more information.)
+If the solar heating system is for domestic hot water (or service water heating) usage only, the field \emph{Use Flow Rate Fraction Schedule Name} of the \hyperref[waterheatermixed]{WaterHeater:Mixed} object can be used to avoid additional plant connections. If the system has more complicated hot water requirements or if the system is for space heating, the \emph{Use Side Inlet} and \emph{Use Side Outlet} nodes must be connected to another plant loop to serve zone and non-zone equipment. (See the \hyperref[waterheatermixed]{WaterHeater:Mixed} object documentation for more information.)
 
 \begin{figure}[hbtp] % fig 132
 \centering
@@ -582,7 +582,7 @@ If the solar heating system is for domestic hot water (or service water heating)
 
 NOTE: The EnergyPlus plant simulation requires the pump to be the first component on the supply side. This may be different from the way the solar heating system is actually configured. This should not affect the validity of the simulation results.
 
-In order to realize energy savings with a solar heating system, it is best to use a two-tank system with a storage tank and auxiliary water heater. The storage tank gathers heat directly from the solar collectors and stores it for later use. The storage tank is modeled using a WaterHeater:Mixed object with the \emph{Heater Maximum Capacity} set to zero. The auxiliary water heater is positioned downstream of the storage tank on the supply side of the main plant loop. The auxiliary water heater, or booster water heater, provides additional heat if the storage tank water is not hot enough. The auxiliary water heater can be modeled as an instantaneous/tankless water heater or as a standard tanked water heater with heating source (see WaterHeater:Mixed).
+In order to realize energy savings with a solar heating system, it is best to use a two-tank system with a storage tank and auxiliary water heater. The storage tank gathers heat directly from the solar collectors and stores it for later use. The storage tank is modeled using a \hyperref[waterheatermixed]{WaterHeater:Mixed} object with the \emph{Heater Maximum Capacity} set to zero. The auxiliary water heater is positioned downstream of the storage tank on the supply side of the main plant loop. The auxiliary water heater, or booster water heater, provides additional heat if the storage tank water is not hot enough. The auxiliary water heater can be modeled as an instantaneous/tankless water heater or as a standard tanked water heater with heating source (see \hyperref[waterheatermixed]{WaterHeater:Mixed}).
 
 \begin{figure}[hbtp] % fig 133
 \centering
@@ -590,7 +590,7 @@ In order to realize energy savings with a solar heating system, it is best to us
 \caption{Two-Tank Solar Heating System Connection Diagram \protect \label{fig:two-tank-solar-heating-system-connection}}
 \end{figure}
 
-Another strategy to consider for solar heating systems is to allow the storage tank to reach a much higher temperature than necessary for the end use. This allows the tank to store more energy from the solar collectors, when it is available. However, for applications such as domestic hot water, it is undesirable and unsafe to supply excessive hot water temperatures at the point of demand. To take advantage of higher storage temperatures, yet still avoid scalding temperatures at the faucet, the hot water leaving the storage tank can be tempered with cold water using a three-way valve to achieve the target temperature. See the TemperingValve object documentation for more details.
+Another strategy to consider for solar heating systems is to allow the storage tank to reach a much higher temperature than necessary for the end use. This allows the tank to store more energy from the solar collectors, when it is available. However, for applications such as domestic hot water, it is undesirable and unsafe to supply excessive hot water temperatures at the point of demand. To take advantage of higher storage temperatures, yet still avoid scalding temperatures at the faucet, the hot water leaving the storage tank can be tempered with cold water using a three-way valve to achieve the target temperature. See the \hyperref[temperingvalve]{TemperingValve} object documentation for more details.
 
 A complete two-tank solar heating system with tempering valve is shown below.
 
@@ -604,7 +604,7 @@ A complete two-tank solar heating system with tempering valve is shown below.
 
 There are several options for controlling a solar heating system in EnergyPlus. Since the solar collectors request a constant flow demand based on their \emph{Maximum Flow Rate}, the limiting factor is actually the flow rate determined by the loop pump. Therefore the entire system can be controlled using the \emph{Pump Flow Rate Schedule} of the pump. If the schedule is omitted, the pump and system will run all the time (without any other controls specified). This is usually not the best way to operate a solar heating system.
 
-To better control the collector loop, a differential thermostat can be used to compare the temperature in the water heater to the temperature in the collector so that the pump is only turned on when there is a useful heat gain. The differential thermostat is simulated using the AvailabilityManager:DifferentialThermostat object. For a typical system, the \emph{Hot Node Name} field refers to an outlet node of one of the collector modules. The \emph{Cold Node Name} field refers to the \emph{Source Side Outlet} node, i.e.~the cold storage water leaving the water heater. The fields \emph{Temperature Difference On Limit} and \emph{Temperature Difference Off Limit} are usually 8 12 C and 1 3 C respectively. If the two temperature differences are too close, it is possible for the system to turn on and off rapidly without much useful heat gain. This can also occur if the flow rate through the collector is too high. Without flow the fluid in the collector heats up more quickly; when high flow is turned on, all of the hot fluid is removed and the temperature drops, forcing the system off again.
+To better control the collector loop, a differential thermostat can be used to compare the temperature in the water heater to the temperature in the collector so that the pump is only turned on when there is a useful heat gain. The differential thermostat is simulated using the \hyperref[availabilitymanagerdifferentialthermostat]{AvailabilityManager:DifferentialThermostat} object. For a typical system, the \emph{Hot Node Name} field refers to an outlet node of one of the collector modules. The \emph{Cold Node Name} field refers to the \emph{Source Side Outlet} node, i.e.~the cold storage water leaving the water heater. The fields \emph{Temperature Difference On Limit} and \emph{Temperature Difference Off Limit} are usually 8 12 C and 1 3 C respectively. If the two temperature differences are too close, it is possible for the system to turn on and off rapidly without much useful heat gain. This can also occur if the flow rate through the collector is too high. Without flow the fluid in the collector heats up more quickly; when high flow is turned on, all of the hot fluid is removed and the temperature drops, forcing the system off again.
 
 Another control method is to use a photovoltaic panel to power the pump. The system begins pumping when there is enough solar radiation to operate the pump. This is not yet implemented in EnergyPlus.
 
@@ -618,15 +618,15 @@ In climates with a cold season, the solar heating system must be designed to avo
 
 \emph{Drain-back system}. This strategy automatically empties the collector when the pump is not running. This scenario is modeled by default in EnergyPlus, although the extra pump energy required to start the system is not taken into account.
 
-\emph{Recirculation system}. This strategy automatically recirculates warm liquid from the storage tank back through the collector to maintain the system above the freezing point. There are system losses using this method. This can be simulated in EnergyPlus by using AvailabilityManager:LowTemperatureTurnOn to force the system to turn on when the outdoor air temperature or collector outlet temperature falls below a specified minimum.
+\emph{Recirculation system}. This strategy automatically recirculates warm liquid from the storage tank back through the collector to maintain the system above the freezing point. There are system losses using this method. This can be simulated in EnergyPlus by using \hyperref[availabilitymanagerlowtemperatureturnon]{AvailabilityManager:LowTemperatureTurnOn} to force the system to turn on when the outdoor air temperature or collector outlet temperature falls below a specified minimum.
 
 \subsubsection{Additional Controls}\label{additional-controls}
 
-In addition to freeze prevention, it is also necessary to prevent the system from becoming too hot. This is usually a safety issue for the water heater. For this case it is important to have a high temperature cutoff to stop the pump before damaging the water heater. This is accomplished with a AvailabilityManager:HighTemperatureTurnOff.
+In addition to freeze prevention, it is also necessary to prevent the system from becoming too hot. This is usually a safety issue for the water heater. For this case it is important to have a high temperature cutoff to stop the pump before damaging the water heater. This is accomplished with a \hyperref[availabilitymanagerhightemperatureturnoff]{AvailabilityManager:HighTemperatureTurnOff}.
 
 \subsubsection{System Availability Manager List Example}\label{system-availability-manager-list-example}
 
-To use the availability managers for the control cases described above, a AvailabilityManagerAssignmentList must be defined and referenced in the PlantLoop object of the collector loop. An example of a differential thermostat, recirculation for freeze prevention, and high temperature cutoff is shown below:
+To use the availability managers for the control cases described above, a \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} must be defined and referenced in the \hyperref[plantloop]{PlantLoop} object of the collector loop. An example of a differential thermostat, recirculation for freeze prevention, and high temperature cutoff is shown below:
 
 \begin{lstlisting}
 
@@ -660,17 +660,17 @@ AvailabilityManagerAssignmentList,
   2.0;                                                                                       !- Temperature Difference Off Limit (delta C)
 \end{lstlisting}
 
-The AvailabilityManager:DifferentialThermostat object must always be the last manager in the availability manager list. See the AvailabilityManagerAssignmentList object documentation for more information.
+The \hyperref[availabilitymanagerdifferentialthermostat]{AvailabilityManager:DifferentialThermostat} object must always be the last manager in the availability manager list. See the \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} object documentation for more information.
 
 \subsection{SolarCollector:UnglazedTranspired}\label{solarcollectorunglazedtranspired}
 
-This object is used to model unglazed transpired solar collectors (UTSC) used to condition outdoor air. These collectors are generally used to heat air drawn through perforated absorbers that are heated by the sun and also recover heat conducted out through the underlying wall. The SolarCollector:UnglazedTranspired object represents a single collector attached to one or more BuildingSurface:Detailed objects and to one or more outdoor air systems. Therefore the transpired collector is part of both the thermal envelope and the HVAC system. An example file is provided called TranspiredCollectors.idf.
+This object is used to model unglazed transpired solar collectors (UTSC) used to condition outdoor air. These collectors are generally used to heat air drawn through perforated absorbers that are heated by the sun and also recover heat conducted out through the underlying wall. The SolarCollector:UnglazedTranspired object represents a single collector attached to one or more \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects and to one or more outdoor air systems. Therefore the transpired collector is part of both the thermal envelope and the HVAC system. An example file is provided called TranspiredCollectors.idf.
 
-The area and orientation of the collector is obtained from BuildingSurface:Detailed objects, which are referenced by name. Although the collector surface itself is slightly detached from the underlying building wall (or roof), no additional surface object is needed to represent the collector itself. When modeling transpired collectors, it is important to consider the size of the collector when developing the building model s BuildingSurface:Detailed objects because the underlying surfaces must match the collector. For example, if the collector covers only part of the wall, then that wall should be split into separate surfaces where one matches the size of the collector. A single collector can be associated with as many BuildingSurface:Detailed objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The collector can be arranged at any tilt angle by describing the surfaces appropriately. The surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
+The area and orientation of the collector is obtained from \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects, which are referenced by name. Although the collector surface itself is slightly detached from the underlying building wall (or roof), no additional surface object is needed to represent the collector itself. When modeling transpired collectors, it is important to consider the size of the collector when developing the building model s \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects because the underlying surfaces must match the collector. For example, if the collector covers only part of the wall, then that wall should be split into separate surfaces where one matches the size of the collector. A single collector can be associated with as many \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The collector can be arranged at any tilt angle by describing the surfaces appropriately. The surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
 
-The collector conditions outdoor air and is connected to the outdoor air system using the usual method of specifying node names. Using the UTSC model requires specifying a relatively complete HVAC air system that includes an outdoor air path. This will typically require using a set of objects that, at a minimum, will include: AirLoopHVAC:ControllerList, AirLoopHVAC:OutdoorAirSystem:EquipmentList, AirLoopHVAC:OutdoorAirSystem, OutdoorAir:NodeList, OutdoorAir:Mixer, SetpointManager:MixedAir, and Controller:OutdoorAir. A single UTSC can serve more than one outdoor air system but requires also using a separate object, called SolarCollector:UnglazedTranspired:Multisystem to specify node connections.
+The collector conditions outdoor air and is connected to the outdoor air system using the usual method of specifying node names. Using the UTSC model requires specifying a relatively complete HVAC air system that includes an outdoor air path. This will typically require using a set of objects that, at a minimum, will include: \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList}, \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}, \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}, \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List}, \hyperref[outdoorairmixer]{OutdoorAir:Mixer}, \hyperref[setpointmanagermixedair]{SetpointManager:MixedAir}, and \hyperref[controlleroutdoorair]{Controller:OutdoorAir}. A single UTSC can serve more than one outdoor air system but requires also using a separate object, called \hyperref[solarcollectorunglazedtranspiredmultisystem]{SolarCollector:UnglazedTranspired:Multisystem} to specify node connections.
 
-Controls for the UTSC involve setting the rate of air flow and the status of a bypass damper. If the bypass damper is open, then all the ventilation air goes straight into the outdoor air mixer; if it closed, then all the air first passes through the UTSC. The bypass damper is modeled as completely open or completely closed. The UTSC bypass damper control is determined by an availability manager, the airflow set by the outdoor air mixer controls, and thermostatic type controls that decide if heating is useful. An availability schedule is used to bypass the collector for certain times of the year, eg. summer cooling season. The air flow rates are set by controls associated with the outdoor air mixer (see SetpointManager:MixedAir, and Controller:OutdoorAir). Thermostatic type control decides if the collector will provide useful heating based on either of two types of setpoints. The first type of temperature setpoint is managed by SetpointManager:MixedAir, where the UTSC model looks at a control node, usually the mixed air node. The second type is an extra setpoint especially for free heating that is managed within this object where the UTSC model looks at the zone air node.
+Controls for the UTSC involve setting the rate of air flow and the status of a bypass damper. If the bypass damper is open, then all the ventilation air goes straight into the outdoor air mixer; if it closed, then all the air first passes through the UTSC. The bypass damper is modeled as completely open or completely closed. The UTSC bypass damper control is determined by an availability manager, the airflow set by the outdoor air mixer controls, and thermostatic type controls that decide if heating is useful. An availability schedule is used to bypass the collector for certain times of the year, eg. summer cooling season. The air flow rates are set by controls associated with the outdoor air mixer (see \hyperref[setpointmanagermixedair]{SetpointManager:MixedAir}, and \hyperref[controlleroutdoorair]{Controller:OutdoorAir}). Thermostatic type control decides if the collector will provide useful heating based on either of two types of setpoints. The first type of temperature setpoint is managed by \hyperref[setpointmanagermixedair]{SetpointManager:MixedAir}, where the UTSC model looks at a control node, usually the mixed air node. The second type is an extra setpoint especially for free heating that is managed within this object where the UTSC model looks at the zone air node.
 
 \subsubsection{Inputs}\label{inputs-6-026}
 
@@ -680,7 +680,7 @@ This field contains a unique name for the unglazed transpired solar collector.
 
 \paragraph{Field: Boundary Conditions Model Name}\label{field-boundary-conditions-model-name-000}
 
-This field contains the name of a SurfaceProperty:OtherSideConditionsModel object declared elsewhere in the input file. This will connect the collector to the exterior boundary conditions for the underlying heat transfer surface.
+This field contains the name of a \hyperref[surfacepropertyothersideconditionsmodel]{SurfaceProperty:OtherSideConditionsModel} object declared elsewhere in the input file. This will connect the collector to the exterior boundary conditions for the underlying heat transfer surface.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-016}
 
@@ -688,19 +688,19 @@ This field contains the name of a schedule that determines whether or not the UT
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-2-003}
 
-This field contains the name of an air node that provides air into the UTSC. This node name should also be assigned to be an outdoor air node using the OutdoorAir:NodeList or OutdoorAir:Node objects. This node should also be named as the actuated node in a Controller:OutdoorAir object. If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:Multisystem object should be used to define the nodes.
+This field contains the name of an air node that provides air into the UTSC. This node name should also be assigned to be an outdoor air node using the \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} or \hyperref[outdoorairnode]{OutdoorAir:Node} objects. This node should also be named as the actuated node in a \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object. If the UTSC is connected to more than one air system, then this field can be left blank and the \hyperref[solarcollectorunglazedtranspiredmultisystem]{SolarCollector:UnglazedTranspired:Multisystem} object should be used to define the nodes.
 
 \paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-2-003}
 
-This field contains the name of an air node that is the outlet of the UTSC. This node name will typically be the inlet to the OutdoorAir:Mixer (if there is no other equipment on the outdoor air path). If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:Multisystem object should be used to define the nodes.
+This field contains the name of an air node that is the outlet of the UTSC. This node name will typically be the inlet to the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} (if there is no other equipment on the outdoor air path). If the UTSC is connected to more than one air system, then this field can be left blank and the \hyperref[solarcollectorunglazedtranspiredmultisystem]{SolarCollector:UnglazedTranspired:Multisystem} object should be used to define the nodes.
 
 \paragraph{Field: Setpoint Node Name}\label{field-setpoint-node-name-000}
 
-This field contains the name of an air node that has a setpoint manager controlling its temperature setpoint. This node name will typically be named as the control node in a a Controller:OutdoorAir object. If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:Multisystem object should be used to define the nodes.
+This field contains the name of an air node that has a setpoint manager controlling its temperature setpoint. This node name will typically be named as the control node in a a \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object. If the UTSC is connected to more than one air system, then this field can be left blank and the \hyperref[solarcollectorunglazedtranspiredmultisystem]{SolarCollector:UnglazedTranspired:Multisystem} object should be used to define the nodes.
 
 \paragraph{Field: Zone Node Name}\label{field-zone-node-name-001}
 
-This field contains the name of an air node for a thermal zone that is ultimately connected to the air system. This node is used with the setpoint schedule, defined in the following field, to provide an added layer of thermostatic control for the UTSC without affecting the control of auxiliary heating. If there is a single air system that is connected to more than one zone, then a single zone should be selected based on where the thermostat might be located. If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:Multisystem object should be used to define the nodes.
+This field contains the name of an air node for a thermal zone that is ultimately connected to the air system. This node is used with the setpoint schedule, defined in the following field, to provide an added layer of thermostatic control for the UTSC without affecting the control of auxiliary heating. If there is a single air system that is connected to more than one zone, then a single zone should be selected based on where the thermostat might be located. If the UTSC is connected to more than one air system, then this field can be left blank and the \hyperref[solarcollectorunglazedtranspiredmultisystem]{SolarCollector:UnglazedTranspired:Multisystem} object should be used to define the nodes.
 
 \paragraph{Field: Free Heating Setpoint Schedule Name}\label{field-free-heating-setpoint-schedule-name}
 
@@ -807,7 +807,7 @@ This field is used to enter a value for the coefficient used to determine natura
 
 \paragraph{Field: Surface \textless{}\#\textgreater{} Name}\label{field-surface-name-3-001}
 
-The remaining fields are used to name the BuildingSurface:Detailed objects that are associated with the UTSC. These are the underlying heat transfer surfaces and are defined elsewhere in the input file. These other surfaces should all specify OtherSideConditionsModel as their exterior environment. The input object can currently accommodate up to ten surfaces, but it is extensible.
+The remaining fields are used to name the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects that are associated with the UTSC. These are the underlying heat transfer surfaces and are defined elsewhere in the input file. These other surfaces should all specify OtherSideConditionsModel as their exterior environment. The input object can currently accommodate up to ten surfaces, but it is extensible.
 
 An example of this object follows.
 
@@ -950,11 +950,11 @@ The efficiency of the UTSC solar collector.
 
 \subsection{SolarCollector:UnglazedTranspired:Multisystem}\label{solarcollectorunglazedtranspiredmultisystem}
 
-This object is used to model unglazed transpired solar collectors (UTSC) that are connected to multiple outdoor air systems. This object supplements the SolarCollector:UnglazedTranspired object and is only necessary if more than one air system is connected to a single transpired collector. After the name field, there are sets of four node names used to define the connections of each air system. Each set contains node names for inlet, outlet, control, and zone. If more than five air systems are needed, this object is extensible.
+This object is used to model unglazed transpired solar collectors (UTSC) that are connected to multiple outdoor air systems. This object supplements the \hyperref[solarcollectorunglazedtranspired]{SolarCollector:UnglazedTranspired} object and is only necessary if more than one air system is connected to a single transpired collector. After the name field, there are sets of four node names used to define the connections of each air system. Each set contains node names for inlet, outlet, control, and zone. If more than five air systems are needed, this object is extensible.
 
 \subsubsection{Field: Solar Collector Name}\label{field-solar-collector-name}
 
-This field is used to identify the name of the SolarCollector:UnglazedTranspired object that needs to be connected to more than one air system. This field must match the name.
+This field is used to identify the name of the \hyperref[solarcollectorunglazedtranspired]{SolarCollector:UnglazedTranspired} object that needs to be connected to more than one air system. This field must match the name.
 
 \subsubsection{Field Set: Inlet Node, Outlet Node, Mixed Air Node, Zone Node}\label{field-set-inlet-node-outlet-node-mixed-air-node-zone-node}
 
@@ -962,15 +962,15 @@ The following four fields form a repeating set of four fields. One set is used f
 
 \subsubsection{Field: Outdoor Air System \textless{}\#\textgreater{} Collector Inlet Node}\label{field-outdoor-air-system-collector-inlet-node}
 
-This field contains the name of an air node that provides air into the UTSC. This node name should also be assigned to be an outdoor air node using the OutdoorAir:NodeList and OutdoorAir:Node objects. This node is also be named as the actuator node in a Controller:OutdoorAir object.
+This field contains the name of an air node that provides air into the UTSC. This node name should also be assigned to be an outdoor air node using the \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} and \hyperref[outdoorairnode]{OutdoorAir:Node} objects. This node is also be named as the actuator node in a \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object.
 
 \subsubsection{Field: Outdoor Air System \textless{}\#\textgreater{} Collector Outlet Node}\label{field-outdoor-air-system-collector-outlet-node}
 
-This field contains the name of an air node that is the outlet of the UTSC. This node name will typically be the Outdoor Air Stream Node Name in the OutdoorAir:Mixer (if there is no other equipment on the outdoor air path).
+This field contains the name of an air node that is the outlet of the UTSC. This node name will typically be the Outdoor Air Stream Node Name in the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} (if there is no other equipment on the outdoor air path).
 
 \subsubsection{Field: Outdoor Air System \textless{}\#\textgreater{} Mixed Air Node}\label{field-outdoor-air-system-mixed-air-node}
 
-This field contains the name of an air node that has a setpoint manager controlling its temperature setpoint. This node name will typically be named as the mixed air node in a Controller:OutdoorAir object.
+This field contains the name of an air node that has a setpoint manager controlling its temperature setpoint. This node name will typically be named as the mixed air node in a \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object.
 
 \subsubsection{Field: Outdoor Air System \textless{}\#\textgreater{} Zone Node}\label{field-outdoor-air-system-zone-node}
 

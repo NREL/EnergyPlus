@@ -68,7 +68,7 @@ This field contains the minimum volume flow rate while operating in variable flo
 
 \paragraph{Field: Pump Control Type}\label{field-pump-control-type-000}
 
-This is a choice field of Continuous or Intermittent. A variable speed pump is defined with maximum and minimum flow rates that are the physical limits of the device. If there is no load on the loop and the pump is operating intermittently, then the pump can shutdown. For any other condition such as the loop having a load and the pump is operating intermittently or the pump is continuously operating (regardless of the loading condition), the pump will operate and select a flow somewhere between the minimum and maximum limits. In these cases where the pump is running, it will try to meet the flow request made by demand side components. Applicable availability managers (ref. AvailabilityManagerAssignmentList) may override this control by forcing the pump to be on or off.
+This is a choice field of Continuous or Intermittent. A variable speed pump is defined with maximum and minimum flow rates that are the physical limits of the device. If there is no load on the loop and the pump is operating intermittently, then the pump can shutdown. For any other condition such as the loop having a load and the pump is operating intermittently or the pump is continuously operating (regardless of the loading condition), the pump will operate and select a flow somewhere between the minimum and maximum limits. In these cases where the pump is running, it will try to meet the flow request made by demand side components. Applicable availability managers (ref. \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList}) may override this control by forcing the pump to be on or off.
 
 \paragraph{Field: Pump Flow Rate Schedule Name}\label{field-pump-flow-rate-schedule-name-000}
 
@@ -271,7 +271,7 @@ This numeric field contains the pump motor's fraction of power loss to the fluid
 
 \paragraph{Field: Pump Control Type}\label{field-pump-control-type-1-000}
 
-This is a choice field of Continuous or Intermittent. The operation of a constant speed pump is fairly straightforward. If the user designates a constant speed pump that is operating continuously, the pump will run regardless of whether or not there is a load. This may have the net effect of adding heat to the loop if no equipment is turned on. If the pump is constant speed and operates intermittently, the pump will run at its capacity if a load is sensed and will shut off if there is no load on the loop. Applicable availability managers (ref. AvailabilityManagerAssignmentList) may override this control by forcing the pump to be on or off.
+This is a choice field of Continuous or Intermittent. The operation of a constant speed pump is fairly straightforward. If the user designates a constant speed pump that is operating continuously, the pump will run regardless of whether or not there is a load. This may have the net effect of adding heat to the loop if no equipment is turned on. If the pump is constant speed and operates intermittently, the pump will run at its capacity if a load is sensed and will shut off if there is no load on the loop. Applicable availability managers (ref. \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList}) may override this control by forcing the pump to be on or off.
 
 \paragraph{Field: Pump Flow Rate Schedule Name}\label{field-pump-flow-rate-schedule-name-1}
 
@@ -279,7 +279,7 @@ The schedule values modify the value for Rated Flow Rate of the pump on a time b
 
 \paragraph{Field:Pump Curve Name}\label{fieldpump-curve-name}
 
-This field is only used if the user is performing a pressure-based simulation in the plant loop of the LoopFlowCorrection type (see PlantLoop section for how to enable this).
+This field is only used if the user is performing a pressure-based simulation in the plant loop of the LoopFlowCorrection type (see \hyperref[plantloop]{PlantLoop} section for how to enable this).
 
 This field references a separate pressure head curve that the user has input separately in the input file. The pressure curve represents a non-dimensional regression of pressure-flow rate data. The equation should be of the following form:
 
@@ -299,19 +299,19 @@ In this equation, the two dimensionless parameters, X and X are defined in terms
 
 Where Delta P is the pressure drop, mdot is the fluid mass flow rate, rho is a representative fluid density, N is the rotational speed of the pump, and D is the pump impeller diameter.
 
-Since the user may not need a full fourth order expansion of this, the user may use linear (first order), quadratic (second order), cubic (third order), or full quartic (fourth order). These are available in the objects Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic.
+Since the user may not need a full fourth order expansion of this, the user may use linear (first order), quadratic (second order), cubic (third order), or full quartic (fourth order). These are available in the objects \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}.
 
 Once this curve is input properly (along with the following two fields), the pump will respond to the plant loop pressure drop when resolving the flow rate. Note that this simulation method will likely result in a plant loop that does not exactly hit the setpoint as the current simulation method does. This is due to the loop flow rate now being pressure-based and not decision-based .
 
 \paragraph{Field:Impeller Diameter}\label{fieldimpeller-diameter}
 
-This field is only used if the user is performing a pressure-based simulation in the plant loop of the LoopFlowCorrection type (see PlantLoop section for how to enable this).
+This field is only used if the user is performing a pressure-based simulation in the plant loop of the LoopFlowCorrection type (see \hyperref[plantloop]{PlantLoop} section for how to enable this).
 
 To re-dimensionalize the dimensionless pump curve, the impeller diameter must be known. This value is entered in meters.
 
 \paragraph{Field:Rotational Speed}\label{fieldrotational-speed}
 
-This field is only used if the user is performing a pressure-based simulation in the plant loop of the LoopFlowCorrection type (see PlantLoop section for how to enable this).
+This field is only used if the user is performing a pressure-based simulation in the plant loop of the LoopFlowCorrection type (see \hyperref[plantloop]{PlantLoop} section for how to enable this).
 
 To re-dimensionalize the dimensionless pump curve, the rotational speed must be known. This value is entered in RPM (revolutions per minute).
 
@@ -647,7 +647,7 @@ This numeric field contains the pump motor's fraction of power loss to the fluid
 
 \paragraph{Field: Pump Control Type}\label{field-pump-control-type-2-000}
 
-This is a choice field of Continuous or Intermittent. The operation of a constant speed pump bank is fairly straightforward. If the user designates a constant speed pump bank that is operating continuously, the pump bank will run regardless of whether or not there is a load. This may have the net effect of adding heat to the loop if no equipment is turned on. If the pump bank is constant speed and operates intermittently, the pump bank will run at its capacity if a load is sensed and will shut off if there is no load on the loop. Applicable availability managers (ref. AvailabilityManagerAssignmentList) may override this control by forcing the pump to be on or off.
+This is a choice field of Continuous or Intermittent. The operation of a constant speed pump bank is fairly straightforward. If the user designates a constant speed pump bank that is operating continuously, the pump bank will run regardless of whether or not there is a load. This may have the net effect of adding heat to the loop if no equipment is turned on. If the pump bank is constant speed and operates intermittently, the pump bank will run at its capacity if a load is sensed and will shut off if there is no load on the loop. Applicable availability managers (ref. \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList}) may override this control by forcing the pump to be on or off.
 
 \paragraph{Field: Pump Flow Rate Schedule Name}\label{field-pump-flow-rate-schedule-name-3}
 
@@ -835,7 +835,7 @@ The numeric field specifies the minimum flow allowed for the pump bank as a frac
 
 \paragraph{Field: Pump Control Type}\label{field-pump-control-type-3}
 
-This is a choice field of Continuous or Intermittent. A variable speed pump bank is defined with maximum and minimum flow rates that are the physical limits of the device. If there is no load on the loop and the pump bank is operating intermittently, then the bank can shutdown. For any other condition such as the loop having a load and the pump bank is operating intermittently or the pump bank is continuously operating (regardless of the loading condition), the bank will operate and select a flow somewhere between the minimum and maximum limits. In these cases where the pump bank is running, it will try to meet the flow request made by demand side components. Applicable availability managers (ref. AvailabilityManagerAssignmentList) may override this control by forcing the pump to be on or off.
+This is a choice field of Continuous or Intermittent. A variable speed pump bank is defined with maximum and minimum flow rates that are the physical limits of the device. If there is no load on the loop and the pump bank is operating intermittently, then the bank can shutdown. For any other condition such as the loop having a load and the pump bank is operating intermittently or the pump bank is continuously operating (regardless of the loading condition), the bank will operate and select a flow somewhere between the minimum and maximum limits. In these cases where the pump bank is running, it will try to meet the flow request made by demand side components. Applicable availability managers (ref. \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList}) may override this control by forcing the pump to be on or off.
 
 \paragraph{Field: Pump Flow Rate Schedule Name}\label{field-pump-flow-rate-schedule-name-4}
 

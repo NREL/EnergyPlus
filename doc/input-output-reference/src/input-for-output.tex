@@ -6,7 +6,7 @@ Several items are used to specify what will appear in the output file(s). The ou
 
 \subsection{Variable Dictionary Reports}\label{variable-dictionary-reports}
 
-One of the most important outputs for EnergyPlus is the Variable Dictionary reports -- these contain the key variable names for each simulation. This single input object is used to produce two important reports that are used to identify the specific output variables and meters available for a specific EnergyPlus model.~ Two output files are produced (\textbf{eplusout.rdd \& eplusout.mdd}) that list the names of the output variables and meters for that simulation.~ You may need to run your simulation once and produce these files before you ask for specific output variables (\textbf{rdd}) or meters (\textbf{mdd}) (see Output:Variable and Output:Meter objects). Variables available, to some extent, depend on the simulation input. Variables are ``set up'' during the initial ``get input'' processing done within the modules. Therefore, an item that is specific to a certain type of coil would not be available if that coil were not used during the simulation. This command will produce a list of variables available for reporting.
+One of the most important outputs for EnergyPlus is the Variable Dictionary reports -- these contain the key variable names for each simulation. This single input object is used to produce two important reports that are used to identify the specific output variables and meters available for a specific EnergyPlus model.~ Two output files are produced (\textbf{eplusout.rdd \& eplusout.mdd}) that list the names of the output variables and meters for that simulation.~ You may need to run your simulation once and produce these files before you ask for specific output variables (\textbf{rdd}) or meters (\textbf{mdd}) (see \hyperref[outputvariable]{Output:Variable} and \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Variables available, to some extent, depend on the simulation input. Variables are ``set up'' during the initial ``get input'' processing done within the modules. Therefore, an item that is specific to a certain type of coil would not be available if that coil were not used during the simulation. This command will produce a list of variables available for reporting.
 
 \subsection{Output:VariableDictionary}\label{output-variabledictionary}
 
@@ -46,7 +46,7 @@ Output:VariableDictionary, IDF, Name;
 
 \subsection{Surface Reports}\label{surface-reports}
 
-There are two specific objects for surfaces: \textbf{Output:Surfaces:List} and \textbf{Output:Surfaces:Drawing} -- as the names imply, the list reports are simple text reports that are contained in one of the output files whereas the drawing reports will create files that are used in other graphic tools.
+There are two specific objects for surfaces: \textbf{\hyperref[outputsurfaceslist]{Output:Surfaces:List}} and \textbf{\hyperref[outputsurfacesdrawing]{Output:Surfaces:Drawing}} -- as the names imply, the list reports are simple text reports that are contained in one of the output files whereas the drawing reports will create files that are used in other graphic tools.
 
 These objects and their use is described in the following:
 
@@ -124,7 +124,7 @@ An example input object for this report follows.
 Output:Surfaces:List, DecayCurvesFromComponentLoadsSummary;
 \end{lstlisting}
 
-This report (in \textbf{eplusout.eio}) provides an intermediate calculation used, called a decay curve,~ in the Zone Component Loads Summary report for the estimate of the sensible-delayed column values. A decay curve is created for each surface in a zone by introducing a radiant pulse. Each value in each row of the report corresponds to a zone time step from the time the pulse was introduced. See Zone Component Load Summary described in object Output:Table:SummaryReports for more detailed information.
+This report (in \textbf{eplusout.eio}) provides an intermediate calculation used, called a decay curve,~ in the Zone Component Loads Summary report for the estimate of the sensible-delayed column values. A decay curve is created for each surface in a zone by introducing a radiant pulse. Each value in each row of the report corresponds to a zone time step from the time the pulse was introduced. See Zone Component Load Summary described in object \hyperref[outputtablesummaryreports]{Output:Table:SummaryReports} for more detailed information.
 
 \subsection{Output:Surfaces:Drawing}\label{outputsurfacesdrawing}
 
@@ -159,7 +159,7 @@ As indicated in the example, you can select among three different ways that surf
 
 \paragraph{Field: Report Specifications 2}\label{field-report-specifications-2}
 
-This field can be used to control the color scheme in the DXF file by entering the name of an OutputControl:SurfaceColorScheme object.~ Using OutputControl:SurfaceColorScheme, you can define color schemes for surface representation. This feature will let you align the colors with the software of your choice (colors don't seem to be standard across DXF viewers).
+This field can be used to control the color scheme in the DXF file by entering the name of an \hyperref[outputcontrolsurfacecolorscheme]{OutputControl:SurfaceColorScheme} object.~ Using \hyperref[outputcontrolsurfacecolorscheme]{OutputControl:SurfaceColorScheme}, you can define color schemes for surface representation. This feature will let you align the colors with the software of your choice (colors don't seem to be standard across DXF viewers).
 
 Several software programs can render this file into something viewable and are described in more detail in the Output Details and Examples document under the file name (\textbf{eplusout.dxf}).
 
@@ -216,7 +216,7 @@ Output:Schedules, Hourly;     ! values on hourly increments (day schedule resolu
   Output:Schedules, TimeStep; ! will give them at the timestep of the simulation
 \end{lstlisting}
 
-This report is placed on the \textbf{eplusout.eio} file. Details of this reporting are shown in the Output Details and Examples document.~ Schedule values over time can also be obtained in the EnergyPlus Standard Output (in eplusout.eso) using Output:Variable objects.
+This report is placed on the \textbf{eplusout.eio} file. Details of this reporting are shown in the Output Details and Examples document.~ Schedule values over time can also be obtained in the EnergyPlus Standard Output (in eplusout.eso) using \hyperref[outputvariable]{Output:Variable} objects.
 
 \subsection{Output:Constructions}\label{outputconstructions}
 
@@ -254,7 +254,7 @@ EnergyPlus reports the daylight factors for four sky types (clear, turbid clear,
 
 \paragraph{Field: Reporting Days}\label{field-reporting-days}
 
-This field is used to select days to report the daylight factors. Two choices are ``SizingDays'' and ``AllShadowCalculationDays''. The SizingDays choice will output the daylight factors for only the sizing calculation days, while the AllShadowCalculationDays choice will output daylight factors for all shadow calculation days.
+This field is used to select days to report the daylight factors. Two choices are ``SizingDays'' and ``All\hyperref[shadowcalculation]{ShadowCalculation}Days''. The SizingDays choice will output the daylight factors for only the sizing calculation days, while the All\hyperref[shadowcalculation]{ShadowCalculation}Days choice will output daylight factors for all shadow calculation days.
 
 \subsection{Output:EnergyManagementSystem}\label{outputenergymanagementsystem}
 
@@ -264,11 +264,11 @@ This report content is added to the ``eplusout.edd'' file. It shows information 
 
 \paragraph{Field: Actuator Availability Dictionary Reporting}\label{field-actuator-availability-dictionary-reporting}
 
-This field is used to control the level of output reporting related to the EMS actuators that are available for a particular model. When EnergyPlus runs with EMS, it sets up a wide array of possible actuators that the EMS could use. (To actually use them requires an EnergyManagementSystem:Actuator object). Actuator availability dictionary reporting is provided to show the user what actuators are available in a particular building model. Regardless of the level of reporting chosen here, the same set of actuators are actually available. There are three levels to choose from. The ``None'' choice means that no reporting of available actuators is done. The ``NotByUniqueNames'' level means that the output includes only the types of actuators and their control options but not the unique, user-defined names that identify a specific actuator in the model. The ``Verbose'' level means that the output includes all combinations of actuator types, control types, and the unique names of specific actuators. The verbose level provides all the information needed for input in an EnergyManagementSystem:Actuator input object.
+This field is used to control the level of output reporting related to the EMS actuators that are available for a particular model. When EnergyPlus runs with EMS, it sets up a wide array of possible actuators that the EMS could use. (To actually use them requires an \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator} object). Actuator availability dictionary reporting is provided to show the user what actuators are available in a particular building model. Regardless of the level of reporting chosen here, the same set of actuators are actually available. There are three levels to choose from. The ``None'' choice means that no reporting of available actuators is done. The ``NotByUniqueNames'' level means that the output includes only the types of actuators and their control options but not the unique, user-defined names that identify a specific actuator in the model. The ``Verbose'' level means that the output includes all combinations of actuator types, control types, and the unique names of specific actuators. The verbose level provides all the information needed for input in an \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator} input object.
 
 \paragraph{Field: Internal Variable Availability Dictionary Reporting}\label{field-internal-variable-availability-dictionary-reporting}
 
-This field is used to control the level of output reporting related to the EMS internal variables that are available for a particular model. When EnergyPlus runs with EMS, it sets up a wide array of possible internal data sources that the EMS could use. (To actually use them requires an EnergyManagementSystem:InternalVariable object). Internal variable availability dictionary reporting is provided to show the user what internal data are available. Regardless of the level of reporting chosen here, the same internal data are available. There are three levels to choose from. The ``None'' choice means that no reporting of available internal data is done. The ``NotByUniqueNames'' level means that the output includes only the types of internal data but not the unique names that identify a specific instances in the model. The ``Verbose'' level means that the output includes all combinations of internal variables and the unique names of specific instances. The verbose level provides all the information needed for an EnergyManagementSystem:InternalVariable input object.
+This field is used to control the level of output reporting related to the EMS internal variables that are available for a particular model. When EnergyPlus runs with EMS, it sets up a wide array of possible internal data sources that the EMS could use. (To actually use them requires an \hyperref[energymanagementsysteminternalvariable]{EnergyManagementSystem:InternalVariable} object). Internal variable availability dictionary reporting is provided to show the user what internal data are available. Regardless of the level of reporting chosen here, the same internal data are available. There are three levels to choose from. The ``None'' choice means that no reporting of available internal data is done. The ``NotByUniqueNames'' level means that the output includes only the types of internal data but not the unique names that identify a specific instances in the model. The ``Verbose'' level means that the output includes all combinations of internal variables and the unique names of specific instances. The verbose level provides all the information needed for an \hyperref[energymanagementsysteminternalvariable]{EnergyManagementSystem:InternalVariable} input object.
 
 \paragraph{Field: EnergyPlus Runtime Language Debug Output Level}\label{field-energyplus-runtime-language-debug-output-level}
 
@@ -389,7 +389,7 @@ This alpha field is the variable name (you don't have to put on the units) that 
 
 \paragraph{Field: Reporting Frequency}\label{field-reporting-frequency}
 
-This field specifies how often the variable will be listed in the output file. ``\textbf{Detailed}'' will list the value each calculation step (i.e.~Zone or HVAC). ``\textbf{Timestep}'' will be the same as ``Detailed'' for Zone valued variables and will be aggregated to the Zone timestep (i.e.~Timestep in Hour value) for HVAC variables. ``\textbf{Hourly}'' will aggregate the value to the hour. ``\textbf{Daily}'' will aggregate to the day (i.e.~one value per day). ``\textbf{Monthly}'' will aggregate to the month (i.e.~one value per month). ``\textbf{RunPeriod}'' will aggregate to the runperiod specified (each Design Day is a runperiod as is each runperiod object). ``\textbf{Annual}'' will aggregate to the year  (i.e.~one value per year) when used with a RunPeriod:CustomRange object. Default for this field if left blank or omitted is \textbf{Hourly}.
+This field specifies how often the variable will be listed in the output file. ``\textbf{Detailed}'' will list the value each calculation step (i.e.~Zone or HVAC). ``\textbf{Timestep}'' will be the same as ``Detailed'' for Zone valued variables and will be aggregated to the Zone timestep (i.e.~Timestep in Hour value) for HVAC variables. ``\textbf{Hourly}'' will aggregate the value to the hour. ``\textbf{Daily}'' will aggregate to the day (i.e.~one value per day). ``\textbf{Monthly}'' will aggregate to the month (i.e.~one value per month). ``\textbf{\hyperref[runperiod]{RunPeriod}}'' will aggregate to the runperiod specified (each Design Day is a runperiod as is each runperiod object). ``\textbf{Annual}'' will aggregate to the year  (i.e.~one value per year) when used with a RunPeriod:CustomRange object. Default for this field if left blank or omitted is \textbf{Hourly}.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-004}
 
@@ -410,9 +410,9 @@ Output:Variable, * , Zone Air Temperature;  ! same as previous line
 
 \subsection{Output:\-Meter:\-Cumulative and Output:\-Meter:\-Cumulative:\-Meter\-File\-Only}\label{outputmetercumulative-and-outputmetercumulativemeterfileonly}
 
-Appropriate variables are grouped onto ``meters'' for reporting purposes.~ (The meters available are listed in the eplusout.mdd file, see Variable Dictionary Report section.) If the ``Output:Meter'' input object is used, these results written out to both the \textbf{eplusout.eso} and \textbf{eplusout.mtr} files. This allows easy graphing and comparison with ``normal'' values (such as Zone Temperature or Outdoor Temperature). If the ``Output:Meter:MeterFileOnly'' input object is used, then the values results written out to only the \textbf{eplusout.mtr} file. The \textbf{eplusout.mtr} file has the same structure as the \textbf{eplusout.eso} file. A companion file, the \textbf{eplusout.mtd} file, contains a detailed list and explanation of all meters for a given run and the component values that are accumulated on each meter.
+Appropriate variables are grouped onto ``meters'' for reporting purposes.~ (The meters available are listed in the eplusout.mdd file, see Variable Dictionary Report section.) If the ``\hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter}'' input object is used, these results written out to both the \textbf{eplusout.eso} and \textbf{eplusout.mtr} files. This allows easy graphing and comparison with ``normal'' values (such as Zone Temperature or Outdoor Temperature). If the ``\hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter:MeterFileOnly}'' input object is used, then the values results written out to only the \textbf{eplusout.mtr} file. The \textbf{eplusout.mtr} file has the same structure as the \textbf{eplusout.eso} file. A companion file, the \textbf{eplusout.mtd} file, contains a detailed list and explanation of all meters for a given run and the component values that are accumulated on each meter.
 
-The cumulative meter outputs (Output:Meter:Cumulative and Output:\-Meter:\-Cumulative:\-Meter\-File\-Only) use the same meter names but the output is cumulative for the reporting (for each environment). That is, if the reporting frequency for the cumulative meter output is hourly, then hour 1 value will be that for hour 1, hour 2 value will be hour1 + hour2, etc. In other words, the end value for a cumulative meter reporting should be identical if you reported the value of the meter at the RunPeriod frequency.
+The cumulative meter outputs (\hyperref[outputmetercumulative-and-outputmetercumulativemeterfileonly]{Output:Meter:Cumulative} and Output:\-Meter:\-Cumulative:\-Meter\-File\-Only) use the same meter names but the output is cumulative for the reporting (for each environment). That is, if the reporting frequency for the cumulative meter output is hourly, then hour 1 value will be that for hour 1, hour 2 value will be hour1 + hour2, etc. In other words, the end value for a cumulative meter reporting should be identical if you reported the value of the meter at the \hyperref[runperiod]{RunPeriod} frequency.
 
 \subsubsection{Field: Name}\label{field-name-1-036}
 
@@ -625,7 +625,7 @@ The meter details file illustrates what is on each meter and vice versa.~ It is 
 
 \subsection{Output:EnvironmentalImpactFactors}\label{outputenvironmentalimpactfactors}
 
-The Output:EnvironmentalImpactFactors object triggers the necessary Facility meters to be reported and the Pollutants resulting from these on and off-site energy consumptions. These values are put into the eplusout.mtr file. Facility meters contain all the energy of a fuel type. Thus, the following relationships should be observed:
+The Output:\hyperref[environmentalimpactfactors]{EnvironmentalImpactFactors} object triggers the necessary Facility meters to be reported and the Pollutants resulting from these on and off-site energy consumptions. These values are put into the eplusout.mtr file. Facility meters contain all the energy of a fuel type. Thus, the following relationships should be observed:
 
 \begin{equation}
 Facility = \sum {\left( {Building + System + Plant + Exterior} \right)}
@@ -641,7 +641,7 @@ To turn on the reporting and the calculations for the environmental factors the 
 
 \textbf{FuelFactors:} (required for every fuel that is simulated and converted in this simulation input file)
 
-Users will enter environmental impact factors for each Fuel Type or FuelFactor. This is the same for each Fuel Type: Natural Gas, Residual Oil, Distillate Oil, Coal, Off-Site Electricity, Gasoline, and Propane. For District Heating, District Cooling, and Steam there are additional fields in the EnvironmentalImpactFactors object that help in the conversion of their energy to Natural Gas and Electricity.
+Users will enter environmental impact factors for each Fuel Type or FuelFactor. This is the same for each Fuel Type: Natural Gas, Residual Oil, Distillate Oil, Coal, Off-Site Electricity, Gasoline, and Propane. For District Heating, District Cooling, and Steam there are additional fields in the \hyperref[environmentalimpactfactors]{EnvironmentalImpactFactors} object that help in the conversion of their energy to Natural Gas and Electricity.
 
 The energy is obtained internally from the following facility meters:
 
@@ -673,7 +673,7 @@ For the pollutant calculation only the total off-site or purchased electric ener
 
 Similar to the output variables and meters the environmental impact calculations can be reported at different frequencies. Their resolution is the Zone Timestep interval (Number of Timesteps input). For this frequency, the elemental value of the Environmental Impact Factors Calculation will be reported. For more inclusive frequencies, the summed value along with the maximum and minimum values for the time interval will be reported.
 
-Valid values are Timestep, Hourly, Daily, Monthly, Annual, or RunPeriod.
+Valid values are Timestep, Hourly, Daily, Monthly, Annual, or \hyperref[runperiod]{RunPeriod}.
 
 An example of specifying in the IDF:
 
@@ -684,7 +684,7 @@ Output:EnvironmentalImpactFactors,
 
 \subsection{EnvironmentalImpactFactors}\label{environmentalimpactfactors}
 
-The EnvironmentalImpactFactors object contains additional information that is not individually specified in the FuelFactors object and is the second object needed to complete the calculation.~ Source to Site conversion factors for District Heating, District Cooling and Steam are entered in this object.
+The EnvironmentalImpactFactors object contains additional information that is not individually specified in the \hyperref[fuelfactors]{FuelFactors} object and is the second object needed to complete the calculation.~ Source to Site conversion factors for District Heating, District Cooling and Steam are entered in this object.
 
 \subsubsection{Inputs}\label{inputs-10-017}
 
@@ -748,7 +748,7 @@ Multiplied by the fuel consumption to compute the source energy contribution for
 
 This field contains the name of a schedule containing values that are multiplied by the fuel consumption to determine the source energy. Specifically, each value in the schedule are multiplied by the Source Energy Factor field value and by the fuel consumption to determine the source energy consumption for the fuel. If the values in the schedule fully represent the source energy conversion factor, the value in the previous field, Source Energy Factor should be set to one.
 
-The use of this field is required for evaluations using source energy factors that change throughout the year such as Time Dependent Valuation (TDV), the method used to show compliance with to California's Title 24 under the ACM (Alternative Compliance Method). Data files containing TDV factors are in the DataSets\textbackslash{}TDV\textbackslash{} directory. An example file for use with TDV file is in the ExampleFiles directory and is named 5zoneTDV.IDF. When using these TDV files with EnergyPlus it is important that a consistent weather file be used. It is also important that the day of the week for January 1 is set to Tuesday since all the TDV and related weather files use 1991 as the year of reference. Also note that the values in the TDV datasets files are in non SI units of measure. The source energy factor field should contain the value of 0.293 for electricity and 0.01 for natural gas to account for the non-standard units used in the files. A summary report that provides a breakdown of the facility energy use in terms of source energy can be obtained by selecting the `\emph{AllSummary}' or `\emph{SourceEnergyEndUseComponentsSummary}' keywords in the `Output:Table:SummaryReports' reporting object. To learn more about TDV see:
+The use of this field is required for evaluations using source energy factors that change throughout the year such as Time Dependent Valuation (TDV), the method used to show compliance with to California's Title 24 under the ACM (Alternative Compliance Method). Data files containing TDV factors are in the DataSets\textbackslash{}TDV\textbackslash{} directory. An example file for use with TDV file is in the ExampleFiles directory and is named 5zoneTDV.IDF. When using these TDV files with EnergyPlus it is important that a consistent weather file be used. It is also important that the day of the week for January 1 is set to Tuesday since all the TDV and related weather files use 1991 as the year of reference. Also note that the values in the TDV datasets files are in non SI units of measure. The source energy factor field should contain the value of 0.293 for electricity and 0.01 for natural gas to account for the non-standard units used in the files. A summary report that provides a breakdown of the facility energy use in terms of source energy can be obtained by selecting the `\emph{AllSummary}' or `\emph{SourceEnergyEndUseComponentsSummary}' keywords in the `\hyperref[outputtablesummaryreports]{Output:Table:SummaryReports}' reporting object. To learn more about TDV see:
 
 \url{http://www.energy.ca.gov/title24/2005standards/archive/rulemaking/documents/tdv/index.html}
 

@@ -4,7 +4,7 @@
 
 Air loops along with zone equipment form the entire forced air heating and cooling system (air side). The main statement for defining an air loop is the \emph{AirLoopHVAC} object described here. As with the main plant and condenser statements, several of the items in the AirLoopHVAC object definition are actually names that refer to other objects in the input file. After the AirLoopHVAC object name, four such list pointers are encountered: for controllers, system availability, branches, and connectors. The Controller List defines how the air loop will respond due to various inputs (control signals). The Availability Manager List refers to methods for controlling when a system is operational. This may be as simple as a schedule to define when the system is shutdown. The Branch List lists the branches that comprise the primary air system. Finally, the Connector List lists the connections between the branches. The branches and connections together define the primary air system topology.
 
-The only numeric input is the design primary air flow rate. This item is input just before the BranchList name.
+The only numeric input is the design primary air flow rate. This item is input just before the \hyperref[branchlist]{BranchList} name.
 
 The next series of names refer to nodes for the various inlet and outlet points of the air loop. The air loop starts where the zone equipment ends. This is a single point consisting of the return air duct once all of the zone return air streams have been collected (if the loop has a return path). While in reality, there is really only one point, for clarity within the simulation components and consistency with the other HVAC loop sections, this point in the systems is defined as two points: one that resides with the zone equipment simulation and one that is acted upon by the air loop simulation. Both node names must be entered into the input file (if the loop has a return path), and both nodes must have unique names. Similarly, the end points of the air loop that also correspond to the beginning points of the zone equipment loop must also be defined. These consist of names referencing lists of up to three pairs of node names as shown below. Up to three air loop outlets are allowed to accommodate the simulation of three deck systems.
 
@@ -31,11 +31,11 @@ This is the system primary air design volumetric flow rate in cubic meters per s
 
 \paragraph{Field: Branch List Name}\label{field-branch-list-name}
 
-This field is the object name of a BranchList object (see BranchList and Branch). The BranchList named here specifies all the branches composing the primary air system. These branches, together with the Connectors listed in the ConnectorList, define the primary air system topology.
+This field is the object name of a \hyperref[branchlist]{BranchList} object (see \hyperref[branchlist]{BranchList} and Branch). The \hyperref[branchlist]{BranchList} named here specifies all the branches composing the primary air system. These branches, together with the Connectors listed in the \hyperref[connectorlist]{ConnectorList}, define the primary air system topology.
 
 \paragraph{Field: Connector List Name}\label{field-connector-list-name}
 
-This field is the name of ConnectorList object. This ConnectorList object lists all the Connectors (by type and name) that are included in this primary air system. These Connectors, together with the Branches in the BranchList, define the topology of the primary air system.
+This field is the name of \hyperref[connectorlist]{ConnectorList} object. This \hyperref[connectorlist]{ConnectorList} object lists all the Connectors (by type and name) that are included in this primary air system. These Connectors, together with the Branches in the \hyperref[branchlist]{BranchList}, define the topology of the primary air system.
 
 \paragraph{Field: Supply Side Inlet Node Name}\label{field-supply-side-inlet-node-name}
 
@@ -43,11 +43,11 @@ The name of the air entrance node of this primary air system. If this air loop h
 
 \paragraph{Field: Demand Side Outlet Node Name}\label{field-demand-side-outlet-node-name}
 
-The name of the air outlet node for the zone equipment group (ZoneHVAC:EquipmentConnections objects) attached to the primary air system. This should be the outlet node of a AirLoopHVAC:ZoneMixer or AirloopHVAC:ReturnPlenum in the AirLoopHVAC:ReturnPath for the zone equipment group attached to this primary air system. Leave this field blank if this air loop does not have a return path.
+The name of the air outlet node for the zone equipment group (\hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} objects) attached to the primary air system. This should be the outlet node of a \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or AirloopHVAC:ReturnPlenum in the \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} for the zone equipment group attached to this primary air system. Leave this field blank if this air loop does not have a return path.
 
 \paragraph{Field: Demand Side Inlet Node Names}\label{field-demand-side-inlet-node-names}
 
-This field can be the name of a node which is the air inlet node for the zone equipment group (see ZoneHVAC:EquipmentConnections objects) attached to this primary air system. Or, this field can be the name of a node list containing one or more nodes (up to 3). These nodes should be the inlet nodes to the AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum in each of the AirLoopHVAC:SupplyPaths for the zone equipment groups attached to this primary air system. For single duct systems, there is only one node name in this list. For two and three duct systems, the order of the nodes in this list must correspond with the order of the nodes in the Supply Side Outlet Node Names list.
+This field can be the name of a node which is the air inlet node for the zone equipment group (see \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} objects) attached to this primary air system. Or, this field can be the name of a node list containing one or more nodes (up to 3). These nodes should be the inlet nodes to the \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} or \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum} in each of the \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath}s for the zone equipment groups attached to this primary air system. For single duct systems, there is only one node name in this list. For two and three duct systems, the order of the nodes in this list must correspond with the order of the nodes in the Supply Side Outlet Node Names list.
 
 \paragraph{Field: Supply Side Outlet Node Names}\label{field-supply-side-outlet-node-names}
 
@@ -317,11 +317,11 @@ This combination will report the ventilation loads on a monthly basis in a HTML 
 
 \subsection{Systems Level Reporting}\label{systems-level-reporting}
 
-Most output variables are a single entity reporting. Meters are a combination of like variables -- specifically for Energy Consumption. This section introduces a slightly different concept -- where output variables described herein are a combination of several similar items -- specifically targeted at HVAC/System level reporting. This reporting is coupled with an Air Loop (ref: AirLoopHVAC)
+Most output variables are a single entity reporting. Meters are a combination of like variables -- specifically for Energy Consumption. This section introduces a slightly different concept -- where output variables described herein are a combination of several similar items -- specifically targeted at HVAC/System level reporting. This reporting is coupled with an Air Loop (ref: \hyperref[airloophvac]{AirLoopHVAC})
 
-All items shown in this section are typical ``output variables'' and can be reported with the Output:Variable object.
+All items shown in this section are typical ``output variables'' and can be reported with the \hyperref[outputvariable]{Output:Variable} object.
 
-Or, as is shown by example here, perhaps a more readable form is to generate them in Tabular Form with the ``Output:Table:Monthly'' object.
+Or, as is shown by example here, perhaps a more readable form is to generate them in Tabular Form with the ``\hyperref[outputtablemonthly]{Output:Table:Monthly}'' object.
 
 \begin{figure}[hbtp] % fig 91
 \centering
@@ -341,7 +341,7 @@ Heat Addition to the Air Loop (Sum of all components) in Joules
 
 Heat Removal from the Air Loop (Sum of all components) in Joules
 
-In `Output:Table:Monthly' format shown below.
+In `\hyperref[outputtablemonthly]{Output:Table:Monthly}' format shown below.
 
 \begin{lstlisting}
 
@@ -554,7 +554,7 @@ A map for Air Loop input syntax is shown in the following diagram.
 
 \subsection{AirLoopHVAC:ControllerList}\label{airloophvaccontrollerlist}
 
-The syntax for the AirLoopHVAC:ControllerList definition is shown below. As with other lists in EnergyPlus input, the object title and identifying name are followed by type-name pairs. In this case, the types are controller types. The order in which controllers appear on this list also define the priority as described below. The identifying name refers back to the name recorded in the AirLoopHVAC statement.
+The syntax for the AirLoopHVAC:ControllerList definition is shown below. As with other lists in EnergyPlus input, the object title and identifying name are followed by type-name pairs. In this case, the types are controller types. The order in which controllers appear on this list also define the priority as described below. The identifying name refers back to the name recorded in the \hyperref[airloophvac]{AirLoopHVAC} statement.
 
 \subsubsection{Inputs}\label{inputs-1-002}
 
@@ -568,11 +568,11 @@ After the identifying name, input for the controller list consists of up to 8 pa
 
 \paragraph{Field: Controller \textless{}x\textgreater{} Object Type}\label{field-controller-x-object-type}
 
-The type of~ controller. This should be a key word defining a class of controllers such as Controller:WaterCoil.
+The type of~ controller. This should be a key word defining a class of controllers such as \hyperref[controllerwatercoil]{Controller:WaterCoil}.
 
 \paragraph{Field: Controller \textless{}x\textgreater{} Name}\label{field-controller-x-name}
 
-The name of a controller object (such as a Controller:WaterCoil) defined elsewhere in the input file.
+The name of a controller object (such as a \hyperref[controllerwatercoil]{Controller:WaterCoil}) defined elsewhere in the input file.
 
 An example of this statement in an IDF is:
 
@@ -586,23 +586,23 @@ AirLoopHVAC:ControllerList,
 
 \subsection{AvailabilityManagerAssignmentList}\label{availabilitymanagerassignmentlist}
 
-The AvailabilityManagerAssignmentList defines the applicable managers used for an AirLoopHVAC or PlantLoop. The priority of availability managers is based on a set of rules and are specific to the type of loop. The output from each Availability Manager is an availability status flag. This flag can have the values \emph{NoAction}, \emph{ForceOff}, \emph{CycleOn}, or \emph{CycleOnZoneFansOnly} (used only for air loops). The availability status flags for the Availability Managers referenced by an air or plant loop are used to set the availability status flag for each loop. For the air loops, \emph{ForceOff} takes precedence: if any of the loop's availability managers are showing status \emph{ForceOff}, the loop status will be \emph{ForceOff}. Next in precedence is \emph{CycleOnZoneFansOnly,} followed by \emph{CycleOn}, and \emph{NoAction}. For the plant loops, there is no precedence among the Availability Manager status flag values. Instead, the first availability manager giving a status flag value other than \emph{NoAction} sets the status for the loop. The Availability Managers are executed in Availability Manager List order.
+The AvailabilityManagerAssignmentList defines the applicable managers used for an \hyperref[airloophvac]{AirLoopHVAC} or \hyperref[plantloop]{PlantLoop}. The priority of availability managers is based on a set of rules and are specific to the type of loop. The output from each Availability Manager is an availability status flag. This flag can have the values \emph{NoAction}, \emph{ForceOff}, \emph{CycleOn}, or \emph{CycleOnZoneFansOnly} (used only for air loops). The availability status flags for the Availability Managers referenced by an air or plant loop are used to set the availability status flag for each loop. For the air loops, \emph{ForceOff} takes precedence: if any of the loop's availability managers are showing status \emph{ForceOff}, the loop status will be \emph{ForceOff}. Next in precedence is \emph{CycleOnZoneFansOnly,} followed by \emph{CycleOn}, and \emph{NoAction}. For the plant loops, there is no precedence among the Availability Manager status flag values. Instead, the first availability manager giving a status flag value other than \emph{NoAction} sets the status for the loop. The Availability Managers are executed in Availability Manager List order.
 
-Special rules also apply for which managers may be listed in a Availability Manager list. The Hybrid Ventilation Control Manager (object: AvailabilityManager:HybridVentilation) is a special type of manager and is never specified in a Availability Manager List (it is used stand-alone for a specific air loop). All other types of availability managers may be listed in the Availability Manager List used for AirLoopHVACs. For Plant Loops, the Night Cycle and Night Ventilation managers (objects: AvailabilityManager:NightCycle ~and AvailabilityManager:NightVentilation) are not allowed in the Availability Manager List.
+Special rules also apply for which managers may be listed in a Availability Manager list. The Hybrid Ventilation Control Manager (object: \hyperref[availabilitymanagerhybridventilation]{AvailabilityManager:HybridVentilation}) is a special type of manager and is never specified in a Availability Manager List (it is used stand-alone for a specific air loop). All other types of availability managers may be listed in the Availability Manager List used for \hyperref[airloophvac]{AirLoopHVAC}s. For Plant Loops, the Night Cycle and Night Ventilation managers (objects: \hyperref[availabilitymanagernightcycle]{AvailabilityManager:NightCycle} ~and \hyperref[availabilitymanagernightventilation]{AvailabilityManager:NightVentilation}) are not allowed in the Availability Manager List.
 
 \subsubsection{Inputs}\label{inputs-2-002}
 
 \paragraph{Field: Name}\label{field-name-2-001}
 
-The name of the AvailabilityManagerAssignmentList ~object. This is referenced by AirLoopHVAC and PlantLoop objects.
+The name of the AvailabilityManagerAssignmentList ~object. This is referenced by \hyperref[airloophvac]{AirLoopHVAC} and \hyperref[plantloop]{PlantLoop} objects.
 
 \paragraph{Field Set (Availability Manager Object Type, Name)}\label{field-set-availability-manager-object-type-name}
 
-Managers are listed by pairs of data items:~ \emph{Availability Manager Object Type} and \emph{Availability Manager Name}. The managers are simulated down the list and calculate a control status for use by the AirLoopHVAC or PlantLoop. The priority of each manager used for a specific loop is based on the rules described above. Availability managers are not currently used for condenser loops. The availability managers, along with the AirLoopHVAC and PlantLoop object, report the control status calculated each simulation timestep. These output variables can be used to prioritize the managers according to the required control strategy. Six managers are accomodated in the list by default, however, this IDD specification is extensible. Additional pairs may be added by directly editing the IDD.
+Managers are listed by pairs of data items:~ \emph{Availability Manager Object Type} and \emph{Availability Manager Name}. The managers are simulated down the list and calculate a control status for use by the \hyperref[airloophvac]{AirLoopHVAC} or \hyperref[plantloop]{PlantLoop}. The priority of each manager used for a specific loop is based on the rules described above. Availability managers are not currently used for condenser loops. The availability managers, along with the \hyperref[airloophvac]{AirLoopHVAC} and \hyperref[plantloop]{PlantLoop} object, report the control status calculated each simulation timestep. These output variables can be used to prioritize the managers according to the required control strategy. Six managers are accomodated in the list by default, however, this IDD specification is extensible. Additional pairs may be added by directly editing the IDD.
 
 \paragraph{Field: Availability Manager \textless{}x\textgreater{} Object Type}\label{field-availability-manager-x-object-type}
 
-The key word defining the type of manager, e.g.~AvailabilityManager:NightCycle.
+The key word defining the type of manager, e.g.~\hyperref[availabilitymanagernightcycle]{AvailabilityManager:NightCycle}.
 
 \paragraph{Field: Availability Manager\textless{}x\textgreater{}~ Name}\label{field-availability-managerx-name}
 
@@ -624,7 +624,7 @@ AvailabilityManagerAssignmentList,
 
 \subsection{AirLoopHVAC:OutdoorAirSystem}\label{airloophvacoutdoorairsystem}
 
-The Outside Air System (object AirLoopHVAC:OutdoorAirSystem) is a subsystem of an AirLoopHVAC. It handles the mixed air portion of the primary air system: the system relief air, the outside air inlet, and any components and controllers associated with the system relief air and outside air streams. From the perspective of the primary air loop the Outside Air System is treated as a single component. As a subsystem, it can contain one or more components and controllers.
+The Outside Air System (object AirLoopHVAC:OutdoorAirSystem) is a subsystem of an \hyperref[airloophvac]{AirLoopHVAC}. It handles the mixed air portion of the primary air system: the system relief air, the outside air inlet, and any components and controllers associated with the system relief air and outside air streams. From the perspective of the primary air loop the Outside Air System is treated as a single component. As a subsystem, it can contain one or more components and controllers.
 
 The input for the Outside Air System consists of a system name, a controller list name, an equipment list name, and an availability manager list name. The controller list simply lists, by type and unique name, all the controllers in the subsystem. The controllers will be simulated in list order. The equipment list lists all the components in the subsystem, by type and name. The equipment is simulated in list order. Finally, the availability manager list gives the type and name of the availability managers used by the subsystem.
 
@@ -638,17 +638,17 @@ The unique, user assigned name for a single instance of an Outside Air System. A
 
 \paragraph{Field: Name: Controller List Name}\label{field-name-controller-list-name}
 
-This field is the name of a AirLoopHVAC:ControllerList object. A AirLoopHVAC:ControllerList is simply a list of controllers giving both controller name and type. This Controller List specifies all the controllers that will act on this outside air system. The order of the controllers in the list is significant: controllers are simulated sequentially in the order given in the Controller List. Typically the Controller List would contain a Controller:OutdoorAir. If there are chilled water or hot water coils in the outdoor air system, each such coil will need a Controller:WaterCoil.
+This field is the name of a \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList} object. A \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList} is simply a list of controllers giving both controller name and type. This Controller List specifies all the controllers that will act on this outside air system. The order of the controllers in the list is significant: controllers are simulated sequentially in the order given in the Controller List. Typically the Controller List would contain a \hyperref[controlleroutdoorair]{Controller:OutdoorAir}. If there are chilled water or hot water coils in the outdoor air system, each such coil will need a \hyperref[controllerwatercoil]{Controller:WaterCoil}.
 
 \paragraph{Field: Outdoor Air Equipment List Name}\label{field-outdoor-air-equipment-list-name}
 
-This field is the name of an AirLoopHVAC:OutdoorAirSystem:EquipmentList object. An AirLoopHVAC:OutdoorAirSystem:EquipmentList is simply a list of components giving both component name and type. This Outdoor Air Equipment List specifies all the components that will be simulated in this outside air system. The order of the components in the list is significant: components are simulated sequentially in the order given in the Outdoor Air Equipment List. Typically the equipment list would contain at least an OutdoorAir:Mixer. If there is more than one component, the components must be listed in order from the outside air to the OutdoorAir:Mixer (the OutdoorAir:Mixer is last).
+This field is the name of an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} object. An \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} is simply a list of components giving both component name and type. This Outdoor Air Equipment List specifies all the components that will be simulated in this outside air system. The order of the components in the list is significant: components are simulated sequentially in the order given in the Outdoor Air Equipment List. Typically the equipment list would contain at least an \hyperref[outdoorairmixer]{OutdoorAir:Mixer}. If there is more than one component, the components must be listed in order from the outside air to the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} (the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} is last).
 
 \paragraph{Field: Availability Manager List Name}\label{field-availability-manager-list-name-1}
 
-This field is the name of a AvailabilityManagerAssignmentList object. An Availability Manager List is a list of Availability Managers giving both Availability Manager Object Type and Name. \textbf{Use of this input is optional.} This field may be omitted; it is not currently used by the program.
+This field is the name of a \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} object. An Availability Manager List is a list of Availability Managers giving both Availability Manager Object Type and Name. \textbf{Use of this input is optional.} This field may be omitted; it is not currently used by the program.
 
-An IDF example, including the AirLoopHVAC, and the controller and equipment lists.
+An IDF example, including the \hyperref[airloophvac]{AirLoopHVAC}, and the controller and equipment lists.
 
 \begin{lstlisting}
 
@@ -743,13 +743,13 @@ AirLoopHVAC:OutdoorAirSystem:EquipmentList,
 
 \subsection{OutdoorAir:Node}\label{outdoorairnode}
 
-The OutdoorAir:Node object declares an HVAC system node for outdoor air conditions. The program automatically sets the air conditions at these nodes to correspond to the ambient environmental conditions at the beginning of every timestep. The outdoor air node is typically used as the inlet air node to an HVAC component such as the OutdoorAir:Mixer object. Multiple OutdoorAir:Node objects can be used in an input file, however, duplicate node names are not allowed.
+The OutdoorAir:Node object declares an HVAC system node for outdoor air conditions. The program automatically sets the air conditions at these nodes to correspond to the ambient environmental conditions at the beginning of every timestep. The outdoor air node is typically used as the inlet air node to an HVAC component such as the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} object. Multiple OutdoorAir:Node objects can be used in an input file, however, duplicate node names are not allowed.
 
 The \emph{Height Above Ground} field is used to adjust the weather file air conditions, e.g., outdoor dry-bulb and wet-bulb air temperatures, for atmospheric variation with height. This variation can become a significant factor when modeling tall buildings. See the Engineering Reference section on Atmospheric Variation for a description of the algorithm for variation of atmospheric properties with height. A blank entry or a value less than zero for this field indicates that the height will be ignored and the weather file conditions will be used.
 
-\textbf{OutdoorAir:Node} and \textbf{OutdoorAir:NodeList} both set a node to outdoor air conditions. \textbf{OutdoorAir:Node} modifies the weather file conditions if a height has been specified. \textbf{OutdoorAir:NodeList} does not have a height input and always uses the weather file conditions without modification. The same node name may not be used with both of these objects.
+\textbf{OutdoorAir:Node} and \textbf{\hyperref[outdoorairnodelist]{OutdoorAir:\hyperref[nodelist]{NodeList}}} both set a node to outdoor air conditions. \textbf{OutdoorAir:Node} modifies the weather file conditions if a height has been specified. \textbf{\hyperref[outdoorairnodelist]{OutdoorAir:\hyperref[nodelist]{NodeList}}} does not have a height input and always uses the weather file conditions without modification. The same node name may not be used with both of these objects.
 
-When declared in surface property objects \textbf{SurfaceProperty:LocalEnvironment}, in zone property objects \textbf{ZoneProperty:LocalEnvironment}, or as an external node in the airflow network calculation linking to a surface node \textbf{AirflowNetwork:Multizone:Surface}, the object can also be used to define local outdoor air conditions for surfaces, zones or air loop components. The local outdoor air conditions would be used in the EnergyPlus calculations for:
+When declared in surface property objects \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}}, in zone property objects \textbf{\hyperref[ZonePropertylocalEnvironment]{ZoneProperty:LocalEnvironment}}, or as an external node in the airflow network calculation linking to a surface node \textbf{AirflowNetwork:Multizone:Surface}, the object can also be used to define local outdoor air conditions for surfaces, zones or air loop components. The local outdoor air conditions would be used in the EnergyPlus calculations for:
 \begin{enumerate}
 \item Convection coefficients used in the exterior surface heat balance
 
@@ -797,7 +797,7 @@ This field is used to supply a schedule name of the local wind direction of this
 
 \paragraph{Field: Wind Pressure Coefficient Curve Name}\label{field-wind-pressure-coeff-curve-name}
 
-The name of a specific \textbf{AirflowNetwork:MultiZone:WindPressureCoefficientValues} object (which gives wind pressure coefficients for the façade as a function of angle of wind incident on the façade).
+The name of a specific \textbf{\hyperref[airflownetworkmultizonewindpressurecoefficientvalues]{AirflowNetwork:MultiZone:WindPressureCoefficientValues}} object (which gives wind pressure coefficients for the façade as a function of angle of wind incident on the façade).
 
 \paragraph{Field: Symmetric Wind Pressure Coefficient Curve}\label{field-sym-windp-curve-name}
 
@@ -860,17 +860,17 @@ Output:Variable,
 
 \subsection{OutdoorAir:NodeList}\label{outdoorairnodelist}
 
-The program needs to know which HVAC system nodes are inlets for outdoor air. Knowing this, the program can set the conditions at these nodes to the outdoor conditions at the start of each major timestep. The OutdoorAir:NodeList provides the means for specifying which nodes are outdoor air nodes.
+The program needs to know which HVAC system nodes are inlets for outdoor air. Knowing this, the program can set the conditions at these nodes to the outdoor conditions at the start of each major timestep. The \hyperref[outdoorairnode]{OutdoorAir:Node}List provides the means for specifying which nodes are outdoor air nodes.
 
-The input is flexible: there may be one or more OutdoorAir:NodeList in each input file. Each list contains up to 25 names. The names can be the name of a unique HVAC system node, or the name of a Node List which will contain the actual node names. Duplicate node names are ignored.
+The input is flexible: there may be one or more \hyperref[outdoorairnode]{OutdoorAir:Node}List in each input file. Each list contains up to 25 names. The names can be the name of a unique HVAC system node, or the name of a Node List which will contain the actual node names. Duplicate node names are ignored.
 
-\textbf{OutdoorAir:Node} and \textbf{OutdoorAir:NodeList} both set a node to outdoor air conditions. \textbf{OutdoorAir:Node} modifies the weather file conditions if a height has been specified. \textbf{OutdoorAir:NodeList} does not have a height input and always uses the weather file conditions without modification. The same node name may not be used with both of these objects.
+\textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}} and \textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}List} both set a node to outdoor air conditions. \textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}} modifies the weather file conditions if a height has been specified. \textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}List} does not have a height input and always uses the weather file conditions without modification. The same node name may not be used with both of these objects.
 
 \subsubsection{Inputs}\label{inputs-6-001}
 
 \paragraph{Field: Node or NodeList name}\label{field-node-or-nodelist-name}
 
-The name of an HVAC system node or of a NodeList object. There can be up to 25 names.
+The name of an HVAC system node or of a \hyperref[nodelist]{NodeList} object. There can be up to 25 names.
 
 An example IDF:
 

@@ -15,11 +15,11 @@ Demand limiting controls shut off or reduce the power to non-essential loads in 
   turn on generators to meet some or all of the building's demand.
 \end{itemize}
 
-The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only Exterior:Lights, Lights, ElectricEquipment, ZoneControl:Thermostat, and Controller:OutdoorAir objects can be demand limited. Additional components will be demand limited in future releases.
+The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only \hyperref[exteriorlights]{Exterior:Lights}, Lights, \hyperref[electricequipment]{ElectricEquipment}, \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat}, and \hyperref[controlleroutdoorair]{Controller:OutdoorAir} objects can be demand limited. Additional components will be demand limited in future releases.
 
 \subsection{DemandManagerAssignmentList}\label{demandmanagerassignmentlist}
 
-The DemandManagerAssignmentList object is a high level control that makes demand limiting decisions based on a list of possible demand limiting strategies. Each demand limiting strategy is described in a separate DemandManager object. (This is structured like the relationship between the AvailabilityManagerAssignmentList and the AvailabilityManager objects.)
+The DemandManagerAssignmentList object is a high level control that makes demand limiting decisions based on a list of possible demand limiting strategies. Each demand limiting strategy is described in a separate DemandManager object. (This is structured like the relationship between the \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} and the AvailabilityManager objects.)
 
 Each DemandManagerAssignmentList monitors and demand limits one meter. Only electricity meters are currently allowed. In many cases, the meter will be \emph{Electricity:Facility}. A schedule and safety factor are used to set the demand limit above which the DemandManagers become activated. The billing month schedule and demand window are also taken into account when calculating the demand limit.
 
@@ -56,15 +56,15 @@ This field is a multiplier that is applied to the target demand limit (above). W
 
 \paragraph{Field: Billing Period Schedule Name}\label{field-billing-period-schedule-name}
 
-The reference to the schedule object that defines the monthly billing periods. The peak demand during the peak period of the billing period typically determines the demand charge. This should reference the same schedule that is used in the \emph{Month Schedule Name} field of the UtilityCost:Tariff object. If left blank, it defaults to the regular divisions between months.
+The reference to the schedule object that defines the monthly billing periods. The peak demand during the peak period of the billing period typically determines the demand charge. This should reference the same schedule that is used in the \emph{Month Schedule Name} field of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. If left blank, it defaults to the regular divisions between months.
 
 \paragraph{Field: Peak Period Schedule Name}\label{field-peak-period-schedule-name}
 
-The reference to the schedule object that defines the peak/off-peak time-of-use periods. The peak demand during the peak period of the billing period typically determines the demand charge. This should reference the same schedule that is used in the \emph{Time of Use Period Schedule Name} field of the UtilityCost:Tariff object. A value of 1 indicates the peak period; any other value is off-peak. If left blank, it defaults to always on the peak period. The DemandManagerAssignmentList only attempts to demand limit during peak periods.
+The reference to the schedule object that defines the peak/off-peak time-of-use periods. The peak demand during the peak period of the billing period typically determines the demand charge. This should reference the same schedule that is used in the \emph{Time of Use Period Schedule Name} field of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. A value of 1 indicates the peak period; any other value is off-peak. If left blank, it defaults to always on the peak period. The DemandManagerAssignmentList only attempts to demand limit during peak periods.
 
 \paragraph{Field: Demand Window Length}\label{field-demand-window-length}
 
-This field is similar to the field of the same name in the UtilityCost:Tariff object. However, the user may not want to limit using the same demand window as the utility company. This field allows the user to input the number of minutes over which to calculate the current demand. The minutes are rounded to match the nearest multiple of time steps.
+This field is similar to the field of the same name in the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. However, the user may not want to limit using the same demand window as the utility company. This field allows the user to input the number of minutes over which to calculate the current demand. The minutes are rounded to match the nearest multiple of time steps.
 
 \paragraph{Field: Demand Manager Priority}\label{field-demand-manager-priority}
 
@@ -182,7 +182,7 @@ The number times that the HVAC system was resimulated for demand limiting.
 
 \subsection{DemandManager:ExteriorLights}\label{demandmanagerexteriorlights}
 
-The DemandManager:ExteriorLights object is used for demand limiting Exterior:Lights objects.
+The DemandManager:ExteriorLights object is used for demand limiting \hyperref[exteriorlights]{Exterior:Lights} objects.
 
 \subsubsection{Inputs}\label{inputs-1-009}
 
@@ -220,7 +220,7 @@ If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Select
 
 \paragraph{Field: Exterior Lights 1-10 Name}\label{field-exterior-lights-1-10-name}
 
-The names of Exterior:Lights objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
+The names of \hyperref[exteriorlights]{Exterior:Lights} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
 
 Ten objects are accomodated in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
 
@@ -316,13 +316,13 @@ There are no output variables reported for the DemandManager:Lights object.
 
 \subsection{DemandManager:ElectricEquipment}\label{demandmanagerelectricequipment}
 
-The DemandManager:ElectricEquipment object is used for demand limiting ElectricEquipment objects.
+The DemandManager:\hyperref[electricequipment]{ElectricEquipment} object is used for demand limiting \hyperref[electricequipment]{ElectricEquipment} objects.
 
 \subsubsection{Inputs}\label{inputs-3-008}
 
 \paragraph{Field: Name}\label{field-name-3-008}
 
-The name of the DemandManager:ElectricEquipment object.
+The name of the DemandManager:\hyperref[electricequipment]{ElectricEquipment} object.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-2-000}
 
@@ -354,11 +354,11 @@ If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Select
 
 \paragraph{Field: Electric Equipment 1-10 Name}\label{field-electric-equipment-1-10-name}
 
-The names of ElectricEquipment objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
+The names of \hyperref[electricequipment]{ElectricEquipment} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
 
 Ten objects are accomodated in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
 
-If a global Electric Equipment statement is used (Ref: ElectricEquipment), then only that name need be entered and the demand limiting will be applied to all the zones for that equipment. If only one of a set of zones from a global electric equipment statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of ElectricEquipment Global Object\textgreater{}.
+If a global Electric Equipment statement is used (Ref: \hyperref[electricequipment]{ElectricEquipment}), then only that name need be entered and the demand limiting will be applied to all the zones for that equipment. If only one of a set of zones from a global electric equipment statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of \hyperref[electricequipment]{ElectricEquipment} Global Object\textgreater{}.
 
 An example IDF showing how this object is used is provided below:
 
@@ -382,7 +382,7 @@ There are no output variables reported for the DemandManager:ElectricEquipment o
 
 \subsection{DemandManager:Thermostats}\label{demandmanagerthermostats}
 
-The DemandManager:Thermostats object is used for demand limiting ZoneControl:Thermostat objects.
+The DemandManager:Thermostats object is used for demand limiting \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects.
 
 \subsubsection{Inputs}\label{inputs-4-007}
 
@@ -424,11 +424,11 @@ If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Select
 
 \paragraph{Field: Thermostat 1-10 Name}\label{field-thermostat-1-10-name}
 
-The names of ZoneControl:Thermostat objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
+The names of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
 
 Ten objects are accomodated in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
 
-If a global thermostat statement is used (Ref: ZoneControl:Thermostat), then only that name need be entered and the demand limiting will be applied to all the zones for that thermostatic control. If only one of a set of zones from a global thermostat statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of Thermostat Global Object\textgreater{}.
+If a global thermostat statement is used (Ref: \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat}), then only that name need be entered and the demand limiting will be applied to all the zones for that thermostatic control. If only one of a set of zones from a global thermostat statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of Thermostat Global Object\textgreater{}.
 
 An example IDF showing how this object is used is provided below:
 
@@ -457,7 +457,7 @@ There are no output variables reported for the DemandManager:Thermostats object.
 
 \subsection{DemandManager:Ventilation}\label{demandmanagerventilation}
 
-The DemandManager:Ventilation object is used for limiting the ventilation rate calculated from the Controller:OutdoorAir object.
+The DemandManager:Ventilation object is used for limiting the ventilation rate calculated from the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object.
 
 \subsubsection{Field: Name}\label{field-name-5-006}
 
@@ -497,7 +497,7 @@ If the \textbf{RotateOne} of \textbf{RotateMany} option is used for \emph{Select
 
 \subsubsection{Field: Controller Outdoor Air 1-10 Name}\label{field-controller-outdoor-air-1-10-name}
 
-The names of Controller:OutdoorAir objects defined elsewhere in the input file. These are the ventilation rates to be limited by this demand manager. Then objects are accommodated in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
+The names of \hyperref[controlleroutdoorair]{Controller:OutdoorAir} objects defined elsewhere in the input file. These are the ventilation rates to be limited by this demand manager. Then objects are accommodated in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
 
 An example IDF showing how this object is used is provided below:
 
@@ -518,4 +518,4 @@ DemandManager:Ventilation,
 
 \subsection{DemandManager:Ventilation Outputs}\label{demandmanagerventilation-outputs}
 
-There are no output variables reported for the DemandManager:Ventilation object.
+There are no output variables reported for the \hyperref[demandmanagerventilation]{DemandManager:Ventilation} object.

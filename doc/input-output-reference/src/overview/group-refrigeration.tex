@@ -5,12 +5,12 @@ There are two ways to model a supermarket refrigeration system.~ The first, and 
 For the first approach, the input objects needed are:
 
 \begin{itemize}
-  \item  One Refrigeration:CompressorRack object
+  \item  One \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack} object
   \item  At least one refrigeration load, which may be any combination of:
   \begin{itemize}
-    \item  Refrigeration:Case or
-    \item  Refrigeration:WalkIn or
-    \item  Refrigeration:CaseAndWalkInList objects .
+    \item  \hyperref[refrigerationcase]{Refrigeration:Case} or
+    \item  \hyperref[refrigerationwalkin]{Refrigeration:WalkIn} or
+    \item  \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList} objects .
   \end{itemize}
 \end{itemize}
 
@@ -19,33 +19,33 @@ The second approach requires more input objects but also allows the user to mode
 For the detailed approach, the input objects needed are:
 
 \begin{itemize}
-  \item  One Refrigeration:System object
+  \item  One \hyperref[refrigerationsystem]{Refrigeration:System} object
   \item  At least one refrigeration load object which may include any combination of:
   \begin{itemize}
-    \item  Refrigeration:Case,
-    \item  Refrigeration:WalkIn,
-    \item  Refrigeration:CaseAndWalkInList (may include any combination of cases and walk in cooler names, OR, a list of air chiller names)
-    \item  Refrigeration:SecondarySystem,
-    \item  Refrigeration:Condenser:Cascade (as a load, cooling a lower-temperature system) objects,
-    \item  Refrigeration:TransferLoadList (may include cascade condenser loads and/or secondary loop loads)
-    \item  Refrigeration:AirChiller
+    \item  \hyperref[refrigerationcase]{Refrigeration:Case},
+    \item  \hyperref[refrigerationwalkin]{Refrigeration:WalkIn},
+    \item  \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList} (may include any combination of cases and walk in cooler names, OR, a list of air chiller names)
+    \item  \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem},
+    \item  \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade} (as a load, cooling a lower-temperature system) objects,
+    \item  \hyperref[refrigerationtransferloadlist]{Refrigeration:TransferLoadList} (may include cascade condenser loads and/or secondary loop loads)
+    \item  \hyperref[refrigerationairchiller]{Refrigeration:AirChiller}
   \end{itemize}
-  \item  At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
+  \item  At least one \hyperref[refrigerationcompressor]{Refrigeration:Compressor} object (multiple compressors are entered using a \hyperref[refrigerationcompressorlist]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}List}),
   \item  One condenser object which may be either:
   \begin{itemize}
-    \item  Refrigeration:Condenser:AirCooled,
-    \item  Refrigeration:Condenser:EvaporativeCooled,
-    \item  Refrigeration:Condenser:WaterCooled, or
-    \item  Refrigeration:Condenser:Cascade (rejecting heat from this system)
+    \item  \hyperref[refrigerationcondenseraircooled]{Refrigeration:Condenser:AirCooled},
+    \item  \hyperref[refrigerationcondenserevaporativecooled]{Refrigeration:Condenser:EvaporativeCooled},
+    \item  \hyperref[refrigerationcondenserwatercooled]{Refrigeration:Condenser:WaterCooled}, or
+    \item  \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade} (rejecting heat from this system)
   \end{itemize}
-  \item  The object Refrigeration:Subcooler may optionally be included to describe either a liquid suction or mechanical subcooler.
+  \item  The object \hyperref[refrigerationsubcooler]{Refrigeration:Subcooler} may optionally be included to describe either a liquid suction or mechanical subcooler.
 \end{itemize}
 
 Output variables are also available to describe the total heat exchange between all refrigeration objects and the zones containing these objects. These variables are described at the end of this section after all the refrigeration objects.
 
 \subsection{Refrigeration:CompressorRack}\label{refrigerationcompressorrack}
 
-The refrigeration compressor rack object works in conjunction with the refrigeration case and walkin objects (Ref. Refrigeration:Case and Refrigeration:WalkIn) to simulate the performance of a refrigerated case system. This object models the electric consumption of the rack compressors and the condenser fans. Heat removed from the refrigerated cases, walkins, and compressor/condenser fan heat can be rejected either outdoors or to a zone. Compressor rack waste heat can also be reclaimed for use by an optional air- or water-heating coil (Ref. Coil:Heating:Desuperheater and Coil:WaterHeating:Desuperheater).
+The refrigeration compressor rack object works in conjunction with the refrigeration case and walkin objects (Ref. \hyperref[refrigerationcase]{Refrigeration:Case} and \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}) to simulate the performance of a refrigerated case system. This object models the electric consumption of the rack compressors and the condenser fans. Heat removed from the refrigerated cases, walkins, and compressor/condenser fan heat can be rejected either outdoors or to a zone. Compressor rack waste heat can also be reclaimed for use by an optional air- or water-heating coil (Ref. \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater} and \hyperref[coilwaterheatingdesuperheater]{Coil:WaterHeating:Desuperheater}).
 
 If heat is rejected outdoors, condenser cooling can either be accomplished by direct air flow, evaporative water cooling, or a by water-cooled condenser with appropriate plant loop piping. With evaporative cooling, water is sprayed through the air stream to effectively lower the air temperature experienced by the condenser coil as a result of water evaporation. The use of a water-cooled condenser requires the definition of a plant loop to supply cooling to the condenser.~ Waste heat can be reclaimed and stored using a water storage device.
 
@@ -69,7 +69,7 @@ The coefficient of performance (COP) for the compressor rack at design condition
 
 \paragraph{Field: Compressor Rack COP Function of Temperature Curve Name}\label{field-compressor-rack-cop-function-of-temperature-curve-name}
 
-The name of the curve object defining the change in compressor rack COP as a function of the temperature of air entering the condenser. The curve object will be evaluated using the zone air dry-bulb temperature when rack heat rejection location equals ``Zone'' and the outdoor air dry-bulb temperature when rack heat rejection location equals ``Outdoors'' and the condenser type is air-cooled. As explained below, if the condenser is cooled by evaporative or water loop cooling, the curve object is evaluated using an effective temperature. The output from this curve is multiplied by the design compressor rack COP to yield the actual COP at the specific air temperature entering the condenser. This curve must be cubic or quadratic (Curve:Cubic or Curve:Quadratic), and should be normalized to 1.0 at the condenser entering air temperature at which the design compressor rack COP occurs. This curve should represent the compressor rack COP corresponding to the lowest evaporating temperature of any case served by the rack.
+The name of the curve object defining the change in compressor rack COP as a function of the temperature of air entering the condenser. The curve object will be evaluated using the zone air dry-bulb temperature when rack heat rejection location equals ``Zone'' and the outdoor air dry-bulb temperature when rack heat rejection location equals ``Outdoors'' and the condenser type is air-cooled. As explained below, if the condenser is cooled by evaporative or water loop cooling, the curve object is evaluated using an effective temperature. The output from this curve is multiplied by the design compressor rack COP to yield the actual COP at the specific air temperature entering the condenser. This curve must be cubic or quadratic (\hyperref[curvecubic]{Curve:Cubic} or \hyperref[curvequadratic]{Curve:Quadratic}), and should be normalized to 1.0 at the condenser entering air temperature at which the design compressor rack COP occurs. This curve should represent the compressor rack COP corresponding to the lowest evaporating temperature of any case served by the rack.
 
 \paragraph{Field: Design Condenser Fan Power}\label{field-design-condenser-fan-power}
 
@@ -77,7 +77,7 @@ This field defines the design power for the condenser fan(s) in Watts. This fiel
 
 \paragraph{Field: Condenser Fan Power Function of Temperature Curve Name}\label{field-condenser-fan-power-function-of-temperature-curve-name}
 
-This field is the name of the curve object defining the change in condenser fan power as a function of the temperature of air entering the condenser. This curve is used to simulate the modulation of air flow by the condenser fans (e.g., staging, multi-speed, or variable speed) as a function of temperature.~ The curve object will be evaluated using the zone air dry-bulb temperature when rack heat rejection location equals ``Zone'' and the outdoor air dry-bulb temperature when rack heat rejection location equals ``Outdoors'' and the condenser type is air-cooled. As explained below, if the condenser is cooled by evaporative cooling, the curve object is evaluated using an effective temperature. The output from this curve is multiplied by the design condenser fan power to yield the actual fan power at the specific air temperature entering the condenser. This curve must be cubic or quadratic (Curve:Cubic or Curve:Quadratic), and should be normalized to 1.0 at the condenser entering air temperature at which the design condenser fan power occurs. The actual condenser fan power is not allowed to exceed the design condenser fan power defined in the previous input field or go below zero (i.e., the output of the curve object is limited to values from 0.0 to 1.0). If this field is left blank, then the model assumes the condenser fan power is at the design power level when any of the refrigerated cases connected to this rack are operating.
+This field is the name of the curve object defining the change in condenser fan power as a function of the temperature of air entering the condenser. This curve is used to simulate the modulation of air flow by the condenser fans (e.g., staging, multi-speed, or variable speed) as a function of temperature.~ The curve object will be evaluated using the zone air dry-bulb temperature when rack heat rejection location equals ``Zone'' and the outdoor air dry-bulb temperature when rack heat rejection location equals ``Outdoors'' and the condenser type is air-cooled. As explained below, if the condenser is cooled by evaporative cooling, the curve object is evaluated using an effective temperature. The output from this curve is multiplied by the design condenser fan power to yield the actual fan power at the specific air temperature entering the condenser. This curve must be cubic or quadratic (\hyperref[curvecubic]{Curve:Cubic} or \hyperref[curvequadratic]{Curve:Quadratic}), and should be normalized to 1.0 at the condenser entering air temperature at which the design condenser fan power occurs. The actual condenser fan power is not allowed to exceed the design condenser fan power defined in the previous input field or go below zero (i.e., the output of the curve object is limited to values from 0.0 to 1.0). If this field is left blank, then the model assumes the condenser fan power is at the design power level when any of the refrigerated cases connected to this rack are operating.
 
 \paragraph{Field: Condenser Type}\label{field-condenser-type-002}
 
@@ -93,7 +93,7 @@ When the condenser type is ``WaterCooled'', a node name for the water-side conde
 
 \paragraph{Field: Water-cooled Loop Flow Type}\label{field-water-cooled-loop-flow-type}
 
-When the condenser type is ``WaterCooled'', the type of flow loop should be specified.~ The two choices are \textbf{VariableFlow}, in which a Pump:VariableSpeed needs to~ be included in the plant loop, or \textbf{ConstantFlow}, in which the loop circuit has a constant flow rate, typically associated with a Pump:ConstantSpeed object.~ If the flow type is VariableFlow, the flow needed to remove the condenser heat energy will be calculated and requested of the pump.~ If the flow type is Constant Flow, the outlet water temperature will be determined based on the fixed loop flow rate and heat energy to be removed.~ The default type is \textbf{VariableFlow}. Refer to additional discussion in the Engineering Reference.
+When the condenser type is ``WaterCooled'', the type of flow loop should be specified.~ The two choices are \textbf{VariableFlow}, in which a \hyperref[pumpvariablespeed]{Pump:VariableSpeed} needs to~ be included in the plant loop, or \textbf{ConstantFlow}, in which the loop circuit has a constant flow rate, typically associated with a \hyperref[pumpconstantspeed]{Pump:ConstantSpeed} object.~ If the flow type is VariableFlow, the flow needed to remove the condenser heat energy will be calculated and requested of the pump.~ If the flow type is Constant Flow, the outlet water temperature will be determined based on the fixed loop flow rate and heat energy to be removed.~ The default type is \textbf{VariableFlow}. Refer to additional discussion in the Engineering Reference.
 
 \paragraph{Field: Water-cooled Condenser Outlet Temperature Schedule Name}\label{field-water-cooled-condenser-outlet-temperature-schedule-name}
 
@@ -143,7 +143,7 @@ If the two function-of-temperature curves (i.e., Compressor Rack COP as a Functi
 
 \paragraph{Field: Evaporative Condenser Air Flow Rate}\label{field-evaporative-condenser-air-flow-rate-001}
 
-When the condenser type is ``EvaporativelyCooled'', the air volume flow rate, in m\(^{3}\)per second, entering the evaporative condenser. This value is used to calculate the amount of water evaporated when evaporatively cooling the condenser inlet air. The value for this field must be greater than zero. This input field is also autocalculatable, equivalent to 0.000144 m\(^{3}\)/s per watt of total cooling capacity {[}850 cfm/ton{]} where the total cooling capacity is the sum of the rated total cooling capacities for the refrigerated cases connected to this compressor rack (Ref. Refrigeration:Case).
+When the condenser type is ``EvaporativelyCooled'', the air volume flow rate, in m\(^{3}\)per second, entering the evaporative condenser. This value is used to calculate the amount of water evaporated when evaporatively cooling the condenser inlet air. The value for this field must be greater than zero. This input field is also autocalculatable, equivalent to 0.000144 m\(^{3}\)/s per watt of total cooling capacity {[}850 cfm/ton{]} where the total cooling capacity is the sum of the rated total cooling capacities for the refrigerated cases connected to this compressor rack (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}).
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-003}
 
@@ -155,7 +155,7 @@ When the condenser type is ``EvaporativelyCooled'', this numeric field contains 
 
 \paragraph{Field: Design Evaporative Condenser Water Pump Power}\label{field-design-evaporative-condenser-water-pump-power}
 
-When the condenser type is ``EvaporativelyCooled'', the rated power of the evaporative condenser water pump in Watts. This value is used to calculate the power required to pump the water used to evaporatively cool the condenser inlet air. The value for this field must be greater than or equal to 0, with a default value of 1000 Watts if this field is left blank. This input field is also autocalculatable, equivalent to 0.004266 W per watt {[}15 W/ton{]} of total cooling capacity where the total cooling capacity is the sum of the rated total cooling capacities for the refrigerated cases and walk-ins connected to this compressor rack (Ref. Refrigeration:Case and Refrigeration:WalkIn)).
+When the condenser type is ``EvaporativelyCooled'', the rated power of the evaporative condenser water pump in Watts. This value is used to calculate the power required to pump the water used to evaporatively cool the condenser inlet air. The value for this field must be greater than or equal to 0, with a default value of 1000 Watts if this field is left blank. This input field is also autocalculatable, equivalent to 0.004266 W per watt {[}15 W/ton{]} of total cooling capacity where the total cooling capacity is the sum of the rated total cooling capacities for the refrigerated cases and walk-ins connected to this compressor rack (Ref. \hyperref[refrigerationcase]{Refrigeration:Case} and \hyperref[refrigerationwalkin]{Refrigeration:WalkIn})).
 
 \paragraph{Field: Evaporative Water Supply Tank Name}\label{field-evaporative-water-supply-tank-name}
 
@@ -163,11 +163,11 @@ When the condenser type is ``EvaporativelyCooled'', this field is used to define
 
 \paragraph{Field: Condenser Air Inlet Node Name}\label{field-condenser-air-inlet-node-name-000}
 
-This optional alpha field contains the name of the node from which the outdoor compressor rack condenser draws its outdoor air. This field is applicable only when the heat rejection location is ``Outdoors'' (if the heat rejection location is ``Zone'', this field is disregarded). If this field is left blank, the outdoor air temperature entering the condenser (dry-bulb or wet-bulb) is taken directly from the weather data. If this field is not blank, this node name must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data.
+This optional alpha field contains the name of the node from which the outdoor compressor rack condenser draws its outdoor air. This field is applicable only when the heat rejection location is ``Outdoors'' (if the heat rejection location is ``Zone'', this field is disregarded). If this field is left blank, the outdoor air temperature entering the condenser (dry-bulb or wet-bulb) is taken directly from the weather data. If this field is not blank, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor air temperature is taken directly from the weather data.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-003}
 
-This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.  If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
+This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.  If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Refrigeration Case Name or WalkIn Name or CaseAndWalkInList Name}\label{field-refrigeration-case-name-or-walkin-name-or-caseandwalkinlist-name}
 
@@ -482,7 +482,7 @@ These are the sensible heating energy, in Joules or Watts, provided to the HVAC 
 
 \subsection{Refrigeration:Case}\label{refrigerationcase}
 
-The Refrigeration Case object works in conjunction with a compressor rack, a refrigeration system, or a secondary loop object (Refrigeration:CompressorRack, Refrigeration:System, or Refrigeration:SecondarySystem) to simulate the performance of a refrigerated case system. The refrigerated case model uses performance information at rated conditions along with performance curves for latent case credits and defrost heat load to determine performance at off-rated conditions. Energy use for lights, fans and anti-sweat heaters is modeled based on inputs for nominal power, schedules, and control type. The refrigerated case model accounts for the sensible and latent heat exchange with the surrounding environment (termed ``case credits'') which impacts the temperature and humidity in the zone where the case is located.
+The Refrigeration Case object works in conjunction with a compressor rack, a refrigeration system, or a secondary loop object (\hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of a refrigerated case system. The refrigerated case model uses performance information at rated conditions along with performance curves for latent case credits and defrost heat load to determine performance at off-rated conditions. Energy use for lights, fans and anti-sweat heaters is modeled based on inputs for nominal power, schedules, and control type. The refrigerated case model accounts for the sensible and latent heat exchange with the surrounding environment (termed ``case credits'') which impacts the temperature and humidity in the zone where the case is located.
 
 \textbf{\emph{A dataset has been provided containing refrigerated case input data for a large number of refrigerated cases from multiple manufacturers. See RefrigerationCases.idf.}}
 
@@ -508,7 +508,7 @@ The name of the schedule (ref: Schedule) that denotes whether the refrigerated c
 
 \paragraph{Field: Zone Name}\label{field-zone-name-010}
 
-The name of the zone where the refrigerated case is located. The refrigerated case will impact the air heat balance in this zone. When modeling multiple refrigerated cases connected to a single compressor rack where the condenser heat is rejected to the zone (ref: Refrigeration:CompressorRack), \textbf{all} of the refrigerated cases connected to that compressor rack must be located in the same zone.
+The name of the zone where the refrigerated case is located. The refrigerated case will impact the air heat balance in this zone. When modeling multiple refrigerated cases connected to a single compressor rack where the condenser heat is rejected to the zone (ref: \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}), \textbf{all} of the refrigerated cases connected to that compressor rack must be located in the same zone.
 
 \paragraph{Field: Rated Ambient Temperature}\label{field-rated-ambient-temperature}
 
@@ -694,7 +694,7 @@ The name of the schedule (ref: Schedule) that denotes a fraction of both the sen
 
 \paragraph{Field: Design Evaporator Temperature or Brine Inlet Temperature}\label{field-design-evaporator-temperature-or-brine-inlet-temperature}
 
-The value of this numeric field is used only with the detailed refrigeration system and is not read for the compressor-rack system. For the refrigeration system, it is used to evaluate compressor performance and is also used when the evaporator pressure and temperature are allowed to float at loads less than the design load. If the case is cooled by a secondary system (ref: Refrigeration:SecondarySystem), this value is the brine inlet temperature. The minimum value is -70C and the maximum value is 40C.~ The default value is 5C less than the case temperature.
+The value of this numeric field is used only with the detailed refrigeration system and is not read for the compressor-rack system. For the refrigeration system, it is used to evaluate compressor performance and is also used when the evaporator pressure and temperature are allowed to float at loads less than the design load. If the case is cooled by a secondary system (ref: \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}), this value is the brine inlet temperature. The minimum value is -70C and the maximum value is 40C.~ The default value is 5C less than the case temperature.
 
 \paragraph{Field: Average Refrigerant Charge Inventory}\label{field-average-refrigerant-charge-inventory}
 
@@ -935,7 +935,7 @@ This field is the total electricity consumption of the refrigerated case electri
 
 \subsection{Refrigeration:CaseAndWalkInList}\label{refrigerationcaseandwalkinlist}
 
-This object provides a list of all the refrigerated cases and/or walk in coolers cooled by a single refrigeration system (ref: Refrigeraion:CompressorRack and Refrigeration:System). This list is extensible. Note that the names of all cases, walk-ins,air chillers, and caseandwalkinlists must be unique.~ That is, you cannot give a list the same name as one of the cases.~ Similarly, a walkin cannot have the same name as a case.This list may contain a combination of case and walk-in names OR a list of air chiller names.~ Air chillers may not be included in any list that also includes cases or walk-ins.
+This object provides a list of all the refrigerated cases and/or walk in coolers cooled by a single refrigeration system (ref: Refrigeraion:CompressorRack and \hyperref[refrigerationsystem]{Refrigeration:System}). This list is extensible. Note that the names of all cases, walk-ins,air chillers, and caseandwalkinlists must be unique.~ That is, you cannot give a list the same name as one of the cases.~ Similarly, a walkin cannot have the same name as a case.This list may contain a combination of case and walk-in names OR a list of air chiller names.~ Air chillers may not be included in any list that also includes cases or walk-ins.
 
 \subsubsection{Inputs}\label{inputs-2-033}
 
@@ -945,7 +945,7 @@ A unique user-assigned name for an instance of a CaseAndWalkInList. Any referenc
 
 \paragraph{Field: Case or WalkIn or Air Chiller \textless{}x\textgreater{} Name}\label{field-case-or-walkin-or-air-chiller-x-name}
 
-Identifies a particular refrigerated case or walk-in. The name will be validated against the~ Refrigeration Case, Refrigeration WalkIn, and Air Chiller names (ref: Refrigeration:Case,~ Refrigeration:WalkIn, and Refrigeration:AirChiller) in the input file. Up to 20 are provided in the IDD; this object is extensible.
+Identifies a particular refrigerated case or walk-in. The name will be validated against the~ Refrigeration Case, Refrigeration WalkIn, and Air Chiller names (ref: \hyperref[refrigerationcase]{Refrigeration:Case},~ \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, and \hyperref[refrigerationairchiller]{Refrigeration:AirChiller}) in the input file. Up to 20 are provided in the IDD; this object is extensible.
 
 The following is an example input for a CaseAndWalkInList.
 
@@ -961,7 +961,7 @@ Refrigeration:CaseAndWalkInList,
 
 \subsection{Refrigeration:WalkIn}\label{refrigerationwalkin}
 
-The Refrigeration WalkIn object works in conjunction with a compressor rack, a refrigeration system, or a refrigeration secondary system object (Ref. Refrigeration:CompressorRack, Refrigeration:System, or Refrigeration:SecondarySystem) to simulate the performance of a walk-in cooler. The walk-in cooler model uses information at rated conditions along with input descriptions for heat transfer surfaces facing multiple zones to determine performance. Energy use for lights, fans, and floor and anti-sweat heaters is modeled based on inputs for nominal power, schedules, and control type. The walk-in cooler model accounts for the sensible and latent heat exchange with the surrounding environment (termed ``case credits'') which impacts the temperature and humidity in each zone adjacent to the walk-in.
+The Refrigeration WalkIn object works in conjunction with a compressor rack, a refrigeration system, or a refrigeration secondary system object (Ref. \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of a walk-in cooler. The walk-in cooler model uses information at rated conditions along with input descriptions for heat transfer surfaces facing multiple zones to determine performance. Energy use for lights, fans, and floor and anti-sweat heaters is modeled based on inputs for nominal power, schedules, and control type. The walk-in cooler model accounts for the sensible and latent heat exchange with the surrounding environment (termed ``case credits'') which impacts the temperature and humidity in each zone adjacent to the walk-in.
 
 The walk-in cooler object inputs include a name, an availability schedule name, the rated cooling capacity, the rated operating temperature, the rated cooling source temperature, the rated total heating power and heating power schedule, the rated fan and lighting power and schedules, defrost type, defrost control type, defrost schedule name, drip-down schedule name, defrost power, the portion of the defrost energy used to melt ice (only for temperature termination control type), restocking schedule, refrigerant inventory, and the floor area and U-value.
 
@@ -1059,7 +1059,7 @@ The floor themal transmittance (in W/m\(^{2}\)-K). This value has a default valu
 
 \subsubsection{Field: Zone \textless{}x\textgreater{} Name}\label{field-zone-x-name}
 
-The name of a zone adjoining the walkin. The walkin will impact the air heat balance in this zone. This zone must represent a conditioned space, that is, it must appear in a ZoneHVAC:EquipmentConnections object.
+The name of a zone adjoining the walkin. The walkin will impact the air heat balance in this zone. This zone must represent a conditioned space, that is, it must appear in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object.
 
 \subsubsection{Field: Total Insulated Surface Area Facing~ Zone \textless{}x\textgreater{}}\label{field-total-insulated-surface-area-facing-zone-x}
 
@@ -1210,7 +1210,7 @@ This field is the total (sensible plus latent) cooling rate of the WalkIn evapor
 
 \subsubsection{Refrigeration Walk In Evaporator Total Cooling Energy {[}J{]}}\label{refrigeration-walk-in-evaporator-total-cooling-energy-j}
 
-This field is the total (sensible plus latent) cooling of the WalkIn evaporator coil in Joules over the timestep being reported. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects).
+This field is the total (sensible plus latent) cooling of the WalkIn evaporator coil in Joules over the timestep being reported. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = Refrigeration, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects).
 
 \subsubsection{Refrigeration Walk In Evaporator Sensible Cooling Rate {[}W{]}}\label{refrigeration-walk-in-evaporator-sensible-cooling-rate-w}
 
@@ -1242,7 +1242,7 @@ This field is the electric power input to the WalkIn fan(s) in Watts.
 
 \subsubsection{Refrigeration Walk In Fan Electric Energy {[}J{]}}\label{refrigeration-walk-in-fan-electric-energy-j}
 
-This field is the electricity consumption of the WalkIn fan(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects).
+This field is the electricity consumption of the WalkIn fan(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects).
 
 \subsubsection{Refrigeration Walk In Lighting Electric Power {[}W{]}}\label{refrigeration-walk-in-lighting-electric-power-w}
 
@@ -1250,7 +1250,7 @@ This field is the electric power input to the WalkIn lights in Watts.
 
 \subsubsection{Refrigeration Walk In Lighting Electric Energy {[}J{]}}\label{refrigeration-walk-in-lighting-electric-energy-j}
 
-This field is the electricity consumption of the WalkIn lights in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects).
+This field is the electricity consumption of the WalkIn lights in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects).
 
 \subsubsection{Refrigeration Walk In Heater Electric Power {[}W{]}}\label{refrigeration-walk-in-heater-electric-power-w}
 
@@ -1258,7 +1258,7 @@ This field is the electric power input to the WalkIn heaters in Watts.
 
 \subsubsection{Refrigeration Walk In Heater Electric Energy {[}J{]}}\label{refrigeration-walk-in-heater-electric-energy-j}
 
-This field is the total electricity consumption of the WalkIn heaters in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects).
+This field is the total electricity consumption of the WalkIn heaters in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects).
 
 \subsubsection{Refrigeration Walk In Defrost Electric Power {[}W{]}}\label{refrigeration-walk-in-defrost-electric-power-w}
 
@@ -1266,7 +1266,7 @@ This field is the electric power input to the WalkIn electric defrost heater(s) 
 
 \subsubsection{Refrigeration Walk In Defrost Electric Energy {[}J{]}}\label{refrigeration-walk-in-defrost-electric-energy-j}
 
-This field is the total electricity consumption of the WalkIn electric defrost heater(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. Output:Meter objects). This output is available if case defrost type is Electric.
+This field is the total electricity consumption of the WalkIn electric defrost heater(s) in Joules over the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). This output is available if case defrost type is Electric.
 
 \emph{The following output variables are available for each zone adjacent to the walkin. An output variable identification is created for each zone exchanging energy with the walkin.~ For example if the walkin, ``DairyWalkIn'', were exchanging energy with the zone, ``SalesArea'', the output variable identification would be ``DairyWalkInInZoneSalesArea''.}
 
@@ -1298,15 +1298,15 @@ This field is the amount of latent cooling (dehumidification) case credit energy
 
 The refrigeration system object simulates the performance of a supermarket refrigeration system when used along with other objects to define the refrigeration load(s), the compressor(s), and the condenser.
 
-At least one refrigeration load object must be defined which may be one of four types of load, a refrigerated case, a walk-in cooler, a chiller providing refrigeration to a secondary loop, or a cascade condenser which absorbs heat rejected by a lower-temperature system (Ref. Refrigeration:Case, Refrigeration:WalkIn, Refrigeration:SecondarySystem,~ and Refrigeration:Condenser:Cascade) If multiple loads are served by the same system , the user should use one or both of the list objects available to assign loads to the system. The first list includes all cases and walkins cooled directly by this system (Ref. Refrigeration:CaseAndWalkInList). The second list includes any `transfer' loads, that is refrigeration loads borne by this system that are transferred from another refrigeration system via either a secondary loop chiller or a cascade condenser (Ref. Refrigeration:TransferLoadList, see the Engineering Reference for more information about these types of systems).
+At least one refrigeration load object must be defined which may be one of four types of load, a refrigerated case, a walk-in cooler, a chiller providing refrigeration to a secondary loop, or a cascade condenser which absorbs heat rejected by a lower-temperature system (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem},~ and \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade}) If multiple loads are served by the same system , the user should use one or both of the list objects available to assign loads to the system. The first list includes all cases and walkins cooled directly by this system (Ref. \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}). The second list includes any `transfer' loads, that is refrigeration loads borne by this system that are transferred from another refrigeration system via either a secondary loop chiller or a cascade condenser (Ref. \hyperref[refrigerationtransferloadlist]{Refrigeration:TransferLoadList}, see the Engineering Reference for more information about these types of systems).
 
-The refrigeration system object is capable of modeling both single-stage and two-stage compression refrigeration systems.~ The name of at least one compressor must be defined and a list object is available if the system is served by more than one compressor (Ref. Refrigeration:Compressor and Refrigeration:CompressorList).
+The refrigeration system object is capable of modeling both single-stage and two-stage compression refrigeration systems.~ The name of at least one compressor must be defined and a list object is available if the system is served by more than one compressor (Ref. \hyperref[refrigerationcompressor]{Refrigeration:Compressor} and \hyperref[refrigerationcompressorlist]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}List}).
 
-Heat is rejected outdoors in a condenser by direct air flow, evaporative water cooling, by a water-cooled condenser with appropriate plant loop piping, or to a cascade condenser cooled by another refrigeration system(ref: Refrigeration:Condenser:AirCooled, Refrigeration:Condenser:EvaporativeCooled, Refrigeration:Condenser:WaterCooled, Refrigeration:Condenser:Cascade). With evaporative cooling, water is sprayed through the air stream to effectively lower the air temperature experienced by the condenser coil as a result of water evaporation. The use of a water-cooled condenser requires the definition of a plant loop to supply cooling to the condenser.~ If a cascade condenser is specified, the refrigeration system absorbing the rejected heat must also be defined.
+Heat is rejected outdoors in a condenser by direct air flow, evaporative water cooling, by a water-cooled condenser with appropriate plant loop piping, or to a cascade condenser cooled by another refrigeration system(ref: \hyperref[refrigerationcondenseraircooled]{Refrigeration:Condenser:AirCooled}, \hyperref[refrigerationcondenserevaporativecooled]{Refrigeration:Condenser:EvaporativeCooled}, \hyperref[refrigerationcondenserwatercooled]{Refrigeration:Condenser:WaterCooled}, \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade}). With evaporative cooling, water is sprayed through the air stream to effectively lower the air temperature experienced by the condenser coil as a result of water evaporation. The use of a water-cooled condenser requires the definition of a plant loop to supply cooling to the condenser.~ If a cascade condenser is specified, the refrigeration system absorbing the rejected heat must also be defined.
 
-The refrigeration system may also include a liquid suction and/or mechanical subcooler (Ref. Refrigeration:Subcooler).
+The refrigeration system may also include a liquid suction and/or mechanical subcooler (Ref. \hyperref[refrigerationsubcooler]{Refrigeration:Subcooler}).
 
-The system object coordinates the energy flows between the other refrigeration objects and is used to set system parameters. Compressor waste heat can also be reclaimed for use by an optional air- or water-heating coil (Ref. Coil:Heating:Desuperheater and Coil:WaterHeating:Desuperheater).
+The system object coordinates the energy flows between the other refrigeration objects and is used to set system parameters. Compressor waste heat can also be reclaimed for use by an optional air- or water-heating coil (Ref. \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater} and \hyperref[coilwaterheatingdesuperheater]{Coil:WaterHeating:Desuperheater}).
 
 The inputs for the refrigeration system object, in addition to the names of the other refrigeration objects described above, include a name for this system, the minimum condensing temperature, the refrigeration system working fluid, and the type of saturated suction temperature control. Optional input fields are also provided for users seeking to keep track of refrigerant inventory and suction pipe heat gains.
 
@@ -1318,19 +1318,19 @@ A unique user-assigned name for an instance of a refrigeration system. Any refer
 
 \paragraph{Field: Refrigerated Case or WalkIn or CaseAndWalkInList Name}\label{field-refrigerated-case-or-walkin-or-caseandwalkinlist-name}
 
-Identifies a single case, a single walkin, single air chiller, or a particular list of refrigerated cases and walkins or air chillers, that is cooled by this refrigeration system. The name will be validated against the case, walkin, air chiller and CaseAndWalkInList names ~(ref: Refrigeration:Case, Refrigeration:WalkIn, Refrigeration:AirChiller, and Refrigeration:CaseAndWalkInList) in the input file. Only cases and walkins or air chillers served directly by the system should be included in this list.~ Any cases, walkins, or air chillers served indirectly via a secondary loop should NOT be included in this list. Note that any system that serves an air chiller cannot also serve a case or walkin.
+Identifies a single case, a single walkin, single air chiller, or a particular list of refrigerated cases and walkins or air chillers, that is cooled by this refrigeration system. The name will be validated against the case, walkin, air chiller and CaseAndWalkInList names ~(ref: \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, \hyperref[refrigerationairchiller]{Refrigeration:AirChiller}, and \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}) in the input file. Only cases and walkins or air chillers served directly by the system should be included in this list.~ Any cases, walkins, or air chillers served indirectly via a secondary loop should NOT be included in this list. Note that any system that serves an air chiller cannot also serve a case or walkin.
 
 \paragraph{Field: Refrigeration Transfer Load or TransferLoad List Name}\label{field-refrigeration-transfer-load-or-transferload-list-name}
 
-Identifies a single SecondarySystem, a single Cascade Condenser, OR or a list of Transfer Loads (where the list is comprised of SecondarySystems and/or Cascade Condensers) that are cooled by this refrigeration system. The name will be validated against the secondary system, cascade condenser, and TransferLoad list names (ref: Refrigeration:SecondarySystem, Refrigeration:Condenser:Cascade, and Refrigeration:TransferLoadList) in the input file. Only secondary systems and cascade condensers served directly by the system should be included in this list. (NOTE -- this entry is for a cascade condenser \emph{cooled by} this system, not a condenser \emph{absorbing heat rejected by} this system.)
+Identifies a single SecondarySystem, a single Cascade Condenser, OR or a list of Transfer Loads (where the list is comprised of SecondarySystems and/or Cascade Condensers) that are cooled by this refrigeration system. The name will be validated against the secondary system, cascade condenser, and TransferLoad list names (ref: \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}, \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade}, and \hyperref[refrigerationtransferloadlist]{Refrigeration:TransferLoadList}) in the input file. Only secondary systems and cascade condensers served directly by the system should be included in this list. (NOTE -- this entry is for a cascade condenser \emph{cooled by} this system, not a condenser \emph{absorbing heat rejected by} this system.)
 
 \paragraph{Field: Condenser Name}\label{field-condenser-name}
 
-The name of the condenser that is used to \emph{reject heat from} this refrigeration system. The name will be validated against the condenser names (ref: Refrigeration:Condenser:AirCooled, Refrigeration:Condenser:WaterCooled, Refrigeration:Condenser:EvaporativeCooled, and Refrigeration:Condenser:Cascade) in the input file.
+The name of the condenser that is used to \emph{reject heat from} this refrigeration system. The name will be validated against the condenser names (ref: \hyperref[refrigerationcondenseraircooled]{Refrigeration:Condenser:AirCooled}, \hyperref[refrigerationcondenserwatercooled]{Refrigeration:Condenser:WaterCooled}, \hyperref[refrigerationcondenserevaporativecooled]{Refrigeration:Condenser:EvaporativeCooled}, and \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade}) in the input file.
 
 \paragraph{Field:Compressor or ~Compressor List Name}\label{fieldcompressor-or-compressor-list-name}
 
-Identifies a single compressor, or a particular list of compressors, that provide cooling energy to this refrigeration system. The name will be validated against the compressor list names (ref: List:Refrigeration:Compressors) in the input file.~ If the refrigeration systems contains two stages of compression, this field identifies the low-stage compressors connected to the two-stage system.
+Identifies a single compressor, or a particular list of compressors, that provide cooling energy to this refrigeration system. The name will be validated against the compressor list names (ref: List:\hyperref[refrigerationcompressor]{Refrigeration:Compressor}s) in the input file.~ If the refrigeration systems contains two stages of compression, this field identifies the low-stage compressors connected to the two-stage system.
 
 \paragraph{Field: Minimum Condensing Temperature}\label{field-minimum-condensing-temperature}
 
@@ -1346,11 +1346,11 @@ The type of saturated suction temperature control used by the system. Valid choi
 
 \paragraph{Field: Mechanical Subcooler Name}\label{field-mechanical-subcooler-name}
 
-This optional field identifies a mechanical subcooler that absorbs heat from this refrigeration system. This field should not be used for a mechanical subcooler that absorbs heat from another system. The name will be validated against the subcooler names (ref: Refrigeration:Subcooler) in the input file.
+This optional field identifies a mechanical subcooler that absorbs heat from this refrigeration system. This field should not be used for a mechanical subcooler that absorbs heat from another system. The name will be validated against the subcooler names (ref: \hyperref[refrigerationsubcooler]{Refrigeration:Subcooler}) in the input file.
 
 \paragraph{Field: Liquid Suction Heat Exchanger Subcooler Name}\label{field-liquid-suction-heat-exchanger-subcooler-name}
 
-This optional field Identifies a particular liquid suction heat exchanger (LSHX) subcooler present in this refrigeration system. The name will be validated against the subcooler names (ref: Refrigeration:Subcooler) in the input file.
+This optional field Identifies a particular liquid suction heat exchanger (LSHX) subcooler present in this refrigeration system. The name will be validated against the subcooler names (ref: \hyperref[refrigerationsubcooler]{Refrigeration:Subcooler}) in the input file.
 
 \paragraph{Field: Sum UA Suction Piping}\label{field-sum-ua-suction-piping}
 
@@ -1362,7 +1362,7 @@ This optional field is typically used when trying to determine the impact of pip
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-1-002}
 
-This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
+This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Number of Compressor Stages}\label{field-number-of-compressor-stages}
 
@@ -1378,7 +1378,7 @@ When a shell-and-coil intercooler is selected for two-stage compression systems,
 
 \paragraph{Field: High-Stage Compressor or CompressorList Name}\label{field-high-stage-compressor-or-compressorlist-name}
 
-Identifies a single compressor, or a particular list of compressors, that comprise the high-stage compression of a two-stage compression refrigeration system. The name will be validated against the compressor list names (ref: List:Refrigeration:Compressors) in the input file.~ Names in this field are only valid if two compressor stages have been specified in the ``Number of Compressor Stages'' field above.
+Identifies a single compressor, or a particular list of compressors, that comprise the high-stage compression of a two-stage compression refrigeration system. The name will be validated against the compressor list names (ref: List:\hyperref[refrigerationcompressor]{Refrigeration:Compressor}s) in the input file.~ Names in this field are only valid if two compressor stages have been specified in the ``Number of Compressor Stages'' field above.
 
 The following is an example input for a single-stage compression refrigeration system.
 
@@ -1860,24 +1860,24 @@ The input objects required to model a detailed transcritical CO\(_{2}\) refriger
 \item
   At least one refrigeration load object which may include any combination of the following:
 \item
-  Refrigeration:Case,
+  \hyperref[refrigerationcase]{Refrigeration:Case},
 \item
-  Refrigeration:WalkIn,
+  \hyperref[refrigerationwalkin]{Refrigeration:WalkIn},
 \item
-  Refrigeration:CaseAndWalkInList (may include both cases and/or walk-in cooler names),
+  \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList} (may include both cases and/or walk-in cooler names),
 \item
-  At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
+  At least one \hyperref[refrigerationcompressor]{Refrigeration:Compressor} object (multiple compressors are entered using a \hyperref[refrigerationcompressorlist]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}List}),
 \item
-  One Refrigeration:GasCooler:AirCooled object,
+  One \hyperref[refrigerationgascooleraircooled]{Refrigeration:GasCooler:AirCooled} object,
 \end{itemize}
 
 Output variables are available to describe the total heat exchange between all the refrigeration objects and the zones containing these objects.~ These variables are described at the end of this section.
 
-At least one refrigeration load object must be defined which may be one of two types of loads, including a refrigerated display case and a walk-in cooler, (Ref. Refrigeration:Case, and Refrigeration:WalkIn).~ If multiple loads are served by the same system, the user should use the refrigerated case and walk-in list object available to assign all cases and walk-ins cooled directly by this system (Ref. Refrigeration:CaseAndWalkInList).
+At least one refrigeration load object must be defined which may be one of two types of loads, including a refrigerated display case and a walk-in cooler, (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, and \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}).~ If multiple loads are served by the same system, the user should use the refrigerated case and walk-in list object available to assign all cases and walk-ins cooled directly by this system (Ref. \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}).
 
-The name of at least one compressor must be defined and a list object is available if the system is served by more than one compressor (Ref. Refrigeration:Compressor and Refrigeration:CompressorList).
+The name of at least one compressor must be defined and a list object is available if the system is served by more than one compressor (Ref. \hyperref[refrigerationcompressor]{Refrigeration:Compressor} and \hyperref[refrigerationcompressorlist]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}List}).
 
-Heat is rejected to the outdoors via an air-cooled gas cooler (Ref. Refrigeration:GasCooler:AirCooled).
+Heat is rejected to the outdoors via an air-cooled gas cooler (Ref. \hyperref[refrigerationgascooleraircooled]{Refrigeration:GasCooler:AirCooled}).
 
 The Refrigeration:TranscriticalSystem object coordinates the energy flows between the other refrigeration objects and is used to set system parameters.
 
@@ -1897,23 +1897,23 @@ Identifies the transcritical CO\(_{2}\) refrigeration system as either a single-
 
 \paragraph{Field: Medium Temperature Refrigerated Case or WalkIn or CaseAndWalkInList Name}\label{field-medium-temperature-refrigerated-case-or-walkin-or-caseandwalkinlist-name}
 
-Identifies a single case, a single walk-in, or a particular list of refrigerated cases and walk-ins, that is cooled by the medium-temperature stage of the refrigeration system.~ The name will be validated against the case, walk-in, and CaseAndWalkInList names (Ref. Refrigeration:Case, Refrigeration:WalkIn, and Refrigeration:CaseAndWalkInList) in the input file.~ Only medium temperature cases and walk-ins served directly by the system should be included in this list.~ Note that this entry is required for both single-stage and two-stage systems.
+Identifies a single case, a single walk-in, or a particular list of refrigerated cases and walk-ins, that is cooled by the medium-temperature stage of the refrigeration system.~ The name will be validated against the case, walk-in, and CaseAndWalkInList names (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, and \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}) in the input file.~ Only medium temperature cases and walk-ins served directly by the system should be included in this list.~ Note that this entry is required for both single-stage and two-stage systems.
 
 \paragraph{Field: Low Temperature Refrigerated Case or WalkIn or CaseAndWalkInList Name}\label{field-low-temperature-refrigerated-case-or-walkin-or-caseandwalkinlist-name}
 
-Identifies a single case, a single walk-in, or a particular list of refrigerated cases and walk-ins, that is cooled by the low-temperature stage of the refrigeration system.~ The name will be validated against the case, walk-in, and CaseAndWalkInList names (Ref. Refrigeration:Case, Refrigeration:WalkIn, and Refrigeration:CaseAndWalkInList) in the input file.~ Only low temperature cases and walk-ins served directly by the system should be included in this list.~ Note that this entry is valid only for two-stage systems.
+Identifies a single case, a single walk-in, or a particular list of refrigerated cases and walk-ins, that is cooled by the low-temperature stage of the refrigeration system.~ The name will be validated against the case, walk-in, and CaseAndWalkInList names (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, and \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}) in the input file.~ Only low temperature cases and walk-ins served directly by the system should be included in this list.~ Note that this entry is valid only for two-stage systems.
 
 \paragraph{Field: Refrigeration Gas Cooler Name}\label{field-refrigeration-gas-cooler-name}
 
-The name of the gas cooler that is used to reject heat from the transcritical refrigeration system.~ The name will be validated against the gas cooler names (Ref. Refrigeration:GasCooler:AirCooled) in the input file.
+The name of the gas cooler that is used to reject heat from the transcritical refrigeration system.~ The name will be validated against the gas cooler names (Ref. \hyperref[refrigerationgascooleraircooled]{Refrigeration:GasCooler:AirCooled}) in the input file.
 
 \paragraph{Field: High Pressure Compressor or Compressor List Name}\label{field-high-pressure-compressor-or-compressor-list-name}
 
-Identifies a single compressor, or a particular list of compressors, that provides compression for a single-stage system or the high pressure stage of a two-stage system.~ The name will be validated against the compressor list names (Ref. List:Refrigeration:Compressors) in the input file.~ Note that this entry is required for both single-stage and two-stage systems.
+Identifies a single compressor, or a particular list of compressors, that provides compression for a single-stage system or the high pressure stage of a two-stage system.~ The name will be validated against the compressor list names (Ref. List:\hyperref[refrigerationcompressor]{Refrigeration:Compressor}s) in the input file.~ Note that this entry is required for both single-stage and two-stage systems.
 
 \paragraph{Field: Low Pressure Compressor or Compressor List Name}\label{field-low-pressure-compressor-or-compressor-list-name}
 
-Identifies a single compressor, or a particular list of compressors, that provides compression for the low pressure stage of a two-stage system.~ The name will be validated against the compressor list names (Ref. List:Refrigeration:Compressors) in the input file.~ Note that this entry is valid only for two-stage systems.
+Identifies a single compressor, or a particular list of compressors, that provides compression for the low pressure stage of a two-stage system.~ The name will be validated against the compressor list names (Ref. List:\hyperref[refrigerationcompressor]{Refrigeration:Compressor}s) in the input file.~ Note that this entry is valid only for two-stage systems.
 
 \paragraph{Field: Receiver Pressure}\label{field-receiver-pressure}
 
@@ -1945,7 +1945,7 @@ This optional field is typically used to determine the impact of pipe heat gains
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-2-002}
 
-This field allows the specification of a user-defined end-use subcategory (e.g., ``Medium Temperature System'').~ A new meter for reporting is created for each unique subcategory (Ref. Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
+This field allows the specification of a user-defined end-use subcategory (e.g., ``Medium Temperature System'').~ A new meter for reporting is created for each unique subcategory (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
 The following is an example input for a transcritical CO\(_{2}\) refrigeration system.
 
@@ -2150,7 +2150,7 @@ A unique user-assigned name for an instance of a compressor. Any reference to th
 
 \paragraph{Field: Refrigeration Compressor Power Curve Name}\label{field-refrigeration-compressor-power-curve-name}
 
-This required field provides the name of the curve object that describes the compressor power as a function of the evaporating and condensing temperatures, as specified in ARI 540. The curve is of the bicubic form(ref: Curve:Bicubic).~ However, the input order for the Energy Plus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
+This required field provides the name of the curve object that describes the compressor power as a function of the evaporating and condensing temperatures, as specified in ARI 540. The curve is of the bicubic form(ref: \hyperref[curvebicubic]{Curve:Bicubic}).~ However, the input order for the Energy Plus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
 
 N1 is ARI C1 and N2 is ARI C2.
 
@@ -2168,7 +2168,7 @@ N13 is the the Minimum condensing temperature and N14 is the Maximum condensing 
 
 \paragraph{Field: Refrigeration Compressor Capacity Curve Name}\label{field-refrigeration-compressor-capacity-curve-name}
 
-This required field provides the name of the curve object that describes the compressor cooling capacity as a function of the evaporating and condensing temperatures, as specified in ARI 540. The curve is of the bicubic form(ref: Curve:Bicubic).~ However, the input order for the Energy Plus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
+This required field provides the name of the curve object that describes the compressor cooling capacity as a function of the evaporating and condensing temperatures, as specified in ARI 540. The curve is of the bicubic form(ref: \hyperref[curvebicubic]{Curve:Bicubic}).~ However, the input order for the Energy Plus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
 
 N1 is ARI C1 and N2 is ARI C2.
 
@@ -2202,7 +2202,7 @@ Some compressor manufactures rate their equipment according to a constant subcoo
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-3-001}
 
-This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature System''). A new meter for reporting is created for each unique subcategory (Ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.  If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
+This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature System''). A new meter for reporting is created for each unique subcategory (Ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table.  If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Mode-of-Operation}\label{field-mode-of-operation}
 
@@ -2210,7 +2210,7 @@ The type of mode of operation. Valid choices are \textbf{Subcritical} and \textb
 
 \paragraph{Field: Transcritical-Compressor-Power-Curve-Name}\label{field-transcritical-compressor-power-curve-name}
 
-This field is the name of the curve object that describes the transcritical operation compressor power as a function of the saturated suction temperature and the gas cooler pressure. The curve is of the bicubic form(ref: Curve:Bicubic).~ However, the input order of the coefficients for the EnergyPlus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
+This field is the name of the curve object that describes the transcritical operation compressor power as a function of the saturated suction temperature and the gas cooler pressure. The curve is of the bicubic form(ref: \hyperref[curvebicubic]{Curve:Bicubic}).~ However, the input order of the coefficients for the EnergyPlus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
 
 N1 is ARI C1 and N2 is ARI C2.
 
@@ -2232,7 +2232,7 @@ If \textbf{Transcritical} is selected as \textit{Mode of Operation}, then this i
 
 \paragraph{Field: Transcritical-Compressor-Capacity-Curve-Name}\label{field-transcritical-compressor-capacity-curve-name}
 
-This field is the name of the curve object that describes the transcritical compressor operation cooling capacity as a function of the saturated suction temperature and the gas cooler outlet enthalpy. The curve is of the bicubic form(ref: Curve:Bicubic).~ However, the input order of the coefficients for the EnergyPlus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
+This field is the name of the curve object that describes the transcritical compressor operation cooling capacity as a function of the saturated suction temperature and the gas cooler outlet enthalpy. The curve is of the bicubic form(ref: \hyperref[curvebicubic]{Curve:Bicubic}).~ However, the input order of the coefficients for the EnergyPlus bicubic curve does not match the ARI 540 standard order. When this curve is entered, the user should use the following assignments:
 
 N1 is ARI C1 and N2 is ARI C2.
 
@@ -2345,7 +2345,7 @@ This is the fraction of the time step when the compressor ran to meet the load.~
 
 \subsection{Refrigeration:CompressorList}\label{refrigerationcompressorlist}
 
-This object provides a list of all the compressors included within a single refrigeration system (Ref: Refrigeration:System). Each list must contain at least one compressor. The order in which the individual compressors are listed here will be the order in which the compressors are dispatched to meet the system load.~ That is, at very low loads, only compressor \#1 will be operating.~ As the load increases, the first two compressors will be operating, and so on. This list is extensible.
+This object provides a list of all the compressors included within a single refrigeration system (Ref: \hyperref[refrigerationsystem]{Refrigeration:System}). Each list must contain at least one compressor. The order in which the individual compressors are listed here will be the order in which the compressors are dispatched to meet the system load.~ That is, at very low loads, only compressor \#1 will be operating.~ As the load increases, the first two compressors will be operating, and so on. This list is extensible.
 
 \subsubsection{Inputs}\label{inputs-6-020}
 
@@ -2355,7 +2355,7 @@ A unique user-assigned name for an instance of a compressor list. Any reference 
 
 \paragraph{Field: Refrigeration Compressor \textless{}x\textgreater{} Name}\label{field-refrigeration-compressor-x-name}
 
-Identifies a particular compressor that works in conjunction with the other compressors on this list to provides cooling to a single refrigeration system. The name will be validated against the compressor names (ref: Refrigeration:Compressor) in the input file. Up to 20 are available in the IDD; this object is extensible.
+Identifies a particular compressor that works in conjunction with the other compressors on this list to provides cooling to a single refrigeration system. The name will be validated against the compressor names (ref: \hyperref[refrigerationcompressor]{Refrigeration:Compressor}) in the input file. Up to 20 are available in the IDD; this object is extensible.
 
 The following is an example input for a compressor list.
 
@@ -2396,7 +2396,7 @@ This numeric field is the design inlet temperature (C) for the cool vapor enteri
 
 \paragraph{Field: Capacity-Providing System}\label{field-capacity-providing-system}
 
-This field is the name of the refrigeration system object that provides the cooling capacity for the mechanical subcooler (ref: Refrigeration:System Name). This field should be blank for a liquid suction heat exchanger.
+This field is the name of the refrigeration system object that provides the cooling capacity for the mechanical subcooler (ref: \hyperref[refrigerationsystem]{Refrigeration:System} Name). This field should be blank for a liquid suction heat exchanger.
 
 \paragraph{Field: Outlet Control Temperature}\label{field-outlet-control-temperature}
 
@@ -2472,7 +2472,7 @@ This output is the cooling energy transferred from one system's compressor group
 
 \subsection{Refrigeration:Condenser:AirCooled}\label{refrigerationcondenseraircooled}
 
-The refrigeration system requires a single condenser to reject the system heat.~ The air cooled condenser object is one of four options for this condenser. In an air-cooled condenser, the total heat of rejection is characterized by a linear relationship between the difference between the inlet air (usually the outside drybulb) and condensing temperatures. This curve is commonly found in the condenser manufacturers' literature. This rating curve, which corresponds to ARI 460 standards, also has an associated rated value for subcooling that should be entered. The rated condenser fan power and fan speed control type must be specified. If the condenser is not at ground level, the user may specify an air inlet node name (ref: OutdoorAir:Node name). If the condenser is located inside a conditioned zone, the zone name may be specified(ref: bbbZoneNamebbb). Optional input is provided to help the user compare refrigerant inventories for different systems.~ These inputs represent the design values for the refrigerant inventory within the condenser, within a receiver beneath the condenser, and in the liquid pipes between the condenser and the refrigerated cases.
+The refrigeration system requires a single condenser to reject the system heat.~ The air cooled condenser object is one of four options for this condenser. In an air-cooled condenser, the total heat of rejection is characterized by a linear relationship between the difference between the inlet air (usually the outside drybulb) and condensing temperatures. This curve is commonly found in the condenser manufacturers' literature. This rating curve, which corresponds to ARI 460 standards, also has an associated rated value for subcooling that should be entered. The rated condenser fan power and fan speed control type must be specified. If the condenser is not at ground level, the user may specify an air inlet node name (ref: \hyperref[outdoorairnode]{OutdoorAir:Node} name). If the condenser is located inside a conditioned zone, the zone name may be specified(ref: bbbZoneNamebbb). Optional input is provided to help the user compare refrigerant inventories for different systems.~ These inputs represent the design values for the refrigerant inventory within the condenser, within a receiver beneath the condenser, and in the liquid pipes between the condenser and the refrigerated cases.
 
 \subsubsection{Inputs}\label{inputs-8-018}
 
@@ -2482,7 +2482,7 @@ Identifies a particular condenser that rejects heat for a one or more refrigerat
 
 \paragraph{Field: Rated Effective Total Heat Rejection Rate Curve Name}\label{field-rated-effective-total-heat-rejection-rate-curve-name}
 
-This field is the name of a curve object defining the condenser heat rejection as a function of the difference between the condensing and entering air temperatures. The curve should be linear (Curve:Linear). See the Engineering Reference for more discussion on the curve coefficients.
+This field is the name of a curve object defining the condenser heat rejection as a function of the difference between the condensing and entering air temperatures. The curve should be linear (\hyperref[curvelinear]{Curve:Linear}). See the Engineering Reference for more discussion on the curve coefficients.
 
 \paragraph{Field: Rated Subcooling Temperature Difference}\label{field-rated-subcooling-temperature-difference}
 
@@ -2502,11 +2502,11 @@ Fan controls often include a minimum air flow ratio to avoid overheating the fan
 
 \paragraph{Field: Air Inlet Node Name or Zone Name}\label{field-air-inlet-node-name-or-zone-name}
 
-This optional alpha field contains the name of the node from which the condenser draws its outdoor air or the name of the conditioned zone where the condenser is located. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank and an outdoor air node name is entered, this node name must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If a zone name is entered, the temperature of that zone is used.
+This optional alpha field contains the name of the node from which the condenser draws its outdoor air or the name of the conditioned zone where the condenser is located. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank and an outdoor air node name is entered, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor air temperature is taken directly from the weather data. If a zone name is entered, the temperature of that zone is used.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-4-001}
 
-This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
+This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Condenser Refrigerant Operating Charge Inventory}\label{field-condenser-refrigerant-operating-charge-inventory}
 
@@ -2669,7 +2669,7 @@ This is the total heat recovered from the condenser inlet flow for defrost purpo
 
 \subsection{Refrigeration:Condenser:EvaporativeCooled}\label{refrigerationcondenserevaporativecooled}
 
-Each refrigeration system requires a single condenser.~ The evaporative cooled condenser object is one of four options for this condenser. In an evaporative-cooled condenser, the total heat of rejection is characterized by a four-factor relationship between the condensing temperature and the difference between the outside wetbulb and condensing temperatures. This curve must be developed by regression from the condenser manufacturers' literature. This rating curve, which is based upon rated data taken according to ARI 460 standards, also has an associated rated value for subcooling that should be entered. The rated condenser fan power and fan speed control type must be specified. If the condenser is not at ground level, the user may specify an air inlet node name (ref: OutdoorAir:Node name). Optional input is provided to help the user compare refrigerant inventories for different systems.~ These input represent the design values for the refrigerant inventory within the condenser, within a receiver beneath the condenser, and in the liquid pipes between the condenser and the refrigerated cases.
+Each refrigeration system requires a single condenser.~ The evaporative cooled condenser object is one of four options for this condenser. In an evaporative-cooled condenser, the total heat of rejection is characterized by a four-factor relationship between the condensing temperature and the difference between the outside wetbulb and condensing temperatures. This curve must be developed by regression from the condenser manufacturers' literature. This rating curve, which is based upon rated data taken according to ARI 460 standards, also has an associated rated value for subcooling that should be entered. The rated condenser fan power and fan speed control type must be specified. If the condenser is not at ground level, the user may specify an air inlet node name (ref: \hyperref[outdoorairnode]{OutdoorAir:Node} name). Optional input is provided to help the user compare refrigerant inventories for different systems.~ These input represent the design values for the refrigerant inventory within the condenser, within a receiver beneath the condenser, and in the liquid pipes between the condenser and the refrigerated cases.
 
 Additional inputs are needed for basin heater parameters, water pump power, and water source. An evaporative cooling availability schedule is available.
 
@@ -2741,7 +2741,7 @@ This numeric field is the maximum heat rejection capacity factor in the manufact
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-005}
 
-This optional alpha field contains the name of the node from which the condenser draws its outdoor air. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank, this node name must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data.
+This optional alpha field contains the name of the node from which the condenser draws its outdoor air. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor air temperature is taken directly from the weather data.
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-000}
 
@@ -2769,7 +2769,7 @@ For evaporative cooled condensers, the name of the optional schedule (Ref: Sched
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-5-000}
 
-This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
+This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Condenser Refrigerant Operating Charge Inventory}\label{field-condenser-refrigerant-operating-charge-inventory-1}
 
@@ -3056,7 +3056,7 @@ A node name for the water-side condenser outlet must be provided.
 
 \paragraph{Field: Water-Cooled Loop Flow Type}\label{field-water-cooled-loop-flow-type-1}
 
-The type of flow loop should be specified.~ The two choices are \textbf{VariableFlow}, in which a Pump:VariableSpeed must be included in the plant loop, or \textbf{ConstantFlow}, in which the loop circuit has a constant flow rate, typically associated with a Pump:ConstandSpeed object.~ If the flow type is VariableFlow, the flow needed to remove the condenser heat energy will be calculated and requested of the pump.~ If the flow type is ConstantFlow, the outlet water temperature will be determined based on the fixed loop flow rate and heat energy to be removed.~ The default type is VariableFlow. Refer to additional discussion in the Engineering Reference.
+The type of flow loop should be specified.~ The two choices are \textbf{VariableFlow}, in which a \hyperref[pumpvariablespeed]{Pump:VariableSpeed} must be included in the plant loop, or \textbf{ConstantFlow}, in which the loop circuit has a constant flow rate, typically associated with a Pump:ConstandSpeed object.~ If the flow type is VariableFlow, the flow needed to remove the condenser heat energy will be calculated and requested of the pump.~ If the flow type is ConstantFlow, the outlet water temperature will be determined based on the fixed loop flow rate and heat energy to be removed.~ The default type is VariableFlow. Refer to additional discussion in the Engineering Reference.
 
 \paragraph{Field: Water Outlet Temperature Schedule Name}\label{field-water-outlet-temperature-schedule-name}
 
@@ -3080,7 +3080,7 @@ This numeric field specifies the minimum allowed water temperature in degrees C 
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-6}
 
-This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature System''). A new meter for reporting is created for each unique subcategory (Ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
+This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature System''). A new meter for reporting is created for each unique subcategory (Ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Condenser Refrigerant Operating Charge Inventory}\label{field-condenser-refrigerant-operating-charge-inventory-2}
 
@@ -3240,7 +3240,7 @@ This is the mass flow rate of the water used to cool the condenser in kg/s.
 
 \subsection{Refrigeration:Condenser:Cascade}\label{refrigerationcondensercascade}
 
-The refrigeration system requires a single condenser.~ The cascade condenser object is one of four options for this condenser. The cascade condenser is unlike the other condenser options because it rejects heat to another, higher-temperature, refrigeration system. That is, the cascade condenser acts as a heat rejection object for one system, but acts as a refrigeration load for another system.~ Therefore, this object will be referenced twice: first for the system rejecting heat (see the field Refrigeration Condenser Name for the object Refrigeration:System), and second for the system absorbing the heat (see the input for the field Refrigeration Transfer Load or TransferLoad List Name for the object Refrigeration:System or the field Cascade Condenser Name or Secondary System Name for the object Refrigeration:TransferLoadList).
+The refrigeration system requires a single condenser.~ The cascade condenser object is one of four options for this condenser. The cascade condenser is unlike the other condenser options because it rejects heat to another, higher-temperature, refrigeration system. That is, the cascade condenser acts as a heat rejection object for one system, but acts as a refrigeration load for another system.~ Therefore, this object will be referenced twice: first for the system rejecting heat (see the field Refrigeration Condenser Name for the object \hyperref[refrigerationsystem]{Refrigeration:System}), and second for the system absorbing the heat (see the input for the field Refrigeration Transfer Load or TransferLoad List Name for the object \hyperref[refrigerationsystem]{Refrigeration:System} or the field Cascade Condenser Name or Secondary System Name for the object \hyperref[refrigerationtransferloadlist]{Refrigeration:TransferLoadList}).
 
 Manufacturer's data is required for the rated condensing temperature and the rated approach temperature difference. The user must also specify the condensing temperature control type.~ There are two choices. The user can specify ``Fixed'' and the condensing temperature will be held constant at the input value.~ The user can specify ``Float'' if they want the condensing temperature to be set by other refrigeration loads served by the higher-temperature system.
 
@@ -3334,7 +3334,7 @@ This is the total heat energy flowing across the condenser for the timestep bein
 
 \subsection{Refrigeration:GasCooler:AirCooled}\label{refrigerationgascooleraircooled}
 
-The transcritical refrigeration system requires a single gas cooler to reject the system heat.~ The total heat of rejection is characterized by a linear relationship between the difference between the outside dry-bulb and gas cooler outlet temperatures.~ The rated gas cooler fan power and fan speed control type must be specified.~ If the gas cooler is not at ground level, the user may specify an air inlet node name (Ref. OutdoorAir:Node name).~ Optional input is provided to help the user track refrigerant inventories.~ These inputs represent the design values for the refrigerant inventory within the gas cooler, within a receiver, and in the liquid pipes between the gas cooler and the refrigerated cases.
+The transcritical refrigeration system requires a single gas cooler to reject the system heat.~ The total heat of rejection is characterized by a linear relationship between the difference between the outside dry-bulb and gas cooler outlet temperatures.~ The rated gas cooler fan power and fan speed control type must be specified.~ If the gas cooler is not at ground level, the user may specify an air inlet node name (Ref. \hyperref[outdoorairnode]{OutdoorAir:Node} name).~ Optional input is provided to help the user track refrigerant inventories.~ These inputs represent the design values for the refrigerant inventory within the gas cooler, within a receiver, and in the liquid pipes between the gas cooler and the refrigerated cases.
 
 \subsubsection{Inputs}\label{inputs-12-013}
 
@@ -3344,7 +3344,7 @@ Identifies a particular gas cooler that rejects heat for a single refrigeration 
 
 \paragraph{Field: Rated Total Heat Rejection Rate Curve Name}\label{field-rated-total-heat-rejection-rate-curve-name}
 
-This field is the name of a curve object defining the gas cooler heat rejection as a function of the difference between the gas cooler outlet and entering air temperatures. The curve should be linear (Curve:Linear). See the Engineering Reference for more discussion on the curve coefficients.
+This field is the name of a curve object defining the gas cooler heat rejection as a function of the difference between the gas cooler outlet and entering air temperatures. The curve should be linear (\hyperref[curvelinear]{Curve:Linear}). See the Engineering Reference for more discussion on the curve coefficients.
 
 \paragraph{Field: Gas Cooler Fan Speed Control Type}\label{field-gas-cooler-fan-speed-control-type}
 
@@ -3376,11 +3376,11 @@ This numeric field specifies the minimum condensing temperature (C) required to 
 
 \textbf{\emph{Field: Air Inlet Node Name}}
 
-This optional alpha field contains the name of the node from which the gas cooler draws its outdoor air.~ If this field is left blank, the outdoor air dry-bulb temperature entering the gas cooler is taken directly from the weather data.~ If this field is not blank, this node name must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data.~ Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data.
+This optional alpha field contains the name of the node from which the gas cooler draws its outdoor air.~ If this field is left blank, the outdoor air dry-bulb temperature entering the gas cooler is taken directly from the weather data.~ If this field is not blank, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data.~ Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor air temperature is taken directly from the weather data.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-7}
 
-This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack'').~ A new meter for reporting is created for each unique subcategory (Ref. Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
+This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack'').~ A new meter for reporting is created for each unique subcategory (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Gas Cooler Refrigerant Operating Charge Inventory}\label{field-gas-cooler-refrigerant-operating-charge-inventory}
 
@@ -3470,7 +3470,7 @@ This is the total heat recovered from the gas cooler inlet flow for defrost purp
 
 \subsection{Refrigeration:TransferLoadList}\label{refrigerationtransferloadlist}
 
-A refrigeration system may provide cooling to other, secondary, systems through either a secondary loop or a cascade condenser (Ref. Refrigeration:SecondarySystem and Refrigeration:Condenser:Cascade). If multiple transfer loads are served by a single primary system, use this list to group them together for reference by the primary system (see the field ``Refrigeration Transfer Load or TransferLoad List Name'' in the Refrigeration:System object).
+A refrigeration system may provide cooling to other, secondary, systems through either a secondary loop or a cascade condenser (Ref. \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem} and \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade}). If multiple transfer loads are served by a single primary system, use this list to group them together for reference by the primary system (see the field ``Refrigeration Transfer Load or TransferLoad List Name'' in the \hyperref[refrigerationsystem]{Refrigeration:System} object).
 
 \subsubsection{Inputs}\label{inputs-13-011}
 
@@ -3480,7 +3480,7 @@ A unique user-assigned name for an instance of a refrigeration transfer load lis
 
 \paragraph{Field: Cascade Condenser Name or Secondary System Name}\label{field-cascade-condenser-name-or-secondary-system-name}
 
-Identifies a cascade condenser or secondary loop that is cooled, along with the other transfer loads listed here, by a single system. The name will be validated against the Refrigeration:SecondarySystem and Refrigeration:Condenser:Cascade names in the input file (the name will also be compared against all the other condenser names, but an error will be issued if it refers to any type of condenser other than a cascade condenser).
+Identifies a cascade condenser or secondary loop that is cooled, along with the other transfer loads listed here, by a single system. The name will be validated against the \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem} and \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade} names in the input file (the name will also be compared against all the other condenser names, but an error will be issued if it refers to any type of condenser other than a cascade condenser).
 
 The list is extensible; ten fields are provided in the IDD.
 
@@ -3496,7 +3496,7 @@ Refrigeration:TransferLoadList,
 
 \subsection{Refrigeration:SecondarySystem}\label{refrigerationsecondarysystem}
 
-A refrigeration secondary system works in conjunction with refrigerated cases and walkins (Ref. Refrigeration:SecondarySystem, Refrigeration:CaseAndWalkInList, Refrigeration:Case, and Refrigeration:WalkIn) to simulate the performance of a secondary loop supermarket refrigeration system. Heat from the refrigeration loads served by the secondary loop is absorbed by a primary refrigeration system (ref: Refrigeration:System). The SecondarySystem object simulates a heat exchanger that is an evaporator, or refrigeration load, on the primary refrigeration system.
+A refrigeration secondary system works in conjunction with refrigerated cases and walkins (Ref. Refrigeration:SecondarySystem, \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}, \hyperref[refrigerationcase]{Refrigeration:Case}, and \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}) to simulate the performance of a secondary loop supermarket refrigeration system. Heat from the refrigeration loads served by the secondary loop is absorbed by a primary refrigeration system (ref: \hyperref[refrigerationsystem]{Refrigeration:System}). The SecondarySystem object simulates a heat exchanger that is an evaporator, or refrigeration load, on the primary refrigeration system.
 
 The inputs for the refrigeration secondary system object include a name, which is also referenced to identify the load placed upon the primary refrigeration system. The inputs that describe the loads placed upon the secondary loop include the name of a single refrigerated case, the name of a single walk-in cooler, or a list of cases and walkin coolers.~ The circulating fluid type specifies whether or not the secondary fluid remains in the liquid state throughout the loop (e.g., a glycol or brine solution) or undergoes a partial phase change while serving the refrigeration loads (e.g., a CO\(_{2}\) liquid overfeed system). The circulating fluid name must also be specified and must correspond to a name used to provide the fluid properties.
 
@@ -3514,7 +3514,7 @@ A unique user-assigned name for an instance of a refrigeration secondary system.
 
 \paragraph{Field: Refrigerated Case or WalkIn or CaseAndWalkInList Name}\label{field-refrigerated-case-or-walkin-or-caseandwalkinlist-name-1}
 
-Identifies a single case, or walkin, or a particular list of refrigerated cases and walkins, that are cooled by this refrigeration secondary system. The name will be validated against the case, walkin, and CaseAndWalkInList names (ref. Refrigeration:Case, Refrigeration:WalkIn and Refrigeration:CaseAndWalkInList) in the input file.
+Identifies a single case, or walkin, or a particular list of refrigerated cases and walkins, that are cooled by this refrigeration secondary system. The name will be validated against the case, walkin, and CaseAndWalkInList names (ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn} and \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}) in the input file.
 
 \paragraph{Field: Circulating Fluid Type}\label{field-circulating-fluid-type}
 
@@ -3524,9 +3524,9 @@ Specifies whether the fluid is always liquid (e.g., glycol solution), or undergo
 
 The name of the secondary circulating fluid.
 
-For ``FluidAlwaysLiquid'', this name must correspond to either an ethylene or propylene glycol (ref: FluidProperties:GlycolConcentration) or to a user-defined glycol (ref: FluidProperties:Name and FluidProperties: GlycolConcentration) in the input file. Note that the corresponding property data, including FluidProperties:Concentration, FluidProperties:Temperatures, and FluidProperties:GlycolConcentration must also be included in the input file and are provided in GlycolPropertiesRefData.idf for typical ethylene and propylene glycols.
+For ``FluidAlwaysLiquid'', this name must correspond to either an ethylene or propylene glycol (ref: \hyperref[fluidpropertiesglycolconcentration]{FluidProperties:GlycolConcentration}) or to a user-defined glycol (ref: \hyperref[fluidpropertiesname]{FluidProperties:Name} and FluidProperties: GlycolConcentration) in the input file. Note that the corresponding property data, including \hyperref[fluidpropertiesconcentration]{FluidProperties:Concentration}, \hyperref[fluidpropertiestemperatures]{FluidProperties:Temperatures}, and \hyperref[fluidpropertiesglycolconcentration]{FluidProperties:GlycolConcentration} must also be included in the input file and are provided in GlycolPropertiesRefData.idf for typical ethylene and propylene glycols.
 
-For ``FluidPhaseChange'', the refrigerant used by the secondary system must be listed in the FluidProperties:Name object.~ The corresponding property data must also be supplied in the input file. Property data for many refrigererants, including R11, R123, R134A, R12, R22, R404A, R507A, R410A, and R744, are available in FluidPropertiesRefData.idf.
+For ``FluidPhaseChange'', the refrigerant used by the secondary system must be listed in the \hyperref[fluidpropertiesname]{FluidProperties:Name} object.~ The corresponding property data must also be supplied in the input file. Property data for many refrigererants, including R11, R123, R134A, R12, R22, R404A, R507A, R410A, and R744, are available in FluidPropertiesRefData.idf.
 
 \paragraph{Field: Evaporator Capacity}\label{field-evaporator-capacity}
 
@@ -3610,7 +3610,7 @@ The secondary loop is chilled by a primary system via a heat exchanger.~ This fi
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-8}
 
-This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
+This field allows the specification of a user-defined end-use subcategory (e.g., ``Low Temperature Rack''). A new meter for reporting is created for each unique subcategory (Ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is left blank, the equipment will be assigned to the ``General'' end-use subcategory.
 
 The following is an example input for a brine-type (``FluidAlwaysLiquid'')refrigeration secondary system.
 
@@ -3980,7 +3980,7 @@ This is the total cooling (sensible plus latent) from all air chillers located i
 
 \subsection{Refrigeration:AirChiller}\label{refrigerationairchiller}
 
-The Refrigeration:AirChiller object works in conjunction with a refrigeration chiller set, compressor rack, a refrigeration system, or a refrigeration secondary system object (Ref. ZoneHvac:RefrigerationChillerSet, and a Refrigeration:CompressorRack, Refrigeration:System, or Refrigeration:SecondarySystem) to simulate the performance of an air chiller, similar to one found in a refrigerated warehouse. The air chiller model uses information at rated conditions along with the zone conditions to determine performance. Energy use for fans and heaters is modeled based on inputs for nominal power, schedules, and control type. The refrigeration chiller model accounts for the sensible and latent heat exchange with the surrounding environment.
+The Refrigeration:AirChiller object works in conjunction with a refrigeration chiller set, compressor rack, a refrigeration system, or a refrigeration secondary system object (Ref. ZoneHvac:RefrigerationChillerSet, and a \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of an air chiller, similar to one found in a refrigerated warehouse. The air chiller model uses information at rated conditions along with the zone conditions to determine performance. Energy use for fans and heaters is modeled based on inputs for nominal power, schedules, and control type. The refrigeration chiller model accounts for the sensible and latent heat exchange with the surrounding environment.
 
 The refrigeration chiller cooler object inputs include a name, an availability schedule name, the rated cooling capacity, the rated operating temperature, the rated cooling source temperature, the rated total heating power and heating power schedule, the rated fan power and schedules, defrost type, defrost control type, defrost schedule name, drip-down schedule name, defrost power, the portion of the defrost energy used to melt ice (only for temperature termination control type), and refrigerant inventory.
 
@@ -3998,7 +3998,7 @@ The name of the schedule (ref: Schedule) that denotes whether the refrigeration 
 
 \paragraph{Field: Capacity Rating Type}\label{field-capacity-rating-type}
 
-The type of capacity rating used for this refrigeration chiller. Valid choices are UnitLoadFactorSensibleOnly, CapacityTotalSpecificConditions, EuropeanSC1Standard, EuropeanSC1NominalWet, EuropeanSC2Standard, EuropeanSC2NominalWet, EuropeanSC3Standard, EuropeanSC3NominalWet, EuropeanSC4Standard, EuropeanSC4NominalWet, EuropeanSC5Standard, and EuropeanSC5NominalWet. In each case, select the rating option that corresponds to the expected service conditions.~ For example, U.S. manufacturers quote a separate Unit Load Factor for wet or frosted coils.~ If the evaporating temperature is less than 0C, input the frosted coil value. Within the European convention, select SC1, 2, 3, 4, or 5 depending upon the expected evaporating temperature. This field is required and there is no default value. Refer to the Engineering Reference for further information on these rating types. NOTE: If the CapacityTotalSpecificConditions rating type is specified, the input file must include the manufacturer's coil capacity correction curve in tabular form using the Table:MultiVariableLookup object. An example of this may be found in the RefrigeratedWarehouse.idf example file.
+The type of capacity rating used for this refrigeration chiller. Valid choices are UnitLoadFactorSensibleOnly, CapacityTotalSpecificConditions, EuropeanSC1Standard, EuropeanSC1NominalWet, EuropeanSC2Standard, EuropeanSC2NominalWet, EuropeanSC3Standard, EuropeanSC3NominalWet, EuropeanSC4Standard, EuropeanSC4NominalWet, EuropeanSC5Standard, and EuropeanSC5NominalWet. In each case, select the rating option that corresponds to the expected service conditions.~ For example, U.S. manufacturers quote a separate Unit Load Factor for wet or frosted coils.~ If the evaporating temperature is less than 0C, input the frosted coil value. Within the European convention, select SC1, 2, 3, 4, or 5 depending upon the expected evaporating temperature. This field is required and there is no default value. Refer to the Engineering Reference for further information on these rating types. NOTE: If the CapacityTotalSpecificConditions rating type is specified, the input file must include the manufacturer's coil capacity correction curve in tabular form using the \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup} object. An example of this may be found in the RefrigeratedWarehouse.idf example file.
 
 \paragraph{NOTE -- ONLY ONE OF THE FOLLOWING TWO FIELDS IS USED}\label{note-only-one-of-the-following-two-fields-is-used}
 
@@ -4040,7 +4040,7 @@ The type of capacity correction curve used to account for the impact of the room
 
 \paragraph{Field: Capacity Correction Curve Name}\label{field-capacity-correction-curve-name}
 
-The name of the curve object defining the total refrigerating capacity. For correction curve types LinearSHR60 and QuadraticSHR, the independent variable is the Sensible Heat Ratio and the output values are between 1.0 and 2.0. For correction curve type European, EnergyPlus contains built-in capacity correction curves and specification of a capacity correction curve name is not required. For correction curve type TabularRHxDT1xTRoom, enter the name of a Table:MultiVariableLookup object that gives the total capacity (in W) as a function of RH, DT1, and Room Temperature; IN THAT ORDER. An example of a TabularRHxDT1xTRoom correction curve using the Table:MultiVariableLoopkup object may be found in the RefrigeratedWarehouse.idf example file.
+The name of the curve object defining the total refrigerating capacity. For correction curve types LinearSHR60 and QuadraticSHR, the independent variable is the Sensible Heat Ratio and the output values are between 1.0 and 2.0. For correction curve type European, EnergyPlus contains built-in capacity correction curves and specification of a capacity correction curve name is not required. For correction curve type TabularRHxDT1xTRoom, enter the name of a \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup} object that gives the total capacity (in W) as a function of RH, DT1, and Room Temperature; IN THAT ORDER. An example of a TabularRHxDT1xTRoom correction curve using the Table:MultiVariableLoopkup object may be found in the RefrigeratedWarehouse.idf example file.
 
 \paragraph{Field: SHR60 Correction Factor}\label{field-shr60-correction-factor}
 

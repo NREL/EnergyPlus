@@ -2,7 +2,7 @@
 
 \subsection{Input Descriptions}\label{input-descriptions}
 
-In the descriptions below, the fields for each input object will be described but the Energy+.idd descriptions will not be shown. Refer to the actual Energy+.idd file for complete specifications. Energy+.idd is a text file that can be viewed with many text editors or word processors. The Site:Location object will serve as an example.
+In the descriptions below, the fields for each input object will be described but the Energy+.idd descriptions will not be shown. Refer to the actual Energy+.idd file for complete specifications. Energy+.idd is a text file that can be viewed with many text editors or word processors. The \hyperref[sitelocation]{Site:Location} object will serve as an example.
 
 \begin{lstlisting}
 Site:Location,
@@ -43,13 +43,13 @@ Site:Location,
 
 The IDD excerpt above is the complete definition as seen in the IDD file.
 
-First, the object name is given. (Site:Location)~ This is followed by a comma in both the definition (IDD) and in an input file (IDF). In fact, all fields except the terminating field of an IDD class object and IDF object are followed by commas. The final field in an IDD class object or in an IDF object is terminated by a semi-colon.
+First, the object name is given. (\hyperref[sitelocation]{Site:Location})~ This is followed by a comma in both the definition (IDD) and in an input file (IDF). In fact, all fields except the terminating field of an IDD class object and IDF object are followed by commas. The final field in an IDD class object or in an IDF object is terminated by a semi-colon.
 
-Next is an alpha field, the location name. As noted above, for input, spaces are significant in this field. The main inputs for Site:Location are numeric fields. These are numbered (as is the alpha field) for convenience. The \textbackslash{} designations will show various information about the objects as described above in the IDD conventions discussion. Of importance for reading this document are the units and possible minimum and maximum values for a~ field.
+Next is an alpha field, the location name. As noted above, for input, spaces are significant in this field. The main inputs for \hyperref[sitelocation]{Site:Location} are numeric fields. These are numbered (as is the alpha field) for convenience. The \textbackslash{} designations will show various information about the objects as described above in the IDD conventions discussion. Of importance for reading this document are the units and possible minimum and maximum values for a~ field.
 
 There is automatic processing of the \textbackslash{}minimum, \textbackslash{}maximum and \textbackslash{}default data for numeric fields. Any infractions of the \textbackslash{}minimum, \textbackslash{}maximum fields are automatically detected and messages will appear in the standard error file. After all the input is checked, infractions will cause program termination (before the bulk of the simulation is completed). Defaults are also enforced if you leave the numeric field blank.
 
-Some objects need all the parameters listed by the definition; some do not. In the descriptions that follow, we will try to indicate which parts are optional. Usually, these will be the last fields in the object input or definition. Even if items are not used for a particular object (e.g.~Multiplier in the FenestrationSurface:Detailed and type = Door), the field must be included unless it is the \emph{last field in the object}. So, for this instance, one must include a multiplier field (must be numeric and would need to obey any \textbackslash{}minimum, \textbackslash{}maximum rules) for doors.
+Some objects need all the parameters listed by the definition; some do not. In the descriptions that follow, we will try to indicate which parts are optional. Usually, these will be the last fields in the object input or definition. Even if items are not used for a particular object (e.g.~Multiplier in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} and type = Door), the field must be included unless it is the \emph{last field in the object}. So, for this instance, one must include a multiplier field (must be numeric and would need to obey any \textbackslash{}minimum, \textbackslash{}maximum rules) for doors.
 
 Two spreadsheet files are included with the installation:
 
@@ -62,7 +62,7 @@ Two spreadsheet files are included with the installation:
 
 \subsection{Output Descriptions}\label{output-descriptions}
 
-In the descriptions below, we will endeavor to have each object's output displayed as well as each of the outputs described. The output variables for a run are selected by choosing the Output:VariableDictionary object. This object displays the available output variables for a run on the \textbf{eplusout.rdd} (regular variables) and \textbf{eplusout.mdd} (meter variables) files. Two significant styles are available for these displays and the descriptions below may have one for some objects and another for other objects. The variables are the same but will look a bit different.~ For clarity, the two displays are shown below:
+In the descriptions below, we will endeavor to have each object's output displayed as well as each of the outputs described. The output variables for a run are selected by choosing the \hyperref[output-variabledictionary]{\hyperref[outputvariable]{Output:Variable}Dictionary} object. This object displays the available output variables for a run on the \textbf{eplusout.rdd} (regular variables) and \textbf{eplusout.mdd} (meter variables) files. Two significant styles are available for these displays and the descriptions below may have one for some objects and another for other objects. The variables are the same but will look a bit different.~ For clarity, the two displays are shown below:
 
 Note that the IDF-Editor can interpret both sets of files and assist you in getting output variables into your input files. But you will have to successfully run your input file first.
 
@@ -70,7 +70,7 @@ The Simple (or regular) display looks like the following figure and is interpret
 
 \textbf{Zone/HVAC} -- when the output is produced at the ``Zone'' timestep (ref: number of timesteps in each hour) or at the ``HVAC'' aka System timestep (which can vary for each hour).
 
-\textbf{Average/Sum} -- whether this is a averaged value over the reporting period (such as a temperature or rate) or whether this is a summed value over the reporting period. Reporting periods are specified in the Output:Variable or Output:Meter objects.
+\textbf{Average/Sum} -- whether this is a averaged value over the reporting period (such as a temperature or rate) or whether this is a summed value over the reporting period. Reporting periods are specified in the \hyperref[outputvariable]{Output:Variable} or \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects.
 
 \textbf{\textless{}Variable Name\textgreater{}} -- The variable name one uses for reporting is displayed (e.g., Site Outdoor Drybulb Temperature) along with the units (e.g., {[}C{]}).
 
@@ -132,29 +132,29 @@ Example from the \textbf{eplusout.rdd} file:
 
 \begin{itemize}
 \item
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average {[}C{]}
+  \hyperref[outputvariable]{Output:Variable},*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average {[}C{]}
 \item
-  Output:Variable,*,Site Outdoor Air Dewpoint Temperature,hourly; !- Zone Average {[}C{]}
+  \hyperref[outputvariable]{Output:Variable},*,Site Outdoor Air Dewpoint Temperature,hourly; !- Zone Average {[}C{]}
 \item
-  Output:Variable,*,Site Outdoor Air Wetbulb Temperature,hourly; !- Zone Average {[}C{]}
+  \hyperref[outputvariable]{Output:Variable},*,Site Outdoor Air Wetbulb Temperature,hourly; !- Zone Average {[}C{]}
 \item
-  Output:Variable,*,Site Outdoor Air Humidity Ratio,hourly; !- Zone Average {[}kgWater/kgAir{]}
+  \hyperref[outputvariable]{Output:Variable},*,Site Outdoor Air Humidity Ratio,hourly; !- Zone Average {[}kgWater/kgAir{]}
 \item
-  Output:Variable,*,Site Outdoor Air Relative Humidity,hourly; !- Zone Average {[}\%{]}
+  \hyperref[outputvariable]{Output:Variable},*,Site Outdoor Air Relative Humidity,hourly; !- Zone Average {[}\%{]}
 \item
-  Output:Variable,*,Site Outdoor Air Barometric Pressure,hourly; !- Zone Average {[}Pa{]}
+  \hyperref[outputvariable]{Output:Variable},*,Site Outdoor Air Barometric Pressure,hourly; !- Zone Average {[}Pa{]}
 \item
-  Output:Variable,*,Zone Air System Sensible Heating Energy,hourly; !- HVAC Sum {[}J{]}
+  \hyperref[outputvariable]{Output:Variable},*,Zone Air System Sensible Heating Energy,hourly; !- HVAC Sum {[}J{]}
 \item
-  Output:Variable,*,Zone Air System Sensible Cooling Energy,hourly; !- HVAC Sum {[}J{]}
+  \hyperref[outputvariable]{Output:Variable},*,Zone Air System Sensible Cooling Energy,hourly; !- HVAC Sum {[}J{]}
 \item
-  Output:Variable,*,Zone Air System Sensible Heating Rate,hourly; !- HVAC Average {[}W{]}
+  \hyperref[outputvariable]{Output:Variable},*,Zone Air System Sensible Heating Rate,hourly; !- HVAC Average {[}W{]}
 \item
-  Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly; !- HVAC Average {[}W{]}
+  \hyperref[outputvariable]{Output:Variable},*,Zone Air System Sensible Cooling Rate,hourly; !- HVAC Average {[}W{]}
 \item
-  Output:Variable,*,Zone Air Temperature,hourly; !- HVAC Average {[}C{]}
+  \hyperref[outputvariable]{Output:Variable},*,Zone Air Temperature,hourly; !- HVAC Average {[}C{]}
 \item
-  Output:Variable,*,Zone Thermostat Air Temperature,hourly; !- HVAC Average {[}C{]}
+  \hyperref[outputvariable]{Output:Variable},*,Zone Thermostat Air Temperature,hourly; !- HVAC Average {[}C{]}
 \end{itemize}
 
 All of the same information appears in a slightly different form and defaults to ``hourly'' reporting frequency (which, of course, can be changed when you put it into your input file). The ``*'' is preselected so that you would be reporting for all those items.
