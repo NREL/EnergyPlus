@@ -182,14 +182,14 @@ The System Summary Report (key: SystemSummary) produces a report that includes t
 \item
   Demand Controlled Ventilation table is for each \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation} object and shows the name, the nominal outdoor air per person and the nominal outdoor air per zone area.
 \item
-  Time Not Comfortable Based on Simple ASHRAE 55-2004 table shows how many hours that the space is not comfortable for each zone under the criteria of assuming winter clothes, summer clothes or both summer and winter clothes.~ See the People object for more information about this thermal comfort calculation.
+  Time Not Comfortable Based on Simple ASHRAE 55-2004 table shows how many hours that the space is not comfortable for each zone under the criteria of assuming winter clothes, summer clothes or both summer and winter clothes.~ See the \hyperref[people]{People} object for more information about this thermal comfort calculation.
 \item
   Time Setpoint is Not Met table shows how many hours the space is more than 0.2C from the setpoint during heating and during cooling.~ The last two columns indicate those hours that the setpoint is not met while the space is occupied.
 \end{itemize}
 
 \paragraph{Adaptive Comfort Summary}\label{adaptive-comfort-summary}
 
-The Adaptive Comfort Summary report (key: AdaptiveComfortSummary) produces a report tabulating the sum of occupied hours not meeting adaptive comfort acceptability limits for each relevant People object (People objects for which adaptive comfort calculations are requested). These acceptability limits include ASHRAE Std. 55 80\%, ASHRAE Std. 55 90\%, CEN-15251 Category I, CEN-15251 Category II, and CEN-15251 Category III.
+The Adaptive Comfort Summary report (key: AdaptiveComfortSummary) produces a report tabulating the sum of occupied hours not meeting adaptive comfort acceptability limits for each relevant \hyperref[people]{People} object (\hyperref[people]{People} objects for which adaptive comfort calculations are requested). These acceptability limits include ASHRAE Std. 55 80\%, ASHRAE Std. 55 90\%, CEN-15251 Category I, CEN-15251 Category II, and CEN-15251 Category III.
 
 \paragraph{Sensible Heat Gain Summary}\label{sensible-heat-gain-summary}
 
@@ -327,7 +327,7 @@ The report has six parts:
   Estimated Cooling Peak Load Components
 \end{itemize}
 
-Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-delay column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For People and Lights the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
+Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-delay column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For \hyperref[people]{People} and \hyperref[lights-000]{Lights} the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
 
 \begin{itemize}
 \tightlist
@@ -352,7 +352,7 @@ This table shows some ratios that may be handy in evaluating the results. It con
   Estimated Heating Peak Load Components
 \end{itemize}
 
-Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-day column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For People and Lights the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
+Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-day column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For \hyperref[people]{People} and \hyperref[lights-000]{Lights} the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
 
 \begin{itemize}
 \tightlist

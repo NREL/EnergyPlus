@@ -197,7 +197,7 @@ This field is used to determine the heat transfer algorithm that is to be applie
 
 \paragraph{Field: Construction Name}\label{field-construction-name}
 
-This field is the name of a Construction object defined elsewhere. All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm selected in the previous field.
+This field is the name of a \hyperref[construction-000]{Construction} object defined elsewhere. All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm selected in the previous field.
 
 An example IDF object follows.
 
@@ -1642,7 +1642,7 @@ The convection coefficients of each surface, both exterior and interior, are aut
 Note that using these in conjunction, in particular, the ``Simple'' option on either the Outside Convection Algorithm or the Zone Outside Convection Algorithm field will result in a combined coefficient regardless of choice chosen here.
 
 \begin{callout}
-Note that surfaces with ``\hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients}'' cannot use this object with the ``outside'' coefficient -- attempting to do so will cause a severe error; \hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients} surfaces can apply an ``inside'' coefficient. And, surfaces with ``Ground'' exposure do not use the ``outside'' coefficient that might be supplied here. Note, too, that some lower boundaries are used regardless by certain surface types (i.e.~Window) or certain algorithm types.
+Note that surfaces with ``\hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients}'' cannot use this object with the ``outside'' coefficient -- attempting to do so will cause a severe error; \hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients} surfaces can apply an ``inside'' coefficient. And, surfaces with ``Ground'' exposure do not use the ``outside'' coefficient that might be supplied here. Note, too, that some lower boundaries are used regardless by certain surface types (i.e.~\hyperref[window]{Window}) or certain algorithm types.
 \end{callout}
 
 \subsubsection{Inputs}\label{inputs-10}
@@ -1787,7 +1787,7 @@ The convection coefficients of each surface, both outside and inside, are automa
 
 Note that using these in conjunction, in particular, the ``Simple'' option on either the Outside Convection Algorithm or the Zone Outside Convection Algorithm field will result in a combined coefficient regardless of choice chosen here.
 
-Note that surfaces with ``\hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients}'' cannot use this object with the ``outside'' coefficient -- attempting to do so will ignore OSC surfaces during a multiple surface ``apply''; \hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients} surfaces can apply an ``inside'' coefficient. And, surfaces with ``Ground'' exposure do not use the ``outside'' coefficient that might be supplied here. Note, too, that some lower boundaries are used regardless by certain surface types (i.e.~Window) or certain algorithm types.
+Note that surfaces with ``\hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients}'' cannot use this object with the ``outside'' coefficient -- attempting to do so will ignore OSC surfaces during a multiple surface ``apply''; \hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients} surfaces can apply an ``inside'' coefficient. And, surfaces with ``Ground'' exposure do not use the ``outside'' coefficient that might be supplied here. Note, too, that some lower boundaries are used regardless by certain surface types (i.e.~\hyperref[window]{Window}) or certain algorithm types.
 
 \subsubsection{Inputs}\label{inputs-11}
 
@@ -2263,7 +2263,7 @@ This field is used to enter a factor that accounts for the extra surface area re
 
 \paragraph{Field: Roughness of Exterior Surface}\label{field-roughness-of-exterior-surface}
 
-This field is used to describe the relative roughness of the baffle material. This field is similar to one in the \textbf{Material} object. This parameter only influences the convection coefficients, more specifically the exterior convection coefficient. A special keyword is expected in this field with the options being ``VeryRough'', ``Rough'', ``MediumRough'', ``MediumSmooth'', ``Smooth'', and ``VerySmooth'' in order of roughest to smoothest options.
+This field is used to describe the relative roughness of the baffle material. This field is similar to one in the \textbf{\hyperref[material]{Material}} object. This parameter only influences the convection coefficients, more specifically the exterior convection coefficient. A special keyword is expected in this field with the options being ``VeryRough'', ``Rough'', ``MediumRough'', ``MediumSmooth'', ``Smooth'', and ``VerySmooth'' in order of roughest to smoothest options.
 
 \paragraph{Field: Effectiveness for Perforations with Respect to Wind}\label{field-effectiveness-for-perforations-with-respect-to-wind}
 
@@ -2364,7 +2364,7 @@ The building surface associated with this object (ref \hyperref[buildingsurfaced
 
 \paragraph{Field: Construction Name}\label{field-construction-name-1}
 
-The building construction associated with this object (ref Construction). It is possible that the Energy Management System will change the construction associated with the surface; if the construction is changed, a new set of data may need to be applied to the current surface.
+The building construction associated with this object (ref \hyperref[construction-000]{Construction}). It is possible that the Energy Management System will change the construction associated with the surface; if the construction is changed, a new set of data may need to be applied to the current surface.
 
 \paragraph{Field: Inside Surface Incident Sun Solar Radiation Schedule Name}\label{field-inside-surface-incident-sun-solar-radiation-schedule-name}
 
@@ -2407,7 +2407,7 @@ The fenestration surface associated with this object (ref \hyperref[fenestration
 
 \paragraph{Field: Construction Name}\label{field-construction-name-2}
 
-The building construction associated with this object (ref Construction). It is possible that the Energy Management System will change the construction associated with the surface; if the construction is changed, a new set of data may need to be applied to the current surface.
+The building construction associated with this object (ref \hyperref[construction-000]{Construction}). It is possible that the Energy Management System will change the construction associated with the surface; if the construction is changed, a new set of data may need to be applied to the current surface.
 
 \paragraph{Field: Layer 1 Solar Radiation Absorbed Schedule Name}\label{field-layer-1-solar-radiation-absorbed-schedule-name}
 
@@ -2482,7 +2482,7 @@ This object should be used with considerable care since it will completely alter
 
 The surface geometry must be set to \textbf{Relative}, see \textbf{\hyperref[globalgeometryrules]{GlobalGeometryRules}}. Of course, the coordinates must be entered in relative coordinates as well.
 
-Since windows in EnergyPlus need to be rectangular, it is possible to define a horizontal window (skylight) that once transformed is no longer rectangular and will cause EnergyPlus to halt. To avoid this problem, horizontal windows should be defined orthogonal to the Cardinal directions and building rotation (see \textbf{Building}) used to orient the final form with respect to North.
+Since windows in EnergyPlus need to be rectangular, it is possible to define a horizontal window (skylight) that once transformed is no longer rectangular and will cause EnergyPlus to halt. To avoid this problem, horizontal windows should be defined orthogonal to the Cardinal directions and building rotation (see \textbf{\hyperref[building]{Building}}) used to orient the final form with respect to North.
 
 The object doesn't create any specific output, but the results of using it can be understood by viewing DXF output files. Figure~\ref{fig:example-of-geometry-transform-aspect-ratio} shows an example of a building that has been morphed using the Aspect Ratio Transform object. Using this object allowed the same geometry input to generate both of the models represented in by their DXF output files.
 
