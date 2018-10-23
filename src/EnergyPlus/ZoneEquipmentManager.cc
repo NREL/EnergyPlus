@@ -4393,6 +4393,16 @@ namespace ZoneEquipmentManager {
             ShowFatalError("DistributeSystemOutputRequired: Illegal load distribution scheme type.");
             break;
         }
+        // For every load distribution scheme except SequentialLoad
+        //  set the remaining loads to the first equipment type's load to support equipment types that don't use the sequenced loads
+        if (thisZEqList.LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading) {
+            energy.RemainingOutputRequired = energy.SequencedOutputRequired(1);
+            moisture.RemainingOutputRequired = moisture.SequencedOutputRequired(1);
+            energy.RemainingOutputReqToHeatSP = energy.SequencedOutputRequiredToHeatingSP(1);
+            moisture.RemainingOutputReqToHumidSP = moisture.SequencedOutputRequiredToHumidSP(1);
+            energy.RemainingOutputReqToCoolSP = energy.SequencedOutputRequiredToCoolingSP(1);
+            moisture.RemainingOutputReqToDehumidSP = moisture.SequencedOutputRequiredToDehumidSP(1);
+        }
     }
 
     void UpdateSystemOutputRequired(int const ZoneNum,
