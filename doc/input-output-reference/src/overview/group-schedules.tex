@@ -473,7 +473,7 @@ This field should contain a unique (between \hyperref[scheduleyear]{Schedule:Yea
 
 This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see \hyperref[scheduletypelimits]{ScheduleTypeLimits} object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
 
-\paragraph{Field: File Name}\label{field-file-name}
+\paragraph{Field: File Name}\label{schedulefile-field-file-name}
 
 This field contains the name of the file that contains the data for the schedule. The field should include a full path with file name, for best results. The field must be \(\le\) 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
 
@@ -580,7 +580,7 @@ With a Schedule:File:Shading object defined, the shading schedules for all exter
 
 \subsubsection{Inputs}\label{inputs-schedule-file-shading}
 
-\paragraph{Field: File Name}\label{field-file-name}
+\paragraph{Field: File Name}\label{schedulefileshading-field-file-name}
 
 This field contains the name of the file that contains the data for the shading schedules. The field should include a full path with file name, for best results. The field must be \(\le\) 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
 
