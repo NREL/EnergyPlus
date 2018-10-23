@@ -178,7 +178,7 @@ AirTerminal:SingleDuct:UserDefined,
 
 \subsection{Coil:UserDefined}\label{coiluserdefined}
 
-This object is used to define a generic coil for custom component modeling of a device that processes air as part of an air handeler. The Coil:UserDefined object appears directly on a Branch object used to define the supply side of an air handler, or in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} object used to define outdoor air systems. This object has one or two air connections and an optional plant connection. Water storage tanks can be connected for supply or collection. An ambient zone can be connected for skin losses to be treated as separate internal gains.
+This object is used to define a generic coil for custom component modeling of a device that processes air as part of an air handeler. The Coil:UserDefined object appears directly on a \hyperref[branch]{Branch} object used to define the supply side of an air handler, or in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} object used to define outdoor air systems. This object has one or two air connections and an optional plant connection. Water storage tanks can be connected for supply or collection. An ambient zone can be connected for skin losses to be treated as separate internal gains.
 
 \subsubsection{Field: Name}\label{field-name-2-041}
 
@@ -286,7 +286,7 @@ EnergyManagementSystem:Program,
 
 This object is used to define a generic plant component for custom component models. This object can connect to up to four different plant loops. There is an optional air connection that can be used as an air-based source or heat rejection connection. Water storage tanks can be connected for supply or collection. An ambient zone can be connected for skin losses to be treated as separate internal gains.
 
-The PlantComponent:UserDefined object appears directly on the Branch object used to describe the plant.
+The PlantComponent:UserDefined object appears directly on the \hyperref[branch]{Branch} object used to describe the plant.
 
 \subsubsection{Field: Name}\label{field-name-3-035}
 

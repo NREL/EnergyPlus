@@ -211,7 +211,9 @@ This field specifies the heat transfer effectiveness between the use side water 
 
 \paragraph{Field: Source Side Inlet Node Name}\label{field-source-side-inlet-node-name-000}
 
-The inlet node connection to the plant loop for the source side of the water heater. Typically the source side draws cold water from the tank and returns warmer water.~ The source side volume flow rate is obtained from the plant loop.~ The magnitude of the flow rates through the source side can be controlled by setting the Maximum Branch Flow Rate field in the \textbf{Branch} object that connects the source inlet node.
+The inlet node connection to the plant loop for the source side of the water heater. Typically the source side draws cold water from the tank and returns warmer water.
+The source side volume flow rate is obtained from the plant loop.
+The magnitude of the flow rates through the source side can be controlled by setting the Maximum Branch Flow Rate field in the \textbf{\hyperref[branch]{Branch}} object that connects the source inlet node.
 
 \paragraph{Field: Source Side Outlet Node Name}\label{field-source-side-outlet-node-name-000}
 
@@ -1073,7 +1075,7 @@ This field describes which of several methods are to be used for sizing the wate
 \item
   \textbf{ResidentialHUD-FHAMinimum} This design method is based on minimum permissible water heater sizes (established by HUD-FHA in its Minimum Property Standards for One- and Two-Family Living Units, No. 4900.1-1982).~ The user enters the number of bathrooms and bedrooms in this input object.~ The smallest allowable water heater sizes are used.
 \item
-  \textbf{PerPerson} This design method scales sizes based on the total number of people in all zones in the building.~ Each water heater in the model will be sized using the total (peak, design) number of people for the entire model.~ The number of people is determined from People objects defined elsewhere in the input file
+  \textbf{PerPerson} This design method scales sizes based on the total number of people in all zones in the building.~ Each water heater in the model will be sized using the total (peak, design) number of people for the entire model.~ The number of people is determined from \hyperref[people]{People} objects defined elsewhere in the input file
 \item
   \textbf{PerFloorArea} This design method scales sizes based on the total floor area in all the zones in the building.~ Each water heater in the model will be sized using all the floor area in the model.~ The floor areas are determined from the geometry input elsewhere in the input file.
 \item
