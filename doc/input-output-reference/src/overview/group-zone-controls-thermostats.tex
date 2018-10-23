@@ -858,11 +858,11 @@ Name of the zone or set of zones that is being controlled. When the \hyperref[zo
 
 \paragraph{Field: Averaging Method}\label{field-averaging-method}
 
-This choice field specifies the method for calculating the thermal comfort dry-bulb temperature setpoint for a zone with multiple People objects defined. The available choices are: \textbf{SpecificObject}, \textbf{ObjectAverage}, and \textbf{PeopleAverage}. This field is only used when multiple people objects are defined for this zone. If this field is specified as \textbf{PeopleAverage} and the total number of people for all people objects is zero for a particular timestep, the PeopleAverage method cannot be applied and the program automatically uses the ObjectAverage method for this timestep. The default input is \textbf{PeopleAverage}.
+This choice field specifies the method for calculating the thermal comfort dry-bulb temperature setpoint for a zone with multiple \hyperref[people]{People} objects defined. The available choices are: \textbf{SpecificObject}, \textbf{ObjectAverage}, and \textbf{\hyperref[people]{People}Average}. This field is only used when multiple people objects are defined for this zone. If this field is specified as \textbf{\hyperref[people]{People}Average} and the total number of people for all people objects is zero for a particular timestep, the \hyperref[people]{People}Average method cannot be applied and the program automatically uses the ObjectAverage method for this timestep. The default input is \textbf{\hyperref[people]{People}Average}.
 
 \paragraph{Field: Object Name for Specific Object Averaging Method}\label{field-object-name-for-specific-object-averaging-method}
 
-This choice field specifies the name of the specific People object to be used for calculating comfort control when multiple People objects are defined. Only used if the Averaging Method is specified as SpecificObject.
+This choice field specifies the name of the specific \hyperref[people]{People} object to be used for calculating comfort control when multiple \hyperref[people]{People} objects are defined. Only used if the Averaging Method is specified as SpecificObject.
 
 \paragraph{Field: Minimum Dry-Bulb Temperature Setpoint}\label{field-minimum-dry-bulb-temperature-setpoint}
 
