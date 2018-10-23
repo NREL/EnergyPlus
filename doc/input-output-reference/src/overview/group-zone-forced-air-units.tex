@@ -1011,7 +1011,7 @@ Note that Fan:SystemModel was added as of version 8.7 and is recommended for use
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-1-000}
 
-This field is the name of a fan (ref: Fan:SystemModel, Fan:OnOff, Fan:ConstantVolume, Fan: VariableVolume) that is part of the unit ventilator system. This name links the unit ventilator to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit ventilator system.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:OnOff, Fan:ConstantVolume, Fan:VariableVolume) that is part of the unit ventilator system. This name links the unit ventilator to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit ventilator system.
 
 \paragraph{Field: Coil Option}\label{field-coil-option}
 
@@ -1105,7 +1105,7 @@ ZoneHVAC:UnitVentilator,
       Zone1UnitVentOAInNode,   !- Outdoor Air Node Name
       Zone1UnitVentExhNode,    !- Exhaust Air Node Name
       Zone1UnitVentOAMixerOutletNode,  !- Mixed Air Node Name
-      Fan: ConstantVolume,     !- Supply Air Fan Object Type
+      Fan:ConstantVolume,     !- Supply Air Fan Object Type
       Zone1UnitVentFan,        !- Fan Name
       HeatingAndCooling,       !- Coil Option
       Coil:Heating:Water,      !- Heating Coil Object Type
@@ -1348,7 +1348,7 @@ ZoneHVAC:UnitHeater,
       UnitHeatAvailability,    !- Availability Schedule Name
       Zone1UnitHeatAirInletNode,  !- Air Inlet Node Name
       Zone1UnitHeatAirOutletNode,  !- Air Outlet Node Name
-      Fan: ConstantVolume,     !- Supply Air Fan Object Type
+      Fan:ConstantVolume,     !- Supply Air Fan Object Type
       Zone1UnitHeatFan,        !- Fan Name
       0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
       Continuous,              !- Fan Control Type
@@ -1646,7 +1646,7 @@ This field contains a schedule name (ref: Schedule) that contains values for mod
 
 \paragraph{Field: Supply Fan Name}\label{field-supply-fan-name-000}
 
-This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan: VariableVolume) that is part of the zone outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the outdoor air control unit.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan:VariableVolume) that is part of the zone outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the outdoor air control unit.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-1-001}
 
@@ -1663,7 +1663,7 @@ If the user does not select a fan placement type, \textbf{DrawThrough} is assume
 
 \paragraph{Field: Exhaust Fan Name}\label{field-exhaust-fan-name}
 
-This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan: VariableVolume) that is part of the outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. This field is optional.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan:VariableVolume) that is part of the outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. This field is optional.
 
 \paragraph{Field: Exhaust Air Flow Rate}\label{field-exhaust-air-flow-rate}
 
