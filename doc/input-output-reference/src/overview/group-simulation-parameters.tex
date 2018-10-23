@@ -353,7 +353,7 @@ Four values are allowed to select which solution will be used.
   \item
     \hyperref[materialpropertyvariablethermalconductivity]{MaterialProperty:VariableThermalConductivity}
   \item
-    \hyperref[materialpropertyphasechangehysteresis]{\hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}Hysteresis}
+    \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis}
   \end{itemize}
 \item
   \textbf{Advanced/Research usage:} The \textbf{CombinedHeatAndMoistureFiniteElement} is a coupled heat and moisture transfer and storage solution. The solution technique uses a one dimensional finite difference solution in the construction elements and requires further material properties described in the Heat and Moisture Transfer material properties objects. Outputs from the algorithm are described with these objects. The Heat and Moisture Transfer property objects are:
@@ -930,7 +930,7 @@ This field must be a valid output variable name or a valid meter name. Additiona
 
 \subsection{Custom Meter Examples}\label{custom-meter-examples}
 
-Details of the \hyperref[metercustom]{Meter:Custom}/\hyperref[metercustomdecrement]{\hyperref[metercustom]{Meter:Custom}Decrement} are shown on the Meter Details file.
+Details of the \hyperref[metercustom]{Meter:Custom}/\hyperref[metercustomdecrement]{Meter:CustomDecrement} are shown on the Meter Details file.
 
 In the following examples, the custom meters are set up to illustrate the capabilities of custom meters. Custom meter ``\textbf{MyGeneralLights}'' duplicates the InteriorLights:Electricity meter. Custom meter ``\textbf{MyBuildingElectric}'' duplicates the Electricity:Building meter (by specifying that meter). Custom Meter (Decrement) ``\textbf{MyBuildingOther}'' uses the Electricity:Building meter as the source meter and subtracts out the values for MyGeneralLights (aka InteriorLights:Electricity). The resultant value for the MyBuildingOther meter should be equal to the value for the meters Electricity:Building -- InteriorLights:Electricity.
 

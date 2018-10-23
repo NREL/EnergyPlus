@@ -5,12 +5,12 @@ There are two ways to model a supermarket refrigeration system.~ The first, and 
 For the first approach, the input objects needed are:
 
 \begin{itemize}
-  \item  One \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack} object
+  \item  One \hyperref[refrigerationcompressorrack]{Refrigeration:CompressorRack} object
   \item  At least one refrigeration load, which may be any combination of:
   \begin{itemize}
     \item  \hyperref[refrigerationcase]{Refrigeration:Case} or
     \item  \hyperref[refrigerationwalkin]{Refrigeration:WalkIn} or
-    \item  \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList} objects .
+    \item  \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList} objects .
   \end{itemize}
 \end{itemize}
 
@@ -24,13 +24,13 @@ For the detailed approach, the input objects needed are:
   \begin{itemize}
     \item  \hyperref[refrigerationcase]{Refrigeration:Case},
     \item  \hyperref[refrigerationwalkin]{Refrigeration:WalkIn},
-    \item  \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList} (may include any combination of cases and walk in cooler names, OR, a list of air chiller names)
+    \item  \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList} (may include any combination of cases and walk in cooler names, OR, a list of air chiller names)
     \item  \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem},
     \item  \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade} (as a load, cooling a lower-temperature system) objects,
     \item  \hyperref[refrigerationtransferloadlist]{Refrigeration:TransferLoadList} (may include cascade condenser loads and/or secondary loop loads)
     \item  \hyperref[refrigerationairchiller]{Refrigeration:AirChiller}
   \end{itemize}
-  \item  At least one \hyperref[refrigerationcompressor]{Refrigeration:Compressor} object (multiple compressors are entered using a \hyperref[refrigerationcompressorlist]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}List}),
+  \item  At least one \hyperref[refrigerationcompressor]{Refrigeration:Compressor} object (multiple compressors are entered using a \hyperref[refrigerationcompressorlist]{Refrigeration:CompressorList}),
   \item  One condenser object which may be either:
   \begin{itemize}
     \item  \hyperref[refrigerationcondenseraircooled]{Refrigeration:Condenser:AirCooled},
@@ -163,7 +163,7 @@ When the condenser type is ``EvaporativelyCooled'', this field is used to define
 
 \paragraph{Field: Condenser Air Inlet Node Name}\label{field-condenser-air-inlet-node-name-000}
 
-This optional alpha field contains the name of the node from which the outdoor compressor rack condenser draws its outdoor air. This field is applicable only when the heat rejection location is ``Outdoors'' (if the heat rejection location is ``Zone'', this field is disregarded). If this field is left blank, the outdoor air temperature entering the condenser (dry-bulb or wet-bulb) is taken directly from the weather data. If this field is not blank, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor air temperature is taken directly from the weather data.
+This optional alpha field contains the name of the node from which the outdoor compressor rack condenser draws its outdoor air. This field is applicable only when the heat rejection location is ``Outdoors'' (if the heat rejection location is ``Zone'', this field is disregarded). If this field is left blank, the outdoor air temperature entering the condenser (dry-bulb or wet-bulb) is taken directly from the weather data. If this field is not blank, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air temperature is taken directly from the weather data.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-003}
 
@@ -482,7 +482,7 @@ These are the sensible heating energy, in Joules or Watts, provided to the HVAC 
 
 \subsection{Refrigeration:Case}\label{refrigerationcase}
 
-The Refrigeration Case object works in conjunction with a compressor rack, a refrigeration system, or a secondary loop object (\hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of a refrigerated case system. The refrigerated case model uses performance information at rated conditions along with performance curves for latent case credits and defrost heat load to determine performance at off-rated conditions. Energy use for lights, fans and anti-sweat heaters is modeled based on inputs for nominal power, schedules, and control type. The refrigerated case model accounts for the sensible and latent heat exchange with the surrounding environment (termed ``case credits'') which impacts the temperature and humidity in the zone where the case is located.
+The Refrigeration Case object works in conjunction with a compressor rack, a refrigeration system, or a secondary loop object (\hyperref[refrigerationcompressorrack]{Refrigeration:CompressorRack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of a refrigerated case system. The refrigerated case model uses performance information at rated conditions along with performance curves for latent case credits and defrost heat load to determine performance at off-rated conditions. Energy use for lights, fans and anti-sweat heaters is modeled based on inputs for nominal power, schedules, and control type. The refrigerated case model accounts for the sensible and latent heat exchange with the surrounding environment (termed ``case credits'') which impacts the temperature and humidity in the zone where the case is located.
 
 \textbf{\emph{A dataset has been provided containing refrigerated case input data for a large number of refrigerated cases from multiple manufacturers. See RefrigerationCases.idf.}}
 
@@ -508,7 +508,7 @@ The name of the schedule (ref: Schedule) that denotes whether the refrigerated c
 
 \paragraph{Field: Zone Name}\label{field-zone-name-010}
 
-The name of the zone where the refrigerated case is located. The refrigerated case will impact the air heat balance in this zone. When modeling multiple refrigerated cases connected to a single compressor rack where the condenser heat is rejected to the zone (ref: \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}), \textbf{all} of the refrigerated cases connected to that compressor rack must be located in the same zone.
+The name of the zone where the refrigerated case is located. The refrigerated case will impact the air heat balance in this zone. When modeling multiple refrigerated cases connected to a single compressor rack where the condenser heat is rejected to the zone (ref: \hyperref[refrigerationcompressorrack]{Refrigeration:CompressorRack}), \textbf{all} of the refrigerated cases connected to that compressor rack must be located in the same zone.
 
 \paragraph{Field: Rated Ambient Temperature}\label{field-rated-ambient-temperature}
 
@@ -961,7 +961,7 @@ Refrigeration:CaseAndWalkInList,
 
 \subsection{Refrigeration:WalkIn}\label{refrigerationwalkin}
 
-The Refrigeration WalkIn object works in conjunction with a compressor rack, a refrigeration system, or a refrigeration secondary system object (Ref. \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of a walk-in cooler. The walk-in cooler model uses information at rated conditions along with input descriptions for heat transfer surfaces facing multiple zones to determine performance. Energy use for lights, fans, and floor and anti-sweat heaters is modeled based on inputs for nominal power, schedules, and control type. The walk-in cooler model accounts for the sensible and latent heat exchange with the surrounding environment (termed ``case credits'') which impacts the temperature and humidity in each zone adjacent to the walk-in.
+The Refrigeration WalkIn object works in conjunction with a compressor rack, a refrigeration system, or a refrigeration secondary system object (Ref. \hyperref[refrigerationcompressorrack]{Refrigeration:CompressorRack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of a walk-in cooler. The walk-in cooler model uses information at rated conditions along with input descriptions for heat transfer surfaces facing multiple zones to determine performance. Energy use for lights, fans, and floor and anti-sweat heaters is modeled based on inputs for nominal power, schedules, and control type. The walk-in cooler model accounts for the sensible and latent heat exchange with the surrounding environment (termed ``case credits'') which impacts the temperature and humidity in each zone adjacent to the walk-in.
 
 The walk-in cooler object inputs include a name, an availability schedule name, the rated cooling capacity, the rated operating temperature, the rated cooling source temperature, the rated total heating power and heating power schedule, the rated fan and lighting power and schedules, defrost type, defrost control type, defrost schedule name, drip-down schedule name, defrost power, the portion of the defrost energy used to melt ice (only for temperature termination control type), restocking schedule, refrigerant inventory, and the floor area and U-value.
 
@@ -1298,9 +1298,9 @@ This field is the amount of latent cooling (dehumidification) case credit energy
 
 The refrigeration system object simulates the performance of a supermarket refrigeration system when used along with other objects to define the refrigeration load(s), the compressor(s), and the condenser.
 
-At least one refrigeration load object must be defined which may be one of four types of load, a refrigerated case, a walk-in cooler, a chiller providing refrigeration to a secondary loop, or a cascade condenser which absorbs heat rejected by a lower-temperature system (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem},~ and \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade}) If multiple loads are served by the same system , the user should use one or both of the list objects available to assign loads to the system. The first list includes all cases and walkins cooled directly by this system (Ref. \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}). The second list includes any `transfer' loads, that is refrigeration loads borne by this system that are transferred from another refrigeration system via either a secondary loop chiller or a cascade condenser (Ref. \hyperref[refrigerationtransferloadlist]{Refrigeration:TransferLoadList}, see the Engineering Reference for more information about these types of systems).
+At least one refrigeration load object must be defined which may be one of four types of load, a refrigerated case, a walk-in cooler, a chiller providing refrigeration to a secondary loop, or a cascade condenser which absorbs heat rejected by a lower-temperature system (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem},~ and \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade}) If multiple loads are served by the same system , the user should use one or both of the list objects available to assign loads to the system. The first list includes all cases and walkins cooled directly by this system (Ref. \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList}). The second list includes any `transfer' loads, that is refrigeration loads borne by this system that are transferred from another refrigeration system via either a secondary loop chiller or a cascade condenser (Ref. \hyperref[refrigerationtransferloadlist]{Refrigeration:TransferLoadList}, see the Engineering Reference for more information about these types of systems).
 
-The refrigeration system object is capable of modeling both single-stage and two-stage compression refrigeration systems.~ The name of at least one compressor must be defined and a list object is available if the system is served by more than one compressor (Ref. \hyperref[refrigerationcompressor]{Refrigeration:Compressor} and \hyperref[refrigerationcompressorlist]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}List}).
+The refrigeration system object is capable of modeling both single-stage and two-stage compression refrigeration systems.~ The name of at least one compressor must be defined and a list object is available if the system is served by more than one compressor (Ref. \hyperref[refrigerationcompressor]{Refrigeration:Compressor} and \hyperref[refrigerationcompressorlist]{Refrigeration:CompressorList}).
 
 Heat is rejected outdoors in a condenser by direct air flow, evaporative water cooling, by a water-cooled condenser with appropriate plant loop piping, or to a cascade condenser cooled by another refrigeration system(ref: \hyperref[refrigerationcondenseraircooled]{Refrigeration:Condenser:AirCooled}, \hyperref[refrigerationcondenserevaporativecooled]{Refrigeration:Condenser:EvaporativeCooled}, \hyperref[refrigerationcondenserwatercooled]{Refrigeration:Condenser:WaterCooled}, \hyperref[refrigerationcondensercascade]{Refrigeration:Condenser:Cascade}). With evaporative cooling, water is sprayed through the air stream to effectively lower the air temperature experienced by the condenser coil as a result of water evaporation. The use of a water-cooled condenser requires the definition of a plant loop to supply cooling to the condenser.~ If a cascade condenser is specified, the refrigeration system absorbing the rejected heat must also be defined.
 
@@ -1318,7 +1318,7 @@ A unique user-assigned name for an instance of a refrigeration system. Any refer
 
 \paragraph{Field: Refrigerated Case or WalkIn or CaseAndWalkInList Name}\label{field-refrigerated-case-or-walkin-or-caseandwalkinlist-name}
 
-Identifies a single case, a single walkin, single air chiller, or a particular list of refrigerated cases and walkins or air chillers, that is cooled by this refrigeration system. The name will be validated against the case, walkin, air chiller and CaseAndWalkInList names ~(ref: \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, \hyperref[refrigerationairchiller]{Refrigeration:AirChiller}, and \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}) in the input file. Only cases and walkins or air chillers served directly by the system should be included in this list.~ Any cases, walkins, or air chillers served indirectly via a secondary loop should NOT be included in this list. Note that any system that serves an air chiller cannot also serve a case or walkin.
+Identifies a single case, a single walkin, single air chiller, or a particular list of refrigerated cases and walkins or air chillers, that is cooled by this refrigeration system. The name will be validated against the case, walkin, air chiller and CaseAndWalkInList names ~(ref: \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, \hyperref[refrigerationairchiller]{Refrigeration:AirChiller}, and \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList}) in the input file. Only cases and walkins or air chillers served directly by the system should be included in this list.~ Any cases, walkins, or air chillers served indirectly via a secondary loop should NOT be included in this list. Note that any system that serves an air chiller cannot also serve a case or walkin.
 
 \paragraph{Field: Refrigeration Transfer Load or TransferLoad List Name}\label{field-refrigeration-transfer-load-or-transferload-list-name}
 
@@ -1864,18 +1864,18 @@ The input objects required to model a detailed transcritical CO\(_{2}\) refriger
 \item
   \hyperref[refrigerationwalkin]{Refrigeration:WalkIn},
 \item
-  \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList} (may include both cases and/or walk-in cooler names),
+  \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList} (may include both cases and/or walk-in cooler names),
 \item
-  At least one \hyperref[refrigerationcompressor]{Refrigeration:Compressor} object (multiple compressors are entered using a \hyperref[refrigerationcompressorlist]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}List}),
+  At least one \hyperref[refrigerationcompressor]{Refrigeration:Compressor} object (multiple compressors are entered using a \hyperref[refrigerationcompressorlist]{Refrigeration:CompressorList}),
 \item
   One \hyperref[refrigerationgascooleraircooled]{Refrigeration:GasCooler:AirCooled} object,
 \end{itemize}
 
 Output variables are available to describe the total heat exchange between all the refrigeration objects and the zones containing these objects.~ These variables are described at the end of this section.
 
-At least one refrigeration load object must be defined which may be one of two types of loads, including a refrigerated display case and a walk-in cooler, (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, and \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}).~ If multiple loads are served by the same system, the user should use the refrigerated case and walk-in list object available to assign all cases and walk-ins cooled directly by this system (Ref. \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}).
+At least one refrigeration load object must be defined which may be one of two types of loads, including a refrigerated display case and a walk-in cooler, (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, and \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}).~ If multiple loads are served by the same system, the user should use the refrigerated case and walk-in list object available to assign all cases and walk-ins cooled directly by this system (Ref. \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList}).
 
-The name of at least one compressor must be defined and a list object is available if the system is served by more than one compressor (Ref. \hyperref[refrigerationcompressor]{Refrigeration:Compressor} and \hyperref[refrigerationcompressorlist]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}List}).
+The name of at least one compressor must be defined and a list object is available if the system is served by more than one compressor (Ref. \hyperref[refrigerationcompressor]{Refrigeration:Compressor} and \hyperref[refrigerationcompressorlist]{Refrigeration:CompressorList}).
 
 Heat is rejected to the outdoors via an air-cooled gas cooler (Ref. \hyperref[refrigerationgascooleraircooled]{Refrigeration:GasCooler:AirCooled}).
 
@@ -1897,11 +1897,11 @@ Identifies the transcritical CO\(_{2}\) refrigeration system as either a single-
 
 \paragraph{Field: Medium Temperature Refrigerated Case or WalkIn or CaseAndWalkInList Name}\label{field-medium-temperature-refrigerated-case-or-walkin-or-caseandwalkinlist-name}
 
-Identifies a single case, a single walk-in, or a particular list of refrigerated cases and walk-ins, that is cooled by the medium-temperature stage of the refrigeration system.~ The name will be validated against the case, walk-in, and CaseAndWalkInList names (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, and \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}) in the input file.~ Only medium temperature cases and walk-ins served directly by the system should be included in this list.~ Note that this entry is required for both single-stage and two-stage systems.
+Identifies a single case, a single walk-in, or a particular list of refrigerated cases and walk-ins, that is cooled by the medium-temperature stage of the refrigeration system.~ The name will be validated against the case, walk-in, and CaseAndWalkInList names (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, and \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList}) in the input file.~ Only medium temperature cases and walk-ins served directly by the system should be included in this list.~ Note that this entry is required for both single-stage and two-stage systems.
 
 \paragraph{Field: Low Temperature Refrigerated Case or WalkIn or CaseAndWalkInList Name}\label{field-low-temperature-refrigerated-case-or-walkin-or-caseandwalkinlist-name}
 
-Identifies a single case, a single walk-in, or a particular list of refrigerated cases and walk-ins, that is cooled by the low-temperature stage of the refrigeration system.~ The name will be validated against the case, walk-in, and CaseAndWalkInList names (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, and \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}) in the input file.~ Only low temperature cases and walk-ins served directly by the system should be included in this list.~ Note that this entry is valid only for two-stage systems.
+Identifies a single case, a single walk-in, or a particular list of refrigerated cases and walk-ins, that is cooled by the low-temperature stage of the refrigeration system.~ The name will be validated against the case, walk-in, and CaseAndWalkInList names (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}, and \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList}) in the input file.~ Only low temperature cases and walk-ins served directly by the system should be included in this list.~ Note that this entry is valid only for two-stage systems.
 
 \paragraph{Field: Refrigeration Gas Cooler Name}\label{field-refrigeration-gas-cooler-name}
 
@@ -2502,7 +2502,7 @@ Fan controls often include a minimum air flow ratio to avoid overheating the fan
 
 \paragraph{Field: Air Inlet Node Name or Zone Name}\label{field-air-inlet-node-name-or-zone-name}
 
-This optional alpha field contains the name of the node from which the condenser draws its outdoor air or the name of the conditioned zone where the condenser is located. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank and an outdoor air node name is entered, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor air temperature is taken directly from the weather data. If a zone name is entered, the temperature of that zone is used.
+This optional alpha field contains the name of the node from which the condenser draws its outdoor air or the name of the conditioned zone where the condenser is located. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank and an outdoor air node name is entered, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air temperature is taken directly from the weather data. If a zone name is entered, the temperature of that zone is used.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-4-001}
 
@@ -2741,7 +2741,7 @@ This numeric field is the maximum heat rejection capacity factor in the manufact
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-005}
 
-This optional alpha field contains the name of the node from which the condenser draws its outdoor air. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor air temperature is taken directly from the weather data.
+This optional alpha field contains the name of the node from which the condenser draws its outdoor air. If this field is left blank, the outdoor air drybulb temperature entering the condenser is taken directly from the weather data. If this field is not blank, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air temperature is taken directly from the weather data.
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-000}
 
@@ -3376,7 +3376,7 @@ This numeric field specifies the minimum condensing temperature (C) required to 
 
 \textbf{\emph{Field: Air Inlet Node Name}}
 
-This optional alpha field contains the name of the node from which the gas cooler draws its outdoor air.~ If this field is left blank, the outdoor air dry-bulb temperature entering the gas cooler is taken directly from the weather data.~ If this field is not blank, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data.~ Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor air temperature is taken directly from the weather data.
+This optional alpha field contains the name of the node from which the gas cooler draws its outdoor air.~ If this field is left blank, the outdoor air dry-bulb temperature entering the gas cooler is taken directly from the weather data.~ If this field is not blank, this node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data.~ Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air temperature is taken directly from the weather data.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-7}
 
@@ -3496,7 +3496,7 @@ Refrigeration:TransferLoadList,
 
 \subsection{Refrigeration:SecondarySystem}\label{refrigerationsecondarysystem}
 
-A refrigeration secondary system works in conjunction with refrigerated cases and walkins (Ref. Refrigeration:SecondarySystem, \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}, \hyperref[refrigerationcase]{Refrigeration:Case}, and \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}) to simulate the performance of a secondary loop supermarket refrigeration system. Heat from the refrigeration loads served by the secondary loop is absorbed by a primary refrigeration system (ref: \hyperref[refrigerationsystem]{Refrigeration:System}). The SecondarySystem object simulates a heat exchanger that is an evaporator, or refrigeration load, on the primary refrigeration system.
+A refrigeration secondary system works in conjunction with refrigerated cases and walkins (Ref. Refrigeration:SecondarySystem, \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList}, \hyperref[refrigerationcase]{Refrigeration:Case}, and \hyperref[refrigerationwalkin]{Refrigeration:WalkIn}) to simulate the performance of a secondary loop supermarket refrigeration system. Heat from the refrigeration loads served by the secondary loop is absorbed by a primary refrigeration system (ref: \hyperref[refrigerationsystem]{Refrigeration:System}). The SecondarySystem object simulates a heat exchanger that is an evaporator, or refrigeration load, on the primary refrigeration system.
 
 The inputs for the refrigeration secondary system object include a name, which is also referenced to identify the load placed upon the primary refrigeration system. The inputs that describe the loads placed upon the secondary loop include the name of a single refrigerated case, the name of a single walk-in cooler, or a list of cases and walkin coolers.~ The circulating fluid type specifies whether or not the secondary fluid remains in the liquid state throughout the loop (e.g., a glycol or brine solution) or undergoes a partial phase change while serving the refrigeration loads (e.g., a CO\(_{2}\) liquid overfeed system). The circulating fluid name must also be specified and must correspond to a name used to provide the fluid properties.
 
@@ -3514,7 +3514,7 @@ A unique user-assigned name for an instance of a refrigeration secondary system.
 
 \paragraph{Field: Refrigerated Case or WalkIn or CaseAndWalkInList Name}\label{field-refrigerated-case-or-walkin-or-caseandwalkinlist-name-1}
 
-Identifies a single case, or walkin, or a particular list of refrigerated cases and walkins, that are cooled by this refrigeration secondary system. The name will be validated against the case, walkin, and CaseAndWalkInList names (ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn} and \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}) in the input file.
+Identifies a single case, or walkin, or a particular list of refrigerated cases and walkins, that are cooled by this refrigeration secondary system. The name will be validated against the case, walkin, and CaseAndWalkInList names (ref. \hyperref[refrigerationcase]{Refrigeration:Case}, \hyperref[refrigerationwalkin]{Refrigeration:WalkIn} and \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList}) in the input file.
 
 \paragraph{Field: Circulating Fluid Type}\label{field-circulating-fluid-type}
 
@@ -3980,7 +3980,7 @@ This is the total cooling (sensible plus latent) from all air chillers located i
 
 \subsection{Refrigeration:AirChiller}\label{refrigerationairchiller}
 
-The Refrigeration:AirChiller object works in conjunction with a refrigeration chiller set, compressor rack, a refrigeration system, or a refrigeration secondary system object (Ref. ZoneHvac:RefrigerationChillerSet, and a \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of an air chiller, similar to one found in a refrigerated warehouse. The air chiller model uses information at rated conditions along with the zone conditions to determine performance. Energy use for fans and heaters is modeled based on inputs for nominal power, schedules, and control type. The refrigeration chiller model accounts for the sensible and latent heat exchange with the surrounding environment.
+The Refrigeration:AirChiller object works in conjunction with a refrigeration chiller set, compressor rack, a refrigeration system, or a refrigeration secondary system object (Ref. ZoneHvac:RefrigerationChillerSet, and a \hyperref[refrigerationcompressorrack]{Refrigeration:CompressorRack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of an air chiller, similar to one found in a refrigerated warehouse. The air chiller model uses information at rated conditions along with the zone conditions to determine performance. Energy use for fans and heaters is modeled based on inputs for nominal power, schedules, and control type. The refrigeration chiller model accounts for the sensible and latent heat exchange with the surrounding environment.
 
 The refrigeration chiller cooler object inputs include a name, an availability schedule name, the rated cooling capacity, the rated operating temperature, the rated cooling source temperature, the rated total heating power and heating power schedule, the rated fan power and schedules, defrost type, defrost control type, defrost schedule name, drip-down schedule name, defrost power, the portion of the defrost energy used to melt ice (only for temperature termination control type), and refrigerant inventory.
 

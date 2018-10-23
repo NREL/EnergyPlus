@@ -167,7 +167,7 @@ The reference to the zone object specifying the ambient air temperature around t
 
 \paragraph{Field: Ambient Temperature Outdoor Air Node Name}\label{field-ambient-temperature-outdoor-air-node-name-000}
 
-This optional alpha field specifies the outdoor air node name used to define the ambient conditions surrounding the water heater tank. This field is applicable only when the Ambient Temperature Indicator is specified as \textbf{Outdoors}, otherwise this field should be left blank. The node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor air conditions are taken directly from the weather data.
+This optional alpha field specifies the outdoor air node name used to define the ambient conditions surrounding the water heater tank. This field is applicable only when the Ambient Temperature Indicator is specified as \textbf{Outdoors}, otherwise this field should be left blank. The node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air conditions are taken directly from the weather data.
 
 \paragraph{Field: Off-Cycle Loss Coefficient to Ambient Temperature}\label{field-off-cycle-loss-coefficient-to-ambient-temperature}
 
@@ -791,7 +791,7 @@ The reference to the zone object specifying the ambient air temperature around t
 
 \paragraph{Field: Ambient Temperature Outdoor Air Node}\label{field-ambient-temperature-outdoor-air-node}
 
-The reference to the outdoor air node specifying the ambient air temperature around the tank for skin losses. An outdoor air node can be defined by an \hyperref[outdoorairnode]{OutdoorAir:Node} object or \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object. This field is only used if Ambient Temperature Indicator is \textbf{Outdoors}.
+The reference to the outdoor air node specifying the ambient air temperature around the tank for skin losses. An outdoor air node can be defined by an \hyperref[outdoorairnode]{OutdoorAir:Node} object or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object. This field is only used if Ambient Temperature Indicator is \textbf{Outdoors}.
 
 \paragraph{Field: Uniform Skin Loss Coefficient Per Unit Area to Ambient Temperature}\label{field-uniform-skin-loss-coefficient-per-unit-area-to-ambient-temperature-000}
 
@@ -1223,7 +1223,7 @@ This alpha field contains the name of the node to which the heat pump water heat
 
 \paragraph{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name-000}
 
-This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `Schedule', this node name should be left blank. If the Inlet Air Configuration field is set to `ZoneAndOutdoorAir' or `OutdoorAirOnly', this node name should be the name of an outdoor air node (Ref. \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List}).
+This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `Schedule', this node name should be left blank. If the Inlet Air Configuration field is set to `ZoneAndOutdoorAir' or `OutdoorAirOnly', this node name should be the name of an outdoor air node (Ref. \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}).
 
 \paragraph{Field: Exhaust Air Node Name}\label{field-exhaust-air-node-name}
 
@@ -1577,7 +1577,7 @@ This alpha field contains the name of the node to which the heat pump water heat
 
 \paragraph{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name-1}
 
-This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `Schedule', this node name should be left blank. If the Inlet Air Configuration field is set to `ZoneAndOutdoorAir' or `OutdoorAirOnly', this node name should be the name of an outdoor air node (Ref. \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List}).
+This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to `ZoneAirOnly' or `Schedule', this node name should be left blank. If the Inlet Air Configuration field is set to `ZoneAndOutdoorAir' or `OutdoorAirOnly', this node name should be the name of an outdoor air node (Ref. \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}).
 
 \paragraph{Field: Exhaust Air Node Name}\label{field-exhaust-air-node-name-1}
 

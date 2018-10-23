@@ -113,7 +113,7 @@ This alpha field specifies the name of a \hyperref[designspecificationoutdoorair
 
 \paragraph{Field: Outdoor Air Inlet Node Name}\label{field-outdoor-air-inlet-node-name-002}
 
-This alpha field specifies the node name of the outdoor air inlet node. This node name is also specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object. If this field is blank, a node name will be created internally.
+This alpha field specifies the node name of the outdoor air inlet node. This node name is also specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object. If this field is blank, a node name will be created internally.
 
 \paragraph{Field: Demand Controlled Ventilation Type}\label{field-demand-controlled-ventilation-type-000}
 
@@ -1451,7 +1451,7 @@ This optional alpha input field is the name of an \hyperref[availabilitymanagera
 
 \paragraph{Field: Outdoor Air Inlet Node Name}\label{field-outdoor-air-inlet-node-name-1-000}
 
-This alpha input field defines the name of the HVAC system node from which the evaporative cooler unit draws its supply air.~ This node is usually declared to be an outdoor air node using \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List}.
+This alpha input field defines the name of the HVAC system node from which the evaporative cooler unit draws its supply air.~ This node is usually declared to be an outdoor air node using \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}.
 
 \paragraph{Field: Cooler Outlet Node Name}\label{field-cooler-outlet-node-name}
 
@@ -2872,7 +2872,7 @@ This is the availability status of the packaged terminal heat pump~ fan. This st
 
 \subsection{ZoneHVAC:RefrigerationChillerSet}\label{zonehvacrefrigerationchillerset}
 
-The ZoneHVAC:RefrigerationChillerSet object works in conjunction with one or multiple air chillers, compressor racks, refrigeration systems, or refrigeration secondary system objects (Ref. \hyperref[refrigerationairchiller]{Refrigeration:AirChiller} \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of a group of air chillers cooling a single zone. The chiller set model passes information about the zone conditions to determine the performance of individual chiller coils within the set, thus providing the sensible and latent heat exchange with the zone environment.
+The ZoneHVAC:RefrigerationChillerSet object works in conjunction with one or multiple air chillers, compressor racks, refrigeration systems, or refrigeration secondary system objects (Ref. \hyperref[refrigerationairchiller]{Refrigeration:AirChiller} \hyperref[refrigerationcompressorrack]{Refrigeration:CompressorRack}, \hyperref[refrigerationsystem]{Refrigeration:System}, or \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}) to simulate the performance of a group of air chillers cooling a single zone. The chiller set model passes information about the zone conditions to determine the performance of individual chiller coils within the set, thus providing the sensible and latent heat exchange with the zone environment.
 
 The refrigeration chiller set object inputs include a name, an availability schedule name, the name of the zone cooled by the chiller set, the air inlet node name, the air outlet node name, and an extensible list of air chiller names (Ref. \hyperref[refrigerationairchiller]{Refrigeration:AirChiller}).
 
@@ -2880,7 +2880,7 @@ The refrigeration chiller set object inputs include a name, an availability sche
 
 \paragraph{Field: Name}\label{field-name-10-020}
 
-A unique user-assigned name for an instance of a refrigeration chiller. Any reference to this refrigeration chiller by another object (may be listed in a \hyperref[refrigerationcaseandwalkinlist]{\hyperref[refrigerationcase]{Refrigeration:Case}AndWalkInList}, \hyperref[refrigerationsystem]{Refrigeration:System}, \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}, or \hyperref[refrigerationcompressorrack]{\hyperref[refrigerationcompressor]{Refrigeration:Compressor}Rack}) will use this name.
+A unique user-assigned name for an instance of a refrigeration chiller. Any reference to this refrigeration chiller by another object (may be listed in a \hyperref[refrigerationcaseandwalkinlist]{Refrigeration:CaseAndWalkInList}, \hyperref[refrigerationsystem]{Refrigeration:System}, \hyperref[refrigerationsecondarysystem]{Refrigeration:SecondarySystem}, or \hyperref[refrigerationcompressorrack]{Refrigeration:CompressorRack}) will use this name.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-9-002}
 
@@ -2939,13 +2939,13 @@ For this zone heat pump,there are two types of WaterToAirHeatPump coil model all
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:EquationFit}
+  \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}
 \item
-  \hyperref[coilheatingwatertoairheatpumpequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeatPump:EquationFit}
+  \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
+  \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{Coil:Cooling:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \item
-  \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
+  \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{Coil:Heating:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \end{itemize}
 
 \begin{figure}[hbtp] % fig 113
@@ -3022,7 +3022,7 @@ This alpha field contains the identifying name given to the heat pump supply air
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-5-000}
 
-This alpha field contains the identifying type of heating coil specified in the heat pump. The only valid types are \hyperref[coilheatingwatertoairheatpumpequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeatPump:EquationFit} \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}..
+This alpha field contains the identifying type of heating coil specified in the heat pump. The only valid types are \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit} \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{Coil:Heating:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}..
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-5-000}
 
@@ -3030,7 +3030,7 @@ This alpha field contains the identifying name given to the WaterToAirHeatPump h
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-5-000}
 
-This alpha field contains the identifying type of cooling coil specified in the heat pump. The only valid types are \hyperref[coilcoolingwatertoairheatpumpequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:EquationFit} and \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}.
+This alpha field contains the identifying type of cooling coil specified in the heat pump. The only valid types are \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} and \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{Coil:Cooling:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}.
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-4-000}
 
@@ -3099,7 +3099,7 @@ This numeric field defines the outdoor air dry-bulb temperature in degrees Celsi
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature Sensor Node Name}\label{field-outdoor-dry-bulb-temperature-sensor-node-name-000}
 
-This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor temperature is taken directly from the weather data.
+This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor temperature is taken directly from the weather data.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-5-000}
 
@@ -3598,7 +3598,7 @@ To model a stand alone ERV connected to a single zone, the input data file shoul
 \item
   \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}
 \item
-  \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List}
+  \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}
 \end{itemize}
 
 A description of each input field for this compound object is provided below.
@@ -3629,7 +3629,7 @@ where p = pressure in Pa and Z = altitude in m
 
 Note that this flow rate must be within the valid air flow range for the heat exchanger (ref: \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent} in the Engineering Document). In addition, this flow rate must be less than or equal to the supply fan air flow rate (\hyperref[fanonoff]{Fan:OnOff}). If the supply air flow rate is less than the exhaust air flow rate, the zone infiltration (ref: ZoneInfiltration) should be specified accordingly (the infiltration induced by imbalanced air flows is not accounted for automatically). The ERV supply air flow rate may also be autosized using the ventilation rate per floor area and/or ventilation rate per occupant fields below. When autosizing, the heat exchanger and fan air flow rates should also be autosized.
 
-Note: The supply air inlet node specified in the generic heat exchanger object must be an outdoor air node (ref: \hyperref[outdoorairnode]{OutdoorAir:Node} and \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List}). The supply air outlet node specified in the generic heat exchanger object must be a zone air inlet node (ref: \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}).
+Note: The supply air inlet node specified in the generic heat exchanger object must be an outdoor air node (ref: \hyperref[outdoorairnode]{OutdoorAir:Node} and \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}). The supply air outlet node specified in the generic heat exchanger object must be a zone air inlet node (ref: \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}).
 
 \paragraph{Field: Exhaust Air Flow Rate}\label{field-exhaust-air-flow-rate-1}
 
@@ -4203,7 +4203,7 @@ This alpha input field specifies the method that will be used to choose operatin
 This alpha input field specifies the name of the HVAC system node from which the hybrid unit draws return air. This node name must also be specified as a zone return air node in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. It may also be included in \hyperref[nodelist]{NodeList} object that is specified as a zone return air node in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. (Ref. Group - Zone Equipment \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} and Group - Node-Branch Management \hyperref[nodelist]{NodeList}).
 
 \paragraph{Field: Outdoor Air Node Name}
-This alpha input field specifies the name of the HVAC system node from which the hybrid unit draws outdoor air. This node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object. If this field is blank, a node name will be created internally. (Ref. Group - Node-Branch Management \hyperref[outdoorairnode]{OutdoorAir:Node} and \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List}).
+This alpha input field specifies the name of the HVAC system node from which the hybrid unit draws outdoor air. This node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object. If this field is blank, a node name will be created internally. (Ref. Group - Node-Branch Management \hyperref[outdoorairnode]{OutdoorAir:Node} and \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}).
 
 \paragraph{Field: Supply Air Node Name}
 This alpha input field specifies the name of the HVAC system node to which the hybrid unit sends supply air. This node name must also be specified as zone inlet node in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. It may also be included in \hyperref[nodelist]{NodeList} object that is specified as a zone inlet node in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. (Ref. Group - Zone Equipment \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} and Group - Node-Branch Management \hyperref[nodelist]{NodeList}).

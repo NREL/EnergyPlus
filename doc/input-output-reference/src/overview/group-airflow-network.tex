@@ -73,7 +73,7 @@ The Airflow Network input objects are:
 
 \textbf{\hyperref[airflownetworkdistributioncomponentleak]{AirflowNetwork:Distribution:Component:Leak}}
 
-\textbf{\hyperref[airflownetworkdistributioncomponentleakageratio]{\hyperref[airflownetworkdistributioncomponentleak]{AirflowNetwork:Distribution:Component:Leak}ageRatio}}
+\textbf{\hyperref[airflownetworkdistributioncomponentleakageratio]{AirflowNetwork:Distribution:Component:LeakageRatio}}
 
 \textbf{\hyperref[airflownetworkdistributioncomponentduct]{AirflowNetwork:Distribution:Component:Duct}}
 
@@ -1687,14 +1687,14 @@ This choice field distinguishes the node type for the EnergyPlus node or object 
 \item
   \textbf{OAMixerOutdoorAirStreamNode}: Represents an external node name specified as an Outdoor Air Stream Node Name in the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} object when the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} object is used.
 \item
-  \textbf{\hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List}}: Represents an external node name defined in the \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object when the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} object and an exhaust energy recovery system (air-to-air heat exchanger) are used.
+  \textbf{\hyperref[outdoorairnodelist]{OutdoorAir:NodeList}}: Represents an external node name defined in the \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object when the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} object and an exhaust energy recovery system (air-to-air heat exchanger) are used.
 \item
   \textbf{OutdoorAir}: Represents an external node name defined in the \hyperref[outdoorairnode]{OutdoorAir:Node} object when the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} and an exhaust energy recovery system (air-to-air heat exchanger) are used.
 \item
   \textbf{Other}: Represents a type not already defined above.
 \end{itemize}
 
-Note: Both the \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} and \hyperref[outdoorairnode]{OutdoorAir:Node} node types represent a node to outdoor air conditions. Either one of these node types can be used to represent an external node when an air-to-air heat exchanger is used to recover energy from the exhaust air stream as part of an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} object. Node type OAMixerOutdoorAirStreamNode does not represent an external node when an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} or \hyperref[outdoorairnode]{OutdoorAir:Node} object is specified. If no exhaust heat recovery system (i.e., air-to-air heat exchanger) is specified in the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}, the node type OAMixerOutdoorAirStreamNode represents an external node.
+Note: Both the \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} and \hyperref[outdoorairnode]{OutdoorAir:Node} node types represent a node to outdoor air conditions. Either one of these node types can be used to represent an external node when an air-to-air heat exchanger is used to recover energy from the exhaust air stream as part of an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} object. Node type OAMixerOutdoorAirStreamNode does not represent an external node when an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} or \hyperref[outdoorairnode]{OutdoorAir:Node} object is specified. If no exhaust heat recovery system (i.e., air-to-air heat exchanger) is specified in the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}, the node type OAMixerOutdoorAirStreamNode represents an external node.
 
 \paragraph{Field: Node Height}\label{field-node-height-1}
 
@@ -1737,7 +1737,7 @@ The next section describes AirflowNetwork Distribution Components, with 7 availa
 \item
   \hyperref[airflownetworkdistributioncomponentleak]{AirflowNetwork:Distribution:Component:Leak}
 \item
-  \hyperref[airflownetworkdistributioncomponentleakageratio]{\hyperref[airflownetworkdistributioncomponentleak]{AirflowNetwork:Distribution:Component:Leak}ageRatio}
+  \hyperref[airflownetworkdistributioncomponentleakageratio]{AirflowNetwork:Distribution:Component:LeakageRatio}
 \item
   \hyperref[airflownetworkdistributioncomponentduct]{AirflowNetwork:Distribution:Component:Duct}
 \item

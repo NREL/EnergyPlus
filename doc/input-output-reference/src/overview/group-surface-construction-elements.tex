@@ -45,7 +45,7 @@ There are several material additions that can be made to the basic material prop
 \item
   \hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}
 \item
-  \hyperref[materialpropertyphasechangehysteresis]{\hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}Hysteresis}
+  \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis}
 \end{itemize}
 
 These material property objects are used in conjunction with the basic material specification and reference back to the name of the basic material type. Without the basic material type specified the program, will give a severe error and terminate. For example, specifying the moisture materials and changing the \hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm} to a moisture simulation will allow the moisture simulation to take place.
@@ -1992,7 +1992,7 @@ WindowMaterial:GasMixture,ArgonKryptonMix,
 
 \subsection{WindowMaterial:Gap}\label{windowmaterialgap}
 
-This input object is used to define the gap between two layers in a complex fenestration system, where the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object is used. It references the gas or gas mixtures defined in the \hyperref[windowmaterialgas]{WindowMaterial:Gas} and \hyperref[windowmaterialgasmixture]{\hyperref[windowmaterialgas]{WindowMaterial:Gas}Mixture} objects. It is referenced as a layer in the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object ;it cannot be referenced as a layer from the Construction object.
+This input object is used to define the gap between two layers in a complex fenestration system, where the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object is used. It references the gas or gas mixtures defined in the \hyperref[windowmaterialgas]{WindowMaterial:Gas} and \hyperref[windowmaterialgasmixture]{WindowMaterial:GasMixture} objects. It is referenced as a layer in the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object ;it cannot be referenced as a layer from the Construction object.
 
 \subsubsection{Inputs}\label{inputs-18-009}
 
@@ -2018,7 +2018,7 @@ References the support pillar of the gap layer if vacuum glazing is being modele
 
 \paragraph{Field: Gas (or GasMixture)}\label{field-gas-or-gasmixture}
 
-References gas (\hyperref[windowmaterialgas]{WindowMaterial:Gas}) or gas mixture (\hyperref[windowmaterialgasmixture]{\hyperref[windowmaterialgas]{WindowMaterial:Gas}Mixture}) of the gap layer.
+References gas (\hyperref[windowmaterialgas]{WindowMaterial:Gas}) or gas mixture (\hyperref[windowmaterialgasmixture]{WindowMaterial:GasMixture}) of the gap layer.
 
 An IDF example for simple glazing:
 

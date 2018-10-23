@@ -118,7 +118,7 @@ For direct-expansion cooling, packaged and split system simulations:
 \item
   \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary} or
 \item
-  \hyperref[hvactemplatesystemunitarysystem]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System}
+  \hyperref[hvactemplatesystemunitarysystem]{HVACTemplate:System:UnitarySystem}
 \end{itemize}
 
 For direct-expansion heat pump systems:
@@ -129,9 +129,9 @@ For direct-expansion heat pump systems:
 \item
   \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary}
 \item
-  \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}HeatPump:AirToAir} or
+  \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{HVACTemplate:System:UnitaryHeatPump:AirToAir} or
 \item
-  \hyperref[hvactemplatesystemunitarysystem]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System}
+  \hyperref[hvactemplatesystemunitarysystem]{HVACTemplate:System:UnitarySystem}
 \end{itemize}
 
 For packaged variable air volume systems using direct-expansion cooling:
@@ -1435,7 +1435,7 @@ Enter the shaft power of the supply fan divided by the electrical power consumed
 
 \paragraph{Field: Cooling Coil Type}\label{field-cooling-coil-type-3}
 
-Enter the type of cooling coil. There is currently only one choices for this field, \hyperref[coilcoolingwatertoairheatpumpequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:EquationFit}.
+Enter the type of cooling coil. There is currently only one choices for this field, \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}.
 
 \paragraph{Field: Cooling Coil Gross Rated Total Capacity}\label{field-cooling-coil-gross-rated-total-capacity-2}
 
@@ -1443,7 +1443,7 @@ Enter autosize to let the automatic sizing algorithm determine the cooling coil 
 
 \paragraph{Field: Cooling Coil Gross Rated Sensible Heat Ratio}\label{field-cooling-coil-gross-rated-sensible-heat-ratio-2}
 
-Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by gross total cooling capacity of the DX cooling coil at rated conditions (26.7C (80F) entering air dry-bulb temperature, 19.4C (67F) entering air wet-bulb temperature, and 29.4C (85F) entering water temperature). Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be ``gross'' , i.e., the effect of supply air fan heat is not accounted for. The default is autosize. If the Cooling Coil Rated Capacity is autosized, this field should also be autosized (any value specified for Cooling Coil Rate Sensibe Heat Ratio will be ignored). If the Cooling Coil Rated Capacity has a specified value, then this field should also have a specified value. This is because the \hyperref[coilcoolingwatertoairheatpumpequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:EquationFit} object has fields for Rated Total Cooling Capacity and Rated Sensible Cooling Capacity. If this field is autosized, a specified value for Cooling Coil Rated Capacity will not be used when the coil object sensible capacity is autosized.
+Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by gross total cooling capacity of the DX cooling coil at rated conditions (26.7C (80F) entering air dry-bulb temperature, 19.4C (67F) entering air wet-bulb temperature, and 29.4C (85F) entering water temperature). Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be ``gross'' , i.e., the effect of supply air fan heat is not accounted for. The default is autosize. If the Cooling Coil Rated Capacity is autosized, this field should also be autosized (any value specified for Cooling Coil Rate Sensibe Heat Ratio will be ignored). If the Cooling Coil Rated Capacity has a specified value, then this field should also have a specified value. This is because the \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} object has fields for Rated Total Cooling Capacity and Rated Sensible Cooling Capacity. If this field is autosized, a specified value for Cooling Coil Rated Capacity will not be used when the coil object sensible capacity is autosized.
 
 \paragraph{Field: Cooling Coil Gross Rated COP}\label{field-cooling-coil-gross-rated-cop-1}
 
@@ -1451,7 +1451,7 @@ Enter the coefficient of performance defined as the gross cooling coil capacity 
 
 \paragraph{Field: Heat Pump Heating Coil Type}\label{field-heat-pump-heating-coil-type-1}
 
-Enter the type of heat pump heating coil. There is currently only one choices for this field, \hyperref[coilheatingwatertoairheatpumpequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeatPump:EquationFit}.
+Enter the type of heat pump heating coil. There is currently only one choices for this field, \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}.
 
 \paragraph{Field: Heat Pump Heating Coil Gross Rated Capacity}\label{field-heat-pump-heating-coil-gross-rated-capacity-1}
 
@@ -1886,7 +1886,7 @@ HVACTemplate:Zone:VRF,
 
 \subsection{HVACTemplate:Zone:Unitary}\label{hvactemplatezoneunitary}
 
-This object simulates the zone portion of a constant volume direct-expansion based HVAC configuration with several different heating options. Often a single HVACTemplate:Zone:Unitary object will be used with a single \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary} (or \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}HeatPump:AirToAir} , or \hyperref[hvactemplatesystemunitarysystem]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System}) object to simulate single zone direct-expansion based air conditioning systems. In addition, multiple HVACTemplate:Zone:Unitary objects may appear that all reference the same HVACTemplate:System object in a multiple zone version. For a multizone system, only one zone is specified as the control zone (see \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}, \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}HeatPump:AirToAir} , or \hyperref[hvactemplatesystemunitarysystem]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System} for more information). Direct expansion includes single packaged rooftop systems commonly seen in commercial applications and split systems commonly seen in residential applications.
+This object simulates the zone portion of a constant volume direct-expansion based HVAC configuration with several different heating options. Often a single HVACTemplate:Zone:Unitary object will be used with a single \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary} (or \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{HVACTemplate:System:UnitaryHeatPump:AirToAir} , or \hyperref[hvactemplatesystemunitarysystem]{HVACTemplate:System:UnitarySystem}) object to simulate single zone direct-expansion based air conditioning systems. In addition, multiple HVACTemplate:Zone:Unitary objects may appear that all reference the same HVACTemplate:System object in a multiple zone version. For a multizone system, only one zone is specified as the control zone (see \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}, \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{HVACTemplate:System:UnitaryHeatPump:AirToAir} , or \hyperref[hvactemplatesystemunitarysystem]{HVACTemplate:System:UnitarySystem} for more information). Direct expansion includes single packaged rooftop systems commonly seen in commercial applications and split systems commonly seen in residential applications.
 
 \subsubsection{Inputs}\label{inputs-8-009}
 
@@ -1896,7 +1896,7 @@ Enter the name of the zone. The name must match a building zone name used in the
 
 \paragraph{Field: Template Unitary System Name}\label{field-template-unitary-system-name}
 
-Enter the name of the \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}, \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}HeatPump:AirToAir} , or \hyperref[hvactemplatesystemunitarysystem]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System} object serving this zone.
+Enter the name of the \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}, \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{HVACTemplate:System:UnitaryHeatPump:AirToAir} , or \hyperref[hvactemplatesystemunitarysystem]{HVACTemplate:System:UnitarySystem} object serving this zone.
 
 \paragraph{Field: Template Thermostat Name}\label{field-template-thermostat-name-7}
 
@@ -3994,7 +3994,7 @@ HVACTemplate:System:UnitaryHeatPump:AirToAir,
 
 \subsection{HVACTemplate:System:UnitarySystem}\label{hvactemplatesystemunitarysystem}
 
-This object simulates a unitary system with option cooling coil (air-cooled DX, water-cooled DX, and chilled water), options heating coil (gas, electric, hot water, air-to-air heat pump, and water-to-air heat pump) with cycling or continous fan controls. Often a single \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} object will be used with a single \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System object to simulate single zone system. In addition, multiple \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} objects may reference the same \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System object in a multiple zone version. For a multiple zone system, only one zone is specified as the control zone. The model can simulate chilled water or heat pump systems seen in commercial buildings and split systems commonly seen in residential buildings. \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System is similar to \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary} and \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{\hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}HeatPump:AirToAir}, but it offers more flexilbility by using the more general \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} object instead of the more specific unitary furnace and heat pump objects.
+This object simulates a unitary system with option cooling coil (air-cooled DX, water-cooled DX, and chilled water), options heating coil (gas, electric, hot water, air-to-air heat pump, and water-to-air heat pump) with cycling or continous fan controls. Often a single \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} object will be used with a single \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System object to simulate single zone system. In addition, multiple \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} objects may reference the same \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System object in a multiple zone version. For a multiple zone system, only one zone is specified as the control zone. The model can simulate chilled water or heat pump systems seen in commercial buildings and split systems commonly seen in residential buildings. \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System is similar to \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary} and \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{HVACTemplate:System:UnitaryHeatPump:AirToAir}, but it offers more flexilbility by using the more general \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} object instead of the more specific unitary furnace and heat pump objects.
 
 \subsubsection{Inputs}\label{inputs-2016-06-16-1621}
 
@@ -4089,7 +4089,7 @@ There are seven coil types available:
 
 \emph{HeatExchangerAssistedDX} uses the \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}, and \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} objects.
 
-\emph{SingleSpeedDXWaterCooled} uses the \hyperref[coilcoolingwatertoairheatpumpequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:EquationFit} object. This option requires an \hyperref[hvactemplateplantmixedwaterloop]{HVACTemplate:Plant:MixedWaterLoop} to serve as the water source.
+\emph{SingleSpeedDXWaterCooled} uses the \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} object. This option requires an \hyperref[hvactemplateplantmixedwaterloop]{HVACTemplate:Plant:MixedWaterLoop} to serve as the water source.
 
 The default type is \emph{SingleSpeedDX}
 
@@ -4851,7 +4851,7 @@ Select the type of automatic reset control for the cooling supply air temperatur
 \item
   OutdoorAirTemperatureReset -- reset the cooling supply air temperature based on the following default rules. When the outdoor dry-bulb temperature (ODB) is at or below 15.6C the setpoint is the Cooling Coil Design Setpoint plus 5.2C. When the ODB is at or above 26.7C the setpoint is the Cooling Coil Design Setpoint. In between, the setpoint is varied linearly. (Reference \hyperref[setpointmanageroutdoorairreset]{SetpointManager:OutdoorAirReset})
 \item
-  WarmestTemperatureFirst -- find the highest setpoint temperature that will satisfy all the zone cooling loads at minimum supply air flow rate. If this setpoint temperature is less than the Cooling Coil Design Setpoint, the setpoint temperature is set to the minimum, and the supply air flow rate is increased to meet the loads. This option is appropriate when modeling a single-zone VAV system. The maximum setpoint allowed is defaulted to the greater of 18C or the Heating Coil Design Setpoint plus 1.0C. (Reference \hyperref[setpointmanagerwarmesttemperatureflow]{\hyperref[setpointmanagerwarmest]{SetpointManager:Warmest}TemperatureFlow})
+  WarmestTemperatureFirst -- find the highest setpoint temperature that will satisfy all the zone cooling loads at minimum supply air flow rate. If this setpoint temperature is less than the Cooling Coil Design Setpoint, the setpoint temperature is set to the minimum, and the supply air flow rate is increased to meet the loads. This option is appropriate when modeling a single-zone VAV system. The maximum setpoint allowed is defaulted to the greater of 18C or the Heating Coil Design Setpoint plus 1.0C. (Reference \hyperref[setpointmanagerwarmesttemperatureflow]{SetpointManager:WarmestTemperatureFlow})
 \end{itemize}
 
 The default is \emph{None}.
@@ -5318,7 +5318,7 @@ Select the type of automatic reset control for the cooling supply air temperatur
 \item
   OutdoorAirTemperatureReset -- reset the cooling supply air temperature based on the following default rules. When the outdoor dry-bulb temperature (ODB) is at or below 15.6C the setpoint isthe Cooling Coil Design Setpoint plus 5.2C. When the ODB is at or above 26.7C the setpoint is the Cooling Coil Design Setpoint. In between, the setpoint is varied linearly. (Reference \hyperref[setpointmanageroutdoorairreset]{SetpointManager:OutdoorAirReset})
 \item
-  WarmestTemperatureFirst -- find the highest setpoint temperature that will satisfy all the zone cooling loads at minimum supply air flow rate. If this setpoint temperature is less than the Cooling Coil Design Setpoint, the setpoint temperature is set to the minimum, and the supply air flow rate is increased to meet the loads. This option is appropriate when modeling a single-zone VAV system. The maximum setpoint allowed is defaulted to the greater of 18C or the Heating Coil Design Setpoint plus 1.0C. (Reference \hyperref[setpointmanagerwarmesttemperatureflow]{\hyperref[setpointmanagerwarmest]{SetpointManager:Warmest}TemperatureFlow})
+  WarmestTemperatureFirst -- find the highest setpoint temperature that will satisfy all the zone cooling loads at minimum supply air flow rate. If this setpoint temperature is less than the Cooling Coil Design Setpoint, the setpoint temperature is set to the minimum, and the supply air flow rate is increased to meet the loads. This option is appropriate when modeling a single-zone VAV system. The maximum setpoint allowed is defaulted to the greater of 18C or the Heating Coil Design Setpoint plus 1.0C. (Reference \hyperref[setpointmanagerwarmesttemperatureflow]{SetpointManager:WarmestTemperatureFlow})
 \end{itemize}
 
 The default is \emph{None}.

@@ -119,11 +119,11 @@ This alpha field contains the identifying type of heating coil specified in the 
 \item
   \hyperref[coilheatingdxvariablespeed]{Coil:Heating:DX:VariableSpeed}
 \item
-  \hyperref[coilheatingwatertoairheatpumpparameterestimation]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeatPump:ParameterEstimation}
+  \hyperref[coilheatingwatertoairheatpumpparameterestimation]{Coil:Heating:WaterToAirHeatPump:ParameterEstimation}
 \item
-  \hyperref[coilheatingwatertoairheatpumpequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeatPump:EquationFit}
+  \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}
 \item
-  \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
+  \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{Coil:Heating:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \item
   \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
@@ -170,11 +170,11 @@ This alpha field contains the identifying type of cooling coil specified in the 
 \item
   \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpparameterestimation]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:ParameterEstimation}
+  \hyperref[coilcoolingwatertoairheatpumpparameterestimation]{Coil:Cooling:WaterToAirHeatPump:ParameterEstimation}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:EquationFit}
+  \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
+  \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{Coil:Cooling:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \item
   \hyperref[coilcoolingwater]{Coil:Cooling:Water}
 \item
@@ -304,7 +304,7 @@ This numeric field defines the outdoor air dry-bulb temperature above which the 
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature Sensor Node Name}\label{field-outdoor-dry-bulb-temperature-sensor-node-name}
 
-This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor temperature is taken directly from the weather data.
+This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor temperature is taken directly from the weather data.
 
 \paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-001}
 
@@ -2393,13 +2393,13 @@ There are three type of WaterToAirHeatPump coil models available:
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpparameterestimation]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:ParameterEstimation}
+  \hyperref[coilcoolingwatertoairheatpumpparameterestimation]{Coil:Cooling:WaterToAirHeatPump:ParameterEstimation}
 \item
-  \hyperref[coilheatingwatertoairheatpumpparameterestimation]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeatPump:ParameterEstimation}
+  \hyperref[coilheatingwatertoairheatpumpparameterestimation]{Coil:Heating:WaterToAirHeatPump:ParameterEstimation}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:EquationFit}
+  \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}
 \item
-  \hyperref[coilheatingwatertoairheatpumpequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeatPump:EquationFit}
+  \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}
 \item
   \hyperref[coilcoolingwater]{Coil:Cooling:Water}toAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit
 \item
@@ -2454,11 +2454,11 @@ This alpha field contains the identifying type of heating coil specified in the 
 
 \begin{itemize}
 \item
-  \hyperref[coilheatingwatertoairheatpumpparameterestimation]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeatPump:ParameterEstimation}
+  \hyperref[coilheatingwatertoairheatpumpparameterestimation]{Coil:Heating:WaterToAirHeatPump:ParameterEstimation}
 \item
-  \hyperref[coilheatingwatertoairheatpumpequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeatPump:EquationFit}
+  \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}
 \item
-  \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{\hyperref[coilheatingwater]{Coil:Heating:Water}ToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
+  \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{Coil:Heating:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \end{itemize}
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-7}
@@ -2475,11 +2475,11 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpparameterestimation]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:ParameterEstimation}
+  \hyperref[coilcoolingwatertoairheatpumpparameterestimation]{Coil:Cooling:WaterToAirHeatPump:ParameterEstimation}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:EquationFit}
+  \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}
 \item
-  \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
+  \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{Coil:Cooling:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-5}
@@ -2553,7 +2553,7 @@ This numeric field defines the outdoor air dry-bulb temperature in degrees Celsi
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature Sensor Node Name}\label{field-outdoor-dry-bulb-temperature-sensor-node-name-1}
 
-This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{\hyperref[outdoorairnode]{OutdoorAir:Node}List} object where the outdoor temperature is taken directly from the weather data.
+This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor temperature is taken directly from the weather data.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-6}
 
@@ -2590,7 +2590,7 @@ This alpha input field contains the type of dehumidification control. The follow
 
 \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. The excess cooling beyond the cooling set point temperature is offset by the supplemental heating coil.
 
-The default is \textbf{None}. For \textbf{CoolReheat} dehumidification control modes, the maximum humidity setpoint is required. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in WaterToAir HeatPumps. When dehumidification control is active the heating and the reheat load due to extra dehumidification are met with supplemetal heating coil. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to~ extra dehumidification. The dehumidification control type CoolReheat works only with \hyperref[coilcoolingwatertoairheatpumpequationfit]{\hyperref[coilcoolingwater]{Coil:Cooling:Water}ToAirHeatPump:EquationFit} cooling coil type.
+The default is \textbf{None}. For \textbf{CoolReheat} dehumidification control modes, the maximum humidity setpoint is required. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in WaterToAir HeatPumps. When dehumidification control is active the heating and the reheat load due to extra dehumidification are met with supplemetal heating coil. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to~ extra dehumidification. The dehumidification control type CoolReheat works only with \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} cooling coil type.
 
 \paragraph{Field: Heat Pump Coil Water Flow Mode}\label{field-heat-pump-coil-water-flow-mode-000}
 

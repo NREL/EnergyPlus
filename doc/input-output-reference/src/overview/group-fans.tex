@@ -927,13 +927,13 @@ If no duct static pressure reset scheme is used and the duct static pressure set
 
 \paragraph{Field: Normalized Fan Static Efficiency Curve Name Non-Stall Region}\label{field-normalized-fan-static-efficiency-curve-name-non-stall-region}
 
-The required alpha name of the exponential-modified skew normal performance curve (ref: \hyperref[curveexponentialskewnormal]{\hyperref[curveexponent]{Curve:Exponent}ialSkewNormal} in Performance Curves) that parameterizes the normalized fan static efficiency (\(\eta_{\rm{fan}}(x_{\rm{fan}}) / \eta_{\rm{fan, max}}\)) at each time step for the normal operating (non-stall) region of the fan performance map as a function of \(x_{\rm{fan}}\), which is defined as log-base-10 of Eu at the fan flow and pressure rise operating point divided by Eu at maximum fan static efficiency \([log_{10}(Eu / Eu_{\rm{max}})]\). In this region, \(x_{\rm{fan}} \le 0\).
+The required alpha name of the exponential-modified skew normal performance curve (ref: \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal} in Performance Curves) that parameterizes the normalized fan static efficiency (\(\eta_{\rm{fan}}(x_{\rm{fan}}) / \eta_{\rm{fan, max}}\)) at each time step for the normal operating (non-stall) region of the fan performance map as a function of \(x_{\rm{fan}}\), which is defined as log-base-10 of Eu at the fan flow and pressure rise operating point divided by Eu at maximum fan static efficiency \([log_{10}(Eu / Eu_{\rm{max}})]\). In this region, \(x_{\rm{fan}} \le 0\).
 
 The output of this curve is used to calculate the fan efficiency \(\eta_{\rm{fan}} (x_{\rm{fan}})\) at each time step by modifying \(\eta_{\rm{fan, max}}\) (see \emph{Maximum Fan Static Efficiency} field). This curve should have a maximum of 1.0 and should be valid for the range of volumetric flows and fan pressure rises anticipated for the simulation period.
 
 \paragraph{Field: Normalized Fan Static Efficiency Curve Name Stall Region}\label{field-normalized-fan-static-efficiency-curve-name-stall-region}
 
-The required alpha name of the exponential-modified skew normal performance curve (ref: \hyperref[curveexponentialskewnormal]{\hyperref[curveexponent]{Curve:Exponent}ialSkewNormal} in Performance Curves) that parameterizes the normalized fan static efficiency (\(\eta_{\rm{fan}} (x_{\rm{fan}}) / \eta_{\rm{fan, max}}\)) at each time step for the stall region of the fan performance map as a function of \(x_{\rm{fan}}\) (see \emph{Normalized Fan Static Efficiency Curve Name Non-Stall Region} field). In this region, \(x_{\rm{fan}} > 0\).
+The required alpha name of the exponential-modified skew normal performance curve (ref: \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal} in Performance Curves) that parameterizes the normalized fan static efficiency (\(\eta_{\rm{fan}} (x_{\rm{fan}}) / \eta_{\rm{fan, max}}\)) at each time step for the stall region of the fan performance map as a function of \(x_{\rm{fan}}\) (see \emph{Normalized Fan Static Efficiency Curve Name Non-Stall Region} field). In this region, \(x_{\rm{fan}} > 0\).
 
 The output of this curve is used to calculate the fan efficiency \(\eta_{\rm{fan}} ( x_{\rm{fan}} )\) at each time step by modifying \(\eta_{\rm{fan, max}}\) (see \emph{Maximum Fan Static Efficiency} field). This curve should have a maximum of 1.0 and should be valid for the range of volumetric flows and fan pressure rises anticipated for the simulation period.
 
@@ -979,7 +979,7 @@ If this field is left blank, the model assumes that the output of the modifier c
 
 \paragraph{Field: Normalized Belt Efficiency Curve Name Region 2}\label{field-normalized-belt-efficiency-curve-name-region-2}
 
-The alpha name of the exponential decay performance curve (ref: \hyperref[curveexponentialdecay]{\hyperref[curveexponent]{Curve:Exponent}ialDecay} in Performance Curves) that determines the normalized (part-load) fan drive belt efficiency (\(\eta_{\rm{belt}} (x_{\rm{belt}}) / \eta_{\rm{belt, max}}\)) as a function of \(x_{\rm{belt}}\). Normalized belt efficiency is represented by a segmented curve with three different regions. The curve for Region 2 (\(x_{\rm{belt, trans}} \le x_{\rm{belt}} \le 1\)) is:
+The alpha name of the exponential decay performance curve (ref: \hyperref[curveexponentialdecay]{Curve:ExponentialDecay} in Performance Curves) that determines the normalized (part-load) fan drive belt efficiency (\(\eta_{\rm{belt}} (x_{\rm{belt}}) / \eta_{\rm{belt, max}}\)) as a function of \(x_{\rm{belt}}\). Normalized belt efficiency is represented by a segmented curve with three different regions. The curve for Region 2 (\(x_{\rm{belt, trans}} \le x_{\rm{belt}} \le 1\)) is:
 
 \begin{equation}
   \eta_{\rm{belt}} (x_{\rm{belt}}) / \eta_{\rm{belt, max}} = C_1 + C_2 \cdot exp(C_3 \cdot x_{\rm{belt}})
