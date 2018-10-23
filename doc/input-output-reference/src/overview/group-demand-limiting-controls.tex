@@ -15,7 +15,7 @@ Demand limiting controls shut off or reduce the power to non-essential loads in 
   turn on generators to meet some or all of the building's demand.
 \end{itemize}
 
-The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only \hyperref[exteriorlights]{Exterior:Lights}, Lights, \hyperref[electricequipment]{ElectricEquipment}, \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat}, and \hyperref[controlleroutdoorair]{Controller:OutdoorAir} objects can be demand limited. Additional components will be demand limited in future releases.
+The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only \hyperref[exteriorlights]{Exterior:Lights}, \hyperref[lights-000]{Lights}, \hyperref[electricequipment]{ElectricEquipment}, \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat}, and \hyperref[controlleroutdoorair]{Controller:OutdoorAir} objects can be demand limited. Additional components will be demand limited in future releases.
 
 \subsection{DemandManagerAssignmentList}\label{demandmanagerassignmentlist}
 
@@ -284,11 +284,11 @@ If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Select
 
 \paragraph{Field: Lights 1-10 Name}\label{field-lights-1-10-name}
 
-The names of Lights objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
+The names of \hyperref[lights-000]{Lights} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.
 
 Ten objects are accomodated in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
 
-If a global lights statement is used (Ref: Lights), then only that name need be entered and the demand limiting will be applied to all the zones for that lighting. If only one of a set of zones from a global lights statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of Lights Global Object\textgreater{}.
+If a global lights statement is used (Ref: \hyperref[lights-000]{Lights}), then only that name need be entered and the demand limiting will be applied to all the zones for that lighting. If only one of a set of zones from a global lights statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of \hyperref[lights-000]{Lights} Global Object\textgreater{}.
 
 An example IDF showing how this object is used is provided below:
 

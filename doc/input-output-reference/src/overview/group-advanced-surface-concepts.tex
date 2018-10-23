@@ -229,7 +229,7 @@ This field refers the movable insulation back to a particular surface (ref: Buil
 
 \subsubsection{Field: Material Name}\label{field-material-name}
 
-This field refers to a material layer (e.g., Material, \hyperref[materialnomass]{Material:NoMass}, or \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.  Note that for non-glazing materials the solar absorptivity of the layer will be used directly in the calculations.  For glazing material layers, the solar absorptivity will be calculated by subtracting both the transmissivity and the front side reflectivity from unity for the material.
+This field refers to a material layer (e.g., \hyperref[material]{Material}, \hyperref[materialnomass]{Material:NoMass}, or \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.  Note that for non-glazing materials the solar absorptivity of the layer will be used directly in the calculations.  For glazing material layers, the solar absorptivity will be calculated by subtracting both the transmissivity and the front side reflectivity from unity for the material.
 
 \subsubsection{Field: Schedule Name}\label{field-schedule-name}
 
@@ -643,8 +643,8 @@ of Foundation:Kiva objects. These components include:
 
 \subsubsection{Example IDF}\label{example-idf}
 
-\begin{verbatim}
-\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed},
+\begin{lstlisting}
+BuildingSurface:Detailed,
   Slab Floor,         !- Name
   Floor,              !- Surface Type
   Slab Construction,  !- Construction Name
@@ -701,7 +701,7 @@ Material,
 Construction,
   Slab Footing Construction, !- Name
   Concrete;                  !- Outside Layer Name
-\end{verbatim}
+\end{lstlisting}
 
 \subsubsection{Inputs}
 
