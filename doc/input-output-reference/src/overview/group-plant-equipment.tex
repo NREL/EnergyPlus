@@ -5477,7 +5477,7 @@ The following four items are repeated up to a maximum of 20 individual chiller-h
 
 \paragraph{Field: Chiller Heater Module Performance Component Object Type \textless{}x\textgreater{}}\label{field-chiller-heater-module-performance-component-object-type-x}
 
-This alpha field describes the type of the chiller-heater comprising this module set. Only the chiller-heater type ChillerHeaterPerformance:EIectric:EIR is currently available. Note that up to 20 sets of chiller-heater module name, schedule, and number of identical chiller-heater may be entered for a single central heat pump system.
+This alpha field describes the type of the chiller-heater comprising this module set. Only the chiller-heater type ChillerHeaterPerformance:Electric:EIR is currently available. Note that up to 20 sets of chiller-heater module name, schedule, and number of identical chiller-heater may be entered for a single central heat pump system.
 
 \paragraph{Field: Chiller Heater Module Performance Component Name \textless{}x\textgreater{}}\label{field-chiller-heater-module-performance-component-name-x}
 
@@ -5613,7 +5613,7 @@ These outputs are the hot water inlet and outlet temperatures and flow rate.
 
 These outputs are the source water inlet and outlet temperatures and flow rate.
 
-\subsection{ChillerHeaterPerformance:EIectric:EIR}\label{chillerheaterperformanceeiectriceir}
+\subsection{ChillerHeaterPerformance:Electric:EIR}\label{chillerheaterperformancelectriceir}
 
 The performance of the chiller-heater will be defined by two sets of curves meant to describe unloading for: 1) cooling-only mode, and 2) heating-only mode or simultaneous cooling-heating mode. Reference conditions must be defined for both because each has its own set of three unloading curves based on their associated reference conditions. The cooling-mode curves are typically (but not always) based on condenser entering water temperature while the heating-only mode curves are typically based on condenser leaving water temperature. This chiller-heater object allows the user to specify whether to use condenser leaving or condenser entering as a dependent variable to differentiate, if necessary, the condenser temperature basis used to generate the cooling- and heating-only mode curves.
 

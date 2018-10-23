@@ -963,39 +963,36 @@ include all opaque surface output variables except:
   internal sources yet, but this is a possible future enhancement)
 \end{itemize}
 
-\subsection{Foundation:Kiva:Settings}
+\subsection{Foundation:Kiva:Settings}\label{foundation-kiva-settings}
 
 This object defines settings applied across all Kiva foundation
 calculations. This object is not required. If it is not defined, all
 defaults will be applied.
 
-\subsubsection{Inputs}
+\subsubsection{Inputs}\label{foundation-kiva-settings-inputs}
 
-\paragraph{Field: Soil Conductivity}
+\paragraph{Field: Soil Conductivity}\label{foundation-kiva-settings-soil-conductivity}
 
 The thermal conductivity of the soil, in W/m-K. Default: 1.73 W/m-K.
 
-\paragraph{Field: Soil Density}
+\paragraph{Field: Soil Density}\label{foundation-kiva-settings-soil-density}
 
 The bulk density of the soil, in kg/m3. Default: 1842 kg/m3.
 
-\paragraph{Field: Soil Specific Heat}
+\paragraph{Field: Soil Specific Heat}\label{foundation-kiva-settings-soil-specific-heater}
 
 The specific heat of the soil, in J/kg-K. Default: 419 J/kg-K
 
-\paragraph{Field: Ground Solar
-Absorptivity}
+\paragraph{Field: Ground Solar Absorptivity}\label{foundation-kiva-settings-ground-solar-absorptivity}
 
 Solar absorptivity of the exterior grade surface. Default: 0.9.
 
-\paragraph{Field: Ground Thermal
-Absorptivity}
+\paragraph{Field: Ground Thermal Absorptivity}\label{foundation-kiva-settings-ground-thermal-absorptivity}
 
 Long-wave absorptivity (emissivity) of the exterior grade surface.
 Default: 0.9.
 
-\paragraph{Field: Ground Surface
-Roughness}
+\paragraph{Field: Ground Surface Roughness}\label{foundation-kiva-settings-ground-thermal-roughness}
 
 The relief roughness of the exterior ground surface in m. Default: 0.03
 m.
@@ -1023,7 +1020,7 @@ Grass & 0.030 \tabularnewline
 \bottomrule
 \end{longtable}
 
-\paragraph{Field: Far-Field Width}
+\paragraph{Field: Far-Field Width}\label{foundation-kiva-settings-far-field-width}
 
 The distance from the wall interior to the zero horizontal heat flux
 (i.e., adiabatic) far-field boundary, in m. This distance represents
@@ -1032,8 +1029,7 @@ foundation of a neighboring building, or a distance adequately far from
 the foundation such that it is isolated from the effects of the boundary
 (typically \textgreater{}= 40 m). Default: 40 m.
 
-\paragraph{Field: Deep-Ground Boundary
-Condition}
+\paragraph{Field: Deep-Ground Boundary Condition}\label{foundation-kiva-settings-deep-ground-boundary-condition}
 
 Defines the type of boundary condition to apply at the Deep-Ground
 Depth. Options are:
@@ -1064,7 +1060,7 @@ is applied at 1 m below the lowest element.
 
 Default: Autoselect.
 
-\paragraph{Field: Deep-Ground Depth}
+\paragraph{Field: Deep-Ground Depth}\label{foundation-kiva-settings-deep-ground-depth}
 
 The distance from the exterior grade to the deep ground boundary, in m.
 This distance represents either the distance to the ground water level,
@@ -1073,26 +1069,24 @@ isolated from the effects of the boundary (typically \textgreater{}= 40
 m). Default 40 m, or the distance determined by the ``Auto'' Deep-Ground
 Boundary Condition.
 
-\paragraph{Field: Minimum Cell
-Dimension}
+\paragraph{Field: Minimum Cell Dimension}\label{foundation-kiva-settings-minimum-cell-dimension}
 
 The minimum cell dimension, in m, used in the Kiva discretization.
 Default: 0.02 m.
 
-\paragraph{Field: Maximum Cell Growth
-Coefficient}
+\paragraph{Field: Maximum Cell Growth Coefficient}\label{foundation-kiva-settings-maximum-cell-growth-coefficient}
 
 The maximum ratio of growth between neighboring cells in the direction
 away from the near-field area of interest. Default: 1.50.
 
-\paragraph{Field: Simulation Timestep}
+\paragraph{Field: Simulation Timestep}\label{foundation-kiva-settings-simulation-timestep}
 
 This field allows the user to choose whether to calculate foundation
 loads on the zone timestep or at hourly intervals. Hourly intervals will
 allow for less overall computation time, but with less accuracy. Choices
 are ``Hourly'' and ``Timestep''. Default: Hourly
 
-\subsection{SurfaceProperty:ExposedFoundationPerimeter}
+\subsection{SurfaceProperty:ExposedFoundationPerimeter}\label{surfaceproperty-exposedfoundationperimeter}
 
 This object (currently only used in conjunction with Foundation:Kiva
 boundary conditions) defines the perimeter of a foundation floor that is
@@ -1124,9 +1118,9 @@ interior foundation wall using an Adiabatic Outside Boundary Condition.
 \caption{Interior foundation wall\label{fig:ifw}}
 \end{figure}
 
-\subsubsection{Inputs}
+\subsubsection{Inputs}\label{surfaceproperty-exposedfoundationperimeter-inputs}
 
-\paragraph{Field: Surface Name}
+\paragraph{Field: Surface Name}\label{surfaceproperty-exposedfoundationperimeter-surface-name}
 
 Name of foundation floor surface.
 
@@ -1143,18 +1137,15 @@ Required key/choice field that tells which method to use to calculate the expose
 Exposed fields should be filled.)
 \end{itemize}
 
-\paragraph{Field: Total Exposed
-Perimeter}
+\paragraph{Field: Total Exposed Perimeter}\label{surfaceproperty-exposedfoundationperimeter-total-exposed-perimeter}
 
 Total perimeter that is is exposed in m.
 
-\paragraph{Field: Exposed Perimeter
-Fraction}
+\paragraph{Field: Exposed Perimeter Fraction}\label{surfaceproperty-exposedfoundationperimeter-exposed-perimeter-fraction}
 
 Fraction of the total perimeter that is exposed. Default 1.0
 
-\paragraph{Field: Surface Segment \textless{}x\textgreater{}
-Exposed}
+\paragraph{Field: Surface Segment \textless{}x\textgreater{} Exposed}\label{surfaceproperty-exposedfoundationperimeter-surface-segment-x-exposed}
 
 Surface Segment \textless{}x\textgreater{} is the perimeter between the
 \textless{}x\textgreater{}th and (\textless{}x\textgreater{}+1)th
