@@ -8,7 +8,7 @@ Several items are used to specify what will appear in the output file(s). The ou
 
 One of the most important outputs for EnergyPlus is the Variable Dictionary reports -- these contain the key variable names for each simulation. This single input object is used to produce two important reports that are used to identify the specific output variables and meters available for a specific EnergyPlus model.~ Two output files are produced (\textbf{eplusout.rdd \& eplusout.mdd}) that list the names of the output variables and meters for that simulation.~ You may need to run your simulation once and produce these files before you ask for specific output variables (\textbf{rdd}) or meters (\textbf{mdd}) (see Output:Variable and Output:Meter objects). Variables available, to some extent, depend on the simulation input. Variables are ``set up'' during the initial ``get input'' processing done within the modules. Therefore, an item that is specific to a certain type of coil would not be available if that coil were not used during the simulation. This command will produce a list of variables available for reporting.
 
-\subsection{Output:VariableDictionary}
+\subsection{Output:VariableDictionary}\label{output-variabledictionary}
 
 \subsubsection{Inputs}
 
