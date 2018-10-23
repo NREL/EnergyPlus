@@ -1251,7 +1251,7 @@ This alpha field contains the name of the specific water heater tank used by thi
 
 \paragraph{Field: Tank Use Side Inlet Node Name}\label{field-tank-use-side-inlet-node-name}
 
-This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. \hyperref[waterheatermixed]{\listinline!WaterHeater:Mixed!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:PumpedCondenser! object (see branch object example below).
+This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:PumpedCondenser! object (see branch object example below).
 
 \paragraph{Field: Tank Use Side Outlet Node Name}\label{field-tank-use-side-outlet-node-name}
 
@@ -1520,13 +1520,13 @@ To model a wrapped condenser heat pump water, the input data file must include s
 \item
   \hyperref[coilwaterheatingairtowaterheatpumpwrapped]{\lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped!} (required)
 \item
-  \hyperref[fansystemmodel]{Fan:SystemModel!} or \hyperref[fanonoff]{\listinline!Fan:OnOff!} (required)
+  \hyperref[fansystemmodel]{Fan:SystemModel!} or \hyperref[fanonoff]{\lstinline!Fan:OnOff!} (required)
 \item
-  \hyperref[zonehvacequipmentlist]{\listinline!ZoneHVAC:EquipmentList!} (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
+  \hyperref[zonehvacequipmentlist]{\lstinline!ZoneHVAC:EquipmentList!} (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
 \item
-  \hyperref[zonehvacequipmentconnections]{\listinline!ZoneHVAC:EquipmentConnections!} (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
+  \hyperref[zonehvacequipmentconnections]{\lstinline!ZoneHVAC:EquipmentConnections!} (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
 \item
-  \hyperref[outdoorairnodelist]{\listinline!OutdoorAir:NodeList!} (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
+  \hyperref[outdoorairnodelist]{\lstinline!OutdoorAir:NodeList!} (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
 \end{itemize}
 
 The input fields for the compound object are described in detail below:
@@ -1601,15 +1601,15 @@ This alpha (choice) field contains the type of water heater tank used by this he
 
 \paragraph{Field: Tank Name}\label{field-tank-name-1}
 
-This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type \hyperref[waterheaterstratified]{\listinline!WaterHeater:Stratified!}.
+This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}.
 
 \paragraph{Field: Tank Use Side Inlet Node Name}\label{field-tank-use-side-inlet-node-name-1}
 
-This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. \hyperref[waterheaterstratified]{\listinline!WaterHeater:Stratified!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:WrappedCondenser! object (see branch object example below).
+This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:WrappedCondenser! object (see branch object example below).
 
 \paragraph{Field: Tank Use Side Outlet Node Name}\label{field-tank-use-side-outlet-node-name-1}
 
-This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. \hyperref[waterheaterstratified]{\listinline!WaterHeater:Stratified!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:WrappedCondenser! object (see branch object example below).
+This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a \lstinline!WaterHeater:HeatPump:WrappedCondenser! object (see branch object example below).
 
 \paragraph{Field: DX Coil Object Type}\label{field-dx-coil-object-type-1}
 
@@ -1617,7 +1617,7 @@ This alpha (choice) field contains the type of DX coil used by this heat pump wa
 
 \paragraph{Field: DX Coil Name}\label{field-dx-coil-name-1}
 
-This alpha field contains the name of the specific DX coil (\hyperref[coilwaterheatingairtowaterheatpumpwrapped]{\listinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped!}) used by this heat pump water heater.
+This alpha field contains the name of the specific DX coil (\hyperref[coilwaterheatingairtowaterheatpumpwrapped]{\lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped!}) used by this heat pump water heater.
 
 \paragraph{Field: Minimum Inlet Air Temperature for Compressor Operation}\label{field-minimum-inlet-air-temperature-for-compressor-operation-1}
 
@@ -1637,7 +1637,7 @@ This alpha (choice) field contains the type of fan used by this heat pump water 
 
 \paragraph{Field: Fan Name}\label{field-fan-name-1-000}
 
-This alpha field contains the name of the specific fan (\hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanonoff]{\listinline!Fan:OnOff!} object) used by this heat pump water heater.
+This alpha field contains the name of the specific fan (\hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanonoff]{\lstinline!Fan:OnOff!} object) used by this heat pump water heater.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-1-000}
 
@@ -1681,7 +1681,7 @@ This alpha field defines settings for the control logic of when to run the tank 
 
 \paragraph{Field: Control Sensor 1 Height In Stratified Tank}\label{field-control-sensor-1-height-in-stratified-tank-1}
 
-This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is \hyperref[waterheaterstratified]{\listinline!WaterHeater:Stratified!}.~ The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.~ This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
+This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}.~ The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.~ This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
 
 \paragraph{Field: Control Sensor 1 Weight}\label{field-control-sensor-1-weight-1}
 
@@ -1689,7 +1689,7 @@ The model can optionally use two control sensor locations in stratified tanks. W
 
 \paragraph{Field: Control Sensor 2 Height in Stratified Tank}\label{field-control-sensor-2-height-in-stratified-tank-1}
 
-This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is \hyperref[waterheaterstratified]{\listinline!WaterHeater:Stratified!}. If omitted, this defaults to the height of Heater2.
+This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}. If omitted, this defaults to the height of Heater2.
 
 Following is an example input for the \lstinline!WaterHeater:HeatPump:WrappedCondenser! compound object and the other required component objects that it references.
 
