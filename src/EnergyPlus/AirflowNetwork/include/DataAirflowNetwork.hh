@@ -471,6 +471,7 @@ namespace AirflowNetwork {
         {
         }
 
+        /*
         template <typename NODE>
         int calculate(bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
@@ -606,6 +607,7 @@ namespace AirflowNetwork {
             }
             return 1;
         }
+        */
     };
 
     struct SurfaceEffectiveLeakageArea // Surface effective leakage area component
