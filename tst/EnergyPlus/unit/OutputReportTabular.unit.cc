@@ -78,7 +78,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/DataOutputs.hh>
-
+#include <EnergyPlus/ThermalComfort.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
@@ -7371,15 +7371,75 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_AddNeededOutputVa
 
     ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
+    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
+    UpdateTabularReports(OutputReportTabular::stepTypeHVAC);
+
     // InputProcessor::addVariablesForMonthlyReport should have requested 5 variables
     // for the SetpointsNotMetWithTemperatureMonthly report
     EXPECT_EQ(DataOutputs::OutputVariablesForSimulation.size(), 5u);
-    EXPECT_EQ(OutputProcessor::NumOfReqVariables, 5);
+
+    // 10 Variables, because two zones * 5 per zone
+    EXPECT_EQ(2, inputProcessor->getNumObjectsFound("Output:Variable"));
+    EXPECT_EQ(OutputProcessor::NumOfReqVariables, 2*5);
 
     // Work around to output the content of the array while running the test
     for (int i=1; i<= OutputProcessor::NumOfReqVariables; ++i) {
         EXPECT_TRUE(false) << ": i = " << i << ", " << OutputProcessor::ReqRepVars(i).VarName << std::endl;
     }
+
+    EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
+    EXPECT_EQ(OutputReportTabular::MonthlyInput(1).numTables, 1);
+
+    // Trick it into thinking it's an annual sim, to check the reporting portion
+    // DataGlobals::DoWeathSim = true;
+
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_AddNeededOutputVars_Simple) {
+
+    std::string const idf_objects = delimited_string({
+        "Output:Table:SummaryReports,",
+        " SetpointsNotMetWithTemperaturesMonthly; !- Report 1 Name",
+
+        "Zone,",
+        "  Space,                   !- Name",
+        "  0.0000,                  !- Direction of Relative North {deg}",
+        "  0.0000,                  !- X Origin {m}",
+        "  0.0000,                  !- Y Origin {m}",
+        "  0.0000,                  !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  2.4,                     !- Ceiling Height {m}",
+        "  ,                        !- Volume {m3}",
+        "  autocalculate,           !- Floor Area {m2}",
+        "  ,                        !- Zone Inside Convection Algorithm",
+        "  ,                        !- Zone Outside Convection Algorithm",
+        "  Yes;                     !- Part of Total Floor Area",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_EQ(1, inputProcessor->getNumObjectsFound("Output:Table:SummaryReports"));
+    EXPECT_EQ(0, inputProcessor->getNumObjectsFound("Output:Variable"));
+
+    EXPECT_EQ(DataOutputs::OutputVariablesForSimulation.size(), 5u);
+
+    ThermalComfort::InitThermalComfort();
+
+    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
+
+    OutputProcessor::GetReportVariableInput();
+    OutputReportTabular::GetInputOutputTableSummaryReports();
+    OutputReportTabular::InitializeTabularMonthly();
+
+    //UpdateTabularReports(OutputReportTabular::stepTypeHVAC);
+
+    // InputProcessor::addVariablesForMonthlyReport should have requested 5 variables
+    // for the SetpointsNotMetWithTemperatureMonthly report
+    EXPECT_EQ(DataOutputs::OutputVariablesForSimulation.size(), 5u);
+    EXPECT_EQ(OutputProcessor::NumOfReqVariables, 5);
 
     EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
     EXPECT_EQ(OutputReportTabular::MonthlyInput(1).numTables, 1);
