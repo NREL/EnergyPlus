@@ -1886,13 +1886,15 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
     } else {
         vnameLen = len_trim(VariableName.substr(0, rbpos));
     }
-    std::string const VarName(VariableName.substr(0, vnameLen));
+    // Always make everything upper case
+    std::string const VarName(UtilityRoutines::MakeUPPERCase(VariableName.substr(0, vnameLen)));
 
     auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
     if (found == DataOutputs::OutputVariablesForSimulation.end()) {
         std::unordered_map<std::string, DataOutputs::OutputReportingVariables> data;
         data.reserve(32);
-        data.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
+        std::string const KeyValueUpper(UtilityRoutines::MakeUPPERCase(KeyValue));
+        data.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValueUpper, VarName));
         DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));
     } else {
         found->second.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
