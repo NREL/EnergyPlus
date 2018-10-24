@@ -94,6 +94,7 @@ namespace DataOutputs {
         std::unique_ptr<RE2> pattern;
         std::unique_ptr<RE2> case_insensitive_pattern;
     };
+    // Outer map has a Key of Variable Name, and value is inner map of Key=KeyValue, Value=struct OutputReportingVariables
     extern std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables>> OutputVariablesForSimulation;
 
     // Functions
