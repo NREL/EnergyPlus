@@ -864,8 +864,7 @@ namespace OutputProcessor {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int iOuputVariable;
-        int iReqVariable = 1;
+        int Loop;
         int NumAlpha;
         int NumNumbers;
         int IOStat;
@@ -896,37 +895,13 @@ namespace OutputProcessor {
         }
 
         cCurrentModuleObject = "Output:Variable";
-
-        // We also add the ones that are requested when A Predefined Monthly Report is asked for
-        NumOfReqVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject) + DataOutputs::NumConsideredOutputVariables;
-
+        NumOfReqVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         ReqRepVars.allocate(NumOfReqVariables);
 
-        for (auto& it: DataOutputs::OutputVariablesForSimulation) {
-            for (auto& it2: it.second) {
-                ReqRepVars(iReqVariable).Key = it2.second.key;
-                if (ReqRepVars(iReqVariable).Key == "*") {
-                    ReqRepVars(iReqVariable).Key = BlankString;
-                }
-                ReqRepVars(iReqVariable).VarName = it2.second.variableName;
+        for (Loop = 1; Loop <= NumOfReqVariables; ++Loop) {
 
-                // These are monthly tables, so ask monthly
-                ReqRepVars(iReqVariable).frequency = ReportingFrequency::Monthly;
-
-                // No Schedule
-                ReqRepVars(iReqVariable).SchedPtr = 0;
-                ReqRepVars(iReqVariable).Used = false;
-                ++iReqVariable;
-            }
-        }
-
-        std::cout << "DataOutputs::NumConsideredOutputVariables=" << DataOutputs::NumConsideredOutputVariables
-                  << ", iReqVariable=" << iReqVariable << ", Actual IDF Vars=" << inputProcessor->getNumObjectsFound(cCurrentModuleObject)
-                  << ", NumOfReqVariables=" << NumOfReqVariables;
-
-        for (iOuputVariable = 1; iOuputVariable <= inputProcessor->getNumObjectsFound(cCurrentModuleObject); ++iOuputVariable) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
-                                          iOuputVariable,
+                                          Loop,
                                           cAlphaArgs,
                                           NumAlpha,
                                           rNumericArgs,
@@ -939,35 +914,33 @@ namespace OutputProcessor {
 
             // Check for duplicates?
 
-            ReqRepVars(iReqVariable).Key = cAlphaArgs(1);
-            if (ReqRepVars(iReqVariable).Key == "*") {
-                ReqRepVars(iReqVariable).Key = BlankString;
+            ReqRepVars(Loop).Key = cAlphaArgs(1);
+            if (ReqRepVars(Loop).Key == "*") {
+                ReqRepVars(Loop).Key = BlankString;
             }
 
             std::string::size_type const lbpos = index(cAlphaArgs(2), '['); // Remove Units designation if user put it in
             if (lbpos != std::string::npos) {
                 cAlphaArgs(2).erase(lbpos);
             }
-            ReqRepVars(iReqVariable).VarName = cAlphaArgs(2);
+            ReqRepVars(Loop).VarName = cAlphaArgs(2);
 
-            ReqRepVars(iReqVariable).frequency = determineFrequency(cAlphaArgs(3));
+            ReqRepVars(Loop).frequency = determineFrequency(cAlphaArgs(3));
 
             // Schedule information
-            ReqRepVars(iReqVariable).SchedName = cAlphaArgs(4);
-            if (not_blank(ReqRepVars(iReqVariable).SchedName)) {
-                ReqRepVars(iReqVariable).SchedPtr = GetScheduleIndex(ReqRepVars(iReqVariable).SchedName);
-                if (ReqRepVars(iReqVariable).SchedPtr == 0) {
-                    ShowSevereError("GetReportVariableInput: " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ':' + ReqRepVars(iReqVariable).VarName +
-                                    "\" invalid " + cAlphaFieldNames(4) + "=\"" + ReqRepVars(iReqVariable).SchedName + "\" - not found.");
+            ReqRepVars(Loop).SchedName = cAlphaArgs(4);
+            if (not_blank(ReqRepVars(Loop).SchedName)) {
+                ReqRepVars(Loop).SchedPtr = GetScheduleIndex(ReqRepVars(Loop).SchedName);
+                if (ReqRepVars(Loop).SchedPtr == 0) {
+                    ShowSevereError("GetReportVariableInput: " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ':' + ReqRepVars(Loop).VarName +
+                                    "\" invalid " + cAlphaFieldNames(4) + "=\"" + ReqRepVars(Loop).SchedName + "\" - not found.");
                     ErrorsFound = true;
                 }
             } else {
-                ReqRepVars(iReqVariable).SchedPtr = 0;
+                ReqRepVars(Loop).SchedPtr = 0;
             }
 
-            ReqRepVars(iReqVariable).Used = false;
-
-            ++iReqVariable;
+            ReqRepVars(Loop).Used = false;
         }
 
         if (ErrorsFound) {
