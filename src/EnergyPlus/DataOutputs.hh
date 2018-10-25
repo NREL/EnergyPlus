@@ -58,6 +58,7 @@
 #include <cstddef>
 #include <unordered_map>
 #include <vector>
+#include "UtilityRoutines.hh"
 
 namespace EnergyPlus {
 
@@ -94,8 +95,33 @@ namespace DataOutputs {
         std::unique_ptr<RE2> pattern;
         std::unique_ptr<RE2> case_insensitive_pattern;
     };
+
+    // Two structs to have a case insensitive unordered_map. We need to have a case insenstive hasher and a case insensitive comparator
+    // (The default allocator for unordered_map is fine)
+    struct case_insensitive_hasher
+    {
+        size_t operator()(const std::string& key) const noexcept
+        {
+            std::string keyCopy = UtilityRoutines::MakeUPPERCase(key);
+            return std::hash<std::string>()(keyCopy);
+        }
+    };
+
+    struct case_insensitive_comparator
+    {
+        bool operator()(const std::string& a, const std::string& b) const noexcept
+        {
+            return UtilityRoutines::SameString(a, b);
+        }
+    };
+
     // Outer map has a Key of Variable Name, and value is inner map of Key=KeyValue, Value=struct OutputReportingVariables
-    extern std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables>> OutputVariablesForSimulation;
+    // All of the string are considered as case insenstive (If we search for "ZONE MEAN AIR TEMPERATURE" it would find "Zone Mean Air Temperature")
+    extern std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
+                                                              case_insensitive_hasher,
+                                                              case_insensitive_comparator>,
+                               case_insensitive_hasher,
+                               case_insensitive_comparator> OutputVariablesForSimulation;
 
     // Functions
 
@@ -103,6 +129,7 @@ namespace DataOutputs {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
+    // Check if a KeyValue/VariableName is inside the map OutputVariablesForSimulation
     bool FindItemInVariableList(std::string const &KeyedValue, std::string const &VariableName);
 
 } // namespace DataOutputs
