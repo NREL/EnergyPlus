@@ -5526,7 +5526,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
-    using DataOutputs::FindItemInVariableList;
     using General::TrimSigDigits;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5552,10 +5551,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     std::string VarName = VariableName;
     //  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
 
-    // Upper Versions
-    std::string VarNameUpper = UtilityRoutines::MakeUPPERCase(VarName);
-    std::string KeyedValueUpper(UtilityRoutines::MakeUPPERCase(KeyedValue));
-
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
 
@@ -5571,8 +5566,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         ReportList = 0;
     }
 
-    // DataOutputs::OutputVariablesForSimulation stores as upper case, so find with upper case too
-    ThisOneOnTheList = FindItemInVariableList(KeyedValueUpper, VarNameUpper);
+    // DataOutputs::OutputVariablesForSimulation is case-insensitive
+    ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
     OnMeter = false; // just a safety initialization
 
     for (Loop = 1; Loop <= NumExtraVars; ++Loop) {
@@ -5640,9 +5635,9 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         RVariableTypes(CV).storeType = VariableType;
         RVariableTypes(CV).VarName = KeyedValue + ':' + VarName;
         RVariableTypes(CV).VarNameOnly = VarName;
-        RVariableTypes(CV).VarNameOnlyUC = VarNameUpper;
+        RVariableTypes(CV).VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         RVariableTypes(CV).VarNameUC = UtilityRoutines::MakeUPPERCase(RVariableTypes(CV).VarName);
-        RVariableTypes(CV).KeyNameOnlyUC = KeyedValueUpper;
+        RVariableTypes(CV).KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
         RVariableTypes(CV).units = VariableUnit;
         if (VariableUnit == OutputProcessor::Unit::customEMS) {
             RVariableTypes(CV).unitNameCustomEMS = customUnitName;
@@ -5773,7 +5768,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
-    using DataOutputs::FindItemInVariableList;
     using General::TrimSigDigits;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5793,10 +5787,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     std::string VarName = VariableName;
     //  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
 
-    // Upper Versions
-    std::string VarNameUpper = UtilityRoutines::MakeUPPERCase(VarName);
-    std::string KeyedValueUpper(UtilityRoutines::MakeUPPERCase(KeyedValue));
-
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
 
@@ -5812,8 +5802,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         ReportList = 0;
     }
 
-    // DataOutputs::OutputVariablesForSimulation stores as upper case, so find with upper case too
-    ThisOneOnTheList = FindItemInVariableList(KeyedValueUpper, VarNameUpper);
+    // DataOutputs::OutputVariablesForSimulation is case-insentitive
+    ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
 
     for (Loop = 1; Loop <= NumExtraVars; ++Loop) {
 
