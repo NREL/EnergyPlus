@@ -162,7 +162,11 @@ namespace DataOutputs {
     int iTotalAutoCalculatableFields;    // number of fields that can be autocalculated
 
     // Object Data
-    std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables>> OutputVariablesForSimulation;
+    std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
+                                                      case_insensitive_hasher,
+                                                      case_insensitive_comparator>,
+                       case_insensitive_hasher,
+                       case_insensitive_comparator> OutputVariablesForSimulation;
     // Functions
 
     OutputReportingVariables::OutputReportingVariables(std::string const &KeyValue, std::string const &VariableName)
